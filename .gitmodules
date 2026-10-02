@@ -34,9 +34,9 @@
 [submodule "pthread-Win32"]
 	path = thirdparty/pthread-win32/src
 	url = https://github.com/GerHobbelt/pthread-win32.git
-[submodule "StormByte BuildMaster"]
+[submodule "BuildMaster"]
 	path = thirdparty/buildmaster
-	url = https://github.com/StormBytePP/StormByte-BuildMaster.git
+	url = https://github.com/StormByte-Suite/StormByte-BuildMaster.git
 [submodule "zlib"]
 	path = thirdparty/ffmpeg/plugins/compressors/zlib/src
 	url = https://github.com/madler/zlib.git
@@ -82,9 +82,9 @@
 [submodule "tessdata"]
 	path = thirdparty/ocr/tessdata/cmake-wrapper/src
 	url = https://github.com/tesseract-ocr/tessdata_fast.git
-[submodule "StormByte Buffer"]
+[submodule "StormByte Suite - Buffer"]
 	path = thirdparty/StormByte/buffer/src
-	url = https://github.com/StormBytePP/StormByte-Buffer.git
+	url = https://github.com/StormByte-Suite/StormByte-Buffer.git
 [submodule "ebur128"]
 	path = thirdparty/ebur128/src
 	url = https://github.com/jiixyj/libebur128.git
