@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project("StormByte C++ Library: Multimedia module"
 	VERSION 0.0.9999
 	DESCRIPTION "StormByte-Multimedia is a StormByte library module for parsing configuration files"
-	HOMEPAGE_URL "https://dev.stormbyte.org/StormByte-Multimedia"
+	HOMEPAGE_URL "https://suite.stormbyte.org/StormByte-Multimedia"
 )
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
