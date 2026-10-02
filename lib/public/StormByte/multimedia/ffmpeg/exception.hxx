@@ -40,117 +40,231 @@
 
 #include <StormByte/multimedia/exception.hxx>
 
+#include <string>
+#include <string_view>
+#include <utility>
+
 /**
- * @namespace StormByte::Multimedia::FFmpeg
- * @brief Private RAII wrappers over libav*.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia::FFmpeg {
+namespace StormByte {
 	/**
-	 * @class Exception
-	 * @brief Base for FFmpeg backend errors.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public Multimedia::Exception {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::FFmpeg
+		 * @brief Private RAII wrappers over libav*.
+		 */
+		namespace FFmpeg {
 			/**
-			 * @brief Constructs a formatted AV exception.
-			 * @tparam Args Format argument types.
-			 * @param component Subsystem label (`BSF`, `Decoder`, `Encoder`).
-			 * @param fmt Format string.
-			 * @param args Format arguments.
+			 * @class Exception
+			 * @brief Base for FFmpeg backend errors.
 			 */
-			template <typename... Args>
-			Exception(const std::string& component, std::format_string<Args...> fmt, Args&&... args):
-			Multimedia::Exception("AV::" + component, fmt, std::forward<Args>(args)...) {}
+			class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public Multimedia::Exception {
+				public:
+					/**
+					 * @brief Constructs a formatted AV exception.
+					 * @tparam Args Format argument types.
+					 * @param component Subsystem label (`BSF`, `Decoder`, `Encoder`).
+					 * @param fmt Format string.
+					 * @param args Format arguments.
+					 */
+					template <typename... Args>
+					Exception(std::string_view component, std::format_string<Args...> fmt, Args&&... args):
+						Multimedia::Exception(
+							std::string{"AV."}.append(component), fmt, std::forward<Args>(args)...) {}
+
+					/**
+					 * @brief Constructs from a preformatted message (`Unexpected<E>(fmt, …)`).
+					 * @param message Already formatted text.
+					 */
+					explicit Exception(std::string_view message):
+						Multimedia::Exception("AV", "{}", message) {}
+
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					Exception(const Exception& other);
+
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					Exception(Exception&& other) noexcept;
+
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~Exception() noexcept override;
+
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					Exception& operator=(const Exception& other);
+
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					Exception& operator=(Exception&& other) noexcept;
+			};
 
 			/**
-			 * @brief Constructs from a preformatted message (`Unexpected<E>(fmt, …)`).
-			 * @param message Already formatted text.
+			 * @class BSFError
+			 * @brief Bitstream filter failure.
 			 */
-			explicit Exception(const std::string& message):
-			Multimedia::Exception("AV", "{}", message) {}
+			class STORMBYTE_MULTIMEDIA_PUBLIC BSFError: public Exception {
+				public:
+					/**
+					 * @brief Constructs a BSF error.
+					 * @tparam Args Format argument types.
+					 * @param fmt Format string.
+					 * @param args Format arguments.
+					 */
+					template <typename... Args>
+					BSFError(std::format_string<Args...> fmt, Args&&... args):
+						Exception("BSF", fmt, std::forward<Args>(args)...) {}
+
+					using Exception::Exception;
+
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					BSFError(const BSFError& other);
+
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					BSFError(BSFError&& other) noexcept;
+
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~BSFError() noexcept override;
+
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					BSFError& operator=(const BSFError& other);
+
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					BSFError& operator=(BSFError&& other) noexcept;
+			};
 
 			/**
-			 * @brief Copy constructor.
+			 * @class DecoderError
+			 * @brief Decoder open or process failure.
 			 */
-			Exception(const Exception&) = default;
+			class STORMBYTE_MULTIMEDIA_PUBLIC DecoderError: public Exception {
+				public:
+					/**
+					 * @brief Constructs a decoder error.
+					 * @tparam Args Format argument types.
+					 * @param fmt Format string.
+					 * @param args Format arguments.
+					 */
+					template <typename... Args>
+					DecoderError(std::format_string<Args...> fmt, Args&&... args):
+						Exception("Decoder", fmt, std::forward<Args>(args)...) {}
+
+					using Exception::Exception;
+
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					DecoderError(const DecoderError& other);
+
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					DecoderError(DecoderError&& other) noexcept;
+
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~DecoderError() noexcept override;
+
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					DecoderError& operator=(const DecoderError& other);
+
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					DecoderError& operator=(DecoderError&& other) noexcept;
+			};
 
 			/**
-			 * @brief Move constructor.
+			 * @class EncoderError
+			 * @brief Encoder open or process failure.
 			 */
-			Exception(Exception&&) noexcept = default;
+			class STORMBYTE_MULTIMEDIA_PUBLIC EncoderError: public Exception {
+				public:
+					/**
+					 * @brief Constructs an encoder error.
+					 * @tparam Args Format argument types.
+					 * @param fmt Format string.
+					 * @param args Format arguments.
+					 */
+					template <typename... Args>
+					EncoderError(std::format_string<Args...> fmt, Args&&... args):
+						Exception("Encoder", fmt, std::forward<Args>(args)...) {}
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Exception() noexcept override = default;
+					using Exception::Exception;
 
-			/**
-			 * @brief Copy assignment.
-			 * @return *this.
-			 */
-			Exception& operator=(const Exception&) = default;
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					EncoderError(const EncoderError& other);
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Exception& operator=(Exception&&) noexcept = default;
-	};
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					EncoderError(EncoderError&& other) noexcept;
 
-	/**
-	 * @class BSFError
-	 * @brief Bitstream filter failure.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC BSFError: public Exception {
-		public:
-			/**
-			 * @brief Constructs a BSF error.
-			 * @tparam Args Format argument types.
-			 * @param fmt Format string.
-			 * @param args Format arguments.
-			 */
-			template <typename... Args>
-			BSFError(std::format_string<Args...> fmt, Args&&... args):
-			Exception("BSF", fmt, std::forward<Args>(args)...) {}
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~EncoderError() noexcept override;
 
-			using Exception::Exception;
-	};
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					EncoderError& operator=(const EncoderError& other);
 
-	/**
-	 * @class DecoderError
-	 * @brief Decoder open or process failure.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC DecoderError: public Exception {
-		public:
-			/**
-			 * @brief Constructs a decoder error.
-			 * @tparam Args Format argument types.
-			 * @param fmt Format string.
-			 * @param args Format arguments.
-			 */
-			template <typename... Args>
-			DecoderError(std::format_string<Args...> fmt, Args&&... args):
-			Exception("Decoder", fmt, std::forward<Args>(args)...) {}
-
-			using Exception::Exception;
-	};
-
-	/**
-	 * @class EncoderError
-	 * @brief Encoder open or process failure.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC EncoderError: public Exception {
-		public:
-			/**
-			 * @brief Constructs an encoder error.
-			 * @tparam Args Format argument types.
-			 * @param fmt Format string.
-			 * @param args Format arguments.
-			 */
-			template <typename... Args>
-			EncoderError(std::format_string<Args...> fmt, Args&&... args):
-			Exception("Encoder", fmt, std::forward<Args>(args)...) {}
-
-			using Exception::Exception;
-	};
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					EncoderError& operator=(EncoderError&& other) noexcept;
+			};
+		}
+	}
 }

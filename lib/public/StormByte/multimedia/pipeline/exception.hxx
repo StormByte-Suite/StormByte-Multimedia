@@ -42,71 +42,81 @@
 #include <StormByte/multimedia/visibility.h>
 
 #include <format>
-#include <string>
+#include <string_view>
+#include <utility>
 
 /**
- * @namespace StormByte::Multimedia::Pipeline
- * @brief Demux / decode / filter / encode / mux types.
- *
- * @ingroup multimedia_pipeline
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia::Pipeline {
+namespace StormByte {
 	/**
-	 * @class PlanException
-	 * @brief Thrown when @ref Plan::Check finds a malformed plan.
-	 *
-	 * Formation only (missing origin track, type mismatch, empty
-	 * path). Not an FFmpeg or Step failure.
-	 *
-	 * @ingroup multimedia_pipeline
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC PlanException: public StormByte::Multimedia::Exception {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Pipeline
+		 * @brief Demux / decode / filter / encode / mux types.
+		 *
+		 * @ingroup multimedia_pipeline
+		 */
+		namespace Pipeline {
 			/**
-			 * @brief Constructs a formatted Plan exception.
-			 * @tparam Args Format argument types.
-			 * @param fmt Format string.
-			 * @param args Format arguments.
+			 * @class PlanException
+			 * @brief Thrown when @ref Plan::Check finds a malformed plan.
+			 *
+			 * Formation only (missing origin track, type mismatch, empty
+			 * path). Not an FFmpeg or Step failure.
+			 *
+			 * @ingroup multimedia_pipeline
 			 */
-			template<typename... Args>
-			PlanException(std::format_string<Args...> fmt, Args&&... args)
-			: StormByte::Multimedia::Exception("Plan", fmt, std::forward<Args>(args)...) {}
+			class STORMBYTE_MULTIMEDIA_PUBLIC PlanException: public StormByte::Multimedia::Exception {
+				public:
+					/**
+					 * @brief Constructs a formatted Plan exception.
+					 * @tparam Args Format argument types.
+					 * @param fmt Format string.
+					 * @param args Format arguments.
+					 */
+					template<typename... Args>
+					PlanException(std::format_string<Args...> fmt, Args&&... args):
+						StormByte::Multimedia::Exception("Plan", fmt, std::forward<Args>(args)...) {}
 
-			explicit PlanException(const std::string& message)
-			: StormByte::Multimedia::Exception("Plan", "{}", message) {}
+					explicit PlanException(std::string_view message):
+						StormByte::Multimedia::Exception("Plan", "{}", message) {}
 
-			explicit PlanException(std::string&& message)
-			: StormByte::Multimedia::Exception("Plan", "{}", message) {}
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					PlanException(const PlanException& other);
 
-			/**
-			 * @brief Copy constructor.
-			 * @param other Source exception.
-			 */
-			PlanException(const PlanException& other) = default;
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					PlanException(PlanException&& other) noexcept;
 
-			/**
-			 * @brief Move constructor.
-			 * @param other Exception to take.
-			 */
-			PlanException(PlanException&& other) noexcept = default;
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~PlanException() noexcept override;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~PlanException() noexcept override = default;
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					PlanException& operator=(const PlanException& other);
 
-			/**
-			 * @brief Copy assignment.
-			 * @param other Source exception.
-			 * @return *this.
-			 */
-			PlanException& operator=(const PlanException& other) = default;
-
-			/**
-			 * @brief Move assignment.
-			 * @param other Exception to take.
-			 * @return *this.
-			 */
-			PlanException& operator=(PlanException&& other) noexcept = default;
-	};
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					PlanException& operator=(PlanException&& other) noexcept;
+			};
+		}
+	}
 }

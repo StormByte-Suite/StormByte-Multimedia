@@ -43,144 +43,343 @@
 
 #include <format>
 #include <string>
+#include <string_view>
+#include <utility>
 
 /**
- * @namespace StormByte::Multimedia
- * @brief Public Multimedia module.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia {
+namespace StormByte {
 	/**
-	 * @class Exception
-	 * @brief Base exception for the Multimedia module.
-	 *
-	 * The first argument is the subsystem tag (`File`, `Codec`).
-	 * It is wrapped in @c StormByte::Component so Base 1.1 does not
-	 * treat it as the format string.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public StormByte::Exception {
-		public:
-			/**
-			 * @brief Constructs a formatted Multimedia exception.
-			 * @tparam Args Format argument types.
-			 * @param component Subsystem name (`File`, `Codec`, `Container`).
-			 * @param fmt Format string.
-			 * @param args Format arguments.
-			 */
-			template <typename... Args>
-			Exception(const std::string& component, std::format_string<Args...> fmt, Args&&... args):
-			StormByte::Exception(StormByte::Component("Multimedia::" + component),
-				fmt, std::forward<Args>(args)...) {}
+	namespace Multimedia {
+		/**
+		 * @class Exception
+		 * @brief Base exception for the Multimedia module.
+		 *
+		 * The first argument is the subsystem tag (`File`, `Codec`). It is
+		 * copied into a temporary @ref StormByte::Exception::Path; Base formats
+		 * and copies the message during construction.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public StormByte::Exception {
+			public:
+				/**
+				 * @brief Constructs a formatted Multimedia exception.
+				 * @tparam Args Format argument types.
+				 * @param component Subsystem name (`File`, `Codec`, `Container`).
+				 * @param fmt Format string.
+				 * @param args Format arguments.
+				 */
+				template <typename... Args>
+				Exception(std::string_view component, std::format_string<Args...> fmt, Args&&... args):
+					StormByte::Exception(
+						StormByte::Exception::Path{std::string{"Multimedia."}.append(component)},
+						fmt, std::forward<Args>(args)...) {}
 
-			/**
-			 * @brief Copy constructor.
-			 */
-			Exception(const Exception&) = default;
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				Exception(const Exception& other);
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Exception(Exception&&) noexcept = default;
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				Exception(Exception&& other) noexcept;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Exception() noexcept override = default;
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~Exception() noexcept override;
 
-			/**
-			 * @brief Copy assignment.
-			 * @return *this.
-			 */
-			Exception& operator=(const Exception&) = default;
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				Exception& operator=(const Exception& other);
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Exception& operator=(Exception&&) noexcept = default;
-	};
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				Exception& operator=(Exception&& other) noexcept;
+		};
 
-	/**
-	 * @class CodecNotFoundException
-	 * @brief Thrown when Registry::FindCodec does not resolve a key.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC CodecNotFoundException: public Exception {
-		public:
-			/**
-			 * @brief Constructs the exception for @p codec.
-			 * @param codec StormByte name or FFmpeg id that was not found.
-			 */
-			explicit CodecNotFoundException(const std::string& codec):
-			Exception("Codec", "codec '{}' not found", codec) {}
-	};
+		/**
+		 * @class CodecNotFoundException
+		 * @brief Thrown when Registry::FindCodec does not resolve a key.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC CodecNotFoundException: public Exception {
+			public:
+				/**
+				 * @brief Constructs the exception for @p codec.
+				 * @param codec StormByte name or FFmpeg id that was not found.
+				 */
+				explicit CodecNotFoundException(std::string_view codec):
+					Exception("Codec", "codec '{}' not found", codec) {}
 
-	/**
-	 * @class ContainerNotFoundException
-	 * @brief Thrown when Registry::FindContainer does not resolve a key.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC ContainerNotFoundException: public Exception {
-		public:
-			/**
-			 * @brief Constructs the exception for @p container.
-			 * @param container StormByte name or FFmpeg format id that was not found.
-			 */
-			explicit ContainerNotFoundException(const std::string& container):
-			Exception("Container", "container '{}' not found", container) {}
-	};
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				CodecNotFoundException(const CodecNotFoundException& other);
 
-	/**
-	 * @class FileOpenException
-	 * @brief Thrown when File::Open fails (path or buffer).
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC FileOpenException: public Exception {
-		public:
-			/**
-			 * @brief Constructs the exception with a finished message.
-			 * @param message Already formatted reason text.
-			 */
-			explicit FileOpenException(const std::string& message):
-			Exception("File", "{}", message) {}
-	};
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				CodecNotFoundException(CodecNotFoundException&& other) noexcept;
 
-	/**
-	 * @class FilePathOpenException
-	 * @brief Thrown when File::Open fails on a filesystem path.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC FilePathOpenException: public FileOpenException {
-		public:
-			/**
-			 * @brief Constructs the exception for @p path.
-			 * @param path Filesystem path.
-			 * @param reason Why Open failed.
-			 */
-			FilePathOpenException(const std::string& path, const std::string& reason):
-			FileOpenException(std::format("failed to open '{}': {}", path, reason)) {}
-	};
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~CodecNotFoundException() noexcept override;
 
-	/**
-	 * @class FileBufferOpenException
-	 * @brief Thrown when File::Open fails on a Consumer.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC FileBufferOpenException: public FileOpenException {
-		public:
-			/**
-			 * @brief Constructs the exception.
-			 * @param reason Why Open failed (empty, corrupt, I/O).
-			 */
-			explicit FileBufferOpenException(const std::string& reason):
-			FileOpenException(std::format("failed to open buffer: {}", reason)) {}
-	};
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				CodecNotFoundException& operator=(const CodecNotFoundException& other);
 
-	/**
-	 * @class TranscodeException
-	 * @brief Thrown when Transcode::Open or a configuration call fails.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC TranscodeException: public Exception {
-		public:
-			/**
-			 * @brief Constructs the exception with a finished message.
-			 * @param message Already formatted reason text.
-			 */
-			explicit TranscodeException(const std::string& message):
-			Exception("Transcode", "{}", message) {}
-	};
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				CodecNotFoundException& operator=(CodecNotFoundException&& other) noexcept;
+		};
+
+		/**
+		 * @class ContainerNotFoundException
+		 * @brief Thrown when Registry::FindContainer does not resolve a key.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC ContainerNotFoundException: public Exception {
+			public:
+				/**
+				 * @brief Constructs the exception for @p container.
+				 * @param container StormByte name or FFmpeg format id that was not found.
+				 */
+				explicit ContainerNotFoundException(std::string_view container):
+					Exception("Container", "container '{}' not found", container) {}
+
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				ContainerNotFoundException(const ContainerNotFoundException& other);
+
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				ContainerNotFoundException(ContainerNotFoundException&& other) noexcept;
+
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~ContainerNotFoundException() noexcept override;
+
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				ContainerNotFoundException& operator=(const ContainerNotFoundException& other);
+
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				ContainerNotFoundException& operator=(ContainerNotFoundException&& other) noexcept;
+		};
+
+		/**
+		 * @class FileOpenException
+		 * @brief Thrown when File::Open fails (path or buffer).
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC FileOpenException: public Exception {
+			public:
+				/**
+				 * @brief Constructs the exception with a finished message.
+				 * @param message Already formatted reason text.
+				 */
+				explicit FileOpenException(std::string_view message):
+					Exception("File", "{}", message) {}
+
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				FileOpenException(const FileOpenException& other);
+
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				FileOpenException(FileOpenException&& other) noexcept;
+
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~FileOpenException() noexcept override;
+
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				FileOpenException& operator=(const FileOpenException& other);
+
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				FileOpenException& operator=(FileOpenException&& other) noexcept;
+		};
+
+		/**
+		 * @class FilePathOpenException
+		 * @brief Thrown when File::Open fails on a filesystem path.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC FilePathOpenException: public FileOpenException {
+			public:
+				/**
+				 * @brief Constructs the exception for @p path.
+				 * @param path Filesystem path.
+				 * @param reason Why Open failed.
+				 */
+				explicit FilePathOpenException(std::string_view path, std::string_view reason):
+					FileOpenException(std::format("failed to open '{}': {}", path, reason)) {}
+
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				FilePathOpenException(const FilePathOpenException& other);
+
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				FilePathOpenException(FilePathOpenException&& other) noexcept;
+
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~FilePathOpenException() noexcept override;
+
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				FilePathOpenException& operator=(const FilePathOpenException& other);
+
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				FilePathOpenException& operator=(FilePathOpenException&& other) noexcept;
+		};
+
+		/**
+		 * @class FileBufferOpenException
+		 * @brief Thrown when File::Open fails on a Consumer.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC FileBufferOpenException: public FileOpenException {
+			public:
+				/**
+				 * @brief Constructs the exception.
+				 * @param reason Why Open failed (empty, corrupt, I/O).
+				 */
+				explicit FileBufferOpenException(std::string_view reason):
+					FileOpenException(std::format("failed to open buffer: {}", reason)) {}
+
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				FileBufferOpenException(const FileBufferOpenException& other);
+
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				FileBufferOpenException(FileBufferOpenException&& other) noexcept;
+
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~FileBufferOpenException() noexcept override;
+
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				FileBufferOpenException& operator=(const FileBufferOpenException& other);
+
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				FileBufferOpenException& operator=(FileBufferOpenException&& other) noexcept;
+		};
+
+		/**
+		 * @class TranscodeException
+		 * @brief Thrown when Transcode::Open or a configuration call fails.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC TranscodeException: public Exception {
+			public:
+				/**
+				 * @brief Constructs the exception with a finished message.
+				 * @param message Already formatted reason text.
+				 */
+				explicit TranscodeException(std::string_view message):
+					Exception("Transcode", "{}", message) {}
+
+				/**
+				 * @brief Copy constructor.
+				 * @param other Exception to copy.
+				 */
+				TranscodeException(const TranscodeException& other);
+
+				/**
+				 * @brief Move constructor.
+				 * @param other Exception to take.
+				 */
+				TranscodeException(TranscodeException&& other) noexcept;
+
+				/**
+				 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+				 */
+				~TranscodeException() noexcept override;
+
+				/**
+				 * @brief Copy assignment.
+				 * @param other Exception to copy.
+				 * @return *this.
+				 */
+				TranscodeException& operator=(const TranscodeException& other);
+
+				/**
+				 * @brief Move assignment.
+				 * @param other Exception to take.
+				 * @return *this.
+				 */
+				TranscodeException& operator=(TranscodeException&& other) noexcept;
+		};
+	}
 }

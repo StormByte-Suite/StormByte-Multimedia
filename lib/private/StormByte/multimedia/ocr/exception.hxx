@@ -45,133 +45,141 @@
 #include <string_view>
 
 /**
- * @namespace StormByte::Multimedia::OCR
- * @brief Private Tesseract OCR helpers.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia::OCR {
+namespace StormByte {
 	/**
-	 * @class TessDataNotFoundException
-	 * @brief Thrown when the requested tessdata language blob is missing.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	class STORMBYTE_MULTIMEDIA_PRIVATE TessDataNotFoundException: public StormByte::Multimedia::Exception {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::OCR
+		 * @brief Private Tesseract OCR helpers.
+		 */
+		namespace OCR {
 			/**
-			 * @name Construction
-			 * @{
+			 * @class TessDataNotFoundException
+			 * @brief Thrown when the requested tessdata language blob is missing.
 			 */
+			class STORMBYTE_MULTIMEDIA_PRIVATE TessDataNotFoundException: public StormByte::Multimedia::Exception {
+				public:
+					/**
+					 * @name Construction
+					 * @{
+					 */
+
+					/**
+					 * @brief Constructs the exception for @p lang.
+					 * @param lang Requested tessdata key (`eng`, `spa`, …).
+					 */
+					explicit TessDataNotFoundException(std::string_view lang):
+							StormByte::Multimedia::Exception(
+								"OCR",
+								"unsupported or missing language: {}",
+								lang
+							) {}
+
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					TessDataNotFoundException(const TessDataNotFoundException& other);
+
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					TessDataNotFoundException(TessDataNotFoundException&& other) noexcept;
+
+					/**
+					 * @brief Inherits the formatted Multimedia::Exception constructors.
+					 */
+					using StormByte::Multimedia::Exception::Exception;
+
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~TessDataNotFoundException() noexcept override;
+
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					TessDataNotFoundException& operator=(const TessDataNotFoundException& other);
+
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					TessDataNotFoundException& operator=(TessDataNotFoundException&& other) noexcept;
+
+					/** @} */
+			};
 
 			/**
-			 * @brief Constructs the exception for @p lang.
-			 * @param lang Requested tessdata key (`eng`, `spa`, …).
+			 * @class OCRException
+			 * @brief Thrown when the Tesseract session cannot open or recognize a cue.
 			 */
-			explicit TessDataNotFoundException(std::string_view lang):
-				StormByte::Multimedia::Exception(
-					"OCR",
-					"unsupported or missing language: {}",
-					std::string(lang)
-				) {}
+			class STORMBYTE_MULTIMEDIA_PRIVATE OCRException: public StormByte::Multimedia::Exception {
+				public:
+					/**
+					 * @name Construction
+					 * @{
+					 */
 
-			/**
-			 * @brief Copy constructor.
-			 * @param other Exception to copy.
-			 */
-			TessDataNotFoundException(const TessDataNotFoundException& other) = default;
+					/**
+					 * @brief Constructs the exception with @p reason.
+					 * @param reason Already worded failure text.
+					 */
+					explicit OCRException(std::string_view reason):
+							StormByte::Multimedia::Exception(
+								"OCR",
+								"{}",
+								reason
+							) {}
 
-			/**
-			 * @brief Move constructor.
-			 * @param other Exception to take.
-			 */
-			TessDataNotFoundException(TessDataNotFoundException&& other) noexcept = default;
+					/**
+					 * @brief Copy constructor.
+					 * @param other Exception to copy.
+					 */
+					OCRException(const OCRException& other);
 
-			/**
-			 * @brief Inherits the formatted Multimedia::Exception constructors.
-			 */
-			using StormByte::Multimedia::Exception::Exception;
+					/**
+					 * @brief Move constructor.
+					 * @param other Exception to take.
+					 */
+					OCRException(OCRException&& other) noexcept;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~TessDataNotFoundException() noexcept override = default;
+					/**
+					 * @brief Inherits the formatted Multimedia::Exception constructors.
+					 */
+					using StormByte::Multimedia::Exception::Exception;
 
-			/**
-			 * @brief Copy assignment.
-			 * @param other Exception to copy.
-			 * @return *this.
-			 */
-			TessDataNotFoundException& operator=(const TessDataNotFoundException& other) = default;
+					/**
+					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
+					 */
+					~OCRException() noexcept override;
 
-			/**
-			 * @brief Move assignment.
-			 * @param other Exception to take.
-			 * @return *this.
-			 */
-			TessDataNotFoundException& operator=(TessDataNotFoundException&& other) noexcept = default;
+					/**
+					 * @brief Copy assignment.
+					 * @param other Exception to copy.
+					 * @return *this.
+					 */
+					OCRException& operator=(const OCRException& other);
 
-			/**
-			 * @}
-			 */
-	};
+					/**
+					 * @brief Move assignment.
+					 * @param other Exception to take.
+					 * @return *this.
+					 */
+					OCRException& operator=(OCRException&& other) noexcept;
 
-	/**
-	 * @class OCRException
-	 * @brief Thrown when the Tesseract session cannot open or recognize a cue.
-	 */
-	class STORMBYTE_MULTIMEDIA_PRIVATE OCRException: public StormByte::Multimedia::Exception {
-		public:
-			/**
-			 * @name Construction
-			 * @{
-			 */
-
-			/**
-			 * @brief Constructs the exception with @p reason.
-			 * @param reason Already worded failure text.
-			 */
-			explicit OCRException(std::string_view reason):
-				StormByte::Multimedia::Exception(
-					"OCR",
-					"{}",
-					std::string(reason)
-				) {}
-
-			/**
-			 * @brief Copy constructor.
-			 * @param other Exception to copy.
-			 */
-			OCRException(const OCRException& other) = default;
-
-			/**
-			 * @brief Move constructor.
-			 * @param other Exception to take.
-			 */
-			OCRException(OCRException&& other) noexcept = default;
-
-			/**
-			 * @brief Inherits the formatted Multimedia::Exception constructors.
-			 */
-			using StormByte::Multimedia::Exception::Exception;
-
-			/**
-			 * @brief Destructor.
-			 */
-			~OCRException() noexcept override = default;
-
-			/**
-			 * @brief Copy assignment.
-			 * @param other Exception to copy.
-			 * @return *this.
-			 */
-			OCRException& operator=(const OCRException& other) = default;
-
-			/**
-			 * @brief Move assignment.
-			 * @param other Exception to take.
-			 * @return *this.
-			 */
-			OCRException& operator=(OCRException&& other) noexcept = default;
-
-			/**
-			 * @}
-			 */
-	};
+					/** @} */
+			};
+		}
+	}
 }

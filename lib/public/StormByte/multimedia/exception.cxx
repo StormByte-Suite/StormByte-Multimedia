@@ -1,0 +1,111 @@
+/*
+ * Copyright (C) 2024-2026 David C. Manuelda (StormBytePP)
+ *
+ * This file is part of StormByte-Multimedia.
+ *
+ * StormByte-Multimedia original source is dual-licensed:
+ *
+ * 1. GNU Lesser General Public License v3.0 (or later)
+ *    You may redistribute and/or modify this file under the terms of the
+ *    GNU Lesser General Public License as published by the Free Software
+ *    Foundation, either version 3 of the License, or (at your option)
+ *    any later version.
+ *
+ * 2. Commercial license
+ *    Alternatively, this file may be used under the terms of a commercial
+ *    license agreement with the copyright holder
+ *    (David C. Manuelda <StormByte@gmail.com>).
+ *
+ * Both licenses apply only to original StormByte-Multimedia source in this
+ * file. Third-party components — including FFmpeg and embedded trained data —
+ * remain under their own licenses and are not covered by the commercial grant.
+ *
+ * Neither license grants any patent rights. Any patent licenses required
+ * to use this software or third-party components must be obtained separately
+ * from the patent holders.
+ *
+ * StormByte-Multimedia is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with StormByte-Multimedia. If not, see
+ * <https://www.gnu.org/licenses/lgpl-3.0.html>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
+ */
+
+#include <StormByte/multimedia/exception.hxx>
+
+using namespace StormByte::Multimedia;
+
+Exception::Exception(const Exception& other) = default;
+
+Exception::Exception(Exception&& other) noexcept = default;
+
+Exception::~Exception() noexcept = default;
+
+Exception& Exception::operator=(const Exception& other) = default;
+
+Exception& Exception::operator=(Exception&& other) noexcept = default;
+
+CodecNotFoundException::CodecNotFoundException(const CodecNotFoundException& other) = default;
+
+CodecNotFoundException::CodecNotFoundException(CodecNotFoundException&& other) noexcept = default;
+
+CodecNotFoundException::~CodecNotFoundException() noexcept = default;
+
+CodecNotFoundException& CodecNotFoundException::operator=(const CodecNotFoundException& other) = default;
+
+CodecNotFoundException& CodecNotFoundException::operator=(CodecNotFoundException&& other) noexcept = default;
+
+ContainerNotFoundException::ContainerNotFoundException(const ContainerNotFoundException& other) = default;
+
+ContainerNotFoundException::ContainerNotFoundException(ContainerNotFoundException&& other) noexcept = default;
+
+ContainerNotFoundException::~ContainerNotFoundException() noexcept = default;
+
+ContainerNotFoundException& ContainerNotFoundException::operator=(const ContainerNotFoundException& other) = default;
+
+ContainerNotFoundException& ContainerNotFoundException::operator=(ContainerNotFoundException&& other) noexcept = default;
+
+FileOpenException::FileOpenException(const FileOpenException& other) = default;
+
+FileOpenException::FileOpenException(FileOpenException&& other) noexcept = default;
+
+FileOpenException::~FileOpenException() noexcept = default;
+
+FileOpenException& FileOpenException::operator=(const FileOpenException& other) = default;
+
+FileOpenException& FileOpenException::operator=(FileOpenException&& other) noexcept = default;
+
+FilePathOpenException::FilePathOpenException(const FilePathOpenException& other) = default;
+
+FilePathOpenException::FilePathOpenException(FilePathOpenException&& other) noexcept = default;
+
+FilePathOpenException::~FilePathOpenException() noexcept = default;
+
+FilePathOpenException& FilePathOpenException::operator=(const FilePathOpenException& other) = default;
+
+FilePathOpenException& FilePathOpenException::operator=(FilePathOpenException&& other) noexcept = default;
+
+FileBufferOpenException::FileBufferOpenException(const FileBufferOpenException& other) = default;
+
+FileBufferOpenException::FileBufferOpenException(FileBufferOpenException&& other) noexcept = default;
+
+FileBufferOpenException::~FileBufferOpenException() noexcept = default;
+
+FileBufferOpenException& FileBufferOpenException::operator=(const FileBufferOpenException& other) = default;
+
+FileBufferOpenException& FileBufferOpenException::operator=(FileBufferOpenException&& other) noexcept = default;
+
+TranscodeException::TranscodeException(const TranscodeException& other) = default;
+
+TranscodeException::TranscodeException(TranscodeException&& other) noexcept = default;
+
+TranscodeException::~TranscodeException() noexcept = default;
+
+TranscodeException& TranscodeException::operator=(const TranscodeException& other) = default;
+
+TranscodeException& TranscodeException::operator=(TranscodeException&& other) noexcept = default;
