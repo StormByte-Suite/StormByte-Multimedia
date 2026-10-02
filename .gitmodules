@@ -35,7 +35,7 @@
 	path = thirdparty/pthread-win32/src
 	url = https://github.com/GerHobbelt/pthread-win32.git
 [submodule "BuildMaster"]
-	path = thirdparty/buildmaster
+	path = buildmaster
 	url = https://github.com/StormByte-Suite/StormByte-BuildMaster.git
 [submodule "zlib"]
 	path = thirdparty/ffmpeg/plugins/compressors/zlib/src
