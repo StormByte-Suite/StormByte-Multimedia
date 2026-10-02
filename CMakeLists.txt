@@ -10,14 +10,16 @@ project("StormByte C++ Library: Multimedia module"
 	HOMEPAGE_URL "https://dev.stormbyte.org/StormByte-Multimedia"
 )
 
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
 include(cmake/optimizations.cmake)
 include(cmake/asan.cmake)
 cmake_policy(SET CMP0079 NEW)
 
 include(cmake/load_buildmaster.cmake)
 add_subdirectory(doc)
-add_subdirectory(thirdparty)
 add_subdirectory(lib)
+add_subdirectory(thirdparty)
 add_subdirectory(test)
 
 include(cmake/install.cmake)

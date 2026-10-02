@@ -43,8 +43,10 @@
 #ifdef WINDOWS
 	#ifdef StormByte_Multimedia_EXPORTS
 		#define STORMBYTE_MULTIMEDIA_PUBLIC	__declspec(dllexport)	///< Exported symbol
-	#else
+	#elifdef STORMBYTE_MULTIMEDIA_SHARED
 		#define STORMBYTE_MULTIMEDIA_PUBLIC	__declspec(dllimport)	///< Imported symbol
+	#else
+		#define STORMBYTE_MULTIMEDIA_PUBLIC
 	#endif
 	#define STORMBYTE_MULTIMEDIA_PRIVATE					///< No hidden attr on MSVC
 #else

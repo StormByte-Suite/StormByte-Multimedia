@@ -5,8 +5,28 @@ file(GLOB_RECURSE STORMBYTE_MULTIMEDIA_SOURCES CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_LIST_DIR}/private/*.cxx"
 )
 
-add_library(StormByte-Multimedia SHARED ${STORMBYTE_MULTIMEDIA_SOURCES})
-add_library(StormByte::Multimedia ALIAS StormByte-Multimedia)
+if(BUILD_SHARED_LIBS)
+	set(_mode shared)
+else()
+	set(_mode static)
+endif()
+
+buildmaster_component(
+	StormByte-Multimedia
+	"StormByte Suite - Multimedia"
+	"${STORMBYTE_MULTIMEDIA_SOURCES}"
+	""
+	${_mode}
+	"StormByte-Multimedia"
+	"BACKEND=host;ALIAS=StormByte::Multimedia"
+)
+
+if(BUILD_SHARED_LIBS)
+	target_compile_definitions(StormByte-Multimedia
+		PRIVATE StormByte_Multimedia_EXPORTS
+		PUBLIC STORMBYTE_MULTIMEDIA_SHARED
+	)
+endif()
 
 set_target_properties(StormByte-Multimedia PROPERTIES
 	LINKER_LANGUAGE CXX
