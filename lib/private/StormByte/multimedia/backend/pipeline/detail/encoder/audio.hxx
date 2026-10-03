@@ -131,7 +131,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return true if the frame was ingested.
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
 
 			/**
 			 * @brief Signals EOF, flushes the fifo and drains.
@@ -143,7 +143,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @brief Receives one packet from libav if needed, then pops the queue.
 			 * @return Packet with Producer::Encoder, or empty if none ready.
 			 */
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Take() noexcept override;
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() noexcept override;
 
 			/**
 			 * @brief Opened AVCodecContext, if any.
@@ -199,7 +199,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			std::optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;	///< Opened encoder
 			StormByte::Multimedia::FFmpeg::AVPacket m_scratch;					///< Receive scratch
 			StormByte::Multimedia::FFmpeg::AVFrame m_converted;				///< Encoder-sized frame
-			std::deque<std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Packets waiting for Mux
+			std::deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Packets waiting for Mux
 			StormByte::Multimedia::Pipeline::Encoder* m_owner;							///< Owner for Take/Wrap
 			AVRational m_timeBase;														///< Encoder time base
 			std::optional<StormByte::Multimedia::FFmpeg::Swr> m_swr;			///< Format / layout converter

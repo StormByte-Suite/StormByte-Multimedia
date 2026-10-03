@@ -177,10 +177,10 @@ namespace {
 
 	std::string ReadCue(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
 		auto& pay = frame.Payload();
-		const auto n = pay.AvailableBytes();
+		const auto n = pay.Available();
 		if (n == 0)
 			return {};
-		StormByte::Buffer::DataType bytes;
+		StormByte::BinaryData bytes;
 		if (!pay.Peek(n, bytes) || bytes.empty())
 			return {};
 		const auto* raw = reinterpret_cast<const std::uint8_t*>(bytes.data());
@@ -200,10 +200,10 @@ namespace {
 
 	std::optional<GrayBitmap> ReadOcrBitmap(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
 		auto& pay = frame.Payload();
-		const auto n = pay.AvailableBytes();
+		const auto n = pay.Available();
 		if (n < 12)
 			return std::nullopt;
-		StormByte::Buffer::DataType bytes;
+		StormByte::BinaryData bytes;
 		if (!pay.Peek(n, bytes) || bytes.size() < 12)
 			return std::nullopt;
 		const auto* p = reinterpret_cast<const std::uint8_t*>(bytes.data());
@@ -374,7 +374,7 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
+	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
 	if (!frame) {
 		owner.Fail("empty frame");
 		return false;
@@ -438,7 +438,7 @@ void Subtitle::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	m_flushed = true;
 }
 
-std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Subtitle::Take() noexcept {
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Subtitle::Take() noexcept {
 	if (m_pending.empty())
 		return {};
 	auto packet = std::move(m_pending.front());

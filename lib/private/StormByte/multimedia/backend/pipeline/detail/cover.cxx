@@ -98,7 +98,8 @@ namespace {
 	StormByte::Buffer::FIFO BytesToFifo(const std::uint8_t* data, int size) noexcept {
 		if (!data || size <= 0)
 			return StormByte::Buffer::FIFO{};
-		StormByte::Buffer::DataType bytes(
+		StormByte::BinaryData bytes;
+		bytes.assign(
 			reinterpret_cast<const std::byte*>(data),
 			reinterpret_cast<const std::byte*>(data) + size);
 		return StormByte::Buffer::FIFO{std::move(bytes)};
@@ -177,7 +178,7 @@ namespace StormByte::Multimedia::Detail {
 				continue;
 			if (slot >= items.size())
 				break;
-			if (items[slot].Payload().AvailableBytes() == 0)
+				if (items[slot].Payload().Available() == 0)
 				empty.emplace(stream.Index(), slot);
 			++slot;
 		}
@@ -197,7 +198,7 @@ namespace StormByte::Multimedia::Detail {
 			const auto it = empty.find(packet.StreamIndex());
 			if (it != empty.end() && packet.Data() && packet.Size() > 0) {
 				auto& dest = items[it->second];
-				if (dest.Payload().AvailableBytes() == 0) {
+							if (dest.Payload().Available() == 0) {
 					dest = Multimedia::Attachment{dest.FileName(), dest.MimeType(),
 						BytesToFifo(packet.Data(), packet.Size())};
 					empty.erase(it);

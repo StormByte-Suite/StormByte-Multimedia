@@ -38,8 +38,8 @@
 
 #pragma once
 
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
-#include <StormByte/buffer/io/buffered_file_writer.hxx>
+#include <StormByte/buffer/io/buffered_location_reader.hxx>
+#include <StormByte/buffer/io/buffered_location_writer.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/file.hxx>
@@ -208,13 +208,15 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @brief Facade that maps tracks and runs one reader-to-writer job.
 	 *
 	 * Connects operator>> and Filters for you. The stock class is a
-	 * complete job: own BufferedFile leaves, choose origin streams,
+	 * complete job: own reader/writer locations, choose origin streams,
 	 * remux or encode each one, write through the Plan writer. You do
 	 * not have to derive anything to transcode.
 	 *
-	 * Four constructors. Each one always owns BufferedFile leaves
-	 * (built from a path when needed). Run moves those leaves into
-	 * EmptyPlan and the Transcoder loses them. File is only used as
+	 * Four input/output combinations are accepted: path/path, path/writer,
+	 * reader/path, and reader/writer. Path arguments create local
+	 * BufferedFile leaves; location arguments are Safe::Unique owners and
+	 * preserve their dynamic type. Run transfers both owners to EmptyPlan,
+	 * after which the Transcoder no longer owns them. File is only used as
 	 * a consultation snapshot and is discarded after analysis.
 	 * File::Reader is not used.
 	 *
@@ -435,52 +437,34 @@ namespace StormByte::Multimedia::Pipeline {
 				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
 
 			/**
-			 * @brief Builds a reader from @p source and takes @p writer.
-			 * @tparam Writer Leaf derived from BufferedFileWriter.
+			 * @brief Builds a local reader and takes @p writer.
 			 * @param source Input path.
-			 * @param writer Output writer (moved).
+			 * @param writer Owned output location (moved).
 			 * @param logger Shared log for the job and the tube.
 			 */
-			template<typename Writer>
-			requires StormByte::Type::DerivedFrom<Writer, StormByte::Buffer::IO::BufferedFileWriter>
-			Transcoder(const std::filesystem::path& source, Writer&& writer,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-			: Transcoder(StormByte::Buffer::IO::BufferedFileReader{source},
-				std::forward<Writer>(writer), std::move(logger)) {}
+			Transcoder(const std::filesystem::path& source,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
 
 			/**
-			 * @brief Takes @p reader and builds a writer on @p destination.
-			 * @tparam Reader Leaf derived from BufferedFileReader.
-			 * @param reader Input reader (moved).
+			 * @brief Takes @p reader and builds a local writer.
+			 * @param reader Owned input location (moved).
 			 * @param destination Output path.
 			 * @param logger Shared log for the job and the tube.
 			 */
-			template<typename Reader>
-			requires StormByte::Type::DerivedFrom<Reader, StormByte::Buffer::IO::BufferedFileReader>
-			Transcoder(Reader&& reader, const std::filesystem::path& destination,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-			: Transcoder(std::forward<Reader>(reader),
-				StormByte::Buffer::IO::BufferedFileWriter{destination},
-				std::move(logger)) {}
+			Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				const std::filesystem::path& destination,
+				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
 
 			/**
-			 * @brief Takes both leaves. Heap-allocates the dynamic types.
-			 * @tparam Reader Leaf derived from BufferedFileReader.
-			 * @tparam Writer Leaf derived from BufferedFileWriter.
-			 * @param reader Input reader (moved).
-			 * @param writer Output writer (moved).
+			 * @brief Takes both location owners without slicing.
+			 * @param reader Owned input location (moved).
+			 * @param writer Owned output location (moved).
 			 * @param logger Shared log for the job and the tube.
 			 */
-			template<typename Reader, typename Writer>
-			requires StormByte::Type::DerivedFrom<Reader, StormByte::Buffer::IO::BufferedFileReader>
-				&& StormByte::Type::DerivedFrom<Writer, StormByte::Buffer::IO::BufferedFileWriter>
-			Transcoder(Reader&& reader, Writer&& writer,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-			: Transcoder(std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader>(
-					std::make_unique<std::remove_cvref_t<Reader>>(std::forward<Reader>(reader))),
-				std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter>(
-					std::make_unique<std::remove_cvref_t<Writer>>(std::forward<Writer>(writer))),
-				std::move(logger)) {}
+			Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
 
 			/**
 			 * @brief Copy constructor.
@@ -715,8 +699,8 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Allocates the Plan type for this job.
-			 * @param reader Origin octets (moved).
-			 * @param writer Destination octets (moved).
+			 * @param reader Owned origin location, transferred from this Transcoder.
+			 * @param writer Owned destination location, transferred from this Transcoder.
 			 * @return Plan of the desired dynamic type, with no tracks yet.
 			 *
 			 * Override to return a type derived from Plan. Tracks are
@@ -724,8 +708,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * call this Transcoder no longer owns the leaves.
 			 */
 			virtual std::unique_ptr<class Plan> EmptyPlan(
-				StormByte::Buffer::IO::BufferedFileReader&& reader,
-				StormByte::Buffer::IO::BufferedFileWriter&& writer) const noexcept;
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) const noexcept;
 
 			/**
 			 * @brief Allocates the settled-row type.
@@ -804,10 +788,6 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param writer Owned sink.
 			 * @param logger Shared log.
 			 */
-			Transcoder(std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader> reader,
-				std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter> writer,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
-
 			/**
 			 * @brief Marks a hard error and cancels the coordinator.
 			 * @param reason Message stored in Error().
@@ -857,8 +837,8 @@ namespace StormByte::Multimedia::Pipeline {
 
 			std::shared_ptr<StormByte::Logger::Log> m_app_log;			///< Logger from the constructor; input for tube stages
 			std::shared_ptr<StormByte::Logger::Log> m_logger;			///< Job facade after InstallLog
-			std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader> m_reader;	///< Origin until EmptyPlan
-			std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter> m_writer;	///< Sink until EmptyPlan
+			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Origin until EmptyPlan
+			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Sink until EmptyPlan
 			std::unique_ptr<File> m_consult;							///< Consultation snapshot; discarded after analysis
 			std::shared_ptr<class Plan> m_plan;							///< Intention; shared with the job after Run
 			std::unique_ptr<Backend::Pipeline::Transcoder> m_backend;	///< Map and coordinator thread

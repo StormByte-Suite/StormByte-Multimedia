@@ -38,8 +38,8 @@
 
 #pragma once
 
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
-#include <StormByte/buffer/io/buffered_file_writer.hxx>
+#include <StormByte/buffer/io/buffered_location_reader.hxx>
+#include <StormByte/buffer/io/buffered_location_writer.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <cstdint>
@@ -71,13 +71,13 @@ namespace StormByte::Multimedia::Backend {
 			 * @brief Bind @p reader. Does not allocate AVIO yet.
 			 * @param reader Live File-family reader.
 			 */
-			explicit FileAvio(StormByte::Buffer::IO::BufferedFileReader& reader) noexcept;
+			explicit FileAvio(StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept;
 
 			/**
 			 * @brief Bind @p writer. Does not allocate AVIO yet.
 			 * @param writer Live File-family writer.
 			 */
-			explicit FileAvio(StormByte::Buffer::IO::BufferedFileWriter& writer) noexcept;
+			explicit FileAvio(StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
 
 			FileAvio(const FileAvio&) = delete;
 			FileAvio& operator=(const FileAvio&) = delete;
@@ -121,8 +121,8 @@ namespace StormByte::Multimedia::Backend {
 			 * @brief Leaf bound to this AVIO.
 			 */
 			using Leaf = std::variant<
-				StormByte::Buffer::IO::BufferedFileReader*,
-				StormByte::Buffer::IO::BufferedFileWriter*>;
+				StormByte::Buffer::IO::BufferedLocationReader*,
+				StormByte::Buffer::IO::BufferedLocationWriter*>;
 
 			Leaf m_leaf;			///< Not owned
 			AVIOContext* m_avio;	///< Custom I/O

@@ -204,7 +204,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 	return true;
 }
 
-std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>
 StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 	StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept {
 	if (!m_ctx || !m_ctx->format) {
@@ -242,7 +242,7 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 		if (const auto found = m_ctx->timeBase.find(index); found != m_ctx->timeBase.end())
 			tb = found->second;
 
-		StormByte::Buffer::DataType bytes;
+		StormByte::BinaryData bytes;
 		const auto* data = m_ctx->scratch.Data();
 		const int size = m_ctx->scratch.Size();
 		if (data && size > 0) {

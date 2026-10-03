@@ -49,6 +49,8 @@
 #include <StormByte/multimedia/property/video.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/buffer/io/buffered_file_reader.hxx>
+#include <StormByte/safe/wstring.hxx>
 
 #include <cstdint>
 #include <string>
@@ -68,12 +70,23 @@ extern "C" {
 using namespace StormByte::Multimedia;
 namespace FFmpeg = StormByte::Multimedia::FFmpeg;
 using StormByte::Buffer::IO::BufferedFileReader;
+using StormByte::Buffer::IO::BufferedLocationReader;
 
 namespace {
 	constexpr int Hdr10PlusVideoPackets = 48;
 
-	ExpectedFile FailOpen(const std::filesystem::path& label, const std::string& reason) noexcept {
-		return Unexpected(FilePathOpenException(label.string(), reason));
+	StormByte::Safe::String LocationText(const std::filesystem::path& path) {
+		const auto native = path.wstring();
+		return StormByte::Safe::String{StormByte::Safe::WString{std::wstring_view{native}}};
+	}
+
+	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const std::filesystem::path& path) {
+		return StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<BufferedFileReader>(
+			LocationText(path));
+	}
+
+	ExpectedFile FailOpen(std::string_view label, std::string_view reason) noexcept {
+		return Unexpected(FilePathOpenException(label, reason));
 	}
 
 	ExpectedContainer ResolveContainer(std::string_view formatName) noexcept {
@@ -117,8 +130,8 @@ namespace {
 		return Property::Duration{*ns};
 	}
 
-	StormByte::Buffer::DataType AttachmentBytes(const FFmpeg::AVStream& stream) noexcept {
-		StormByte::Buffer::DataType bytes;
+	StormByte::BinaryData AttachmentBytes(const FFmpeg::AVStream& stream) noexcept {
+		StormByte::BinaryData bytes;
 		const ::AVStream* raw = stream.Raw();
 		if (raw && raw->attached_pic.size > 0 && raw->attached_pic.data) {
 			const auto* p = reinterpret_cast<const std::byte*>(raw->attached_pic.data);
@@ -147,7 +160,7 @@ namespace {
 		Multimedia::Attachments& attachments, const std::vector<int>& coverIndex) noexcept {
 		bool missing = false;
 		for (const auto& item : attachments) {
-			if (item.Payload().AvailableBytes() == 0) {
+			if (item.Payload().Available() == 0) {
 				missing = true;
 				break;
 			}
@@ -170,9 +183,9 @@ namespace {
 			for (std::size_t n = 0; n < coverIndex.size(); ++n) {
 				if (coverIndex[n] != index)
 					continue;
-				if (attachments[n].Payload().AvailableBytes() != 0)
+				if (attachments[n].Payload().Available() != 0)
 					break;
-				StormByte::Buffer::DataType bytes;
+				StormByte::BinaryData bytes;
 				if (const auto* data = packet.Data(); data && packet.Size() > 0) {
 					const auto* raw = reinterpret_cast<const std::byte*>(data);
 					bytes.assign(raw, raw + packet.Size());
@@ -207,7 +220,7 @@ namespace {
 		raw = nullptr;
 	}
 
-	bool OpenAvio(BufferedFileReader& reader, ::AVFormatContext*& raw,
+	bool OpenAvio(BufferedLocationReader& reader, ::AVFormatContext*& raw,
 		Backend::FileAvio& avio) noexcept {
 		if (!reader.IsOpen() && !reader.Open())
 			return false;
@@ -244,16 +257,16 @@ File::~File() noexcept = default;
 
 ExpectedFile File::Open(const std::filesystem::path& path,
 	std::optional<std::chrono::nanoseconds> duration) noexcept {
-	BufferedFileReader reader{path};
-	return Probe(reader, duration, Origin{path});
+	auto reader = LocalReader(path);
+	return Probe(*reader, duration, Origin{path});
 }
 
-ExpectedFile File::Open(BufferedFileReader& reader,
+ExpectedFile File::Open(BufferedLocationReader& reader,
 	std::optional<std::chrono::nanoseconds> duration) noexcept {
 	return Probe(reader, duration, Origin{std::ref(reader)});
 }
 
-void File::ScanWithReader(BufferedFileReader& reader, Multimedia::Streams& streams,
+void File::ScanWithReader(BufferedLocationReader& reader, Multimedia::Streams& streams,
 	std::optional<Property::Duration>& duration) noexcept {
 	Backend::FileAvio avio(reader);
 	::AVFormatContext* raw = nullptr;
@@ -380,7 +393,7 @@ void File::ScanDurations(FFmpeg::AVFormatContext& ctx, Multimedia::Streams& stre
 		container = longest;
 }
 
-ExpectedFile File::Probe(BufferedFileReader& reader,
+ExpectedFile File::Probe(BufferedLocationReader& reader,
 	std::optional<std::chrono::nanoseconds> knownDuration,
 	Origin origin) noexcept {
 	const auto label = reader.Path();
@@ -451,10 +464,10 @@ ExpectedFile File::Probe(BufferedFileReader& reader,
 		std::move(duration), resolved);
 }
 
-const std::filesystem::path& File::Path() const noexcept {
+StormByte::Safe::String File::Path() const {
 	if (const auto* path = std::get_if<std::filesystem::path>(&m_origin))
-		return *path;
-	return std::get<std::reference_wrapper<BufferedFileReader>>(m_origin).get().Path();
+		return LocationText(*path);
+	return std::get<std::reference_wrapper<BufferedLocationReader>>(m_origin).get().Path();
 }
 
 const Multimedia::Attachments& File::Attachments() const noexcept {
@@ -472,8 +485,8 @@ void File::ResolveDuration() const noexcept {
 	std::visit([&](auto& held) {
 		using Held = std::decay_t<decltype(held)>;
 		if constexpr (std::is_same_v<Held, std::filesystem::path>) {
-			BufferedFileReader reader{held};
-			ScanWithReader(reader, m_streams, m_duration);
+			auto reader = LocalReader(held);
+			ScanWithReader(*reader, m_streams, m_duration);
 		}
 		else {
 			ScanWithReader(held.get(), m_streams, m_duration);

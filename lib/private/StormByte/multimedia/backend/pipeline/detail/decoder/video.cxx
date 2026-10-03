@@ -135,7 +135,8 @@ namespace {
 			const AVFrameSideData* sd = av.SideDataAt(i);
 			if (!sd || !sd->data || sd->size <= 0)
 				continue;
-			StormByte::Buffer::DataType bytes(
+			StormByte::BinaryData bytes;
+			bytes.assign(
 				reinterpret_cast<const std::byte*>(sd->data),
 				reinterpret_cast<const std::byte*>(sd->data) + sd->size);
 			const auto kind = MapKind(sd->type);
@@ -222,15 +223,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	bool Video::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-		const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
 		if (!packet) {
 			owner.Fail("empty packet");
 			return false;
 		}
 
 		StormByte::Multimedia::FFmpeg::AVPacket raw;
-		StormByte::Buffer::DataType bytes;
-		const auto n = packet->Payload().AvailableBytes();
+		StormByte::BinaryData bytes;
+		const auto n = packet->Payload().Available();
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
 			if (!packet->Payload().Extract(n, bytes) || bytes.size() != n) {
@@ -262,7 +263,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		return true;
 	}
 
-	std::shared_ptr<StormByte::Multimedia::Pipeline::Frame> Video::Receive(
+	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Video::Receive(
 		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
 		auto holder = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Frame>();
 		const auto result = m_decoder.ReceiveFrame(holder->Handle());
@@ -284,8 +285,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				video->SampleAspectRatio());
 		}
 
-		auto frame = std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>(
-			new StormByte::Multimedia::Pipeline::Frame(
+		auto frame = StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>::MakePointer<
+			StormByte::Multimedia::Pipeline::Frame>(
 				owner.Index(),
 				Type::Video,
 				Producer::Decoder,
@@ -296,8 +297,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				std::move(attachments),
 				std::nullopt,
 				0,
-				0
-			));
+				0);
 		auto* backend = holder.get();
 		BindFrame(owner, *frame, std::move(holder));
 		backend->BindProperties(*frame);

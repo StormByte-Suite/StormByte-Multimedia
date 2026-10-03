@@ -56,7 +56,7 @@ extern "C" {
 namespace {
 	std::span<const std::byte> UnreadSpan(const StormByte::Buffer::FIFO& fifo) noexcept {
 		const auto& stored = fifo.Data();
-		const auto avail = fifo.AvailableBytes();
+		const auto avail = fifo.Available();
 		if (avail == 0 || avail > stored.size())
 			return {};
 		return std::span<const std::byte>{stored.data() + (stored.size() - avail), avail};

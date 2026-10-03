@@ -66,7 +66,7 @@ extern "C" {
 
 using namespace StormByte::Multimedia;
 using StormByte::Buffer::Consumer;
-using StormByte::Buffer::DataType;
+using StormByte::BinaryData;
 using StormByte::Buffer::Position;
 
 namespace {
@@ -121,11 +121,11 @@ struct FFmpeg::AVFormatContext::ConsumerIO {
 		auto* io = static_cast<ConsumerIO*>(opaque);
 		if (!io->consumer.IsReadable() || io->consumer.EoF())
 			return AVERROR_EOF;
-		const std::size_t avail = io->consumer.AvailableBytes();
+		const std::size_t avail = io->consumer.Available();
 		if (avail == 0)
 			return AVERROR_EOF;
 		const std::size_t want = std::min(avail, static_cast<std::size_t>(bufSize));
-		DataType chunk;
+		BinaryData chunk;
 		if (!io->consumer.Extract(want, chunk) || chunk.empty())
 			return AVERROR_EOF;
 		std::memcpy(buf, chunk.data(), chunk.size());

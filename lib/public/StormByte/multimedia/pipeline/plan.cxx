@@ -39,6 +39,8 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 
 #include <StormByte/expected.hxx>
+#include <StormByte/buffer/io/buffered_file_reader.hxx>
+#include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/cover.hxx>
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/pipeline/config/attachment.hxx>
@@ -50,6 +52,7 @@
 #include <StormByte/multimedia/pipeline/exception.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/wstring.hxx>
 
 #include <cctype>
 #include <string>
@@ -57,15 +60,35 @@
 
 using StormByte::Buffer::IO::BufferedFileReader;
 using StormByte::Buffer::IO::BufferedFileWriter;
+using StormByte::Buffer::IO::BufferedLocationReader;
+using StormByte::Buffer::IO::BufferedLocationWriter;
 using namespace StormByte::Multimedia::Pipeline;
 
 namespace {
-	std::string ExtensionOf(const std::filesystem::path& path) noexcept {
-		std::string ext = path.extension().string();
-		if (ext.empty())
+	StormByte::Safe::String LocationText(const std::filesystem::path& path) {
+		const auto native = path.wstring();
+		return StormByte::Safe::String{StormByte::Safe::WString{std::wstring_view{native}}};
+	}
+
+	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const std::filesystem::path& path) {
+		return StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<BufferedFileReader>(
+			LocationText(path));
+	}
+
+	StormByte::Safe::Unique<BufferedLocationWriter> LocalWriter(const std::filesystem::path& path) {
+		return StormByte::Safe::Unique<BufferedLocationWriter>::MakePointer<BufferedFileWriter>(
+			LocationText(path));
+	}
+
+	std::string ExtensionOf(std::string_view location) noexcept {
+		const auto end = location.find_first_of("?#");
+		if (end != std::string_view::npos)
+			location = location.substr(0, end);
+		const auto separator = location.find_last_of("/\\");
+		const auto dot = location.find_last_of('.');
+		if (dot == std::string_view::npos || (separator != std::string_view::npos && dot < separator))
 			return {};
-		if (ext.front() == '.')
-			ext.erase(ext.begin());
+		std::string ext(location.substr(dot + 1));
 		for (char& ch : ext)
 			ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 		return ext;
@@ -96,10 +119,18 @@ namespace {
 
 Plan::Plan(const std::filesystem::path& source,
 	const std::filesystem::path& destination) noexcept
-: Plan(BufferedFileReader{source}, BufferedFileWriter{destination}) {}
+: Plan(LocalReader(source), LocalWriter(destination)) {}
 
-Plan::Plan(std::unique_ptr<BufferedFileReader> reader,
-	std::unique_ptr<BufferedFileWriter> writer) noexcept
+Plan::Plan(const std::filesystem::path& source,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer) noexcept
+: Plan(LocalReader(source), std::move(writer)) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	const std::filesystem::path& destination) noexcept
+: Plan(std::move(reader), LocalWriter(destination)) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer) noexcept
 : m_reader(std::move(reader)),
 	m_writer(std::move(writer)),
 	m_container(m_writer ? ContainerFromWriter(*m_writer) : nullptr) {
@@ -111,8 +142,8 @@ Plan::Plan(std::unique_ptr<BufferedFileReader> reader,
 }
 
 const StormByte::Multimedia::Container* Plan::ContainerFromWriter(
-	const BufferedFileWriter& writer) noexcept {
-	const auto ext = ExtensionOf(writer.Path());
+	const BufferedLocationWriter& writer) noexcept {
+	const auto ext = ExtensionOf(std::string_view{writer.Path()});
 	if (ext.empty())
 		return nullptr;
 	auto found = StormByte::Multimedia::Registry::Instance().FindContainer(ext);
@@ -121,19 +152,19 @@ const StormByte::Multimedia::Container* Plan::ContainerFromWriter(
 	return &found.value().get();
 }
 
-BufferedFileReader& Plan::Reader() noexcept {
+BufferedLocationReader& Plan::Reader() noexcept {
 	return *m_reader;
 }
 
-const BufferedFileReader& Plan::Reader() const noexcept {
+const BufferedLocationReader& Plan::Reader() const noexcept {
 	return *m_reader;
 }
 
-BufferedFileWriter& Plan::Writer() noexcept {
+BufferedLocationWriter& Plan::Writer() noexcept {
 	return *m_writer;
 }
 
-const BufferedFileWriter& Plan::Writer() const noexcept {
+const BufferedLocationWriter& Plan::Writer() const noexcept {
 	return *m_writer;
 }
 

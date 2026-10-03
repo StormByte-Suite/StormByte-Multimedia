@@ -38,6 +38,7 @@
 
 #pragma once
 
+#include <StormByte/binary_data.hxx>
 #include <StormByte/buffer/generic.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
@@ -286,10 +287,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			std::optional<StormByte::Multimedia::Property::Point> m_point;	///< Absolute placement
 			unsigned m_opacity;												///< 0–100
 			int m_margin;													///< Anchor margin
-			StormByte::Buffer::DataType m_bytes;							///< File bytes
+			StormByte::BinaryData m_bytes;							///< File bytes
 			int m_logoWidth;												///< Decoded logo width
 			int m_logoHeight;												///< Decoded logo height
-			StormByte::Buffer::DataType m_rgba;								///< Decoded RGBA8888
+			StormByte::BinaryData m_rgba;								///< Decoded RGBA8888
 			bool m_loaded;													///< File read attempted
 			bool m_decoded;													///< Decode attempted
 			bool m_released;												///< Hold finished; replays may Paint

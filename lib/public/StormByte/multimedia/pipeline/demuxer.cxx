@@ -164,11 +164,11 @@ bool Demuxer::Rewind() noexcept {
 	return true;
 }
 
-const BufferedFileReader& Demuxer::Origin() const noexcept {
+const StormByte::Buffer::IO::BufferedLocationReader& Demuxer::Origin() const noexcept {
 	return m_plan->Reader();
 }
 
-BufferedFileReader& Demuxer::Origin() noexcept {
+StormByte::Buffer::IO::BufferedLocationReader& Demuxer::Origin() noexcept {
 	return m_plan->Reader();
 }
 
@@ -199,7 +199,7 @@ Packet::PointerType Demuxer::Wrap(
 	const std::uint64_t serial = m_nextSerial[track]++;
 	Log(Level::LowLevel, std::format("t={} {} {}:0 pts={} dts={} dur={} key={} bytes={}",
 		track, ToString(type), serial, Ns(pts), Ns(dts), Ns(duration),
-		keyframe ? 1 : 0, payload.Size()));
+		keyframe ? 1 : 0, static_cast<std::size_t>(payload.Size())));
 	auto packet = Packet::PointerType::MakePointer<Packet>(
 		track,
 		type,

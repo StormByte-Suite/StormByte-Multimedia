@@ -89,15 +89,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	bool Subtitle::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-		const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
 		if (!packet) {
 			owner.Fail("empty packet");
 			return false;
 		}
 
 		StormByte::Multimedia::FFmpeg::AVPacket raw;
-		StormByte::Buffer::DataType bytes;
-		const auto n = packet->Payload().AvailableBytes();
+		StormByte::BinaryData bytes;
+		const auto n = packet->Payload().Available();
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
 			if (!packet->Payload().Extract(n, bytes) || bytes.size() != n) {
@@ -134,7 +134,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		return true;
 	}
 
-	std::shared_ptr<StormByte::Multimedia::Pipeline::Frame> Subtitle::Receive(
+	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Subtitle::Receive(
 		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
 		if (!m_pendingSub.has_value())
 			return {};
@@ -143,7 +143,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		m_pendingSub.reset();
 
 		auto text = sub.Text();
-		StormByte::Buffer::DataType bytes;
+		StormByte::BinaryData bytes;
 		if (!text.empty()) {
 			bytes.assign(
 				reinterpret_cast<const std::byte*>(text.data()),
@@ -179,8 +179,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		if (duration && duration->Nanoseconds().count() > 600000000000LL)
 			duration.reset();
 
-		auto incoming = std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>(
-			new StormByte::Multimedia::Pipeline::Frame(
+		auto incoming = StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>::MakePointer<
+			StormByte::Multimedia::Pipeline::Frame>(
 				owner.Index(),
 				Type::Subtitle,
 				Producer::Decoder,
@@ -191,11 +191,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				std::vector<SideData>{},
 				std::nullopt,
 				0,
-				0
-			));
+				0);
 		BindFrame(owner, *incoming, nullptr);
 
-		const bool hasCue = incoming->Payload().AvailableBytes() > 0;
+		const bool hasCue = incoming->Payload().Available() > 0;
 		if (m_heldSubtitle) {
 			if (!m_heldSubtitle->Duration() && m_heldSubtitle->Pts() && incoming->Pts()) {
 				const auto delta = incoming->Pts()->Nanoseconds() - m_heldSubtitle->Pts()->Nanoseconds();

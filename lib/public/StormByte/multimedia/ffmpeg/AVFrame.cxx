@@ -143,7 +143,7 @@ std::int64_t FFmpeg::AVFrame::DurationTicks() const noexcept {
 	return m_ptr ? m_ptr->duration : 0;
 }
 
-void FFmpeg::AVFrame::CopyPrimaryBuffer(StormByte::Buffer::DataType& out) const noexcept {
+void FFmpeg::AVFrame::CopyPrimaryBuffer(StormByte::BinaryData& out) const noexcept {
 	out.clear();
 	if (!m_ptr)
 		return;
@@ -153,7 +153,7 @@ void FFmpeg::AVFrame::CopyPrimaryBuffer(StormByte::Buffer::DataType& out) const 
 		const int size = av_image_get_buffer_size(format, m_ptr->width, m_ptr->height, 1);
 		if (size <= 0)
 			return;
-		out.resize(static_cast<std::size_t>(size));
+		out.resize(StormByte::ByteSize{static_cast<std::uint64_t>(size)});
 		if (av_image_copy_to_buffer(
 			reinterpret_cast<std::uint8_t*>(out.data()), size,
 			m_ptr->data, m_ptr->linesize,
@@ -168,7 +168,7 @@ void FFmpeg::AVFrame::CopyPrimaryBuffer(StormByte::Buffer::DataType& out) const 
 			m_ptr->nb_samples, format, 1);
 		if (bytes <= 0)
 			return;
-		out.resize(static_cast<std::size_t>(bytes));
+		out.resize(StormByte::ByteSize{static_cast<std::uint64_t>(bytes)});
 		auto* dst = reinterpret_cast<std::uint8_t*>(out.data());
 		if (av_samples_copy(&dst, m_ptr->extended_data, 0, 0,
 			m_ptr->nb_samples, m_ptr->ch_layout.nb_channels, format) < 0)
@@ -224,10 +224,10 @@ void FFmpeg::AVFrame::WriteSideData(
 		return;
 
 	for (const auto& item : attachments) {
-		const auto size = item.Payload().AvailableBytes();
+		const auto size = item.Payload().Available();
 		if (size == 0)
 			continue;
-		StormByte::Buffer::DataType bytes;
+		StormByte::BinaryData bytes;
 		if (!item.Payload().Peek(size, bytes) || bytes.empty())
 			continue;
 
@@ -240,7 +240,7 @@ void FFmpeg::AVFrame::WriteSideData(
 			AVDynamicHDRPlus* plus = av_dynamic_hdr_plus_create_side_data(m_ptr);
 			if (!plus)
 				continue;
-			const std::size_t copy = std::min(bytes.size(), sizeof(AVDynamicHDRPlus));
+			const std::size_t copy = std::min(static_cast<std::size_t>(bytes.size()), sizeof(AVDynamicHDRPlus));
 			std::memcpy(plus, bytes.data(), copy);
 			continue;
 		}

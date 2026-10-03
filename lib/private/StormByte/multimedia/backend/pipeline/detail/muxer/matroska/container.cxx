@@ -145,7 +145,7 @@ namespace {
 
 	std::span<const std::byte> UnreadSpan(const StormByte::Buffer::FIFO& fifo) noexcept {
 		const auto& stored = fifo.Data();
-		const auto avail = fifo.AvailableBytes();
+		const auto avail = fifo.Available();
 		if (avail == 0 || avail > stored.size())
 			return {};
 		return std::span<const std::byte>{stored.data() + (stored.size() - avail), avail};
@@ -157,7 +157,7 @@ namespace {
 			return nullptr;
 
 		auto& fifo = packet.Payload();
-		const auto size = fifo.AvailableBytes();
+		const auto size = fifo.Available();
 		if (size > 0) {
 			if (av_new_packet(raw, static_cast<int>(size)) < 0) {
 				av_packet_free(&raw);
@@ -229,7 +229,7 @@ namespace {
 		const auto view = UnreadSpan(fifo);
 		if (view.empty())
 			return StormByte::Buffer::FIFO{};
-		StormByte::Buffer::DataType bytes(view.begin(), view.end());
+		StormByte::BinaryData bytes{view};
 		return StormByte::Buffer::FIFO{std::move(bytes)};
 	}
 }
@@ -399,7 +399,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 	}
 
 	bool Container::Push(StormByte::Multimedia::Pipeline::Muxer& owner,
-		const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
 		if (!packet) {
 			owner.Fail("empty packet");
 			return false;
@@ -419,7 +419,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 			return false;
 		if (m_header) {
 			while (!m_queue.empty()) {
-				std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> leftover = std::move(m_queue.front());
+				StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> leftover = std::move(m_queue.front());
 				m_queue.pop_front();
 				if (!leftover || !WritePacket(owner, *leftover))
 					return false;
@@ -579,7 +579,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 
 		m_header = true;
 		while (!m_queue.empty()) {
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> queued = std::move(m_queue.front());
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> queued = std::move(m_queue.front());
 			m_queue.pop_front();
 			if (!queued || !WritePacket(owner, *queued))
 				return false;
@@ -683,7 +683,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 		if (!WriteHeaderIfReady(owner))
 			return;
 		while (!m_queue.empty()) {
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> leftover = std::move(m_queue.front());
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> leftover = std::move(m_queue.front());
 			m_queue.pop_front();
 			if (m_header) {
 				if (!leftover || !WritePacket(owner, *leftover))

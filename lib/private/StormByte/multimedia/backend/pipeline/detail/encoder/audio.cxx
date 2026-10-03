@@ -341,7 +341,7 @@ bool Audio::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Audio::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
+	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
 	if (!frame) {
 		owner.Fail("empty frame");
 		return false;
@@ -441,7 +441,7 @@ void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	m_flushed = true;
 }
 
-std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Audio::Take() noexcept {
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Audio::Take() noexcept {
 	if (m_pending.empty() && m_encoder && m_owner) {
 		const auto result = m_encoder->ReceivePacket(m_scratch);
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Success) {

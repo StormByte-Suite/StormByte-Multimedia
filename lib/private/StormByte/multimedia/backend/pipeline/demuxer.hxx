@@ -102,7 +102,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * During Measure, packets whose track is not in
 			 * owner.m_measureTracks are skipped (not treated as EOF).
 			 */
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Read(
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Read(
 				StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept;
 
 			/**

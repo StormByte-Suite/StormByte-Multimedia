@@ -218,7 +218,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return true if libav accepted it.
 			 */
 			virtual bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept = 0;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept = 0;
 
 			/**
 			 * @brief Signals EOF and drains. No-op if already flushed.
@@ -230,7 +230,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Pops one pending encoded packet.
 			 * @return Packet with Producer::Encoder, or empty if none ready.
 			 */
-			virtual std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Take() noexcept = 0;
+			virtual StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() noexcept = 0;
 
 			/**
 			 * @brief Opened AVCodecContext, if any.
@@ -267,7 +267,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param keepPacketHdrPlus false for HEVC (SEI already in payload).
 			 * @return shared Packet with Producer::Encoder.
 			 */
-			static std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> MakePacket(
+			static StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> MakePacket(
 				StormByte::Multimedia::Pipeline::Encoder& owner,
 				enum StormByte::Multimedia::Type type, int index,
 				const StormByte::Multimedia::FFmpeg::AVPacket& raw,

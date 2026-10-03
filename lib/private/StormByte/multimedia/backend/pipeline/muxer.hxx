@@ -140,7 +140,7 @@ namespace StormByte {
 						 * @return true if the packet was accepted.
 						 */
 						virtual bool Push(StormByte::Multimedia::Pipeline::Muxer& owner,
-							const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
+							const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
 
 						/**
 						 * @brief Flushes leftover packets and the trailer.

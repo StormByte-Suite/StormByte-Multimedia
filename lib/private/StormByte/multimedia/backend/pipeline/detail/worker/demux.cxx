@@ -129,7 +129,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_positionNs.store(-1, std::memory_order_release);
 		m_owner.m_nextSerial.clear();
 		m_feedStop.store(false, std::memory_order_release);
-		Log(Level::Notice, std::format("open {}", m_owner.Origin().Path().string()));
+			Log(Level::Notice, std::format("open {}", std::string_view{m_owner.Origin().Path()}));
 	}
 
 	void Demux::Process(Item::PointerType) noexcept {

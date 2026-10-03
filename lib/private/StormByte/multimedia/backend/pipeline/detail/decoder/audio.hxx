@@ -123,14 +123,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @return true if libav accepted it.
 			 */
 			bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
 
 			/**
 			 * @brief Receives one audio frame.
 			 * @param owner Public decoder.
 			 * @return Frame with Producer::Decoder, or empty if none ready.
 			 */
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Frame> Receive(
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Receive(
 				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
 
 			/**

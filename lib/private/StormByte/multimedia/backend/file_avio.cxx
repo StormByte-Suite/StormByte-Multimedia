@@ -49,16 +49,16 @@ extern "C" {
 	#include <libavutil/mem.h>
 }
 
-using StormByte::Buffer::IO::BufferedFileReader;
-using StormByte::Buffer::IO::BufferedFileWriter;
+using StormByte::Buffer::IO::BufferedLocationReader;
+using StormByte::Buffer::IO::BufferedLocationWriter;
 using StormByte::Buffer::IO::Status;
 using StormByte::Buffer::Position;
 
 namespace StormByte::Multimedia::Backend {
-	FileAvio::FileAvio(BufferedFileReader& reader) noexcept
+	FileAvio::FileAvio(BufferedLocationReader& reader) noexcept
 	: m_leaf(&reader), m_avio(nullptr) {}
 
-	FileAvio::FileAvio(BufferedFileWriter& writer) noexcept
+	FileAvio::FileAvio(BufferedLocationWriter& writer) noexcept
 	: m_leaf(&writer), m_avio(nullptr) {}
 
 	FileAvio::FileAvio(FileAvio&& other) noexcept
@@ -81,13 +81,13 @@ namespace StormByte::Multimedia::Backend {
 	}
 
 	bool FileAvio::IsWriter() const noexcept {
-		return std::holds_alternative<BufferedFileWriter*>(m_leaf);
+		return std::holds_alternative<BufferedLocationWriter*>(m_leaf);
 	}
 
 	std::optional<std::size_t> FileAvio::LeafSize() const noexcept {
-		if (auto* reader = std::get_if<BufferedFileReader*>(&m_leaf); reader && *reader)
+		if (auto* reader = std::get_if<BufferedLocationReader*>(&m_leaf); reader && *reader)
 			return (*reader)->Size();
-		if (auto* writer = std::get_if<BufferedFileWriter*>(&m_leaf); writer && *writer)
+		if (auto* writer = std::get_if<BufferedLocationWriter*>(&m_leaf); writer && *writer)
 			return (*writer)->Size();
 		return std::nullopt;
 	}
@@ -137,7 +137,7 @@ namespace StormByte::Multimedia::Backend {
 		auto* self = static_cast<FileAvio*>(opaque);
 		if (!self || bufSize <= 0)
 			return AVERROR(EINVAL);
-		auto* reader = std::get_if<BufferedFileReader*>(&self->m_leaf);
+		auto* reader = std::get_if<BufferedLocationReader*>(&self->m_leaf);
 		if (!reader || !*reader)
 			return AVERROR(EINVAL);
 
@@ -154,7 +154,7 @@ namespace StormByte::Multimedia::Backend {
 		auto* self = static_cast<FileAvio*>(opaque);
 		if (!self || !buf || bufSize <= 0)
 			return AVERROR(EINVAL);
-		auto* writer = std::get_if<BufferedFileWriter*>(&self->m_leaf);
+		auto* writer = std::get_if<BufferedLocationWriter*>(&self->m_leaf);
 		if (!writer || !*writer)
 			return AVERROR(EINVAL);
 
@@ -196,13 +196,13 @@ namespace StormByte::Multimedia::Backend {
 			return AVERROR(EINVAL);
 		}
 
-		if (auto* reader = std::get_if<BufferedFileReader*>(&self->m_leaf); reader && *reader) {
+		if (auto* reader = std::get_if<BufferedLocationReader*>(&self->m_leaf); reader && *reader) {
 			const auto seek = (*reader)->Seek(target, pos);
 			if (seek.status != Status::Ok)
 				return AVERROR(EIO);
 			return static_cast<std::int64_t>((*reader)->Tell());
 		}
-		if (auto* writer = std::get_if<BufferedFileWriter*>(&self->m_leaf); writer && *writer) {
+		if (auto* writer = std::get_if<BufferedLocationWriter*>(&self->m_leaf); writer && *writer) {
 			const auto seek = (*writer)->Seek(target, pos);
 			if (seek.status != Status::Ok)
 				return AVERROR(EIO);

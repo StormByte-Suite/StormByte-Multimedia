@@ -130,7 +130,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return true if the cue was accepted (or skipped empty).
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
 
 			/**
 			 * @brief Emits any held show packet, then marks flushed.
@@ -142,7 +142,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @brief Pops one encoded subtitle packet.
 			 * @return Packet with Producer::Encoder, or empty if none ready.
 			 */
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Take() noexcept override;
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() noexcept override;
 
 			/**
 			 * @brief Opened AVCodecContext, if any.
@@ -167,7 +167,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 
 			std::optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;		///< Opened encoder
 			StormByte::Multimedia::FFmpeg::AVPacket m_scratch;						///< Encode scratch
-			std::deque<std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Packets waiting for Mux
+			std::deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Packets waiting for Mux
 			AVRational m_timeBase;															///< Encoder time base
 			StormByte::Multimedia::OCR::Engine m_ocr;										///< Bitmap OCR
 			int m_index;																	///< Encoder::Index after Open

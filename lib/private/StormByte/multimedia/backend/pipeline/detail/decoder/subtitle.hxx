@@ -121,14 +121,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @return true if libav accepted it.
 			 */
 			bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
 
 			/**
 			 * @brief Receives one subtitle frame (text or OCR-prefixed bitmap).
 			 * @param owner Public decoder.
 			 * @return Frame with Producer::Decoder, or empty if none ready.
 			 */
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Frame> Receive(
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Receive(
 				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
 
 			/**
@@ -147,7 +147,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		private:
 			StormByte::Multimedia::FFmpeg::AVDecoder m_decoder;							///< Opened decoder
 			std::optional<StormByte::Multimedia::FFmpeg::AVSubtitle> m_pendingSub;		///< Pending AVSubtitle
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Frame> m_heldSubtitle;		///< Held subtitle frame
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> m_heldSubtitle;		///< Held subtitle frame
 			std::optional<StormByte::Multimedia::Property::Duration> m_packetPts;		///< Last packet PTS
 			std::optional<StormByte::Multimedia::Property::Duration> m_packetDuration;	///< Last packet duration
 			AVRational m_timeBase;														///< Stream time base

@@ -38,6 +38,7 @@
 
 #pragma once
 
+#include <StormByte/binary_data.hxx>
 #include <StormByte/buffer/typedefs.hxx>
 #include <StormByte/multimedia/ffmpeg/AVChannelLayout.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
@@ -692,7 +693,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Packs planar video/audio into @p out without linesize padding.
 			 * @param out Destination (cleared first).
 			 */
-			void CopyPrimaryBuffer(StormByte::Buffer::DataType& out) const noexcept;
+			void CopyPrimaryBuffer(StormByte::BinaryData& out) const noexcept;
 
 			/**
 			 * @brief Writes mastering display and content light from @p hdr10.

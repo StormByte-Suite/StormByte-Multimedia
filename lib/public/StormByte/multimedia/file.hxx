@@ -38,7 +38,8 @@
 
 #pragma once
 
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
+#include <StormByte/buffer/io/buffered_location_reader.hxx>
+#include <StormByte/safe/string.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/metadata/file.hxx>
@@ -52,8 +53,20 @@
 #include <optional>
 #include <variant>
 
-namespace StormByte::Multimedia::FFmpeg {
-	class AVFormatContext;
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia module of the StormByte suite.
+	 */
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::FFmpeg
+		 * @brief Private RAII wrappers over libav*.
+		 */
+		namespace FFmpeg {
+			class AVFormatContext;
+		}
+	}
 }
 
 /**
@@ -63,30 +76,28 @@ namespace StormByte::Multimedia::FFmpeg {
 namespace StormByte {
 	/**
 	 * @namespace StormByte::Multimedia
-	 * @brief Public multimedia types: codecs, containers, streams and files.
+	 * @brief Multimedia module of the StormByte suite.
 	 */
 	namespace Multimedia {
 		/**
 		 * @class File
 		 * @brief Read-only consultation snapshot of a media source.
 		 *
-		 * File lists path label, container, streams (HDR / HDR10+ and
-		 * other mapped properties), attachments, metadata and duration.
-		 * It has no write API and is not part of the tube. There is no
-		 * public Reader().
+		 * File lists a locator, container, streams (HDR / HDR10+ and other
+		 * mapped properties), attachments, metadata and duration. It has no
+		 * write API and is not part of the tube. There is no public Reader().
 		 *
-		 * Open(path) builds a temporary BufferedFileReader, probes, and
-		 * drops it so the handle is not held (Windows locking). The
-		 * snapshot keeps the path. Open(BufferedFileReader&) probes
-		 * that reader with AVIO and keeps a reference; the caller
-		 * retains ownership. Duration() uses the borrowed reader or
-		 * builds another temporary reader from the stored path and
-		 * drops it. Path() is the stored path or reader.Path().
+		 * Open(path) creates a temporary local file leaf and drops it after
+		 * probing so the handle is not held (Windows locking). Open(reader)
+		 * probes any BufferedLocationReader with AVIO and keeps a borrowed
+		 * reference; the caller retains ownership. Duration() uses that reader
+		 * or builds another temporary local reader from the stored path.
+		 * Path() returns the stored path or the borrowed reader locator.
 		 *
-		 * Open probes headers and a bounded run of video packets for
-		 * HDR10+. It does not read the whole source for Duration.
+		 * Open probes headers and a bounded run of video packets for HDR10+.
+		 * It does not read the whole source for Duration.
 		 *
-		 * @see StormByte::Buffer::IO::BufferedFileReader
+		 * @see StormByte::Buffer::IO::BufferedLocationReader
 		 */
 		class STORMBYTE_MULTIMEDIA_PUBLIC File {
 			public:
@@ -110,7 +121,7 @@ namespace StormByte {
 				 * @brief Path label: stored path, or reader.Path() if borrowed.
 				 * @return Label.
 				 */
-				const std::filesystem::path& Path() const noexcept;
+				StormByte::Safe::String Path() const;
 
 				/**
 				 * @brief Detected container.
@@ -165,13 +176,13 @@ namespace StormByte {
 				 * @param duration Authoritative duration; empty means scan on first Duration().
 				 * @return Snapshot or FileOpenException.
 				 */
-				static ExpectedFile Open(StormByte::Buffer::IO::BufferedFileReader& reader,
+				static ExpectedFile Open(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 			private:
 				using Origin = std::variant<
 					std::filesystem::path,
-					std::reference_wrapper<StormByte::Buffer::IO::BufferedFileReader>
+					std::reference_wrapper<StormByte::Buffer::IO::BufferedLocationReader>
 				>;
 
 				Origin m_origin;										///< Path or borrowed reader
@@ -204,7 +215,7 @@ namespace StormByte {
 				 * @param origin Path to keep, or borrowed reference.
 				 * @return Snapshot or FileOpenException.
 				 */
-				static ExpectedFile Probe(StormByte::Buffer::IO::BufferedFileReader& reader,
+				static ExpectedFile Probe(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					std::optional<std::chrono::nanoseconds> duration,
 					Origin origin) noexcept;
 
@@ -219,7 +230,7 @@ namespace StormByte {
 				 * @param streams Streams to update.
 				 * @param duration Container duration to fill if empty.
 				 */
-				static void ScanWithReader(StormByte::Buffer::IO::BufferedFileReader& reader,
+				static void ScanWithReader(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					Multimedia::Streams& streams,
 					std::optional<Property::Duration>& duration) noexcept;
 

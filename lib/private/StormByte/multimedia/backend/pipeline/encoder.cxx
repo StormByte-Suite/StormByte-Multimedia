@@ -184,11 +184,11 @@ std::int64_t Encoder::NsToTicks(std::int64_t ns, FFmpeg::AVRational timeBase) no
 	return FFmpeg::Nanosecond.Rescale(ns, timeBase);
 }
 
-std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePacket(
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePacket(
 	StormByte::Multimedia::Pipeline::Encoder& owner,
 	enum Type type, int index, const StormByte::Multimedia::FFmpeg::AVPacket& raw,
 	AVRational timeBase, bool keepPacketHdrPlus) noexcept {
-	StormByte::Buffer::DataType bytes;
+	StormByte::BinaryData bytes;
 	const auto* data = raw.Data();
 	const int size = raw.Size();
 	if (data && size > 0) {
@@ -209,7 +209,8 @@ std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePacket(
 			&& type != AV_PKT_DATA_MASTERING_DISPLAY_METADATA
 			&& type != AV_PKT_DATA_CONTENT_LIGHT_LEVEL)
 			continue;
-		StormByte::Buffer::DataType blob(
+		StormByte::BinaryData blob;
+		blob.assign(
 			reinterpret_cast<const std::byte*>(data),
 			reinterpret_cast<const std::byte*>(data) + size);
 		switch (type) {

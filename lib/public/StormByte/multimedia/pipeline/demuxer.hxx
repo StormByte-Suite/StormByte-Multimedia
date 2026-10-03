@@ -116,8 +116,8 @@ namespace StormByte {
 			 * in this stage.
 			 *
 			 * @par Octets
-			 * LibAV talks only to @ref Backend::FileAvio on the seekable
-			 * @ref StormByte::Buffer::IO::BufferedFileReader owned by the
+				 * LibAV talks only to @ref Backend::FileAvio on the seekable
+				 * @ref StormByte::Buffer::IO::BufferedLocationReader owned by the
 			 * Plan. There is no second ring and no Bridge on that reader.
 			 *
 			 * A @ref Filter::ProcessTwoPasses leaf tells @ref Filters to call
@@ -302,13 +302,13 @@ namespace StormByte {
 					 * @brief Origin reader owned by the bound Plan.
 					 * @return Seekable reader.
 					 */
-					const StormByte::Buffer::IO::BufferedFileReader& Origin() const noexcept;
+					const StormByte::Buffer::IO::BufferedLocationReader& Origin() const noexcept;
 
 					/**
 					 * @brief Origin reader owned by the bound Plan.
 					 * @return Seekable reader.
 					 */
-					StormByte::Buffer::IO::BufferedFileReader& Origin() noexcept;
+					StormByte::Buffer::IO::BufferedLocationReader& Origin() noexcept;
 
 					/**
 					 * @brief Opens the decode backend for @p decoder.

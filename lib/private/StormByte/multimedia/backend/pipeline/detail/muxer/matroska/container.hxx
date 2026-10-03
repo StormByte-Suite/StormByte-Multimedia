@@ -165,7 +165,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 			 * @return true if the packet was accepted.
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Muxer& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
 
 			/**
 			 * @brief Writes leftover packets and the trailer.
@@ -228,7 +228,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 			std::optional<StormByte::Multimedia::Backend::FileAvio> m_avio;	///< Writer AVIO
 			std::map<int, Track> m_tracks;								///< Output index → track
 			std::map<int, int> m_inToOut;								///< Source index → output index
-			std::deque<std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>> m_queue;	///< Packets waiting for header
+			std::deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_queue;	///< Packets waiting for header
 			StormByte::Multimedia::Attachments m_attachments;			///< Header catalogue
 			bool m_header;												///< avformat_write_header done
 			bool m_trailer;												///< av_write_trailer done

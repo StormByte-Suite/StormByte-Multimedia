@@ -40,6 +40,8 @@
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 
+#include <StormByte/buffer/io/buffered_file_reader.hxx>
+#include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/file.hxx>
@@ -51,6 +53,7 @@
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/stream.hxx>
+#include <StormByte/safe/wstring.hxx>
 
 #include <algorithm>
 #include <limits>
@@ -65,6 +68,23 @@ using namespace StormByte::Multimedia::Pipeline;
 
 namespace {
 	constexpr std::size_t InvalidSlot = std::numeric_limits<std::size_t>::max();
+
+	StormByte::Safe::String LocationText(const std::filesystem::path& path) {
+		const auto native = path.wstring();
+		return StormByte::Safe::String{StormByte::Safe::WString{std::wstring_view{native}}};
+	}
+
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> LocalReader(
+		const std::filesystem::path& path) {
+		return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>::MakePointer<
+			StormByte::Buffer::IO::BufferedFileReader>(LocationText(path));
+	}
+
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> LocalWriter(
+		const std::filesystem::path& path) {
+		return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter>::MakePointer<
+			StormByte::Buffer::IO::BufferedFileWriter>(LocationText(path));
+	}
 
 	void JobLog(const std::shared_ptr<StormByte::Logger::Log>& log,
 		Level level, std::string_view text) noexcept {
@@ -234,12 +254,22 @@ Transcoder::Track& Transcoder::Track::Title(std::string title) noexcept {
 Transcoder::Transcoder(const std::filesystem::path& source,
 	const std::filesystem::path& destination,
 	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-: Transcoder(std::make_unique<StormByte::Buffer::IO::BufferedFileReader>(source),
-	std::make_unique<StormByte::Buffer::IO::BufferedFileWriter>(destination),
-	std::move(logger)) {}
+: Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger)) {}
 
-Transcoder::Transcoder(std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader> reader,
-	std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter> writer,
+Transcoder::Transcoder(const std::filesystem::path& source,
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
+	: Transcoder(LocalReader(source), std::move(writer), std::move(logger)) {}
+
+Transcoder::Transcoder(
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+	const std::filesystem::path& destination,
+	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
+	: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger)) {}
+
+Transcoder::Transcoder(
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
 : m_app_log(logger), m_logger(std::move(logger)),
 	m_reader(std::move(reader)), m_writer(std::move(writer)),
@@ -311,14 +341,14 @@ bool Transcoder::ProbeSource() noexcept {
 		Fail("reader path is empty");
 		return false;
 	}
-	auto opened = File::Open(path);
+	auto opened = File::Open(*m_reader);
 	if (!opened) {
 		const char* text = opened.error() ? opened.error()->what() : "file open failed";
 		Fail(text);
 		return false;
 	}
 	m_consult = std::make_unique<File>(std::move(*opened));
-	JobLog(m_logger, Level::Notice, "probed source " + path.string());
+	JobLog(m_logger, Level::Notice, std::format("probed source {}", std::string_view{path}));
 	return true;
 }
 
@@ -512,8 +542,8 @@ Transcoder::operator bool() const noexcept {
 }
 
 std::unique_ptr<class Plan> Transcoder::EmptyPlan(
-	StormByte::Buffer::IO::BufferedFileReader&& reader,
-	StormByte::Buffer::IO::BufferedFileWriter&& writer) const noexcept {
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) const noexcept {
 	return std::make_unique<class Plan>(std::move(reader), std::move(writer));
 }
 

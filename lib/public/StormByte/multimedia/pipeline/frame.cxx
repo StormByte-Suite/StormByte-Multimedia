@@ -162,7 +162,7 @@ void Frame::BecomeEmpty() noexcept {
 
 StormByte::Buffer::FIFO& Frame::Payload() noexcept {
 	if (m_backend && !m_backend->PayloadReady()) {
-		StormByte::Buffer::DataType bytes;
+			StormByte::BinaryData bytes;
 		m_backend->Handle().CopyPrimaryBuffer(bytes);
 		m_payload = StormByte::Buffer::FIFO{std::move(bytes)};
 		m_backend->PayloadReady(true);

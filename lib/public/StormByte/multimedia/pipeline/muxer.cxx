@@ -258,7 +258,7 @@ bool Muxer::ArmOctets() noexcept {
 	if (!m_backend->BindSink(*this))
 		return false;
 
-	Log(Level::Notice, std::format("writer {}", m_plan->Path().string()));
+	Log(Level::Notice, std::format("writer {}", std::string_view{m_plan->Path()}));
 	return true;
 }
 

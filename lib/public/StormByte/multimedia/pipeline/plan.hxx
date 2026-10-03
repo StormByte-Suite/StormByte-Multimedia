@@ -38,14 +38,15 @@
 
 #pragma once
 
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
-#include <StormByte/buffer/io/buffered_file_writer.hxx>
+#include <StormByte/buffer/io/buffered_location_reader.hxx>
+#include <StormByte/buffer/io/buffered_location_writer.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/pointers.hxx>
 #include <StormByte/multimedia/visibility.h>
-#include <StormByte/type_traits.hxx>
 
 #include <filesystem>
 #include <memory>
@@ -73,11 +74,11 @@ namespace StormByte {
 
 			/**
 			 * @class Plan
-			 * @brief Closed job intention: owned reader, owned writer, tracks.
+				 * @brief Closed job intention: owned location reader, writer and tracks.
 			 *
-			 * Octets in and out are BufferedFile leaves taken by &&
-			 * (or built from a path) and stored on the heap as the
-			 * dynamic type. No slicing. The constructor probes the
+				 * Octets are held as @ref StormByte::Safe::Unique of the location
+				 * bases. Paths build local BufferedFile leaves; supplied owners retain
+				 * their dynamic types without slicing. The constructor probes the
 			 * reader once into a consultation File snapshot
 			 * (streams, attachments, metadata). That File is not the
 			 * octet origin. Duration() is not called on it.
@@ -110,44 +111,28 @@ namespace StormByte {
 						const std::filesystem::path& destination) noexcept;
 
 					/**
-					 * @brief Builds a reader from @p source and takes @p writer.
-					 * @tparam Writer Leaf type derived from BufferedFileWriter.
+					 * @brief Builds a local reader and takes @p writer.
 					 * @param source Input path.
-					 * @param writer Output writer (moved).
+					 * @param writer Owned output location (moved).
 					 */
-					template<typename Writer>
-					requires StormByte::Type::DerivedFrom<Writer, StormByte::Buffer::IO::BufferedFileWriter>
-					Plan(const std::filesystem::path& source, Writer&& writer) noexcept
-					: Plan(StormByte::Buffer::IO::BufferedFileReader{source},
-						std::forward<Writer>(writer)) {}
+					Plan(const std::filesystem::path& source,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) noexcept;
 
 					/**
-					 * @brief Takes @p reader and builds a writer on @p destination.
-					 * @tparam Reader Leaf type derived from BufferedFileReader.
-					 * @param reader Input reader (moved).
+					 * @brief Takes @p reader and builds a local writer.
+					 * @param reader Owned input location (moved).
 					 * @param destination Output path.
 					 */
-					template<typename Reader>
-					requires StormByte::Type::DerivedFrom<Reader, StormByte::Buffer::IO::BufferedFileReader>
-					Plan(Reader&& reader, const std::filesystem::path& destination) noexcept
-					: Plan(std::forward<Reader>(reader),
-						StormByte::Buffer::IO::BufferedFileWriter{destination}) {}
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						const std::filesystem::path& destination) noexcept;
 
 					/**
-					 * @brief Takes both leaves. Heap-allocates the dynamic types.
-					 * @tparam Reader Leaf type derived from BufferedFileReader.
-					 * @tparam Writer Leaf type derived from BufferedFileWriter.
-					 * @param reader Input reader (moved).
-					 * @param writer Output writer (moved).
+					 * @brief Takes both location owners without slicing.
+					 * @param reader Owned input location (moved).
+					 * @param writer Owned output location (moved).
 					 */
-					template<typename Reader, typename Writer>
-					requires StormByte::Type::DerivedFrom<Reader, StormByte::Buffer::IO::BufferedFileReader>
-						&& StormByte::Type::DerivedFrom<Writer, StormByte::Buffer::IO::BufferedFileWriter>
-					Plan(Reader&& reader, Writer&& writer) noexcept
-					: Plan(std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader>(
-							std::make_unique<std::remove_cvref_t<Reader>>(std::forward<Reader>(reader))),
-						std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter>(
-							std::make_unique<std::remove_cvref_t<Writer>>(std::forward<Writer>(writer)))) {}
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) noexcept;
 
 					Plan(const Plan&) = delete;
 					Plan& operator=(const Plan&) = delete;
@@ -202,13 +187,13 @@ namespace StormByte {
 					 * @brief Origin reader owned by this Plan.
 					 * @return Reader.
 					 */
-					StormByte::Buffer::IO::BufferedFileReader& Reader() noexcept;
+					StormByte::Buffer::IO::BufferedLocationReader& Reader() noexcept;
 
 					/**
 					 * @brief Origin reader owned by this Plan.
 					 * @return Reader.
 					 */
-					const StormByte::Buffer::IO::BufferedFileReader& Reader() const noexcept;
+					const StormByte::Buffer::IO::BufferedLocationReader& Reader() const noexcept;
 
 					/**
 					 * @brief Consultation snapshot taken in the constructor.
@@ -231,19 +216,19 @@ namespace StormByte {
 					 * @brief Destination writer owned by this Plan.
 					 * @return Writer.
 					 */
-					StormByte::Buffer::IO::BufferedFileWriter& Writer() noexcept;
+					StormByte::Buffer::IO::BufferedLocationWriter& Writer() noexcept;
 
 					/**
 					 * @brief Destination writer owned by this Plan.
 					 * @return Writer.
 					 */
-					const StormByte::Buffer::IO::BufferedFileWriter& Writer() const noexcept;
+					const StormByte::Buffer::IO::BufferedLocationWriter& Writer() const noexcept;
 
 					/**
 					 * @brief Output path forwarded from the writer.
 					 * @return Path.
 					 */
-					inline const std::filesystem::path& Path() const noexcept {
+					inline const StormByte::Safe::String& Path() const noexcept {
 						return m_writer->Path();
 					}
 
@@ -297,19 +282,16 @@ namespace StormByte {
 					 * @param reader Owned origin.
 					 * @param writer Owned sink.
 					 */
-					Plan(std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader> reader,
-						std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter> writer) noexcept;
-
 					/**
 					 * @brief Resolves the registry container from the writer path.
 					 * @param writer Sink whose Path() has the extension.
 					 * @return Registry container pointer, or nullptr.
 					 */
 					static const class Container* ContainerFromWriter(
-						const StormByte::Buffer::IO::BufferedFileWriter& writer) noexcept;
+						const StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
 
-					std::unique_ptr<StormByte::Buffer::IO::BufferedFileReader> m_reader;	///< Owned origin octets
-					std::unique_ptr<StormByte::Buffer::IO::BufferedFileWriter> m_writer;	///< Owned sink octets
+					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets
+					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned sink octets
 					std::optional<StormByte::Multimedia::File> m_snapshot;				///< Constructor probe
 					const class Container* m_container;										///< Registry destination
 					class Tracks m_tracks;													///< Tube tracks; index is mux slot

@@ -91,14 +91,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return true if libav accepted it. false if the codec is full.
 			 */
 			virtual bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const std::shared_ptr<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
 
 			/**
 			 * @brief Receives one decoded frame.
 			 * @param owner Public decoder.
 			 * @return Frame with Producer::Decoder, or empty if none ready.
 			 */
-			virtual std::shared_ptr<StormByte::Multimedia::Pipeline::Frame> Receive(
+			virtual StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Receive(
 				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept = 0;
 
 			/**

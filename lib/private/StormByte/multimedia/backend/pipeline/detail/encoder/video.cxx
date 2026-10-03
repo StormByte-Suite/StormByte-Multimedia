@@ -275,7 +275,7 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const std::shared_ptr<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
+	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
 	if (!frame) {
 		owner.Fail("empty frame");
 		return false;
@@ -386,7 +386,7 @@ void Video::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	m_flushed = true;
 }
 
-std::shared_ptr<StormByte::Multimedia::Pipeline::Packet> Video::Take() noexcept {
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Video::Take() noexcept {
 	if (m_pending.empty() && m_encoder && m_owner) {
 		const auto result = m_encoder->ReceivePacket(m_scratch);
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Success) {
