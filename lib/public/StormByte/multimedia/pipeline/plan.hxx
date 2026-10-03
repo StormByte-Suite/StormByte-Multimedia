@@ -40,6 +40,7 @@
 
 #include <StormByte/buffer/io/buffered_location_reader.hxx>
 #include <StormByte/buffer/io/buffered_location_writer.hxx>
+#include <StormByte/buffer/telemetry.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
@@ -207,6 +208,12 @@ namespace StormByte {
 					const StormByte::Buffer::IO::BufferedLocationReader& Reader() const noexcept;
 
 					/**
+					 * @brief Shared telemetry for the owned input reader.
+					 * @return Shared handle. Retain it to inspect final I/O counters after this Plan dies.
+					 */
+					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> InputTelemetry() const noexcept;
+
+					/**
 					 * @brief Consultation snapshot taken in the constructor.
 					 * @return File snapshot (streams, attachments, metadata).
 					 *
@@ -301,6 +308,7 @@ namespace StormByte {
 					static const class Container* ContainerFromWriter(
 						const StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
 
+					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;	///< Input counters retained independently of the reader
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned sink octets
 					std::optional<StormByte::Multimedia::File> m_snapshot;				///< Constructor probe

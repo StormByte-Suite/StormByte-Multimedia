@@ -276,6 +276,7 @@ Transcoder::Transcoder(
 	std::shared_ptr<StormByte::Logger::Log> logger,
 	std::optional<std::chrono::nanoseconds> duration) noexcept
 : m_app_log(logger), m_logger(std::move(logger)),
+	m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_reader(std::move(reader)), m_writer(std::move(writer)),
 	m_duration(duration && duration->count() > 0 ? duration : std::nullopt),
 	m_backend(std::make_unique<Backend::Pipeline::Transcoder>()),
@@ -527,6 +528,10 @@ std::optional<std::string> Transcoder::Error() const noexcept {
 		return std::nullopt;
 	std::lock_guard lock(m_backend->Lock);
 	return m_backend->Error;
+}
+
+StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> Transcoder::InputTelemetry() const noexcept {
+	return m_input_telemetry;
 }
 
 Progress::Pointer Transcoder::Progress() const noexcept {

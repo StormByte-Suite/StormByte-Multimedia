@@ -135,7 +135,8 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
 	std::optional<std::chrono::nanoseconds> duration) noexcept
-: m_reader(std::move(reader)),
+: m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
+	m_reader(std::move(reader)),
 	m_writer(std::move(writer)),
 	m_container(m_writer ? ContainerFromWriter(*m_writer) : nullptr) {
 	if (!m_reader)
@@ -167,6 +168,10 @@ BufferedLocationReader& Plan::Reader() noexcept {
 
 const BufferedLocationReader& Plan::Reader() const noexcept {
 	return *m_reader;
+}
+
+StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> Plan::InputTelemetry() const noexcept {
+	return m_input_telemetry;
 }
 
 BufferedLocationWriter& Plan::Writer() noexcept {
