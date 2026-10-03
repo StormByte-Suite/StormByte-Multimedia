@@ -267,6 +267,19 @@ ExpectedFile File::Open(BufferedLocationReader& reader,
 
 void File::ScanWithReader(BufferedLocationReader& reader, Multimedia::Streams& streams,
 	std::optional<Property::Duration>& duration, const DurationProgress& progress) noexcept {
+	const bool local = reader.Location() == StormByte::Buffer::IO::Location::Local;
+	const auto readAhead = reader.ReadAhead();
+	const auto maxMemory = reader.MaxMemory();
+	const auto restoreReaderPolicy = [&] {
+		if (!local)
+			return;
+		reader.MaxMemory(maxMemory);
+		reader.ReadAhead(readAhead);
+	};
+	if (local) {
+		reader.ReadAhead(StormByte::ByteSize{0});
+		reader.MaxMemory(StormByte::ByteSize{0});
+	}
 	double percent = 0.0;
 	auto published = std::chrono::steady_clock::now();
 	std::uint64_t payloadBytes = 0;
@@ -294,6 +307,7 @@ void File::ScanWithReader(BufferedLocationReader& reader, Multimedia::Streams& s
 	::AVFormatContext* raw = nullptr;
 	if (!OpenAvio(reader, raw, avio)) {
 		static_cast<void>(reader.Rewind());
+		restoreReaderPolicy();
 		return;
 	}
 	auto wrapped = FFmpeg::AVFormatContext::WrapBorrowed(raw, false);
@@ -302,6 +316,7 @@ void File::ScanWithReader(BufferedLocationReader& reader, Multimedia::Streams& s
 		progress(percent);
 	const bool complete = ScanDurations(wrapped, streams, duration, report);
 	const bool rewound = reader.Rewind();
+	restoreReaderPolicy();
 	if (progress)
 		progress(complete && rewound ? 100.0 : percent);
 }
