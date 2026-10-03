@@ -119,9 +119,6 @@ class StormByte::Multimedia::Backend::Pipeline::Demuxer::Context {
 		FFmpeg::AVPacket scratch;
 		std::unordered_map<int, FFmpeg::AVRational> timeBase;
 		std::unordered_set<int> wanted;
-		StormByte::ByteSize measureReadAhead{0};
-		StormByte::ByteSize measureMaxMemory{0};
-		bool measureReaderPolicySaved{false};
 };
 
 StormByte::Multimedia::Backend::Pipeline::Demuxer::Demuxer() noexcept
@@ -133,27 +130,6 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::~Demuxer() noexcept {
 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::IsOpen() const noexcept {
 	return m_ctx && m_ctx->format.has_value();
-}
-
-void StormByte::Multimedia::Backend::Pipeline::Demuxer::BeginMeasure(
-	StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept {
-	if (!m_ctx || m_ctx->measureReaderPolicySaved
-			|| reader.Location() != StormByte::Buffer::IO::Location::Local)
-		return;
-	m_ctx->measureReadAhead = reader.ReadAhead();
-	m_ctx->measureMaxMemory = reader.MaxMemory();
-	m_ctx->measureReaderPolicySaved = true;
-	reader.ReadAhead(StormByte::ByteSize{0});
-	reader.MaxMemory(StormByte::ByteSize{0});
-}
-
-void StormByte::Multimedia::Backend::Pipeline::Demuxer::RestoreReaderPolicy(
-	StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept {
-	if (!m_ctx || !m_ctx->measureReaderPolicySaved)
-		return;
-	reader.MaxMemory(m_ctx->measureMaxMemory);
-	reader.ReadAhead(m_ctx->measureReadAhead);
-	m_ctx->measureReaderPolicySaved = false;
 }
 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
@@ -250,9 +226,6 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 		owner.Fail("demuxer is not open");
 		return {};
 	}
-	if (owner.Measuring())
-		BeginMeasure(owner.Origin());
-
 	for (;;) {
 		const auto result = m_ctx->format->ReadPacket(m_ctx->scratch);
 		if (result == FFmpeg::OperationResult::EndOfFile)

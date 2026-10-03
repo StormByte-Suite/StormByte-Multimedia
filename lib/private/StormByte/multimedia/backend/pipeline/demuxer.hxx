@@ -41,7 +41,6 @@
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
-#include <StormByte/buffer/io/buffered_location_reader.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
@@ -94,18 +93,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool Open(StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept;
-
-			/**
-			 * @brief Disable local reader cache during the sequential measure pass.
-			 * @param reader Origin reader owned by the Plan.
-			 */
-			void BeginMeasure(StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept;
-
-			/**
-			 * @brief Restore the reader policy saved by @ref BeginMeasure.
-			 * @param reader Origin reader owned by the Plan.
-			 */
-			void RestoreReaderPolicy(StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept;
 
 			/**
 			 * @brief Reads one compressed packet.
