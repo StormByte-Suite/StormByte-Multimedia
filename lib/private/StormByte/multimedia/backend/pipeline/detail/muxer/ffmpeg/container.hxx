@@ -55,23 +55,23 @@
 #include <string>
 
 /**
- * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska
- * @brief Matroska / WebM mux backend.
+ * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg
+ * @brief Generic libavformat output mux backend.
  *
  * @ingroup multimedia_pipeline
  */
-namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
-	using FFmpeg::AVRational;
+namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
+	using StormByte::Multimedia::FFmpeg::AVRational;
 
 	/**
 	 * @class Container
-	 * @brief Matroska / WebM mux backend.
+	 * @brief libavformat mux backend for registered destination containers.
 	 *
 	 * Owns the output AVFormatContext, reserved tracks and the
 	 * header-delay queue. Bytes leave through @ref Backend::FileAvio
-	 * on @ref Plan::Writer. Format is guessed from the registry
-	 * container extension. The writer AVIO is seekable so duration
-	 * and indexes can be patched.
+	 * on @ref Plan::Writer. Format is guessed from the registry container
+	 * extension. Matroska attachments and header options remain conditional
+	 * on destination capabilities.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */

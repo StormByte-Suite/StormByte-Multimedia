@@ -37,7 +37,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/matroska/attachment.hxx>
-#include <StormByte/multimedia/backend/pipeline/detail/muxer/matroska/container.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
 #include <StormByte/multimedia/pipeline/config/subtitle.hxx>
@@ -234,7 +234,14 @@ namespace {
 	}
 }
 
-namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
+namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
+	namespace {
+		bool MatroskaFamily(const StormByte::Multimedia::Container& container) noexcept {
+			const auto name = container.Name();
+			return name == "Matroska" || name == "WebM";
+		}
+	}
+
 	Container::Container() noexcept
 	: m_ctx(nullptr),
 	m_header(false), m_trailer(false), m_customIo(false) {}
@@ -381,6 +388,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 			m_attachments.clear();
 			return true;
 		}
+		if (!owner.Destination().HasAccess(StormByte::Multimedia::Access{
+				StormByte::Multimedia::Operation::Attach})) {
+			owner.Fail("destination container does not support attachments");
+			return false;
+		}
 
 		if (!owner.Destination().HasAccess(Access{Operation::Attach})) {
 			owner.Fail("destination container does not support attachments");
@@ -449,7 +461,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 				return false;
 			}
 
-			if (!*track.encoder)
+			if (!track.encoder->Opened())
 				return true;
 		}
 
@@ -506,6 +518,16 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 					stream->time_base = ::AVRational{track.srcTb.num, track.srcTb.den};
 			}
 
+			if (stream->codecpar) {
+				const int supported = avformat_query_codec(m_ctx->oformat,
+					stream->codecpar->codec_id, FF_COMPLIANCE_NORMAL);
+				if (supported == 0) {
+					owner.Fail(std::format("destination {} does not support codec {}",
+						owner.Destination().Name(), avcodec_get_name(stream->codecpar->codec_id)));
+					return false;
+				}
+			}
+
 			if (track.language)
 				av_dict_set(&stream->metadata, "language", track.language->c_str(), 0);
 			if (track.title)
@@ -527,10 +549,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 			track.timeBase = FFmpeg::AVRational{stream->time_base.num, stream->time_base.den};
 		}
 
-		if (!m_attachments.empty() && !Attachment::Write(owner, m_ctx, m_attachments))
-			return false;
+		if (!m_attachments.empty()) {
+			if (!MatroskaFamily(owner.Destination())) {
+				owner.Fail("file attachments are only supported in Matroska/WebM output");
+				return false;
+			}
+			if (!Matroska::Attachment::Write(owner, m_ctx, m_attachments))
+				return false;
+		}
 
-		av_dict_set(&m_ctx->metadata, "encoding_tool", WritingApp, 0);
+		if (MatroskaFamily(owner.Destination()))
+			av_dict_set(&m_ctx->metadata, "encoding_tool", WritingApp, 0);
 
 		std::int64_t deltaUs = InterleaveDeltaUs(owner);
 		const auto cap = owner.InputCeiling();
@@ -558,7 +587,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 		m_ctx->max_interleave_delta = deltaUs;
 
 		AVDictionary* opts = nullptr;
-		av_dict_set(&opts, "default_mode", "passthrough", 0);
+		if (MatroskaFamily(owner.Destination()))
+			av_dict_set(&opts, "default_mode", "passthrough", 0);
 		const int rc = avformat_write_header(m_ctx, &opts);
 		av_dict_free(&opts);
 		if (rc < 0) {

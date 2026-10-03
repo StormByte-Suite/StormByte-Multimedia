@@ -103,6 +103,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={}",
 			m_owner.m_index, *frame->Serial(), frame->Part(),
 			Ns(frame->Pts()), Ns(frame->Dts())));
+		m_owner.m_serial = frame->Serial();
+		m_owner.m_part = frame->Part();
 
 		while (!m_owner.m_backend->Push(m_owner, frame)) {
 			if (m_owner.Failed())
@@ -115,9 +117,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 			m_owner.Emit(std::move(packet));
 		}
-
-		m_owner.m_serial = frame->Serial();
-		m_owner.m_part = frame->Part();
 
 		for (;;) {
 			if (m_owner.Failed())

@@ -194,7 +194,7 @@ void Downmix::Eof() noexcept {
 			Fail("downmix: AVFilterGraph::Flush failed");
 			break;
 		}
-		if (!out)
+		if (out.NbSamples() <= 0)
 			break;
 		Log(Level::LowLevel, std::format(
 			"downmix flush {}ch pts={}",

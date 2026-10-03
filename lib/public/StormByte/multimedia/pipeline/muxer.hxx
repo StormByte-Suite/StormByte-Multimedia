@@ -83,7 +83,7 @@ namespace StormByte {
 					}
 
 					namespace Muxer {
-						namespace Matroska {
+						namespace FFmpeg {
 							class Container;
 						}
 					}
@@ -158,7 +158,7 @@ namespace StormByte {
 			 * @ingroup multimedia_pipeline
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Muxer final: public Step {
-				friend class Backend::Pipeline::Detail::Muxer::Matroska::Container;
+				friend class Backend::Pipeline::Detail::Muxer::FFmpeg::Container;
 				friend class Backend::Pipeline::Muxer;
 				friend class Backend::Pipeline::Detail::Worker::Mux;
 				friend Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
