@@ -168,6 +168,10 @@ What that mapping means:
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
 
+Capture `job.Telemetry()` before `Run()` if the final snapshot must outlive the job. It retains each stage's origin, lifecycle, frame/packet input and output counts, setup and elapsed time, Process-call total/mean/min/max, and blocked-wait total/count/max. The coordinator also logs the final multi-line report at `Info`; converting the retained handle to `std::string` produces the same report. A hand-built `Step` or filter exposes its own retained `Telemetry()` handle.
+
+`JobTelemetry::PeakMemory()` (also `MemoryMaximum()`) is the highest sampled process resident set size in bytes; `MemoryMinimum()` and `MemoryCurrent()` report the lowest sample and last sample. The coordinator samples nominally every 20 ms and at job start/end. These values are process-wide RSS, not memory attributed to an individual stage; OS sampling may miss short-lived peaks and can be unavailable on unsupported platforms.
+
 Quality knobs on a recode track are the obvious ones: `CRF`, `BitRate`, `MaxBitRate`, `Preset`, `Tune`, `FineTune`, plus `Language` / `Title` overrides.
 
 ### 2. The tube by hand

@@ -548,6 +548,12 @@ std::vector<std::pair<std::string, Filter::Report>> Transcoder::Reports() const 
 	return m_backend->Reports;
 }
 
+std::shared_ptr<const JobTelemetry> Transcoder::Telemetry() const noexcept {
+	if (!m_backend)
+		return {};
+	return m_backend->Metrics;
+}
+
 Transcoder::operator bool() const noexcept {
 	const auto status = Status();
 	return status != Status::Error && status != Status::Aborted;

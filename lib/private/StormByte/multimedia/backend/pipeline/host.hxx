@@ -40,9 +40,11 @@
 
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <cstdint>
+#include <chrono>
 #include <string>
 #include <string_view>
 
@@ -152,7 +154,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Adds one Process duration to the step summary.
 			 * @param microseconds Wall time of that Process call.
 			 */
-			virtual void RecordWork(std::int64_t microseconds) noexcept = 0;
+			virtual void RecordWork(std::chrono::nanoseconds duration) noexcept = 0;
+
+			/**
+			 * @brief Stage counters updated by the worker thread.
+			 * @return Mutable stage metrics.
+			 */
+			virtual Multimedia::Pipeline::StageTelemetry& Telemetry() noexcept = 0;
 
 			/**
 			 * @brief Writes min/max Process time at Debug. No-op if none.

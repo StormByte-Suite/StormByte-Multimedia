@@ -48,6 +48,7 @@
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -684,6 +685,17 @@ namespace StormByte::Multimedia::Pipeline {
 			 * are log, not this API.
 			 */
 			std::vector<std::pair<std::string, Filter::Report>> Reports() const noexcept;
+
+			/**
+			 * @brief Shared job and stage telemetry, available before Run.
+			 *
+			 * Retain the handle to inspect final counters after the worker
+			 * and its pipeline stages have been destroyed. Resident memory
+			 * values are sampled process RSS and are not per-stage allocations.
+			 *
+			 * @return Shared telemetry handle, or empty without a backend.
+			 */
+			std::shared_ptr<const JobTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief true if not failed.

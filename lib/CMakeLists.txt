@@ -11,6 +11,11 @@ else()
 	set(_mode static)
 endif()
 
+set(_component_options "BACKEND=host;ALIAS=StormByte::Multimedia")
+if(WIN32)
+	set(_component_options "${_component_options};LINK=Psapi")
+endif()
+
 buildmaster_component(
 	StormByte-Multimedia
 	"StormByte Suite - Multimedia"
@@ -18,7 +23,7 @@ buildmaster_component(
 	""
 	${_mode}
 	"StormByte-Multimedia"
-	"BACKEND=host;ALIAS=StormByte::Multimedia"
+	"${_component_options}"
 )
 
 if(BUILD_SHARED_LIBS)

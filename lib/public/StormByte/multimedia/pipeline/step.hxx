@@ -42,6 +42,7 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
 
@@ -208,6 +209,12 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return @ref State of this step only.
 			 */
 			State Status() const noexcept;
+
+			/**
+			 * @brief Shared stage counters, retained independently of this Step.
+			 * @return Const metrics handle. Origin is filled from @ref Label.
+			 */
+			std::shared_ptr<const StageTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief Whether this step can take work.
@@ -497,6 +504,7 @@ namespace StormByte::Multimedia::Pipeline {
 			std::shared_ptr<class Plan> m_plan;						///< Current plan
 			std::mutex m_wait;										///< Mutex for m_wake
 			std::optional<std::string> m_error;						///< Fail message
+			std::shared_ptr<StageTelemetry> m_telemetry;				///< Counters retained by telemetry snapshots
 			bool m_exhausted;										///< Source Ended()
 			std::uint64_t m_workN;									///< Timed Process calls
 			std::int64_t m_workMin;									///< Fastest Process, us

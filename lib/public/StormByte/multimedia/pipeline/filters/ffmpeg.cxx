@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/type.hxx>
 
 #include <algorithm>
+#include <chrono>
 #include <format>
 #include <limits>
 #include <utility>
@@ -127,6 +128,8 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 		Item::PointerType Pull() noexcept override {
 			Item::PointerType item;
 			m_owner.pipe() >> item;
+			if (item)
+				m_owner.m_telemetry->RecordInput(item->Kind());
 			return item;
 		}
 
@@ -143,8 +146,13 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 			m_owner.m_wake.notify_all();
 		}
 
-		void RecordWork(std::int64_t microseconds) noexcept override {
-			m_owner.RecordWork(microseconds);
+		void RecordWork(std::chrono::nanoseconds duration) noexcept override {
+			m_owner.m_telemetry->RecordProcess(duration);
+			m_owner.RecordWork(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
+		}
+
+		StormByte::Multimedia::Pipeline::StageTelemetry& Telemetry() noexcept override {
+			return *m_owner.m_telemetry;
 		}
 
 		void DumpWork() noexcept override {
@@ -163,6 +171,7 @@ FFmpeg::FFmpeg(std::shared_ptr<StormByte::Logger::Log> log,
 	m_produces(produces),
 	m_wake(),
 	m_pipe(std::make_unique<StormByte::Multimedia::Backend::Pipeline::Pipe>(m_wake)),
+	m_telemetry(std::make_shared<StormByte::Multimedia::Pipeline::StageTelemetry>()),
 	m_surface(std::make_unique<Surface>(*this)),
 	m_exhausted(false),
 	m_workN(0),
@@ -181,6 +190,12 @@ FFmpeg::~FFmpeg() noexcept {
 
 std::string FFmpeg::Name() const noexcept {
 	return std::string(ToString(Media())) + "/" + m_name;
+}
+
+std::shared_ptr<const StormByte::Multimedia::Pipeline::StageTelemetry> FFmpeg::Telemetry() const noexcept {
+	const std::string origin = Name();
+	m_telemetry->SetOrigin(origin);
+	return m_telemetry;
 }
 
 void FFmpeg::Process(const Pipeline::Frame&) noexcept {}
@@ -223,6 +238,7 @@ void FFmpeg::Fail(std::string reason) noexcept {
 	m_hold = 0;
 	m_heldFor = 0;
 	m_queue.clear();
+	m_telemetry->SetError(reason);
 	m_error = std::move(reason);
 	Log(Level::Error, *m_error);
 	if (m_pumper)
@@ -494,12 +510,15 @@ void FFmpeg::Finish() noexcept {
 }
 
 void FFmpeg::Emit(Pipeline::Item::PointerType item) noexcept {
+	if (item)
+		m_telemetry->RecordOutput(item->Kind());
 	item >> *m_pipe;
 }
 
 void FFmpeg::Wait() noexcept {
 	Log(Level::LowLevel, "wait");
 	std::unique_lock lock(m_wait);
+	const auto started = std::chrono::steady_clock::now();
 	m_wake.wait(lock, [this] {
 		if (Stopping() || m_pipe->Ready())
 			return true;
@@ -512,6 +531,7 @@ void FFmpeg::Wait() noexcept {
 			&& !two->m_measureDrained.load(std::memory_order_acquire)
 			&& !m_pipe->Ready();
 	});
+	m_telemetry->RecordWait(std::chrono::steady_clock::now() - started);
 	Log(Level::LowLevel, "wake");
 	if (MeasuringTwoPass()) {
 		auto* two = static_cast<ProcessTwoPasses*>(this);

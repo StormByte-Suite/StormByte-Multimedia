@@ -40,6 +40,7 @@
 
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -197,6 +198,13 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Name / report pairs. Empty reports are omitted.
 			 */
 			std::vector<std::pair<std::string, Filter::Report>> Reports() const noexcept;
+
+			/**
+			 * @brief Telemetry handles for every attached filter.
+			 * @return Name / metrics pairs in mount order.
+			 */
+			std::vector<std::pair<std::string, std::shared_ptr<const StageTelemetry>>>
+				StageTelemetries() const noexcept;
 
 			/**
 			 * @class Handle

@@ -45,6 +45,7 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 
+#include <chrono>
 #include <format>
 #include <limits>
 #include <string>
@@ -90,6 +91,8 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		Item::PointerType Pull() noexcept override {
 			Item::PointerType item;
 			m_step.pipe() >> item;
+			if (item)
+				m_step.m_telemetry->RecordInput(item->Kind());
 			return item;
 		}
 
@@ -106,8 +109,13 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 			m_step.m_wake.notify_all();
 		}
 
-		void RecordWork(std::int64_t microseconds) noexcept override {
-			m_step.RecordWork(microseconds);
+		void RecordWork(std::chrono::nanoseconds duration) noexcept override {
+			m_step.m_telemetry->RecordProcess(duration);
+			m_step.RecordWork(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
+		}
+
+		StageTelemetry& Telemetry() noexcept override {
+			return *m_step.m_telemetry;
 		}
 
 		void DumpWork() noexcept override {
@@ -128,6 +136,7 @@ Step::Step(std::shared_ptr<StormByte::Logger::Log> log,
 	m_wake(),
 	m_pipe(std::make_unique<Backend::Pipeline::Pipe>(m_wake)),
 	m_surface(std::make_unique<Surface>(*this)),
+	m_telemetry(std::make_shared<StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
 	m_workMin(std::numeric_limits<std::int64_t>::max()),
@@ -146,11 +155,18 @@ State Step::Status() const noexcept {
 	return m_error ? State::Failed : State::Created;
 }
 
+std::shared_ptr<const StageTelemetry> Step::Telemetry() const noexcept {
+	const std::string origin = Label();
+	m_telemetry->SetOrigin(origin);
+	return m_telemetry;
+}
+
 void Step::CloseHoppers() noexcept {
 	m_pipe->Close();
 }
 
 void Step::Fail(std::string reason) noexcept {
+	m_telemetry->SetError(reason);
 	m_error = std::move(reason);
 	Log(Level::Error, *m_error);
 	if (m_pumper)
@@ -213,9 +229,11 @@ const Backend::Pipeline::Pipe& Step::pipe() const noexcept {
 void Step::Wait() noexcept {
 	Log(Level::LowLevel, "wait");
 	std::unique_lock lock(m_wait);
+	const auto started = std::chrono::steady_clock::now();
 	m_wake.wait(lock, [this] {
 		return Stopping() || m_pipe->Ready() || m_pipe->InputEof() || WakeNow();
 	});
+	m_telemetry->RecordWait(std::chrono::steady_clock::now() - started);
 	Log(Level::LowLevel, "wake");
 	AfterWait();
 }
@@ -227,6 +245,8 @@ bool Step::WakeNow() const noexcept {
 void Step::AfterWait() noexcept {}
 
 void Step::Emit(Item::PointerType item) noexcept {
+	if (item)
+		m_telemetry->RecordOutput(item->Kind());
 	item >> *m_pipe;
 }
 

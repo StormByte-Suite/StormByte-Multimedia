@@ -71,6 +71,36 @@ namespace {
 		*log << level << text << std::endl;
 	}
 
+	void RegisterStage(StormByte::Multimedia::Pipeline::JobTelemetry& job,
+		const StormByte::Multimedia::Pipeline::Step& stage) noexcept {
+		auto metrics = stage.Telemetry();
+		std::string name = static_cast<std::string>(metrics->Origin());
+		job.RegisterStage(std::move(name), std::move(metrics));
+	}
+
+	struct TelemetrySummary {
+		std::shared_ptr<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;
+		std::shared_ptr<StormByte::Logger::Log> Logger;
+
+		~TelemetrySummary() noexcept {
+			if (!Metrics)
+				return;
+			Metrics->SampleMemory();
+			if (!Logger)
+				return;
+			const std::string report = static_cast<std::string>(*Metrics);
+			std::size_t begin = 0;
+			while (begin < report.size()) {
+				const std::size_t end = report.find('\n', begin);
+				const std::size_t length = end == std::string::npos ? report.size() - begin : end - begin;
+				JobLog(Logger, Level::Info, std::string_view{report}.substr(begin, length));
+				if (end == std::string::npos)
+					break;
+				begin = end + 1;
+			}
+		}
+	};
+
 	const StormByte::Multimedia::Codec* LeafCodec(
 		const StormByte::Multimedia::Pipeline::Config::Base* config) noexcept {
 		if (const auto* video = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Video*>(config))
@@ -121,7 +151,8 @@ namespace {
 	}
 }
 
-Transcoder::Transcoder() noexcept = default;
+Transcoder::Transcoder() noexcept
+: Metrics(std::make_shared<StormByte::Multimedia::Pipeline::JobTelemetry>()) {}
 
 Transcoder::~Transcoder() noexcept {
 	RequestCancel();
@@ -169,6 +200,7 @@ void Transcoder::WaitIfPaused() noexcept {
 
 void Transcoder::TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
 	StormByte::Multimedia::Pipeline::Filters& graph) noexcept {
+	Metrics->SampleMemory();
 	graph.ClockAnalytics();
 	if (!Clock)
 		return;
@@ -185,6 +217,8 @@ void Transcoder::TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
 
 void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop_token token) noexcept {
 	NameThread("MM-Transcoder");
+	Metrics->SampleMemory();
+	TelemetrySummary summary{Metrics, job.Logger()};
 	const auto started = std::chrono::steady_clock::now();
 	JobLog(job.Logger(), Level::Notice, "running");
 	job.OnConfigure();
@@ -242,6 +276,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	const auto& tube = job.ApplicationLog();
 	auto demux = std::make_shared<StormByte::Multimedia::Pipeline::Demuxer>(tube);
 	auto mux = std::make_shared<StormByte::Multimedia::Pipeline::Muxer>(tube);
+	RegisterStage(*Metrics, *demux);
+	RegisterStage(*Metrics, *mux);
 	std::move(*built) >> *demux;
 	job.m_plan = demux->Plan();
 	*demux >> *mux;
@@ -283,6 +319,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		const StormByte::Multimedia::Codec* codec = LeafCodec(slot.Config.get());
 		if (!codec) {
 			auto remux = std::make_shared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);
+			RegisterStage(*Metrics, *remux);
 			*demux >> *remux;
 			*remux >> *mux;
 			if (mux->Failed() || remux->Failed()) {
@@ -298,6 +335,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		else {
 			auto decoder = std::make_shared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
 			auto encoder = std::make_shared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
+			RegisterStage(*Metrics, *decoder);
+			RegisterStage(*Metrics, *encoder);
 			ConfigureEncoder(*encoder, *slot.Config);
 			*demux >> *decoder;
 			*encoder >> *mux;
@@ -324,6 +363,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	for (const auto& filter : Analytics)
 		graph.Add(filter);
 	graph.Close();
+	for (auto& [name, metrics] : graph.StageTelemetries())
+		Metrics->RegisterStage(std::move(name), std::move(metrics));
 	TickHooks(job, graph);
 
 	while (!Stopping(*this, token)) {

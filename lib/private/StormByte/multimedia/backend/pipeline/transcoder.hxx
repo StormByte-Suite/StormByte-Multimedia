@@ -42,6 +42,7 @@
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -159,6 +160,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			std::atomic<bool> Cancel { false };			///< Cancel requested
 			std::atomic<bool> Paused { false };			///< Coordinator is paused
 			std::shared_ptr<StormByte::Multimedia::Pipeline::Progress> Clock;	///< Demuxer clock
+			std::shared_ptr<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;	///< Retained stage and process metrics
 			std::optional<std::string> Error;			///< Failure text
 			std::vector<TranscoderSlot> Mapped;			///< Fluent map, mux order
 			std::vector<std::shared_ptr<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Analytics;	///< Global analytics

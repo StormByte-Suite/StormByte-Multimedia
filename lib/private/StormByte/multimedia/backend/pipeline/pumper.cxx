@@ -43,7 +43,6 @@
 #include <utility>
 
 using namespace StormByte::Multimedia::Backend::Pipeline;
-using StormByte::Multimedia::Pipeline::Kind;
 using StormByte::Multimedia::Pipeline::State;
 using StormByte::Logger::Level;
 
@@ -52,9 +51,9 @@ namespace {
 		return state == State::Failed || state == State::Stopped;
 	}
 
-	std::int64_t ElapsedUs(std::chrono::steady_clock::time_point started) noexcept {
-		return std::chrono::duration_cast<std::chrono::microseconds>(
-			std::chrono::steady_clock::now() - started).count();
+	std::chrono::nanoseconds Elapsed(std::chrono::steady_clock::time_point started) noexcept {
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(
+			std::chrono::steady_clock::now() - started);
 	}
 }
 
@@ -77,13 +76,24 @@ void Pumper::Launch() noexcept {
 		return;
 	m_thread = std::jthread([this](std::stop_token token) {
 		(void)token;
+		auto& telemetry = m_host.Telemetry();
+		telemetry.Start();
+		const auto setup_started = std::chrono::steady_clock::now();
 		m_worker->Setup();
-		if (Stopping())
+		telemetry.RecordSetup(std::chrono::steady_clock::now() - setup_started);
+		if (Stopping()) {
+			telemetry.SetState(Status());
+			telemetry.Finish();
 			return;
+		}
 		State expected = State::Created;
 		if (!m_state.compare_exchange_strong(expected, State::Ready,
-				std::memory_order_acq_rel, std::memory_order_acquire))
+				std::memory_order_acq_rel, std::memory_order_acquire)) {
+			telemetry.SetState(Status());
+			telemetry.Finish();
 			return;
+		}
+		telemetry.SetState(State::Ready);
 		m_host.BecameReady();
 		Pump();
 		m_host.CloseOutput();
@@ -96,6 +106,8 @@ void Pumper::Launch() noexcept {
 		}
 
 		m_host.Log(Level::LowLevel, "stopped");
+		telemetry.SetState(Status());
+		telemetry.Finish();
 	});
 }
 
@@ -113,14 +125,17 @@ void Pumper::Halt() noexcept {
 		m_state.compare_exchange_strong(expected, State::Stopped,
 			std::memory_order_acq_rel, std::memory_order_acquire);
 	}
+	m_host.Telemetry().SetState(Status());
 }
 
 void Pumper::Stop() noexcept {
 	State current = m_state.load(std::memory_order_acquire);
 	while (current == State::Created || current == State::Ready) {
 		if (m_state.compare_exchange_weak(current, State::Stopping,
-				std::memory_order_acq_rel, std::memory_order_acquire))
+				std::memory_order_acq_rel, std::memory_order_acquire)) {
+			m_host.Telemetry().SetState(State::Stopping);
 			break;
+		}
 	}
 }
 
@@ -149,6 +164,7 @@ void Pumper::Fail(std::string reason) noexcept {
 				std::memory_order_acq_rel, std::memory_order_acquire))
 			break;
 	}
+	m_host.Telemetry().SetState(Status());
 }
 
 void Pumper::PumpSource() noexcept {
@@ -159,13 +175,13 @@ void Pumper::PumpSource() noexcept {
 			break;
 		const auto started = std::chrono::steady_clock::now();
 		m_worker->Process({});
+		m_host.RecordWork(Elapsed(started));
 		if (Stopping())
 			break;
 		if (m_host.Exhausted()) {
 			m_host.DumpWork();
 			break;
 		}
-		m_host.RecordWork(ElapsedUs(started));
 	}
 }
 
@@ -183,18 +199,18 @@ void Pumper::PumpPop() noexcept {
 			}
 
 			if (!Stopping()) {
+				const auto started = std::chrono::steady_clock::now();
 				m_worker->Process({});
+				m_host.RecordWork(Elapsed(started));
 				m_host.DumpWork();
 			}
 
 			break;
 		}
 
-		const bool frame = item->Kind() == Kind::Frame;
 		const auto started = std::chrono::steady_clock::now();
 		m_worker->Process(std::move(item));
-		if (frame)
-			m_host.RecordWork(ElapsedUs(started));
+		m_host.RecordWork(Elapsed(started));
 		if (Failed())
 			break;
 	}

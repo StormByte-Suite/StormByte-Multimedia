@@ -45,6 +45,7 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -308,6 +309,12 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @return Identity string.
 			 */
 			std::string Name() const noexcept;
+
+			/**
+			 * @brief Shared counters retained independently of this filter.
+			 * @return Const stage metrics with this filter's origin label.
+			 */
+			std::shared_ptr<const Pipeline::StageTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief Leaf token used in reports (`vmaf`).
@@ -710,6 +717,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 */
 			const Backend::Pipeline::Pipe& pipe() const noexcept;
 
+			std::shared_ptr<Pipeline::StageTelemetry> m_telemetry;	///< Counters retained by job snapshots
 			std::unique_ptr<Surface> m_surface;						///< Host for Pumper and Worker
 			std::unique_ptr<Backend::Pipeline::Pumper> m_pumper;	///< Thread and State
 			std::mutex m_wait;										///< Mutex for m_wake

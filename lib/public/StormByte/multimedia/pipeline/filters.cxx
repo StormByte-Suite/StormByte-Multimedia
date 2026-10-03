@@ -429,3 +429,20 @@ std::vector<std::pair<std::string, Filter::Report>> Filters::Reports() const noe
 
 	return out;
 }
+
+std::vector<std::pair<std::string, std::shared_ptr<const StageTelemetry>>>
+Filters::StageTelemetries() const noexcept {
+	std::vector<std::pair<std::string, std::shared_ptr<const StageTelemetry>>> out;
+	out.reserve(m_reports.size());
+	for (const auto& item : m_reports) {
+		if (!item.Filter)
+			continue;
+		std::string name = item.Filter->Name() + "[";
+		name += item.Track ? std::to_string(*item.Track) : "general";
+		name += "]";
+		auto metrics = item.Filter->Telemetry();
+		item.Filter->m_telemetry->SetOrigin(name);
+		out.emplace_back(std::move(name), std::move(metrics));
+	}
+	return out;
+}
