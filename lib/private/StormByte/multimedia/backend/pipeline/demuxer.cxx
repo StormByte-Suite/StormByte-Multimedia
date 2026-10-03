@@ -147,7 +147,7 @@ void StormByte::Multimedia::Backend::Pipeline::Demuxer::BeginMeasure(
 	reader.MaxMemory(StormByte::ByteSize{0});
 }
 
-void StormByte::Multimedia::Backend::Pipeline::Demuxer::EndMeasure(
+void StormByte::Multimedia::Backend::Pipeline::Demuxer::RestoreReaderPolicy(
 	StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept {
 	if (!m_ctx || !m_ctx->measureReaderPolicySaved)
 		return;

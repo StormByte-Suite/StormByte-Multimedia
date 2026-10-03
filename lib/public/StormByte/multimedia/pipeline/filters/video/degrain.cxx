@@ -659,6 +659,8 @@ void Degrain::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	if (!m_voted)
 		Decide();
+	if (m_ran == 0)
+		return;
 	if (m_capIn && !std::isfinite(*m_capIn))
 		return;
 	const FFrame& source = AVFrame();

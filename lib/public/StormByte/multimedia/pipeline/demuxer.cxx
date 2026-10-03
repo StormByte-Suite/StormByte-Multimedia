@@ -126,6 +126,8 @@ void Demuxer::ReachedEof() noexcept {
 		return;
 	}
 
+	if (m_backend && m_plan)
+		m_backend->RestoreReaderPolicy(Origin());
 	if (!m_eof)
 		Log(Level::Notice, "eof");
 	m_eof = true;
@@ -152,16 +154,17 @@ bool Demuxer::Rewind() noexcept {
 		auto& reader = Origin();
 		if (reader.IsOpen() && !reader.Rewind()) {
 			if (m_backend)
-				m_backend->EndMeasure(reader);
+				m_backend->RestoreReaderPolicy(reader);
 			Fail("reader rewind failed");
 			return false;
 		}
-		if (m_backend)
-			m_backend->EndMeasure(reader);
 	}
 
-	if (!m_backend || !m_backend->Rewind(*this))
+	if (!m_backend || !m_backend->Rewind(*this)) {
+		if (m_backend && m_plan)
+			m_backend->RestoreReaderPolicy(Origin());
 		return false;
+	}
 	m_eof = false;
 	m_positionNs.store(-1, std::memory_order_release);
 	m_nextSerial.clear();

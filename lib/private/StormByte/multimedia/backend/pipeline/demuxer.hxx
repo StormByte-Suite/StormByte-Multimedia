@@ -105,7 +105,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Restore the reader policy saved by @ref BeginMeasure.
 			 * @param reader Origin reader owned by the Plan.
 			 */
-			void EndMeasure(StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept;
+			void RestoreReaderPolicy(StormByte::Buffer::IO::BufferedLocationReader& reader) noexcept;
 
 			/**
 			 * @brief Reads one compressed packet.
