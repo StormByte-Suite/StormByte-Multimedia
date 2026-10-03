@@ -153,7 +153,7 @@ namespace StormByte {
 					 * @param other Plan to take.
 					 * @return *this.
 					 */
-					Plan& operator=(Plan&& other) noexcept = default;
+					Plan& operator=(Plan&& other) noexcept = delete;
 
 					/**
 					 * @}
