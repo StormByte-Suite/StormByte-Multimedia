@@ -96,7 +96,7 @@ namespace StormByte::Multimedia::Backend {
 		if (m_avio)
 			return true;
 
-		constexpr int ioSize = 4096;
+		constexpr int ioSize = 64 * 1024;
 		auto* ioBuf = static_cast<unsigned char*>(av_malloc(ioSize));
 		if (!ioBuf)
 			return false;

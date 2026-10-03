@@ -72,16 +72,21 @@ namespace StormByte {
 			inline StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>
 			MakeLocalFileReader(StormByte::Safe::String path) {
 				constexpr std::uint64_t fallbackBytes = 1024ull * 1024ull;
-				constexpr std::uint64_t maximumBytes = 64ull * 1024ull * 1024ull;
+				constexpr std::uint64_t maximumBytes = 16ull * 1024ull * 1024ull;
+				constexpr std::uint64_t maximumReadAheadBytes = 8ull * 1024ull * 1024ull;
 				const std::uint64_t availableBytes = static_cast<std::uint64_t>(
 					StormByte::System::Host::AvailableMemory());
 				const std::uint64_t budget = availableBytes == 0
 					? fallbackBytes
 					: std::clamp(availableBytes / 64, fallbackBytes, maximumBytes);
+				const std::uint64_t readAhead = std::min(budget, maximumReadAheadBytes);
 				using Reader = StormByte::Buffer::IO::BufferedFileReader;
 				using MaxMemory = StormByte::Buffer::IO::MaxMemory;
+				using ReadAhead = StormByte::Buffer::IO::ReadAhead;
 				return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>
-					::MakePointer<Reader>(std::move(path), Reader::Parameters{MaxMemory{StormByte::ByteSize{budget}}});
+					::MakePointer<Reader>(std::move(path), Reader::Parameters{
+						ReadAhead{StormByte::ByteSize{readAhead}},
+						MaxMemory{StormByte::ByteSize{budget}}});
 			}
 		}
 	}
