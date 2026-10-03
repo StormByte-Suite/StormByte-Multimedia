@@ -567,6 +567,18 @@ namespace StormByte::Multimedia::FFmpeg {
 			int BitsPerComponent() const noexcept;
 
 			/**
+			 * @brief Checks for independent integer YUV/gray planes at 8/10/12/16 bits.
+			 * @return True for CPU-readable samples with no packing or bit shifts.
+			 */
+			bool PlanarInteger() const noexcept;
+
+			/**
+			 * @brief Byte order of multi-byte video samples.
+			 * @return True for a big-endian pixel descriptor.
+			 */
+			bool BigEndianSamples() const noexcept;
+
+			/**
 			 * @brief Pixel or sample format name.
 			 * @return FFmpeg name, or `"?"`.
 			 */

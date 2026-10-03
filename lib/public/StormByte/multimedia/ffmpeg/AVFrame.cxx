@@ -627,7 +627,7 @@ int FFmpeg::AVFrame::PlaneWidth(int plane) const noexcept {
 	if (!m_ptr || m_ptr->width <= 0)
 		return 0;
 	const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(m_ptr->format));
-	if (!desc || plane <= 0)
+	if (!desc || (plane != 1 && plane != 2))
 		return m_ptr->width;
 	return AV_CEIL_RSHIFT(m_ptr->width, desc->log2_chroma_w);
 }
@@ -636,7 +636,7 @@ int FFmpeg::AVFrame::PlaneHeight(int plane) const noexcept {
 	if (!m_ptr || m_ptr->height <= 0)
 		return 0;
 	const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(m_ptr->format));
-	if (!desc || plane <= 0)
+	if (!desc || (plane != 1 && plane != 2))
 		return m_ptr->height;
 	return AV_CEIL_RSHIFT(m_ptr->height, desc->log2_chroma_h);
 }
@@ -648,6 +648,33 @@ int FFmpeg::AVFrame::BitsPerComponent() const noexcept {
 	if (!desc)
 		return 8;
 	return desc->comp[0].depth;
+}
+
+bool FFmpeg::AVFrame::PlanarInteger() const noexcept {
+	if (!m_ptr || Width() <= 0 || Height() <= 0)
+		return false;
+	const auto* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(Format()));
+	if (!desc || (desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_RGB
+		| AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_FLOAT)))
+		return false;
+	if (desc->nb_components != 1 && desc->nb_components != 3 && desc->nb_components != 4)
+		return false;
+	const int depth = desc->comp[0].depth;
+	if (depth != 8 && depth != 10 && depth != 12 && depth != 16)
+		return false;
+	for (int component = 0; component < desc->nb_components; ++component) {
+		const auto& sample = desc->comp[component];
+		if (sample.plane != component || sample.depth != depth || sample.shift != 0
+			|| sample.offset != 0 || sample.step != (depth == 8 ? 1 : 2)
+			|| !Data(component))
+			return false;
+	}
+	return true;
+}
+
+bool FFmpeg::AVFrame::BigEndianSamples() const noexcept {
+	const auto* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(Format()));
+	return desc && (desc->flags & AV_PIX_FMT_FLAG_BE);
 }
 
 const char* FFmpeg::AVFrame::FormatName() const noexcept {
