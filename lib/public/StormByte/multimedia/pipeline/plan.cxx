@@ -39,8 +39,8 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 
 #include <StormByte/expected.hxx>
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
 #include <StormByte/buffer/io/buffered_file_writer.hxx>
+#include <StormByte/multimedia/backend/local_file_reader.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/cover.hxx>
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/pipeline/config/attachment.hxx>
@@ -58,7 +58,6 @@
 #include <string>
 #include <utility>
 
-using StormByte::Buffer::IO::BufferedFileReader;
 using StormByte::Buffer::IO::BufferedFileWriter;
 using StormByte::Buffer::IO::BufferedLocationReader;
 using StormByte::Buffer::IO::BufferedLocationWriter;
@@ -71,8 +70,7 @@ namespace {
 	}
 
 	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const std::filesystem::path& path) {
-		return StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<BufferedFileReader>(
-			LocationText(path));
+		return StormByte::Multimedia::Backend::MakeLocalFileReader(LocationText(path));
 	}
 
 	StormByte::Safe::Unique<BufferedLocationWriter> LocalWriter(const std::filesystem::path& path) {
@@ -136,6 +134,7 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
 	std::optional<std::chrono::nanoseconds> duration) noexcept
 : m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
+	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)),
 	m_writer(std::move(writer)),
 	m_container(m_writer ? ContainerFromWriter(*m_writer) : nullptr) {
@@ -172,6 +171,10 @@ const BufferedLocationReader& Plan::Reader() const noexcept {
 
 StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> Plan::InputTelemetry() const noexcept {
 	return m_input_telemetry;
+}
+
+StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> Plan::OutputTelemetry() const noexcept {
+	return m_output_telemetry;
 }
 
 BufferedLocationWriter& Plan::Writer() noexcept {

@@ -655,6 +655,12 @@ namespace StormByte::Multimedia::Pipeline {
 			StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> InputTelemetry() const noexcept;
 
 			/**
+			 * @brief Shared telemetry for the destination writer.
+			 * @return Shared handle. Retain it to inspect final I/O counters after this job dies.
+			 */
+			StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> OutputTelemetry() const noexcept;
+
+			/**
 			 * @brief Shared tube clock. Forwards Demuxer::Progress().
 			 *
 			 * Empty before Run wires the Demuxer. The user may keep
@@ -855,6 +861,7 @@ namespace StormByte::Multimedia::Pipeline {
 			std::shared_ptr<StormByte::Logger::Log> m_app_log;			///< Logger from the constructor; input for tube stages
 			std::shared_ptr<StormByte::Logger::Log> m_logger;			///< Job facade after InstallLog
 			StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;	///< Input counters retained across owner transfer
+			StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;	///< Output counters retained across owner transfer
 			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Origin until EmptyPlan
 			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Sink until EmptyPlan
 			std::optional<std::chrono::nanoseconds> m_duration;								///< Authoritative source duration, when supplied

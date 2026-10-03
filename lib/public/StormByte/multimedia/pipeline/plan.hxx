@@ -214,6 +214,12 @@ namespace StormByte {
 					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> InputTelemetry() const noexcept;
 
 					/**
+					 * @brief Shared telemetry for the owned output writer.
+					 * @return Shared handle. Retain it to inspect final I/O counters after this Plan dies.
+					 */
+					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> OutputTelemetry() const noexcept;
+
+					/**
 					 * @brief Consultation snapshot taken in the constructor.
 					 * @return File snapshot (streams, attachments, metadata).
 					 *
@@ -309,6 +315,7 @@ namespace StormByte {
 						const StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
 
 					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;	///< Input counters retained independently of the reader
+					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;	///< Output counters retained independently of the writer
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned sink octets
 					std::optional<StormByte::Multimedia::File> m_snapshot;				///< Constructor probe

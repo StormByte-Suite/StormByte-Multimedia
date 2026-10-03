@@ -37,10 +37,10 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/cover.hxx>
+#include <StormByte/multimedia/backend/local_file_reader.hxx>
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
 #include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/attachment.hxx>
@@ -76,8 +76,7 @@ namespace {
 
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> LocalReader(
 		const std::filesystem::path& path) {
-		return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>::MakePointer<
-			StormByte::Buffer::IO::BufferedFileReader>(LocationText(path));
+		return StormByte::Multimedia::Backend::MakeLocalFileReader(LocationText(path));
 	}
 
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> LocalWriter(
@@ -277,6 +276,7 @@ Transcoder::Transcoder(
 	std::optional<std::chrono::nanoseconds> duration) noexcept
 : m_app_log(logger), m_logger(std::move(logger)),
 	m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
+	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)), m_writer(std::move(writer)),
 	m_duration(duration && duration->count() > 0 ? duration : std::nullopt),
 	m_backend(std::make_unique<Backend::Pipeline::Transcoder>()),
@@ -532,6 +532,10 @@ std::optional<std::string> Transcoder::Error() const noexcept {
 
 StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> Transcoder::InputTelemetry() const noexcept {
 	return m_input_telemetry;
+}
+
+StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> Transcoder::OutputTelemetry() const noexcept {
+	return m_output_telemetry;
 }
 
 Progress::Pointer Transcoder::Progress() const noexcept {

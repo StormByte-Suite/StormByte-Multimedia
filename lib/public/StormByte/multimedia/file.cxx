@@ -38,6 +38,7 @@
 
 #include <StormByte/multimedia/backend/file_avio.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/cover.hxx>
+#include <StormByte/multimedia/backend/local_file_reader.hxx>
 #include <StormByte/multimedia/detail/probe.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFormatContext.hxx>
@@ -49,7 +50,6 @@
 #include <StormByte/multimedia/property/video.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
-#include <StormByte/buffer/io/buffered_file_reader.hxx>
 #include <StormByte/safe/wstring.hxx>
 
 #include <cstdint>
@@ -69,7 +69,6 @@ extern "C" {
 
 using namespace StormByte::Multimedia;
 namespace FFmpeg = StormByte::Multimedia::FFmpeg;
-using StormByte::Buffer::IO::BufferedFileReader;
 using StormByte::Buffer::IO::BufferedLocationReader;
 
 namespace {
@@ -81,8 +80,7 @@ namespace {
 	}
 
 	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const std::filesystem::path& path) {
-		return StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<BufferedFileReader>(
-			LocationText(path));
+		return StormByte::Multimedia::Backend::MakeLocalFileReader(LocationText(path));
 	}
 
 	ExpectedFile FailOpen(std::string_view label, std::string_view reason) noexcept {
