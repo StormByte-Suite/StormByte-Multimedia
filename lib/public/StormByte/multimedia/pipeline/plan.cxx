@@ -39,7 +39,6 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 
 #include <StormByte/expected.hxx>
-#include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/multimedia/backend/local_file_reader.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/cover.hxx>
 #include <StormByte/multimedia/codec.hxx>
@@ -58,7 +57,6 @@
 #include <string>
 #include <utility>
 
-using StormByte::Buffer::IO::BufferedFileWriter;
 using StormByte::Buffer::IO::BufferedLocationReader;
 using StormByte::Buffer::IO::BufferedLocationWriter;
 using namespace StormByte::Multimedia::Pipeline;
@@ -74,8 +72,7 @@ namespace {
 	}
 
 	StormByte::Safe::Unique<BufferedLocationWriter> LocalWriter(const std::filesystem::path& path) {
-		return StormByte::Safe::Unique<BufferedLocationWriter>::MakePointer<BufferedFileWriter>(
-			LocationText(path));
+		return StormByte::Multimedia::Backend::MakeLocalFileWriter(LocationText(path));
 	}
 
 	std::string ExtensionOf(std::string_view location) noexcept {

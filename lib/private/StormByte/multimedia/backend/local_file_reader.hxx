@@ -39,8 +39,10 @@
 #pragma once
 
 #include <StormByte/buffer/io/buffered_file_reader.hxx>
+#include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
+#include <StormByte/system/device.hxx>
 #include <StormByte/system/host.hxx>
 
 #include <algorithm>
@@ -86,6 +88,34 @@ namespace StormByte {
 				return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>
 					::MakePointer<Reader>(std::move(path), Reader::Parameters{
 						ReadAhead{StormByte::ByteSize{readAhead}},
+						MaxMemory{StormByte::ByteSize{budget}}});
+			}
+
+			/**
+			 * @brief Builds a local writer preserving System's transfer window with a RAM-aware dirty-page budget.
+			 * @param path Local file path, already converted to a Safe string.
+			 * @return Writer owner. Dirty pages are capped at the smaller of 16 MiB
+			 *         or one sixty-fourth of available RAM, with a 1 MiB fallback/floor.
+			 */
+			inline StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter>
+			MakeLocalFileWriter(StormByte::Safe::String path) {
+				constexpr std::uint64_t fallbackBytes = 1024ull * 1024ull;
+				constexpr std::uint64_t maximumBytes = 16ull * 1024ull * 1024ull;
+				const std::uint64_t availableBytes = static_cast<std::uint64_t>(
+					StormByte::System::Host::AvailableMemory());
+				const std::uint64_t budget = availableBytes == 0
+					? fallbackBytes
+					: std::clamp(availableBytes / 64, fallbackBytes, maximumBytes);
+				const StormByte::System::Device device{path};
+				const StormByte::ByteSize writeChunk = device
+					? device.Window().write : StormByte::ByteSize{0};
+				using Writer = StormByte::Buffer::IO::BufferedFileWriter;
+				using BackPressure = StormByte::Buffer::IO::BackPressure;
+				using MaxMemory = StormByte::Buffer::IO::MaxMemory;
+				using WriteChunk = StormByte::Buffer::IO::WriteChunk;
+				return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter>
+					::MakePointer<Writer>(std::move(path), Writer::Parameters{
+						WriteChunk{writeChunk}, BackPressure{4},
 						MaxMemory{StormByte::ByteSize{budget}}});
 			}
 		}

@@ -41,7 +41,6 @@
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 
-#include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/file.hxx>
@@ -81,8 +80,7 @@ namespace {
 
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> LocalWriter(
 		const std::filesystem::path& path) {
-		return StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter>::MakePointer<
-			StormByte::Buffer::IO::BufferedFileWriter>(LocationText(path));
+		return StormByte::Multimedia::Backend::MakeLocalFileWriter(LocationText(path));
 	}
 
 	void JobLog(const std::shared_ptr<StormByte::Logger::Log>& log,
