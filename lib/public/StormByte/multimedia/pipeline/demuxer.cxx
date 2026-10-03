@@ -151,9 +151,13 @@ bool Demuxer::Rewind() noexcept {
 	if (m_plan) {
 		auto& reader = Origin();
 		if (reader.IsOpen() && !reader.Rewind()) {
+			if (m_backend)
+				m_backend->EndMeasure(reader);
 			Fail("reader rewind failed");
 			return false;
 		}
+		if (m_backend)
+			m_backend->EndMeasure(reader);
 	}
 
 	if (!m_backend || !m_backend->Rewind(*this))
