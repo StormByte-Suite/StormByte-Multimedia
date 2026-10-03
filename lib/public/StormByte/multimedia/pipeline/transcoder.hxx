@@ -217,11 +217,9 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * Four input/output combinations are accepted: path/path, path/writer,
 	 * reader/path, and reader/writer. Path arguments create local
-	 * BufferedFile leaves; location arguments are Safe::Unique owners and
-	 * preserve their dynamic type. Run transfers both owners to EmptyPlan,
-	 * after which the Transcoder no longer owns them. File is only used as
-	 * a consultation snapshot and is discarded after analysis.
-	 * File::Reader is not used.
+	 * file locations; supplied location owners preserve their dynamic type.
+	 * The job takes ownership of the reader and writer. Source analysis
+	 * supplies stream information, attachments and metadata for the Plan.
 	 *
 	 * It is also the extension point. Mix what you need:
 	 *
@@ -250,8 +248,8 @@ namespace StormByte::Multimedia::Pipeline {
 	 * tube reads with @ref Filter::Analytics::Report on the leaf
 	 * pointer.
 	 *
-	 * @ref Progress forwards the Demuxer clock. The user may keep
-	 * that shared_ptr after the tube dies.
+	 * @ref Progress provides shared job progress. The handle remains usable
+	 * after the job has been destroyed.
 	 *
 	 * Each constructor calls @ref InstallLog after the most-derived
 	 * constructor body of this class. A derived constructor that
@@ -714,7 +712,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Stock path is StormByte/Multimedia/Transcoder with the
 			 * Multimedia format and throttle. Override to use another
 			 * path and other rules. Tube stages still use
-			 * StormByte/Multimedia/<stage>. Do not call from a
+			 * the @c StormByte/Multimedia/ prefix followed by the stage name.
+			 * Do not call from a
 			 * constructor. Each stock constructor calls this after
 			 * the most-derived constructor of this class.
 			 */
@@ -735,6 +734,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Allocates the Plan type for this job.
 			 * @param reader Owned origin location, transferred from this Transcoder.
 			 * @param writer Owned destination location, transferred from this Transcoder.
+			 * @param duration Authoritative source duration; absent or non-positive scans the source.
 			 * @return Plan of the desired dynamic type, with no tracks yet.
 			 *
 			 * Override to return a type derived from Plan. Tracks are

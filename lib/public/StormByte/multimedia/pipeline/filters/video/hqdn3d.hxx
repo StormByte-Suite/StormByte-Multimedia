@@ -68,10 +68,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * (it already has a temporal term). Fine before
 	 * @ref Deband and @ref Cas.
 	 *
-	 * @par Memory
-	 * Keeps the last **filtered** picture. Spatial on the
-	 * first frame, spatial + temporal after that. Not Hold.
-	 * No avfilter `hqdn3d`.
+	 * @par Temporal behavior
+	 * The first frame receives spatial denoising only; subsequent
+	 * frames also receive temporal denoising. No initial Hold.
 	 *
 	 * @par Strength
 	 * Four coefficients in 8-bit units, same layout as
@@ -112,7 +111,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			enum StormByte::Multimedia::Type Media() const noexcept override;
 
 			/**
-			 * @brief Drops @ref m_prev.
+			 * @brief Resets temporal denoising history.
 			 */
 			void Clean() noexcept override;
 

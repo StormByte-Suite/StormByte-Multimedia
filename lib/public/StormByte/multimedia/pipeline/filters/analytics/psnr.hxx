@@ -76,12 +76,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref Report, @ref Media.
 	 *
 	 * @par Pairing
-	 * Presentation FIFOs per @ref Pipeline::Frame::Track, not Serial
-	 * or PTS. Serial is tube lineage and does not identify a
-	 * reconstructed picture when the encoder has delay. Each look
-	 * leaves avcodec in presentation order, so the nth Decoder tap
-	 * frame of a track is the same picture as the nth dest-look
-	 * frame of that track. There is no pooled mean across tracks.
+	 * Frames are paired in presentation order per
+	 * @ref Pipeline::Frame::Track, not by Serial or PTS. The nth
+	 * reference frame is compared with the nth distorted frame
+	 * of that track. There is no pooled mean across tracks.
 	 *
 	 * @par Metric
 	 * Peak is @c (1 << bpc) - 1 from the latched reference.
@@ -92,27 +90,19 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * and @c psnr_min (minimum per-frame average). Identical
 	 * frames report a finite cap of 100.0, not +inf.
 	 *
-	 * Computation uses only
-	 * @ref StormByte::Multimedia::FFmpeg::AVFrame
-	 * (@c Data, @c Linesize, @c PlaneWidth, @c PlaneHeight,
-	 * @c BitsPerComponent, @c Clone, @c ScaleTo). No libav
-	 * headers and no avfilter `psnr`.
-	 *
 	 * @par Geometry
 	 * Latched on the first valid reference. Distorted looks
-	 * of another size are scaled to that latch with
-	 * @ref AVFrame::ScaleTo. A later reference that changes
+	 * of another size are scaled to the reference dimensions.
+	 * A later reference that changes
 	 * width/height is skipped with a Warning. Scale is not
 	 * @ref Report::Failed.
 	 *
 	 * @par Memory
-	 * Process must not stall the encode tube: it clones the
-	 * RAII look, parks it, scores when both FIFOs have a
-	 * head, and returns. Waiting for leftovers is only in
-	 * @ref Eof. @ref InputCeiling (512) sizes the analytics
-	 * hopper, not the park.
+	 * Unpaired frames may be retained to accommodate encoder delay.
+	 * @ref InputCeiling (512) limits pending input, not frames awaiting
+	 * a matching look. @ref Eof completes end-of-input processing.
 	 *
-	 * @par When to read @ref Report
+	 * @par When to read the report
 	 * Muxer closed is not Eof on this node. Wait until the
 	 * job is Done. A low score is not Fail. @ref Report::Failed
 	 * only when no pair was scored. One track keeps flat keys

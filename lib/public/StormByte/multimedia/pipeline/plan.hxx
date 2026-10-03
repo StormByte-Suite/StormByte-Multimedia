@@ -94,8 +94,8 @@ namespace StormByte {
 			 * idempotent. A track omitted from @ref Tracks is dropped.
 			 *
 			 * @ref Check tests formation of this intention only. Success
-			 * does not mean the tube will run. @ref operator bool is
-			 * @ref Check.
+			 * does not mean the tube will run. Boolean conversion reports
+			 * whether @ref Check succeeds.
 			 *
 			 * @ingroup multimedia_pipeline
 			 */

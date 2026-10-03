@@ -99,10 +99,9 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 *
 	 * Construct the leaf with a shared logger and a short name
 	 * (`scale`) via the Process / ProcessTwoPasses / Packet /
-	 * Analytics constructor. @ref Name is `Media()/name`. Do not
-	 * Launch, Stop, Halt or Mount from the leaf. A destructor only
-	 * releases filter resources (a sws context, a libvmaf model).
-	 * Do not call Halt.
+	 * Analytics constructor. @ref Name is `Media()/name`. The job
+	 * manages attachment and worker lifecycle. A destructor only
+	 * releases filter resources.
 	 *
 	 * Implement @ref Media, @ref Clean, @ref Setup and the
 	 * @ref Process overload that matches the kind. A
@@ -122,7 +121,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 * @ref Eof.
 	 *
 	 * Attach the leaf from the tube
-	 * (`job.Video(in).Filter<T>(…)`). Do not wire anything
+	 * (@c job.Video(in).Filter<T>(…)). Do not wire anything
 	 * from inside the filter.
 	 *
 	 * @par Kinds
@@ -180,14 +179,14 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 * own worker. A plain @c Log is only safe if a single thread
 	 * writes. An empty pointer is a silent no-op, not a Fail.
 	 *
-	 * UseLog scopes that pointer at StormByte/Multimedia/<Leaf>
-	 * (the first letter of @p name is capitalized). @ref Log
+	 * Logging uses @c StormByte/Multimedia/&lt;Leaf&gt;
+	 * (the first letter of the leaf name is capitalized). @ref Log
 	 * writes on that facade. Format is `[%L] %T %c`. There is
 	 * no STMM component and no Logger group. Levels are
 	 * @c StormByte::Logger::Level (`LowLevel`, `Debug`, `Warning`,
 	 * `Notice`, `Info`, `Error`, `Fatal`). The print floor is
 	 * set on the application logger. Module throttle is
-	 * installed by UseLog. Format the text before the call
+	 * applied to the filter module. Format the text before the call
 	 * (`std::format`). Logging is not @ref Fail and is not a
 	 * measurement; @ref Analytics still reports numbers via
 	 * @ref Report.
@@ -225,14 +224,13 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 *
 	 * @par Mutation
 	 * Effect of a mutation is @ref Save. @ref Analytics deletes
-	 * @ref Save: an analytics leaf must not rewrite units.
+	 * @ref Save : an analytics leaf must not rewrite units.
 	 * Paint a new @ref StormByte::Multimedia::FFmpeg::AVFrame
 	 * or @ref StormByte::Multimedia::FFmpeg::AVPacket (graph
 	 * output, @c AllocVideo / @c AllocAudio, or @c Copy plus
 	 * @c CopyProps). Then @ref Save that wrapper by rvalue.
 	 * Serial, Part and timing stay on the StormByte Frame /
-	 * Packet. The packed @c Payload FIFO is cleared. The filter
-	 * does not pass a geometry hint.
+	 * Packet. The replacement becomes the unit seen downstream.
 	 *
 	 * The getters borrow the current unit. @ref Save of that
 	 * same raw handle is @ref Fail. Copy / @c Clone of a getter
@@ -241,11 +239,10 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 * On @ref ProcessTwoPasses during the measure pass @ref Save
 	 * is a no-op and the unit is not forwarded.
 	 *
-	 * Coupled extras that would lie after the new card (HDR10+
-	 * windows, audio downmix) may be dropped or remapped by
-	 * @c Backend::Pipeline::Detail::Content::Video::Put. That is
+	 * Metadata that no longer matches the replacement (HDR10+
+	 * windows, audio downmix) may be dropped or remapped. That is
 	 * not @ref Fail. @ref Log writes @c Level::Warning with the
-	 * holder's reason. HDR10 static metadata is not rebuilt
+	 * reason. HDR10 static metadata is not rebuilt
 	 * here; it rides on the incoming frame if @c CopyProps /
 	 * @c WriteHdr10 copied it.
 	 *
@@ -352,7 +349,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Drops per-run state. First-run no-op is allowed.
 			 *
-			 * Called from @ref Open before @ref Setup and again if
+			 * Called before @ref Setup and again if
 			 * the tube reuses the leaf. Must be idempotent.
 			 */
 			virtual void Clean() noexcept = 0;
@@ -360,8 +357,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Acquires per-run state. Must be callable again after @ref Clean.
 			 *
-			 * Open contexts, load models, cache geometry. Do not
-			 * Launch or Halt from here.
+			 * Prepare the filter for a new run. Worker lifecycle is
+			 * managed by the job.
 			 */
 			virtual void Setup() noexcept = 0;
 
@@ -370,7 +367,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param frame Unit in the tube. Never null.
 			 *
 			 * On @ref Analytics this is both looks. Read
-			 * @ref StormByte::Multimedia::Pipeline::Item::Producer:
+			 * @ref StormByte::Multimedia::Pipeline::Item::Producer :
 			 * Decoder is the reference look. Encoder or Remuxer is
 			 * the distorted look, already decoded. Pair them in
 			 * presentation order per track.
@@ -421,9 +418,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief Ceiling of this filter's input hopper.
 			 * @return Max queued items. 0 means unbounded.
 			 *
-			 * Built from @ref Backend::Pipeline::Ceiling after
-			 * @ref Filters copies the job Plan onto the leaf.
-			 * An empty Plan is a contract violation.
+			 * The limit follows the job's configured buffering policy.
+			 * The filter must be attached to a job before use.
 			 */
 			virtual std::size_t InputCeiling() const noexcept;
 
@@ -440,8 +436,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Named filter. There is no empty constructor.
 			 * @param log Shared logger. Prefer ThreadedLog. Empty means no log.
-			 * @param name Short leaf name (`scale`). UseLog capitalizes it
-			 *        for StormByte/Multimedia/<Leaf>.
+			 * @param name Short leaf name (`scale`). Capitalized in the
+			 *        logging scope @c StormByte/Multimedia/&lt;Leaf&gt;.
 			 * @param receives Kinds this filter consumes.
 			 * @param produces Kinds this filter emits.
 			 *
@@ -461,7 +457,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param level StormByte::Logger::Level of this line.
 			 * @param message Already-formatted text.
 			 *
-			 * %c is StormByte/Multimedia/<Leaf>. No-op if @ref m_log
+			 * %c is @c StormByte/Multimedia/&lt;Leaf&gt;. No-op if the logger
 			 * is empty. Safe from the destructor (does not call
 			 * @ref Media).
 			 */
@@ -510,9 +506,9 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Filter-visible end-of-input hook. Default no-op.
 			 *
-			 * Called from @ref Finish after a Hold has been
-			 * released or failed. Flush leftover filter state
-			 * here. Do not Emit from this hook.
+			 * Called at end-of-input after a Hold has been
+			 * released or failed. Complete any outstanding filter
+			 * work here.
 			 */
 			virtual void Eof() noexcept;
 
@@ -600,6 +596,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 */
 			void Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept;
 
+			/** @cond */
 		private:
 			class Surface;
 
@@ -733,6 +730,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			std::uint8_t m_heldFor;									///< Parked count
 			std::shared_ptr<const Pipeline::Plan> m_plan;			///< Job plan; Filters copies it
 			int m_origin;											///< Plan track In(); -1 until bound
+			/** @endcond */
 	};
 
 	/**
@@ -868,7 +866,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief Whether the tube is in the measure pass.
 			 * @return true until @ref Measured.
 			 *
-			 * For the leaf only. The tube uses a private hook.
+			 * Available to the derived filter during processing.
 			 */
 			bool Measuring() const noexcept;
 
@@ -948,7 +946,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			Packet(Packet&& other) noexcept = delete;
 
 			/**
-			 * @brief Releases only filter resources. Does not Halt.
+			 * @brief Releases filter resources; the job manages worker shutdown.
 			 */
 			~Packet() noexcept override = default;
 

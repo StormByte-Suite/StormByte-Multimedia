@@ -70,12 +70,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Versus Yadif
 	 * Same job, different interpolator (cubic spatial +
 	 * temporal fallback). Do not stack @ref Yadif and
-	 * @ref Bwdif: pick one. With @c onlyInterlaced the
+	 * @ref Bwdif : pick one. With @c onlyInterlaced the
 	 * second would be a no-op anyway.
 	 *
 	 * @par Delay, not Hold
-	 * Two RAII clones (@ref m_prev, @ref m_cur). First unit
-	 * waits for a neighbour; @ref Eof weaves the tail.
+	 * The first frame waits for a neighbouring frame before output;
+	 * @ref Eof produces the remaining delayed output.
 	 * Progressive input is a no-op when @c onlyInterlaced
 	 * is set. No avfilter `bwdif`.
 	 *
@@ -123,7 +123,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			enum StormByte::Multimedia::Type Media() const noexcept override;
 
 			/**
-			 * @brief Drops @ref m_prev and @ref m_cur.
+			 * @brief Discards delayed frames and resets deinterlacing history.
 			 */
 			void Clean() noexcept override;
 
@@ -133,7 +133,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Setup() noexcept override;
 
 			/**
-			 * @brief Shifts the two-frame delay and weaves when ready.
+			 * @brief Produces a progressive frame when enough input is available.
 			 * @param frame Video unit.
 			 */
 			void Process(const Pipeline::Frame& frame) noexcept override;

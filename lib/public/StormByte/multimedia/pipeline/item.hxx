@@ -88,8 +88,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * @ref Clone (via @c StormByte::Safe::Clonable) returns a new
 	 * @c StormByte::Safe::Shared and
-	 * references libav media buffers (`av_frame_ref` /
-	 * `av_packet_ref`). It is not a deep copy of planes or packet
+	 * shares media buffers. It is not a deep copy of planes or packet
 	 * payload. @ref Move relocates the unit.
 	 *
 	 * @ingroup multimedia_pipeline
@@ -155,7 +154,7 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Stage that created this unit.
-			 * @return Value passed to the private constructor.
+			 * @return Producer associated with this unit.
 			 */
 			enum Producer Producer() const noexcept {
 				return m_producer;

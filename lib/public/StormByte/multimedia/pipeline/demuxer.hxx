@@ -110,37 +110,20 @@ namespace StormByte {
 			 * @class Demuxer
 			 * @brief Reads interleaved compressed packets from the Plan reader.
 			 *
-			 * Only tracks listed in the bound Plan enter the tube. An origin
-			 * stream omitted from Plan::add is never pushed. A second Plan is
-			 * @ref Step::Fail. There is no @ref StormByte::Multimedia::File
-			 * in this stage.
+			 * Only tracks listed in the bound @ref Plan are emitted. Binding
+			 * a second Plan fails the stage. Input comes from the Plan's
+			 * seekable @ref StormByte::Buffer::IO::BufferedLocationReader.
 			 *
-			 * @par Octets
-				 * LibAV talks only to @ref Backend::FileAvio on the seekable
-				 * @ref StormByte::Buffer::IO::BufferedLocationReader owned by the
-			 * Plan. There is no second ring and no Bridge on that reader.
+			 * With @ref Filter::ProcessTwoPasses filters, the required tracks
+			 * are read for measurement first. Once measurement completes,
+			 * the source is rewound and read again for the output pass.
 			 *
-			 * A @ref Filter::ProcessTwoPasses leaf tells @ref Filters to call
-			 * @ref Measure before the first read. During that pass only the
-			 * listed tracks are emitted and hoppers stay open at EoF.
-			 * @ref ReachedEof then asks Filters to CloseMeasureSource.
-			 * Decode workers drain and Reset; Filters then LeaveMeasure
-			 * and Rewind. The same Demuxer instance continues with ordinary
-			 * Process (the same path as a job that never measured).
-			 * Transcoder is not involved.
+			 * @ref Progress() returns a shared, read-only progress handle
+			 * that remains usable after the pipeline has been destroyed.
+			 * It includes filtering and output progress for the same job.
 			 *
-			 * After measure EoF the demux worker @ref Wait s until
-			 * @ref Rewind clears @ref Measuring. That wake is @ref WakeNow
-			 * (`!Measuring()`), not hopper Ready.
-			 *
-			 * The tube clock (@ref Progress) is created here because a tube
-			 * has exactly one Demuxer. Filters and the Muxer write the same
-			 * shared object. @ref Progress() returns a const handle the user
-			 * may keep after the tube dies.
-			 *
-			 * Wrap assigns the next @ref Packet::Serial for that origin
-			 * track and Part zero. That id is pipe lineage, not an FFmpeg
-			 * frame count.
+			 * Each packet receives a serial number within its origin track
+			 * and part zero. This identifies source lineage, not frame count.
 			 *
 			 * @ingroup multimedia_pipeline
 			 */
@@ -225,7 +208,7 @@ namespace StormByte {
 					 * @brief Whether the last read hit EOF.
 					 * @return true at end of source of the Process pass.
 					 *
-					 * Measure EoF does not stick. @ref Rewind clears it.
+					 * Measurement end-of-file is cleared before the output pass.
 					 */
 					bool Eof() const noexcept;
 

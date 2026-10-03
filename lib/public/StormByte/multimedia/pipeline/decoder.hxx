@@ -115,35 +115,19 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Decoder
 	 * @brief Decodes packets of one origin track into frames.
 	 *
-	 * Notice: opened implementation, once. LowLevel unit lines
-	 * always; the shared logger throttles. The Through pumper times each
-	 * Process; source EoF dumps min/max at Debug.
+	 * Each produced frame carries the serial number and decoding
+	 * timestamp of its source packet. Parts distinguish frames from
+	 * the same packet; serial numbers are not decoded-frame counts.
 	 *
-	 * Lineage: @ref StampLineage copies the last accepted packet
-	 * Serial onto each produced frame and advances Part. Dts of
-	 * that packet is copied onto @ref Frame::Dts. That is pipe
-	 * lineage, not a decoded-frame count.
+	 * @ref Filters can supply decoded pictures for analytics on
+	 * compressed-packet connections. Source pictures identify
+	 * @ref Producer::Decoder; destination pictures identify the
+	 * supplying @ref Producer::Encoder or @ref Producer::Remuxer.
 	 *
-	 * Origin frames leave through @ref Step::Emit (analytics tap
-	 * clone, then process). Dest-look frames also Emit; their
-	 * Producer is the stage that fed the look (@ref Producer::Encoder
-	 * or @ref Producer::Remuxer). Source-look frames keep
-	 * @ref Producer::Decoder.
-	 *
-	 * @ref Label is `Decoder(<implementation>)` after Open pins a
-	 * table row, otherwise `Decoder(t=<origin index>)`. Look mode
-	 * is `Decoder(look encode|remux|src t=<index>)`.
-	 *
-	 * Look modes are not public constructors. Filters builds them
-	 * when Analytics needs pictures from a packet stretch. Those
-	 * decoders have no Demuxer: they open from the first Packet's
-	 * codec parameters. The public ctor never enters look mode.
-	 *
-	 * After measure origin EoF, Filters calls
-	 * @ref MeasureSourceClosed. The decode worker then
-	 * @ref DrainMeasure (Flush + @ref ResetAfterMeasure) from
-	 * @ref AfterWait or after the last measure packet. Look
-	 * decoders ignore that path.
+	 * Two-pass processing completes the measurement pass before
+	 * decoding the source again for the output pass.
+	 * Logging identifies the selected decoder and origin track;
+	 * the supplied logger controls throttling.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -228,8 +212,8 @@ namespace StormByte::Multimedia::Pipeline {
 			}
 
 			/**
-			 * @brief Ceiling of the decoder input hopper.
-			 * @return Max queued packets, or `0` if this hopper does not exist.
+			 * @brief Maximum number of queued input packets.
+			 * @return Packet limit, or `0` if no input queue exists.
 			 */
 			std::size_t InputCeiling() const noexcept override;
 

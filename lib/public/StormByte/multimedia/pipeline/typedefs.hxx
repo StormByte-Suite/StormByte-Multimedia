@@ -107,7 +107,7 @@ namespace StormByte::Multimedia::Pipeline {
 		Decoder,	///< @ref Decoder
 		Remuxer,	///< @ref Remuxer
 		Filter,		///< @ref Filter::FFmpeg
-		Route,		///< @ref Route
+		Route,		///< A configured connection between pipeline stages
 		Filters,	///< @ref Filters
 		Encoder,	///< @ref Encoder
 		Muxer		///< @ref Muxer
@@ -154,57 +154,23 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @enum State
 	 * @brief Lifecycle of the stage thread. Values are mutually exclusive.
 	 *
-	 * This is the state of *this* stage, not of the job and not of
-	 * the bound neighbor. A neighbor learns that this stage is dead
-	 * because the shared hopper is Eof, not by reading this enum.
+	 * Describes an individual stage, not the whole job or its neighbors.
+	 * Inspect it through @ref Step::Status.
 	 *
-	 * Owned by the Pumper. A Worker has no State: it only Fail()s
-	 * into the Host. Step::Status forwards to the Pumper.
+	 * - Created: constructed and available for configuration, but not ready
+	 *   to process media. Binding a Plan, connecting stages, stopping and
+	 *   reporting failure are permitted.
+	 * - Ready: initialized and processing media. End of input leads to
+	 *   Stopped; cancellation or failure may also end processing.
+	 * - Stopping: shutdown has been requested but has not completed.
+	 *   This is not a failure; pending output may still be flushed.
+	 * - Stopped: processing has ended, naturally or after a stop request.
+	 * - Failed: processing failed; @ref Step::Error provides the reason.
 	 *
-	 * Created
-	 *   Constructor finished. The object is usable: Plan can be
-	 *   bound, operator>> can wire hoppers, Stop/Fail are legal.
-	 *   Setup/Open has not returned. Pump must not take units
-	 *   from the input hopper. Launch has usually already spawned
-	 *   the thread; the thread is blocked inside Setup (waiting
-	 *   for a Plan, an origin, a path, …).
-	 *   This is the only state
-	 *   in which Setup may run to completion.
-	 *
-	 * Ready
-	 *   Setup returned. The backend (if any) can take work. Pump
-	 *   may pop and call Process. There is no separate "running"
-	 *   value: pumping is what a Ready thread does, not a new
-	 *   phase. Fail or Stop may still fire from here.
-	 *   When the input hopper reaches Eof and Pump returns without
-	 *   Stop(), Launch moves Ready → Stopped. That is how a stage
-	 *   ends in a live tube (Analytics after the last look, Muxer
-	 *   after the last packet). Filters::Idle and Transcoder wait
-	 *   that Stopped before Reports / OnDone.
-	 *
-	 * Stopping
-	 *   Stop() was called, or Halt() from a destructor. Hoppers
-	 *   are Eof and waiters are notified. The thread has not
-	 *   joined yet. Pump and Setup must return. This is not a
-	 *   failure; the last Process({}) flush may still run.
-	 *
-	 * Stopped
-	 *   The thread has left. Hoppers stay Eof. Reached from
-	 *   Stopping after Halt/Stop, or from Ready after a natural
-	 *   hopper Eof. The tube is not reused: there is no restart
-	 *   back to Created.
-	 *
-	 * Failed
-	 *   Fail() latched a reason. Hoppers are Eof. Terminal, like
-	 *   Stopped, but Error() is set. May be entered from Created
-	 *   (Setup never succeeded) or from Ready. Does not pass
-	 *   through Stopping.
-	 *
-	 * Legal moves: Created→Ready, Created→Failed, Created→Stopping,
-	 * Ready→Stopping, Ready→Failed, Ready→Stopped, Stopping→Stopped.
-	 * Failed and Stopped do not leave.
-	 *
-	 * Source EOF is not a State. Demuxer keeps m_eof next to this.
+	 * Legal transitions are Created to Ready, Failed or Stopping;
+	 * Ready to Stopping, Failed or Stopped; and Stopping to Stopped.
+	 * Failed and Stopped are terminal: stages cannot be restarted.
+	 * Source end-of-file is reported separately by @ref Demuxer::Eof.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */

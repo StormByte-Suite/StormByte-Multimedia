@@ -80,12 +80,12 @@ namespace StormByte::Multimedia::Pipeline {
 	class Step;
 
 	/**
-	 * @brief Shares Plan and binds every output hopper of @p from onto @p to.
+	 * @brief Shares the Plan and connects output from @p from to @p to.
 	 *
 	 * Demuxer fan-out is not this operator. A demuxer binds one origin
-	 * index at a time from the leaf operator>>.
+	 * index at a time using the corresponding operator>> overload.
 	 *
-	 * Does not bind the analytics tap.
+	 * Analytics are configured separately through @ref Filters.
 	 *
 	 * @param from Producer step.
 	 * @param to Consumer step.
@@ -95,20 +95,17 @@ namespace StormByte::Multimedia::Pipeline {
 
 	/**
 	 * @class Step
-	 * @brief One stage with a @ref Backend::Pipeline::Pipe (in / out).
+	 * @brief A pipeline stage that receives and emits media items.
 	 *
-	 * Owns a Pumper (thread + @ref State) and exposes hoppers to
-	 * that pumper through a private Host surface. Leaves Mount a
-	 * concrete Pumper and Worker, then Launch.
+	 * Connect stages with operator>> and inspect their lifecycle with
+	 * @ref Status. The accepted and produced item kinds describe which
+	 * connections are compatible.
 	 *
-	 * Log lines use Scope StormByte/Multimedia/<Producer>. UseLog
-	 * installs the module format and throttle. Volume is that
-	 * Logger throttle, not a per-step counter.
+	 * Log scopes use the @c StormByte/Multimedia/ prefix followed by
+	 * the producer name. The supplied logger controls throttling.
 	 *
-	 * @ref Emit writes @c item >> pipe. Analytics looks are a
-	 * @ref Backend::Pipeline::Pipe::CloneTo on that Pipe, bound
-	 * by @ref Filters before the origin emits. Without CloneTo
-	 * there is no clone.
+	 * @ref Filters can attach analytics without changing the items
+	 * delivered to the next processing stage.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -136,11 +133,7 @@ namespace StormByte::Multimedia::Pipeline {
 			Step(Step&& other) noexcept = delete;
 
 			/**
-			 * @brief Destructor. Joins the pumper if Launch ran.
-			 *
-			 * Most-derived Step members are already gone. Those
-			 * leaves Halt first via @ref Join so a backend the
-			 * worker still uses survives until the thread has left.
+			 * @brief Destructor. Waits for stage execution to finish.
 			 */
 			virtual ~Step() noexcept;
 
@@ -212,36 +205,33 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Shared stage counters, retained independently of this Step.
-			 * @return Const metrics handle. Origin is filled from @ref Label.
+			 * @return Const metrics handle identifying this stage.
 			 */
 			std::shared_ptr<const StageTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief Whether this step can take work.
 			 *
-			 * Default: Status is Ready (Setup finished without Fail or Stop).
-			 * Muxer also requires @ref Muxer::Armed so header write and
-			 * Pump do not start while @c operator>> is still reserving.
+			 * By default, @ref Status must be State::Ready. Muxer also
+			 * requires @ref Muxer::Armed before writing output.
 			 *
 			 * @return true when the stage is open for work.
 			 */
 			virtual bool Ready() const noexcept;
 
 			/**
-			 * @brief Asks the worker to leave and closes all hoppers.
+			 * @brief Requests shutdown and notifies connected stages.
 			 *
-			 * Neighbors unblock on hopper EoF. Does not join; the
-			 * worker may be the caller. Idempotent. A mounted tube
-			 * is not restarted after Stop.
+			 * Returns without waiting for completion. Safe to call more than
+			 * once. A stopped stage cannot be restarted.
 			 */
 			void Stop() noexcept;
 
 			/**
-			 * @brief Ceiling of this step's input hopper.
+			 * @brief Maximum number of queued input items.
 			 * @return Max queued items. 0 means unbounded.
 			 *
-			 * Leaves override this and return their private Ceiling.
-			 * Bind sites call it after creating the destination bucket.
+			 * Derived stages override this to specify their input limit.
 			 */
 			virtual std::size_t InputCeiling() const noexcept;
 
@@ -267,11 +257,10 @@ namespace StormByte::Multimedia::Pipeline {
 			const std::optional<std::string>& Error() const noexcept;
 
 			/**
-			 * @brief Marks Failed, closes all hoppers and wakes the worker.
+			 * @brief Marks the stage as failed and notifies connected stages.
 			 *
-			 * Bound neighbors unblock on hopper EoF. Does not join the
-			 * worker; the worker may be the caller. Does not write a
-			 * log line; the owner of the job logs Error.
+			 * Returns without waiting for completion. Stores the reason
+			 * in @ref Error but does not log it.
 			 *
 			 * @param reason Message.
 			 */
@@ -289,11 +278,11 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 			/**
-			 * @brief Step in State::Created. Sinks start at zero buckets.
+			 * @brief Constructs a stage in State::Created.
 			 * @param log Shared logger. Prefer @c StormByte::Logger::ThreadedLog
 			 *        when several workers write. A plain @c Log is accepted
 			 *        for single-thread use. Empty pointer means no log.
-			 * @param name Stage name. UseLog leaf and default @ref Label.
+			 * @param name Stage name for log scope and default @ref Label.
 			 * @param receives Kinds this step consumes.
 			 * @param produces Kinds this step emits.
 			 */
@@ -311,27 +300,25 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 			/**
-			 * @brief Write @p item to the Pipe (@c item >> pipe).
+			 * @brief Sends @p item to connected consumers.
 			 * @param item Unit to emit. Empty is a no-op.
 			 *
-			 * Analytics clones, if any, happen inside the Pipe
-			 * after @ref Backend::Pipeline::Pipe::CloneTo.
+			 * Configured analytics receive copies without changing @p item.
 			 */
 			void Emit(Item::PointerType item) noexcept;
 
 			/**
-			 * @brief Deep-copies @p item through @ref Item::Clone.
+			 * @brief Creates a distinct item through @ref Item::Clone.
 			 * @param item Unit to clone.
 			 * @return Owning pointer, or empty if @p item cannot clone.
 			 *
-			 * Packet/Frame copy constructors stay private. Looks
-			 * must go through this helper (or @ref Emit) so a leaf
-			 * Step does not need to be a friend of the unit types.
+			 * Media buffers are shared according to @ref Item::Clone;
+			 * the returned item does not duplicate the media payload.
 			 */
 			Item::PointerType CloneItem(const Item& item) const noexcept;
 
 			/**
-			 * @brief Sleeps on Wake until hopper Ready, Failed, Stopping
+			 * @brief Waits until input is available, the stage fails or stops,
 			 *        or @ref WakeNow.
 			 *
 			 * After the CV unblocks, runs @ref AfterWait on this
@@ -341,7 +328,7 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Extra reason to leave @ref Wait.
-			 * @return true to wake without hopper Ready. Default false.
+			 * @return true to wake without available input. Default false.
 			 *
 			 * Leaf office. Step does not know why the leaf wakes.
 			 */
@@ -355,32 +342,27 @@ namespace StormByte::Multimedia::Pipeline {
 			virtual void AfterWait() noexcept;
 
 			/**
-			 * @brief Starts the pumper: Setup, Ready, Pump.
+			 * @brief Starts stage initialization and processing.
 			 *
-			 * Idempotent. No-op without a mounted pumper, or if the
+			 * Idempotent. No-op without an execution handler, or if the
 			 * stage has already Failed or Stopped.
 			 */
 			void Launch() noexcept;
 
 			/**
-			 * @brief Stop and join the pumper.
+			 * @brief Stops the stage and waits for execution to finish.
 			 *
-			 * Safe to call more than once. Step leaves do not call
-			 * this from their destructor: @ref Join is their last
-			 * member and Halt s before other members die. Filter
-			 * plugins never call Halt; @ref Route joins them while
-			 * the leaf is still complete.
+			 * Safe to call more than once. Returns after stage execution
+			 * finishes. Filter plugins do not need to call this.
 			 */
 			void Halt() noexcept;
 
 			/**
 			 * @class Join
-			 * @brief Last data member of every most-derived Step.
+			 * @brief Ensures a derived stage stops before its resources expire.
 			 *
-			 * Destructor Halt s this Step. Declared last so backends
-			 * and hoppers of the leaf are still alive while the
-			 * worker leaves. Not a plugin API: Filter::FFmpeg is
-			 * not a Step.
+			 * Declare this guard last in a derived stage. Its destructor
+			 * waits for stage execution to finish. Not a filter plugin API.
 			 */
 			class Join final {
 				public:
@@ -421,17 +403,21 @@ namespace StormByte::Multimedia::Pipeline {
 			void DumpWork() noexcept;
 
 			/**
+			 * @internal
 			 * @brief Owner surface for the Pumper and Worker.
 			 * @return Host implemented by this Step.
+			 * @endinternal
 			 */
 			Backend::Pipeline::Host& Face() noexcept;
 
 			/**
+			 * @internal
 			 * @brief Takes ownership of @p pumper and binds @p worker.
 			 * @param pumper Source, Through or Sink. Must not be empty.
 			 * @param worker Stage body. Must not be empty.
 			 *
 			 * No-op if a pumper is already mounted. Does not Launch.
+			 * @endinternal
 			 */
 			void Mount(std::unique_ptr<Backend::Pipeline::Pumper> pumper,
 				std::unique_ptr<Backend::Pipeline::Worker> worker) noexcept;
@@ -458,10 +444,9 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param message Already-formatted text (caller may use std::format).
 			 *        Must not include the level name; Logger prints that.
 			 *
-			 * No-op when @ref m_log is empty. Virtual so a leaf can
-			 * re-expose it to its backend (friendship is not inherited).
-			 * %c is StormByte/Multimedia/<leaf>. There is no STMM
-			 * component and no Logger group.
+			 * No-op without a logger. Overrides may customize delivery.
+			 * The component scope uses the @c StormByte/Multimedia/ prefix
+			 * followed by the stage name.
 			 */
 			virtual void Log(StormByte::Logger::Level level, std::string_view message) noexcept;
 
@@ -480,14 +465,18 @@ namespace StormByte::Multimedia::Pipeline {
 
 		protected:
 			/**
+			 * @internal
 			 * @brief In / out hoppers of this stage.
 			 * @return The composed Pipe.
+			 * @endinternal
 			 */
 			Backend::Pipeline::Pipe& pipe() noexcept;
 
 			/**
+			 * @internal
 			 * @brief In / out hoppers of this stage.
 			 * @return The composed Pipe.
+			 * @endinternal
 			 */
 			const Backend::Pipeline::Pipe& pipe() const noexcept;
 

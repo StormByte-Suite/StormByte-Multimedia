@@ -57,7 +57,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Attach with @c job.Video(in).Filter<Yadif>(log).
 	 *
 	 * @par What it is for
-	 * Same problem as @ref Bwdif: true interlaced video at
+	 * Same problem as @ref Bwdif : true interlaced video at
 	 * the same output rate. Prefer Bwdif on new jobs. Keep
 	 * Yadif when a pipeline was signed off on it or when
 	 * residual comb after Fieldmatch needs an interlaced-only
@@ -69,8 +69,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Not on native 24p.
 	 *
 	 * @par Delay, not Hold
-	 * Two RAII clones. Field-rate doubling is out of scope.
-	 * No avfilter `yadif`.
+	 * Output waits for a neighbouring frame; @ref Eof produces
+	 * the remaining delayed output. Field-rate doubling is out of scope.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Bwdif
 	 */
@@ -102,7 +102,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			enum StormByte::Multimedia::Type Media() const noexcept override;
 
 			/**
-			 * @brief Drops @ref m_prev and @ref m_cur.
+			 * @brief Discards delayed frames and resets deinterlacing history.
 			 */
 			void Clean() noexcept override;
 
@@ -112,7 +112,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Setup() noexcept override;
 
 			/**
-			 * @brief Shifts the two-frame delay and weaves when ready.
+			 * @brief Produces a progressive frame when enough input is available.
 			 * @param frame Video unit.
 			 */
 			void Process(const Pipeline::Frame& frame) noexcept override;

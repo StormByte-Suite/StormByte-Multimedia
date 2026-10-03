@@ -81,9 +81,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class SideData
 	 * @brief One side-data blob attached to a Frame or Packet.
 	 *
-	 * Copy duplicates the FIFO. That is cheap next to an @c AVFrame
-	 * plane clone; @ref StormByte::Multimedia::Pipeline::Frame needs it
-	 * for its private copy.
+	 * Copies duplicate the side-data bytes independently of the original.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */

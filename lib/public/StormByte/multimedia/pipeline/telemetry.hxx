@@ -291,7 +291,7 @@ namespace StormByte {
 			 * are the lowest and highest successful samples during this job;
 			 * PeakMemory is the sampled maximum, not an allocator-exact or
 			 * OS-lifetime peak. Sampling is nominally every 20 ms while the
-			 * coordinator is pumping. It is not attributed to individual stages.
+			 * job is running. It is not attributed to individual stages.
 			 *
 			 * @ingroup multimedia_pipeline
 			 */

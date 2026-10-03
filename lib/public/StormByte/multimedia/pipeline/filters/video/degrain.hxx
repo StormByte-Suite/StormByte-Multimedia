@@ -76,15 +76,15 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * Use it when you can see grain in mid-tones and crushed night, and
 	 * you are willing to spend a full decode before encode. It is not
-	 * a live filter and not a substitute for @ref Afftdn (audio) or
+	 * a live filter and not a substitute for
+	 * @ref StormByte::Multimedia::Pipeline::Filter::Audio::Afftdn (audio) or
 	 * @ref Deband (contouring).
 	 *
 	 * @par What it is not
 	 * Not @ref Fftdnoiz with a different name. @ref Fftdnoiz is one
-	 * sigma, one graph, every frame. Degrain owns the measure, the
-	 * stretch vote and the skip path; @c fftdnoiz is only the engine
-	 * on stretches that survived the vote. Do not document or sell
-	 * this leaf as “fftdnoiz defaults”.
+	 * sigma for every frame. Degrain chooses a strength for each
+	 * measured stretch and leaves stretches unchanged when denoising
+	 * is unnecessary or the measurement is inconclusive.
 	 *
 	 * @par When to attach
 	 * After decode, before @ref Cas / @ref Scale / @ref Deband.
@@ -101,36 +101,26 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * (bands, not grain).
 	 *
 	 * @par Two passes
-	 * @ref Measure copies a bounded YUV420P ring (5+1+5), scores the
-	 * centre when neighbours exist, and stores one @ref Row per
-	 * picture. @ref Eof of the measure pass calls @ref Decide, which
-	 * cuts on mean/raw jumps and votes one @ref Segment per stretch.
-	 * @ref Process of the encode pass looks the PTS up, builds or
-	 * reuses an @ref FFmpeg::AVFilterGraph at that sigma, and
-	 * @ref Filter::FFmpeg::Save. A stretch with @c skip or a
-	 * failed vote is a no-op (no graph, no Save). Hardware frames
-	 * are not converted here; ScaleTo failure drops that sample.
+	 * @ref Measure assesses grain across neighbouring pictures.
+	 * At the end of measurement, changes in brightness and grain
+	 * determine stretch boundaries and a denoising strength for each.
+	 * @ref Process applies that strength during the encode pass.
+	 * Skipped or inconclusive stretches remain unchanged. Samples
+	 * that cannot be converted for measurement are omitted.
 	 *
-	 * @par Vote (contract)
-	 * Night (@c mean ≤ NightMean) never skips and is at least
-	 * SigmaNight — crushed blacks still hold grain. Flat walls with
-	 * no live/skin signal follow raw, capped at SigmaWall. Motion
-	 * or a close “alive” plane uses SigmaClose. Mixed alive+flat
-	 * uses SigmaMix. Clean mid/bright with raw below CleanSigma
-	 * skips. The caller @a cap is an extra ceiling, not a floor.
-	 *
-	 * @par Detectors
-	 * @c fLive is a cheap band-pass + temporal hold, not a face
-	 * network. @c fSkin is a Y/U/V box on 4:2:0 chroma. Both are
-	 * auxiliary: a miss must not skip a night stretch. A future
-	 * face library can replace those two numbers; the vote stays.
+	 * @par Strength selection
+	 * Dark stretches receive a minimum denoising strength even when
+	 * detail detection is inconclusive. Flat areas follow the measured
+	 * grain strength up to a ceiling; motion, skin-like colours and
+	 * mixed detail influence the selected strength. Clean mid-tone or
+	 * bright stretches may be skipped. The caller's cap is an extra
+	 * ceiling, not a floor. Detail detection is not face recognition.
 	 *
 	 * @par Cost
-	 * Measure is a full decode plus a small ring of YUV420P frames
-	 * (max 11). The second pass is @c fftdnoiz with prev=next=1 —
-	 * expensive on 4K because of the FFT, not because of two
-	 * passes. RAM of the row table is a handful of doubles per
-	 * frame; do not keep pictures after Decide.
+	 * Measurement requires a full decode and memory for at most
+	 * 11 measurement frames plus compact per-frame measurements.
+	 * The second pass performs temporal FFT denoising, which can be
+	 * expensive on 4K. Full pictures are not retained for the whole job.
 	 *
 	 * @par Failure
 	 * No stable stretch → Warning and passthrough. Graph Ensure /
@@ -146,7 +136,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Scene-aware grain reduce.
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param sigmaCap Optional hard ceiling for every stretch.
-			 *        Empty uses SigmaWall from the implementation.
+			 *        Empty uses the default maximum strength.
 			 */
 			Degrain(std::shared_ptr<StormByte::Logger::Log> log,
 				std::optional<double> sigmaCap = {}) noexcept;
@@ -164,17 +154,17 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			enum StormByte::Multimedia::Type Media() const noexcept override;
 
 			/**
-			 * @brief Drops ring, rows, segments and the avfilter graph.
+			 * @brief Discards measurements and resets denoising state.
 			 */
 			void Clean() noexcept override;
 
 			/**
-			 * @brief Resets the graph before a pass starts.
+			 * @brief Prepares denoising for a new pass.
 			 */
 			void Setup() noexcept override;
 
 			/**
-			 * @brief First pass: push the picture into the ring and score.
+			 * @brief First pass: measures grain in the current picture.
 			 * @param frame Current pipeline unit. Non-video is ignored.
 			 */
 			void Measure(const Pipeline::Frame& frame) noexcept override;
@@ -186,12 +176,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Process(const Pipeline::Frame& frame) noexcept override;
 
 			/**
-			 * @brief Measure: flush ring and Decide. Encode: drain the graph.
+			 * @brief Finalizes strength selection or emits remaining filtered output.
 			 */
 			void Eof() noexcept override;
 
 			/**
-			 * @brief Stretch map after Decide: status, frames, ran/skip, sigma.
+			 * @brief Reports stretch status, frame counts, applied/skipped filtering and strength.
 			 */
 			class Filter::Report Report() const noexcept override;
 

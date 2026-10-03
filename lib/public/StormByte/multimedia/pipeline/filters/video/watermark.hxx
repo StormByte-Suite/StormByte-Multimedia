@@ -99,16 +99,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Anchor placement Holds to find letterbox bars.
 	 *
 	 * @par Hold (anchor placement only)
-	 * Opens @ref FFmpeg::Hold(@ref ProbeMax) on the first
-	 * video unit. @ref Process only probes while Held.
-	 * @ref FFmpeg::Release replays parked units into
-	 * @ref Paint so the logo is on from frame one.
-	 * Release early when bars are stable (`m_stable >= 8`).
-	 * @ref LastChance must Release or the job Fails.
-	 *
-	 * Bars are measured on a GRAY8 plane from ScaleTo, not
-	 * on plane 0 of HDR. Overlay is RGBA then back to the
-	 * source format.
+	 * Delays at most 200 video units while detecting letterbox bars.
+	 * Output starts earlier when the bars are stable for eight frames.
+	 * The logo appears from the first output frame, including those
+	 * delayed during detection. @ref LastChance ends detection at
+	 * the limit or at end-of-input. The source pixel format is preserved.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::FFmpeg::Hold
 	 */
@@ -209,11 +204,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Setup() noexcept override;
 
 			/**
-			 * @brief Probes bars while Held; paints after Release replay.
+			 * @brief Detects anchor placement, then overlays the logo on video frames.
 			 * @param frame Video unit. Borrow
 			 *        @ref Filter::FFmpeg::AVFrame for the live picture.
 			 *
-			 * Must not @ref Paint while @ref FFmpeg::Held is true.
+			 * Frames delayed during detection also receive the overlay.
 			 */
 			void Process(const Pipeline::Frame& frame) noexcept override;
 

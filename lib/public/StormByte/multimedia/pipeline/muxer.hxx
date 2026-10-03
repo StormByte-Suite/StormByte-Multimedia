@@ -110,7 +110,7 @@ namespace StormByte {
 			 * @return @p encoder.
 			 *
 			 * Binds the Plan on the first reservation. Opens the Plan
-			 * writer and binds FileAvio once.
+			 * writer for output.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
 
@@ -121,7 +121,7 @@ namespace StormByte {
 			 * @return @p remuxer.
 			 *
 			 * Binds the Plan on the first reservation. Opens the Plan
-			 * writer and binds FileAvio once.
+			 * writer for output.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
 
@@ -130,8 +130,8 @@ namespace StormByte {
 			 *
 			 * Required when any remux track is reserved. Without it the muxer
 			 * cannot clone origin codec parameters. Also shares the tube
-			 * @ref Progress clock. Opens the Plan writer and binds FileAvio
-			 * once if needed. There is no @c file >> muxer and no
+			 * @ref Progress clock. Opens the Plan writer if needed.
+			 * There is no @c file >> muxer and no
 			 * @c muxer >> path.
 			 *
 			 * @param demuxer Origin demuxer. Must outlive header write.
@@ -144,19 +144,16 @@ namespace StormByte {
 			 * @class Muxer
 			 * @brief Writes interleaved packets to the Plan writer.
 			 *
-			 * Destination is @ref Plan::Writer. Libav writes through
-			 * @ref Backend::FileAvio on that writer (seekable). There is
-			 * no Producer, Consumer or Bridge on the output path.
+			 * Destination is the seekable @ref Plan::Writer. The writer's
+			 * path extension determines the destination container.
 			 *
 			 * Does not write the container header until @ref Armed is true.
 			 * @ref Armed is reserved muxable tracks versus the Plan, not a
 			 * bound path. @ref Ready is Status Ready and @ref Armed.
 			 *
-			 * Container comes from the Plan writer extension. The backend
-			 * is created on the first @c operator>>.
-			 *
-			 * Shares the Demuxer’s @ref Progress. Writes advance All via
-			 * @ref ClockPass. Trailer calls @ref FlushOctets and MuxDone.
+			 * Shares the Demuxer's @ref Progress. Written packets advance
+			 * output progress; completion includes the container trailer
+			 * and flushing the destination writer.
 			 *
 			 * @ingroup multimedia_pipeline
 			 */
@@ -237,11 +234,11 @@ namespace StormByte {
 					const Container& Destination() const noexcept;
 
 					/**
-					 * @brief Whether every muxable Plan track has a reserved hopper.
+					 * @brief Whether every muxable Plan track has an output connection.
 					 *
 					 * Counts Video, Audio and Subtitle entries in @ref Plan::Tracks.
-					 * Attachments are written at header time and are not hoppers.
-					 * true when reserved slots equal that count. false with no Plan,
+					 * Attachments are written with the header, not as packet streams.
+					 * true when connected tracks equal that count. false with no Plan,
 					 * or while @c operator>> is still running.
 					 *
 					 * Does not Fail. The owner of the graph (@ref Filters::Close
@@ -259,11 +256,10 @@ namespace StormByte {
 					bool Ready() const noexcept override;
 
 					/**
-					 * @brief Ceiling of the muxer input hopper.
+					 * @brief Maximum number of queued input packets.
 					 *
-					 * Uses @ref Backend::Pipeline::Ceiling for the first muxable
-					 * Plan track. Aborts if there is no Plan: a muxer without a
-					 * Plan must not invent a hopper size.
+					 * The first muxable Plan track determines the limit.
+					 * Calling without a bound Plan aborts the process.
 					 *
 					 * @return Max queued packets. Never 0 after a live Plan.
 					 */

@@ -63,15 +63,12 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Frame
 	 * @brief One decoded access unit.
 	 *
-	 * In libav that is an @c AVFrame: one picture or one block of
-	 * samples after decode. In Multimedia it is what process and
-	 * analytics filters, and @ref Encoder, see — pixels or samples,
+	 * One picture or one block of decoded samples, consumed by process
+	 * and analytics filters and @ref Encoder. Provides pixels or samples,
 	 * timestamps and the stream tags the decoder copied across.
 	 *
-	 * Copy and @ref Clone reference libav plane buffers
-	 * (`av_frame_ref`). They are not a deep copy of planes.
-	 * @ref Filter::FFmpeg::Save emits a new frame when a filter
-	 * paints.
+	 * Copies and @ref Clone share media buffers rather than duplicating
+	 * pixels or samples.
 	 *
 	 * @see Item
 	 * @see Packet
@@ -103,7 +100,7 @@ namespace StormByte::Multimedia::Pipeline {
 			Frame() noexcept;
 
 			/**
-			 * @brief Builds a frame without a backend buffer.
+			 * @brief Builds a frame from supplied media bytes and properties.
 			 * @param track Origin container stream index.
 			 * @param type Media of this unit (Video, Audio or Subtitle).
 			 * @param producer Step that created this unit.
@@ -145,7 +142,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param other Frame to take.
 			 *
 			 * Container-safe: @p other becomes the empty sentinel
-			 * (@ref Item::Type Unknown, track -1, no backend). @c ~Frame
+			 * (@ref Item::Type Unknown, track -1, no media). @c ~Frame
 			 * on a moved-from object is a no-op.
 			 */
 			Frame(Frame&& other) noexcept;
@@ -194,7 +191,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Copied by @ref Decoder from the compressed packet that
 			 * produced this frame. Empty when that packet had no Dts,
 			 * or when the unit was not stamped. There is no public
-			 * setter; friendship writes @c m_dts.
+			 * setter.
 			 *
 			 * @return Dts, or empty.
 			 */
@@ -302,17 +299,17 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 			/**
-			 * @brief Payload. Materialises planes on first call if a backend frame is held.
+			 * @brief Payload. Materializes decoded media bytes on first access.
 			 * @return FIFO.
 			 *
-			 * After materialisation the backend stays alive; a later
-			 * filter @c Save replaces it and this FIFO is cleared.
+			 * Materialization preserves the decoded media. Filtering that
+			 * replaces the media invalidates the previously materialized bytes.
 			 */
 			StormByte::Buffer::FIFO& Payload() noexcept;
 
 			/**
 			 * @brief Payload already materialised, or empty.
-			 * @return FIFO. Does not pull planes out of the backend.
+			 * @return FIFO. Does not materialize decoded media bytes.
 			 */
 			inline const StormByte::Buffer::FIFO& Payload() const noexcept {
 				return m_payload;

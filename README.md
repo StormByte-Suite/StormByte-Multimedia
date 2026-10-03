@@ -1,5 +1,7 @@
 # StormByte
 
+Contributor guides: [Contributing](CONTRIBUTING.md) and [Coding Style](CODING_STYLE.md).
+
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
 ![C++26](https://img.shields.io/badge/C%2B%2B-26-00599C?logo=c%2B%2B&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.12+-064F8C?logo=cmake&logoColor=white)
@@ -26,15 +28,15 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 
 | Module | Role | API |
 | --- | --- | --- |
-| [Base](https://github.com/StormBytePP/StormByte) | Exceptions, Expected, serialization, strings, UUID, concepts | [/StormByte](https://dev.stormbyte.org/StormByte) |
-| [Buffer](https://github.com/StormBytePP/StormByte-Buffer) | FIFO, SharedFIFO, Ring, Producer/Consumer and multi-stage pipelines | [/StormByte-Buffer](https://dev.stormbyte.org/StormByte-Buffer) |
-| [Config](https://github.com/StormBytePP/StormByte-Config) | Human-readable text and versioned binary documents (groups, lists, raw bytes) | [/StormByte-Config](https://dev.stormbyte.org/StormByte-Config) |
-| [Crypto](https://github.com/StormBytePP/StormByte-Crypto) | Hash, compress, encrypt, sign and key agreement — Crypto++ never leaves the private tree | [/StormByte-Crypto](https://dev.stormbyte.org/StormByte-Crypto) |
-| [Database](https://github.com/StormBytePP/StormByte-Database) | One API over SQLite, PostgreSQL and MariaDB | [/StormByte-Database](https://dev.stormbyte.org/StormByte-Database) |
-| [Logger](https://github.com/StormBytePP/StormByte-Logger) | Stream logging, levels, headers, redaction, `ThreadedLog` | [/StormByte-Logger](https://dev.stormbyte.org/StormByte-Logger) |
-| **Multimedia** | This repository | [/StormByte-Multimedia](https://dev.stormbyte.org/StormByte-Multimedia) |
-| [Network](https://github.com/StormBytePP/StormByte-Network) | Framed packets, Client/Server, IPv4/IPv6 TCP and Buffer pipelines (compress/encrypt) | [/StormByte-Network](https://dev.stormbyte.org/StormByte-Network) |
-| [System](https://github.com/StormBytePP/StormByte-System) | Processes, pipes and environment variables across Linux, Windows and macOS | [/StormByte-System](https://dev.stormbyte.org/StormByte-System) |
+| [Base](https://github.com/StormBytePP/StormByte) | Exceptions, Expected, serialization, strings, UUID, concepts | [/StormByte](https://suite.stormbyte.org/StormByte) |
+| [Buffer](https://github.com/StormBytePP/StormByte-Buffer) | FIFO, SharedFIFO, Ring, Producer/Consumer and multi-stage pipelines | [/StormByte-Buffer](https://suite.stormbyte.org/StormByte-Buffer) |
+| [Config](https://github.com/StormBytePP/StormByte-Config) | Human-readable text and versioned binary documents (groups, lists, raw bytes) | [/StormByte-Config](https://suite.stormbyte.org/StormByte-Config) |
+| [Crypto](https://github.com/StormBytePP/StormByte-Crypto) | Hash, compress, encrypt, sign and key agreement — Crypto++ never leaves the private tree | [/StormByte-Crypto](https://suite.stormbyte.org/StormByte-Crypto) |
+| [Database](https://github.com/StormBytePP/StormByte-Database) | One API over SQLite, PostgreSQL and MariaDB | [/StormByte-Database](https://suite.stormbyte.org/StormByte-Database) |
+| [Logger](https://github.com/StormBytePP/StormByte-Logger) | Stream logging, levels, headers, redaction, `ThreadedLog` | [/StormByte-Logger](https://suite.stormbyte.org/StormByte-Logger) |
+| **Multimedia** | This repository | [/StormByte-Multimedia](https://suite.stormbyte.org/StormByte-Multimedia) |
+| [Network](https://github.com/StormBytePP/StormByte-Network) | Framed packets, Client/Server, IPv4/IPv6 TCP and Buffer pipelines (compress/encrypt) | [/StormByte-Network](https://suite.stormbyte.org/StormByte-Network) |
+| [System](https://github.com/StormBytePP/StormByte-System) | Processes, pipes and environment variables across Linux, Windows and macOS | [/StormByte-System](https://suite.stormbyte.org/StormByte-System) |
 
 ## Table of Contents
 
@@ -56,12 +58,12 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 ## Documentation
 
 - This README: how to build, the two entry points, the tube contract, distribution flags.
-- Doxygen class reference (headers under `StormByte/multimedia/`): [https://dev.stormbyte.org/StormByte-Multimedia/](https://dev.stormbyte.org/StormByte-Multimedia/).
-- Logger contract used by every `Step`: [https://dev.stormbyte.org/StormByte-Logger/](https://dev.stormbyte.org/StormByte-Logger/).
+- Doxygen class reference (headers under `StormByte/multimedia/`): [https://suite.stormbyte.org/StormByte-Multimedia/](https://suite.stormbyte.org/StormByte-Multimedia/).
+- Logger contract used by every `Step`: [https://suite.stormbyte.org/StormByte-Logger/](https://suite.stormbyte.org/StormByte-Logger/).
 
 ## Two ways to work
 
-Every job is the same tube. You either let `Transcoder` assemble it from a fluent map of origin streams, or you construct the `Step`s yourself and join them with `operator>>`. There is no third private path.
+You either let `Transcoder` assemble a job from a fluent map of origin streams, or construct the `Step`s yourself and join them with `operator>>`.
 
 ### 1. Transcoder (File → File)
 
@@ -247,7 +249,7 @@ graph.Close();
 
 Filters are leaves, not a second pipeline language. `Scale` is resize (that is the name). `Watermark` is a still image on decoded video, with Hold so a black slate at the start does not pin the letterbox probe too early.
 
-Analytics never emit into the encode lane. The last analytics node is a drain. VMAF (when built) compares a reference decode against a post-encode look: `Filters` mounts an internal decoder in EncodeLook mode, scales the distorted geometry to the latched reference, and reports mean / min against model `vmaf_4k_v0.6.1`. One libvmaf context per `Frame::Track`. Default `n_threads` is all cores; 4K 10-bit at 32 threads holds ~18.5 GiB for the job (peak ~20.5 GiB). Pass a smaller count as the third constructor argument. That look is not a user API.
+Analytics do not change the encoded output. VMAF (when built) compares the source video with the decoded encoded result, scales the result to the reference geometry, and reports mean and minimum scores against model `vmaf_4k_v0.6.1`. Each video track is evaluated separately. The default thread count uses all cores; 4K 10-bit evaluation at 32 threads has been observed to use about 18.5 GiB for the job, with peaks around 20.5 GiB. Pass a smaller count as the third constructor argument to reduce memory demand.
 
 Write a new filter the same way `Scale` and `Watermark` are written. Do not add public friends so a coordinator can peek.
 

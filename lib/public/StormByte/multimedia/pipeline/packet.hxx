@@ -61,16 +61,14 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Packet
 	 * @brief One compressed access unit.
 	 *
-	 * In libav that is an @c AVPacket: compressed bytes for one
-	 * picture, one audio block or one subtitle event. In Multimedia
-	 * it is what packet filters, @ref Remuxer and @ref Muxer see —
+	 * Compressed bytes for one picture, audio block or subtitle event.
+	 * Packet filters, @ref Remuxer and @ref Muxer can inspect the
 	 * origin track, timestamps, payload, side data and the Registry
 	 * @ref StormByte::Multimedia::Codec of that AU. The Packet does
 	 * not open a codec.
 	 *
-	 * Copy and @ref Clone reference libav packet buffers
-	 * (`av_packet_ref`). They are not a deep copy of compressed
-	 * bytes.
+	 * Copies and @ref Clone share media buffers rather than duplicating
+	 * compressed bytes.
 	 *
 	 * @see Item
 	 * @see Frame

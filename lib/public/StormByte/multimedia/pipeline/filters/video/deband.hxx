@@ -69,10 +69,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * on a clean master just adds noise.
 	 *
 	 * @par Algorithm
-	 * One frame. Neighbours at @ref m_range are averaged
-	 * when every |delta| is below @ref m_threshold. A
-	 * position+PTS hash adds @ref m_grain. No Hold.
-	 * No avfilter `deband`.
+	 * Processes each frame independently without Hold. The configured
+	 * range and threshold control smoothing of nearby colour differences;
+	 * the grain setting adds texture to the result.
 	 *
 	 * @par Mutation
 	 * Writes a new @ref StormByte::Multimedia::FFmpeg::AVFrame

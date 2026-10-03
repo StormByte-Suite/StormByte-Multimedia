@@ -73,15 +73,12 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Remuxer
 	 * @brief Forwards compressed packets of one origin track to the muxer.
 	 *
-	 * Notice: origin index at Open. LowLevel forwards always;
-	 * the shared logger throttles. The packet keeps the lineage
-	 * born at the demuxer.
+	 * Packets retain their source lineage and are forwarded without
+	 * re-encoding. @ref Filters can analyze decoded destination
+	 * pictures without changing the forwarded packets.
 	 *
-	 * Dest-look is @ref Backend::Pipeline::Pipe::CloneTo on the
-	 * remux Pipe (Filters dest look). There is no side hopper.
-	 *
-	 * @ref Label is `Remuxer(<origin codec>)` when a Plan is bound
-	 * and that stream exists, otherwise `Remuxer(t=<origin index>)`.
+	 * Logging identifies the origin codec or track index; the supplied
+	 * logger controls throttling.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -148,8 +145,8 @@ namespace StormByte::Multimedia::Pipeline {
 			}
 
 			/**
-			 * @brief Ceiling of the remuxer input hopper.
-			 * @return Max queued packets, or `0` if this hopper does not exist.
+			 * @brief Maximum number of queued input packets.
+			 * @return Packet limit, or `0` if no input queue exists.
 			 */
 			std::size_t InputCeiling() const noexcept override;
 

@@ -68,9 +68,8 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Progress
 	 * @brief Job clock for one tube.
 	 *
-	 * Transcoder creates the clock before resolving duration and shares
-	 * it with the Demuxer. Standalone Demuxers create their own clock. Filters write
-	 * analytics, the Muxer writes that the container finished.
+	 * Tracks duration resolution, measurement, analytics and output completion
+	 * for one job. Standalone Demuxers also provide a progress handle.
 	 * @ref Transcoder::Progress and @ref Demuxer::Progress return
 	 * @ref Pointer (shared, const). The user may keep that pointer
 	 * after the tube dies. There are no public setters.
@@ -88,8 +87,8 @@ namespace StormByte::Multimedia::Pipeline {
 	 * and runs in parallel with Process. Process/mux takes the rest
 	 * (100, 95, 90 or 85 percent). Missing axes are not in the mix.
 	 * 100.00 only when the Muxer finished and every mounted phase
-	 * is closed. Measure pts come from frames that already ran
-	 * Measure, not from demux emission.
+	 * is closed. Measurement progress reflects completed frame measurement,
+	 * not merely reading the source packets.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */

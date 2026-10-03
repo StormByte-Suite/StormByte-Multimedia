@@ -1,0 +1,8 @@
+/**
+ * @defgroup multimedia_pipeline Multimedia Pipeline
+ * @brief Demux, decode, filter, encode, and mux types for multimedia jobs.
+ *
+ * The pipeline connects track processing and analytics through shared jobs,
+ * progress clocks, and retained telemetry. Transcoder provides the fluent
+ * coordinator, while individual stages support hand-built processing routes.
+ */

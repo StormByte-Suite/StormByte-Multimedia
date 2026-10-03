@@ -86,18 +86,12 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Encoder
 	 * @brief Encodes frames of one output track into packets.
 	 *
-	 * Notice: destination codec when the backend first opens.
-	 * LowLevel unit lines are always written; the shared logger
-	 * throttles. One incoming frame counts once; packets produced
-	 * in that Work share the sample. Pts/Dts on Wrap are the
-	 * flattened encoder clock (the line that catches a bad DTS
-	 * flatten). The Through pumper times each Process.
+	 * The bound @ref Plan selects the destination codec. Logging
+	 * identifies the selected encoder, and the supplied logger
+	 * controls throttling.
 	 *
-	 * @ref Label is `Encoder(libx265)` when an implementation is
-	 * pinned or selected, otherwise `Encoder(<registry name>)`.
-	 *
-	 * Encode-look is @ref Backend::Pipeline::Pipe::CloneTo on the
-	 * encode Pipe (Filters dest look). There is no side hopper.
+	 * @ref Filters can analyze decoded pictures from the encoded
+	 * output without changing the packets delivered to the muxer.
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Encoder final: public Step {
@@ -161,7 +155,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 			/**
-			 * @brief true if the backend is open and not failed.
+			 * @brief true if the encoder is open and has not failed.
 			 * @return Open and not Failed.
 			 */
 			explicit operator bool() const noexcept;
@@ -175,8 +169,8 @@ namespace StormByte::Multimedia::Pipeline {
 			}
 
 			/**
-			 * @brief Ceiling of the encoder input hopper.
-			 * @return Max queued frames, or `0` if this hopper does not exist.
+			 * @brief Maximum number of queued input frames.
+			 * @return Frame limit, or `0` if no input queue exists.
 			 */
 			std::size_t InputCeiling() const noexcept override;
 
@@ -189,7 +183,7 @@ namespace StormByte::Multimedia::Pipeline {
 			}
 
 			/**
-			 * @brief Whether the backend finished Open().
+			 * @brief Whether encoder initialization has completed.
 			 * @return false before the first frame or after Fail().
 			 */
 			bool Opened() const noexcept;

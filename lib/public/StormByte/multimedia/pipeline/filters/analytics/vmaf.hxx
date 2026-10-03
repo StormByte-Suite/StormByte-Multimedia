@@ -81,12 +81,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref Report, @ref Media.
 	 *
 	 * @par Pairing
-	 * Presentation FIFOs per @ref Pipeline::Frame::Track, not Serial
-	 * or PTS. Serial is tube lineage and does not identify a
-	 * reconstructed picture when the encoder has delay. Each look
-	 * leaves avcodec in presentation order, so the nth Decoder tap
-	 * frame of a track is the same picture as the nth dest-look
-	 * frame of that track. One libvmaf context per track. There is
+	 * Frames are paired in presentation order per
+	 * @ref Pipeline::Frame::Track, not by Serial or PTS. The nth
+	 * reference frame is compared with the nth distorted frame
+	 * of that track. Each track is measured independently; there is
 	 * no pooled mean across tracks.
 	 *
 	 * @par Geometry
@@ -96,13 +94,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Warning. Scale is not @ref Report::Failed.
 	 *
 	 * @par Memory
-	 * Process must not stall the encode tube: it clones the
-	 * RAII look, enqueues @c vmaf_read_pictures, and returns.
-	 * Waiting for extractors is only in @ref Eof.
-	 * @ref InputCeiling (512) sizes the analytics hopper, not
-	 * the park. Parked RAII frames cover encoder delay (ref
-	 * waiting for dist). libvmaf feature extractors scale
-	 * with n_threads × resolution, not duration.
+	 * Unpaired frames may be retained to accommodate encoder delay.
+	 * @ref Eof waits for outstanding measurements.
+	 * @ref InputCeiling (512) limits pending input, not frames awaiting
+	 * a matching look. Measurement memory scales with thread count
+	 * and resolution, not duration.
 	 * Default n_threads is
 	 * @c std::thread::hardware_concurrency() (all cores).
 	 * 4K 10-bit (`vmaf_4k_v0.6.1`, subsample 1) at 32
@@ -110,13 +106,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * plateau; peak ~20.5 GiB at init). RSS is the same
 	 * order. A second video track opens another context of
 	 * that size. Pass a smaller thread count in the
-	 * constructor to cap it. Park depth is LowLevel; the
-	 * module logger throttles it.
+	 * constructor to cap it.
 	 *
-	 * A failed @c vmaf_read_pictures still belongs to us:
-	 * Score unrefs both pictures.
-	 *
-	 * @par When to read @ref Report
+	 * @par When to read the report
 	 * Muxer closed is not Eof on this node. Wait until the
 	 * job is Done. A low score is not Fail. @ref Report::Failed
 	 * only when a context or model could not be opened, or

@@ -72,31 +72,21 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Filters
 	 * @brief Optional facade: Between stretches, Add filters, Close.
 	 *
-	 * A tube without filters does not need this. Ends are
-	 * @c std::shared_ptr<Step>. operator>> still wires Plan and
-	 * reserves (demuxer >> decoder, encoder >> muxer). Close
-	 * wires each stretch (process chain, CloneTo, dest look).
+	 * Use @ref Between to select connected stages, @ref Handle::Add
+	 * to add filters to that connection, and @ref Close to complete
+	 * configuration. Pipelines without filters do not need this facade.
 	 *
-	 * Global @ref Add is one analytics node shared by every
-	 * matching Between (CloneTo, not N Launch). Per-stretch Add
-	 * is @ref Handle::Add. Both are allowed; there is no dedup.
+	 * Global @ref Add applies one analytics filter to every matching
+	 * connection. Global and per-connection filters may coexist;
+	 * duplicate additions are not removed.
 	 *
-	 * A @ref Filter::ProcessTwoPasses leaf on a stretch puts that
-	 * track on Demuxer::Measure when @ref Close runs. Remux plus
-	 * that leaf is Fail on @ref Handle::Add. Demuxer measure EoF
-	 * calls @ref CloseMeasureSource. Each measure-track Decoder
-	 * drains on its worker, then @ref OnMeasureDrained. Each
-	 * ProcessTwoPasses leaf drains on its worker, then
-	 * @ref OnMeasureFilterDrained. @ref FinishMeasure runs on the
-	 * two-pass filter worker when both sets are drained:
-	 * LeaveMeasure and Rewind. After that the tube is ordinary
-	 * Process, same as a job that never measured.
+	 * @ref Filter::ProcessTwoPasses filters measure the required source
+	 * tracks before the output pass. Two-pass processing is not supported
+	 * on remux connections. The source is reread after measurement.
 	 *
-	 * Shares the Demuxer’s @ref Progress. Analytics leaves set
-	 * HasAnalytics. Dest-look Decoders feed the analytics axis.
-	 * Measure pts is written after ProcessTwoPasses::Measure in
-	 * FFmpeg::Work, not when the Demuxer emits. Leaves never see
-	 * Progress. Idle after the job sets AnalyticsDone.
+	 * Analytics can inspect decoded destination pictures as well as
+	 * source pictures. The shared job progress includes measurement
+	 * and analytics completion. @ref Reports returns analytics snapshots.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -146,8 +136,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param destination Encoder / Remuxer / Muxer.
 			 * @return @ref Handle for per-stretch Add.
 			 *
-			 * Hopper key: Decoder::Index, else Remuxer::In / Encoder::Index
-			 * of dest, else origin Encoder/Remuxer. Fail dest if unknown.
+			 * The stages must identify the track being connected. An
+			 * unidentifiable track causes the destination stage to fail.
 			 */
 			Handle Between(std::shared_ptr<Step> origin,
 				std::shared_ptr<Step> destination) noexcept;
