@@ -117,7 +117,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		NameThread("STMM:Decode:" + std::to_string(m_owner.m_index));
 		if (m_owner.Failed())
 			return;
-		auto packet = std::dynamic_pointer_cast<Packet>(item);
+		auto packet = StormByte::Safe::DynamicPointerCast<Packet>(item);
 		if (!packet) {
 			Fail("decoder expected a packet");
 			return;

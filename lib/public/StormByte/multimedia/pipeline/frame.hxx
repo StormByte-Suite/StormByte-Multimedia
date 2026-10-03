@@ -87,7 +87,7 @@ namespace StormByte::Multimedia::Pipeline {
 		friend Frame& operator>>(Frame& frame, Encoder& encoder) noexcept;
 
 		public:
-			using PointerType = std::shared_ptr<Frame>;
+			using PointerType = StormByte::Safe::Shared<Frame>;
 
 			/**
 			 * @name Construction

@@ -311,7 +311,7 @@ const StormByte::Multimedia::FFmpeg::AVFrame& FFmpeg::AVFrame() const noexcept {
 		return true;
 	}();
 	(void)primed;
-	auto frame = std::dynamic_pointer_cast<const Pipeline::Frame>(m_current);
+	auto frame = StormByte::Safe::DynamicPointerCast<const Pipeline::Frame>(m_current);
 	if (!frame || !frame->m_backend)
 		return empty;
 	return frame->m_backend->Handle();
@@ -324,7 +324,7 @@ const StormByte::Multimedia::FFmpeg::AVPacket& FFmpeg::AVPacket() const noexcept
 		return true;
 	}();
 	(void)primed;
-	auto packet = std::dynamic_pointer_cast<const Pipeline::Packet>(m_current);
+	auto packet = StormByte::Safe::DynamicPointerCast<const Pipeline::Packet>(m_current);
 	if (!packet || !packet->m_backend)
 		return empty;
 	return packet->m_backend->Handle();
@@ -341,7 +341,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 		Log(Level::Warning, "Save during measure is a no-op");
 		return;
 	}
-	auto frame = std::dynamic_pointer_cast<Pipeline::Frame>(m_current);
+	auto frame = StormByte::Safe::DynamicPointerCast<Pipeline::Frame>(m_current);
 	if (!frame)
 		return;
 	if (!incoming) {
@@ -369,7 +369,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 		Log(Level::Warning, "Save during measure is a no-op");
 		return;
 	}
-	auto packet = std::dynamic_pointer_cast<Pipeline::Packet>(m_current);
+	auto packet = StormByte::Safe::DynamicPointerCast<Pipeline::Packet>(m_current);
 	if (!packet)
 		return;
 	if (!incoming) {

@@ -40,7 +40,6 @@
 
 #include <StormByte/buffer/io/buffered_file_reader.hxx>
 #include <StormByte/buffer/io/buffered_file_writer.hxx>
-#include <StormByte/clonable.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/file.hxx>
@@ -51,6 +50,7 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/clonable.hxx>
 #include <StormByte/type_traits.hxx>
 
 #include <cstdint>
@@ -115,7 +115,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC TrackSettled:
-		public StormByte::Clonable<TrackSettled, std::unique_ptr<TrackSettled>> {
+		public StormByte::Safe::Clonable<TrackSettled, StormByte::Safe::Unique<TrackSettled>> {
 		public:
 			/**
 			 * @name Lifecycle
@@ -734,7 +734,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Override to return a type derived from TrackSettled.
 			 * MarkSettled fills it and calls OnSettled.
 			 */
-			virtual std::unique_ptr<TrackSettled> EmptySettled() const noexcept;
+			virtual StormByte::Safe::Unique<TrackSettled> EmptySettled() const noexcept;
 
 			/**
 			 * @brief Last chance to raise ceilings before the job starts.

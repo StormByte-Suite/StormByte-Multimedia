@@ -86,7 +86,7 @@ namespace StormByte::Multimedia::Pipeline {
 		friend class Muxer;
 
 		public:
-			using PointerType = std::shared_ptr<Packet>;
+			using PointerType = StormByte::Safe::Shared<Packet>;
 
 			/**
 			 * @name Construction

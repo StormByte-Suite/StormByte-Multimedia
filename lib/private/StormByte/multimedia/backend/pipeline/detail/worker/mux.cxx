@@ -90,7 +90,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (m_owner.Failed() || m_owner.Status() == State::Stopping || !m_owner.Armed())
 			return;
 
-		auto packet = std::dynamic_pointer_cast<Packet>(item);
+		auto packet = StormByte::Safe::DynamicPointerCast<Packet>(item);
 		if (!packet) {
 			Fail("muxer expected a packet");
 			return;

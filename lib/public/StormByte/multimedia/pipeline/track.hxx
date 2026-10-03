@@ -38,10 +38,10 @@
 
 #pragma once
 
-#include <StormByte/clonable.hxx>
 #include <StormByte/iterable.hxx>
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/clonable.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <memory>
@@ -71,7 +71,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Track:
-		public StormByte::Clonable<Track, std::unique_ptr<Track>> {
+		public StormByte::Safe::Clonable<Track, StormByte::Safe::Unique<Track>> {
 		public:
 			/**
 			 * @name Lifecycle
@@ -186,7 +186,7 @@ namespace StormByte::Multimedia::Pipeline {
 		private:
 			int m_in;										///< Origin stream index
 			enum StormByte::Multimedia::Type m_type;		///< Media stamped at construction
-			std::unique_ptr<Config::Base> m_config;			///< Leaf, or null
+			StormByte::Safe::Unique<Config::Base> m_config;		///< Leaf, or null
 	};
 
 	/**
@@ -200,10 +200,10 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Tracks:
-		protected StormByte::Iterable<std::vector<std::unique_ptr<Track>>> {
+		protected StormByte::Iterable<std::vector<StormByte::Safe::Unique<Track>>> {
 		public:
-			using size_type = StormByte::Iterable<std::vector<std::unique_ptr<Track>>>::size_type;				///< Count type
-			using const_iterator = StormByte::Iterable<std::vector<std::unique_ptr<Track>>>::const_iterator;	///< Const iterator
+			using size_type = StormByte::Iterable<std::vector<StormByte::Safe::Unique<Track>>>::size_type;			///< Count type
+			using const_iterator = StormByte::Iterable<std::vector<StormByte::Safe::Unique<Track>>>::const_iterator;	///< Const iterator
 
 			/**
 			 * @name Lifecycle

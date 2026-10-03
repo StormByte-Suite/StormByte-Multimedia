@@ -368,18 +368,18 @@ Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 	if (stream)
 		slot.Source = &stream->Codec();
 	if (kind == Type::Video)
-		slot.Config = std::make_unique<Config::Video>();
+		slot.Config = StormByte::Safe::Unique<Config::Base>::MakePointer<Config::Video>();
 	else if (kind == Type::Audio)
-		slot.Config = std::make_unique<Config::Audio>();
+		slot.Config = StormByte::Safe::Unique<Config::Base>::MakePointer<Config::Audio>();
 	else if (kind == Type::Subtitle)
-		slot.Config = std::make_unique<Config::Subtitle>();
+		slot.Config = StormByte::Safe::Unique<Config::Base>::MakePointer<Config::Subtitle>();
 	else {
 		const auto& mime = m_consult->Attachments()[static_cast<std::size_t>(in)].MimeType();
 		if (!mime || mime->empty()) {
 			Fail("attachment slot " + std::to_string(in) + " has no MIME");
 			return Track(*this, InvalidSlot);
 		}
-		slot.Config = std::make_unique<Config::Attachment>(*mime);
+		slot.Config = StormByte::Safe::Unique<Config::Base>::MakePointer<Config::Attachment>(*mime);
 	}
 
 	m_backend->Mapped.push_back(std::move(slot));
@@ -517,8 +517,8 @@ std::unique_ptr<class Plan> Transcoder::EmptyPlan(
 	return std::make_unique<class Plan>(std::move(reader), std::move(writer));
 }
 
-std::unique_ptr<TrackSettled> Transcoder::EmptySettled() const noexcept {
-	return std::make_unique<TrackSettled>();
+StormByte::Safe::Unique<TrackSettled> Transcoder::EmptySettled() const noexcept {
+	return StormByte::Safe::Unique<TrackSettled>::MakePointer<TrackSettled>();
 }
 
 void Transcoder::OnConfigure() noexcept {}

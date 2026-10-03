@@ -158,9 +158,9 @@ void Packet::Bind(std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept {
 }
 
 Item::PointerType Packet::Clone() const {
-	return Item::PointerType(new Packet(*this));
+	return Item::PointerType::MakePointer<Packet>(*this);
 }
 
 Item::PointerType Packet::Move() {
-	return Item::PointerType(new Packet(std::move(*this)));
+	return Item::PointerType::MakePointer<Packet>(std::move(*this));
 }

@@ -63,7 +63,7 @@ Track& Track::operator=(const Track& other) {
 
 Tracks::Tracks(const Tracks& other)
 :	Iterable() {
-	for (const std::unique_ptr<Track>& track : other)
+	for (const StormByte::Safe::Unique<Track>& track : other)
 		add(*track);
 }
 

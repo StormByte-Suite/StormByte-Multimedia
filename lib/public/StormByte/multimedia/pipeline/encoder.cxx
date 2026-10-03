@@ -202,13 +202,13 @@ Packet::PointerType Encoder::Wrap(
 
 	Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={} key={}",
 		index, *m_serial, m_part, Ns(pts), Ns(dts), Ns(duration), keyFrame ? 1 : 0));
-	auto packet = Packet::PointerType(new Packet(
+	auto packet = Packet::PointerType::MakePointer<Packet>(
 		index, type, Producer::Encoder,
 		std::move(payload),
 		std::move(pts), std::move(dts), std::move(duration),
 		keyFrame, std::move(attachments),
 		m_codec,
-		*m_serial, m_part));
+		*m_serial, m_part);
 	packet->Bind(std::move(backend));
 	return packet;
 }

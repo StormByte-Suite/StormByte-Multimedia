@@ -76,7 +76,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			int Out = -1;								///< Mux destination order
 			StormByte::Multimedia::Type Kind = StormByte::Multimedia::Type::Unknown;	///< Media kind
 			const StormByte::Multimedia::Codec* Source = nullptr;	///< Origin codec from consultation
-			std::unique_ptr<StormByte::Multimedia::Pipeline::Config::Base> Config;	///< Track intention
+			StormByte::Safe::Unique<StormByte::Multimedia::Pipeline::Config::Base> Config;	///< Track intention
 			std::vector<std::shared_ptr<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Filters;	///< Stretch leaves
 			bool Settled = false;						///< OnSettled already fired
 	};

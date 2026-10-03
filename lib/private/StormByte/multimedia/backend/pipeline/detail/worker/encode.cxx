@@ -81,7 +81,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		NameThread("STMM:Encode:" + std::to_string(m_owner.m_index));
 		if (m_owner.Failed() || !m_owner.m_backend)
 			return;
-		auto frame = std::dynamic_pointer_cast<Frame>(item);
+		auto frame = StormByte::Safe::DynamicPointerCast<Frame>(item);
 		if (!frame) {
 			Fail("encoder expected a frame");
 			return;

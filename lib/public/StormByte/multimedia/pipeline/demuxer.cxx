@@ -200,7 +200,7 @@ Packet::PointerType Demuxer::Wrap(
 	Log(Level::LowLevel, std::format("t={} {} {}:0 pts={} dts={} dur={} key={} bytes={}",
 		track, ToString(type), serial, Ns(pts), Ns(dts), Ns(duration),
 		keyframe ? 1 : 0, payload.Size()));
-	auto packet = Packet::PointerType(new Packet(
+	auto packet = Packet::PointerType::MakePointer<Packet>(
 		track,
 		type,
 		Producer::Demuxer,
@@ -212,7 +212,7 @@ Packet::PointerType Demuxer::Wrap(
 		std::vector<SideData>{},
 		nullptr,
 		serial,
-		0));
+		0);
 	if (backend)
 		packet->Bind(std::move(backend));
 	return packet;

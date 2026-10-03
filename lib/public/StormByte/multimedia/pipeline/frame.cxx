@@ -176,9 +176,9 @@ void Frame::Bind(std::unique_ptr<Backend::Pipeline::Frame> backend) noexcept {
 }
 
 Item::PointerType Frame::Clone() const {
-	return Item::PointerType(new Frame(*this));
+	return Item::PointerType::MakePointer<Frame>(*this);
 }
 
 Item::PointerType Frame::Move() {
-	return Item::PointerType(new Frame(std::move(*this)));
+	return Item::PointerType::MakePointer<Frame>(std::move(*this));
 }

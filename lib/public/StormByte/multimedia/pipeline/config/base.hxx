@@ -38,7 +38,7 @@
 
 #pragma once
 
-#include <StormByte/clonable.hxx>
+#include <StormByte/safe/clonable.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
 
@@ -76,8 +76,8 @@ namespace StormByte::Multimedia::Pipeline::Config {
 	 * @class Base
 	 * @brief Common destination-stream identity.
 	 *
-	 * Polymorphic store root (`StormByte::Clonable` with
-	 * `unique_ptr`). Holds tags and implementation pins that
+	 * Polymorphic store root (`StormByte::Safe::Clonable` with
+	 * `StormByte::Safe::Unique`). Holds tags and implementation pins that
 	 * apply to every media `StormByte::Multimedia::Type` used
 	 * in a Plan slot. `Type` is stored at construction; it is
 	 * not virtual. Oficio knobs live on the leaves.
@@ -87,7 +87,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Base:
-		public StormByte::Clonable<Base, std::unique_ptr<Base>> {
+		public StormByte::Safe::Clonable<Base, StormByte::Safe::Unique<Base>> {
 		public:
 			/**
 			 * @name Lifecycle

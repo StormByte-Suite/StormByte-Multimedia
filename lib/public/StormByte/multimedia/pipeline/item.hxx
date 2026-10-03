@@ -38,7 +38,7 @@
 
 #pragma once
 
-#include <StormByte/clonable.hxx>
+#include <StormByte/safe/clonable.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -86,14 +86,15 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @class Item
 	 * @brief Facade shared by Frame and Packet.
 	 *
-	 * @ref Clone (via @c Clonable) returns a new @c shared_ptr and
+	 * @ref Clone (via @c StormByte::Safe::Clonable) returns a new
+	 * @c StormByte::Safe::Shared and
 	 * references libav media buffers (`av_frame_ref` /
 	 * `av_packet_ref`). It is not a deep copy of planes or packet
 	 * payload. @ref Move relocates the unit.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Item: protected Clonable<Item, std::shared_ptr<Item>> {
+	class STORMBYTE_MULTIMEDIA_PUBLIC Item: protected StormByte::Safe::Clonable<Item> {
 		friend class Backend::Pipeline::Frame;
 		friend class Backend::Pipeline::Packet;
 		friend class Backend::Pipeline::Pipe;
@@ -107,7 +108,7 @@ namespace StormByte::Multimedia::Pipeline {
 		friend class Step;
 
 		public:
-			using StormByte::Clonable<Item, std::shared_ptr<Item>>::PointerType;
+			using StormByte::Safe::Clonable<Item>::PointerType;
 
 			/**
 			 * @name Lifecycle

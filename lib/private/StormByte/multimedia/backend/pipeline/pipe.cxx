@@ -49,7 +49,7 @@ using StormByte::Multimedia::Pipeline::Packet;
 
 namespace {
 	std::optional<std::int64_t> FrontTs(const Pipe::Item::PointerType& item) noexcept {
-		auto packet = std::dynamic_pointer_cast<Packet>(item);
+		auto packet = StormByte::Safe::DynamicPointerCast<Packet>(item);
 		if (!packet)
 			return std::nullopt;
 		if (const auto& dts = packet->Dts(); dts)
