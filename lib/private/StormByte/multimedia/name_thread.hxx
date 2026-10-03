@@ -38,17 +38,10 @@
 
 #pragma once
 
-#include <StormByte/string.hxx>
+#include <StormByte/system/this_thread.hxx>
 
 #include <string>
-
-#ifdef LINUX
-	#include <pthread.h>
-#elif defined(MACOS)
-	#include <pthread.h>
-#elif defined(WINDOWS)
-	#include <windows.h>
-#endif
+#include <string_view>
 
 /**
  * @brief Sets the current thread name for debuggers and process tools.
@@ -57,24 +50,9 @@
 inline void NameThread(const std::string& name) noexcept {
 	if (name.empty())
 		return;
+	std::string_view view{name};
 #ifdef LINUX
-	char buf[16]{};
-	const std::size_t n = name.size() < 15 ? name.size() : 15;
-	name.copy(buf, n);
-	buf[n] = '\0';
-	::pthread_setname_np(::pthread_self(), buf);
-#elif defined(MACOS)
-	::pthread_setname_np(name.c_str());
-#elif defined(WINDOWS)
-	std::wstring wide;
-	try {
-		wide = StormByte::String::UTF8Decode(name);
-	}
-	catch (...) {
-		return;
-	}
-	if (wide.empty())
-		return;
-	::SetThreadDescription(::GetCurrentThread(), wide.c_str());
+	view = view.substr(0, 15);
 #endif
+	static_cast<void>(StormByte::System::ThisThread::Name(view));
 }
