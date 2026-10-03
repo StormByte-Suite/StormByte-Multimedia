@@ -539,6 +539,7 @@ StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> Transcoder::OutputTel
 Progress::Pointer Transcoder::Progress() const noexcept {
 	if (!m_backend)
 		return {};
+	std::lock_guard lock(m_backend->Lock);
 	return m_backend->Clock;
 }
 
@@ -563,7 +564,17 @@ std::unique_ptr<class Plan> Transcoder::EmptyPlan(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	std::optional<std::chrono::nanoseconds> duration) const noexcept {
-	return std::make_unique<class Plan>(std::move(reader), std::move(writer), std::move(duration));
+	return std::make_unique<class Plan>(std::move(reader), std::move(writer), duration,
+		DurationProgress());
+}
+
+StormByte::Multimedia::File::DurationProgress Transcoder::DurationProgress() const noexcept {
+	return [this](double percent) {
+		if (auto clock = std::const_pointer_cast<class Progress>(Progress())) {
+			clock->SetDurationCalculation(percent);
+			const_cast<Transcoder*>(this)->OnProgress();
+		}
+	};
 }
 
 StormByte::Safe::Unique<TrackSettled> Transcoder::EmptySettled() const noexcept {

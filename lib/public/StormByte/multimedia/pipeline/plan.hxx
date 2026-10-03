@@ -146,6 +146,18 @@ namespace StormByte {
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
+					/**
+					 * @brief Takes both owners and observes automatic duration resolution.
+					 * @param reader Owned input location.
+					 * @param writer Owned output location.
+					 * @param duration Authoritative duration; absent or non-positive scans the source.
+					 * @param progress Duration scan observer; unused when duration is supplied.
+					 */
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						std::optional<std::chrono::nanoseconds> duration,
+						const StormByte::Multimedia::File::DurationProgress& progress) noexcept;
+
 					Plan(const Plan&) = delete;
 					Plan& operator=(const Plan&) = delete;
 

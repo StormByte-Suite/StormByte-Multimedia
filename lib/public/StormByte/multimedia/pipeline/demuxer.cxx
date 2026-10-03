@@ -69,9 +69,13 @@ namespace {
 }
 
 Demuxer::Demuxer(std::shared_ptr<StormByte::Logger::Log> log) noexcept
+: Demuxer(std::move(log), std::make_shared<class Progress>()) {}
+
+Demuxer::Demuxer(std::shared_ptr<StormByte::Logger::Log> log,
+	std::shared_ptr<class Progress> progress) noexcept
 : Step(std::move(log), Producer::Demuxer, Kinds{}, Kinds{Kind::Packet}),
 	m_eof(false), m_positionNs(-1),
-	m_progress(std::make_shared<class Progress>()) {
+	m_progress(progress ? std::move(progress) : std::make_shared<class Progress>()) {
 	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Source>(Face()),
 		std::make_unique<Backend::Pipeline::Detail::Worker::Demux>(*this));
 	Launch();

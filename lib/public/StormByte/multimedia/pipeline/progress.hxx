@@ -42,8 +42,15 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
+
+/** @brief Internal pipeline coordinator types. */
+namespace StormByte::Multimedia::Backend::Pipeline {
+	/** @brief Internal job coordinator sharing the progress clock. */
+	class Transcoder;
+}
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -55,18 +62,24 @@ namespace StormByte::Multimedia::Pipeline {
 	class Demuxer;
 	class Filters;
 	class Muxer;
+	class Transcoder;
 
 	/**
 	 * @class Progress
 	 * @brief Job clock for one tube.
 	 *
-	 * The Demuxer creates one instance and shares it. Filters write
+	 * Transcoder creates the clock before resolving duration and shares
+	 * it with the Demuxer. Standalone Demuxers create their own clock. Filters write
 	 * analytics, the Muxer writes that the container finished.
 	 * @ref Transcoder::Progress and @ref Demuxer::Progress return
 	 * @ref Pointer (shared, const). The user may keep that pointer
 	 * after the tube dies. There are no public setters.
 	 *
-	 * Public axes are measure (optional 2-pass) and analytics
+	 * Duration calculation is an exclusive preliminary phase. Preparation
+	 * exposes activity without a percentage; packet scanning adds its own
+	 * processed-packet position estimate. It is not part of the weighted processing score.
+	 * Snapshot captures a consistent phase and values for GUI consumers.
+	 * Public processing axes are measure (optional 2-pass) and analytics
 	 * (optional taps). Ordinary Process has no public name; its
 	 * score only enters @ref All.
 	 *
@@ -84,8 +97,50 @@ namespace StormByte::Multimedia::Pipeline {
 		friend class Demuxer;
 		friend class Filters;
 		friend class Muxer;
+		friend class Transcoder;
+		friend class StormByte::Multimedia::Backend::Pipeline::Transcoder;
 
 		public:
+			/** @brief Exclusive phase currently presented to the user. */
+			enum class Phase {
+				CalculatingDuration, ///< Scanning source packet timestamps.
+				Measure, ///< Running the optional first pass.
+				Processing, ///< Processing, muxing, or draining analytics.
+				Complete ///< Muxing and all mounted axes have finished.
+			};
+
+			/** @brief Consistent values captured under one clock lock. */
+			struct Values {
+				Phase Current; ///< Exclusive display phase.
+				std::optional<double> Duration; ///< Duration scan percent; empty during CPU-only preparation.
+				std::optional<double> Measure; ///< Mounted measure percent, hidden during duration.
+				std::optional<double> Analytics; ///< Mounted analytics percent, hidden during duration.
+				double Processing; ///< Ordinary processing percent; zero during duration calculation.
+				double All; ///< Processing percent; zero during duration calculation.
+				bool MeasureComplete; ///< Whether the optional measure axis is closed.
+				bool AnalyticsComplete; ///< Whether the optional analytics axis is closed.
+				bool ProcessingComplete; ///< Whether the source processing pass has reached EOF.
+				bool MuxComplete; ///< Whether the destination trailer has been written.
+			};
+
+			/** @brief Capture phase and values atomically. @return Consistent clock values. */
+			Values Snapshot() const noexcept;
+
+			/** @brief Duration scan percent. @return 0..100 during byte scanning; empty during preparation or when inactive. */
+			std::optional<double> DurationCalculation() const noexcept;
+
+			/** @brief Whether the duration scan owns the status line. @return true while scanning. */
+			bool CalculatingDuration() const noexcept;
+
+			/** @brief Ordinary processing percent, independent of weighted All. @return 0..100; zero during duration. */
+			double Processing() const noexcept;
+
+			/** @brief Whether source processing reached EOF. @return true after PassDone. */
+			bool ProcessingComplete() const noexcept;
+
+			/** @brief Whether destination writing finished. @return true after MuxDone. */
+			bool MuxComplete() const noexcept;
+
 			/**
 			 * @brief User-facing handle. Const, shared. Not a raw pointer.
 			 */
@@ -129,13 +184,13 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief First-pass percent, if the tube mounted 2-pass.
-			 * @return 0..100, or empty if there is no measure pass.
+			 * @return 0..100, or empty if unmounted or duration calculation is active.
 			 */
 			std::optional<double> Measure() const noexcept;
 
 			/**
 			 * @brief Dest-look percent, if analytics taps exist.
-			 * @return 0..100, or empty if there are no taps.
+			 * @return 0..100, or empty if unmounted or duration calculation is active.
 			 */
 			std::optional<double> Analytics() const noexcept;
 
@@ -174,7 +229,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * All is monotone and stays below 100 until the Muxer
 			 * finished and every mounted phase is closed.
 			 *
-			 * @return 0..100.
+			 * @return 0..100; zero while duration calculation is active.
 			 */
 			double All() const noexcept;
 
@@ -184,12 +239,25 @@ namespace StormByte::Multimedia::Pipeline {
 			 * An axis is omitted when it was not mounted or already
 			 * finished. While measure is live the analytics label
 			 * is omitted even if taps exist. No newline.
+			 * Duration preparation shows its label and activity indicator. Once
+			 * packet scanning starts, the indicator freezes and the percentage is added.
 			 *
 			 * @return Single line, no trailing newline.
 			 */
 			operator std::string() const noexcept;
 
 		private:
+			/** @brief Begin duration preparation before measurable packet scanning starts. */
+			void BeginDurationCalculation() noexcept;
+
+			/** @brief Update the exclusive duration phase. @param percent Scan estimate; empty closes the phase. */
+			void SetDurationCalculation(std::optional<double> percent) noexcept;
+
+			mutable std::recursive_mutex m_lock; ///< Protects all clock values and snapshots.
+			bool m_calculatingDuration = false; ///< Duration preparation or byte scanning is active.
+			mutable char m_durationIndicator = '|'; ///< Last preparation symbol, frozen while scanning.
+			std::optional<double> m_durationCalculation; ///< Active monotone duration scan estimate.
+
 			/**
 			 * @brief Records that this tube has a measure pass.
 			 * @param on true when Demuxer::Measure was called.

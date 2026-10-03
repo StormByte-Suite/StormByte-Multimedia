@@ -42,6 +42,7 @@
 #include <StormByte/safe/string.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
+#include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/metadata/file.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/stream.hxx>
@@ -51,7 +52,14 @@
 #include <filesystem>
 #include <functional>
 #include <optional>
+#include <unordered_map>
 #include <variant>
+
+/** @brief Multimedia-owned pipeline stages and unit holders. */
+namespace StormByte::Multimedia::Backend::Pipeline {
+	/** @brief Demuxer restoring codec metadata from the consultation snapshot. */
+	class Demuxer;
+}
 
 namespace StormByte {
 	/**
@@ -65,6 +73,8 @@ namespace StormByte {
 		 */
 		namespace FFmpeg {
 			class AVFormatContext;
+			/** @brief Owned FFmpeg packet used by the duration scanner. */
+			class AVPacket;
 		}
 	}
 }
@@ -100,7 +110,11 @@ namespace StormByte {
 		 * @see StormByte::Buffer::IO::BufferedLocationReader
 		 */
 		class STORMBYTE_MULTIMEDIA_PUBLIC File {
+			friend class StormByte::Multimedia::Backend::Pipeline::Demuxer;
 			public:
+				/** @brief Observer receiving monotone byte-based duration scan percentages. */
+				using DurationProgress = std::function<void(double)>;
+
 				File(const File&) = delete;
 
 				/**
@@ -162,6 +176,13 @@ namespace StormByte {
 				const std::optional<Property::Duration>& Duration() const noexcept;
 
 				/**
+				 * @brief Resolve duration while reporting packet scan progress.
+				 * @param progress Byte-position observer; not called for a cached or supplied duration.
+				 * @return Resolved duration, or empty if unavailable.
+				 */
+				const std::optional<Property::Duration>& Duration(const DurationProgress& progress) const noexcept;
+
+				/**
 				 * @brief Opens and probes @p path. Temporary reader is dropped.
 				 * @param path Media file.
 				 * @param duration Authoritative duration; empty means scan on first Duration().
@@ -192,6 +213,7 @@ namespace StormByte {
 				Metadata::File m_metadata;								///< Container tags
 				mutable std::optional<Property::Duration> m_duration;	///< Container duration
 				mutable bool m_durationResolved;						///< Caller-supplied or scan done
+				std::unordered_map<int, FFmpeg::AVCodecParameters> m_codecParameters; ///< Probed codec parameters, including harvested HDR metadata.
 
 				/**
 				 * @brief Snapshot constructor.
@@ -221,18 +243,20 @@ namespace StormByte {
 
 				/**
 				 * @brief Packet scan for container and missing stream durations.
+				 * @param progress Byte-position observer.
 				 */
-				void ResolveDuration() const noexcept;
+				void ResolveDuration(const DurationProgress& progress) const noexcept;
 
 				/**
 				 * @brief Opens AVIO on @p reader and scans durations.
 				 * @param reader Origin.
 				 * @param streams Streams to update.
 				 * @param duration Container duration to fill if empty.
+				 * @param progress Packet scan observer.
 				 */
 				static void ScanWithReader(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					Multimedia::Streams& streams,
-					std::optional<Property::Duration>& duration) noexcept;
+					std::optional<Property::Duration>& duration, const DurationProgress& progress) noexcept;
 
 				/**
 				 * @brief Sets HDR10+ on a video stream.
@@ -252,9 +276,12 @@ namespace StormByte {
 				 * @param ctx Open probe context.
 				 * @param streams Streams to update.
 				 * @param container Container duration to fill if empty.
+				 * @param progress Observer receiving each successfully processed packet.
+				 * @return true only if packet reading reached EOF rather than a read error.
 				 */
-				static void ScanDurations(FFmpeg::AVFormatContext& ctx, Multimedia::Streams& streams,
-					std::optional<Property::Duration>& container) noexcept;
+				static bool ScanDurations(FFmpeg::AVFormatContext& ctx, Multimedia::Streams& streams,
+					std::optional<Property::Duration>& container,
+					const std::function<void(const FFmpeg::AVPacket&)>& progress) noexcept;
 		};
 	}
 }

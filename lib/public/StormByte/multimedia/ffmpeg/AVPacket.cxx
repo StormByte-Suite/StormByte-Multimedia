@@ -134,6 +134,10 @@ int FFmpeg::AVPacket::Size() const noexcept {
 	return m_ptr ? m_ptr->size : 0;
 }
 
+std::int64_t FFmpeg::AVPacket::Position() const noexcept {
+	return m_ptr ? m_ptr->pos : -1;
+}
+
 FFmpeg::AVPacket::operator bool() const noexcept {
 	return m_ptr != nullptr;
 }

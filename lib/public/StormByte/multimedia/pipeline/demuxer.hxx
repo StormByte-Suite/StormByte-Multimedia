@@ -168,6 +168,14 @@ namespace StormByte {
 					explicit Demuxer(std::shared_ptr<StormByte::Logger::Log> log) noexcept;
 
 					/**
+					 * @brief Launch with a clock already used by duration resolution.
+					 * @param log Shared logger.
+					 * @param progress Shared job clock; empty creates a fresh clock.
+					 */
+					Demuxer(std::shared_ptr<StormByte::Logger::Log> log,
+						std::shared_ptr<class Progress> progress) noexcept;
+
+					/**
 					 * @brief Copy constructor.
 					 * @param other Source demuxer.
 					 */

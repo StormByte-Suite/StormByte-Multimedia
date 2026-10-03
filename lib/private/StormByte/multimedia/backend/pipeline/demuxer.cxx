@@ -184,7 +184,22 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 		return false;
 	}
 
-	m_ctx->format = FFmpeg::AVFormatContext::WrapBorrowed(raw);
+	bool restored = static_cast<bool>(owner.Plan());
+	if (restored) {
+		const auto& parameters = owner.Plan()->Snapshot().m_codecParameters;
+		for (unsigned index = 0; index < raw->nb_streams; ++index) {
+			auto* stream = raw->streams[index];
+			if (!stream->codecpar || stream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
+				continue;
+			const auto found = parameters.find(stream->index);
+			if (found == parameters.end() || found->second.CodecId() != stream->codecpar->codec_id
+				|| !found->second.Export(stream->codecpar)) {
+				restored = false;
+				break;
+			}
+		}
+	}
+	m_ctx->format = FFmpeg::AVFormatContext::WrapBorrowed(raw, !restored);
 
 	m_ctx->timeBase.clear();
 	m_ctx->wanted.clear();

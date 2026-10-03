@@ -199,6 +199,14 @@ namespace StormByte::Multimedia::FFmpeg {
 			static AVFormatContext WrapBorrowed(::AVFormatContext* ctx) noexcept;
 
 			/**
+			 * @brief Wrap custom AVIO with optional HDR side-data collection.
+			 * @param ctx Input format context to own without owning its AVIO.
+			 * @param harvest true to decode for missing side data; false for timestamp scans or restored metadata.
+			 * @return Owned format wrapper.
+			 */
+			static AVFormatContext WrapBorrowed(::AVFormatContext* ctx, bool harvest) noexcept;
+
+			/**
 			 * @brief Copies HDR side data from early decoded frames onto codecpar.
 			 */
 			void HarvestSideData() noexcept;

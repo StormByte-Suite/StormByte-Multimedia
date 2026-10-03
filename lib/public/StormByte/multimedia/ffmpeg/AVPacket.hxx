@@ -200,6 +200,12 @@ namespace StormByte::Multimedia::FFmpeg {
 			int Size() const noexcept;
 
 			/**
+			 * @brief Byte position of this packet in its input source.
+			 * @return Source offset, or -1 when unavailable.
+			 */
+			std::int64_t Position() const noexcept;
+
+			/**
 			 * @brief Whether a packet struct is owned.
 			 * @return true if the wrapper holds a packet.
 			 */

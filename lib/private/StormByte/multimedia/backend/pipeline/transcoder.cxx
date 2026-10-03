@@ -170,7 +170,12 @@ void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcep
 	Paused.store(false, std::memory_order_release);
 	m_measureHook = false;
 	m_analyticsHook = false;
-	Clock.reset();
+	{
+		std::lock_guard lock(Lock);
+		Clock = std::make_shared<StormByte::Multimedia::Pipeline::Progress>();
+		if (!job.m_duration || job.m_duration->count() <= 0)
+			Clock->BeginDurationCalculation();
+	}
 	Status.store(StormByte::Multimedia::Pipeline::Status::Running, std::memory_order_release);
 	m_worker = std::jthread([this, &job](std::stop_token token) {
 		Run(job, token);
@@ -248,7 +253,18 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		}
 	}
 
+	if (!job.m_duration || job.m_duration->count() <= 0) {
+		Clock->BeginDurationCalculation();
+		job.OnProgress();
+	}
 	auto built = job.EmptyPlan(std::move(job.m_reader), std::move(job.m_writer), job.m_duration);
+	Clock->SetDurationCalculation(std::nullopt);
+	job.OnProgress();
+	if (Stopping(*this, token)) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
+		job.OnAborted();
+		return;
+	}
 	job.m_armed = true;
 	job.m_consult.reset();
 	for (const auto& slot : Mapped)
@@ -274,14 +290,13 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	}
 
 	const auto& tube = job.ApplicationLog();
-	auto demux = std::make_shared<StormByte::Multimedia::Pipeline::Demuxer>(tube);
+	auto demux = std::make_shared<StormByte::Multimedia::Pipeline::Demuxer>(tube, Clock);
 	auto mux = std::make_shared<StormByte::Multimedia::Pipeline::Muxer>(tube);
 	RegisterStage(*Metrics, *demux);
 	RegisterStage(*Metrics, *mux);
 	std::move(*built) >> *demux;
 	job.m_plan = demux->Plan();
 	*demux >> *mux;
-	Clock = std::const_pointer_cast<StormByte::Multimedia::Pipeline::Progress>(demux->Progress());
 
 	if (demux->Failed()) {
 		job.Fail(demux->Error().value_or("demux open failed"));

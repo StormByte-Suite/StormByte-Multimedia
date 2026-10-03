@@ -130,6 +130,12 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
 	std::optional<std::chrono::nanoseconds> duration) noexcept
+: Plan(std::move(reader), std::move(writer), duration, {}) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer,
+	std::optional<std::chrono::nanoseconds> duration,
+	const StormByte::Multimedia::File::DurationProgress& progress) noexcept
 : m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)),
@@ -143,7 +149,7 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	if (opened) {
 		m_snapshot.emplace(std::move(*opened));
 		if (!duration)
-			static_cast<void>(m_snapshot->Duration());
+			static_cast<void>(m_snapshot->Duration(progress));
 	}
 }
 

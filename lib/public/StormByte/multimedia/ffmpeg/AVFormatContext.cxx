@@ -147,8 +147,15 @@ FFmpeg::AVFormatContext::AVFormatContext(::AVFormatContext* ctx, std::unique_ptr
 : AVPointer(ctx), m_io(std::move(io)), m_avioBorrowed(avioBorrowed) {}
 
 FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext* ctx) noexcept {
+	return WrapBorrowed(ctx, true);
+}
+
+FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext* ctx, bool harvest) noexcept {
 	AVFormatContext out(ctx, nullptr, true);
-	out.HarvestSideData();
+	if (harvest)
+		out.HarvestSideData();
+	else if (ctx)
+		av_seek_frame(ctx, -1, 0, AVSEEK_FLAG_BACKWARD);
 	return out;
 }
 

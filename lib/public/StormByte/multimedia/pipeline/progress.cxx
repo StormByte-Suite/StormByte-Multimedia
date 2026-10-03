@@ -38,9 +38,73 @@
 
 #include <StormByte/multimedia/pipeline/progress.hxx>
 
+#include <chrono>
 #include <format>
+#include <string_view>
 
 using StormByte::Multimedia::Pipeline::Progress;
+
+Progress::Values Progress::Snapshot() const noexcept {
+	std::lock_guard lock(m_lock);
+	const double all = All();
+	const Phase phase = m_calculatingDuration ? Phase::CalculatingDuration
+		: all == 100.0 ? Phase::Complete
+		: m_hasMeasure && !m_measureDone ? Phase::Measure : Phase::Processing;
+	return {phase, m_durationCalculation, Measure(), Analytics(), Processing(), all,
+		MeasureComplete(), AnalyticsComplete(), ProcessingComplete(), MuxComplete()};
+}
+
+double Progress::Processing() const noexcept {
+	std::lock_guard lock(m_lock);
+	if (m_calculatingDuration)
+		return 0.0;
+	return m_passDone || m_muxDone ? 100.0 : Axis(m_passNs, m_durationNs);
+}
+
+bool Progress::ProcessingComplete() const noexcept {
+	std::lock_guard lock(m_lock);
+	return m_passDone;
+}
+
+bool Progress::MuxComplete() const noexcept {
+	std::lock_guard lock(m_lock);
+	return m_muxDone;
+}
+
+std::optional<double> Progress::DurationCalculation() const noexcept {
+	std::lock_guard lock(m_lock);
+	return m_durationCalculation;
+}
+
+bool Progress::CalculatingDuration() const noexcept {
+	std::lock_guard lock(m_lock);
+	return m_calculatingDuration;
+}
+
+void Progress::BeginDurationCalculation() noexcept {
+	std::lock_guard lock(m_lock);
+	m_calculatingDuration = true;
+	m_durationIndicator = '|';
+	m_durationCalculation.reset();
+}
+
+void Progress::SetDurationCalculation(std::optional<double> percent) noexcept {
+	std::lock_guard lock(m_lock);
+	if (!percent) {
+		m_calculatingDuration = false;
+		m_durationCalculation.reset();
+		return;
+	}
+	double value = *percent;
+	if (!(value >= 0.0))
+		value = 0.0;
+	if (value > 100.0)
+		value = 100.0;
+	if (m_durationCalculation && value < *m_durationCalculation)
+		value = *m_durationCalculation;
+	m_calculatingDuration = true;
+	m_durationCalculation = value;
+}
 
 double Progress::Axis(std::int64_t pos, std::int64_t dur) noexcept {
 	if (dur <= 0 || pos <= 0)
@@ -51,6 +115,9 @@ double Progress::Axis(std::int64_t pos, std::int64_t dur) noexcept {
 }
 
 std::optional<double> Progress::Measure() const noexcept {
+	std::lock_guard lock(m_lock);
+	if (m_calculatingDuration)
+		return std::nullopt;
 	if (!m_hasMeasure)
 		return std::nullopt;
 	if (m_measureDone)
@@ -59,6 +126,9 @@ std::optional<double> Progress::Measure() const noexcept {
 }
 
 std::optional<double> Progress::Analytics() const noexcept {
+	std::lock_guard lock(m_lock);
+	if (m_calculatingDuration)
+		return std::nullopt;
 	if (!m_hasAnalytics)
 		return std::nullopt;
 	if (m_analyticsDone)
@@ -67,22 +137,29 @@ std::optional<double> Progress::Analytics() const noexcept {
 }
 
 bool Progress::HasMeasure() const noexcept {
+	std::lock_guard lock(m_lock);
 	return m_hasMeasure;
 }
 
 bool Progress::HasAnalytics() const noexcept {
+	std::lock_guard lock(m_lock);
 	return m_hasAnalytics;
 }
 
 bool Progress::MeasureComplete() const noexcept {
+	std::lock_guard lock(m_lock);
 	return !m_hasMeasure || m_measureDone;
 }
 
 bool Progress::AnalyticsComplete() const noexcept {
+	std::lock_guard lock(m_lock);
 	return !m_hasAnalytics || m_analyticsDone;
 }
 
 double Progress::All() const noexcept {
+	std::lock_guard lock(m_lock);
+	if (m_calculatingDuration)
+		return 0.0;
 	if (m_muxDone && MeasureComplete() && AnalyticsComplete()) {
 		m_all = 100.0;
 		return m_all;
@@ -108,6 +185,16 @@ double Progress::All() const noexcept {
 }
 
 Progress::operator std::string() const noexcept {
+	std::lock_guard lock(m_lock);
+	if (m_calculatingDuration) {
+		if (m_durationCalculation)
+			return std::format("Calculating duration {} {:6.2f}%", m_durationIndicator, *m_durationCalculation);
+		constexpr std::string_view activity = "|/-\\";
+		const auto tick = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now().time_since_epoch()).count() / 125;
+		m_durationIndicator = activity[static_cast<std::size_t>(tick) % activity.size()];
+		return std::format("Calculating duration {}", m_durationIndicator);
+	}
 	std::string line;
 	const bool measureLive = m_hasMeasure && !m_measureDone;
 	if (const auto v = Measure(); v && measureLive)
@@ -121,19 +208,23 @@ Progress::operator std::string() const noexcept {
 }
 
 void Progress::HasMeasure(bool on) noexcept {
+	std::lock_guard lock(m_lock);
 	m_hasMeasure = on;
 }
 
 void Progress::HasAnalytics(bool on) noexcept {
+	std::lock_guard lock(m_lock);
 	m_hasAnalytics = on;
 }
 
 void Progress::SetDurationNs(std::int64_t ns) noexcept {
+	std::lock_guard lock(m_lock);
 	if (ns > 0)
 		m_durationNs = ns;
 }
 
 void Progress::SetMeasureNs(std::int64_t ns) noexcept {
+	std::lock_guard lock(m_lock);
 	if (ns < 0)
 		return;
 	if (m_durationNs > 0 && ns > m_durationNs)
@@ -144,6 +235,7 @@ void Progress::SetMeasureNs(std::int64_t ns) noexcept {
 }
 
 void Progress::SetPassNs(std::int64_t ns) noexcept {
+	std::lock_guard lock(m_lock);
 	if (ns < 0)
 		return;
 	if (m_durationNs > 0 && ns > m_durationNs)
@@ -154,6 +246,7 @@ void Progress::SetPassNs(std::int64_t ns) noexcept {
 }
 
 void Progress::SetAnalyticsNs(std::int64_t ns) noexcept {
+	std::lock_guard lock(m_lock);
 	if (ns < 0)
 		return;
 	if (m_durationNs > 0 && ns > m_durationNs)
@@ -164,23 +257,27 @@ void Progress::SetAnalyticsNs(std::int64_t ns) noexcept {
 }
 
 void Progress::MeasureDone() noexcept {
+	std::lock_guard lock(m_lock);
 	m_measureDone = true;
 	if (m_durationNs > 0)
 		m_measureNs = m_durationNs;
 }
 
 void Progress::PassDone() noexcept {
+	std::lock_guard lock(m_lock);
 	m_passDone = true;
 	if (m_durationNs > 0)
 		m_passNs = m_durationNs;
 }
 
 void Progress::MuxDone() noexcept {
+	std::lock_guard lock(m_lock);
 	m_muxDone = true;
 	m_analyticsAtMux = m_analyticsNs;
 }
 
 void Progress::AnalyticsDone() noexcept {
+	std::lock_guard lock(m_lock);
 	m_analyticsDone = true;
 	if (m_durationNs > 0)
 		m_analyticsNs = m_durationNs;

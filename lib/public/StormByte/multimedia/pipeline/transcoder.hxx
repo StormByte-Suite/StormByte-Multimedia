@@ -740,11 +740,19 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Override to return a type derived from Plan. Tracks are
 			 * filled from the fluent map after this returns. After the
 			 * call this Transcoder no longer owns the leaves.
+			 * Pass DurationProgress() to the observing Plan constructor to
+			 * publish byte-based scan updates from a custom factory.
 			 */
 			virtual std::unique_ptr<class Plan> EmptyPlan(
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 				std::optional<std::chrono::nanoseconds> duration = std::nullopt) const noexcept;
+
+			/**
+			 * @brief Observer for duration resolution in custom EmptyPlan implementations.
+			 * @return Observer to pass to the four-argument Plan constructor.
+			 */
+			StormByte::Multimedia::File::DurationProgress DurationProgress() const noexcept;
 
 			/**
 			 * @brief Allocates the settled-row type.
