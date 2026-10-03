@@ -53,6 +53,7 @@
 #include <StormByte/safe/clonable.hxx>
 #include <StormByte/type_traits.hxx>
 
+#include <chrono>
 #include <cstdint>
 #include <filesystem>
 #include <map>
@@ -428,43 +429,51 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param source Input path.
 			 * @param destination Output path.
 			 * @param logger Shared log for the job and the tube.
+			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
 			 *
 			 * Stores @p logger as-is. @ref InstallLog runs at the end
 			 * of this constructor.
 			 */
 			Transcoder(const std::filesystem::path& source,
 				const std::filesystem::path& destination,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
+				std::shared_ptr<StormByte::Logger::Log> logger,
+				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 			/**
 			 * @brief Builds a local reader and takes @p writer.
 			 * @param source Input path.
 			 * @param writer Owned output location (moved).
 			 * @param logger Shared log for the job and the tube.
+			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
 			 */
 			Transcoder(const std::filesystem::path& source,
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
+				std::shared_ptr<StormByte::Logger::Log> logger,
+				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 			/**
 			 * @brief Takes @p reader and builds a local writer.
 			 * @param reader Owned input location (moved).
 			 * @param destination Output path.
 			 * @param logger Shared log for the job and the tube.
+			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
 			 */
 			Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 				const std::filesystem::path& destination,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
+				std::shared_ptr<StormByte::Logger::Log> logger,
+				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 			/**
 			 * @brief Takes both location owners without slicing.
 			 * @param reader Owned input location (moved).
 			 * @param writer Owned output location (moved).
 			 * @param logger Shared log for the job and the tube.
+			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
 			 */
 			Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-				std::shared_ptr<StormByte::Logger::Log> logger) noexcept;
+				std::shared_ptr<StormByte::Logger::Log> logger,
+				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 			/**
 			 * @brief Copy constructor.
@@ -709,7 +718,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			virtual std::unique_ptr<class Plan> EmptyPlan(
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) const noexcept;
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				std::optional<std::chrono::nanoseconds> duration = std::nullopt) const noexcept;
 
 			/**
 			 * @brief Allocates the settled-row type.
@@ -839,6 +849,7 @@ namespace StormByte::Multimedia::Pipeline {
 			std::shared_ptr<StormByte::Logger::Log> m_logger;			///< Job facade after InstallLog
 			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Origin until EmptyPlan
 			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Sink until EmptyPlan
+			std::optional<std::chrono::nanoseconds> m_duration;								///< Authoritative source duration, when supplied
 			std::unique_ptr<File> m_consult;							///< Consultation snapshot; discarded after analysis
 			std::shared_ptr<class Plan> m_plan;							///< Intention; shared with the job after Run
 			std::unique_ptr<Backend::Pipeline::Transcoder> m_backend;	///< Map and coordinator thread

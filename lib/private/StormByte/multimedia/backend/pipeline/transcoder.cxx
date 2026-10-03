@@ -214,7 +214,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		}
 	}
 
-	auto built = job.EmptyPlan(std::move(job.m_reader), std::move(job.m_writer));
+	auto built = job.EmptyPlan(std::move(job.m_reader), std::move(job.m_writer), job.m_duration);
 	job.m_armed = true;
 	job.m_consult.reset();
 	for (const auto& slot : Mapped)

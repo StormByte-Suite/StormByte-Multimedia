@@ -48,6 +48,7 @@
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/multimedia/visibility.h>
 
+#include <chrono>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -79,9 +80,11 @@ namespace StormByte {
 				 * Octets are held as @ref StormByte::Safe::Unique of the location
 				 * bases. Paths build local BufferedFile leaves; supplied owners retain
 				 * their dynamic types without slicing. The constructor probes the
-			 * reader once into a consultation File snapshot
-			 * (streams, attachments, metadata). That File is not the
-			 * octet origin. Duration() is not called on it.
+				 * reader once into a consultation File snapshot
+				 * (streams, attachments, metadata). That File is not the
+				 * octet origin. The source duration is resolved here: an
+				 * explicit duration avoids scanning; otherwise the full source
+				 * is scanned before pipeline stages are created.
 			 *
 			 * Destination container is resolved from the writer path
 			 * extension. There is no Container argument.
@@ -106,33 +109,41 @@ namespace StormByte {
 					 * @brief Builds reader and writer from paths.
 					 * @param source Input path.
 					 * @param destination Output path.
+					 * @param duration Authoritative source duration; empty scans the full source.
 					 */
 					Plan(const std::filesystem::path& source,
-						const std::filesystem::path& destination) noexcept;
+						const std::filesystem::path& destination,
+						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 					/**
 					 * @brief Builds a local reader and takes @p writer.
 					 * @param source Input path.
 					 * @param writer Owned output location (moved).
+					 * @param duration Authoritative source duration; empty scans the full source.
 					 */
 					Plan(const std::filesystem::path& source,
-						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) noexcept;
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 					/**
 					 * @brief Takes @p reader and builds a local writer.
 					 * @param reader Owned input location (moved).
 					 * @param destination Output path.
+					 * @param duration Authoritative source duration; empty scans the full source.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-						const std::filesystem::path& destination) noexcept;
+						const std::filesystem::path& destination,
+						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 					/**
 					 * @brief Takes both location owners without slicing.
 					 * @param reader Owned input location (moved).
 					 * @param writer Owned output location (moved).
+					 * @param duration Authoritative source duration; empty scans the full source.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) noexcept;
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
 
 					Plan(const Plan&) = delete;
 					Plan& operator=(const Plan&) = delete;

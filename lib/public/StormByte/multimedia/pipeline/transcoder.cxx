@@ -253,26 +253,31 @@ Transcoder::Track& Transcoder::Track::Title(std::string title) noexcept {
 
 Transcoder::Transcoder(const std::filesystem::path& source,
 	const std::filesystem::path& destination,
-	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-: Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger)) {}
+	std::shared_ptr<StormByte::Logger::Log> logger,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
+: Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(const std::filesystem::path& source,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-	: Transcoder(LocalReader(source), std::move(writer), std::move(logger)) {}
+	std::shared_ptr<StormByte::Logger::Log> logger,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
+	: Transcoder(LocalReader(source), std::move(writer), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	const std::filesystem::path& destination,
-	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
-	: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger)) {}
+	std::shared_ptr<StormByte::Logger::Log> logger,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
+	: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-	std::shared_ptr<StormByte::Logger::Log> logger) noexcept
+	std::shared_ptr<StormByte::Logger::Log> logger,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
 : m_app_log(logger), m_logger(std::move(logger)),
 	m_reader(std::move(reader)), m_writer(std::move(writer)),
+	m_duration(duration && duration->count() > 0 ? duration : std::nullopt),
 	m_backend(std::make_unique<Backend::Pipeline::Transcoder>()),
 	m_armed(false) {
 	InstallLog();
@@ -341,7 +346,7 @@ bool Transcoder::ProbeSource() noexcept {
 		Fail("reader path is empty");
 		return false;
 	}
-	auto opened = File::Open(*m_reader);
+	auto opened = File::Open(*m_reader, m_duration);
 	if (!opened) {
 		const char* text = opened.error() ? opened.error()->what() : "file open failed";
 		Fail(text);
@@ -543,8 +548,9 @@ Transcoder::operator bool() const noexcept {
 
 std::unique_ptr<class Plan> Transcoder::EmptyPlan(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer) const noexcept {
-	return std::make_unique<class Plan>(std::move(reader), std::move(writer));
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+	std::optional<std::chrono::nanoseconds> duration) const noexcept {
+	return std::make_unique<class Plan>(std::move(reader), std::move(writer), std::move(duration));
 }
 
 StormByte::Safe::Unique<TrackSettled> Transcoder::EmptySettled() const noexcept {

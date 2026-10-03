@@ -118,27 +118,36 @@ namespace {
 }
 
 Plan::Plan(const std::filesystem::path& source,
-	const std::filesystem::path& destination) noexcept
-: Plan(LocalReader(source), LocalWriter(destination)) {}
+	const std::filesystem::path& destination,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
+: Plan(LocalReader(source), LocalWriter(destination), std::move(duration)) {}
 
 Plan::Plan(const std::filesystem::path& source,
-	StormByte::Safe::Unique<BufferedLocationWriter> writer) noexcept
-: Plan(LocalReader(source), std::move(writer)) {}
+	StormByte::Safe::Unique<BufferedLocationWriter> writer,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
+: Plan(LocalReader(source), std::move(writer), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
-	const std::filesystem::path& destination) noexcept
-: Plan(std::move(reader), LocalWriter(destination)) {}
+	const std::filesystem::path& destination,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
+: Plan(std::move(reader), LocalWriter(destination), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
-	StormByte::Safe::Unique<BufferedLocationWriter> writer) noexcept
+	StormByte::Safe::Unique<BufferedLocationWriter> writer,
+	std::optional<std::chrono::nanoseconds> duration) noexcept
 : m_reader(std::move(reader)),
 	m_writer(std::move(writer)),
 	m_container(m_writer ? ContainerFromWriter(*m_writer) : nullptr) {
 	if (!m_reader)
 		return;
-	auto opened = StormByte::Multimedia::File::Open(*m_reader);
-	if (opened)
+	if (duration && duration->count() <= 0)
+		duration.reset();
+	auto opened = StormByte::Multimedia::File::Open(*m_reader, duration);
+	if (opened) {
 		m_snapshot.emplace(std::move(*opened));
+		if (!duration)
+			static_cast<void>(m_snapshot->Duration());
+	}
 }
 
 const StormByte::Multimedia::Container* Plan::ContainerFromWriter(
