@@ -48,6 +48,10 @@
 #include <map>
 #include <utility>
 
+extern "C" {
+	#include <libavutil/pixfmt.h>
+}
+
 using namespace StormByte::Multimedia::Pipeline::Filter::Video;
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -83,13 +87,12 @@ using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
  *
  * Processing intent
  * -----------------
- * Generate three strengths bracketing each frame's maximum target and blend
- * adjacent outputs, including the original as level zero. Each window is fully
- * drained and its centre is selected by synthetic PTS before restoring source
- * properties. This avoids changing the filter base's current-item lineage or
- * silently discarding delayed outputs at strength changes. It intentionally
- * trades graph creation cost for one-input/one-output accounting and bounded
- * history. The future input is a duplicate current frame, not a real lookahead;
+ * Generate one output at each frame's maximum target and blend it with the
+ * original using the regional target as a per-pixel mix weight. Each window is
+ * fully drained and its centre is selected by synthetic PTS before restoring
+ * source properties. This avoids changing the filter base's current-item
+ * lineage or silently discarding delayed outputs at strength changes. The
+ * future input is a duplicate current frame, not a real lookahead;
  * this asymmetric baseline must not be described as symmetric temporal filtering.
  *
  * Keep output at the source depth/layout and copy source properties and alpha.
@@ -104,6 +107,8 @@ namespace {
 	constexpr int64_t MissingPts = std::numeric_limits<int64_t>::min();
 	constexpr double DefaultCap = 4.0;
 	constexpr double StableFraction = 0.85;
+	constexpr double MinimumNoiseSigma = 0.40;
+	constexpr double MaximumBlend = 0.10;
 
 	float ClampedTarget(double target, double cap) noexcept {
 		const float stored = static_cast<float>(std::clamp(target, 0.0, cap));
@@ -369,8 +374,9 @@ void Degrain::ScoreCenter(std::size_t index) noexcept {
 						const double otherHigh = other.Data(0)[static_cast<std::ptrdiff_t>(vertical) * other.Linesize(0) + horizontal] - otherLow;
 						differences[accepted++] = high - otherHigh;
 					}
-					if (accepted < 3 || candidates == 0 || static_cast<double>(accepted) / candidates < 0.8
-						|| luminance < 4.0 || luminance > 245.0)
+					if (accepted < 3 || candidates == 0 || static_cast<double>(accepted) / candidates < 0.8)
+						continue;
+					if (luminance < 4.0 || luminance > 245.0)
 						continue;
 					++stable;
 					if (!textured)
@@ -396,12 +402,16 @@ void Degrain::ScoreCenter(std::size_t index) noexcept {
 			auto upper = residuals.begin() + static_cast<std::ptrdiff_t>(residuals.size() * 9 / 10);
 			std::nth_element(residuals.begin(), upper, residuals.end());
 			const double noise = mad / (0.67448975 * std::sqrt(16.0 / 9.0));
-			if (noise < 1.25 || *upper > 4.0 * mad)
+			const double detailFraction = static_cast<double>(detail) / seen;
+			const double skinFraction = static_cast<double>(skin) / seen;
+			const double detailProtection = 1.0 - std::min(0.9, 2.0 * detailFraction);
+			const double skinProtection = 1.0 - 0.95 * std::min(1.0, skinFraction / 0.08);
+			if (noise < MinimumNoiseSigma)
 				continue;
-			const double detailProtection = 1.0 - std::min(0.9, 2.0 * detail / seen);
-			const double skinProtection = 1.0 - 0.75 * std::min(1.0, (static_cast<double>(skin) / seen) / 0.15);
+			if (*upper > 4.0 * mad)
+				continue;
 			row.regions[region] = ClampedTarget(
-				0.8 * (noise - 0.75) * detailProtection * skinProtection, cap);
+				0.8 * (noise - MinimumNoiseSigma) * detailProtection * skinProtection, cap);
 		}
 	}
 }
@@ -467,8 +477,9 @@ void Degrain::Decide() noexcept {
 		else
 			++m_skipped;
 	}
-	if (strengths.empty())
+	if (strengths.empty()) {
 		Log(Level::Warning, "degrain: no confident regional grain; leaving video untouched");
+	}
 	else {
 		m_sigmaP50 = Median(strengths);
 		m_sigmaMin = *std::min_element(strengths.begin(), strengths.end());
@@ -499,6 +510,10 @@ bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
 	FFrame input;
 	if (!input.Ref(previous))
 		return false;
+	input.ColorRange(AVCOL_RANGE_UNSPECIFIED);
+	input.ColorSpace(AVCOL_SPC_UNSPECIFIED);
+	input.ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
+	input.ColorTransfer(AVCOL_TRC_UNSPECIFIED);
 	input.Pts(0);
 	const std::string chain = std::format(
 		"fftdnoiz=sigma={:.9f}:prev=1:next=1:block=32:overlap=0.5:planes={},format=pix_fmts={}",
@@ -513,7 +528,7 @@ bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
 	// Synthetic PTS 0/1/2 identify its centre unambiguously. This is asymmetric
 	// temporal denoising, NOT a future real frame, and NOT motion compensation.
 	// At discontinuities the previous input is also current (spatial baseline).
-	// Cost: up to three graph creations and nine submissions for one real frame.
+	// One graph and three submissions produce one complete temporal window.
 	// FFmpeg scales its strength internally by bit depth; do not scale these
 	// 8-bit-equivalent heuristic strengths a second time for 10/12/16-bit input.
 	std::array<bool, 3> received{};
@@ -533,6 +548,10 @@ bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
 	for (int timestamp = 0; timestamp < 3; ++timestamp) {
 		if (timestamp > 0 && !input.Ref(current))
 			return false;
+		input.ColorRange(AVCOL_RANGE_UNSPECIFIED);
+		input.ColorSpace(AVCOL_SPC_UNSPECIFIED);
+		input.ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
+		input.ColorTransfer(AVCOL_TRC_UNSPECIFIED);
 		input.Pts(timestamp);
 		FFrame candidate;
 		if (!graph.Filter(input, candidate) || !Accept(candidate))
@@ -575,18 +594,14 @@ bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
 		? *m_previous : source;
 	const double maximum = std::min(std::clamp(m_capIn.value_or(DefaultCap), 0.0, 100.0),
 		static_cast<double>(*std::max_element(row.regions.begin(), row.regions.end())));
-	std::array<FFrame, 3> variants;
-	std::array<double, 3> levels{};
+	FFrame filtered;
 	if (maximum > 0.0) {
-		// Quantize the maximum into three evenly spaced strengths. Every target
-		// lies between zero/original and two adjacent filtered levels. There is
-		// no single strong-frame alpha approximation, and no level exceeds cap.
-		for (std::size_t level = 0; level < variants.size(); ++level) {
-			levels[level] = maximum * (level + 1) / variants.size();
-			if (!FilterWindow(previous, source, levels[level], variants[level])) {
-				Fail("degrain: temporal window failed or returned ambiguous/incompatible outputs");
-				return false;
-			}
+		// Denoise once at the strongest regional target, then interpolate each
+		// pixel between that result and the source. This trades exact multi-sigma
+		// interpolation for one third of the FFT graph work per active frame.
+		if (!FilterWindow(previous, source, maximum, filtered)) {
+			Fail("degrain: temporal window failed or returned ambiguous/incompatible outputs");
+			return false;
 		}
 		// Deep copy preserves alpha (never mixed), untouched samples and all
 		// properties/side data. Graph-generated properties never replace the
@@ -606,23 +621,17 @@ bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
 			for (int vertical = 0; vertical < height; ++vertical) {
 				auto* destination = output.Data(plane) + static_cast<std::ptrdiff_t>(vertical) * output.Linesize(plane);
 				const auto* original = source.Data(plane) + static_cast<std::ptrdiff_t>(vertical) * source.Linesize(plane);
-				std::array<const uint8_t*, 3> filtered{};
-				for (std::size_t level = 0; level < variants.size(); ++level)
-					filtered[level] = variants[level].Data(plane) + static_cast<std::ptrdiff_t>(vertical) * variants[level].Linesize(plane);
+				const auto* denoised = filtered.Data(plane) + static_cast<std::ptrdiff_t>(vertical) * filtered.Linesize(plane);
 				for (int horizontal = 0; horizontal < width; ++horizontal) {
 					const double target = std::min(maximum,
 						RegionTarget(row.regions, (horizontal + 0.5) / width, (vertical + 0.5) / height));
 					if (target <= 0.0)
 						continue;
 					const std::ptrdiff_t offset = static_cast<std::ptrdiff_t>(horizontal) * bytes;
-					std::size_t upper = 0;
-					while (upper + 1 < levels.size() && target > levels[upper])
-						++upper;
-					const double lowerSigma = upper == 0 ? 0.0 : levels[upper - 1];
-					const double fraction = std::clamp((target - lowerSigma) / (levels[upper] - lowerSigma), 0.0, 1.0);
-					const unsigned lowerSample = ReadSample((upper == 0 ? original : filtered[upper - 1]) + offset, bytes, bigEndian);
-					const unsigned upperSample = ReadSample(filtered[upper] + offset, bytes, bigEndian);
-					const double mixed = (1.0 - fraction) * lowerSample + fraction * upperSample;
+					const double fraction = MaximumBlend * std::clamp(target / maximum, 0.0, 1.0);
+					const unsigned originalSample = ReadSample(original + offset, bytes, bigEndian);
+					const unsigned denoisedSample = ReadSample(denoised + offset, bytes, bigEndian);
+					const double mixed = (1.0 - fraction) * originalSample + fraction * denoisedSample;
 					WriteSample(destination + offset, static_cast<unsigned>(std::clamp(std::round(mixed), 0.0, static_cast<double>(limit))), bytes, bigEndian);
 				}
 			}

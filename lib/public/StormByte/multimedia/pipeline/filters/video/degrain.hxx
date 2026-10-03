@@ -82,8 +82,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @par What it is not
 	 * Not @ref Fftdnoiz with a different name. @ref Fftdnoiz is one
-	 * sigma for every frame. Degrain blends the original with bracketing
-	 * filtered levels using continuous bilinear regional targets.
+	 * sigma for every frame. Degrain filters each frame once at the strongest
+	 * regional target, then blends that result with the original using continuous
+	 * bilinear regional targets.
 	 *
 	 * @par When to attach
 	 * After decode, before @ref Cas / @ref Scale / @ref Deband.
@@ -111,6 +112,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * noise robustly, rather than selecting the smallest neighbour difference.
 	 * Insufficient evidence, motion and clean regions select zero. Texture
 	 * and skin hints suppress strength; the caller cap is never a floor.
+	 * The denoised contribution is conservatively capped at 10% per sample,
+	 * even when a regional target is strong; this favours retaining source
+	 * texture over aggressive grain removal.
 	 * Detail detection is not face recognition or motion compensation.
 	 * Abrupt brightness changes are detected heuristically; equal-brightness
 	 * cuts and correlated or compressed grain can remain ambiguous.
@@ -135,8 +139,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Cost
 	 * Measurement requires a full decode and memory for at most
 	 * 11 measurement frames plus compact per-frame measurements.
-	 * The second pass evaluates multiple denoising strengths for each frame
-	 * and blends them according to regional measurements. Processing is
+	 * The second pass evaluates one denoising strength per active frame and
+	 * blends it according to regional measurements. Processing is
 	 * computationally expensive, especially at 4K. Each input frame produces
 	 * one output frame with the same presentation timestamp.
 	 * It is experimental: visual quality and scene detection are not guaranteed.
