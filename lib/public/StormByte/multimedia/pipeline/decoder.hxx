@@ -44,6 +44,9 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <atomic>
 #include <cstddef>
@@ -98,10 +101,7 @@ namespace StormByte::Multimedia::Pipeline {
 			using Bitmask::Bitmask;
 	};
 
-	/**
-	 * @brief All current heuristic bits.
-	 */
-	inline const DecoderFlags Heuristics{DecoderFlag::HeuristicsHDR10};
+	inline const DecoderFlags Heuristics{DecoderFlag::HeuristicsHDR10};	///< All current heuristic bits.
 
 	/**
 	 * @brief Binds one origin track of @p demuxer to @p decoder.
@@ -154,7 +154,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Origin mode. Frames carry @ref Producer::Decoder.
 			 * Setup waits for demuxer >> decoder.
 			 */
-			explicit Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+			explicit Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				int track, DecoderFlags flags = DecoderFlags{}) noexcept;
 
 			/**
@@ -237,7 +237,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Stream language tag copied from the origin File.
 			 * @return Language, or empty.
 			 */
-			inline const std::optional<std::string>& Language() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Language() const noexcept {
 				return m_language;
 			}
 
@@ -245,7 +245,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Stream title tag copied from the origin File.
 			 * @return Title, or empty.
 			 */
-			inline const std::optional<std::string>& Title() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Title() const noexcept {
 				return m_title;
 			}
 
@@ -262,7 +262,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Pinned FFmpeg decoder name, if any.
 			 * @return Name, or empty before pin / auto-select.
 			 */
-			inline const std::optional<std::string>& Implementation() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Implementation() const noexcept {
 				return m_implementation;
 			}
 
@@ -270,7 +270,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Pins an FFmpeg decoder name (before demuxer >> decoder).
 			 * @param name Table name. Empty clears the pin.
 			 */
-			void Implementation(std::string name) noexcept;
+			void Implementation(StormByte::Safe::String name) noexcept;
 
 			/**
 			 * @brief Extra required Feature bits.
@@ -330,7 +330,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * opens the backend. Produced frames are stamped
 			 * @ref Producer::Encoder. Label is Decoder(look encode).
 			 */
-			Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				int track, EncodeLook tag) noexcept;
 
 			/**
@@ -343,7 +343,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @ref EncodeLook. Produced frames are stamped
 			 * @ref Producer::Remuxer. Label is Decoder(look remux).
 			 */
-			Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				int track, RemuxLook tag) noexcept;
 
 			/**
@@ -356,7 +356,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @ref EncodeLook (codecpar on first Packet). Produced
 			 * frames keep @ref Producer::Decoder.
 			 */
-			Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				int track, SourceLook tag) noexcept;
 
 			using Step::Log;
@@ -367,7 +367,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 *         mode, otherwise `Decoder(<implementation>)` or
 			 *         `Decoder(t=<index>)`.
 			 */
-			std::string Label() const noexcept override;
+			StormByte::Safe::String Label() const noexcept override;
 
 			/**
 			 * @brief Pins the opened backend.
@@ -386,7 +386,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param language Stream language, or empty.
 			 * @param title Stream title, or empty.
 			 */
-			void Stamp(std::optional<std::string> language, std::optional<std::string> title) noexcept;
+			void Stamp(StormByte::Safe::Optional<StormByte::Safe::String> language,
+				StormByte::Safe::Optional<StormByte::Safe::String> title) noexcept;
 
 			/**
 			 * @brief Records the demuxer of demuxer >> decoder.
@@ -481,9 +482,9 @@ namespace StormByte::Multimedia::Pipeline {
 
 			int m_index;											///< Origin stream index
 			DecoderFlags m_flags;									///< Heuristic bits
-			std::optional<std::string> m_language;					///< Origin language tag
-			std::optional<std::string> m_title;						///< Origin title tag
-			std::optional<std::string> m_implementation;			///< Pinned decoder name
+			StormByte::Safe::Optional<StormByte::Safe::String> m_language;			///< Origin language tag
+			StormByte::Safe::Optional<StormByte::Safe::String> m_title;				///< Origin title tag
+			StormByte::Safe::Optional<StormByte::Safe::String> m_implementation;	///< Pinned decoder name
 			Features m_require;										///< Extra required bits
 			Features m_capabilities;								///< Opened row bits
 			Demuxer* m_origin = nullptr;							///< Origin demuxer, origin mode
@@ -491,7 +492,7 @@ namespace StormByte::Multimedia::Pipeline {
 			std::unique_ptr<Backend::Pipeline::Decoder> m_backend;	///< Decode backend
 			std::optional<std::uint64_t> m_serial;					///< Last packet Serial
 			std::uint64_t m_part;									///< Part within Serial
-			std::optional<Property::Duration> m_inDts;				///< Dts of last packet
+			StormByte::Safe::Optional<Property::Duration> m_inDts;		///< Dts of last packet
 			bool m_look = false;									///< Opens from Packet codecpar
 			std::optional<Producer> m_lookStamp;					///< Dest-look Producer, or empty
 			std::atomic<bool> m_measureClosed{false};				///< Origin will not send more measure packets
@@ -499,3 +500,6 @@ namespace StormByte::Multimedia::Pipeline {
 			Join m_join{*this};										///< Halt before other members die
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::DecoderFlags);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Decoder);

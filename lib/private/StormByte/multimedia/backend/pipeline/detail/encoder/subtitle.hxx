@@ -80,7 +80,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			/**
 			 * @brief Destructor.
 			 */
-			~Subtitle() noexcept override = default;
+			~Subtitle() noexcept override;
 
 			/**
 			 * @brief Copy constructor.
@@ -99,14 +99,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @brief Move constructor.
 			 * @param other Backend to take.
 			 */
-			Subtitle(Subtitle&& other) noexcept = default;
+			Subtitle(Subtitle&& other) noexcept;
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Backend to take.
 			 * @return *this.
 			 */
-			Subtitle& operator=(Subtitle&& other) noexcept = default;
+			Subtitle& operator=(Subtitle&& other) noexcept;
 
 			/**
 			 * @brief Whether the FFmpeg encoder is open.

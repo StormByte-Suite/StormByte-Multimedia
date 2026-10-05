@@ -40,10 +40,22 @@
 
 using namespace StormByte::Multimedia::Property;
 
+Audio::Audio() = default;
+
 Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
-	std::uint64_t bitrate, std::optional<std::string> profile) noexcept:
+	std::uint64_t bitrate, StormByte::Safe::Optional<StormByte::Safe::String> profile) noexcept:
 m_layout(layout), m_sample_rate(sample_rate), m_channels(channels),
 m_bitrate(bitrate), m_profile(std::move(profile)) {}
+
+Audio::Audio(const Audio& other) = default;
+
+Audio::Audio(Audio&& other) noexcept = default;
+
+Audio::~Audio() noexcept = default;
+
+Audio& Audio::operator=(const Audio& other) = default;
+
+Audio& Audio::operator=(Audio&& other) noexcept = default;
 
 ChannelLayout Audio::Layout() const noexcept {
 	return m_layout;
@@ -61,6 +73,6 @@ std::uint64_t Audio::BitRate() const noexcept {
 	return m_bitrate;
 }
 
-const std::optional<std::string>& Audio::Profile() const noexcept {
+const StormByte::Safe::Optional<StormByte::Safe::String>& Audio::Profile() const noexcept {
 	return m_profile;
 }

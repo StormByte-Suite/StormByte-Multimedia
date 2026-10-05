@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <cctype>
 #include <chrono>
@@ -155,15 +156,15 @@ namespace {
 	}
 }
 
-Muxer::Muxer(std::shared_ptr<StormByte::Logger::Log> log) noexcept
+Muxer::Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
 : Step(std::move(log), Producer::Muxer, Kinds{Kind::Packet}, Kinds{}),
 	m_container(nullptr),
 	m_origin(nullptr),
 	m_closed(false),
 	m_reserved(0),
 	m_positionNs(-1) {
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Sink>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Mux>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Sink>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Mux>(*this));
 	Launch();
 }
 
@@ -178,7 +179,7 @@ bool Muxer::Closed() const noexcept {
 	return m_closed.load(std::memory_order_acquire) || Failed();
 }
 
-std::optional<Property::Duration> Muxer::Position() const noexcept {
+StormByte::Safe::Optional<Property::Duration> Muxer::Position() const noexcept {
 	const std::int64_t ns = m_positionNs.load(std::memory_order_acquire);
 	if (ns < 0)
 		return std::nullopt;
@@ -230,28 +231,26 @@ std::size_t Muxer::InputCeiling() const noexcept {
 	std::abort();
 }
 
-std::optional<std::string> Muxer::Language(int output_index) const noexcept {
-	const auto it = m_language.find(output_index);
-	if (it == m_language.end() || it->second.empty())
+StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Language(int output_index) const noexcept {
+	if (!m_language.contains(output_index))
 		return std::nullopt;
-	return it->second;
+	return m_language.at(output_index);
 }
 
-void Muxer::Language(int output_index, std::string language) noexcept {
+void Muxer::Language(int output_index, StormByte::Safe::String language) noexcept {
 	if (language.empty())
 		m_language.erase(output_index);
 	else
 		m_language[output_index] = std::move(language);
 }
 
-std::optional<std::string> Muxer::Title(int output_index) const noexcept {
-	const auto it = m_title.find(output_index);
-	if (it == m_title.end() || it->second.empty())
+StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Title(int output_index) const noexcept {
+	if (!m_title.contains(output_index))
 		return std::nullopt;
-	return it->second;
+	return m_title.at(output_index);
 }
 
-void Muxer::Title(int output_index, std::string title) noexcept {
+void Muxer::Title(int output_index, StormByte::Safe::String title) noexcept {
 	if (title.empty())
 		m_title.erase(output_index);
 	else
@@ -259,10 +258,10 @@ void Muxer::Title(int output_index, std::string title) noexcept {
 }
 
 void Muxer::WaitArmed() noexcept {
-	std::unique_lock lock(m_wait);
-	m_wake.wait(lock, [this] {
-		return Failed() || Status() == State::Stopping || Armed();
-	});
+	pipe().Wait(this, [](void* context) noexcept {
+		const auto& owner = *static_cast<Muxer*>(context);
+		return owner.Failed() || owner.Status() == State::Stopping || owner.Armed();
+	}, [](void*, std::chrono::nanoseconds) noexcept {});
 }
 
 bool Muxer::SpawnBackend() noexcept {
@@ -389,7 +388,7 @@ Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& mu
 	muxer.m_reserved.fetch_add(1, std::memory_order_acq_rel);
 	muxer.Log(Level::Debug, std::format("reserve encoder t={}", encoder.Index()));
 	if (muxer.Armed())
-		muxer.Wake().notify_all();
+		muxer.Wake();
 	return encoder;
 }
 
@@ -419,7 +418,7 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& mu
 	muxer.m_reserved.fetch_add(1, std::memory_order_acq_rel);
 	muxer.Log(Level::Debug, std::format("reserve remux t={}", remuxer.In()));
 	if (muxer.Armed())
-		muxer.Wake().notify_all();
+		muxer.Wake();
 	return remuxer;
 }
 

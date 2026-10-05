@@ -43,33 +43,66 @@ using namespace StormByte::Multimedia::Pipeline;
 Track::Track(int in, enum StormByte::Multimedia::Type type) noexcept
 : m_in(in), m_type(type) {}
 
-Track::Track(int in, const Config::Base& config) noexcept
+Track::Track(int in, const Config::Base& config)
 : m_in(in), m_type(config.Type()), m_config(config.Clone()) {}
 
-Track::Track(int in, Config::Base&& config) noexcept
+Track::Track(int in, Config::Base&& config)
 : m_in(in), m_type(config.Type()), m_config(config.Move()) {}
 
 Track::Track(const Track& other)
 : m_in(other.m_in), m_type(other.m_type), m_config(other.m_config ? other.m_config->Clone() : nullptr) {}
 
+Track::Track(Track&& other) noexcept = default;
+
+Track::~Track() noexcept = default;
+
+Track& Track::operator=(Track&& other) noexcept = default;
+
+Track::PointerType Track::Clone() const {
+	return MakePointer<Track>(*this);
+}
+
+Track::PointerType Track::Move() {
+	return MakePointer<Track>(std::move(*this));
+}
+
 Track& Track::operator=(const Track& other) {
 	if (this == &other)
 		return *this;
-	m_in = other.m_in;
-	m_type = other.m_type;
-	m_config = other.m_config ? other.m_config->Clone() : nullptr;
+	Track replacement(other);
+	*this = std::move(replacement);
 	return *this;
 }
 
+Tracks::Tracks() noexcept = default;
+
 Tracks::Tracks(const Tracks& other)
-:	Iterable() {
-	for (const StormByte::Safe::Unique<Track>& track : other)
+: m_tracks() {
+	for (const auto& track : other)
 		add(*track);
 }
+
+Tracks::Tracks(Tracks&& other) noexcept = default;
+
+Tracks::~Tracks() noexcept = default;
 
 Tracks& Tracks::operator=(const Tracks& other) {
 	if (this == &other)
 		return *this;
 	*this = Tracks(other);
 	return *this;
+}
+
+Tracks& Tracks::operator=(Tracks&& other) noexcept = default;
+
+const Track& Tracks::operator[](size_type index) const {
+	return *m_tracks[index];
+}
+
+void Tracks::add(const Track& track) {
+	m_tracks.push_back(track.Clone());
+}
+
+void Tracks::add(Track&& track) {
+	m_tracks.push_back(track.Move());
 }

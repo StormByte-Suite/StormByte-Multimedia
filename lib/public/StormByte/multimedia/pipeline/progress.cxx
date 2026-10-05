@@ -39,10 +39,16 @@
 #include <StormByte/multimedia/pipeline/progress.hxx>
 
 #include <chrono>
+#include <cstddef>
 #include <format>
+#include <optional>
 #include <string_view>
 
-using StormByte::Multimedia::Pipeline::Progress;
+using namespace StormByte::Multimedia::Pipeline;
+
+Progress::Progress() noexcept = default;
+
+Progress::~Progress() noexcept = default;
 
 Progress::Values Progress::Snapshot() const noexcept {
 	std::lock_guard lock(m_lock);
@@ -71,7 +77,7 @@ bool Progress::MuxComplete() const noexcept {
 	return m_muxDone;
 }
 
-std::optional<double> Progress::DurationCalculation() const noexcept {
+StormByte::Safe::Optional<double> Progress::DurationCalculation() const noexcept {
 	std::lock_guard lock(m_lock);
 	return m_durationCalculation;
 }
@@ -88,7 +94,7 @@ void Progress::BeginDurationCalculation() noexcept {
 	m_durationCalculation.reset();
 }
 
-void Progress::SetDurationCalculation(std::optional<double> percent) noexcept {
+void Progress::SetDurationCalculation(StormByte::Safe::Optional<double> percent) noexcept {
 	std::lock_guard lock(m_lock);
 	if (!percent) {
 		m_calculatingDuration = false;
@@ -114,7 +120,7 @@ double Progress::Axis(std::int64_t pos, std::int64_t dur) noexcept {
 	return (static_cast<double>(pos) * 100.0) / static_cast<double>(dur);
 }
 
-std::optional<double> Progress::Measure() const noexcept {
+StormByte::Safe::Optional<double> Progress::Measure() const noexcept {
 	std::lock_guard lock(m_lock);
 	if (m_calculatingDuration)
 		return std::nullopt;
@@ -125,7 +131,7 @@ std::optional<double> Progress::Measure() const noexcept {
 	return Axis(m_measureNs, m_durationNs);
 }
 
-std::optional<double> Progress::Analytics() const noexcept {
+StormByte::Safe::Optional<double> Progress::Analytics() const noexcept {
 	std::lock_guard lock(m_lock);
 	if (m_calculatingDuration)
 		return std::nullopt;
@@ -184,16 +190,16 @@ double Progress::All() const noexcept {
 	return m_all;
 }
 
-Progress::operator std::string() const noexcept {
+Progress::operator StormByte::Safe::String() const {
 	std::lock_guard lock(m_lock);
 	if (m_calculatingDuration) {
 		if (m_durationCalculation)
-			return std::format("Calculating duration {} {:6.2f}%", m_durationIndicator, *m_durationCalculation);
+			return StormByte::Safe::String(std::format("Calculating duration {} {:6.2f}%", m_durationIndicator, *m_durationCalculation));
 		constexpr std::string_view activity = "|/-\\";
 		const auto tick = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now().time_since_epoch()).count() / 125;
 		m_durationIndicator = activity[static_cast<std::size_t>(tick) % activity.size()];
-		return std::format("Calculating duration {}", m_durationIndicator);
+		return StormByte::Safe::String(std::format("Calculating duration {}", m_durationIndicator));
 	}
 	std::string line;
 	const bool measureLive = m_hasMeasure && !m_measureDone;
@@ -204,7 +210,7 @@ Progress::operator std::string() const noexcept {
 			line += std::format("analytics {:6.2f}%  ", *v);
 	}
 	line += std::format("all {:6.2f}%", All());
-	return line;
+	return StormByte::Safe::String(line);
 }
 
 void Progress::HasMeasure(bool on) noexcept {

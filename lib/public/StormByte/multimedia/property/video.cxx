@@ -40,9 +40,11 @@
 
 using namespace StormByte::Multimedia::Property;
 
+Video::Video() = default;
+
 Video::Video(class Color color, class Resolution resolution,
-	std::optional<class HDR10> hdr10, std::optional<AVRational> frameRate,
-	std::optional<AVRational> sampleAspectRatio) noexcept:
+	StormByte::Safe::Optional<class HDR10> hdr10, StormByte::Safe::Optional<AVRational> frameRate,
+	StormByte::Safe::Optional<AVRational> sampleAspectRatio) noexcept:
 m_color(std::move(color)),
 m_resolution(std::move(resolution)),
 m_hdr10(std::move(hdr10)),
@@ -54,6 +56,16 @@ m_sar(std::move(sampleAspectRatio)) {
 		m_sar.reset();
 }
 
+Video::Video(const Video& other) = default;
+
+Video::Video(Video&& other) noexcept = default;
+
+Video::~Video() noexcept = default;
+
+Video& Video::operator=(const Video& other) = default;
+
+Video& Video::operator=(Video&& other) noexcept = default;
+
 const class Color& Video::Color() const noexcept {
 	return m_color;
 }
@@ -62,14 +74,14 @@ const class Resolution& Video::Resolution() const noexcept {
 	return m_resolution;
 }
 
-const std::optional<class HDR10>& Video::HDR10() const noexcept {
+const StormByte::Safe::Optional<class HDR10>& Video::HDR10() const noexcept {
 	return m_hdr10;
 }
 
-const std::optional<AVRational>& Video::FrameRate() const noexcept {
+const StormByte::Safe::Optional<AVRational>& Video::FrameRate() const noexcept {
 	return m_frameRate;
 }
 
-const std::optional<AVRational>& Video::SampleAspectRatio() const noexcept {
+const StormByte::Safe::Optional<AVRational>& Video::SampleAspectRatio() const noexcept {
 	return m_sar;
 }

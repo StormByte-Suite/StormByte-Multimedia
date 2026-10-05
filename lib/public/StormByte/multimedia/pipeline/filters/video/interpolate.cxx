@@ -50,10 +50,12 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Interpolate;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Interpolate::Interpolate(std::shared_ptr<StormByte::Logger::Log> log,
+Interpolate::Interpolate(Safe::Shared<StormByte::Logger::Log> log,
 	std::uint32_t num, std::uint32_t den) noexcept
-	: Filter::Process(std::move(log), "interpolate"),
+	: Filter::Process(std::move(log), Safe::String("interpolate")),
 	m_num(num), m_den(den == 0 ? 1 : den) {}
+
+Interpolate::~Interpolate() noexcept = default;
 
 enum Type Interpolate::Media() const noexcept {
 	return Type::Video;
@@ -97,7 +99,7 @@ void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("interpolate: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("interpolate: AVFilterGraph::Ensure failed");
 		return;

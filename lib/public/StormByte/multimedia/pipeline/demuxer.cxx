@@ -49,6 +49,7 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <algorithm>
 #include <chrono>
@@ -68,16 +69,16 @@ namespace {
 	}
 }
 
-Demuxer::Demuxer(std::shared_ptr<StormByte::Logger::Log> log) noexcept
-: Demuxer(std::move(log), std::make_shared<class Progress>()) {}
+Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+: Demuxer(std::move(log), StormByte::Safe::Heap::MakeShared<class Progress>()) {}
 
-Demuxer::Demuxer(std::shared_ptr<StormByte::Logger::Log> log,
-	std::shared_ptr<class Progress> progress) noexcept
+Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Shared<class Progress> progress) noexcept
 : Step(std::move(log), Producer::Demuxer, Kinds{}, Kinds{Kind::Packet}),
 	m_eof(false), m_positionNs(-1),
-	m_progress(progress ? std::move(progress) : std::make_shared<class Progress>()) {
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Source>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Demux>(*this));
+	m_progress(progress ? std::move(progress) : StormByte::Safe::Heap::MakeShared<class Progress>()) {
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Source>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Demux>(*this));
 	Launch();
 }
 
@@ -91,7 +92,7 @@ bool Demuxer::Eof() const noexcept {
 	return m_eof;
 }
 
-std::optional<Property::Duration> Demuxer::Position() const noexcept {
+StormByte::Safe::Optional<Property::Duration> Demuxer::Position() const noexcept {
 	const std::int64_t ns = m_positionNs.load(std::memory_order_acquire);
 	if (ns < 0)
 		return std::nullopt;
@@ -165,7 +166,7 @@ bool Demuxer::Rewind() noexcept {
 	m_measureTracks.clear();
 	if (m_progress)
 		m_progress->MeasureDone();
-	Wake().notify_all();
+	Wake();
 	m_planPresent.notify_all();
 	return true;
 }
@@ -215,7 +216,7 @@ Packet::PointerType Demuxer::Wrap(
 		std::move(dts),
 		std::move(duration),
 		keyframe,
-		std::vector<SideData>{},
+		StormByte::Safe::Vector<SideData>{},
 		nullptr,
 		serial,
 		0);
@@ -230,7 +231,7 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	if (!decoder.Plan())
 		decoder.m_plan = demuxer.m_plan;
 	if (demuxer.Failed()) {
-		decoder.Fail(demuxer.Error().value_or("demuxer failed"));
+		decoder.Fail(demuxer.Error().value_or(StormByte::Safe::String("demuxer failed")));
 		return decoder;
 	}
 

@@ -93,7 +93,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param time_base Input time base.
 			 * @return AVBSF or BSFError.
 			 */
-			static ExpectedAVBSF Create(const std::string& name, const AVCodecParameters& params, AVRational time_base) noexcept;
+			static ExpectedAVBSF Create(std::string_view name, const AVCodecParameters& params, AVRational time_base) noexcept;
 
 			/**
 			 * @brief Sends a packet into the filter.
@@ -136,3 +136,9 @@ namespace StormByte::Multimedia::FFmpeg {
 
 	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVBSFContext>;
 }
+
+/**
+ * @brief Conditional provider contract: FFmpeg resources are released out-of-line.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVBSF);

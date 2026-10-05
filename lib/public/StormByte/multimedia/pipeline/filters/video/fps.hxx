@@ -42,9 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
-#include <memory>
 #include <string>
 
 /**
@@ -78,6 +80,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref Filter::FFmpeg::Save of the buffersink frame.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Interpolate
+	 * @par Conditional DLL safety
+	 * Requires a compatible C++ ABI and all providers to remain loaded while
+	 * objects, handles or callbacks exist. Create the leaf on Base's heap through
+	 * a Safe owner. Private storage is created, used and destroyed out of line
+	 * by the provider; the private Chain string never transfers ownership to callers.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Fps: public Filter::Process {
 		public:
@@ -87,13 +94,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param num Rate numerator (e.g. 24000).
 			 * @param den Rate denominator (e.g. 1001). 0 is treated as 1.
 			 */
-			Fps(std::shared_ptr<StormByte::Logger::Log> log,
+			Fps(Safe::Shared<StormByte::Logger::Log> log,
 				std::uint32_t num, std::uint32_t den = 1) noexcept;
 
+			/**
+			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Leaf that cannot be copied.
+			 */
 			Fps(const Fps& other) = delete;
+
+			/**
+			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Leaf that cannot be moved.
+			 */
 			Fps(Fps&& other) noexcept = delete;
-			~Fps() noexcept override = default;
+
+			/**
+			 * @brief Drops the cached graph in the provider.
+			 */
+			~Fps() noexcept override;
+
+			/**
+			 * @brief Copy assignment is not allowed.
+			 * @param other Leaf that cannot be copied.
+			 * @return No value; this operation is deleted.
+			 */
 			Fps& operator=(const Fps& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed.
+			 * @param other Leaf that cannot be moved.
+			 * @return No value; this operation is deleted.
+			 */
 			Fps& operator=(Fps&& other) noexcept = delete;
 
 			/**
@@ -130,8 +162,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			std::string Chain() const noexcept;
 
-			std::uint32_t m_num;	///< Rate numerator
-			std::uint32_t m_den;	///< Rate denominator
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;
+			std::uint32_t m_num;													///< Rate numerator
+			std::uint32_t m_den;													///< Rate denominator
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;		///< Reused graph
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Fps);

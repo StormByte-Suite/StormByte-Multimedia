@@ -82,7 +82,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			/**
 			 * @brief Destructor.
 			 */
-			~Audio() noexcept override = default;
+			~Audio() noexcept override;
 
 			/**
 			 * @brief Copy constructor.
@@ -101,14 +101,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @brief Move constructor.
 			 * @param other Backend to take.
 			 */
-			Audio(Audio&& other) noexcept = default;
+			Audio(Audio&& other) noexcept;
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Backend to take.
 			 * @return *this.
 			 */
-			Audio& operator=(Audio&& other) noexcept = default;
+			Audio& operator=(Audio&& other) noexcept;
 
 			/**
 			 * @brief Whether the FFmpeg decoder is open.

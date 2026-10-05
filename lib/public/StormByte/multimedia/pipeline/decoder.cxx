@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <format>
 #include <utility>
@@ -67,39 +68,39 @@ using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
-Decoder::Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, DecoderFlags flags) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags(flags), m_part(0), m_look(false) {
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
-Decoder::Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, EncodeLook) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true), m_lookStamp(Producer::Encoder) {
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
-Decoder::Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, RemuxLook) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true), m_lookStamp(Producer::Remuxer) {
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
-Decoder::Decoder(std::shared_ptr<StormByte::Logger::Log> log,
+Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, SourceLook) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true) {
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
@@ -110,14 +111,15 @@ Decoder::operator bool() const noexcept {
 }
 
 std::size_t Decoder::InputCeiling() const noexcept {
-	const auto* track = Backend::Pipeline::TrackByIn(Plan(), m_index);
+	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
+	const auto* track = Backend::Pipeline::TrackByIn(plan, m_index);
 	if (!track)
 		return 0;
-	const Backend::Pipeline::Ceiling cap{Plan(), Producer::Decoder, *track};
+	const Backend::Pipeline::Ceiling cap{plan, Producer::Decoder, *track};
 	return cap.Packets() != 0 ? cap.Packets() : cap.Frames();
 }
 
-void Decoder::Implementation(std::string name) noexcept {
+void Decoder::Implementation(StormByte::Safe::String name) noexcept {
 	if (name.empty())
 		m_implementation.reset();
 	else
@@ -164,27 +166,28 @@ std::unique_ptr<Backend::Pipeline::Decoder> Decoder::OpenOrigin() noexcept {
 	return m_origin->OpenDecoder(*this);
 }
 
-void Decoder::Stamp(std::optional<std::string> language, std::optional<std::string> title) noexcept {
+void Decoder::Stamp(StormByte::Safe::Optional<StormByte::Safe::String> language,
+	StormByte::Safe::Optional<StormByte::Safe::String> title) noexcept {
 	if (!language || language->empty())
 		m_language.reset();
 	else
-		m_language = std::move(*language);
+		m_language = std::move(language);
 	if (!title || title->empty())
 		m_title.reset();
 	else
-		m_title = std::move(*title);
+		m_title = std::move(title);
 }
 
 void Decoder::AttachOrigin(Demuxer& demuxer) noexcept {
 	m_origin = &demuxer;
-	Wake().notify_all();
+	Wake();
 }
 
 void Decoder::MeasureSourceClosed() noexcept {
 	if (m_look)
 		return;
 	m_measureClosed.store(true, std::memory_order_release);
-	Wake().notify_all();
+	Wake();
 }
 
 void Decoder::DrainMeasure() noexcept {
@@ -285,16 +288,16 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 	return static_cast<bool>(m_backend);
 }
 
-std::string Decoder::Label() const noexcept {
+StormByte::Safe::String Decoder::Label() const noexcept {
 	if (m_look) {
 		if (m_lookStamp == Producer::Encoder)
-			return "Decoder(look encode t=" + std::to_string(m_index) + ")";
+			return StormByte::Safe::String("Decoder(look encode t=" + std::to_string(m_index) + ")");
 		if (m_lookStamp == Producer::Remuxer)
-			return "Decoder(look remux t=" + std::to_string(m_index) + ")";
-		return "Decoder(look src t=" + std::to_string(m_index) + ")";
+			return StormByte::Safe::String("Decoder(look remux t=" + std::to_string(m_index) + ")");
+		return StormByte::Safe::String("Decoder(look src t=" + std::to_string(m_index) + ")");
 	}
 
 	if (m_implementation && !m_implementation->empty())
-		return "Decoder(" + *m_implementation + ")";
-	return "Decoder(t=" + std::to_string(m_index) + ")";
+		return StormByte::Safe::String(std::format("Decoder({})", *m_implementation));
+	return StormByte::Safe::String("Decoder(t=" + std::to_string(m_index) + ")");
 }

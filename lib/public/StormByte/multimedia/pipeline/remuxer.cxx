@@ -47,6 +47,7 @@
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/stream.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <format>
 #include <string>
@@ -54,21 +55,22 @@
 using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
-Remuxer::Remuxer(std::shared_ptr<StormByte::Logger::Log> log, int in) noexcept
+Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept
 :	Step(std::move(log), Producer::Remuxer, Kinds{Kind::Packet}, Kinds{Kind::Packet}),
 	m_index(in) {
-	Mount(std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Remux>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::Heap::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Remux>(*this));
 	Launch();
 }
 
 Remuxer::~Remuxer() noexcept = default;
 
 std::size_t Remuxer::InputCeiling() const noexcept {
-	const auto* track = StormByte::Multimedia::Backend::Pipeline::TrackByIn(Plan(), m_index);
+	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
+	const auto* track = StormByte::Multimedia::Backend::Pipeline::TrackByIn(plan, m_index);
 	if (!track)
 		return 0;
-	const StormByte::Multimedia::Backend::Pipeline::Ceiling cap{Plan(), Producer::Remuxer, *track};
+	const StormByte::Multimedia::Backend::Pipeline::Ceiling cap{plan, Producer::Remuxer, *track};
 	return cap.Packets();
 }
 
@@ -82,7 +84,7 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& 
 	if (!remuxer.m_plan)
 		remuxer.m_plan = demuxer.m_plan;
 	if (demuxer.Failed()) {
-		remuxer.Fail(demuxer.Error().value_or("demuxer failed"));
+		remuxer.Fail(demuxer.Error().value_or(StormByte::Safe::String("demuxer failed")));
 		return remuxer;
 	}
 
@@ -93,13 +95,13 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& 
 	return remuxer;
 }
 
-std::string Remuxer::Label() const noexcept {
+StormByte::Safe::String Remuxer::Label() const noexcept {
 	if (m_plan && *m_plan) {
 		for (const auto& stream : m_plan->Snapshot().Streams()) {
 			if (stream.Index() == m_index)
-				return "Remuxer(" + std::string(stream.Codec().Name()) + ")";
+				return StormByte::Safe::String("Remuxer(" + std::string(stream.Codec().Name()) + ")");
 		}
 	}
 
-	return "Remuxer(t=" + std::to_string(m_index) + ")";
+	return StormByte::Safe::String("Remuxer(t=" + std::to_string(m_index) + ")");
 }

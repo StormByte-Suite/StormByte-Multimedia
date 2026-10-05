@@ -59,11 +59,13 @@ namespace {
 	}
 }
 
-Deflicker::Deflicker(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<unsigned> size,
-	std::optional<std::string> mode) noexcept
-	: Filter::Process(std::move(log), "deflicker"),
+Deflicker::Deflicker(Safe::Shared<StormByte::Logger::Log> log,
+	Safe::Optional<unsigned> size,
+	Safe::Optional<Safe::String> mode) noexcept
+	: Filter::Process(std::move(log), Safe::String("deflicker")),
 	m_sizeIn(size), m_modeIn(std::move(mode)) {}
+
+Deflicker::~Deflicker() noexcept = default;
 
 enum Type Deflicker::Media() const noexcept {
 	return Type::Video;
@@ -80,7 +82,7 @@ void Deflicker::Setup() noexcept {
 std::string Deflicker::Chain() const noexcept {
 	unsigned size = m_sizeIn.value_or(5u);
 	size = std::clamp(size, 2u, 129u);
-	std::string mode = m_modeIn.value_or("am");
+	std::string mode = std::string(m_modeIn.value_or(Safe::String("am")));
 	if (!ModeOk(mode))
 		mode = "am";
 	return std::format("deflicker=size={}:mode={}", size, mode);
@@ -106,7 +108,7 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("deflicker: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("deflicker: AVFilterGraph::Ensure failed");
 		return;

@@ -38,14 +38,11 @@
 
 #pragma once
 
-#include <StormByte/iterable.hxx>
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/type.hxx>
-#include <StormByte/safe/clonable.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <vector>
+#include <StormByte/safe/clonable.hxx>
+#include <StormByte/safe/vector.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -54,7 +51,7 @@
  * @ingroup multimedia_pipeline
  */
 namespace StormByte::Multimedia::Pipeline {
-		/**
+	/**
 	 * @class Track
 	 * @brief One source stream that enters the tube.
 	 *
@@ -71,7 +68,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Track:
-		public StormByte::Safe::Clonable<Track, StormByte::Safe::Unique<Track>> {
+		public StormByte::Safe::Clonable<Track, StormByte::Safe::Shared<Track>> {
 		public:
 			/**
 			 * @name Lifecycle
@@ -89,15 +86,17 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Builds a track; clones @p config and copies its type.
 			 * @param in Origin stream index.
 			 * @param config Leaf config.
+			 * @note Provider clone allocation failures propagate to the caller.
 			 */
-			Track(int in, const Config::Base& config) noexcept;
+			Track(int in, const Config::Base& config);
 
 			/**
 			 * @brief Builds a track; moves @p config and copies its type.
 			 * @param in Origin stream index.
 			 * @param config Leaf config.
+			 * @note Provider move allocation failures propagate to the caller.
 			 */
-			Track(int in, Config::Base&& config) noexcept;
+			Track(int in, Config::Base&& config);
 
 			/**
 			 * @brief Copy constructor. Deep-copies @ref Config if present.
@@ -109,12 +108,12 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Move constructor.
 			 * @param other Track to take.
 			 */
-			Track(Track&& other) noexcept = default;
+			Track(Track&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~Track() noexcept override = default;
+			virtual ~Track() noexcept override;
 
 			/**
 			 * @brief Copy assignment. Deep-copies @ref Config if present.
@@ -128,7 +127,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param other Track to take.
 			 * @return *this.
 			 */
-			Track& operator=(Track&& other) noexcept = default;
+			Track& operator=(Track&& other) noexcept;
 
 			/**
 			 * @}
@@ -137,18 +136,18 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Deep copy.
 			 * @return Owning pointer to a new @ref Track.
+			 * @note Derived tracks must override in their provider module and
+			 *       construct Shared<Track>::MakePointer<Derived> without slicing.
 			 */
-			inline PointerType Clone() const override {
-				return MakePointer<Track>(*this);
-			}
+			PointerType Clone() const override;
 
 			/**
 			 * @brief Move into a new pointer.
 			 * @return Owning pointer to the moved @ref Track.
+			 * @note Derived tracks must override in their provider module and
+			 *       retain the exact payload's creator-module destructor.
 			 */
-			inline PointerType Move() override {
-				return MakePointer<Track>(std::move(*this));
-			}
+			PointerType Move() override;
 
 			/**
 			 * @name Intention
@@ -184,10 +183,27 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 		private:
-			int m_in;										///< Origin stream index
-			enum StormByte::Multimedia::Type m_type;		///< Media stamped at construction
-			StormByte::Safe::Unique<Config::Base> m_config;		///< Leaf, or null
+			int m_in;												///< Origin stream index.
+
+			enum StormByte::Multimedia::Type m_type;				///< Media stamped at construction.
+
+			StormByte::Safe::Unique<Config::Base> m_config;			///< Provider-owned config leaf, or an empty owner.
 	};
+}
+
+/**
+ * @brief Registers the complete track with provider-owned config and lifecycle.
+ * @note Base and Multimedia must remain loaded with compatible C++ ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Track);
+
+/**
+ * @namespace StormByte::Multimedia::Pipeline
+ * @brief Demux / decode / filter / encode / mux types.
+ *
+ * @ingroup multimedia_pipeline
+ */
+namespace StormByte::Multimedia::Pipeline {
 
 	/**
 	 * @class Tracks
@@ -199,11 +215,22 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Tracks:
-		protected StormByte::Iterable<std::vector<StormByte::Safe::Unique<Track>>> {
+	class STORMBYTE_MULTIMEDIA_PUBLIC Tracks {
 		public:
-			using size_type = StormByte::Iterable<std::vector<StormByte::Safe::Unique<Track>>>::size_type;			///< Count type
-			using const_iterator = StormByte::Iterable<std::vector<StormByte::Safe::Unique<Track>>>::const_iterator;	///< Const iterator
+			/**
+			 * @brief Base-owned ordered track handles.
+			 */
+			using ContainerType = StormByte::Safe::Vector<StormByte::Safe::Shared<Track>>;
+
+			/**
+			 * @brief Count type.
+			 */
+			using size_type = ContainerType::size_type;
+
+			/**
+			 * @brief Read-only Safe iterator; dereference yields a shared track handle.
+			 */
+			using const_iterator = ContainerType::const_iterator;
 
 			/**
 			 * @name Lifecycle
@@ -213,7 +240,7 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Empty list.
 			 */
-			Tracks() noexcept = default;
+			Tracks() noexcept;
 
 			/**
 			 * @brief Copy constructor. Clones every @ref Track.
@@ -225,12 +252,12 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Move constructor.
 			 * @param other List to take.
 			 */
-			Tracks(Tracks&& other) noexcept = default;
+			Tracks(Tracks&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~Tracks() noexcept = default;
+			virtual ~Tracks() noexcept;
 
 			/**
 			 * @brief Copy assignment. Clones every @ref Track.
@@ -244,7 +271,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param other List to take.
 			 * @return *this.
 			 */
-			Tracks& operator=(Tracks&& other) noexcept = default;
+			Tracks& operator=(Tracks&& other) noexcept;
 
 			/**
 			 * @}
@@ -257,10 +284,10 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Const begin.
-			 * @return Iterator to the first element (`unique_ptr<Track>`).
+			 * @return Iterator to the first shared track handle.
 			 */
 			inline const_iterator begin() const noexcept {
-				return Iterable::begin();
+				return m_tracks.begin();
 			}
 
 			/**
@@ -268,7 +295,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Past-the-last iterator.
 			 */
 			inline const_iterator end() const noexcept {
-				return Iterable::end();
+				return m_tracks.end();
 			}
 
 			/**
@@ -276,7 +303,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Iterator to the first element.
 			 */
 			inline const_iterator cbegin() const noexcept {
-				return Iterable::cbegin();
+				return m_tracks.cbegin();
 			}
 
 			/**
@@ -284,24 +311,22 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Past-the-last iterator.
 			 */
 			inline const_iterator cend() const noexcept {
-				return Iterable::cend();
+				return m_tracks.cend();
 			}
 
 			/**
 			 * @brief Track at mux slot @p i.
 			 * @param i Zero-based index.
-			 * @return Track.
+			 * @return Borrowed track, valid while its owner remains in this list.
 			 */
-			inline const Track& operator[](size_type i) const {
-				return *Iterable::operator[](i);
-			}
+			const Track& operator[](size_type index) const;
 
 			/**
 			 * @brief Element count.
 			 * @return Number of tracks.
 			 */
 			inline size_type size() const noexcept {
-				return Iterable::size();
+				return m_tracks.size();
 			}
 
 			/**
@@ -309,27 +334,33 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return `true` if empty.
 			 */
 			inline bool empty() const noexcept {
-				return Iterable::empty();
+				return m_tracks.empty();
 			}
 
 			/**
 			 * @brief Appends a clone of @p track.
 			 * @param track Track to copy.
 			 */
-			inline void add(const Track& track) {
-				Iterable::add(track.Clone());
-			}
+			void add(const Track& track);
 
 			/**
 			 * @brief Appends @p track via @ref Track::Move.
 			 * @param track Track to take.
 			 */
-			inline void add(Track&& track) {
-				Iterable::add(track.Move());
-			}
+			void add(Track&& track);
 
 			/**
 			 * @}
 			 */
+
+		private:
+			ContainerType m_tracks;	///< Base-owned collection; all allocating operations run in Multimedia.
+									///< @note Base and Multimedia must remain loaded with compatible C++ ABIs.
 	};
 }
+
+/**
+ * @brief Registers the completed collection with provider-owned storage and lifecycle.
+ * @note Base and Multimedia must remain loaded with compatible C++ ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Tracks);

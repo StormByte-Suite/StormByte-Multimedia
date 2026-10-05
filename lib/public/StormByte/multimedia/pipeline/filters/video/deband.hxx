@@ -41,9 +41,10 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
-#include <memory>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -78,6 +79,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * and @ref Filter::FFmpeg::Save.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
+	 * @par Boundary ownership
+	 * Requires a compatible C++ ABI and the Multimedia, Logger and Base providers
+	 * to remain loaded. Own the leaf through Base-heap Safe pointers. Allocation,
+	 * mutation and destruction run in out-of-line provider methods; copying and
+	 * moving the leaf are disabled.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Deband: public Filter::Process {
 		public:
@@ -89,14 +95,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 *        10/12-bit planes scale this to their peak.
 			 * @param grain Dither amplitude in 8-bit units. 0 uses 2.
 			 */
-			Deband(std::shared_ptr<StormByte::Logger::Log> log,
+			Deband(Safe::Shared<StormByte::Logger::Log> log,
 				unsigned range = 0, unsigned threshold = 0,
 				unsigned grain = 0) noexcept;
 
+			/**
+			 * @brief Copying the provider-owned leaf is disabled.
+			 * @param other Leaf that cannot be copied.
+			 */
 			Deband(const Deband& other) = delete;
+
+			/**
+			 * @brief Moving the mounted leaf is disabled.
+			 * @param other Leaf that cannot be moved.
+			 */
 			Deband(Deband&& other) noexcept = delete;
-			~Deband() noexcept override = default;
+
+			/**
+			 * @brief Destroys the leaf in the Multimedia provider.
+			 */
+			~Deband() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Leaf that cannot be copied.
+			 * @return Assignment is unavailable.
+			 */
 			Deband& operator=(const Deband& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Leaf that cannot be moved.
+			 * @return Assignment is unavailable.
+			 */
 			Deband& operator=(Deband&& other) noexcept = delete;
 
 			/**
@@ -127,3 +158,5 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			unsigned m_grain;		///< 8-bit dither amplitude
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Deband);

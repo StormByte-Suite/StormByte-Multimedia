@@ -42,14 +42,38 @@
 
 using namespace StormByte::Multimedia::Pipeline::Config;
 
-void Base::Language(std::string language) noexcept {
+Implementation::Implementation() = default;
+
+Implementation::Implementation(const struct Implementation& other) = default;
+
+Implementation::Implementation(struct Implementation&& other) noexcept = default;
+
+Implementation::~Implementation() noexcept = default;
+
+Implementation& Implementation::operator=(const struct Implementation& other) = default;
+
+Implementation& Implementation::operator=(struct Implementation&& other) noexcept = default;
+
+Base::Base(enum StormByte::Multimedia::Type type): m_type(type) {}
+
+Base::Base(const Base& other) = default;
+
+Base::Base(Base&& other) noexcept = default;
+
+Base::~Base() noexcept = default;
+
+Base& Base::operator=(const Base& other) = default;
+
+Base& Base::operator=(Base&& other) noexcept = default;
+
+void Base::Language(StormByte::Safe::String language) {
 	if (language.empty())
 		m_language.reset();
 	else
 		m_language = std::move(language);
 }
 
-void Base::Title(std::string title) noexcept {
+void Base::Title(StormByte::Safe::String title) {
 	if (title.empty())
 		m_title.reset();
 	else

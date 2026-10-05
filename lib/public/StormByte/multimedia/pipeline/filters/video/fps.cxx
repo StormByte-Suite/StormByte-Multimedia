@@ -50,10 +50,12 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Fps;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Fps::Fps(std::shared_ptr<StormByte::Logger::Log> log,
+Fps::Fps(Safe::Shared<StormByte::Logger::Log> log,
 	std::uint32_t num, std::uint32_t den) noexcept
-	: Filter::Process(std::move(log), "fps"),
+	: Filter::Process(std::move(log), Safe::String("fps")),
 	m_num(num), m_den(den == 0 ? 1 : den) {}
+
+Fps::~Fps() noexcept = default;
 
 enum Type Fps::Media() const noexcept {
 	return Type::Video;
@@ -95,7 +97,7 @@ void Fps::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("fps: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("fps: AVFilterGraph::Ensure failed");
 		return;

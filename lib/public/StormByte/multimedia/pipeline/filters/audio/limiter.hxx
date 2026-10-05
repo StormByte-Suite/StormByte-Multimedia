@@ -42,10 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <memory>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -88,13 +89,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param ceiling True-peak ceiling in dBTP. Empty → −1.5.
 			 */
-			Limiter(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> ceiling = {}) noexcept;
+			Limiter(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> ceiling = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is disabled.
+			 * @param other Source filter.
+			 */
 			Limiter(const Limiter& other) = delete;
+
+			/**
+			 * @brief Move construction is disabled.
+			 * @param other Source filter.
+			 */
 			Limiter(Limiter&& other) noexcept = delete;
-			~Limiter() noexcept override = default;
+
+			/**
+			 * @brief Releases the provider-owned graph.
+			 */
+			~Limiter() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Limiter& operator=(const Limiter& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Limiter& operator=(Limiter&& other) noexcept = delete;
 
 			/**
@@ -129,9 +155,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `alimiter=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_ceilIn;	///< Caller dBTP, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;
+			Safe::Optional<double> m_ceilIn;	///< Caller dBTP, or empty
+
+			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Provider-owned graph
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private graph ownership is allocated and released only by Multimedia.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Limiter);

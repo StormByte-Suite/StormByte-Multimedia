@@ -37,6 +37,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
+#include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
 #include <memory>
@@ -45,19 +46,19 @@
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
 
-Packet::Packet() noexcept
+Packet::Packet()
 : Item(-1, Type::Unknown, Kind::Packet, Producer::Demuxer),
 	m_keyFrame(false), m_codec(nullptr), m_part(0) {}
 
 Packet::Packet(int track, enum Type type, enum Producer producer, StormByte::Buffer::FIFO payload,
-	std::optional<Property::Duration> pts,
-	std::optional<Property::Duration> dts,
-	std::optional<Property::Duration> duration,
+	StormByte::Safe::Optional<Property::Duration> pts,
+	StormByte::Safe::Optional<Property::Duration> dts,
+	StormByte::Safe::Optional<Property::Duration> duration,
 	bool key_frame,
-	std::vector<SideData> attachments,
+	StormByte::Safe::Vector<SideData> attachments,
 	const StormByte::Multimedia::Codec* codec,
 	std::uint64_t serial,
-	std::uint64_t part) noexcept
+	std::uint64_t part)
 : Item(track, type, Kind::Packet, producer),
 	m_payload(std::move(payload)),
 	m_pts(std::move(pts)), m_dts(std::move(dts)), m_duration(std::move(duration)),
@@ -65,7 +66,7 @@ Packet::Packet(int track, enum Type type, enum Producer producer, StormByte::Buf
 	m_codec(codec),
 	m_serial(serial), m_part(part) {}
 
-Packet::Packet(const Packet& other) noexcept
+Packet::Packet(const Packet& other)
 : Item(other),
 	m_payload(other.m_payload),
 	m_pts(other.m_pts),
@@ -89,7 +90,7 @@ Packet::Packet(Packet&& other) noexcept
 	m_keyFrame(other.m_keyFrame),
 	m_attachments(std::move(other.m_attachments)),
 	m_codec(other.m_codec),
-	m_serial(other.m_serial),
+	m_serial(std::move(other.m_serial)),
 	m_part(other.m_part),
 	m_backend(std::move(other.m_backend)) {
 	other.BecomeEmpty();
@@ -97,24 +98,11 @@ Packet::Packet(Packet&& other) noexcept
 
 Packet::~Packet() noexcept = default;
 
-Packet& Packet::operator=(const Packet& other) noexcept {
+Packet& Packet::operator=(const Packet& other) {
 	if (this == &other)
 		return *this;
-	Item::operator=(other);
-	m_payload = other.m_payload;
-	m_pts = other.m_pts;
-	m_dts = other.m_dts;
-	m_duration = other.m_duration;
-	m_keyFrame = other.m_keyFrame;
-	m_attachments = other.m_attachments;
-	m_codec = other.m_codec;
-	m_serial = other.m_serial;
-	m_part = other.m_part;
-	if (other.m_backend)
-		m_backend = std::make_unique<Backend::Pipeline::Packet>(*other.m_backend);
-	else
-		m_backend.reset();
-	return *this;
+	Packet replacement(other);
+	return *this = std::move(replacement);
 }
 
 Packet& Packet::operator=(Packet&& other) noexcept {
@@ -128,7 +116,7 @@ Packet& Packet::operator=(Packet&& other) noexcept {
 	m_keyFrame = other.m_keyFrame;
 	m_attachments = std::move(other.m_attachments);
 	m_codec = other.m_codec;
-	m_serial = other.m_serial;
+	m_serial = std::move(other.m_serial);
 	m_part = other.m_part;
 	m_backend = std::move(other.m_backend);
 	other.BecomeEmpty();
@@ -141,14 +129,8 @@ void Packet::BecomeEmpty() noexcept {
 	m_kind = Kind::Packet;
 	m_producer = Producer::Demuxer;
 	m_payload = StormByte::Buffer::FIFO{};
-	m_pts.reset();
-	m_dts.reset();
-	m_duration.reset();
 	m_keyFrame = false;
-	m_attachments.clear();
-	m_attachments.shrink_to_fit();
 	m_codec = nullptr;
-	m_serial.reset();
 	m_part = 0;
 	m_backend.reset();
 }

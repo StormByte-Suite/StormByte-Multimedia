@@ -184,3 +184,9 @@ namespace StormByte::Multimedia::FFmpeg {
 
 	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVFilterGraph>;
 }
+
+/**
+ * @brief Conditional provider contract: graph and private cached text lifetimes stay in Multimedia.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVFilterGraph);

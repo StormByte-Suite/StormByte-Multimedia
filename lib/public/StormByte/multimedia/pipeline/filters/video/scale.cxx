@@ -44,21 +44,23 @@ using namespace StormByte::Multimedia::Pipeline::Filter::Video;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using StormByte::Logger::Level;
 
-Scale::Scale(std::shared_ptr<StormByte::Logger::Log> log,
+Scale::Scale(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	const StormByte::Multimedia::Property::Resolution& resolution,
-	std::optional<FFrame::Resample> filter,
-	std::optional<FFrame::Scaler> scaler) noexcept
-	: Filter::Process(std::move(log), "scale"),
+	StormByte::Safe::Optional<FFrame::Resample> filter,
+	StormByte::Safe::Optional<FFrame::Scaler> scaler) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("scale")),
 	m_width(resolution.Width()), m_height(resolution.Height()),
 	m_filter(filter), m_scaler(scaler) {}
 
-Scale::Scale(std::shared_ptr<StormByte::Logger::Log> log,
+Scale::Scale(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	std::uint32_t width, std::uint32_t height,
-	std::optional<FFrame::Resample> filter,
-	std::optional<FFrame::Scaler> scaler) noexcept
-	: Filter::Process(std::move(log), "scale"),
+	StormByte::Safe::Optional<FFrame::Resample> filter,
+	StormByte::Safe::Optional<FFrame::Scaler> scaler) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("scale")),
 	m_width(width), m_height(height),
 	m_filter(filter), m_scaler(scaler) {}
+
+Scale::~Scale() noexcept = default;
 
 enum StormByte::Multimedia::Type Scale::Media() const noexcept {
 	return StormByte::Multimedia::Type::Video;

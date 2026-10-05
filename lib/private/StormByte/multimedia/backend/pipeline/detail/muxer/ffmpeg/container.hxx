@@ -192,8 +192,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 					int avIndex = -1;												///< Index in AVFormatContext
 					AVRational timeBase{0, 1};										///< Mux time base
 					std::int64_t lastDts = StormByte::Multimedia::FFmpeg::NoPts;	///< Last written DTS
-					std::optional<std::string> language;							///< Header language
-					std::optional<std::string> title;								///< Header title
+					StormByte::Safe::Optional<StormByte::Safe::String> language;	///< Header language
+					StormByte::Safe::Optional<StormByte::Safe::String> title;		///< Header title
 			};
 
 			/**

@@ -49,16 +49,13 @@
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <atomic>
-#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
-#include <deque>
-#include <memory>
-#include <mutex>
-#include <optional>
-#include <string>
 #include <string_view>
 
 namespace StormByte::Multimedia::Backend::Pipeline {
@@ -173,7 +170,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 *
 	 * @par Logging
 	 * The owner of the tube passes a
-	 * @c std::shared_ptr<StormByte::Logger::Log> as the first
+	 * @c StormByte::Safe::Shared<StormByte::Logger::Log> as the first
 	 * constructor argument. Prefer
 	 * @c StormByte::Logger::ThreadedLog: every filter runs on its
 	 * own worker. A plain @c Log is only safe if a single thread
@@ -305,19 +302,19 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief `Media()/name` computed on each call.
 			 * @return Identity string.
 			 */
-			std::string Name() const noexcept;
+			StormByte::Safe::String Name() const noexcept;
 
 			/**
 			 * @brief Shared counters retained independently of this filter.
 			 * @return Const stage metrics with this filter's origin label.
 			 */
-			std::shared_ptr<const Pipeline::StageTelemetry> Telemetry() const noexcept;
+			StormByte::Safe::Shared<const Pipeline::StageTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief Leaf token used in reports (`vmaf`).
 			 * @return Constructor name, not `Media()/name`.
 			 */
-			inline const std::string& Leaf() const noexcept {
+			inline const StormByte::Safe::String& Leaf() const noexcept {
 				return m_name;
 			}
 
@@ -412,7 +409,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief Failure text.
 			 * @return Message, or empty.
 			 */
-			const std::optional<std::string>& Error() const noexcept;
+			const StormByte::Safe::Optional<StormByte::Safe::String>& Error() const noexcept;
 
 			/**
 			 * @brief Ceiling of this filter's input hopper.
@@ -438,6 +435,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param log Shared logger. Prefer ThreadedLog. Empty means no log.
 			 * @param name Short leaf name (`scale`). Capitalized in the
 			 *        logging scope @c StormByte/Multimedia/&lt;Leaf&gt;.
+			 *        Borrowed only during construction and copied into Safe storage.
 			 * @param receives Kinds this filter consumes.
 			 * @param produces Kinds this filter emits.
 			 *
@@ -445,8 +443,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @ref Packet and @ref Analytics.
 			 * Do not construct FFmpeg from a filter leaf.
 			 */
-			FFmpeg(std::shared_ptr<StormByte::Logger::Log> log,
-				std::string name, Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
+			FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				std::string_view name, Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
 
 			/**
 			 * @}
@@ -465,9 +463,15 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 
 			/**
 			 * @brief Marks a hard error and wakes the filter. The job stops.
-			 * @param reason Bare message.
+			 * @param reason Owned bare message retained in Safe storage.
 			 */
-			void Fail(std::string reason) noexcept;
+			void Fail(StormByte::Safe::String reason) noexcept;
+
+			/**
+			 * @brief Copies borrowed text into Safe storage and marks a hard error.
+			 * @param reason Bare message borrowed only during this call.
+			 */
+			void Fail(std::string_view reason) noexcept;
 
 			/**
 			 * @brief Starts a Hold of at most @p n units.
@@ -596,8 +600,11 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 */
 			void Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept;
 
-			/** @cond */
+			/// @cond
 		private:
+			/**
+			 * @brief Provider-local Host adapter for the mounted worker.
+			 */
 			class Surface;
 
 			/**
@@ -664,9 +671,9 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			Backend::Pipeline::Host& Face() noexcept;
 
 			/**
-			 * @brief Consumer condition variable.
+			 * @brief Notifies all waiters of this filter.
 			 */
-			std::condition_variable& Wake() noexcept;
+			void Wake() noexcept;
 
 			/**
 			 * @brief Eof on the Pipe.
@@ -692,14 +699,18 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 */
 			bool MeasuringTwoPass() const noexcept;
 
-			std::shared_ptr<StormByte::Logger::Log> m_log;		///< Scoped module logger
-			std::string m_name;									///< Leaf name
+			StormByte::Safe::Shared<StormByte::Logger::Log> m_log;	///< Scoped module logger
+			StormByte::Safe::String m_name;						///< Owned leaf name
 			Pipeline::Kinds m_receives;							///< Receives
 			Pipeline::Kinds m_produces;							///< Produces
 
 		private:
-			std::condition_variable m_wake;						///< Single consumer CV
-			std::unique_ptr<Backend::Pipeline::Pipe> m_pipe;	///< In / out hoppers
+			/**
+			 * @brief Provider-local backend ownership and hold queue.
+			 */
+			class PrivateState;
+
+			PrivateState* m_state;							///< Provider-owned backend state
 
 		protected:
 			/**
@@ -714,23 +725,19 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 */
 			const Backend::Pipeline::Pipe& pipe() const noexcept;
 
-			std::shared_ptr<Pipeline::StageTelemetry> m_telemetry;	///< Counters retained by job snapshots
-			std::unique_ptr<Surface> m_surface;						///< Host for Pumper and Worker
-			std::unique_ptr<Backend::Pipeline::Pumper> m_pumper;	///< Thread and State
-			std::mutex m_wait;										///< Mutex for m_wake
-			std::optional<std::string> m_error;						///< Fail message
+			StormByte::Safe::Shared<Pipeline::StageTelemetry> m_telemetry;	///< Counters retained by job snapshots
+			StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< Fail message
 			bool m_exhausted;										///< Source Ended(); unused on Through
 			std::uint64_t m_workN;									///< Timed Process calls
 			std::int64_t m_workMin;									///< Fastest Process, us
 			std::int64_t m_workMax;									///< Slowest Process, us
 			std::int64_t m_lastWork;								///< Last Process, us
 			Pipeline::Item::PointerType m_current;					///< Unit of this Work call
-			std::deque<Pipeline::Item::PointerType> m_queue;		///< Thread-local Hold
 			std::uint8_t m_hold;									///< Ceiling; 0 = not Held
 			std::uint8_t m_heldFor;									///< Parked count
-			std::shared_ptr<const Pipeline::Plan> m_plan;			///< Job plan; Filters copies it
+			StormByte::Safe::Shared<const Pipeline::Plan> m_plan;	///< Job plan; Filters copies it
 			int m_origin;											///< Plan track In(); -1 until bound
-			/** @endcond */
+			/// @endcond
 	};
 
 	/**
@@ -787,18 +794,18 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Named process node. Frame to Frame.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 */
-			Process(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept;
+			Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
 
 			/**
 			 * @brief Named process node with an explicit mask.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 * @param receives Kinds this leaf consumes.
 			 * @param produces Kinds this leaf emits.
 			 */
-			Process(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+			Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
 	};
 
@@ -848,18 +855,18 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Named two-pass process. Frame to Frame.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 */
-			ProcessTwoPasses(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept;
+			ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
 
 			/**
 			 * @brief Named two-pass process with an explicit mask.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 * @param receives Kinds this leaf consumes.
 			 * @param produces Kinds this leaf emits.
 			 */
-			ProcessTwoPasses(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+			ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
 
 			/**
@@ -964,18 +971,18 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Named packet node. Packet to Packet.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 */
-			Packet(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept;
+			Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
 
 			/**
 			 * @brief Named packet node with an explicit mask.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 * @param receives Kinds this leaf consumes.
 			 * @param produces Kinds this leaf emits.
 			 */
-			Packet(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+			Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
 	};
 
@@ -1037,20 +1044,20 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Named analytics node.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 *
 			 * Receives Frame. Produces Frame.
 			 */
-			Analytics(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept;
+			Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
 
 			/**
 			 * @brief Named analytics node with an explicit mask.
 			 * @param log Shared logger. Empty pointer means no log.
-			 * @param name Short leaf name.
+			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 * @param receives Kinds this leaf consumes.
 			 * @param produces Kinds this leaf emits.
 			 */
-			Analytics(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+			Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
 
 			/**
@@ -1103,3 +1110,14 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			}
 	};
 }
+
+/**
+ * @brief Registers provider-local filter bases with Safe-owned retained values.
+ * @note Compatible C++ ABI and loaded Base, Multimedia and derived providers
+ * are required. Derived filters must preserve provider-local resource lifetime.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::FFmpeg);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Process);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::ProcessTwoPasses);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Packet);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Analytics);

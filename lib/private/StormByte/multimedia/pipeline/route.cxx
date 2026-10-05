@@ -46,6 +46,7 @@
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 using namespace StormByte::Multimedia::Pipeline;
 
@@ -72,8 +73,8 @@ namespace {
 }
 
 Route::Route(int track,
-	std::shared_ptr<Step> origin,
-	std::shared_ptr<Step> destination) noexcept
+	StormByte::Safe::Shared<Step> origin,
+	StormByte::Safe::Shared<Step> destination) noexcept
 : m_track(track),
 	m_origin(std::move(origin)),
 	m_destination(std::move(destination)) {}
@@ -98,7 +99,7 @@ void Route::Observe(Filter::FFmpeg& analytics) noexcept {
 	m_analytics.push_back(&analytics);
 }
 
-Route& Route::Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept {
+Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!filter)
 		return *this;
 
@@ -145,12 +146,12 @@ void Route::Close() noexcept {
 	for (const auto& filter : m_filters) {
 		if (dynamic_cast<Filter::Analytics*>(filter.get()) == nullptr
 			&& !filter->Receives().Has(stretch)) {
-			destination.Fail(filter->Name() + " does not cover this stretch");
+			destination.Fail(std::format("{} does not cover this stretch", filter->Name()));
 			return;
 		}
 
 		if (media != StormByte::Multimedia::Type::Unknown && filter->Media() != media) {
-			destination.Fail(filter->Name() + " media does not match this stretch");
+			destination.Fail(std::format("{} media does not match this stretch", filter->Name()));
 			return;
 		}
 	}

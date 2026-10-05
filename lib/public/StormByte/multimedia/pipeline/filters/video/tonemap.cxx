@@ -60,10 +60,12 @@ namespace {
 	constexpr int RangeTv  = 1;	// AVCOL_RANGE_MPEG
 }
 
-Tonemap::Tonemap(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<std::string> op) noexcept
-	: Filter::Process(std::move(log), "tonemap"),
+Tonemap::Tonemap(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<StormByte::Safe::String> op) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("tonemap")),
 	m_opIn(std::move(op)) {}
+
+Tonemap::~Tonemap() noexcept = default;
 
 enum Type Tonemap::Media() const noexcept {
 	return Type::Video;
@@ -82,23 +84,23 @@ bool Tonemap::NeedsMap(const FFrame& src) noexcept {
 	return trc == TrcPq || trc == TrcHlg;
 }
 
-std::string_view Tonemap::Operator() const noexcept {
+StormByte::Safe::String Tonemap::Operator() const noexcept {
 	if (!m_opIn || m_opIn->empty())
-		return "hable";
-	const std::string& op = *m_opIn;
+		return StormByte::Safe::String("hable");
+	const StormByte::Safe::String op = *m_opIn;
 	if (op == "hable" || op == "mobius" || op == "reinhard"
 		|| op == "gamma" || op == "clip" || op == "linear")
 		return op;
-	return "hable";
+	return StormByte::Safe::String("hable");
 }
 
-std::string Tonemap::Chain(const FFrame& src) const noexcept {
+StormByte::Safe::String Tonemap::Chain(const FFrame& src) const noexcept {
 	const char* tin = src.ColorTransfer() == TrcHlg ? ":tin=arib-std-b67" : "";
-	return std::format(
+	return StormByte::Safe::String(std::format(
 		"zscale=t=linear:npl=100{},format=gbrpf32le,"
 		"zscale=p=bt709,tonemap=tonemap={}:desat=0,"
 		"zscale=t=bt709:m=bt709:r=tv,format=yuv420p",
-		tin, Operator());
+		tin, static_cast<std::string_view>(Operator())));
 }
 
 void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
@@ -119,14 +121,14 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain(src);
+	const StormByte::Safe::String chain = Chain(src);
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
 			Fail("tonemap: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("tonemap: AVFilterGraph::Ensure failed");
 		return;
@@ -152,7 +154,7 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 
 	Log(Level::LowLevel, std::format(
 		"tonemap {} {}x{} pts={}",
-		Operator(), out.Width(), out.Height(), out.Pts()));
+		static_cast<std::string_view>(Operator()), out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));
 }
 

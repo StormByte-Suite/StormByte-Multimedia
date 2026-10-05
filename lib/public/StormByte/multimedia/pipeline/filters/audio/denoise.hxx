@@ -43,10 +43,12 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <memory>
-#include <optional>
-#include <string>
 #include <vector>
 
 /**
@@ -96,13 +98,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param nr Reduction in dB. Empty → 12. Clamped 1–30.
 			 */
-			Denoise(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> nr = {}) noexcept;
+			Denoise(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> nr = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is disabled.
+			 * @param other Source filter.
+			 */
 			Denoise(const Denoise& other) = delete;
+
+			/**
+			 * @brief Move construction is disabled.
+			 * @param other Source filter.
+			 */
 			Denoise(Denoise&& other) noexcept = delete;
-			~Denoise() noexcept override = default;
+
+			/**
+			 * @brief Releases measurement storage and the graph in Multimedia.
+			 */
+			~Denoise() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Denoise& operator=(const Denoise& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Denoise& operator=(Denoise&& other) noexcept = delete;
 
 			/**
@@ -145,15 +172,19 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			class Filter::Report Report() const noexcept override;
 
 		private:
+			/**
+			 * @brief Provider-local room-tone signature used by the vote.
+			 */
 			struct Candidate {
-				double rmsDb = 0.0;
-				double crest = 0.0;
-				double zcr = 0.0;
-				double hp = 0.0;
+				double rmsDb = 0.0;	///< Window RMS in dB
+				double crest = 0.0;	///< Peak-to-RMS ratio
+				double zcr = 0.0;	///< Zero-crossing ratio
+				double hp = 0.0;		///< High-pass energy ratio
 			};
 
 			/**
 			 * @brief Mixes @p src into the measure window and emits candidates.
+			 * @param src Borrowed source frame, valid throughout this call.
 			 */
 			void Ingest(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
 
@@ -169,20 +200,29 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			/**
 			 * @brief @c afftdn=nr=:nf= chain for the winner.
+			 * @return Base-owned filter chain for the voted floor.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_nrIn;
-			std::vector<float> m_acc;
-			std::vector<Candidate> m_cand;
-			int m_rate;
-			int m_win;
-			unsigned m_frames;
-			bool m_voted;
-			bool m_skip;
-			double m_nf;
-			double m_nr;
-			int m_matches;
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;
+			Safe::Optional<double> m_nrIn;	///< Caller noise reduction, or empty
+			std::vector<float> m_acc;		///< Provider-local measurement samples
+			std::vector<Candidate> m_cand;	///< Provider-local candidate signatures
+			int m_rate;						///< Latched sample rate
+			int m_win;						///< Measurement window size
+			unsigned m_frames;				///< Measured audio frame count
+			bool m_voted;					///< Vote has completed
+			bool m_skip;						///< Uncertain floor leaves audio unchanged
+			double m_nf;						///< Voted noise floor in dB
+			double m_nr;						///< Resolved noise reduction in dB
+			int m_matches;					///< Matching room-tone signatures
+
+			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Provider-owned graph
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private STL measurement storage and graph ownership never leave Multimedia;
+ * all allocation, mutation and destruction execute in its out-of-line methods.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Denoise);

@@ -40,6 +40,7 @@
 
 #include <StormByte/logger/log.hxx>
 #include <StormByte/logger/manipulators.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <mutex>
 #include <string>
@@ -50,7 +51,7 @@ namespace StormByte::Multimedia {
 	namespace {
 		std::once_flag g_moduleOnce;
 		std::mutex g_moduleMutex;
-		std::shared_ptr<StormByte::Logger::Log> g_module;
+		StormByte::Safe::Shared<StormByte::Logger::Log> g_module;
 
 		void ConfigureModule(StormByte::Logger::Log& mm) {
 			mm.Format("[%L] %T %c");
@@ -68,8 +69,8 @@ namespace StormByte::Multimedia {
 			// mm.Throttle(StormByte::Logger::Level::Notice, 4.0, 8);
 		}
 
-		std::shared_ptr<StormByte::Logger::Log> ModuleRoot(
-			std::shared_ptr<StormByte::Logger::Log> log) {
+		StormByte::Safe::Shared<StormByte::Logger::Log> ModuleRoot(
+			StormByte::Safe::Shared<StormByte::Logger::Log> log) {
 			std::lock_guard<std::mutex> lock(g_moduleMutex);
 			if (!g_module)
 				g_module = log->Scope("StormByte/Multimedia");
@@ -77,8 +78,8 @@ namespace StormByte::Multimedia {
 		}
 	}
 
-	std::shared_ptr<StormByte::Logger::Log> UseLog(
-		std::shared_ptr<StormByte::Logger::Log> log, std::string_view leaf) noexcept {
+	StormByte::Safe::Shared<StormByte::Logger::Log> UseLog(
+		StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view leaf) noexcept {
 		if (!log)
 			return {};
 		auto mm = ModuleRoot(std::move(log));

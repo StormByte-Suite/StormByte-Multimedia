@@ -97,13 +97,14 @@ namespace {
 	}
 
 	enum Type KindOf(FFmpeg::AVFormatContext& ctx, int index) noexcept {
-		for (const auto& stream : ctx.Streams()) {
+		const auto streams = ctx.Streams();
+		for (const auto& stream : streams) {
 			if (stream.Index() != index)
 				continue;
 			const auto mapped = FFmpeg::MapProperties(stream);
-			if (std::holds_alternative<Property::Video>(mapped))
+			if (mapped.first)
 				return Multimedia::Type::Video;
-			if (std::holds_alternative<Property::Audio>(mapped))
+			if (mapped.second)
 				return Multimedia::Type::Audio;
 			return Multimedia::Type::Subtitle;
 		}
@@ -210,11 +211,16 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 		}
 	}
 
-	for (const auto& stream : m_ctx->format->Streams())
+	const auto streams = m_ctx->format->Streams();
+	for (const auto& stream : streams)
 		m_ctx->timeBase[stream.Index()] = stream.TimeBase();
 
-	if (*m_ctx->format)
-		m_ctx->format->DiscardUnwanted(m_ctx->wanted);
+	if (*m_ctx->format) {
+		StormByte::Safe::Vector<int> wanted;
+		for (const int index : m_ctx->wanted)
+			wanted.push_back(index);
+		m_ctx->format->DiscardUnwanted(wanted);
+	}
 
 	return true;
 }
@@ -265,7 +271,8 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 		}
 
 		auto holder = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Packet>();
-		for (const auto& stream : m_ctx->format->Streams()) {
+		const auto streams = m_ctx->format->Streams();
+		for (const auto& stream : streams) {
 			if (stream.Index() != index)
 				continue;
 			holder->Parameters(stream.CodecParameters());
@@ -315,7 +322,8 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 	std::optional<Stream::Properties> mapped;
 	FFmpeg::AVRational timeBase{0, 1};
 	bool found = false;
-	for (const auto& stream : m_ctx->format->Streams()) {
+	const auto streams = m_ctx->format->Streams();
+	for (const auto& stream : streams) {
 		if (stream.Index() != decoder.Index())
 			continue;
 		params = stream.CodecParameters();
@@ -338,16 +346,16 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 		return {};
 	}
 
-	if (mapped.has_value() && std::holds_alternative<Property::Video>(*mapped)) {
+	if (mapped.has_value() && mapped->first) {
 		return std::make_unique<Detail::Decoder::Video>(
 			std::move(opened.value()), timeBase,
-			std::get<Property::Video>(std::move(*mapped)));
+			*mapped->first);
 	}
 
-	if (mapped.has_value() && std::holds_alternative<Property::Audio>(*mapped)) {
+	if (mapped.has_value() && mapped->second) {
 		return std::make_unique<Detail::Decoder::Audio>(
 			std::move(opened.value()), timeBase,
-			std::get<Property::Audio>(std::move(*mapped)));
+			*mapped->second);
 	}
 
 	return std::make_unique<Detail::Decoder::Subtitle>(
@@ -360,7 +368,8 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::CloneStream(
 	timeBase = FFmpeg::AVRational{0, 1};
 	if (!m_ctx || !m_ctx->format)
 		return false;
-	for (const auto& stream : m_ctx->format->Streams()) {
+	const auto streams = m_ctx->format->Streams();
+	for (const auto& stream : streams) {
 		if (stream.Index() != index)
 			continue;
 		auto wrapped = stream.CodecParameters();

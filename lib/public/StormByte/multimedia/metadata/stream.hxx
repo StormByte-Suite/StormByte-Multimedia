@@ -40,12 +40,21 @@
 
 #include <StormByte/bitmask.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <optional>
-#include <string>
 
-namespace StormByte::Multimedia {
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia processing and metadata.
+	 */
+	namespace Multimedia {
 	/**
 	 * @class File
 	 * @brief Public media file snapshot.
@@ -57,21 +66,24 @@ namespace StormByte::Multimedia {
 	 * @brief Public media stream snapshot.
 	 */
 	class Stream;
-}
 
-namespace StormByte::Multimedia::Detail {
+	/**
+	 * @namespace StormByte::Multimedia::Detail
+	 * @brief Private multimedia implementation helpers.
+	 */
+	namespace Detail {
 	/**
 	 * @class Probe
 	 * @brief Private metadata probe.
 	 */
 	class Probe;
-}
+	}
 
 /**
  * @namespace StormByte::Multimedia::Metadata
  * @brief Snapshot metadata for files and streams.
  */
-namespace StormByte::Multimedia::Metadata {
+	namespace Metadata {
 	/**
 	 * @class Stream
 	 * @brief Per-stream tags and header fields captured at Open.
@@ -83,17 +95,60 @@ namespace StormByte::Multimedia::Metadata {
 	 * @brief Per-stream disposition bits (FFmpeg AV_DISPOSITION_* subset).
 	 */
 	enum class STORMBYTE_MULTIMEDIA_PUBLIC DispositionFlag: std::uint16_t {
-		None				= 0,		///< No flags
-		Default				= 1 << 0,	///< Default playback stream
-		Dub					= 1 << 1,	///< Dubbed audio
-		Original			= 1 << 2,	///< Original language
-		Comment				= 1 << 3,	///< Commentary
-		Lyrics				= 1 << 4,	///< Lyrics
-		Karaoke				= 1 << 5,	///< Karaoke
-		Forced				= 1 << 6,	///< Forced (e.g. foreign subs)
-		HearingImpaired		= 1 << 7,	///< Hearing impaired
-		VisualImpaired		= 1 << 8,	///< Visual impaired
-		AttachedPicture		= 1 << 9	///< Cover / attached pic
+		/**
+		 * @brief No flags.
+		 */
+		None = 0,
+
+		/**
+		 * @brief Default playback stream.
+		 */
+		Default = 1 << 0,
+
+		/**
+		 * @brief Dubbed audio.
+		 */
+		Dub = 1 << 1,
+
+		/**
+		 * @brief Original language.
+		 */
+		Original = 1 << 2,
+
+		/**
+		 * @brief Commentary.
+		 */
+		Comment = 1 << 3,
+
+		/**
+		 * @brief Lyrics.
+		 */
+		Lyrics = 1 << 4,
+
+		/**
+		 * @brief Karaoke.
+		 */
+		Karaoke = 1 << 5,
+
+		/**
+		 * @brief Forced subtitles.
+		 */
+		Forced = 1 << 6,
+
+		/**
+		 * @brief Hearing-impaired content.
+		 */
+		HearingImpaired = 1 << 7,
+
+		/**
+		 * @brief Visually impaired content.
+		 */
+		VisualImpaired = 1 << 8,
+
+		/**
+		 * @brief Cover or attached picture.
+		 */
+		AttachedPicture = 1 << 9
 	};
 
 	/**
@@ -106,32 +161,32 @@ namespace StormByte::Multimedia::Metadata {
 			 * @brief Copy constructor.
 			 * @param disposition Source mask.
 			 */
-			constexpr Disposition(const Disposition& disposition) noexcept = default;
+			Disposition(const Disposition& disposition) noexcept;
 
 			/**
 			 * @brief Move constructor.
 			 * @param disposition Source mask.
 			 */
-			constexpr Disposition(Disposition&& disposition) noexcept = default;
+			Disposition(Disposition&& disposition) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			constexpr ~Disposition() noexcept = default;
+			~Disposition() noexcept override;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param disposition Source mask.
 			 * @return *this.
 			 */
-			constexpr Disposition& operator=(const Disposition& disposition) noexcept = default;
+			Disposition& operator=(const Disposition& disposition) noexcept;
 
 			/**
 			 * @brief Move assignment.
 			 * @param disposition Source mask.
 			 * @return *this.
 			 */
-			constexpr Disposition& operator=(Disposition&& disposition) noexcept = default;
+			Disposition& operator=(Disposition&& disposition) noexcept;
 
 		private:
 			friend class Stream;
@@ -142,16 +197,35 @@ namespace StormByte::Multimedia::Metadata {
 			/**
 			 * @brief Empty mask.
 			 */
-			constexpr Disposition() noexcept
-			: StormByte::Bitmask<Disposition, DispositionFlag>() {}
+			Disposition() noexcept;
 
 			/**
 			 * @brief Mask from a single flag.
 			 * @param flag Initial flag.
 			 */
-			constexpr Disposition(DispositionFlag flag) noexcept
-			: StormByte::Bitmask<Disposition, DispositionFlag>(flag) {}
+			Disposition(DispositionFlag flag) noexcept;
 	};
+	}
+	}
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Metadata::Disposition);
+
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia processing and metadata.
+	 */
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Metadata
+		 * @brief Snapshot metadata for files and streams.
+		 */
+		namespace Metadata {
 
 	/**
 	 * @class Stream
@@ -161,48 +235,52 @@ namespace StormByte::Multimedia::Metadata {
 		public:
 			/**
 			 * @brief Copy constructor.
+			 * @param other Metadata to copy.
 			 */
-			Stream(const Stream&) = default;
+			Stream(const Stream& other);
 
 			/**
 			 * @brief Move constructor.
+			 * @param other Metadata to transfer.
 			 */
-			Stream(Stream&&) noexcept = default;
+			Stream(Stream&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~Stream() = default;
+			~Stream() noexcept;
 
 			/**
 			 * @brief Copy assignment.
+			 * @param other Metadata to copy.
 			 * @return *this.
 			 */
-			Stream& operator=(const Stream&) = default;
+			Stream& operator=(const Stream& other);
 
 			/**
 			 * @brief Move assignment.
+			 * @param other Metadata to transfer.
 			 * @return *this.
 			 */
-			Stream& operator=(Stream&&) noexcept = default;
+			Stream& operator=(Stream&& other) noexcept;
 
 			/**
 			 * @brief Stream title.
 			 * @return Title, or empty.
 			 */
-			const std::optional<std::string>& Title() const noexcept;
+			const Safe::Optional<Safe::String>& Title() const noexcept;
 
 			/**
 			 * @brief Language code (usually ISO 639).
 			 * @return Language, or empty.
 			 */
-			const std::optional<std::string>& Language() const noexcept;
+			const Safe::Optional<Safe::String>& Language() const noexcept;
 
 			/**
 			 * @brief Stream bitrate in bits per second.
 			 * @return Bitrate, or empty.
 			 */
-			std::optional<std::uint64_t> BitRate() const noexcept;
+			Safe::Optional<std::uint64_t> BitRate() const;
 
 			/**
 			 * @brief Disposition flags.
@@ -215,33 +293,36 @@ namespace StormByte::Multimedia::Metadata {
 			friend class StormByte::Multimedia::Stream;
 			friend class StormByte::Multimedia::Detail::Probe;
 
-			std::optional<std::string> m_title;		///< title
-			std::optional<std::string> m_language;		///< language
-			std::optional<std::uint64_t> m_bitRate;		///< bit_rate
-			class Disposition m_disposition;		///< disposition
+			Safe::Optional<Safe::String> m_title;		///< Stream title.
+
+			Safe::Optional<Safe::String> m_language;	///< Language code.
+
+			Safe::Optional<std::uint64_t> m_bitRate;	///< Bitrate in bits per second.
+
+			class Disposition m_disposition;			///< Disposition flags.
 
 			/**
 			 * @brief Empty metadata.
 			 */
-			Stream() noexcept = default;
+			Stream();
 
 			/**
 			 * @brief Sets the stream title.
 			 * @param title Title tag.
 			 */
-			void Title(std::string title) noexcept;
+			void Title(Safe::String title);
 
 			/**
 			 * @brief Sets the language.
 			 * @param language Language tag.
 			 */
-			void Language(std::string language) noexcept;
+			void Language(Safe::String language);
 
 			/**
 			 * @brief Sets the stream bitrate.
 			 * @param bitRate Bits per second.
 			 */
-			void BitRate(std::uint64_t bitRate) noexcept;
+			void BitRate(std::uint64_t bitRate);
 
 			/**
 			 * @brief Sets the disposition mask.
@@ -249,4 +330,8 @@ namespace StormByte::Multimedia::Metadata {
 			 */
 			void Disposition(class Disposition disposition) noexcept;
 	};
+		}
+	}
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Metadata::Stream);

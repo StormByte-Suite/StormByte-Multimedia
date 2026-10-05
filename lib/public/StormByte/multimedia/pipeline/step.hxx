@@ -45,13 +45,11 @@
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
-#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
-#include <memory>
-#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -107,6 +105,12 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ref Filters can attach analytics without changing the items
 	 * delivered to the next processing stage.
 	 *
+	 * @par DLL boundary
+	 * Backend storage and synchronization are created and released by Multimedia.
+	 * Retained owners use Safe storage. Compatible C++ ABI and loaded Base,
+	 * Multimedia and derived-class providers are required through destruction.
+	 * Derived classes must preserve these ownership and lifetime guarantees.
+	 *
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Step {
@@ -117,6 +121,7 @@ namespace StormByte::Multimedia::Pipeline {
 		friend class Filters;
 		friend Decoder& operator>>(Demuxer& demuxer, Decoder& decoder) noexcept;
 		friend Demuxer& operator>>(class Plan&& plan, Demuxer& demuxer) noexcept;
+		friend Demuxer& operator>>(StormByte::Safe::Shared<class Plan> plan, Demuxer& demuxer) noexcept;
 		friend Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
 		friend Muxer& operator>>(Demuxer& demuxer, Muxer& muxer) noexcept;
 		friend Remuxer& operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept;
@@ -150,10 +155,9 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 			/**
-			 * @brief Consumer condition variable.
-			 * @return The single CV of this step.
+			 * @brief Notifies all waiters of this step.
 			 */
-			std::condition_variable& Wake() noexcept;
+			void Wake() noexcept;
 
 			/**
 			 * @}
@@ -168,7 +172,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Bound job intention, if any.
 			 * @return Shared Plan, or empty.
 			 */
-			inline const std::shared_ptr<class Plan>& Plan() const noexcept {
+			inline const StormByte::Safe::Shared<class Plan>& Plan() const noexcept {
 				return m_plan;
 			}
 
@@ -207,7 +211,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Shared stage counters, retained independently of this Step.
 			 * @return Const metrics handle identifying this stage.
 			 */
-			std::shared_ptr<const StageTelemetry> Telemetry() const noexcept;
+			StormByte::Safe::Shared<const StageTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief Whether this step can take work.
@@ -254,7 +258,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Failure text.
 			 * @return Message, or empty.
 			 */
-			const std::optional<std::string>& Error() const noexcept;
+			const StormByte::Safe::Optional<StormByte::Safe::String>& Error() const noexcept;
 
 			/**
 			 * @brief Marks the stage as failed and notifies connected stages.
@@ -264,7 +268,15 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * @param reason Message.
 			 */
-			void Fail(std::string reason) noexcept;
+			void Fail(StormByte::Safe::String reason) noexcept;
+
+			/**
+			 * @brief Copies borrowed failure text before calling the DLL-safe overload.
+			 * @param reason Borrowed message, used only during this call.
+			 */
+			STORMBYTE_FORCE_INLINE void Fail(std::string_view reason) noexcept {
+				Fail(StormByte::Safe::String(reason));
+			}
 
 			/**
 			 * @}
@@ -279,14 +291,14 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Constructs a stage in State::Created.
-			 * @param log Shared logger. Prefer @c StormByte::Logger::ThreadedLog
+			 * @param log Base-heap shared logger. Prefer @c StormByte::Logger::ThreadedLog
 			 *        when several workers write. A plain @c Log is accepted
 			 *        for single-thread use. Empty pointer means no log.
 			 * @param name Stage name for log scope and default @ref Label.
 			 * @param receives Kinds this step consumes.
 			 * @param produces Kinds this step emits.
 			 */
-			Step(std::shared_ptr<StormByte::Logger::Log> log,
+			Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				enum Producer name,
 				Kinds receives, Kinds produces) noexcept;
 
@@ -376,7 +388,7 @@ namespace StormByte::Multimedia::Pipeline {
 					Join& operator=(Join&&) noexcept = delete;
 
 				private:
-					Step& m_step;
+					Step& m_step;	///< Borrowed stage that must outlive this guard; halted when the guard is destroyed.
 			};
 
 			/**
@@ -416,11 +428,13 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param pumper Source, Through or Sink. Must not be empty.
 			 * @param worker Stage body. Must not be empty.
 			 *
+			 * Construct both owners with @c StormByte::Safe::Heap::MakeUnique.
+			 * Their storage is released on Base's heap after execution stops.
 			 * No-op if a pumper is already mounted. Does not Launch.
 			 * @endinternal
 			 */
-			void Mount(std::unique_ptr<Backend::Pipeline::Pumper> pumper,
-				std::unique_ptr<Backend::Pipeline::Worker> worker) noexcept;
+			void Mount(StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper,
+				StormByte::Safe::Unique<Backend::Pipeline::Worker> worker) noexcept;
 
 			/**
 			 * @}
@@ -436,7 +450,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return @ref Producer name (`Encoder`) unless a leaf overrides
 			 *         it (`Encoder(libx265)`).
 			 */
-			virtual std::string Label() const noexcept;
+			virtual StormByte::Safe::String Label() const noexcept;
 
 			/**
 			 * @brief Writes one log line on the scoped module logger.
@@ -454,14 +468,18 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @}
 			 */
 
-			std::shared_ptr<StormByte::Logger::Log> m_log;		///< Scoped module logger (ThreadedLog preferred)
+			StormByte::Safe::Shared<StormByte::Logger::Log> m_log;	///< Scoped logger retained through Base-heap shared ownership
 			enum Producer m_name;								///< UseLog leaf / default Label
 			Kinds m_receives;									///< Receives
 			Kinds m_produces;									///< Produces
 
 		private:
-			std::condition_variable m_wake;						///< Single consumer CV
-			std::unique_ptr<Backend::Pipeline::Pipe> m_pipe;	///< In / out hoppers
+			/**
+			 * @brief Provider-local backend ownership and synchronization.
+			 */
+			class PrivateState;
+
+			PrivateState* m_state;								///< Provider-owned backend state
 
 		protected:
 			/**
@@ -481,6 +499,9 @@ namespace StormByte::Multimedia::Pipeline {
 			const Backend::Pipeline::Pipe& pipe() const noexcept;
 
 		private:
+			/**
+			 * @brief Provider-local Host adapter for the mounted worker.
+			 */
 			class Surface;
 
 			/**
@@ -488,12 +509,9 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			void CloseHoppers() noexcept;
 
-			std::unique_ptr<Surface> m_surface;						///< Host for Pumper and Worker
-			std::unique_ptr<Backend::Pipeline::Pumper> m_pumper;	///< Thread and State
-			std::shared_ptr<class Plan> m_plan;						///< Current plan
-			std::mutex m_wait;										///< Mutex for m_wake
-			std::optional<std::string> m_error;						///< Fail message
-			std::shared_ptr<StageTelemetry> m_telemetry;				///< Counters retained by telemetry snapshots
+			StormByte::Safe::Shared<class Plan> m_plan;				///< Current plan retained through Base-heap shared ownership
+			StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< Fail message
+			StormByte::Safe::Shared<StageTelemetry> m_telemetry;		///< Counters retained by telemetry snapshots
 			bool m_exhausted;										///< Source Ended()
 			std::uint64_t m_workN;									///< Timed Process calls
 			std::int64_t m_workMin;									///< Fastest Process, us
@@ -501,3 +519,5 @@ namespace StormByte::Multimedia::Pipeline {
 			std::int64_t m_lastWork;								///< Last Process, us
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Step);

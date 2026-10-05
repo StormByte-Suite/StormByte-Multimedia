@@ -45,12 +45,12 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/property/video.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <cstdint>
 #include <memory>
-#include <optional>
-#include <string>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -69,6 +69,9 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * Copies and @ref Clone share media buffers rather than duplicating
 	 * pixels or samples.
+	 * Metadata accessors borrow their wrappers until this frame is modified or
+	 * destroyed. Safe optional arrow access returns a read-only snapshot for the
+	 * current full expression, not a stable pointer into the frame.
 	 *
 	 * @see Item
 	 * @see Packet
@@ -84,6 +87,9 @@ namespace StormByte::Multimedia::Pipeline {
 		friend Frame& operator>>(Frame& frame, Encoder& encoder) noexcept;
 
 		public:
+			/**
+			 * @brief Base-heap shared owner of a frame; keep its providers loaded.
+			 */
 			using PointerType = StormByte::Safe::Shared<Frame>;
 
 			/**
@@ -96,8 +102,9 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * @ref Item::Type is @ref StormByte::Multimedia::Type::Unknown.
 			 * @ref Item::Track is -1. @ref Item::Kind is @ref Kind::Frame.
+			 * @throws StormByte::Exception If safe metadata storage cannot be allocated.
 			 */
-			Frame() noexcept;
+			Frame();
 
 			/**
 			 * @brief Builds a frame from supplied media bytes and properties.
@@ -115,16 +122,17 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * @ref Dts starts empty. @ref Decoder stamps it from the
 			 * packet that produced this frame. There is no public setter.
+			 * @throws StormByte::Exception If safe metadata storage cannot be allocated.
 			 */
 			Frame(int track, enum StormByte::Multimedia::Type type, enum Producer producer,
 				StormByte::Buffer::FIFO payload,
-				std::optional<Property::Duration> pts,
-				std::optional<Property::Duration> duration,
-				std::optional<Property::Video> video,
-				std::vector<class SideData> attachments,
-				std::optional<Property::Audio> audio,
+				StormByte::Safe::Optional<Property::Duration> pts,
+				StormByte::Safe::Optional<Property::Duration> duration,
+				StormByte::Safe::Optional<Property::Video> video,
+				StormByte::Safe::Vector<class SideData> attachments,
+				StormByte::Safe::Optional<Property::Audio> audio,
 				std::uint64_t serial,
-				std::uint64_t part) noexcept;
+				std::uint64_t part);
 
 			/**
 			 * @brief Copy. Metadata and FIFO handle are copied; the
@@ -134,8 +142,10 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Not a deep copy of planes. @ref Clone uses this
 			 * constructor. @ref Filter::FFmpeg::Save still emits a
 			 * new frame when a filter paints.
+			 * @throws StormByte::Exception If safe metadata storage cannot be copied.
+			 * @throws std::bad_alloc If the private backend holder cannot be allocated.
 			 */
-			Frame(const Frame& other) noexcept;
+			Frame(const Frame& other);
 
 			/**
 			 * @brief Move constructor.
@@ -156,8 +166,11 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Copy assignment. Same as the copy constructor.
 			 * @param other Source frame.
 			 * @return *this.
+			 * @note The destination is unchanged if copying fails.
+			 * @throws StormByte::Exception If safe metadata storage cannot be copied.
+			 * @throws std::bad_alloc If the private backend holder cannot be allocated.
 			 */
-			Frame& operator=(const Frame& other) noexcept;
+			Frame& operator=(const Frame& other);
 
 			/**
 			 * @brief Move assignment.
@@ -181,7 +194,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Presentation timestamp on the stream clock.
 			 * @return Pts, or empty.
 			 */
-			inline const std::optional<Property::Duration>& Pts() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Duration>& Pts() const noexcept {
 				return m_pts;
 			}
 
@@ -195,7 +208,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * @return Dts, or empty.
 			 */
-			inline const std::optional<Property::Duration>& Dts() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Duration>& Dts() const noexcept {
 				return m_dts;
 			}
 
@@ -203,7 +216,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Frame duration on the stream clock.
 			 * @return Duration, or empty.
 			 */
-			inline const std::optional<Property::Duration>& Duration() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Duration>& Duration() const noexcept {
 				return m_duration;
 			}
 
@@ -211,7 +224,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Stream language tag copied from File metadata.
 			 * @return Language, or empty if the stream had none.
 			 */
-			inline const std::optional<std::string>& Language() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Language() const noexcept {
 				return m_language;
 			}
 
@@ -219,7 +232,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Stream title tag copied from File metadata.
 			 * @return Title, or empty if the stream had none.
 			 */
-			inline const std::optional<std::string>& Title() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Title() const noexcept {
 				return m_title;
 			}
 
@@ -241,7 +254,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * travels Demuxer → … → Muxer. Downstream stages copy it.
 			 * @ref Part distinguishes several frames born from the same serial.
 			 */
-			inline const std::optional<std::uint64_t>& Serial() const noexcept {
+			inline const StormByte::Safe::Optional<std::uint64_t>& Serial() const noexcept {
 				return m_serial;
 			}
 
@@ -268,7 +281,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Video properties (includes HDR10 when set).
 			 * @return Video, or empty.
 			 */
-			inline const std::optional<Property::Video>& Video() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Video>& Video() const noexcept {
 				return m_video;
 			}
 
@@ -276,7 +289,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Audio properties (layout, rate, channels).
 			 * @return Audio, or empty.
 			 */
-			inline const std::optional<Property::Audio>& Audio() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Audio>& Audio() const noexcept {
 				return m_audio;
 			}
 
@@ -285,7 +298,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Blobs. MDM/CLL also appear in @ref Video() HDR10
 			 *         when the decoder could map them.
 			 */
-			inline const std::vector<class SideData>& Attachments() const noexcept {
+			inline const StormByte::Safe::Vector<class SideData>& Attachments() const noexcept {
 				return m_attachments;
 			}
 
@@ -331,6 +344,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * Used by move construction and move assignment so a
 			 * relocated @c Frame in a container is always valid.
+			 * @pre All owning wrappers have already been moved to the destination.
+			 * Their moved-from state is empty; no allocating clear/reset is performed.
 			 */
 			void BecomeEmpty() noexcept;
 
@@ -352,17 +367,41 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			Item::PointerType Move() override;
 
-			StormByte::Buffer::FIFO m_payload;							///< Sample / subtitle bytes
-			std::optional<Property::Duration> m_pts;					///< Presentation timestamp
-			std::optional<Property::Duration> m_dts;					///< Decode timestamp from the source packet
-			std::optional<Property::Duration> m_duration;				///< Frame duration
-			std::optional<Property::Video> m_video;						///< Video properties
-			std::optional<Property::Audio> m_audio;						///< Audio properties
-			std::optional<std::string> m_language;						///< Stream language tag
-			std::optional<std::string> m_title;							///< Stream title tag
-			std::vector<class SideData> m_attachments;					///< Raw side data
-			std::optional<std::uint64_t> m_serial;						///< Lineage id born at demux
-			std::uint64_t m_part;										///< Sub-id inside serial
-			std::unique_ptr<Backend::Pipeline::Frame> m_backend;		///< Backend holder
+			StormByte::Buffer::FIFO m_payload;				///< Buffer-owned materialized sample or subtitle bytes.
+
+			StormByte::Safe::Optional<Property::Duration> m_pts;		///< Presentation timestamp in Base-owned optional storage.
+
+			StormByte::Safe::Optional<Property::Duration> m_dts;		///< Decode timestamp copied from the source packet.
+
+			StormByte::Safe::Optional<Property::Duration> m_duration;	///< Optional frame duration.
+
+			StormByte::Safe::Optional<Property::Video> m_video;		///< Optional provider-owned video properties.
+
+			StormByte::Safe::Optional<Property::Audio> m_audio;		///< Optional provider-owned audio properties.
+
+			StormByte::Safe::Optional<StormByte::Safe::String> m_language;	///< Optional Base-owned stream language tag.
+
+			StormByte::Safe::Optional<StormByte::Safe::String> m_title;	///< Optional Base-owned stream title tag.
+
+			StormByte::Safe::Vector<class SideData> m_attachments;		///< Opaque safe sequence of independently copied side-data blobs.
+
+			StormByte::Safe::Optional<std::uint64_t> m_serial;		///< Lineage identifier, empty on the sentinel.
+
+			std::uint64_t m_part;						///< Sub-identifier within the lineage, zero on the sentinel.
+
+			std::unique_ptr<Backend::Pipeline::Frame> m_backend;		///< Multimedia-private holder, allocated and destroyed only by its provider.
+											///<
+											///< Never exposed to consumers. All operations affecting this STL owner are
+											///< exported out-of-line; compatible class layout is still required.
 	};
 }
+
+/**
+ * @brief Registers the completed frame under Multimedia's conditional ABI contract.
+ *
+ * Metadata uses Base-owned Safe wrappers, payload uses Buffer, and the private
+ * backend is managed by exported Multimedia lifetime operations. Compatible
+ * compiler and runtime ABIs are required; providers must outlive all frames and
+ * callback-backed wrappers. This is not a certification of external subclasses.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Frame);

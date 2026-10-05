@@ -39,9 +39,8 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
-
-#include <map>
-#include <string>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/string.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter
@@ -56,6 +55,9 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 * @c Transcode::OnReport and @c Transcode::ExtraData, not here.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::FFmpeg
+	 * @note Requires a compatible C++ ABI. Base owns payload storage; all
+	 * participating providers must remain loaded through destruction of reports,
+	 * copied payloads and borrowed views. Special members execute in Multimedia.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Report {
 		public:
@@ -64,53 +66,62 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief Whether this node produced usable data.
 			 */
 			enum class Status {
-				None,		///< Filter does not report
-				Ok,		///< Data() is usable
-				Failed		///< Measurement could not be taken
+				/**
+				 * @brief Filter does not report.
+				 */
+				None,
+				/**
+				 * @brief Data() is usable.
+				 */
+				Ok,
+				/**
+				 * @brief Measurement could not be taken.
+				 */
+				Failed
 			};
 
 			/**
 			 * @brief Empty report (`None`).
 			 */
-			Report() noexcept;
+			Report();
 
 			/**
 			 * @brief Report with a status and a dictionary.
 			 * @param status Measurement result.
 			 * @param data Key/value payload (owned).
 			 */
-			Report(Status status, std::map<std::string, std::string> data) noexcept;
+			Report(Status status, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data) noexcept;
 
 			/**
 			 * @brief Copy constructor.
 			 * @param other Source report.
 			 */
-			Report(const Report& other) noexcept = default;
+			Report(const Report& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Source report.
 			 */
-			Report(Report&& other) noexcept = default;
+			Report(Report&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~Report() noexcept = default;
+			~Report() noexcept;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source report.
 			 * @return *this.
 			 */
-			Report& operator=(const Report& other) noexcept = default;
+			Report& operator=(const Report& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Source report.
 			 * @return *this.
 			 */
-			Report& operator=(Report&& other) noexcept = default;
+			Report& operator=(Report&& other) noexcept;
 
 			/**
 			 * @brief Measurement status.
@@ -120,18 +131,23 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 
 			/**
 			 * @brief Dictionary payload.
-			 * @return Owned key/value map (may be empty).
+			 * @return Borrowed key/value map, valid until report mutation or destruction.
 			 */
-			const std::map<std::string, std::string>& Data() const noexcept;
+			const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& Data() const noexcept;
 
 			/**
 			 * @brief Single callable dump of status plus data.
 			 * @return Human-readable snapshot.
 			 */
-			std::string operator()() const noexcept;
+			StormByte::Safe::String operator()() const;
 
 		private:
-			Status m_status;					///< Measurement status
-			std::map<std::string, std::string> m_data;	///< Payload
+			Status m_status;											///< Measurement status
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> m_data;	///< Base-owned payload with creator-dispatched node lifetime
 	};
 }
+
+/**
+ * @brief Report requires compatible C++ ABI and loaded Multimedia and Base modules.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Report);

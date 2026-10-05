@@ -57,7 +57,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 * @return Track, or `nullptr`.
 	 */
 	inline const Multimedia::Pipeline::Track* TrackByIn(
-		const std::shared_ptr<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept {
+		const StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept {
 		if (!plan)
 			return nullptr;
 		for (const auto& held : plan->Tracks()) {
@@ -98,7 +98,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 *
 			 * Terminates if @p plan is empty or has no tracks.
 			 */
-			Ceiling(std::shared_ptr<const Multimedia::Pipeline::Plan> plan,
+			Ceiling(StormByte::Safe::Shared<const Multimedia::Pipeline::Plan> plan,
 				Multimedia::Pipeline::Producer producer,
 				const Multimedia::Pipeline::Track& track) noexcept;
 

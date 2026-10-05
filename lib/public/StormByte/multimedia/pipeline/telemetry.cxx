@@ -42,6 +42,8 @@
 #include <charconv>
 #include <format>
 #include <limits>
+#include <optional>
+#include <string>
 #include <utility>
 
 #if defined(_WIN32)
@@ -139,8 +141,8 @@ namespace {
 		}
 	}
 
-	std::string OptionalBytes(const std::optional<std::uint64_t>& value) {
-		return value ? std::format("{} B", *value) : "unavailable";
+	std::string OptionalBytes(const StormByte::Safe::Optional<std::uint64_t>& value) {
+		return value ? std::format("{} B", value.value()) : "unavailable";
 	}
 }
 
@@ -160,6 +162,8 @@ StageTelemetry::StageTelemetry() noexcept
 	m_started_ns(0),
 	m_finished_ns(0),
 	m_state(State::Created) {}
+
+StageTelemetry::~StageTelemetry() noexcept = default;
 
 void StageTelemetry::SetOrigin(std::string_view origin) const noexcept {
 	std::lock_guard lock(m_origin_lock);
@@ -208,7 +212,7 @@ void StageTelemetry::SetState(State state) noexcept {
 	m_state.store(state, std::memory_order_release);
 }
 
-void StageTelemetry::SetError(std::string reason) noexcept {
+void StageTelemetry::SetError(StormByte::Safe::String reason) noexcept {
 	std::lock_guard lock(m_error_lock);
 	m_error = std::move(reason);
 	SetState(State::Failed);
@@ -293,7 +297,7 @@ State StageTelemetry::Status() const noexcept {
 	return m_state.load(std::memory_order_acquire);
 }
 
-std::optional<std::string> StageTelemetry::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> StageTelemetry::Error() const noexcept {
 	std::lock_guard lock(m_error_lock);
 	return m_error;
 }
@@ -317,7 +321,7 @@ StageTelemetry::operator StormByte::Safe::String() const {
 		OutputFrames(), OutputPackets(), process_total, process_mean,
 		process_min, process_max, WaitCount(), wait_total, wait_max, setup, elapsed);
 	if (error)
-		report += std::format(" error={}", *error);
+		report += std::format(" error={}", static_cast<std::string>(error.value()));
 	return StormByte::Safe::String{std::string_view{report}};
 }
 
@@ -327,8 +331,10 @@ JobTelemetry::JobTelemetry() noexcept
 	m_memory_max(0),
 	m_memory_samples(0) {}
 
-void JobTelemetry::RegisterStage(std::string name,
-	std::shared_ptr<const StageTelemetry> metrics) noexcept {
+JobTelemetry::~JobTelemetry() noexcept = default;
+
+void JobTelemetry::RegisterStage(StormByte::Safe::String name,
+	StormByte::Safe::Shared<const StageTelemetry> metrics) noexcept {
 	if (!metrics)
 		return;
 	std::lock_guard lock(m_stages_lock);
@@ -336,11 +342,11 @@ void JobTelemetry::RegisterStage(std::string name,
 			return stage.Metrics.get() == metrics.get();
 		}) != m_stages.end())
 		return;
-	metrics->SetOrigin(name);
-	m_stages.push_back({std::move(name), std::move(metrics)});
+	metrics->SetOrigin(static_cast<std::string_view>(name));
+	m_stages.push_back(Stage{std::move(name), std::move(metrics)});
 }
 
-std::vector<JobTelemetry::Stage> JobTelemetry::Stages() const noexcept {
+StormByte::Safe::Vector<JobTelemetry::Stage> JobTelemetry::Stages() const noexcept {
 	std::lock_guard lock(m_stages_lock);
 	return m_stages;
 }
@@ -355,25 +361,25 @@ void JobTelemetry::SampleMemory() noexcept {
 	m_memory_samples.fetch_add(1, std::memory_order_relaxed);
 }
 
-std::optional<std::uint64_t> JobTelemetry::MemoryCurrent() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryCurrent() const noexcept {
 	if (MemorySamples() == 0)
 		return std::nullopt;
 	return m_memory_current.load(std::memory_order_relaxed);
 }
 
-std::optional<std::uint64_t> JobTelemetry::MemoryMinimum() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMinimum() const noexcept {
 	if (MemorySamples() == 0)
 		return std::nullopt;
 	return m_memory_min.load(std::memory_order_relaxed);
 }
 
-std::optional<std::uint64_t> JobTelemetry::MemoryMaximum() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMaximum() const noexcept {
 	if (MemorySamples() == 0)
 		return std::nullopt;
 	return m_memory_max.load(std::memory_order_relaxed);
 }
 
-std::optional<std::uint64_t> JobTelemetry::PeakMemory() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::PeakMemory() const noexcept {
 	return MemoryMaximum();
 }
 
@@ -385,9 +391,10 @@ JobTelemetry::operator StormByte::Safe::String() const {
 	std::string report = std::format("process_rss(current={},min={},max={},peak={},samples={})",
 		OptionalBytes(MemoryCurrent()), OptionalBytes(MemoryMinimum()),
 		OptionalBytes(MemoryMaximum()), OptionalBytes(PeakMemory()), MemorySamples());
-	for (const auto& stage: Stages()) {
+	for (const auto& entry: Stages()) {
+		const Stage stage = entry;
 		const std::string metrics = static_cast<std::string>(*stage.Metrics);
-		report += std::format("\n{}: {}", stage.Name, metrics);
+		report += std::format("\n{}: {}", static_cast<std::string>(stage.Name), metrics);
 	}
 	return StormByte::Safe::String{std::string_view{report}};
 }

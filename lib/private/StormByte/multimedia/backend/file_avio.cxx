@@ -84,7 +84,7 @@ namespace StormByte::Multimedia::Backend {
 		return std::holds_alternative<BufferedLocationWriter*>(m_leaf);
 	}
 
-	std::optional<std::size_t> FileAvio::LeafSize() const noexcept {
+	StormByte::Safe::Optional<StormByte::ByteSize> FileAvio::LeafSize() const noexcept {
 		if (auto* reader = std::get_if<BufferedLocationReader*>(&m_leaf); reader && *reader)
 			return (*reader)->Size();
 		if (auto* writer = std::get_if<BufferedLocationWriter*>(&m_leaf); writer && *writer)

@@ -38,10 +38,10 @@
 
 #pragma once
 
-#include <StormByte/safe/clonable.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/clonable.hxx>
 
 #include <cstdint>
 
@@ -107,6 +107,9 @@ namespace StormByte::Multimedia::Pipeline {
 		friend class Step;
 
 		public:
+			/**
+			 * @brief Base-heap owner returned by internal polymorphic cloning.
+			 */
 			using StormByte::Safe::Clonable<Item>::PointerType;
 
 			/**
@@ -211,9 +214,23 @@ namespace StormByte::Multimedia::Pipeline {
 			Item(int track, enum StormByte::Multimedia::Type type, enum Kind kind, enum Producer producer) noexcept
 			: m_track(track), m_type(type), m_kind(kind), m_producer(producer) {}
 
-			int m_track;									///< Origin container stream index
-			enum StormByte::Multimedia::Type m_type;		///< Video / Audio / Subtitle / Unknown
-			enum Kind m_kind;								///< Frame or Packet
-			enum Producer m_producer;						///< Stage that created this unit
+			int m_track;						///< Origin container stream index, or -1 on the sentinel.
+
+			enum StormByte::Multimedia::Type m_type;		///< Media type, or Unknown on the sentinel.
+
+			enum Kind m_kind;					///< Concrete access-unit kind.
+
+			enum Producer m_producer;				///< Stage that created this unit.
 	};
 }
+
+/**
+ * @brief Registers the completed polymorphic interface for Safe pointer ownership.
+ *
+ * Identity fields have no heap ownership. The exported virtual destructor dispatches
+ * to the dynamic provider; concrete implementations remain responsible for their
+ * own members and allocation. Base-heap owners and compatible provider ABIs are
+ * required, and the providers must remain loaded until the last owner is released.
+ * Protected Clonable inheritance keeps cloning an internal pipeline operation.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Item);

@@ -42,9 +42,41 @@
 
 using namespace StormByte::Multimedia::Pipeline::Config;
 
-void Audio::Preset(std::string name) noexcept {
+Audio::Audio(): Base(StormByte::Multimedia::Type::Audio), m_codec(nullptr) {}
+
+Audio::Audio(const Audio& other) = default;
+
+Audio::Audio(Audio&& other) noexcept = default;
+
+Audio::~Audio() noexcept = default;
+
+Audio& Audio::operator=(const Audio& other) = default;
+
+Audio& Audio::operator=(Audio&& other) noexcept = default;
+
+Audio::PointerType Audio::Clone() const {
+	return MakePointer<Audio>(*this);
+}
+
+Audio::PointerType Audio::Move() {
+	return MakePointer<Audio>(std::move(*this));
+}
+
+void Audio::BitRate(std::int64_t bits_per_second) {
+	m_bitRate = bits_per_second;
+}
+
+void Audio::MaxBitRate(std::int64_t bits_per_second) {
+	m_maxBitRate = bits_per_second;
+}
+
+void Audio::Preset(StormByte::Safe::String name) {
 	if (name.empty())
 		m_preset.reset();
 	else
 		m_preset = std::move(name);
+}
+
+void Audio::FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept {
+	m_fineTune = std::move(options);
 }

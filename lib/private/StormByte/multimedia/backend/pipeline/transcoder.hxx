@@ -49,13 +49,9 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <memory>
 #include <mutex>
-#include <optional>
 #include <stop_token>
-#include <string>
 #include <thread>
-#include <utility>
 #include <vector>
 
 /**
@@ -78,7 +74,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Multimedia::Type Kind = StormByte::Multimedia::Type::Unknown;	///< Media kind
 			const StormByte::Multimedia::Codec* Source = nullptr;	///< Origin codec from consultation
 			StormByte::Safe::Unique<StormByte::Multimedia::Pipeline::Config::Base> Config;	///< Track intention
-			std::vector<std::shared_ptr<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Filters;	///< Stretch leaves
+			std::vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Filters;	///< Stretch leaves
 			bool Settled = false;						///< OnSettled already fired
 	};
 
@@ -159,12 +155,12 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			};											///< Public job lifecycle
 			std::atomic<bool> Cancel { false };			///< Cancel requested
 			std::atomic<bool> Paused { false };			///< Coordinator is paused
-			std::shared_ptr<StormByte::Multimedia::Pipeline::Progress> Clock;	///< Demuxer clock
-			std::shared_ptr<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;	///< Retained stage and process metrics
-			std::optional<std::string> Error;			///< Failure text
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Progress> Clock;	///< Demuxer clock
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;	///< Retained stage and process metrics
+			StormByte::Safe::Optional<StormByte::Safe::String> Error;			///< Failure text
 			std::vector<TranscoderSlot> Mapped;			///< Fluent map, mux order
-			std::vector<std::shared_ptr<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Analytics;	///< Global analytics
-			std::vector<std::pair<std::string, StormByte::Multimedia::Pipeline::Filter::Report>> Reports;	///< Snapshots at Done
+			std::vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Analytics;	///< Global analytics
+			StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, StormByte::Multimedia::Pipeline::Filter::Report>> Reports;	///< Snapshots at Done
 
 		private:
 			/**

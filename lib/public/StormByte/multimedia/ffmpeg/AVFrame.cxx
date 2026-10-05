@@ -219,7 +219,7 @@ void FFmpeg::AVFrame::WriteHdr10(const StormByte::Multimedia::Property::HDR10& h
 }
 
 void FFmpeg::AVFrame::WriteSideData(
-	const std::vector<StormByte::Multimedia::Pipeline::SideData>& attachments) noexcept {
+	const StormByte::Safe::Vector<StormByte::Multimedia::Pipeline::SideData>& attachments) noexcept {
 	if (!m_ptr)
 		return;
 

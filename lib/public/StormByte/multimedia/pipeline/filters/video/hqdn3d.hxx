@@ -42,8 +42,8 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -82,6 +82,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref StormByte::Multimedia::FFmpeg::AVFrame.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
+	 * @par Boundary ownership
+	 * Requires a compatible C++ ABI and the Multimedia, Logger and Base providers
+	 * to remain loaded. Own the leaf through Base-heap Safe pointers. Frame
+	 * allocation, mutation and destruction stay in out-of-line provider methods;
+	 * copying and moving the leaf are disabled.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Hqdn3d: public Filter::Process {
 		public:
@@ -94,14 +99,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param chromaTemporal Chroma temporal strength. 0 → 4.5
 			 *        stored as 45 tenths; pass 0 for the default.
 			 */
-			Hqdn3d(std::shared_ptr<StormByte::Logger::Log> log,
+			Hqdn3d(Safe::Shared<StormByte::Logger::Log> log,
 				double lumaSpatial = 0.0, double chromaSpatial = 0.0,
 				double lumaTemporal = 0.0, double chromaTemporal = 0.0) noexcept;
 
+			/**
+			 * @brief Copying the provider-owned leaf is disabled.
+			 * @param other Leaf that cannot be copied.
+			 */
 			Hqdn3d(const Hqdn3d& other) = delete;
+
+			/**
+			 * @brief Moving the mounted leaf is disabled.
+			 * @param other Leaf that cannot be moved.
+			 */
 			Hqdn3d(Hqdn3d&& other) noexcept = delete;
+
+			/**
+			 * @brief Releases the provider-owned temporal frame history.
+			 */
 			~Hqdn3d() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Leaf that cannot be copied.
+			 * @return Assignment is unavailable.
+			 */
 			Hqdn3d& operator=(const Hqdn3d& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Leaf that cannot be moved.
+			 * @return Assignment is unavailable.
+			 */
 			Hqdn3d& operator=(Hqdn3d&& other) noexcept = delete;
 
 			/**
@@ -134,3 +164,5 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			StormByte::Multimedia::FFmpeg::AVFrame m_prev;	///< Last filtered look
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Hqdn3d);

@@ -43,9 +43,10 @@
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -87,6 +88,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref Filter::FFmpeg::Save of the buffersink frame.
 	 *
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @note DLL use requires the same compatible C++ ABI and the parent Safe base.
+	 *       Allocation and destruction remain creator-owned; graph state stays in Multimedia.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Fftdnoiz: public Filter::Process {
 		public:
@@ -97,15 +100,40 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param prev Previous frames in the window. Empty → 1. Clamped to 0..1.
 			 * @param next Future frames in the window. Empty → 1. Clamped to 0..1.
 			 */
-			Fftdnoiz(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> sigma = {},
-				std::optional<unsigned> prev = {},
-				std::optional<unsigned> next = {}) noexcept;
+			Fftdnoiz(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> sigma = {},
+				Safe::Optional<unsigned> prev = {},
+				Safe::Optional<unsigned> next = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is not allowed.
+			 * @param other Source leaf.
+			 */
 			Fftdnoiz(const Fftdnoiz& other) = delete;
+
+			/**
+			 * @brief Move construction is not allowed.
+			 * @param other Source leaf.
+			 */
 			Fftdnoiz(Fftdnoiz&& other) noexcept = delete;
-			~Fftdnoiz() noexcept override = default;
+
+			/**
+			 * @brief Release owned state in the creator module.
+			 */
+			~Fftdnoiz() noexcept override;
+
+			/**
+			 * @brief Copy assignment is not allowed.
+			 * @param other Source leaf.
+			 * @return This leaf.
+			 */
 			Fftdnoiz& operator=(const Fftdnoiz& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed.
+			 * @param other Source leaf.
+			 * @return This leaf.
+			 */
 			Fftdnoiz& operator=(Fftdnoiz&& other) noexcept = delete;
 
 			/**
@@ -140,11 +168,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `format=...,fftdnoiz=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_sigmaIn;	///< Caller sigma, or empty
-			std::optional<unsigned> m_prevIn;	///< Caller prev, or empty
-			std::optional<unsigned> m_nextIn;	///< Caller next, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			Safe::Optional<double> m_sigmaIn;									///< Caller sigma, or empty.
+
+			Safe::Optional<unsigned> m_prevIn;									///< Caller previous-frame count, or empty.
+
+			Safe::Optional<unsigned> m_nextIn;									///< Caller next-frame count, or empty.
+
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph, allocated and destroyed through creator-owned callbacks.
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Fftdnoiz);

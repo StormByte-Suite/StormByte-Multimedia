@@ -41,6 +41,15 @@
 
 using namespace StormByte::Multimedia;
 
+Container::Container(std::string_view name, std::string_view description, std::string_view extension, Access access) noexcept:
+	m_name(name), m_description(description), m_extension(extension), m_access(access) {}
+
+Container::Container(Container&& other) noexcept = default;
+
+Container::~Container() noexcept = default;
+
+Container& Container::operator=(Container&& other) noexcept = default;
+
 bool Container::operator==(const Container& other) const noexcept {
 	return this == &other;
 }
@@ -56,10 +65,13 @@ bool Container::HasAccess(Access access) const noexcept {
 bool Container::Allows(const CodecRefs& codecs) const noexcept {
 	if (codecs.empty())
 		return true;
-	for (const Codec& codec : codecs) {
+	for (const CodecRef codecRef : codecs) {
+		if (!codecRef)
+			return false;
+		const Codec& codec = codecRef.get();
 		bool found = false;
-		for (const Codec& allowed : m_allowed) {
-			if (codec == allowed) {
+		for (const CodecRef allowed : m_allowed) {
+			if (allowed && codec == allowed.get()) {
 				found = true;
 				break;
 			}

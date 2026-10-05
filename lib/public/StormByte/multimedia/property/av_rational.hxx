@@ -39,6 +39,7 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
 
@@ -61,8 +62,9 @@ namespace StormByte::Multimedia::Property {
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC AVRational {
 		public:
-			int num = 0;	///< Numerator (`AVRational.num`)
-			int den = 1;	///< Denominator (`AVRational.den`)
+			int num = 0;	///< Numerator (`AVRational.num`), initialized to zero.
+
+			int den = 1;	///< Denominator (`AVRational.den`), initialized to one.
 
 			/**
 			 * @brief `{0, 1}` — unknown / unset.
@@ -120,3 +122,11 @@ namespace StormByte::Multimedia::Property {
 			}
 	};
 }
+
+/**
+ * @brief Registers the completed rational for Safe value storage.
+ *
+ * Integer numerator and denominator own no heap storage; value lifetime operations
+ * allocate nothing. Compatible provider ABI and provider lifetime are required.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::AVRational);

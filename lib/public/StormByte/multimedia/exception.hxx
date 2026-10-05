@@ -53,7 +53,7 @@
 namespace StormByte {
 	/**
 	 * @namespace StormByte::Multimedia
-	 * @brief Public Multimedia module.
+	 * @brief Public media types: codecs, containers, registry and stream kinds.
 	 */
 	namespace Multimedia {
 		/**
@@ -63,6 +63,11 @@ namespace StormByte {
 		 * The first argument is the subsystem tag (`File`, `Codec`). It is
 		 * copied into a temporary @ref StormByte::Exception::Path; Base formats
 		 * and copies the message during construction.
+		 * @note Base automatically recognizes complete exception derivatives as
+		 * MaybeSafe. This hierarchy keeps copy/move operations and destruction in
+		 * the multimedia provider and messages in Base-owned storage. Compatible
+		 * compiler, standard-library ABI and provider layout are required; Base and
+		 * multimedia providers must remain loaded while exceptions are alive.
 		 */
 		class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public StormByte::Exception {
 			public:

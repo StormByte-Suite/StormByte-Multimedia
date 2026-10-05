@@ -118,7 +118,8 @@ namespace StormByte::Multimedia::Detail {
 	 * @return true when a non-cover video exists.
 	 */
 	inline bool HasPrimaryVideo(const FFmpeg::AVFormatContext& ctx) noexcept {
-		for (const auto& stream : ctx.Streams()) {
+		const auto streams = ctx.Streams();
+		for (const auto& stream : streams) {
 			if (stream.Type() != AVMEDIA_TYPE_VIDEO)
 				continue;
 			if (IsAttachedPicture(stream) || IsContainerAttachment(stream))
@@ -148,7 +149,7 @@ namespace StormByte::Multimedia::Detail {
 		if (!IsStillImageCodec(params.CodecId()))
 			return false;
 		const auto duration = stream.Duration();
-		if (!duration.has_value() || *duration <= std::chrono::milliseconds{50})
+		if (!duration.has_value() || duration->Nanoseconds() <= std::chrono::milliseconds{50})
 			return true;
 		return false;
 	}
@@ -161,7 +162,8 @@ namespace StormByte::Multimedia::Detail {
 	 */
 	inline bool IsAttachmentIndex(const FFmpeg::AVFormatContext& ctx, int index) noexcept {
 		const bool hasPrimaryVideo = HasPrimaryVideo(ctx);
-		for (const auto& stream : ctx.Streams()) {
+		const auto streams = ctx.Streams();
+		for (const auto& stream : streams) {
 			if (stream.Index() != index)
 				continue;
 			return IsContainerAttachment(stream) || IsCoverStream(stream, hasPrimaryVideo);

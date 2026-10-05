@@ -165,7 +165,7 @@ namespace {
 
 	StormByte::Multimedia::FFmpeg::AVCodecParameters FillVideoParams(
 		const StormByte::Multimedia::Pipeline::Frame& frame,
-		const std::optional<std::int64_t>& bitRate,
+		const StormByte::Safe::Optional<std::int64_t>& bitRate,
 		const StormByte::Multimedia::FFmpeg::AVFrame* handle) noexcept {
 		StormByte::Multimedia::FFmpeg::AVCodecParameters params(nullptr);
 		if (bitRate)
@@ -200,6 +200,12 @@ namespace {
 		return params;
 	}
 }
+
+Video::~Video() noexcept = default;
+
+Video::Video(Video&& other) noexcept = default;
+
+Video& Video::operator=(Video&& other) noexcept = default;
 
 Video::Video() noexcept
 : m_owner(nullptr), m_timeBase{0, 1}, m_index(0), m_flushed(false), m_tsOffset(0), m_tsOffsetSet(false) {}

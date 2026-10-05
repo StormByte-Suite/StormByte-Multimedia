@@ -169,6 +169,6 @@ namespace StormByte::Multimedia::Backend {
 			 * @brief Origin length for AVSEEK_SIZE / SEEK_END.
 			 * @return Length, or empty if the reader has no size.
 			 */
-			std::optional<std::size_t> LeafSize() const noexcept;
+			StormByte::Safe::Optional<StormByte::ByteSize> LeafSize() const noexcept;
 	};
 }

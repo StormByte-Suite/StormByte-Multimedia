@@ -41,9 +41,9 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <optional>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -82,6 +82,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref StormByte::Multimedia::FFmpeg::AVFrame.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
+	 * @par ABI contract
+	 * Requires a compatible C++ ABI and a Safe-migrated parent base.
+	 * Optional storage uses creator-module callbacks; destroy and deallocate
+	 * the filter in its creating module while that module remains loaded.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC NlMeans: public Filter::Process {
 		public:
@@ -92,15 +96,40 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param patch Patch radius. Empty → profile default.
 			 * @param strength Filter strength h. Empty → profile default.
 			 */
-			NlMeans(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<unsigned> research = {},
-				std::optional<unsigned> patch = {},
-				std::optional<double> strength = {}) noexcept;
+			NlMeans(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<unsigned> research = {},
+				Safe::Optional<unsigned> patch = {},
+				Safe::Optional<double> strength = {}) noexcept;
 
+			/**
+			 * @brief Copying is disabled.
+			 * @param other Source filter.
+			 */
 			NlMeans(const NlMeans& other) = delete;
+
+			/**
+			 * @brief Moving is disabled.
+			 * @param other Source filter.
+			 */
 			NlMeans(NlMeans&& other) noexcept = delete;
-			~NlMeans() noexcept override = default;
+
+			/**
+			 * @brief Release filter ownership in the provider module.
+			 */
+			~NlMeans() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			NlMeans& operator=(const NlMeans& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			NlMeans& operator=(NlMeans&& other) noexcept = delete;
 
 			/**
@@ -109,8 +138,20 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			enum StormByte::Multimedia::Type Media() const noexcept override;
 
+			/**
+			 * @brief Reset the latched profile.
+			 */
 			void Clean() noexcept override;
+
+			/**
+			 * @brief Prepare the filter for processing.
+			 */
 			void Setup() noexcept override;
+
+			/**
+			 * @brief Denoise a video frame.
+			 * @param frame Borrowed input frame, valid for this call.
+			 */
 			void Process(const Pipeline::Frame& frame) noexcept override;
 
 		private:
@@ -121,12 +162,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			void Latch(int width, int height) noexcept;
 
-			std::optional<unsigned> m_researchIn;	///< Caller research, or empty
-			std::optional<unsigned> m_patchIn;		///< Caller patch, or empty
-			std::optional<double> m_hIn;			///< Caller strength, or empty
+			Safe::Optional<unsigned> m_researchIn;	///< Caller research, or empty
+			Safe::Optional<unsigned> m_patchIn;		///< Caller patch, or empty
+			Safe::Optional<double> m_hIn;			///< Caller strength, or empty
 			unsigned m_research;					///< Effective research
 			unsigned m_patch;						///< Effective patch
 			double m_h;								///< Effective strength
 			bool m_latched;							///< Profile chosen
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::NlMeans);

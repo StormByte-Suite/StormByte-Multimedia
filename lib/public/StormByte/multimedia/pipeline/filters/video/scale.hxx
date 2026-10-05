@@ -44,10 +44,11 @@
 #include <StormByte/multimedia/property/resolution.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <memory>
-#include <optional>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -80,6 +81,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Width or height 0 keeps aspect ratio.
 	 *
 	 * @see StormByte::Multimedia::FFmpeg::AVFrame::ScaleTo
+	 * @par ABI contract
+	 * Requires a compatible C++ ABI and a Safe-migrated parent base.
+	 * Optional storage uses creator-module callbacks; destroy and deallocate
+	 * the filter in its creating module while that module remains loaded.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Scale: public Filter::Process {
 		public:
@@ -90,10 +95,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param filter Resample kernel. Empty → ScaleTo default.
 			 * @param scaler Backend. Empty → ScaleTo default.
 			 */
-			Scale(std::shared_ptr<StormByte::Logger::Log> log,
+			Scale(Safe::Shared<StormByte::Logger::Log> log,
 				const StormByte::Multimedia::Property::Resolution& resolution,
-				std::optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> filter = {},
-				std::optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {}) noexcept;
+				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> filter = {},
+				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {}) noexcept;
 
 			/**
 			 * @brief Destination size. 0 on one axis keeps aspect ratio.
@@ -103,33 +108,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param filter Resample kernel. Empty → ScaleTo default.
 			 * @param scaler Backend. Empty → ScaleTo default.
 			 */
-			Scale(std::shared_ptr<StormByte::Logger::Log> log,
+			Scale(Safe::Shared<StormByte::Logger::Log> log,
 				std::uint32_t width, std::uint32_t height,
-				std::optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> filter = {},
-				std::optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {}) noexcept;
+				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> filter = {},
+				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The tube owns the mounted leaf.
+			 * @param other Source filter.
 			 */
 			Scale(const Scale& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Source filter.
 			 */
 			Scale(Scale&& other) noexcept = delete;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~Scale() noexcept override = default;
+			~Scale() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Scale& operator=(const Scale& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Scale& operator=(Scale&& other) noexcept = delete;
 
@@ -158,7 +169,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 		private:
 			std::uint32_t m_width;														///< Requested width. 0 keeps aspect ratio
 			std::uint32_t m_height;														///< Requested height. 0 keeps aspect ratio
-			std::optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> m_filter;	///< Empty → Resample::Default
-			std::optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> m_scaler;		///< Empty → Scaler::Zimg
+			Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> m_filter;	///< Empty → Resample::Default
+			Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> m_scaler;		///< Empty → Scaler::Zimg
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Scale);

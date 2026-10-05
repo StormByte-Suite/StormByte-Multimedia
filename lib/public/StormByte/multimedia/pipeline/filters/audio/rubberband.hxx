@@ -42,10 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <memory>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -91,14 +92,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param tempo Tempo scale. Empty → 1. Range 0.01–100.
 			 * @param pitch Pitch scale. Empty → 1. Range 0.01–100.
 			 */
-			Rubberband(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> tempo = {},
-				std::optional<double> pitch = {}) noexcept;
+			Rubberband(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> tempo = {},
+				Safe::Optional<double> pitch = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is disabled.
+			 * @param other Source filter.
+			 */
 			Rubberband(const Rubberband& other) = delete;
+
+			/**
+			 * @brief Move construction is disabled.
+			 * @param other Source filter.
+			 */
 			Rubberband(Rubberband&& other) noexcept = delete;
-			~Rubberband() noexcept override = default;
+
+			/**
+			 * @brief Releases the provider-owned graph.
+			 */
+			~Rubberband() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Rubberband& operator=(const Rubberband& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Rubberband& operator=(Rubberband&& other) noexcept = delete;
 
 			/**
@@ -128,10 +154,17 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `rubberband=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_tempoIn;	///< Caller tempo, or empty
-			std::optional<double> m_pitchIn;	///< Caller pitch, or empty
+			Safe::Optional<double> m_tempoIn;	///< Caller tempo, or empty
+			Safe::Optional<double> m_pitchIn;	///< Caller pitch, or empty
+
 			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private graph ownership is allocated and released only by Multimedia.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Rubberband);

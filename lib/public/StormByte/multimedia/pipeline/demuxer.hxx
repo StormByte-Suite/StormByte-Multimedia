@@ -48,6 +48,7 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
 #include <atomic>
 #include <condition_variable>
@@ -135,6 +136,7 @@ namespace StormByte {
 				friend class Muxer;
 				friend Decoder& operator>>(Demuxer& demuxer, Decoder& decoder) noexcept;
 				friend Demuxer& operator>>(class Plan&& plan, Demuxer& demuxer) noexcept;
+				friend Demuxer& operator>>(StormByte::Safe::Shared<class Plan> plan, Demuxer& demuxer) noexcept;
 				friend Muxer& operator>>(Demuxer& demuxer, Muxer& muxer) noexcept;
 				friend Remuxer& operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept;
 
@@ -148,15 +150,15 @@ namespace StormByte {
 					 * @brief Demuxer. Launches; Setup waits for a Plan.
 					 * @param log Shared logger. Empty pointer means no log.
 					 */
-					explicit Demuxer(std::shared_ptr<StormByte::Logger::Log> log) noexcept;
+					explicit Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
 
 					/**
 					 * @brief Launch with a clock already used by duration resolution.
 					 * @param log Shared logger.
 					 * @param progress Shared job clock; empty creates a fresh clock.
 					 */
-					Demuxer(std::shared_ptr<StormByte::Logger::Log> log,
-						std::shared_ptr<class Progress> progress) noexcept;
+					Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+						StormByte::Safe::Shared<class Progress> progress) noexcept;
 
 					/**
 					 * @brief Copy constructor.
@@ -216,7 +218,7 @@ namespace StormByte {
 					 * @brief Presentation time of the last emitted packet.
 					 * @return Pts, or empty until a packet with Pts arrives.
 					 */
-					std::optional<Property::Duration> Position() const noexcept;
+					StormByte::Safe::Optional<Property::Duration> Position() const noexcept;
 
 					/**
 					 * @brief Job clock for this tube (measure, analytics, All).
@@ -350,9 +352,11 @@ namespace StormByte {
 					std::vector<int> m_measureTracks;									///< Tracks visible during measure
 					bool m_measuring = false;											///< Measure pass active
 					Filters* m_filters = nullptr;										///< Facade that started measure
-					std::shared_ptr<class Progress> m_progress;							///< Tube clock (shared)
+					StormByte::Safe::Shared<class Progress> m_progress;				///< Shared tube clock retained through Base-heap ownership.
 					Join m_join{*this};													///< Halt before other members die
 			};
 		}
 	}
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Demuxer);

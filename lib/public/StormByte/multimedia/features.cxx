@@ -40,7 +40,7 @@
 
 using namespace StormByte::Multimedia;
 
-Features::operator std::string() const noexcept {
+Features::operator StormByte::Safe::String() const noexcept {
 	static constexpr Feature All[] = {
 		Feature::MultiThreaded,
 		Feature::RealTime,
@@ -70,7 +70,7 @@ Features::operator std::string() const noexcept {
 		Feature::Encodeable,
 	};
 
-	std::string result;
+	StormByte::Safe::String result;
 	bool first = true;
 	for (Feature feature : All) {
 		if (!Has(feature))

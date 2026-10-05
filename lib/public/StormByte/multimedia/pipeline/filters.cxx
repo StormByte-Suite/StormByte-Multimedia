@@ -36,6 +36,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
@@ -45,7 +46,6 @@
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/route.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
-#include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/type.hxx>
 
@@ -95,9 +95,10 @@ namespace {
 		return true;
 	}
 
-	std::string FlattenKey(const std::string& leaf, std::optional<int> track,
+	std::string FlattenKey(std::string_view leaf, std::optional<int> track,
 		std::map<std::string, int>& seen) noexcept {
-		std::string base = leaf + "[";
+		std::string base(leaf);
+		base += "[";
 		if (track)
 			base += std::to_string(*track);
 		else
@@ -115,7 +116,7 @@ Filters::Filters() noexcept = default;
 Filters::Handle::Handle(Filters& owner, std::size_t index) noexcept
 : m_owner(&owner), m_index(index) {}
 
-Filters::Handle& Filters::Handle::Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept {
+Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!filter || !m_owner || m_index >= m_owner->m_stretches.size())
 		return *this;
 	auto& stretch = m_owner->m_stretches[m_index];
@@ -145,8 +146,8 @@ Filters::Handle& Filters::Handle::Add(std::shared_ptr<Filter::FFmpeg> filter) no
 	return *this;
 }
 
-Filters::Handle Filters::Between(std::shared_ptr<Step> origin,
-	std::shared_ptr<Step> destination) noexcept {
+Filters::Handle Filters::Between(StormByte::Safe::Shared<Step> origin,
+	StormByte::Safe::Shared<Step> destination) noexcept {
 	Stretch stretch;
 	stretch.Origin = std::move(origin);
 	stretch.Destination = std::move(destination);
@@ -170,7 +171,7 @@ Filters::~Filters() noexcept {
 	}
 }
 
-Filters& Filters::Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept {
+Filters& Filters::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!filter)
 		return *this;
 	if (dynamic_cast<Filter::Analytics*>(filter.get()) == nullptr) {
@@ -182,7 +183,7 @@ Filters& Filters::Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept {
 	if (m_progress)
 		m_progress->HasAnalytics(true);
 	for (const auto& stretch : m_stretches) {
-		std::shared_ptr<const Plan> plan;
+		StormByte::Safe::Shared<const Plan> plan;
 		if (stretch.Origin)
 			plan = stretch.Origin->Plan();
 		if (!plan && stretch.Destination)
@@ -246,7 +247,7 @@ void Filters::Close() noexcept {
 	for (auto& stretch : m_stretches) {
 		if (!stretch.Lane || !stretch.Origin || !stretch.Destination)
 			continue;
-		std::shared_ptr<const Plan> plan = stretch.Origin->Plan();
+		StormByte::Safe::Shared<const Plan> plan = stretch.Origin->Plan();
 		if (!plan)
 			plan = stretch.Destination->Plan();
 		if (plan) {
@@ -353,7 +354,7 @@ void Filters::OnMeasureDrained(int track) noexcept {
 		m_measureDrained.push_back(track);
 	for (auto& item : m_reports) {
 		if (auto* two = dynamic_cast<Filter::ProcessTwoPasses*>(item.Filter.get()))
-			two->Wake().notify_all();
+			two->Wake();
 	}
 }
 
@@ -416,33 +417,33 @@ bool Filters::Idle() const noexcept {
 	return true;
 }
 
-std::vector<std::pair<std::string, Filter::Report>> Filters::Reports() const noexcept {
-	std::vector<std::pair<std::string, Filter::Report>> out;
+StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>>
+Filters::Reports() const noexcept {
+	StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> out;
 	std::map<std::string, int> seen;
 	out.reserve(m_reports.size());
 	for (const auto& item : m_reports) {
 		if (!item.Filter)
 			continue;
-		out.emplace_back(FlattenKey(item.Filter->Leaf(), item.Track, seen),
+		out.emplace_back(StormByte::Safe::String{FlattenKey(item.Filter->Leaf(), item.Track, seen)},
 			item.Filter->Report());
 	}
 
 	return out;
 }
 
-std::vector<std::pair<std::string, std::shared_ptr<const StageTelemetry>>>
-Filters::StageTelemetries() const noexcept {
-	std::vector<std::pair<std::string, std::shared_ptr<const StageTelemetry>>> out;
+StormByte::Safe::Vector<TelemetryStage> Filters::StageTelemetries() const noexcept {
+	StormByte::Safe::Vector<TelemetryStage> out;
 	out.reserve(m_reports.size());
 	for (const auto& item : m_reports) {
 		if (!item.Filter)
 			continue;
-		std::string name = item.Filter->Name() + "[";
+		std::string name = std::format("{}[", item.Filter->Name());
 		name += item.Track ? std::to_string(*item.Track) : "general";
 		name += "]";
 		auto metrics = item.Filter->Telemetry();
 		item.Filter->m_telemetry->SetOrigin(name);
-		out.emplace_back(std::move(name), std::move(metrics));
+		out.push_back(TelemetryStage{StormByte::Safe::String{name}, std::move(metrics)});
 	}
 	return out;
 }

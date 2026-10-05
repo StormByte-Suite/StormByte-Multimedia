@@ -70,13 +70,13 @@ FFmpeg::AVRational FFmpeg::AVStream::TimeBase() const noexcept {
 	return m_stream ? FFmpeg::FromRaw(m_stream->time_base) : FFmpeg::AVRational{0, 1};
 }
 
-std::optional<std::chrono::nanoseconds> FFmpeg::AVStream::Duration() const noexcept {
+StormByte::Safe::Optional<Property::Duration> FFmpeg::AVStream::Duration() const noexcept {
 	if (!m_stream || m_stream->duration == AV_NOPTS_VALUE || m_stream->time_base.den <= 0)
-		return std::nullopt;
+		return {};
 	const std::int64_t ns = av_rescale_q(m_stream->duration, m_stream->time_base, ::AVRational{1, 1000000000});
 	if (ns < 0)
-		return std::nullopt;
-	return std::chrono::nanoseconds{ns};
+		return {};
+	return Property::Duration(std::chrono::nanoseconds{ns});
 }
 
 double FFmpeg::AVStream::FrameRate() const noexcept {
@@ -110,11 +110,13 @@ FFmpeg::AVRational FFmpeg::AVStream::SampleAspectRatio() const noexcept {
 	return FFmpeg::FromRaw(m_stream->sample_aspect_ratio);
 }
 
-const char* FFmpeg::AVStream::Tag(const char* key) const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> FFmpeg::AVStream::Tag(const char* key) const noexcept {
 	if (!m_stream || !m_stream->metadata || !key)
-		return nullptr;
+		return {};
 	const AVDictionaryEntry* entry = av_dict_get(m_stream->metadata, key, nullptr, 0);
-	return entry ? entry->value : nullptr;
+	if (!entry)
+		return {};
+	return StormByte::Safe::String(entry->value);
 }
 
 int FFmpeg::AVStream::Disposition() const noexcept {

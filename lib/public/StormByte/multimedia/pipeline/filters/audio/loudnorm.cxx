@@ -46,7 +46,6 @@
 #include <cstdint>
 #include <format>
 #include <limits>
-#include <map>
 #include <vector>
 
 extern "C" {
@@ -152,8 +151,8 @@ namespace {
 	}
 }
 
-Loudnorm::Loudnorm(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> integrated, std::optional<double> truePeak) noexcept
+Loudnorm::Loudnorm(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> integrated, StormByte::Safe::Optional<double> truePeak) noexcept
 	: Filter::ProcessTwoPasses(std::move(log), "loudnorm"),
 	m_targetI(integrated.value_or(DefaultI)),
 	m_targetTp(truePeak.value_or(DefaultTp)),
@@ -366,16 +365,16 @@ void Loudnorm::Eof() noexcept {
 class StormByte::Multimedia::Pipeline::Filter::Report Loudnorm::Report() const noexcept {
 	if (!m_ready)
 		return { Filter::Report::Status::Failed, {} };
-	std::map<std::string, std::string> data;
-	data.emplace("I", std::format("{:.3f}", m_measuredI));
-	data.emplace("LRA", std::format("{:.3f}", m_measuredLra));
-	data.emplace("I_target", std::format("{:.3f}", m_targetI));
-	data.emplace("TP_target", std::format("{:.3f}", m_targetTp));
-	data.emplace("gain_db", std::format("{:.3f}", 20.0 * std::log10(std::max(m_gain, 1e-12))));
-	data.emplace("limit", m_limit ? "1" : "0");
-	data.emplace("frames", std::to_string(m_frames));
-	data.emplace("channels", std::to_string(m_channels));
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
+	data.emplace(StormByte::Safe::String("I"), std::format("{:.3f}", m_measuredI));
+	data.emplace(StormByte::Safe::String("LRA"), std::format("{:.3f}", m_measuredLra));
+	data.emplace(StormByte::Safe::String("I_target"), std::format("{:.3f}", m_targetI));
+	data.emplace(StormByte::Safe::String("TP_target"), std::format("{:.3f}", m_targetTp));
+	data.emplace(StormByte::Safe::String("gain_db"), std::format("{:.3f}", 20.0 * std::log10(std::max(m_gain, 1e-12))));
+	data.emplace(StormByte::Safe::String("limit"), m_limit ? "1" : "0");
+	data.emplace(StormByte::Safe::String("frames"), std::to_string(m_frames));
+	data.emplace(StormByte::Safe::String("channels"), std::to_string(m_channels));
 	for (std::size_t c = 0; c < m_tp.size(); ++c)
-		data.emplace(std::format("TP_{}", c), std::format("{:.3f}", DbTp(m_tp[c])));
+		data.emplace(StormByte::Safe::String(std::format("TP_{}", c)), std::format("{:.3f}", DbTp(m_tp[c])));
 	return { Filter::Report::Status::Ok, std::move(data) };
 }

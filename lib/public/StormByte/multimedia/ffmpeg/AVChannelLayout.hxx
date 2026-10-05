@@ -40,9 +40,9 @@
 
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -148,7 +148,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief FFmpeg layout name (`av_channel_layout_describe`).
 			 * @return Name such as @c "stereo", or empty if there is no layout.
 			 */
-			std::string Describe() const noexcept;
+			Safe::String Describe() const noexcept;
 
 			/**
 			 * @brief `av_channel_layout_compare` == 0.
@@ -190,3 +190,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			::AVChannelLayout* Get() noexcept;
 	};
 }
+
+/**
+ * @brief Conditional provider contract: layout copies and release use FFmpeg out-of-line.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVChannelLayout);

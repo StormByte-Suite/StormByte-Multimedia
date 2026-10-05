@@ -43,127 +43,173 @@
 #include <StormByte/multimedia/property/audio.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/property/video.hxx>
-
-#include <optional>
-#include <variant>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pair.hxx>
+#include <StormByte/safe/vector.hxx>
 
 /**
- * @namespace StormByte::Multimedia
- * @brief Public multimedia types: codecs, containers, streams and files.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia {
-	class File;
-
+namespace StormByte {
 	/**
-	 * @class Stream
-	 * @brief One media stream: registry Codec, duration, properties and tags.
-	 *
-	 * Copies share the same Codec instance. The Codec outlives every Stream.
-	 * Assignment is deleted because Codec is held by reference.
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia module of the StormByte suite.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Stream {
-		public:
-			/**
-			 * @brief Per-stream typed properties.
-			 */
-			using Properties = std::variant<std::monostate, Property::Video, Property::Audio>;
+	namespace Multimedia {
+		/**
+		 * @brief Public media file snapshot.
+		 */
+		class File;
 
-			/**
-			 * @brief Copy constructor.
-			 */
-			Stream(const Stream&) = default;
+		/**
+		 * @class Stream
+		 * @brief One media stream: registry Codec, duration, properties and tags.
+		 *
+		 * Copies share the same Codec instance. The Codec outlives every Stream.
+		 * Default construction creates an empty stream with index -1 and Unknown type.
+		 * Codec() throws for an empty stream. Copies retain a borrowed registry codec.
+		 * Base, Multimedia and the registry must outlive all snapshots and callbacks.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC Stream {
+			public:
+				/**
+				 * @brief Safe video and audio property snapshots, respectively.
+				 * @note At most one optional is populated for a probed stream.
+				 */
+				using Properties = StormByte::Safe::Pair<
+					StormByte::Safe::Optional<Property::Video>,
+					StormByte::Safe::Optional<Property::Audio>>;
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Stream(Stream&&) = default;
+				/**
+				 * @brief Constructs an empty stream snapshot.
+				 * @throws StormByte::Exception Safe storage initialization failed.
+				 */
+				Stream();
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Stream() = default;
+				/**
+				 * @brief Copy constructor.
+				 * @param other Snapshot to copy.
+				 * @throws StormByte::Exception Safe storage copying failed.
+				 */
+				Stream(const Stream& other);
 
-			/**
-			 * @brief Copy assignment (deleted: Codec is a reference).
-			 * @return *this.
-			 */
-			Stream& operator=(const Stream&) = delete;
+				/**
+				 * @brief Move constructor.
+				 * @param other Snapshot to take.
+				 */
+				Stream(Stream&& other) noexcept;
 
-			/**
-			 * @brief Move assignment (deleted: Codec is a reference).
-			 * @return *this.
-			 */
-			Stream& operator=(Stream&&) = delete;
+				/**
+				 * @brief Destructor.
+				 */
+				~Stream() noexcept;
 
-			/**
-			 * @brief Container stream index (avformat). Not the position in File::Streams().
-			 * @return Index used by packets and Decoder.
-			 */
-			int Index() const noexcept { return m_index; }
+				/**
+				 * @brief Copies a snapshot and its borrowed codec.
+				 * @param other Snapshot to copy.
+				 * @return *this.
+				 * @throws StormByte::Exception Safe storage copying failed.
+				 */
+				Stream& operator=(const Stream& other);
 
-			/**
-			 * @brief Codec of this stream.
-			 * @return Registry codec.
-			 */
-			const class Codec& Codec() const noexcept { return m_codec; }
+				/**
+				 * @brief Transfers a snapshot and its borrowed codec.
+				 * @param other Snapshot to take.
+				 * @return *this.
+				 */
+				Stream& operator=(Stream&& other) noexcept;
 
-			/**
-			 * @brief Media kind of the codec.
-			 * @return Audio, Video, Subtitle, Attachment or Unknown.
-			 */
-			Type Type() const noexcept { return m_codec.Type(); }
+				/**
+				 * @brief Container stream index (avformat). Not the position in File::Streams().
+				 * @return Index used by packets and Decoder.
+				 */
+				int Index() const noexcept { return m_index; }
 
-			/**
-			 * @brief Per-stream tags captured at Open.
-			 * @return Metadata snapshot.
-			 */
-			const Metadata::Stream& Metadata() const noexcept { return m_metadata; }
+				/**
+				 * @brief Codec of this stream.
+				 * @return Registry codec.
+				 * @throws StormByte::Multimedia::Exception This snapshot is empty.
+				 */
+				const class Codec& Codec() const;
 
-			/**
-			 * @brief Stream duration.
-			 * @return Duration, or empty if unknown.
-			 *
-			 * Header value from Open, or a value filled by File::Duration() after
-			 * a packet scan. Empty if it cannot be determined.
-			 */
-			const std::optional<Property::Duration>& Duration() const noexcept { return m_duration; }
+				/**
+				 * @brief Media kind of the codec.
+				 * @return Audio, Video, Subtitle, Attachment or Unknown.
+				 */
+				Type Type() const noexcept;
 
-			/**
-			 * @brief Video properties when this stream is video.
-			 * @return Pointer to properties, or nullptr.
-			 */
-			const Property::Video* Video() const noexcept {
-				return std::get_if<Property::Video>(&m_properties);
-			}
+				/**
+				 * @brief Per-stream tags captured at Open.
+				 * @return Metadata snapshot.
+				 */
+				const Metadata::Stream& Metadata() const noexcept { return m_metadata; }
 
-			/**
-			 * @brief Audio properties when this stream is audio.
-			 * @return Pointer to properties, or nullptr.
-			 */
-			const Property::Audio* Audio() const noexcept {
-				return std::get_if<Property::Audio>(&m_properties);
-			}
+				/**
+				 * @brief Stream duration.
+				 * @return Duration, or empty if unknown.
+				 *
+				 * Header value from Open, or a value filled by File::Duration() after
+				 * a packet scan. Empty if it cannot be determined.
+				 */
+				const StormByte::Safe::Optional<Property::Duration>& Duration() const noexcept;
 
-		private:
-			friend class File;
+				/**
+				 * @brief Video properties when this stream is video.
+				 * @return Borrowed Safe optional, empty when video properties are unavailable.
+				 * @note Arrow access yields a temporary read-only snapshot, not retained storage.
+				 */
+				const StormByte::Safe::Optional<Property::Video>& Video() const noexcept;
 
-			int m_index;											///< avformat stream index
-			const class Codec& m_codec;								///< Registry codec
-			Metadata::Stream m_metadata;							///< Stream tags
-			mutable std::optional<Property::Duration> m_duration;	///< Stream duration
-			Properties m_properties;								///< Video, audio, or none
+				/**
+				 * @brief Audio properties when this stream is audio.
+				 * @return Borrowed Safe optional, empty when audio properties are unavailable.
+				 * @note Arrow access yields a temporary read-only snapshot, not retained storage.
+				 */
+				const StormByte::Safe::Optional<Property::Audio>& Audio() const noexcept;
 
-			/**
-			 * @brief File-only constructor.
-			 * @param index avformat stream index.
-			 * @param codec Registry codec.
-			 * @param metadata Stream tags.
-			 * @param duration Stream duration from the header, if any.
-			 * @param properties Typed property bag.
-			 */
-			Stream(int index, const class Codec& codec, Metadata::Stream metadata,
-				std::optional<Property::Duration> duration, Properties properties) noexcept
-			: m_index(index), m_codec(codec), m_metadata(std::move(metadata)),
-			m_duration(std::move(duration)), m_properties(std::move(properties)) {}
-	};
+			private:
+				friend class File;
+
+				int m_index;												///< avformat stream index, or -1 when empty
+				const class Codec* m_codec;									///< Borrowed registry codec, or nullptr when empty
+				Metadata::Stream m_metadata;									///< Stream tags
+				mutable StormByte::Safe::Optional<Property::Duration> m_duration;	///< Stream duration
+				Properties m_properties;										///< Video, audio, or none
+
+				/**
+				 * @brief File-only constructor.
+				 * @param index avformat stream index.
+				 * @param codec Registry codec.
+				 * @param metadata Stream tags.
+				 * @param duration Stream duration from the header, if any.
+				 * @param properties Typed property bag.
+				 */
+				Stream(int index, const class Codec& codec, Metadata::Stream metadata,
+					StormByte::Safe::Optional<Property::Duration> duration, Properties properties) noexcept;
+		};
+	}
+}
+
+/**
+ * @brief Registers completed Stream snapshots with exported value operations.
+ * @note Registry codecs are synchronous borrows; providers must remain loaded.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Stream);
+
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia module of the StormByte suite.
+	 */
+	namespace Multimedia {
+		/**
+		 * @brief Ordered stream snapshots with creator-owned Safe storage.
+		 */
+		using Streams = StormByte::Safe::Vector<Stream>;
+	}
 }

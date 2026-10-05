@@ -38,7 +38,11 @@
 
 #include <StormByte/multimedia/pipeline/filters/analytics/ssim.hxx>
 
+#include <cstdint>
+#include <deque>
 #include <format>
+#include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -47,6 +51,34 @@ using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Producer;
 using StormByte::Multimedia::Pipeline::Filter::Video::SSIM;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
+
+/**
+ * @brief Provider-owned per-track presentation park and SSIM accumulators.
+ */
+struct StormByte::Multimedia::Pipeline::Filter::Video::Detail::SSIM::Lane {
+	/**
+	 * @brief Running SSIM for one plane of one track.
+	 */
+	struct Plane {
+		double sum = 0.0;		///< Sum of per-frame SSIM
+		unsigned frames = 0;	///< Frames that contributed
+	};
+
+	std::deque<FFrame> ref;			///< Decoder looks
+	std::deque<FFrame> dist;			///< Dest looks
+	int width = 0;					///< Latched width
+	int height = 0;					///< Latched height
+	int bpc = 0;					///< Latched bits per component
+	unsigned scored = 0;			///< Accepted pairs
+	std::size_t peakRef = 0;			///< Peak parked refs
+	std::size_t peakDist = 0;			///< Peak parked dists
+	Plane y;						///< Luma
+	Plane u;						///< Cb, if the layout has it
+	Plane v;						///< Cr, if the layout has it
+	std::optional<double> mean;	///< Sample-weighted mean
+	std::optional<double> min;	///< Minimum per-frame average
+	bool failed = false;			///< No pair scored at EoF
+};
 
 namespace {
 	constexpr int kWindow = 8;
@@ -131,7 +163,7 @@ namespace {
 	}
 }
 
-SSIM::SSIM(std::shared_ptr<StormByte::Logger::Log> log) noexcept
+SSIM::SSIM(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
 	: Filter::Analytics(std::move(log), "ssim") {}
 
 SSIM::~SSIM() noexcept {
@@ -148,9 +180,9 @@ void SSIM::DropParked(Lane& lane) noexcept {
 }
 
 void SSIM::DropAll() noexcept {
-	for (auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lane] : std::as_const(m_lanes)) {
 		(void)track;
-		DropParked(lane);
+		DropParked(*lane);
 	}
 	m_lanes.clear();
 }
@@ -264,7 +296,12 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	Lane& lane = m_lanes[frame.Track()];
+	StormByte::Safe::Shared<Lane> lanePointer = m_lanes[frame.Track()];
+	if (!lanePointer) {
+		lanePointer = StormByte::Safe::Heap::MakeShared<Lane>();
+		m_lanes[frame.Track()] = lanePointer;
+	}
+	Lane& lane = *lanePointer;
 	if (lane.failed)
 		return;
 
@@ -300,7 +337,8 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 
 void SSIM::Eof() noexcept {
 	unsigned scored = 0;
-	for (auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
+		Lane& lane = *lanePointer;
 		Drain(lane);
 		Log(Level::Debug, std::format(
 			"eof t={} scored={} ref={} dist={} peak_ref={} peak_dist={} failed={} latch={}x{}",
@@ -346,10 +384,11 @@ void SSIM::Eof() noexcept {
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const noexcept {
-	std::map<std::string, std::string> data;
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	bool failed = m_lanes.empty();
 	unsigned ok = 0;
-	for (const auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : m_lanes) {
+		const Lane& lane = *lanePointer;
 		if (lane.failed || !lane.mean)
 			failed = true;
 		else
@@ -359,11 +398,12 @@ class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const noexc
 	const bool prefix = m_lanes.size() > 1;
 	const auto key = [prefix](int track, std::string_view name) {
 		if (!prefix)
-			return std::string(name);
-		return std::format("{}.{}", track, name);
+			return StormByte::Safe::String(name);
+		return StormByte::Safe::String(std::format("{}.{}", track, name));
 	};
 
-	for (const auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : m_lanes) {
+		const Lane& lane = *lanePointer;
 		if (lane.mean && lane.min) {
 			data.emplace(key(track, "ssim_mean"), std::format("{:.6f}", *lane.mean));
 			data.emplace(key(track, "ssim_min"), std::format("{:.6f}", *lane.min));

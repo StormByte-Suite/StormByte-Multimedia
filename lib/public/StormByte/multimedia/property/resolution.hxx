@@ -39,9 +39,9 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -54,6 +54,11 @@ namespace StormByte::Multimedia::Property {
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Resolution final {
 		public:
+			/**
+			 * @brief Constructs a zero-sized resolution for Safe value storage.
+			 */
+			Resolution() noexcept = default;
+
 			/**
 			 * @brief Constructs a resolution.
 			 * @param width Width in pixels.
@@ -103,17 +108,29 @@ namespace StormByte::Multimedia::Property {
 			/**
 			 * @brief "WIDTHxHEIGHT" string.
 			 * @return Size string.
+			 * @throws StormByte::Exception If Base-owned text cannot be allocated.
+			 * @throws std::bad_alloc If temporary formatting storage cannot be allocated.
 			 */
-			std::string Name() const noexcept;
+			StormByte::Safe::String Name() const;
 
 			/**
 			 * @brief Coarse label (e.g. "1080p", "4K").
 			 * @return Standard name.
+			 * @throws StormByte::Exception If Base-owned text cannot be allocated.
 			 */
-			std::string StandardName() const noexcept;
+			StormByte::Safe::String StandardName() const;
 
 		private:
-			std::uint32_t m_width;		///< Width
-			std::uint32_t m_height;		///< Height
+			std::uint32_t m_width = 0;	///< Width in pixels, initialized to zero.
+
+			std::uint32_t m_height = 0;	///< Height in pixels, initialized to zero.
 	};
 }
+
+/**
+ * @brief Registers completed fixed-width dimensions for Safe value storage.
+ *
+ * Lifetime operations own no heap storage. Formatted text is returned in a
+ * Base-owned String. Compatible provider ABI and provider lifetime are required.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::Resolution);

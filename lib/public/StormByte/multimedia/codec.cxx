@@ -40,6 +40,15 @@
 
 using namespace StormByte::Multimedia;
 
+Codec::Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept
+: m_type(type), m_name(name), m_description(description), m_access(access) {}
+
+Codec::Codec(Codec&& other) noexcept = default;
+
+Codec::~Codec() noexcept = default;
+
+Codec& Codec::operator=(Codec&& other) noexcept = default;
+
 bool Codec::operator==(const Codec& other) const noexcept {
 	return this == &other;
 }

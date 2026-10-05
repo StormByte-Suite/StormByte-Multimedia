@@ -40,10 +40,14 @@
 
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
-#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pair.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <cstddef>
 #include <cstdint>
@@ -139,8 +143,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * The stages must identify the track being connected. An
 			 * unidentifiable track causes the destination stage to fail.
 			 */
-			Handle Between(std::shared_ptr<Step> origin,
-				std::shared_ptr<Step> destination) noexcept;
+			Handle Between(StormByte::Safe::Shared<Step> origin,
+				StormByte::Safe::Shared<Step> destination) noexcept;
 
 			/**
 			 * @brief Global analytics. One node, every matching stretch.
@@ -150,7 +154,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Process / Packet / ProcessTwoPasses leaves Fail: they
 			 * go on @ref Handle::Add.
 			 */
-			Filters& Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept;
+			Filters& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
 
 			/**
 			 * @brief Constructs a global analytics leaf and attaches it.
@@ -161,8 +165,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			template<typename T, typename... Args>
 			Filters& Add(Args&&... args) noexcept {
-				return Add(std::shared_ptr<Filter::FFmpeg>(
-					std::make_shared<T>(std::forward<Args>(args)...)));
+				return Add(StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<T>(
+					std::forward<Args>(args)...));
 			}
 
 			/**
@@ -187,18 +191,21 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Reports from attached leaves, in mount order.
 			 * @return Name / report pairs. Empty reports are omitted.
 			 */
-			std::vector<std::pair<std::string, Filter::Report>> Reports() const noexcept;
+			StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>>
+				Reports() const noexcept;
 
 			/**
 			 * @brief Telemetry handles for every attached filter.
-			 * @return Name / metrics pairs in mount order.
+			 * @return Named stage metrics in mount order.
 			 */
-			std::vector<std::pair<std::string, std::shared_ptr<const StageTelemetry>>>
-				StageTelemetries() const noexcept;
+			StormByte::Safe::Vector<TelemetryStage> StageTelemetries() const noexcept;
 
 			/**
 			 * @class Handle
 			 * @brief Per-stretch Add returned by @ref Between.
+			 *
+			 * Borrows its facade, which must outlive the handle and all
+			 * calls through it. Copying a handle does not extend that lifetime.
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Handle {
 				public:
@@ -209,7 +216,7 @@ namespace StormByte::Multimedia::Pipeline {
 					 *
 					 * ProcessTwoPasses on a remux destination Fails the dest.
 					 */
-					Handle& Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept;
+					Handle& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
 
 					/**
 					 * @brief Constructs a leaf and mounts it on this stretch.
@@ -220,8 +227,8 @@ namespace StormByte::Multimedia::Pipeline {
 					 */
 					template<typename T, typename... Args>
 					Handle& Add(Args&&... args) noexcept {
-						return Add(std::shared_ptr<Filter::FFmpeg>(
-							std::make_shared<T>(std::forward<Args>(args)...)));
+						return Add(StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<T>(
+							std::forward<Args>(args)...));
 					}
 
 				private:
@@ -234,8 +241,8 @@ namespace StormByte::Multimedia::Pipeline {
 					 */
 					Handle(Filters& owner, std::size_t index) noexcept;
 
-					Filters* m_owner;		///< Facade
-					std::size_t m_index;	///< Stretch index
+					Filters* m_owner;		///< Borrowed facade; must outlive this handle.
+					std::size_t m_index;	///< Stretch index; owns no storage.
 			};
 
 		private:
@@ -329,8 +336,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief One origin / destination pair and its Route.
 			 */
 			struct Stretch {
-				std::shared_ptr<Step> Origin;			///< Decoder / Demuxer / Encoder
-				std::shared_ptr<Step> Destination;		///< Encoder / Remuxer / Muxer
+				StormByte::Safe::Shared<Step> Origin;			///< Decoder / Demuxer / Encoder
+				StormByte::Safe::Shared<Step> Destination;		///< Encoder / Remuxer / Muxer
 				int Track = -1;							///< Hopper key
 				std::unique_ptr<Route> Lane;			///< Wired chain
 				std::optional<int> Scope;				///< Optional track scope
@@ -340,7 +347,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief A mounted leaf and the track it is bound to.
 			 */
 			struct Attached {
-				std::shared_ptr<Filter::FFmpeg> Filter;	///< Leaf
+				StormByte::Safe::Shared<Filter::FFmpeg> Filter;	///< Leaf
 				std::optional<int> Track;				///< Stretch track, or none if global
 			};
 
@@ -353,6 +360,9 @@ namespace StormByte::Multimedia::Pipeline {
 			std::size_t m_measureFiltersDrained = 0;	///< Those leaves that finished Measure
 			bool m_measuring = false;					///< After Close, before FinishMeasure
 			bool m_hasAnalytics = false;				///< At least one Analytics leaf
-			std::shared_ptr<class Progress> m_progress;	///< Shared tube clock
+			StormByte::Safe::Shared<class Progress> m_progress;	///< Shared tube clock
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filters::Handle);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filters);

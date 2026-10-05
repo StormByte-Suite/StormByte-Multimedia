@@ -42,8 +42,8 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -80,6 +80,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * is set. No avfilter `bwdif`.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Yadif
+	 * @par Boundary ownership
+	 * Requires a compatible C++ ABI and the Multimedia, Logger and Base providers
+	 * to remain loaded. Own the leaf through Base-heap Safe pointers. Frame
+	 * allocation, mutation and destruction stay in out-of-line provider methods;
+	 * copying and moving the leaf are disabled.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Bwdif: public Filter::Process {
 		public:
@@ -88,16 +93,18 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param onlyInterlaced Skip frames not marked interlaced.
 			 */
-			explicit Bwdif(std::shared_ptr<StormByte::Logger::Log> log,
+			explicit Bwdif(Safe::Shared<StormByte::Logger::Log> log,
 				bool onlyInterlaced = true) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. Each leaf owns delayed looks.
+			 * @param other Leaf that cannot be copied.
 			 */
 			Bwdif(const Bwdif& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Leaf that cannot be moved.
 			 */
 			Bwdif(Bwdif&& other) noexcept = delete;
 
@@ -108,11 +115,15 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Leaf that cannot be copied.
+			 * @return Assignment is unavailable.
 			 */
 			Bwdif& operator=(const Bwdif& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Leaf that cannot be moved.
+			 * @return Assignment is unavailable.
 			 */
 			Bwdif& operator=(Bwdif&& other) noexcept = delete;
 
@@ -169,3 +180,5 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			StormByte::Multimedia::FFmpeg::AVFrame m_cur;	///< Look t
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Bwdif);

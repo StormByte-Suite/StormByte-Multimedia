@@ -38,20 +38,19 @@
 
 #pragma once
 
-#include <StormByte/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
+#include <StormByte/telemetry.hxx>
 
 #include <atomic>
 #include <chrono>
 #include <cstdint>
-#include <memory>
 #include <mutex>
-#include <optional>
-#include <string>
 #include <string_view>
-#include <vector>
 
 /**
  * @namespace StormByte
@@ -86,6 +85,13 @@ namespace StormByte {
 			 * shared between stages. Use @ref JobTelemetry for sampled
 			 * process resident memory.
 			 *
+			 * @par DLL boundary
+			 * Owned values use Safe storage and destruction is provider-local.
+			 * Compatible C++ ABI is required. Derived types must preserve this
+			 * guarantee for their own fields and lifetime operations, including
+			 * an out-of-line destructor for provider-owned allocations.
+			 * Copying and moving stage telemetry are not supported.
+			 *
 			 * @ingroup multimedia_pipeline
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC StageTelemetry: public StormByte::Telemetry {
@@ -94,6 +100,11 @@ namespace StormByte {
 					 * @brief Construct empty stage counters.
 					 */
 					StageTelemetry() noexcept;
+
+					/**
+					 * @brief Release stage telemetry in its providing library.
+					 */
+					~StageTelemetry() noexcept override;
 
 					/**
 					 * @brief Set the stage origin label.
@@ -147,7 +158,7 @@ namespace StormByte {
 					 * @brief Store a stage failure reason.
 					 * @param reason Failure text.
 					 */
-					void SetError(std::string reason) noexcept;
+					void SetError(StormByte::Safe::String reason) noexcept;
 
 					/**
 					 * @brief Mark the start of stage setup.
@@ -253,7 +264,7 @@ namespace StormByte {
 					 * @brief Failure text, if the stage failed.
 					 * @return Failure text or empty.
 					 */
-					std::optional<std::string> Error() const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
 
 					/**
 					 * @brief Flatten all stage counters into an owned Safe::String.
@@ -262,27 +273,82 @@ namespace StormByte {
 					operator StormByte::Safe::String() const override;
 
 				private:
-					std::atomic<std::uint64_t> m_process_calls; ///< Process calls.
-					std::atomic<std::uint64_t> m_input_frames; ///< Consumed frames.
-					std::atomic<std::uint64_t> m_input_packets; ///< Consumed packets.
-					std::atomic<std::uint64_t> m_output_frames; ///< Emitted frames.
-					std::atomic<std::uint64_t> m_output_packets; ///< Emitted packets.
-					std::atomic<std::int64_t> m_process_total_ns; ///< Total Process duration.
-					std::atomic<std::int64_t> m_process_min_ns; ///< Minimum Process duration.
-					std::atomic<std::int64_t> m_process_max_ns; ///< Maximum Process duration.
-					std::atomic<std::uint64_t> m_wait_count; ///< Blocking waits.
-					std::atomic<std::int64_t> m_wait_total_ns; ///< Total blocking wait duration.
-					std::atomic<std::int64_t> m_wait_max_ns; ///< Maximum blocking wait duration.
-					std::atomic<std::int64_t> m_setup_ns; ///< Setup duration.
-					std::atomic<std::int64_t> m_started_ns; ///< Steady-clock start tick.
-					std::atomic<std::int64_t> m_finished_ns; ///< Steady-clock finish tick.
-					std::atomic<State> m_state; ///< Latest lifecycle state.
-					mutable std::mutex m_error_lock; ///< Protects failure text.
-					std::optional<std::string> m_error; ///< Failure text.
-					mutable std::mutex m_origin_lock; ///< Protects origin label.
-					mutable StormByte::Safe::String m_origin; ///< Stage origin label.
+					std::atomic<std::uint64_t> m_process_calls;						///< Process calls.
+
+					std::atomic<std::uint64_t> m_input_frames;						///< Consumed frames.
+
+					std::atomic<std::uint64_t> m_input_packets;						///< Consumed packets.
+
+					std::atomic<std::uint64_t> m_output_frames;						///< Emitted frames.
+
+					std::atomic<std::uint64_t> m_output_packets;					///< Emitted packets.
+
+					std::atomic<std::int64_t> m_process_total_ns;					///< Total Process duration.
+
+					std::atomic<std::int64_t> m_process_min_ns;						///< Minimum Process duration.
+
+					std::atomic<std::int64_t> m_process_max_ns;						///< Maximum Process duration.
+
+					std::atomic<std::uint64_t> m_wait_count;						///< Blocking waits.
+
+					std::atomic<std::int64_t> m_wait_total_ns;						///< Total blocking wait duration.
+
+					std::atomic<std::int64_t> m_wait_max_ns;						///< Maximum blocking wait duration.
+
+					std::atomic<std::int64_t> m_setup_ns;							///< Setup duration.
+
+					std::atomic<std::int64_t> m_started_ns;							///< Steady-clock start tick.
+
+					std::atomic<std::int64_t> m_finished_ns;						///< Steady-clock finish tick.
+
+					std::atomic<State> m_state;										///< Latest lifecycle state.
+
+					mutable std::mutex m_error_lock;								///< Protects failure text.
+
+					StormByte::Safe::Optional<StormByte::Safe::String> m_error;		///< Safe-owned failure text.
+
+					mutable std::mutex m_origin_lock;								///< Protects origin label.
+
+					mutable StormByte::Safe::String m_origin;						///< Stage origin label.
 			};
 
+			/**
+			 * @struct TelemetryStage
+			 * @brief Named stage telemetry retained past worker teardown.
+			 *
+			 * Fields and implicit value operations use Safe-owned storage.
+			 * Compatible C++ ABI and the StageTelemetry derived-type lifetime
+			 * contract are required for retained metric handles.
+			 */
+			struct TelemetryStage {
+				StormByte::Safe::String Name;							///< Display name, including track scope when applicable.
+
+				StormByte::Safe::Shared<const StageTelemetry> Metrics;	///< Shared stage counter handle retained across DLL boundaries.
+			};
+		}
+	}
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::StageTelemetry);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TelemetryStage);
+
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Audio and video processing types.
+	 */
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Pipeline
+		 * @brief Demux / decode / filter / encode / mux types.
+		 *
+		 * @ingroup multimedia_pipeline
+		 */
+		namespace Pipeline {
 			/**
 			 * @class JobTelemetry
 			 * @brief Retained job telemetry with per-stage snapshots and RSS samples.
@@ -293,18 +359,19 @@ namespace StormByte {
 			 * OS-lifetime peak. Sampling is nominally every 20 ms while the
 			 * job is running. It is not attributed to individual stages.
 			 *
+			 * @par DLL boundary
+			 * Owned values use Safe storage and destruction is provider-local.
+			 * Compatible C++ ABI and the StageTelemetry derived-type lifetime
+			 * contract are required. Copying and moving are not supported.
+			 *
 			 * @ingroup multimedia_pipeline
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC JobTelemetry final: public StormByte::Telemetry {
 				public:
 					/**
-					 * @struct Stage
 					 * @brief Named stage telemetry retained past worker teardown.
 					 */
-					struct Stage {
-						std::string Name; ///< Display name, including track scope when applicable.
-						std::shared_ptr<const StageTelemetry> Metrics; ///< Stage counter handle.
-					};
+					using Stage = TelemetryStage;
 
 					/**
 					 * @brief Construct empty job telemetry.
@@ -312,18 +379,23 @@ namespace StormByte {
 					JobTelemetry() noexcept;
 
 					/**
+					 * @brief Release job telemetry in its providing library.
+					 */
+					~JobTelemetry() noexcept override;
+
+					/**
 					 * @brief Add a stage handle once.
 					 * @param name Display name.
 					 * @param metrics Stage counters to retain.
 					 */
-					void RegisterStage(std::string name,
-						std::shared_ptr<const StageTelemetry> metrics) noexcept;
+					void RegisterStage(StormByte::Safe::String name,
+						StormByte::Safe::Shared<const StageTelemetry> metrics) noexcept;
 
 					/**
 					 * @brief Snapshot registered stages in registration order.
 					 * @return Owned list of names and shared metric handles.
 					 */
-					std::vector<Stage> Stages() const noexcept;
+					StormByte::Safe::Vector<Stage> Stages() const noexcept;
 
 					/**
 					 * @brief Sample current process resident memory.
@@ -336,25 +408,25 @@ namespace StormByte {
 					 * @brief Current process resident bytes at the last sample.
 					 * @return Bytes or empty if no sample succeeded.
 					 */
-					std::optional<std::uint64_t> MemoryCurrent() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> MemoryCurrent() const noexcept;
 
 					/**
 					 * @brief Lowest process resident memory sample.
 					 * @return Bytes or empty if no sample succeeded.
 					 */
-					std::optional<std::uint64_t> MemoryMinimum() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> MemoryMinimum() const noexcept;
 
 					/**
 					 * @brief Highest process resident memory sample.
 					 * @return Bytes or empty if no sample succeeded.
 					 */
-					std::optional<std::uint64_t> MemoryMaximum() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> MemoryMaximum() const noexcept;
 
 					/**
 					 * @brief Alias for the maximum sampled resident-memory value.
 					 * @return Sampled peak bytes or empty if no sample succeeded.
 					 */
-					std::optional<std::uint64_t> PeakMemory() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> PeakMemory() const noexcept;
 
 					/**
 					 * @brief Number of successful resident-memory samples.
@@ -369,13 +441,20 @@ namespace StormByte {
 					operator StormByte::Safe::String() const override;
 
 				private:
-					mutable std::mutex m_stages_lock; ///< Protects registered stage list.
-					std::vector<Stage> m_stages; ///< Registered stage snapshots.
-					std::atomic<std::uint64_t> m_memory_current; ///< Last resident-memory sample.
-					std::atomic<std::uint64_t> m_memory_min; ///< Lowest resident-memory sample.
-					std::atomic<std::uint64_t> m_memory_max; ///< Highest resident-memory sample.
-					std::atomic<std::uint64_t> m_memory_samples; ///< Successful sample count.
+					mutable std::mutex m_stages_lock;				///< Protects registered stage list.
+
+					StormByte::Safe::Vector<Stage> m_stages;		///< Safe-owned registered stage snapshots.
+
+					std::atomic<std::uint64_t> m_memory_current;	///< Last resident-memory sample.
+
+					std::atomic<std::uint64_t> m_memory_min;		///< Lowest resident-memory sample.
+
+					std::atomic<std::uint64_t> m_memory_max;		///< Highest resident-memory sample.
+
+					std::atomic<std::uint64_t> m_memory_samples;	///< Successful sample count.
 			};
 		}
 	}
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::JobTelemetry);

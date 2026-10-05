@@ -40,6 +40,7 @@
 
 #include <StormByte/multimedia/property/pixel_format.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -225,6 +226,11 @@ namespace StormByte::Multimedia::Property {
 	class STORMBYTE_MULTIMEDIA_PUBLIC Color final {
 		public:
 			/**
+			 * @brief Constructs unknown pixel format and unspecified colorimetry.
+			 */
+			Color() noexcept = default;
+
+			/**
 			 * @brief Full color description.
 			 * @param format Pixel format.
 			 * @param range Sample range.
@@ -265,31 +271,31 @@ namespace StormByte::Multimedia::Property {
 			 * @brief Pixel format.
 			 * @return Pixel format.
 			 */
-			PixelFormat PixelFormat() const noexcept;
+			enum PixelFormat PixelFormat() const noexcept;
 
 			/**
 			 * @brief Sample range.
 			 * @return Range.
 			 */
-			Range Range() const noexcept;
+			enum Range Range() const noexcept;
 
 			/**
 			 * @brief Matrix coefficients.
 			 * @return Space.
 			 */
-			Space Space() const noexcept;
+			enum Space Space() const noexcept;
 
 			/**
 			 * @brief Chromaticity primaries.
 			 * @return Primaries.
 			 */
-			Primaries Primaries() const noexcept;
+			enum Primaries Primaries() const noexcept;
 
 			/**
 			 * @brief Transfer characteristics.
 			 * @return Transfer.
 			 */
-			Transfer Transfer() const noexcept;
+			enum Transfer Transfer() const noexcept;
 
 			/**
 			 * @brief HDR10 colorimetry (10-bit+, BT.2020, PQ).
@@ -304,10 +310,22 @@ namespace StormByte::Multimedia::Property {
 			bool IsHLG() const noexcept;
 
 		private:
-			enum PixelFormat m_format;		///< Pixel format
-			enum Range m_range;				///< Range
-			enum Space m_space;				///< Space
-			enum Primaries m_primaries;		///< Primaries
-			enum Transfer m_transfer;		///< Transfer
+			enum PixelFormat m_format = PixelFormat::Unknown;		///< Pixel format, initialized to unknown.
+
+			enum Range m_range = Range::Unspecified;				///< Sample range, initialized to unspecified.
+
+			enum Space m_space = Space::Unspecified;				///< Matrix coefficients, initialized to unspecified.
+
+			enum Primaries m_primaries = Primaries::Unspecified;	///< Chromaticity primaries, initialized to unspecified.
+
+			enum Transfer m_transfer = Transfer::Unspecified;		///< Transfer characteristics, initialized to unspecified.
 	};
 }
+
+/**
+ * @brief Registers the completed color description for Safe value storage.
+ *
+ * Enum-valued fields own no heap storage and value lifetime operations allocate
+ * nothing. Compatible provider ABI and provider lifetime are required.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::Color);

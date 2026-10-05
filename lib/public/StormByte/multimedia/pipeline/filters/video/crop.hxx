@@ -42,6 +42,8 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <memory>
 
@@ -83,6 +85,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref FFmpeg::AVFrame::ApplyCropping, Save.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Watermark
+	 * @par Boundary ownership
+	 * Requires a compatible C++ ABI and the Multimedia, Logger and Base providers
+	 * to remain loaded. Own the leaf through Base-heap Safe pointers. The private
+	 * frame cache is allocated, mutated and destroyed only by out-of-line
+	 * Multimedia methods; copying and moving the leaf are disabled.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Crop: public Filter::Process {
 		public:
@@ -90,7 +97,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Detect letterbox / pillarbox. Hold until sure, else no-op.
 			 * @param log Shared logger. Empty pointer means no log.
 			 */
-			explicit Crop(std::shared_ptr<StormByte::Logger::Log> log) noexcept;
+			explicit Crop(Safe::Shared<StormByte::Logger::Log> log) noexcept;
 
 			/**
 			 * @brief Explicit window in frame pixels.
@@ -100,13 +107,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param width Cropped width.
 			 * @param height Cropped height.
 			 */
-			Crop(std::shared_ptr<StormByte::Logger::Log> log,
+			Crop(Safe::Shared<StormByte::Logger::Log> log,
 				int x, int y, int width, int height) noexcept;
 
+			/**
+			 * @brief Copying the provider-owned leaf is disabled.
+			 * @param other Leaf that cannot be copied.
+			 */
 			Crop(const Crop& other) = delete;
+
+			/**
+			 * @brief Moving the mounted leaf is disabled.
+			 * @param other Leaf that cannot be moved.
+			 */
 			Crop(Crop&& other) noexcept = delete;
+
+			/**
+			 * @brief Releases the provider-owned probe cache.
+			 */
 			~Crop() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Leaf that cannot be copied.
+			 * @return Assignment is unavailable.
+			 */
 			Crop& operator=(const Crop& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Leaf that cannot be moved.
+			 * @return Assignment is unavailable.
+			 */
 			Crop& operator=(Crop&& other) noexcept = delete;
 
 			/**
@@ -138,7 +170,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void LastChance(const Pipeline::Frame& frame) noexcept override;
 
 		private:
-			static constexpr std::uint8_t ProbeMax = 200;
+			static constexpr std::uint8_t ProbeMax = 200;	///< Maximum probe count
 
 			/**
 			 * @brief GRAY8 view of @p src via ScaleTo (Sws).
@@ -157,6 +189,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Boxed pair stable for 8 probes.
+			 * @return True when detected bars have stabilized.
 			 */
 			bool Sure() const noexcept;
 
@@ -182,9 +215,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			int m_top;			///< Detected top bar
 			int m_bottom;		///< Detected bottom bar
 			int m_stable;		///< Consecutive matching probes
-			int m_lumaW;
-			int m_lumaH;
-			int m_lumaFmt;
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;
+			int m_lumaW;		///< Cached source width
+			int m_lumaH;		///< Cached source height
+			int m_lumaFmt;		///< Cached source pixel format
+			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Provider-owned luma cache
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Crop);

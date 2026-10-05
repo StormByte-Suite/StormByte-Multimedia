@@ -42,26 +42,54 @@
 
 using namespace StormByte::Multimedia::Pipeline::Config;
 
-void Video::CRF(int value) noexcept {
+Video::Video(): Base(StormByte::Multimedia::Type::Video), m_codec(nullptr) {}
+
+Video::Video(const Video& other) = default;
+
+Video::Video(Video&& other) noexcept = default;
+
+Video::~Video() noexcept = default;
+
+Video& Video::operator=(const Video& other) = default;
+
+Video& Video::operator=(Video&& other) noexcept = default;
+
+Video::PointerType Video::Clone() const {
+	return MakePointer<Video>(*this);
+}
+
+Video::PointerType Video::Move() {
+	return MakePointer<Video>(std::move(*this));
+}
+
+void Video::CRF(int value) {
 	m_crf = value;
 	m_bitRate.reset();
 }
 
-void Video::BitRate(std::int64_t bits_per_second) noexcept {
+void Video::BitRate(std::int64_t bits_per_second) {
 	m_bitRate = bits_per_second;
 	m_crf.reset();
 }
 
-void Video::Preset(std::string name) noexcept {
+void Video::MaxBitRate(std::int64_t bits_per_second) {
+	m_maxBitRate = bits_per_second;
+}
+
+void Video::Preset(StormByte::Safe::String name) {
 	if (name.empty())
 		m_preset.reset();
 	else
 		m_preset = std::move(name);
 }
 
-void Video::Tune(std::string name) noexcept {
+void Video::Tune(StormByte::Safe::String name) {
 	if (name.empty())
 		m_tune.reset();
 	else
 		m_tune = std::move(name);
+}
+
+void Video::FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept {
+	m_fineTune = std::move(options);
 }

@@ -42,10 +42,10 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -90,15 +90,36 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param steps Wavelet steps. Empty → 6.
 			 * @param percent Shrink percent. Empty → 85.
 			 */
-			VagueDenoiser(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> threshold = {},
-				std::optional<unsigned> steps = {},
-				std::optional<double> percent = {}) noexcept;
+			VagueDenoiser(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				StormByte::Safe::Optional<double> threshold = {},
+				StormByte::Safe::Optional<unsigned> steps = {},
+				StormByte::Safe::Optional<double> percent = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is unavailable.
+			 * @param other Filter that cannot be copied.
+			 */
 			VagueDenoiser(const VagueDenoiser& other) = delete;
+			/**
+			 * @brief Move construction is unavailable.
+			 * @param other Filter that cannot be moved.
+			 */
 			VagueDenoiser(VagueDenoiser&& other) noexcept = delete;
-			~VagueDenoiser() noexcept override = default;
+			/**
+			 * @brief Releases owned options and the cached graph in the provider module.
+			 */
+			~VagueDenoiser() noexcept override;
+			/**
+			 * @brief Copy assignment is unavailable.
+			 * @param other Filter that cannot be copied.
+			 * @return No value; this operation is deleted.
+			 */
 			VagueDenoiser& operator=(const VagueDenoiser& other) = delete;
+			/**
+			 * @brief Move assignment is unavailable.
+			 * @param other Filter that cannot be moved.
+			 * @return No value; this operation is deleted.
+			 */
 			VagueDenoiser& operator=(VagueDenoiser&& other) noexcept = delete;
 
 			/**
@@ -128,11 +149,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `vaguedenoiser=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
-			std::optional<double> m_thrIn;		///< Caller threshold, or empty
-			std::optional<unsigned> m_stepsIn;	///< Caller nsteps, or empty
-			std::optional<double> m_pctIn;		///< Caller percent, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			StormByte::Safe::Optional<double> m_thrIn;		///< Caller threshold, or empty
+			StormByte::Safe::Optional<unsigned> m_stepsIn;	///< Caller nsteps, or empty
+			StormByte::Safe::Optional<double> m_pctIn;		///< Caller percent, or empty
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Cached graph with provider-managed FFmpeg resources
 	};
 }
+
+/**
+ * @brief Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::VagueDenoiser);

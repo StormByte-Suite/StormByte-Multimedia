@@ -60,8 +60,7 @@ namespace {
 	}
 }
 
-Pipe::Pipe(std::condition_variable& wake) noexcept
-:	m_wake(&wake) {}
+Pipe::Pipe() noexcept = default;
 
 Pipe::~Pipe() noexcept {
 	m_in.Unnotify();
@@ -91,7 +90,19 @@ void Pipe::Capacity(int track, std::size_t n) noexcept {
 }
 
 void Pipe::Listen() noexcept {
-	m_in.Notify(*m_wake);
+	m_in.Notify(m_wake);
+}
+
+void Pipe::Wake() noexcept {
+	m_wake.notify_all();
+}
+
+void Pipe::Wait(void* owner, bool (*ready)(void*) noexcept,
+	void (*completed)(void*, std::chrono::nanoseconds) noexcept) noexcept {
+	std::unique_lock lock(m_wait);
+	const auto started = std::chrono::steady_clock::now();
+	m_wake.wait(lock, [owner, ready] { return ready(owner); });
+	completed(owner, std::chrono::steady_clock::now() - started);
 }
 
 void Pipe::Close() noexcept {

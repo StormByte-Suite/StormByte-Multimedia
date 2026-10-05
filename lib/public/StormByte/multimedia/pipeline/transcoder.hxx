@@ -53,19 +53,19 @@
 #include <StormByte/multimedia/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/clonable.hxx>
+#include <StormByte/safe/function.hxx>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pair.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 #include <StormByte/type_traits.hxx>
 
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline
@@ -128,38 +128,38 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Empty settled row.
 			 */
-			TrackSettled() noexcept = default;
+			TrackSettled();
 
 			/**
 			 * @brief Copy constructor.
 			 * @param other Source row.
 			 */
-			TrackSettled(const TrackSettled& other) = default;
+			TrackSettled(const TrackSettled& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Row to take.
 			 */
-			TrackSettled(TrackSettled&& other) noexcept = default;
+			TrackSettled(TrackSettled&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~TrackSettled() noexcept override = default;
+			virtual ~TrackSettled() noexcept override;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source row.
 			 * @return *this.
 			 */
-			TrackSettled& operator=(const TrackSettled& other) = default;
+			TrackSettled& operator=(const TrackSettled& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Row to take.
 			 * @return *this.
 			 */
-			TrackSettled& operator=(TrackSettled&& other) noexcept = default;
+			TrackSettled& operator=(TrackSettled&& other) noexcept;
 
 			/**
 			 * @}
@@ -168,42 +168,41 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Deep copy.
 			 * @return Owning pointer to a new row of the same dynamic type.
+			 * @note Derived rows must override in their provider module and use
+			 *       Unique<TrackSettled>::MakePointer<Derived> for the exact payload.
 			 */
-			inline PointerType Clone() const override {
-				return MakePointer<TrackSettled>(*this);
-			}
+			PointerType Clone() const override;
 
 			/**
 			 * @brief Move into a new pointer.
 			 * @return Owning pointer to the moved row.
+			 * @note Derived rows must override in their provider module to avoid slicing.
 			 */
-			inline PointerType Move() override {
-				return MakePointer<TrackSettled>(std::move(*this));
-			}
+			PointerType Move() override;
 
 			/**
 			 * @brief Human-readable line for logs.
 			 * @return One or more lines, no trailing newline required.
 			 */
-			virtual std::string ToString() const;
+			virtual StormByte::Safe::String ToString() const;
 
-			int In = -1;												///< Origin stream or attachment slot
+			int In = -1;													///< Origin stream or attachment slot
 			int Out = -1;												///< Index in Plan::Tracks after Add
 			Type Kind = Type::Unknown;									///< Media kind
-			const Codec* Source = nullptr;								///< Origin codec
-			const Codec* Destination = nullptr;							///< Opened encoder codec, or nullptr if remux
-			std::optional<std::string> Implementation;					///< Opened encoder pin
-			std::optional<int> Crf;										///< CRF/CQ actually used
-			std::optional<std::int64_t> BitRate;						///< Bitrate actually used
-			std::optional<std::int64_t> MaxBitRate;						///< VBV actually used
-			std::optional<std::string> Preset;							///< Preset actually used
-			std::optional<std::string> Tune;							///< Tune actually used
-			std::map<std::string, std::string> FineTune;				///< Vendor leftovers actually used
-			std::optional<int> SampleFormat;							///< Encoder AVSampleFormat
-			std::optional<int> SourceChannels;							///< Decoded channel count
-			std::optional<int> EncoderChannels;							///< Encoder channel count
-			std::optional<int> FrameSize;								///< Encoder frame_size
-			std::optional<int> SampleRate;								///< Samples per second
+			const Codec* Source = nullptr;								///< Borrowed registry origin codec
+			const Codec* Destination = nullptr;							///< Borrowed opened encoder codec, or null for remux
+			StormByte::Safe::Optional<StormByte::Safe::String> Implementation;	///< Opened encoder implementation pin
+			StormByte::Safe::Optional<int> Crf;							///< CRF/CQ actually used
+			StormByte::Safe::Optional<std::int64_t> BitRate;				///< Bitrate actually used
+			StormByte::Safe::Optional<std::int64_t> MaxBitRate;				///< VBV bitrate actually used
+			StormByte::Safe::Optional<StormByte::Safe::String> Preset;		///< Preset actually used
+			StormByte::Safe::Optional<StormByte::Safe::String> Tune;			///< Tune actually used
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> FineTune;	///< Vendor options actually used
+			StormByte::Safe::Optional<int> SampleFormat;					///< Encoder AVSampleFormat
+			StormByte::Safe::Optional<int> SourceChannels;					///< Decoded channel count
+			StormByte::Safe::Optional<int> EncoderChannels;				///< Encoder channel count
+			StormByte::Safe::Optional<int> FrameSize;						///< Encoder frame size
+			StormByte::Safe::Optional<int> SampleRate;						///< Samples per second
 	};
 
 	/**
@@ -329,63 +328,63 @@ namespace StormByte::Multimedia::Pipeline {
 					 * @param name Table name.
 					 * @return *this.
 					 */
-					Track& Implementation(std::string name) noexcept;
+					Track& Implementation(StormByte::Safe::String name);
 
 					/**
 					 * @brief Sets CRF/CQ. Clears BitRate.
 					 * @param value Quality value.
 					 * @return *this.
 					 */
-					Track& CRF(int value) noexcept;
+					Track& CRF(int value);
 
 					/**
 					 * @brief Sets target bitrate. Clears CRF.
 					 * @param bits_per_second Bits per second.
 					 * @return *this.
 					 */
-					Track& BitRate(std::int64_t bits_per_second) noexcept;
+					Track& BitRate(std::int64_t bits_per_second);
 
 					/**
 					 * @brief Sets VBV / max bitrate.
 					 * @param bits_per_second Bits per second.
 					 * @return *this.
 					 */
-					Track& MaxBitRate(std::int64_t bits_per_second) noexcept;
+					Track& MaxBitRate(std::int64_t bits_per_second);
 
 					/**
 					 * @brief Sets encoder preset.
 					 * @param name Preset name.
 					 * @return *this.
 					 */
-					Track& Preset(std::string name) noexcept;
+					Track& Preset(StormByte::Safe::String name);
 
 					/**
 					 * @brief Sets encoder tune.
 					 * @param name Tune name.
 					 * @return *this.
 					 */
-					Track& Tune(std::string name) noexcept;
+					Track& Tune(StormByte::Safe::String name);
 
 					/**
 					 * @brief Replaces vendor leftovers.
 					 * @param options Key / value map.
 					 * @return *this.
 					 */
-					Track& FineTune(std::map<std::string, std::string> options) noexcept;
+					Track& FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept;
 
 					/**
 					 * @brief Overrides stream language.
 					 * @param language ISO tag. Empty clears the override.
 					 * @return *this.
 					 */
-					Track& Language(std::string language) noexcept;
+					Track& Language(StormByte::Safe::String language);
 
 					/**
 					 * @brief Overrides stream title.
 					 * @param title Title text. Empty clears the override.
 					 * @return *this.
 					 */
-					Track& Title(std::string title) noexcept;
+					Track& Title(StormByte::Safe::String title);
 
 					/**
 					 * @brief Appends a Process, Packet or Analytics filter to this track.
@@ -401,7 +400,7 @@ namespace StormByte::Multimedia::Pipeline {
 					template<typename FilterType, typename... Args>
 					Track& Filter(Args&&... args) noexcept {
 						m_owner->AttachFilter(m_slot,
-							std::make_shared<FilterType>(std::forward<Args>(args)...));
+							StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<FilterType>(std::forward<Args>(args)...));
 						return *this;
 					}
 
@@ -415,8 +414,8 @@ namespace StormByte::Multimedia::Pipeline {
 					 */
 					Track(Transcoder& owner, std::size_t slot) noexcept;
 
-					Transcoder* m_owner;								///< Parent job
-					std::size_t m_slot;									///< Job map index
+					Transcoder* m_owner;	///< Borrowed parent job, which must outlive this handle
+					std::size_t m_slot;	///< Job map index
 			};
 
 			/**
@@ -429,51 +428,51 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param source Input path.
 			 * @param destination Output path.
 			 * @param logger Shared log for the job and the tube.
-			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
+			 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
 			 *
 			 * Stores @p logger as-is. @ref InstallLog runs at the end
 			 * of this constructor.
 			 */
 			Transcoder(const std::filesystem::path& source,
 				const std::filesystem::path& destination,
-				std::shared_ptr<StormByte::Logger::Log> logger,
-				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+				StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+				StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 			/**
 			 * @brief Builds a local reader and takes @p writer.
 			 * @param source Input path.
 			 * @param writer Owned output location (moved).
 			 * @param logger Shared log for the job and the tube.
-			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
+			 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
 			 */
 			Transcoder(const std::filesystem::path& source,
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-				std::shared_ptr<StormByte::Logger::Log> logger,
-				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+				StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+				StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 			/**
 			 * @brief Takes @p reader and builds a local writer.
 			 * @param reader Owned input location (moved).
 			 * @param destination Output path.
 			 * @param logger Shared log for the job and the tube.
-			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
+			 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
 			 */
 			Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 				const std::filesystem::path& destination,
-				std::shared_ptr<StormByte::Logger::Log> logger,
-				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+				StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+				StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 			/**
 			 * @brief Takes both location owners without slicing.
 			 * @param reader Owned input location (moved).
 			 * @param writer Owned output location (moved).
 			 * @param logger Shared log for the job and the tube.
-			 * @param duration Authoritative source duration. When omitted, the source is scanned before pipeline stages start.
+			 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
 			 */
 			Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-				std::shared_ptr<StormByte::Logger::Log> logger,
-				std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+				StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+				StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 			/**
 			 * @brief Copy constructor.
@@ -518,13 +517,13 @@ namespace StormByte::Multimedia::Pipeline {
 			 * pass this pointer to a Step or filter; those use the
 			 * application logger and the Multimedia stage path.
 			 */
-			const std::shared_ptr<StormByte::Logger::Log>& Logger() const noexcept;
+			const StormByte::Safe::Shared<StormByte::Logger::Log>& Logger() const noexcept;
 
 			/**
 			 * @brief Intention built for this job, if any.
 			 * @return Plan, or empty before Run.
 			 */
-			inline const std::shared_ptr<class Plan>& Plan() const noexcept {
+			inline const StormByte::Safe::Shared<class Plan>& Plan() const noexcept {
 				return m_plan;
 			}
 
@@ -589,9 +588,9 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			template<typename FilterType, typename... Args>
 			Transcoder& Filter(Args&&... args) noexcept {
-				static_assert(std::is_base_of_v<Filter::Analytics, FilterType>,
+				static_assert(StormByte::Type::DerivedFrom<FilterType, Filter::Analytics>,
 					"Track filters attach on Track::Filter");
-				AttachAnalytics(std::make_shared<FilterType>(std::forward<Args>(args)...));
+				AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<FilterType>(std::forward<Args>(args)...));
 				return *this;
 			}
 
@@ -645,7 +644,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Failure text.
 			 * @return Message, or empty.
 			 */
-			std::optional<std::string> Error() const noexcept;
+			StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
 
 			/**
 			 * @brief Shared telemetry for the original input reader.
@@ -667,7 +666,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * @return Const shared handle, or empty.
 			 */
-			Progress::Pointer Progress() const noexcept;
+			StormByte::Safe::Shared<const class Progress> Progress() const noexcept;
 
 			/**
 			 * @brief Analytics snapshots after the job is Idle.
@@ -682,7 +681,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * A low score is still Ok. Notice lines from a leaf
 			 * are log, not this API.
 			 */
-			std::vector<std::pair<std::string, Filter::Report>> Reports() const noexcept;
+			StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> Reports() const noexcept;
 
 			/**
 			 * @brief Shared job and stage telemetry, available before Run.
@@ -693,7 +692,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * @return Shared telemetry handle, or empty without a backend.
 			 */
-			std::shared_ptr<const JobTelemetry> Telemetry() const noexcept;
+			StormByte::Safe::Shared<const JobTelemetry> Telemetry() const noexcept;
 
 			/**
 			 * @brief true if not failed.
@@ -726,7 +725,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Hand this to a Step or filter. Those apply the Multimedia
 			 * stage path themselves.
 			 */
-			inline const std::shared_ptr<StormByte::Logger::Log>& ApplicationLog() const noexcept {
+			inline const StormByte::Safe::Shared<StormByte::Logger::Log>& ApplicationLog() const noexcept {
 				return m_app_log;
 			}
 
@@ -734,32 +733,35 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Allocates the Plan type for this job.
 			 * @param reader Owned origin location, transferred from this Transcoder.
 			 * @param writer Owned destination location, transferred from this Transcoder.
-			 * @param duration Authoritative source duration; absent or non-positive scans the source.
+			 * @param duration Authoritative source nanoseconds; absent or non-positive scans the source.
 			 * @return Plan of the desired dynamic type, with no tracks yet.
 			 *
 			 * Override to return a type derived from Plan. Tracks are
 			 * filled from the fluent map after this returns. After the
 			 * call this Transcoder no longer owns the leaves.
-			 * Pass DurationProgress() to the observing Plan constructor to
-			 * publish byte-based scan updates from a custom factory.
+			 * Construct Shared<Plan>::MakePointer<Derived> in the provider module
+			 * so the exact payload is released there. Keep a local DurationProgress()
+			 * observer and pass its address to the observing Plan constructor.
 			 */
-			virtual std::unique_ptr<class Plan> EmptyPlan(
+			virtual StormByte::Safe::Shared<class Plan> EmptyPlan(
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-				std::optional<std::chrono::nanoseconds> duration = std::nullopt) const noexcept;
+				StormByte::Safe::Optional<std::int64_t> duration = {}) const noexcept;
 
 			/**
 			 * @brief Observer for duration resolution in custom EmptyPlan implementations.
-			 * @return Observer to pass to the four-argument Plan constructor.
+			 * @return Provider-owned observer to borrow during Plan construction.
+			 * @note The callback borrows this job; it must not outlive the Transcoder.
 			 */
-			StormByte::Multimedia::File::DurationProgress DurationProgress() const noexcept;
+			StormByte::Safe::Function<void(double)> DurationProgress() const noexcept;
 
 			/**
 			 * @brief Allocates the settled-row type.
 			 * @return Empty row of the desired dynamic type.
 			 *
 			 * Override to return a type derived from TrackSettled.
-			 * MarkSettled fills it and calls OnSettled.
+			 * MarkSettled fills it and calls OnSettled. Construct
+			 * Unique<TrackSettled>::MakePointer<Derived> in the provider module.
 			 */
 			virtual StormByte::Safe::Unique<TrackSettled> EmptySettled() const noexcept;
 
@@ -814,7 +816,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Hard error.
 			 * @param message Error text.
 			 */
-			virtual void OnError(const std::string& message) noexcept;
+			virtual void OnError(const StormByte::Safe::String& message) noexcept;
 
 			/**
 			 * @brief Cancel completed.
@@ -826,16 +828,10 @@ namespace StormByte::Multimedia::Pipeline {
 			friend class Track;
 
 			/**
-			 * @brief Takes already heap-allocated leaves.
-			 * @param reader Owned origin.
-			 * @param writer Owned sink.
-			 * @param logger Shared log.
-			 */
-			/**
 			 * @brief Marks a hard error and cancels the coordinator.
 			 * @param reason Message stored in Error().
 			 */
-			void Fail(std::string reason) noexcept;
+			void Fail(std::string_view reason) noexcept;
 
 			/**
 			 * @brief Opens a consultation File from the reader path and discards it after use.
@@ -870,24 +866,42 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param slot Job map index.
 			 * @param filter Filter instance.
 			 */
-			void AttachFilter(std::size_t slot, std::shared_ptr<Filter::FFmpeg> filter) noexcept;
+			void AttachFilter(std::size_t slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
 
 			/**
 			 * @brief Appends a global analytics filter (one node).
 			 * @param filter Filter instance.
 			 */
-			void AttachAnalytics(std::shared_ptr<Filter::FFmpeg> filter) noexcept;
+			void AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
 
-			std::shared_ptr<StormByte::Logger::Log> m_app_log;			///< Logger from the constructor; input for tube stages
-			std::shared_ptr<StormByte::Logger::Log> m_logger;			///< Job facade after InstallLog
+			StormByte::Safe::Shared<StormByte::Logger::Log> m_app_log;				///< Application logger used by pipeline stages
+			StormByte::Safe::Shared<StormByte::Logger::Log> m_logger;				///< Job logger after InstallLog
 			StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;	///< Input counters retained across owner transfer
 			StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;	///< Output counters retained across owner transfer
-			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Origin until EmptyPlan
-			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Sink until EmptyPlan
-			std::optional<std::chrono::nanoseconds> m_duration;								///< Authoritative source duration, when supplied
-			std::unique_ptr<File> m_consult;							///< Consultation snapshot; discarded after analysis
-			std::shared_ptr<class Plan> m_plan;							///< Intention; shared with the job after Run
-			std::unique_ptr<Backend::Pipeline::Transcoder> m_backend;	///< Map and coordinator thread
-			bool m_armed;												///< EmptyPlan already consumed the leaves
+			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Origin owner until EmptyPlan consumes it
+			StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Destination owner until EmptyPlan consumes it
+			StormByte::Safe::Optional<std::int64_t> m_duration;						///< Authoritative source nanoseconds, when supplied
+			StormByte::Safe::Unique<File> m_consult;								///< Provider-owned consultation snapshot discarded after analysis
+			StormByte::Safe::Shared<class Plan> m_plan;							///< Intention shared with the pipeline after Run
+			StormByte::Safe::Unique<Backend::Pipeline::Transcoder> m_backend;		///< Provider-owned coordinator constructed and destroyed out of line
+			bool m_armed;														///< Whether EmptyPlan has already consumed the location owners
 	};
 }
+
+/**
+ * @brief Registers the complete provider-owned settled row.
+ * @note Derived clone and move implementations must retain creator-module lifecycle.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TrackSettled);
+
+/**
+ * @brief Registers the borrowing fluent track handle.
+ * @note The parent Transcoder must outlive the handle.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Transcoder::Track);
+
+/**
+ * @brief Registers the inheritable facade with out-of-line provider lifecycle.
+ * @note Providers, Base and Logger must remain loaded with compatible C++ ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Transcoder);

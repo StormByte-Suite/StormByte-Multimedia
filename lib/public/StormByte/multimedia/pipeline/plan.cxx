@@ -54,6 +54,7 @@
 #include <StormByte/safe/wstring.hxx>
 
 #include <cctype>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -102,7 +103,7 @@ namespace {
 		return nullptr;
 	}
 
-	std::optional<std::string> AttachmentMime(
+	StormByte::Safe::Optional<StormByte::Safe::String> AttachmentMime(
 		const StormByte::Multimedia::Pipeline::Config::Base* config) noexcept {
 		if (!config)
 			return std::nullopt;
@@ -114,28 +115,28 @@ namespace {
 
 Plan::Plan(const std::filesystem::path& source,
 	const std::filesystem::path& destination,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Plan(LocalReader(source), LocalWriter(destination), std::move(duration)) {}
 
 Plan::Plan(const std::filesystem::path& source,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Plan(LocalReader(source), std::move(writer), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	const std::filesystem::path& destination,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Plan(std::move(reader), LocalWriter(destination), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
-: Plan(std::move(reader), std::move(writer), duration, {}) {}
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Plan(std::move(reader), std::move(writer), std::move(duration), nullptr) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
-	std::optional<std::chrono::nanoseconds> duration,
-	const StormByte::Multimedia::File::DurationProgress& progress) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration,
+	const StormByte::Safe::Function<void(double)>* progress) noexcept
 : m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)),
@@ -143,14 +144,26 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	m_container(m_writer ? ContainerFromWriter(*m_writer) : nullptr) {
 	if (!m_reader)
 		return;
-	if (duration && duration->count() <= 0)
+	if (duration && duration.value() <= 0)
 		duration.reset();
 	auto opened = StormByte::Multimedia::File::Open(*m_reader, duration);
 	if (opened) {
-		m_snapshot.emplace(std::move(*opened));
-		if (!duration)
-			static_cast<void>(m_snapshot->Duration(progress));
+		m_snapshot = StormByte::Safe::Unique<StormByte::Multimedia::File>::MakePointer<StormByte::Multimedia::File>(std::move(*opened));
+		if (!duration) {
+			if (progress)
+				static_cast<void>(m_snapshot->Duration(*progress));
+			else
+				static_cast<void>(m_snapshot->Duration());
+		}
 	}
+}
+
+Plan::Plan(Plan&& other) noexcept = default;
+
+Plan::~Plan() noexcept = default;
+
+StormByte::Safe::Shared<Plan> Plan::Move() {
+	return StormByte::Safe::Shared<Plan>::MakePointer<Plan>(std::move(*this));
 }
 
 const StormByte::Multimedia::Container* Plan::ContainerFromWriter(
@@ -235,14 +248,22 @@ CheckResult Plan::Check() const {
 }
 
 Demuxer& StormByte::Multimedia::Pipeline::operator>>(Plan&& plan, Demuxer& demuxer) noexcept {
+	return plan.Move() >> demuxer;
+}
+
+Demuxer& StormByte::Multimedia::Pipeline::operator>>(StormByte::Safe::Shared<Plan> plan, Demuxer& demuxer) noexcept {
 	if (demuxer.Plan()) {
-		demuxer.Fail("demuxer already has a plan");
+		demuxer.Fail(StormByte::Safe::String{"demuxer already has a plan"});
+		return demuxer;
+	}
+	if (!plan) {
+		demuxer.Fail(StormByte::Safe::String{"plan owner is empty"});
 		return demuxer;
 	}
 
 	Step& step = demuxer;
-	step.m_plan = std::make_shared<Plan>(std::move(plan));
+	step.m_plan = std::move(plan);
 	demuxer.m_planPresent.notify_all();
-	demuxer.Wake().notify_all();
+	demuxer.Wake();
 	return demuxer;
 }

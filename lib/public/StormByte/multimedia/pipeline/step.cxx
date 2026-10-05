@@ -44,16 +44,41 @@
 #include <StormByte/multimedia/log.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <chrono>
 #include <format>
 #include <limits>
+#include <memory>
 #include <string>
 #include <utility>
 
 using namespace StormByte::Multimedia::Pipeline;
 namespace Backend = StormByte::Multimedia::Backend;
 using StormByte::Logger::Level;
+
+namespace {
+	class MountedWorker final: public Backend::Pipeline::Worker {
+		public:
+			MountedWorker(Backend::Pipeline::Host& host,
+				StormByte::Safe::Unique<Backend::Pipeline::Worker> worker) noexcept
+			: Backend::Pipeline::Worker(host), m_worker(std::move(worker)) {}
+
+			void Setup() noexcept override {
+				m_worker->Setup();
+			}
+
+			void Process(Item::PointerType item) noexcept override {
+				m_worker->Process(std::move(item));
+			}
+
+		protected:
+			void Flush() noexcept override {}
+
+		private:
+			StormByte::Safe::Unique<Backend::Pipeline::Worker> m_worker;
+	};
+}
 
 class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host {
 	public:
@@ -73,7 +98,7 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		}
 
 		void Fail(std::string reason) noexcept override {
-			m_step.Fail(std::move(reason));
+			m_step.Fail(StormByte::Safe::String(reason));
 		}
 
 		void Log(StormByte::Logger::Level level, std::string_view message) noexcept override {
@@ -106,7 +131,7 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 
 		void BecameReady() noexcept override {
 			m_step.Log(Level::Debug, "ready");
-			m_step.m_wake.notify_all();
+			m_step.Wake();
 		}
 
 		void RecordWork(std::chrono::nanoseconds duration) noexcept override {
@@ -126,17 +151,25 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		Step& m_step;
 };
 
-Step::Step(std::shared_ptr<StormByte::Logger::Log> log,
+class Step::PrivateState {
+	public:
+		explicit PrivateState(Step& owner) noexcept
+		:	surface(owner) {}
+
+		Backend::Pipeline::Pipe pipe;							///< Input/output queues and wait synchronization
+		Surface surface;										///< Host adapter borrowing the owning step
+		StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper;	///< Worker driver owned through Base heap callbacks
+};
+
+Step::Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	enum Producer name,
 	Kinds receives, Kinds produces) noexcept
 :	m_log(StormByte::Multimedia::UseLog(std::move(log), ToString(name))),
 	m_name(name),
 	m_receives(receives),
 	m_produces(produces),
-	m_wake(),
-	m_pipe(std::make_unique<Backend::Pipeline::Pipe>(m_wake)),
-	m_surface(std::make_unique<Surface>(*this)),
-	m_telemetry(std::make_shared<StageTelemetry>()),
+	m_state(new PrivateState(*this)),
+	m_telemetry(StormByte::Safe::Heap::MakeShared<StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
 	m_workMin(std::numeric_limits<std::int64_t>::max()),
@@ -147,32 +180,34 @@ Step::Step(std::shared_ptr<StormByte::Logger::Log> log,
 
 Step::~Step() noexcept {
 	Halt();
+	delete m_state;
 }
 
 State Step::Status() const noexcept {
-	if (m_pumper)
-		return m_pumper->Status();
+	if (m_state->pumper)
+		return m_state->pumper->Status();
 	return m_error ? State::Failed : State::Created;
 }
 
-std::shared_ptr<const StageTelemetry> Step::Telemetry() const noexcept {
-	const std::string origin = Label();
+StormByte::Safe::Shared<const StageTelemetry> Step::Telemetry() const noexcept {
+	const auto origin = Label();
 	m_telemetry->SetOrigin(origin);
 	return m_telemetry;
 }
 
 void Step::CloseHoppers() noexcept {
-	m_pipe->Close();
+	m_state->pipe.Close();
 }
 
-void Step::Fail(std::string reason) noexcept {
+void Step::Fail(StormByte::Safe::String reason) noexcept {
 	m_telemetry->SetError(reason);
 	m_error = std::move(reason);
-	Log(Level::Error, *m_error);
-	if (m_pumper)
-		m_pumper->Fail(*m_error);
+	const StormByte::Safe::String message = *m_error;
+	Log(Level::Error, message);
+	if (m_state->pumper)
+		m_state->pumper->Fail(static_cast<std::string>(message));
 	CloseHoppers();
-	m_wake.notify_all();
+	Wake();
 }
 
 bool Step::Failed() const noexcept {
@@ -186,18 +221,19 @@ bool Step::Ready() const noexcept {
 void Step::Stop() noexcept {
 	const State state = Status();
 	const bool signaled = state == State::Created || state == State::Ready;
-	if (m_pumper)
-		m_pumper->Stop();
+	if (m_state->pumper)
+		m_state->pumper->Stop();
 	if (signaled)
 		Log(Level::LowLevel, "stop");
 	CloseHoppers();
-	m_wake.notify_all();
+	Wake();
 }
 
 std::size_t Step::InputCeiling() const noexcept {
 	if (!m_plan || m_plan->Tracks().empty())
 		return 0;
-	const Backend::Pipeline::Ceiling cap{m_plan, m_name, m_plan->Tracks()[0]};
+	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = m_plan;
+	const Backend::Pipeline::Ceiling cap{plan, m_name, plan->Tracks()[0]};
 	if (Receives().Has(Kind::Frame) && cap.Frames() != 0)
 		return cap.Frames();
 	if (Receives().Has(Kind::Packet) && cap.Packets() != 0)
@@ -210,32 +246,33 @@ bool Step::Stopping() const noexcept {
 	return state == State::Stopping || state == State::Stopped || state == State::Failed;
 }
 
-const std::optional<std::string>& Step::Error() const noexcept {
+const StormByte::Safe::Optional<StormByte::Safe::String>& Step::Error() const noexcept {
 	return m_error;
 }
 
-std::condition_variable& Step::Wake() noexcept {
-	return m_wake;
+void Step::Wake() noexcept {
+	m_state->pipe.Wake();
 }
 
 Backend::Pipeline::Pipe& Step::pipe() noexcept {
-	return *m_pipe;
+	return m_state->pipe;
 }
 
 const Backend::Pipeline::Pipe& Step::pipe() const noexcept {
-	return *m_pipe;
+	return m_state->pipe;
 }
 
 void Step::Wait() noexcept {
 	Log(Level::LowLevel, "wait");
-	std::unique_lock lock(m_wait);
-	const auto started = std::chrono::steady_clock::now();
-	m_wake.wait(lock, [this] {
-		return Stopping() || m_pipe->Ready() || m_pipe->InputEof() || WakeNow();
+	m_state->pipe.Wait(this, [](void* owner) noexcept {
+		auto& step = *static_cast<Step*>(owner);
+		return step.Stopping() || step.pipe().Ready() || step.pipe().InputEof() || step.WakeNow();
+	}, [](void* owner, std::chrono::nanoseconds duration) noexcept {
+		auto& step = *static_cast<Step*>(owner);
+		step.m_telemetry->RecordWait(duration);
+		step.Log(Level::LowLevel, "wake");
+		step.AfterWait();
 	});
-	m_telemetry->RecordWait(std::chrono::steady_clock::now() - started);
-	Log(Level::LowLevel, "wake");
-	AfterWait();
 }
 
 bool Step::WakeNow() const noexcept {
@@ -247,15 +284,15 @@ void Step::AfterWait() noexcept {}
 void Step::Emit(Item::PointerType item) noexcept {
 	if (item)
 		m_telemetry->RecordOutput(item->Kind());
-	item >> *m_pipe;
+	item >> m_state->pipe;
 }
 
 Item::PointerType Step::CloneItem(const Item& item) const noexcept {
 	return item.Clone();
 }
 
-std::string Step::Label() const noexcept {
-	return std::string(ToString(m_name));
+StormByte::Safe::String Step::Label() const noexcept {
+	return StormByte::Safe::String(ToString(m_name));
 }
 
 void Step::Log(StormByte::Logger::Level level, std::string_view message) noexcept {
@@ -291,29 +328,29 @@ void Step::DumpWork() noexcept {
 }
 
 Backend::Pipeline::Host& Step::Face() noexcept {
-	return *m_surface;
+	return m_state->surface;
 }
 
-void Step::Mount(std::unique_ptr<Backend::Pipeline::Pumper> pumper,
-	std::unique_ptr<Backend::Pipeline::Worker> worker) noexcept {
-	if (m_pumper || !pumper || !worker)
+void Step::Mount(StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper,
+	StormByte::Safe::Unique<Backend::Pipeline::Worker> worker) noexcept {
+	if (m_state->pumper || !pumper || !worker)
 		return;
-	m_pumper = std::move(pumper);
-	m_pumper->Bind(std::move(worker));
+	m_state->pumper = std::move(pumper);
+	m_state->pumper->Bind(std::make_unique<MountedWorker>(Face(), std::move(worker)));
 }
 
 void Step::Launch() noexcept {
-	if (!m_pumper || Stopping())
+	if (!m_state->pumper || Stopping())
 		return;
 	Log(Level::LowLevel, "launch");
-	m_pipe->Listen();
-	m_pumper->Launch();
+	m_state->pipe.Listen();
+	m_state->pumper->Launch();
 }
 
 void Step::Halt() noexcept {
 	Stop();
-	if (m_pumper)
-		m_pumper->Halt();
+	if (m_state->pumper)
+		m_state->pumper->Halt();
 }
 
 Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept {

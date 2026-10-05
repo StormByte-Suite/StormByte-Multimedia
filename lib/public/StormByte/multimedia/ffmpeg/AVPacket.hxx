@@ -256,3 +256,9 @@ namespace StormByte::Multimedia::FFmpeg {
 
 	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVPacket>;
 }
+
+/**
+ * @brief Conditional provider contract: packet copies and release use FFmpeg out-of-line.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPacket);

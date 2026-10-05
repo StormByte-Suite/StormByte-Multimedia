@@ -42,11 +42,12 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
 #include <memory>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -83,31 +84,37 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param rate Output sample rate in Hz. Empty → 48000.
 			 */
-			Resample(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<int> rate = {}) noexcept;
+			Resample(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<int> rate = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Source filter.
 			 */
 			Resample(const Resample& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Source filter.
 			 */
 			Resample(Resample&& other) noexcept = delete;
 
 			/**
 			 * @brief Drops the cached graph.
 			 */
-			~Resample() noexcept override = default;
+			~Resample() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Resample& operator=(const Resample& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Resample& operator=(Resample&& other) noexcept = delete;
 
@@ -149,9 +156,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `aresample=osr=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<int> m_rateIn;	///< Caller rate, or empty
+			Safe::Optional<int> m_rateIn;	///< Caller rate, or empty
+
 			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private graph ownership is allocated and released only by Multimedia.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Resample);

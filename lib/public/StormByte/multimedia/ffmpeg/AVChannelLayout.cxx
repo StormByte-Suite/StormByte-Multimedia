@@ -118,7 +118,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		return m_raw ? static_cast<int>(m_raw->order) : 0;
 	}
 
-	std::string AVChannelLayout::Describe() const noexcept {
+	StormByte::Safe::String AVChannelLayout::Describe() const noexcept {
 		if (!m_raw || m_raw->nb_channels <= 0)
 			return {};
 		char small[64];
@@ -126,11 +126,11 @@ namespace StormByte::Multimedia::FFmpeg {
 		if (n < 0)
 			return {};
 		if (n < static_cast<int>(sizeof(small)))
-			return std::string(small);
+			return StormByte::Safe::String(small);
 		std::vector<char> big(static_cast<std::size_t>(n) + 1u);
 		if (av_channel_layout_describe(m_raw, big.data(), big.size()) < 0)
 			return {};
-		return std::string(big.data());
+		return StormByte::Safe::String(big.data());
 	}
 
 	bool AVChannelLayout::operator==(const AVChannelLayout& other) const noexcept {

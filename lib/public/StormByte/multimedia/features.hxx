@@ -41,26 +41,91 @@
 #include <StormByte/bitmask.hxx>
 #include <StormByte/multimedia/feature.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <string>
 
 /**
- * @namespace StormByte::Multimedia
- * @brief Public media types: codecs, registry and stream kinds.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia {
+namespace StormByte {
 	/**
-	 * @class Features
-	 * @brief Bitmask of Feature flags.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public media types: codecs, containers, registry and stream kinds.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Features: public StormByte::Bitmask<Features, Feature> {
-		public:
-			using Bitmask::Bitmask;
+	namespace Multimedia {
+		/**
+		 * @class Features
+		 * @brief Bitmask of Feature flags.
+		 * @note Stores only enum flags and a Bitmask vtable, with no owning heap state.
+		 * Conditional DLL safety requires a compatible compiler, standard-library ABI
+		 * and provider layout, with the multimedia provider loaded during use.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC Features: public StormByte::Bitmask<Features, Feature> {
+			public:
+				/**
+				 * @brief Constructs an empty allocation-free mask.
+				 */
+				constexpr Features() noexcept: Bitmask() {}
 
-			/**
-			 * @brief Enabled flags as "A | B | C".
-			 * @return Empty string when no flag is set.
-			 */
-			operator std::string() const noexcept;
-	};
+				/**
+				 * @brief Constructs an allocation-free mask from feature flags.
+				 * @param feature Initial flags; implicit conversion preserves Bitmask behavior.
+				 */
+				constexpr Features(Feature feature) noexcept: Bitmask(feature) {}
+
+				/**
+				 * @brief Copy constructor for the allocation-free mask.
+				 * @param other Source mask.
+				 */
+				constexpr Features(const Features& other) noexcept = default;
+
+				/**
+				 * @brief Move constructor for the allocation-free mask.
+				 * @param other Source mask.
+				 */
+				constexpr Features(Features&& other) noexcept = default;
+
+				/**
+				 * @brief Destroys the allocation-free mask.
+				 */
+				constexpr ~Features() noexcept override = default;
+
+				/**
+				 * @brief Copies the enum flags.
+				 * @param other Source mask.
+				 * @return This mask.
+				 */
+				constexpr Features& operator=(const Features& other) noexcept = default;
+
+				/**
+				 * @brief Moves the enum flags.
+				 * @param other Source mask.
+				 * @return This mask.
+				 */
+				constexpr Features& operator=(Features&& other) noexcept = default;
+
+				/**
+				 * @brief Enabled flags as Base-owned "A | B | C" text.
+				 * @return Safe string, empty when no flag is set.
+				 */
+				operator Safe::String() const noexcept;
+
+				/**
+				 * @brief Enabled flags as caller-owned "A | B | C" text.
+				 * @return Standard string allocated in the calling module.
+				 * @note Allocation failure terminates, preserving the noexcept contract.
+				 */
+				STORMBYTE_FORCE_INLINE operator std::string() const noexcept {
+					return static_cast<std::string>(static_cast<Safe::String>(*this));
+				}
+		};
+	}
 }
+
+/**
+ * @brief Declare the allocation-free flag mask conditionally DLL-safe.
+ * @note Its Bitmask vtable and inline operations require a compatible provider ABI.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Features);

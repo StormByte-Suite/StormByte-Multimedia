@@ -40,30 +40,42 @@
 
 #include <StormByte/multimedia/visibility.h>
 
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
-namespace StormByte::Multimedia {
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia processing and metadata.
+	 */
+	namespace Multimedia {
 	/**
 	 * @class File
 	 * @brief Public media file snapshot.
 	 */
 	class File;
-}
 
-namespace StormByte::Multimedia::Detail {
+	/**
+	 * @namespace StormByte::Multimedia::Detail
+	 * @brief Private multimedia implementation helpers.
+	 */
+	namespace Detail {
 	/**
 	 * @class Probe
 	 * @brief Private metadata probe.
 	 */
 	class Probe;
-}
+	}
 
 /**
  * @namespace StormByte::Multimedia::Metadata
  * @brief Snapshot metadata for files and streams.
  */
-namespace StormByte::Multimedia::Metadata {
+	namespace Metadata {
 	/**
 	 * @class File
 	 * @brief Container-level tags and header fields captured at Open.
@@ -74,195 +86,214 @@ namespace StormByte::Multimedia::Metadata {
 		public:
 			/**
 			 * @brief Copy constructor.
+			 * @param other Metadata to copy.
 			 */
-			File(const File&) = default;
+			File(const File& other);
 
 			/**
 			 * @brief Move constructor.
+			 * @param other Metadata to transfer.
 			 */
-			File(File&&) noexcept = default;
+			File(File&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~File() = default;
+			~File() noexcept;
 
 			/**
 			 * @brief Copy assignment.
+			 * @param other Metadata to copy.
 			 * @return *this.
 			 */
-			File& operator=(const File&) = default;
+			File& operator=(const File& other);
 
 			/**
 			 * @brief Move assignment.
+			 * @param other Metadata to transfer.
 			 * @return *this.
 			 */
-			File& operator=(File&&) noexcept = default;
+			File& operator=(File&& other) noexcept;
 
 			/**
 			 * @brief Work title.
 			 * @return Title, or empty.
 			 */
-			const std::optional<std::string>& Title() const noexcept;
+			const Safe::Optional<Safe::String>& Title() const noexcept;
 
 			/**
 			 * @brief Main artist.
 			 * @return Artist, or empty.
 			 */
-			const std::optional<std::string>& Artist() const noexcept;
+			const Safe::Optional<Safe::String>& Artist() const noexcept;
 
 			/**
 			 * @brief Album / set name.
 			 * @return Album, or empty.
 			 */
-			const std::optional<std::string>& Album() const noexcept;
+			const Safe::Optional<Safe::String>& Album() const noexcept;
 
 			/**
 			 * @brief Album artist if different from Artist.
 			 * @return Album artist, or empty.
 			 */
-			const std::optional<std::string>& AlbumArtist() const noexcept;
+			const Safe::Optional<Safe::String>& AlbumArtist() const noexcept;
 
 			/**
 			 * @brief Composer.
 			 * @return Composer, or empty.
 			 */
-			const std::optional<std::string>& Composer() const noexcept;
+			const Safe::Optional<Safe::String>& Composer() const noexcept;
 
 			/**
 			 * @brief Genre.
 			 * @return Genre, or empty.
 			 */
-			const std::optional<std::string>& Genre() const noexcept;
+			const Safe::Optional<Safe::String>& Genre() const noexcept;
 
 			/**
 			 * @brief Comment.
 			 * @return Comment, or empty.
 			 */
-			const std::optional<std::string>& Comment() const noexcept;
+			const Safe::Optional<Safe::String>& Comment() const noexcept;
 
 			/**
 			 * @brief Copyright notice.
 			 * @return Copyright, or empty.
 			 */
-			const std::optional<std::string>& Copyright() const noexcept;
+			const Safe::Optional<Safe::String>& Copyright() const noexcept;
 
 			/**
 			 * @brief Encoder identification.
 			 * @return Encoder, or empty.
 			 */
-			const std::optional<std::string>& Encoder() const noexcept;
+			const Safe::Optional<Safe::String>& Encoder() const noexcept;
 
 			/**
 			 * @brief Date / year tag.
 			 * @return Date, or empty.
 			 */
-			const std::optional<std::string>& Date() const noexcept;
+			const Safe::Optional<Safe::String>& Date() const noexcept;
 
 			/**
 			 * @brief Track number.
 			 * @return Track, or empty.
 			 */
-			std::optional<unsigned> Track() const noexcept;
+			Safe::Optional<unsigned> Track() const;
 
 			/**
 			 * @brief Disc number.
 			 * @return Disc, or empty.
 			 */
-			std::optional<unsigned> Disc() const noexcept;
+			Safe::Optional<unsigned> Disc() const;
 
 		private:
 			friend class StormByte::Multimedia::File;
 			friend class StormByte::Multimedia::Detail::Probe;
 
-			std::optional<std::string> m_title;			///< title
-			std::optional<std::string> m_artist;		///< artist
-			std::optional<std::string> m_album;			///< album
-			std::optional<std::string> m_albumArtist;	///< album_artist
-			std::optional<std::string> m_composer;		///< composer
-			std::optional<std::string> m_genre;			///< genre
-			std::optional<std::string> m_comment;		///< comment
-			std::optional<std::string> m_copyright;		///< copyright
-			std::optional<std::string> m_encoder;		///< encoder
-			std::optional<std::string> m_date;			///< date
-			std::optional<unsigned> m_track;			///< track
-			std::optional<unsigned> m_disc;				///< disc
+			Safe::Optional<Safe::String> m_title;		///< Work title.
+
+			Safe::Optional<Safe::String> m_artist;		///< Main artist.
+
+			Safe::Optional<Safe::String> m_album;		///< Album or set name.
+
+			Safe::Optional<Safe::String> m_albumArtist;	///< Album artist.
+
+			Safe::Optional<Safe::String> m_composer;	///< Composer.
+
+			Safe::Optional<Safe::String> m_genre;		///< Genre.
+
+			Safe::Optional<Safe::String> m_comment;		///< Comment.
+
+			Safe::Optional<Safe::String> m_copyright;	///< Copyright notice.
+
+			Safe::Optional<Safe::String> m_encoder;		///< Encoder identification.
+
+			Safe::Optional<Safe::String> m_date;		///< Date or year tag.
+
+			Safe::Optional<unsigned> m_track;			///< Track number.
+
+			Safe::Optional<unsigned> m_disc;			///< Disc number.
 
 			/**
 			 * @brief Empty metadata.
 			 */
-			File() noexcept = default;
+			File();
 
 			/**
 			 * @brief Sets the title.
 			 * @param title Title tag.
 			 */
-			void Title(std::string title) noexcept;
+			void Title(Safe::String title);
 
 			/**
 			 * @brief Sets the artist.
 			 * @param artist Artist tag.
 			 */
-			void Artist(std::string artist) noexcept;
+			void Artist(Safe::String artist);
 
 			/**
 			 * @brief Sets the album.
 			 * @param album Album tag.
 			 */
-			void Album(std::string album) noexcept;
+			void Album(Safe::String album);
 
 			/**
 			 * @brief Sets the album artist.
 			 * @param albumArtist Album artist tag.
 			 */
-			void AlbumArtist(std::string albumArtist) noexcept;
+			void AlbumArtist(Safe::String albumArtist);
 
 			/**
 			 * @brief Sets the composer.
 			 * @param composer Composer tag.
 			 */
-			void Composer(std::string composer) noexcept;
+			void Composer(Safe::String composer);
 
 			/**
 			 * @brief Sets the genre.
 			 * @param genre Genre tag.
 			 */
-			void Genre(std::string genre) noexcept;
+			void Genre(Safe::String genre);
 
 			/**
 			 * @brief Sets the comment.
 			 * @param comment Comment tag.
 			 */
-			void Comment(std::string comment) noexcept;
+			void Comment(Safe::String comment);
 
 			/**
 			 * @brief Sets the copyright.
 			 * @param copyright Copyright tag.
 			 */
-			void Copyright(std::string copyright) noexcept;
+			void Copyright(Safe::String copyright);
 
 			/**
 			 * @brief Sets the encoder.
 			 * @param encoder Encoder tag.
 			 */
-			void Encoder(std::string encoder) noexcept;
+			void Encoder(Safe::String encoder);
 
 			/**
 			 * @brief Sets the date.
 			 * @param date Date tag.
 			 */
-			void Date(std::string date) noexcept;
+			void Date(Safe::String date);
 
 			/**
 			 * @brief Sets the track number.
 			 * @param track Track number.
 			 */
-			void Track(unsigned track) noexcept;
+			void Track(unsigned track);
 
 			/**
 			 * @brief Sets the disc number.
 			 * @param disc Disc number.
 			 */
-			void Disc(unsigned disc) noexcept;
+			void Disc(unsigned disc);
 	};
+	}
+	}
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Metadata::File);

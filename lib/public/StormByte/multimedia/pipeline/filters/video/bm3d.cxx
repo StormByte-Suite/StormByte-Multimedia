@@ -50,12 +50,14 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Bm3d;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Bm3d::Bm3d(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> sigma, std::optional<unsigned> group,
-	std::optional<unsigned> range, std::optional<unsigned> bstep) noexcept
-	: Filter::Process(std::move(log), "bm3d"),
+Bm3d::Bm3d(Safe::Shared<StormByte::Logger::Log> log,
+	Safe::Optional<double> sigma, Safe::Optional<unsigned> group,
+	Safe::Optional<unsigned> range, Safe::Optional<unsigned> bstep) noexcept
+	: Filter::Process(std::move(log), Safe::String("bm3d")),
 	m_sigmaIn(sigma), m_groupIn(group), m_rangeIn(range), m_bstepIn(bstep),
 	m_sigma(0.0), m_group(0), m_range(0), m_bstep(0), m_latched(false) {}
+
+Bm3d::~Bm3d() noexcept = default;
 
 enum Type Bm3d::Media() const noexcept {
 	return Type::Video;
@@ -107,7 +109,7 @@ void Bm3d::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("bm3d: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("bm3d: AVFilterGraph::Ensure failed");
 		return;

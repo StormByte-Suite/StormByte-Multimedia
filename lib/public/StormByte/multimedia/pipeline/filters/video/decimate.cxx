@@ -51,12 +51,14 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Decimate;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Decimate::Decimate(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<unsigned> cycle,
-	std::optional<double> dupthresh,
-	std::optional<double> scthresh) noexcept
-	: Filter::Process(std::move(log), "decimate"),
+Decimate::Decimate(Safe::Shared<StormByte::Logger::Log> log,
+	Safe::Optional<unsigned> cycle,
+	Safe::Optional<double> dupthresh,
+	Safe::Optional<double> scthresh) noexcept
+	: Filter::Process(std::move(log), Safe::String("decimate")),
 	m_cycleIn(cycle), m_dupIn(dupthresh), m_scIn(scthresh) {}
+
+Decimate::~Decimate() noexcept = default;
 
 enum Type Decimate::Media() const noexcept {
 	return Type::Video;
@@ -98,7 +100,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("decimate: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("decimate: AVFilterGraph::Ensure failed");
 		return;

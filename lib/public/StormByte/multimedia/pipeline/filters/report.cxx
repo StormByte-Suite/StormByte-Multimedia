@@ -40,23 +40,33 @@
 
 #include <sstream>
 
-using StormByte::Multimedia::Pipeline::Filter::Report;
+using namespace StormByte::Multimedia::Pipeline::Filter;
 
-Report::Report() noexcept
+Report::Report()
 : m_status(Status::None), m_data() {}
 
-Report::Report(Status status, std::map<std::string, std::string> data) noexcept
+Report::Report(Status status, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data) noexcept
 : m_status(status), m_data(std::move(data)) {}
+
+Report::Report(const Report& other) = default;
+
+Report::Report(Report&& other) noexcept = default;
+
+Report::~Report() noexcept = default;
+
+Report& Report::operator=(const Report& other) = default;
+
+Report& Report::operator=(Report&& other) noexcept = default;
 
 Report::Status Report::Kind() const noexcept {
 	return m_status;
 }
 
-const std::map<std::string, std::string>& Report::Data() const noexcept {
+const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& Report::Data() const noexcept {
 	return m_data;
 }
 
-std::string Report::operator()() const noexcept {
+StormByte::Safe::String Report::operator()() const {
 	const char* kind = "none";
 	if (m_status == Status::Ok)
 		kind = "ok";
@@ -67,5 +77,5 @@ std::string Report::operator()() const noexcept {
 	out << "report status=" << kind;
 	for (const auto& [key, value] : m_data)
 		out << " " << key << "=" << value;
-	return out.str();
+	return StormByte::Safe::String(out.str());
 }

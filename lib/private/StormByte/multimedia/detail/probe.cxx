@@ -38,6 +38,7 @@
 
 #include <StormByte/multimedia/detail/probe.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <charconv>
 
@@ -48,19 +49,20 @@ extern "C" {
 namespace FFmpeg = StormByte::Multimedia::FFmpeg;
 
 namespace {
-	const char* NonEmpty(const char* value) noexcept {
-		return (value && value[0] != '\0') ? value : nullptr;
+	StormByte::Safe::Optional<StormByte::Safe::String> NonEmpty(StormByte::Safe::Optional<StormByte::Safe::String> value) noexcept {
+		return value && !value->empty() ? std::move(value) : std::nullopt;
 	}
 
-	std::optional<unsigned> ParseIndex(const char* value) noexcept {
-		if (!value || value[0] == '\0')
+	StormByte::Safe::Optional<unsigned> ParseIndex(const StormByte::Safe::Optional<StormByte::Safe::String>& value) noexcept {
+		if (!value || value->empty())
 			return std::nullopt;
 		unsigned out = 0;
-		const char* end = value;
+		const char* begin = value->data();
+		const char* end = begin;
 		while (*end && *end != '/')
 			++end;
-		const auto parsed = std::from_chars(value, end, out);
-		if (parsed.ec != std::errc{} || parsed.ptr == value)
+		const auto parsed = std::from_chars(begin, end, out);
+		if (parsed.ec != std::errc{} || parsed.ptr == begin)
 			return std::nullopt;
 		return out;
 	}
@@ -95,28 +97,28 @@ StormByte::Multimedia::Detail::Probe::Disposition(int flags) noexcept {
 StormByte::Multimedia::Metadata::File
 StormByte::Multimedia::Detail::Probe::File(const FFmpeg::AVFormatContext& ctx) noexcept {
 	Metadata::File meta;
-	if (const char* v = NonEmpty(ctx.Tag("title")))
-		meta.Title(v);
-	if (const char* v = NonEmpty(ctx.Tag("artist")))
-		meta.Artist(v);
-	if (const char* v = NonEmpty(ctx.Tag("album")))
-		meta.Album(v);
-	if (const char* v = NonEmpty(ctx.Tag("album_artist")))
-		meta.AlbumArtist(v);
-	if (const char* v = NonEmpty(ctx.Tag("composer")))
-		meta.Composer(v);
-	if (const char* v = NonEmpty(ctx.Tag("genre")))
-		meta.Genre(v);
-	if (const char* v = NonEmpty(ctx.Tag("comment")))
-		meta.Comment(v);
-	if (const char* v = NonEmpty(ctx.Tag("copyright")))
-		meta.Copyright(v);
-	if (const char* v = NonEmpty(ctx.Tag("encoder")))
-		meta.Encoder(v);
-	if (const char* v = NonEmpty(ctx.Tag("date")))
-		meta.Date(v);
-	else if (const char* v = NonEmpty(ctx.Tag("year")))
-		meta.Date(v);
+	if (const auto value = NonEmpty(ctx.Tag("title")))
+		meta.Title(*value);
+	if (const auto value = NonEmpty(ctx.Tag("artist")))
+		meta.Artist(*value);
+	if (const auto value = NonEmpty(ctx.Tag("album")))
+		meta.Album(*value);
+	if (const auto value = NonEmpty(ctx.Tag("album_artist")))
+		meta.AlbumArtist(*value);
+	if (const auto value = NonEmpty(ctx.Tag("composer")))
+		meta.Composer(*value);
+	if (const auto value = NonEmpty(ctx.Tag("genre")))
+		meta.Genre(*value);
+	if (const auto value = NonEmpty(ctx.Tag("comment")))
+		meta.Comment(*value);
+	if (const auto value = NonEmpty(ctx.Tag("copyright")))
+		meta.Copyright(*value);
+	if (const auto value = NonEmpty(ctx.Tag("encoder")))
+		meta.Encoder(*value);
+	if (const auto value = NonEmpty(ctx.Tag("date")))
+		meta.Date(*value);
+	else if (const auto value = NonEmpty(ctx.Tag("year")))
+		meta.Date(*value);
 	if (const auto track = ParseIndex(ctx.Tag("track")))
 		meta.Track(*track);
 	if (const auto disc = ParseIndex(ctx.Tag("disc")))
@@ -127,10 +129,10 @@ StormByte::Multimedia::Detail::Probe::File(const FFmpeg::AVFormatContext& ctx) n
 StormByte::Multimedia::Metadata::Stream
 StormByte::Multimedia::Detail::Probe::Stream(const FFmpeg::AVStream& stream) noexcept {
 	Metadata::Stream meta;
-	if (const char* v = NonEmpty(stream.Tag("title")))
-		meta.Title(v);
-	if (const char* v = NonEmpty(stream.Tag("language")))
-		meta.Language(v);
+	if (const auto value = NonEmpty(stream.Tag("title")))
+		meta.Title(*value);
+	if (const auto value = NonEmpty(stream.Tag("language")))
+		meta.Language(*value);
 	const auto bitRate = stream.CodecParameters().BitRate();
 	if (bitRate > 0)
 		meta.BitRate(static_cast<std::uint64_t>(bitRate));

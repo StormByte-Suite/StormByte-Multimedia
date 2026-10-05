@@ -42,8 +42,8 @@ extern "C" {
 	#include <libavutil/error.h>
 }
 
-std::string StormByte::Multimedia::FFmpeg::ErrorToString(int errnum) {
+StormByte::Safe::String StormByte::Multimedia::FFmpeg::ErrorToString(int errnum) {
 	char buf[AV_ERROR_MAX_STRING_SIZE] = {0};
 	av_strerror(errnum, buf, sizeof(buf));
-	return buf;
+	return StormByte::Safe::String(buf);
 }

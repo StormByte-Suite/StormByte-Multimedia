@@ -42,10 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <memory>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -85,13 +86,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param threshold Impulse threshold 1–100. Empty → FFmpeg default (2).
 			 */
-			Adeclick(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> threshold = {}) noexcept;
+			Adeclick(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> threshold = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is disabled.
+			 * @param other Source filter.
+			 */
 			Adeclick(const Adeclick& other) = delete;
+
+			/**
+			 * @brief Move construction is disabled.
+			 * @param other Source filter.
+			 */
 			Adeclick(Adeclick&& other) noexcept = delete;
-			~Adeclick() noexcept override = default;
+
+			/**
+			 * @brief Releases the filter resources.
+			 */
+			~Adeclick() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Adeclick& operator=(const Adeclick& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Adeclick& operator=(Adeclick&& other) noexcept = delete;
 
 			/**
@@ -126,9 +152,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `adeclick` or `adeclick=threshold=` .
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_thrIn;	///< Caller threshold, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;
+			Safe::Optional<double> m_thrIn;	///< Caller threshold, or empty for the FFmpeg default.
+
+			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Graph allocated and released only by the provider.
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private graph ownership is allocated and released only by Multimedia.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Adeclick);

@@ -42,9 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
-#include <memory>
-#include <optional>
 #include <string>
 
 /**
@@ -97,6 +99,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Decimate
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @par Conditional DLL safety
+	 * Requires a compatible C++ ABI and all providers to remain loaded while
+	 * objects, handles or callbacks exist. Create the leaf on Base's heap through
+	 * a Safe owner. Private storage is created, used and destroyed out of line
+	 * by the provider; the private Chain string never transfers ownership to callers.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Fieldmatch: public Filter::Process {
 		public:
@@ -109,33 +116,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param combmatch Comb score use: @c none, @c sc or @c full.
 			 *        Empty → @c sc.
 			 */
-			Fieldmatch(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<std::string> order = {},
-				std::optional<std::string> mode = {},
-				std::optional<std::string> combmatch = {}) noexcept;
+			Fieldmatch(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<Safe::String> order = {},
+				Safe::Optional<Safe::String> mode = {},
+				Safe::Optional<Safe::String> combmatch = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Leaf that cannot be copied.
 			 */
 			Fieldmatch(const Fieldmatch& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Leaf that cannot be moved.
 			 */
 			Fieldmatch(Fieldmatch&& other) noexcept = delete;
 
 			/**
 			 * @brief Drops the cached graph.
 			 */
-			~Fieldmatch() noexcept override = default;
+			~Fieldmatch() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Leaf that cannot be copied.
+			 * @return No value; this operation is deleted.
 			 */
 			Fieldmatch& operator=(const Fieldmatch& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Leaf that cannot be moved.
+			 * @return No value; this operation is deleted.
 			 */
 			Fieldmatch& operator=(Fieldmatch&& other) noexcept = delete;
 
@@ -173,9 +186,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			std::string Chain() const noexcept;
 
-			std::optional<std::string> m_orderIn;		///< Caller order, or empty
-			std::optional<std::string> m_modeIn;		///< Caller mode, or empty
-			std::optional<std::string> m_combIn;		///< Caller combmatch, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			Safe::Optional<Safe::String> m_orderIn;									///< Caller order, or empty
+			Safe::Optional<Safe::String> m_modeIn;									///< Caller mode, or empty
+			Safe::Optional<Safe::String> m_combIn;									///< Caller combmatch, or empty
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;		///< Reused graph
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Fieldmatch);

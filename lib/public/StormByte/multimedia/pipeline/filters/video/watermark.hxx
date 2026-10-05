@@ -38,20 +38,18 @@
 
 #pragma once
 
-#include <StormByte/binary_data.hxx>
-#include <StormByte/buffer/generic.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
-#include <StormByte/multimedia/ffmpeg/Sws.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/property/point.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
-#include <filesystem>
-#include <memory>
-#include <optional>
 #include <string_view>
 
 /**
@@ -116,35 +114,43 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Logo at an anchor on the active picture.
-			 * @param log Shared logger. Empty pointer means no log.
-			 * @param logo Path to a still image (png, jpeg, webp, bmp).
+			 * @param log Safe shared logger retained by the filter. Empty means no log.
+			 * @param logo Owned UTF-8 path to a still image (png, jpeg, webp, bmp).
 			 * @param anchor Placement relative to measured bars.
 			 * @param opacity 0–100. 0 = no-op.
 			 * @param margin Pixels from the anchored active edge.
+			 * @note The path is copied into provider-owned native filesystem storage;
+			 * UTF-8 is converted to the native wide representation on Windows.
+			 * Allocation or path-conversion exceptions terminate because this is noexcept.
 			 */
-			Watermark(std::shared_ptr<StormByte::Logger::Log> log,
-				const std::filesystem::path& logo, Anchor anchor,
+			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				StormByte::Safe::String logo, Anchor anchor,
 				unsigned opacity = 100, int margin = 0) noexcept;
 
 			/**
 			 * @brief Logo at an absolute top-left. No Hold.
-			 * @param log Shared logger. Empty pointer means no log.
-			 * @param logo Path to a still image (png, jpeg, webp, bmp).
+			 * @param log Safe shared logger retained by the filter. Empty means no log.
+			 * @param logo Owned UTF-8 path to a still image (png, jpeg, webp, bmp).
 			 * @param position Top-left of the logo in frame pixels.
 			 * @param opacity 0–100. 0 = no-op.
+			 * @note The path is copied into provider-owned native filesystem storage;
+			 * UTF-8 is converted to the native wide representation on Windows.
+			 * Allocation or path-conversion exceptions terminate because this is noexcept.
 			 */
-			Watermark(std::shared_ptr<StormByte::Logger::Log> log,
-				const std::filesystem::path& logo,
+			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				StormByte::Safe::String logo,
 				StormByte::Multimedia::Property::Point position,
 				unsigned opacity = 100) noexcept;
 
 			/**
 			 * @brief Copy constructor (deleted). Filters are unique in the tube.
+			 * @param other Filter that cannot be copied.
 			 */
 			Watermark(const Watermark& other) = delete;
 
 			/**
 			 * @brief Move constructor (deleted). Filters are unique in the tube.
+			 * @param other Filter that cannot be moved.
 			 */
 			Watermark(Watermark&& other) noexcept = delete;
 
@@ -155,12 +161,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Copy assignment (deleted). Filters are unique in the tube.
+			 * @param other Filter that cannot be copied.
 			 * @return *this.
 			 */
 			Watermark& operator=(const Watermark& other) = delete;
 
 			/**
 			 * @brief Move assignment (deleted). Filters are unique in the tube.
+			 * @param other Filter that cannot be moved.
 			 * @return *this.
 			 */
 			Watermark& operator=(Watermark&& other) noexcept = delete;
@@ -230,7 +238,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Turns the overlay off without failing the tube.
-			 * @param why Warning text after @c Video/watermark disabled:.
+			 * @param why Borrowed warning text after @c Video/watermark disabled:;
+			 * read only during this call and never retained.
 			 *
 			 * Sets @ref m_opacity to 0 and drops logo buffers. Later
 			 * @ref Process / @ref Paint become no-ops. Frames still
@@ -239,13 +248,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void DisableLogo(std::string_view why) noexcept;
 
 			/**
-			 * @brief Reads @ref m_path into @ref m_bytes.
+			 * @brief Reads the provider-owned logo path into its byte buffer.
 			 * @return false if the logo was disabled.
 			 */
 			bool LoadFile() noexcept;
 
 			/**
-			 * @brief Decodes @ref m_bytes into @ref m_rgba on first use.
+			 * @brief Decodes the provider-owned bytes into RGBA on first use.
 			 * @return false if the logo was disabled.
 			 */
 			bool DecodeLogo() noexcept;
@@ -277,15 +286,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			void DropScale() noexcept;
 
-			std::filesystem::path m_path;									///< Logo file
-			std::optional<Anchor> m_anchor;									///< Relative placement
-			std::optional<StormByte::Multimedia::Property::Point> m_point;	///< Absolute placement
+			struct STORMBYTE_MULTIMEDIA_PRIVATE Implementation;				///< Provider-owned path, buffers and scale owners; complete only in the source.
+			Implementation* m_implementation;								///< Created and deleted only by out-of-line provider methods.
+			StormByte::Safe::Optional<Anchor> m_anchor;						///< Relative placement
+			StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> m_point;	///< Absolute placement
 			unsigned m_opacity;												///< 0–100
 			int m_margin;													///< Anchor margin
-			StormByte::BinaryData m_bytes;							///< File bytes
 			int m_logoWidth;												///< Decoded logo width
 			int m_logoHeight;												///< Decoded logo height
-			StormByte::BinaryData m_rgba;								///< Decoded RGBA8888
 			bool m_loaded;													///< File read attempted
 			bool m_decoded;													///< Decode attempted
 			bool m_released;												///< Hold finished; replays may Paint
@@ -297,7 +305,19 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			int m_lumaW;													///< Cached luma width
 			int m_lumaH;													///< Cached luma height
 			int m_lumaFmt;													///< Cached source pixel format
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::Sws> m_swsLuma;	///< Cached src → gray
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Cached GRAY8 view
 	};
 }
+
+/**
+ * @brief Declares Watermark conditionally safe, not universally ABI-compatible.
+ *
+ * Consumers must use the same compatible C++ class, enum and virtual-dispatch ABI
+ * and keep the Multimedia, Logger and Base creators loaded through destruction.
+ * Private storage is created and destroyed out-of-line by Multimedia; Safe owners
+ * retain their creator's allocation and destruction callbacks. Copy and move are deleted.
+ * Owning handles must preserve creator-side destruction and deallocation of the
+ * Watermark object itself; foreign-runtime deletion of provider allocations is invalid.
+ * The Process parent and its inherited Step state and APIs must first satisfy their
+ * Safe ownership contracts; this declaration does not certify or repair those parents.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Watermark);

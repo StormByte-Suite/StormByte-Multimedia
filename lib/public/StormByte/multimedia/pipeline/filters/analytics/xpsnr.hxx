@@ -44,12 +44,24 @@
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <cstdint>
-#include <deque>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+
+#include <cstddef>
+
+/**
+ * @namespace StormByte::Multimedia::Pipeline::Filter::Video::Detail::XPSNR
+ * @brief Provider-owned XPSNR implementation state.
+ */
+namespace StormByte::Multimedia::Pipeline::Filter::Video::Detail::XPSNR {
+	/**
+	 * @brief Opaque per-track presentation park and accumulators.
+	 */
+	struct Lane;
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::Video::Detail::XPSNR::Lane>);
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -120,7 +132,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief XPSNR analytics leaf.
 			 * @param log Shared logger. Empty pointer means no log.
 			 */
-			explicit XPSNR(std::shared_ptr<StormByte::Logger::Log> log) noexcept;
+			explicit XPSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. Each leaf owns parked looks.
@@ -195,32 +207,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 		private:
 			/**
-			 * @brief Running weighted MSE for one plane of one track.
-			 */
-			struct Plane {
-				double mse = 0.0;			///< Sum of per-frame weighted MSE
-				unsigned frames = 0;		///< Frames that contributed
-			};
-
-			/**
 			 * @brief Per-track presentation park and accumulators.
 			 */
-			struct Lane {
-				std::deque<StormByte::Multimedia::FFmpeg::AVFrame> ref;		///< Decoder looks
-				std::deque<StormByte::Multimedia::FFmpeg::AVFrame> dist;	///< Dest looks
-				int width = 0;												///< Latched width
-				int height = 0;												///< Latched height
-				int bpc = 0;												///< Latched bits per component
-				unsigned scored = 0;										///< Accepted pairs
-				std::size_t peakRef = 0;									///< Peak parked refs
-				std::size_t peakDist = 0;									///< Peak parked dists
-				Plane y;													///< Luma
-				Plane u;													///< Cb, if the layout has it
-				Plane v;													///< Cr, if the layout has it
-				std::optional<double> mean;									///< Sample-weighted mean
-				std::optional<double> min;									///< Minimum per-frame average
-				bool failed = false;										///< No pair scored at EoF
-			};
+			using Lane = Detail::XPSNR::Lane;
 
 			/**
 			 * @brief Scores while both presentation FIFOs of @p lane have a frame.
@@ -252,6 +241,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			static constexpr std::size_t Ceiling = 512;	///< Analytics hopper
 			static constexpr int Block = 16;			///< Activity block edge
 			static constexpr double Cap = 100.0;		///< Finite score when MSE is 0
-			std::map<int, Lane> m_lanes;				///< One park per Frame::Track
+			StormByte::Safe::Map<int, StormByte::Safe::Shared<Lane>> m_lanes;	///< One park per Frame::Track
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::XPSNR);

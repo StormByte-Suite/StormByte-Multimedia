@@ -42,8 +42,8 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -81,10 +81,18 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param onlyInterlaced Skip frames not marked interlaced.
 			 */
-			explicit Yadif(std::shared_ptr<StormByte::Logger::Log> log,
+			explicit Yadif(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				bool onlyInterlaced = true) noexcept;
 
+			/**
+			 * @brief Copy construction is unavailable.
+			 * @param other Filter that cannot be copied.
+			 */
 			Yadif(const Yadif& other) = delete;
+			/**
+			 * @brief Move construction is unavailable.
+			 * @param other Filter that cannot be moved.
+			 */
 			Yadif(Yadif&& other) noexcept = delete;
 
 			/**
@@ -92,7 +100,17 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			~Yadif() noexcept override;
 
+			/**
+			 * @brief Copy assignment is unavailable.
+			 * @param other Filter that cannot be copied.
+			 * @return No value; this operation is deleted.
+			 */
 			Yadif& operator=(const Yadif& other) = delete;
+			/**
+			 * @brief Move assignment is unavailable.
+			 * @param other Filter that cannot be moved.
+			 * @return No value; this operation is deleted.
+			 */
 			Yadif& operator=(Yadif&& other) noexcept = delete;
 
 			/**
@@ -148,3 +166,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			StormByte::Multimedia::FFmpeg::AVFrame m_cur;	///< Look t
 	};
 }
+
+/**
+ * @brief Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Yadif);

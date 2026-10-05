@@ -39,7 +39,9 @@
 #include <StormByte/multimedia/pipeline/filters/analytics/psnr.hxx>
 
 #include <cmath>
+#include <deque>
 #include <format>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -48,6 +50,34 @@ using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Producer;
 using StormByte::Multimedia::Pipeline::Filter::Video::PSNR;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
+
+/**
+ * @brief Provider-owned per-track presentation park and PSNR accumulators.
+ */
+struct StormByte::Multimedia::Pipeline::Filter::Video::Detail::PSNR::Lane {
+	/**
+	 * @brief Running MSE for one plane of one track.
+	 */
+	struct Plane {
+		double mse = 0.0;		///< Sum of per-frame MSE
+		unsigned frames = 0;	///< Frames that contributed
+	};
+
+	std::deque<FFrame> ref;			///< Decoder looks
+	std::deque<FFrame> dist;			///< Dest looks
+	int width = 0;					///< Latched width
+	int height = 0;					///< Latched height
+	int bpc = 0;					///< Latched bits per component
+	unsigned scored = 0;			///< Accepted pairs
+	std::size_t peakRef = 0;			///< Peak parked refs
+	std::size_t peakDist = 0;			///< Peak parked dists
+	Plane y;						///< Luma
+	Plane u;						///< Cb, if the layout has it
+	Plane v;						///< Cr, if the layout has it
+	std::optional<double> mean;	///< Sample-weighted mean
+	std::optional<double> min;	///< Minimum per-frame average
+	bool failed = false;			///< No pair scored at EoF
+};
 
 namespace {
 	constexpr double kCap = 100.0;
@@ -117,7 +147,7 @@ namespace {
 	}
 }
 
-PSNR::PSNR(std::shared_ptr<StormByte::Logger::Log> log) noexcept
+PSNR::PSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
 	: Filter::Analytics(std::move(log), "psnr") {}
 
 PSNR::~PSNR() noexcept {
@@ -134,9 +164,9 @@ void PSNR::DropParked(Lane& lane) noexcept {
 }
 
 void PSNR::DropAll() noexcept {
-	for (auto& [track, lane] : m_lanes) {
+	for (const auto& [track, owner] : std::as_const(m_lanes)) {
 		(void)track;
-		DropParked(lane);
+		DropParked(*owner);
 	}
 	m_lanes.clear();
 }
@@ -251,7 +281,13 @@ void PSNR::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	Lane& lane = m_lanes[frame.Track()];
+	StormByte::Safe::Shared<Lane> owner = std::as_const(m_lanes).contains(frame.Track())
+		? std::as_const(m_lanes).at(frame.Track()) : StormByte::Safe::Shared<Lane>{};
+	if (!owner) {
+		owner = StormByte::Safe::Heap::MakeShared<Lane>();
+		m_lanes[frame.Track()] = owner;
+	}
+	Lane& lane = *owner;
 	if (lane.failed)
 		return;
 
@@ -287,7 +323,8 @@ void PSNR::Process(const Pipeline::Frame& frame) noexcept {
 
 void PSNR::Eof() noexcept {
 	unsigned scored = 0;
-	for (auto& [track, lane] : m_lanes) {
+	for (const auto& [track, owner] : std::as_const(m_lanes)) {
+		Lane& lane = *owner;
 		Drain(lane);
 		Log(Level::Debug, std::format(
 			"eof t={} scored={} ref={} dist={} peak_ref={} peak_dist={} failed={} latch={}x{}",
@@ -334,10 +371,11 @@ void PSNR::Eof() noexcept {
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report PSNR::Report() const noexcept {
-	std::map<std::string, std::string> data;
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	bool failed = m_lanes.empty();
 	unsigned ok = 0;
-	for (const auto& [track, lane] : m_lanes) {
+	for (const auto& [track, owner] : m_lanes) {
+		const Lane& lane = *owner;
 		if (lane.failed || !lane.mean)
 			failed = true;
 		else
@@ -347,11 +385,12 @@ class StormByte::Multimedia::Pipeline::Filter::Report PSNR::Report() const noexc
 	const bool prefix = m_lanes.size() > 1;
 	const auto key = [prefix](int track, std::string_view name) {
 		if (!prefix)
-			return std::string(name);
-		return std::format("{}.{}", track, name);
+			return StormByte::Safe::String(name);
+		return StormByte::Safe::String(std::format("{}.{}", track, name));
 	};
 
-	for (const auto& [track, lane] : m_lanes) {
+	for (const auto& [track, owner] : m_lanes) {
+		const Lane& lane = *owner;
 		if (lane.mean && lane.min) {
 			const double peak = static_cast<double>((1 << lane.bpc) - 1);
 			data.emplace(key(track, "psnr_mean"), std::format("{:.6f}", *lane.mean));

@@ -38,12 +38,12 @@
 
 #pragma once
 
-#include <StormByte/safe/clonable.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/clonable.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <optional>
-#include <string>
 #include <utility>
 
 /**
@@ -51,7 +51,7 @@
  * @brief Per-track intention stored by Plan.
  *
  * Not wiring (`operator>>`) and not runtime settled state.
- * An engaged `std::optional` is an explicit override. Calling a
+ * An engaged `StormByte::Safe::Optional` is an explicit override. Calling a
  * setter with an empty value is also an explicit override.
  *
  * @ingroup multimedia_pipeline
@@ -68,8 +68,44 @@ namespace StormByte::Multimedia::Pipeline::Config {
 	 * @ingroup multimedia_pipeline
 	 */
 	struct STORMBYTE_MULTIMEDIA_PUBLIC Implementation {
-		std::optional<std::string> Decoder;	///< Decode pin; empty = default
-		std::optional<std::string> Encoder;	///< Encode pin; empty = default
+		/**
+		 * @brief Constructs empty decoder and encoder pins in Multimedia.
+		 */
+		Implementation();
+
+		/**
+		 * @brief Copies both pins in Multimedia.
+		 * @param other Source pins.
+		 */
+		Implementation(const Implementation& other);
+
+		/**
+		 * @brief Transfers both pins without copying their storage.
+		 * @param other Source pins, left empty.
+		 */
+		Implementation(Implementation&& other) noexcept;
+
+		/**
+		 * @brief Releases both pins through their creator callbacks.
+		 */
+		~Implementation() noexcept;
+
+		/**
+		 * @brief Copies both pins in Multimedia.
+		 * @param other Source pins.
+		 * @return This object.
+		 */
+		Implementation& operator=(const Implementation& other);
+
+		/**
+		 * @brief Transfers both pins without copying their storage.
+		 * @param other Source pins, left empty.
+		 * @return This object.
+		 */
+		Implementation& operator=(Implementation&& other) noexcept;
+
+		StormByte::Safe::Optional<StormByte::Safe::String> Decoder;	///< Decode pin; empty = default
+		StormByte::Safe::Optional<StormByte::Safe::String> Encoder;	///< Encode pin; empty = default
 	};
 
 	/**
@@ -83,6 +119,9 @@ namespace StormByte::Multimedia::Pipeline::Config {
 	 * not virtual. Oficio knobs live on the leaves.
 	 *
 	 * A null destination codec on a leaf means Remux.
+	 * Boundary use requires compatible C++ ABI and a loaded provider module.
+	 * Derived classes must provide boundary-safe fields and creator-module
+	 * lifetime operations, Clone and Move; this interface does not certify them.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -98,32 +137,32 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Copy constructor.
 			 * @param other Source config.
 			 */
-			Base(const Base& other) noexcept = default;
+			Base(const Base& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Base(Base&& other) noexcept = default;
+			Base(Base&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~Base() noexcept override = default;
+			virtual ~Base() noexcept override;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source config.
 			 * @return *this.
 			 */
-			Base& operator=(const Base& other) noexcept = default;
+			Base& operator=(const Base& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Config to take.
 			 * @return *this.
 			 */
-			Base& operator=(Base&& other) noexcept = default;
+			Base& operator=(Base&& other) noexcept;
 
 			/**
 			 * @}
@@ -155,7 +194,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Language override.
 			 * @return ISO tag, or empty to inherit.
 			 */
-			inline const std::optional<std::string>& Language() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Language() const noexcept {
 				return m_language;
 			}
 
@@ -163,13 +202,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets the language override.
 			 * @param language ISO tag. Empty clears the override.
 			 */
-			void Language(std::string language) noexcept;
+			void Language(StormByte::Safe::String language);
 
 			/**
 			 * @brief Title override.
 			 * @return Title, or empty to inherit.
 			 */
-			inline const std::optional<std::string>& Title() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Title() const noexcept {
 				return m_title;
 			}
 
@@ -177,13 +216,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets the title override.
 			 * @param title Title. Empty clears the override.
 			 */
-			void Title(std::string title) noexcept;
+			void Title(StormByte::Safe::String title);
 
 			/**
 			 * @brief Default-disposition override.
 			 * @return Engaged value, or empty to inherit.
 			 */
-			inline const std::optional<bool>& Default() const noexcept {
+			inline const StormByte::Safe::Optional<bool>& Default() const noexcept {
 				return m_default;
 			}
 
@@ -191,15 +230,15 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets or clears the default-disposition override.
 			 * @param value `true` / `false` to stamp, empty to inherit.
 			 */
-			inline void Default(std::optional<bool> value) noexcept {
-				m_default = value;
+			inline void Default(StormByte::Safe::Optional<bool> value) noexcept {
+				m_default = std::move(value);
 			}
 
 			/**
 			 * @brief Forced-disposition override.
 			 * @return Engaged value, or empty to inherit.
 			 */
-			inline const std::optional<bool>& Forced() const noexcept {
+			inline const StormByte::Safe::Optional<bool>& Forced() const noexcept {
 				return m_forced;
 			}
 
@@ -207,8 +246,8 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets or clears the forced-disposition override.
 			 * @param value `true` / `false` to stamp, empty to inherit.
 			 */
-			inline void Forced(std::optional<bool> value) noexcept {
-				m_forced = value;
+			inline void Forced(StormByte::Safe::Optional<bool> value) noexcept {
+				m_forced = std::move(value);
 			}
 
 			/**
@@ -245,15 +284,24 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Empty overrides; media fixed for the leaf lifetime.
 			 * @param type `StormByte::Multimedia::Type` of the derived class.
 			 */
-			explicit constexpr Base(enum StormByte::Multimedia::Type type) noexcept
-			: m_type(type) {}
+			explicit Base(enum StormByte::Multimedia::Type type);
 
 		private:
-			enum StormByte::Multimedia::Type m_type;	///< Media of the leaf
-			std::optional<std::string> m_language;		///< Language tag override
-			std::optional<std::string> m_title;			///< Title override
-			std::optional<bool> m_default;				///< Default disposition override
-			std::optional<bool> m_forced;				///< Forced disposition override
-			struct Implementation m_implementation;		///< Decode / encode pins
+			enum StormByte::Multimedia::Type m_type;						///< Media of the leaf
+			StormByte::Safe::Optional<StormByte::Safe::String> m_language;	///< Language tag override
+			StormByte::Safe::Optional<StormByte::Safe::String> m_title;		///< Title override
+			StormByte::Safe::Optional<bool> m_default;						///< Default disposition override
+			StormByte::Safe::Optional<bool> m_forced;						///< Forced disposition override
+			struct Implementation m_implementation;							///< Decode / encode pins
 	};
 }
+
+/**
+ * @brief Declares the complete provider-owned implementation pins conditionally safe.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Config::Implementation);
+
+/**
+ * @brief Declares the complete Config root conditionally safe, not arbitrary subclasses.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Config::Base);

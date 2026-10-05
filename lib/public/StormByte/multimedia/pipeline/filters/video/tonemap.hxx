@@ -42,11 +42,10 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <optional>
-#include <string>
-#include <string_view>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -92,13 +91,34 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param op Tone curve: @c hable, @c mobius, @c reinhard,
 			 *        @c gamma, @c clip or @c linear. Empty → @c hable.
 			 */
-			Tonemap(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<std::string> op = {}) noexcept;
+			Tonemap(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				StormByte::Safe::Optional<StormByte::Safe::String> op = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is unavailable.
+			 * @param other Filter that cannot be copied.
+			 */
 			Tonemap(const Tonemap& other) = delete;
+			/**
+			 * @brief Move construction is unavailable.
+			 * @param other Filter that cannot be moved.
+			 */
 			Tonemap(Tonemap&& other) noexcept = delete;
-			~Tonemap() noexcept override = default;
+			/**
+			 * @brief Releases owned options and the cached graph in the provider module.
+			 */
+			~Tonemap() noexcept override;
+			/**
+			 * @brief Copy assignment is unavailable.
+			 * @param other Filter that cannot be copied.
+			 * @return No value; this operation is deleted.
+			 */
 			Tonemap& operator=(const Tonemap& other) = delete;
+			/**
+			 * @brief Move assignment is unavailable.
+			 * @param other Filter that cannot be moved.
+			 * @return No value; this operation is deleted.
+			 */
 			Tonemap& operator=(Tonemap&& other) noexcept = delete;
 
 			/**
@@ -141,14 +161,20 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param src Model frame (HLG adds @c tin=arib-std-b67).
 			 * @return Filterchain for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain(const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
+			StormByte::Safe::String Chain(const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
 
 			/**
 			 * @brief Resolved operator name.
+			 * @return Owned operator name, falling back to hable for empty or invalid input.
 			 */
-			std::string_view Operator() const noexcept;
+			StormByte::Safe::String Operator() const noexcept;
 
-			std::optional<std::string> m_opIn;	///< Caller operator, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;
+			StormByte::Safe::Optional<StormByte::Safe::String> m_opIn;	///< Caller operator, or empty
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Cached graph with provider-managed FFmpeg resources
 	};
 }
+
+/**
+ * @brief Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Tonemap);

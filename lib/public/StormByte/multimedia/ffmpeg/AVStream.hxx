@@ -41,9 +41,12 @@
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/multimedia/property/duration.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <chrono>
-#include <optional>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -55,9 +58,16 @@ namespace StormByte::Multimedia::FFmpeg {
 	/**
 	 * @class AVStream
 	 * @brief Non-owning view of an ::AVStream (owned by AVFormatContext).
+		 * @note Copies borrow the same stream. The owning format context must outlive
+		 * every view. Providers must remain loaded and use a compatible C++ and FFmpeg ABI.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC AVStream {
 		public:
+						/**
+						 * @brief Constructs an empty non-owning view.
+						 */
+			AVStream() noexcept = default;
+
 			/**
 			 * @brief Binds a raw stream pointer (not owned).
 			 * @param stream Raw stream pointer.
@@ -65,13 +75,15 @@ namespace StormByte::Multimedia::FFmpeg {
 			explicit AVStream(::AVStream* stream) noexcept;
 
 			/**
-			 * @brief Copy constructor (deleted).
+						 * @brief Copies the non-owning stream binding.
+						 * @param other Source view; ownership is not transferred.
 			 */
-			AVStream(const AVStream&) = delete;
+			AVStream(const AVStream& other) noexcept = default;
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Source view.
+			 * @note Both views retain the borrowed binding; no resource ownership moves.
 			 */
 			AVStream(AVStream&& other) noexcept = default;
 
@@ -81,20 +93,22 @@ namespace StormByte::Multimedia::FFmpeg {
 			~AVStream() noexcept = default;
 
 			/**
-			 * @brief Copy assignment (deleted).
+						 * @brief Copies the non-owning stream binding.
+						 * @param other Source view; ownership is not transferred.
 			 * @return *this.
 			 */
-			AVStream& operator=(const AVStream&) = delete;
+			AVStream& operator=(const AVStream& other) noexcept = default;
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Source view.
 			 * @return *this.
+			 * @note Both views retain the borrowed binding; no resource ownership moves.
 			 */
 			AVStream& operator=(AVStream&& other) noexcept = default;
 
 			/**
-			 * @brief Orders by stream index (for std::set).
+			 * @brief Orders by stream index.
 			 * @param other Other stream.
 			 * @return true if this index is less.
 			 */
@@ -128,7 +142,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Stream duration in nanoseconds.
 			 * @return Duration, or empty if unknown.
 			 */
-			std::optional<std::chrono::nanoseconds> Duration() const noexcept;
+			Safe::Optional<Property::Duration> Duration() const noexcept;
 
 			/**
 			 * @brief Estimated FPS (avg or r_frame_rate).
@@ -151,9 +165,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			/**
 			 * @brief Looks up a stream metadata tag.
 			 * @param key Dictionary key (e.g. `"language"`).
-			 * @return Value, or nullptr if missing.
+			 * @return Owned value, or empty if missing; independent of the stream lifetime.
 			 */
-			const char* Tag(const char* key) const noexcept;
+			Safe::Optional<Safe::String> Tag(const char* key) const noexcept;
 
 			/**
 			 * @brief Raw FFmpeg disposition bits.
@@ -171,3 +185,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			::AVStream* m_stream = nullptr;	///< Non-owning
 	};
 }
+
+/**
+ * @brief Conditional borrowed-view contract: copying and movement never own stream resources.
+ * @note The format context must outlive every view, and providers must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVStream);

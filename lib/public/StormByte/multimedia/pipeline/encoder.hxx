@@ -47,14 +47,15 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <optional>
-#include <string>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline
@@ -111,7 +112,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param output_index Mux destination order key.
 			 * @param codec Registry codec. Must HasAccess(Write) at open.
 			 */
-			Encoder(std::shared_ptr<StormByte::Logger::Log> log,
+			Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				int output_index, const Codec& codec) noexcept;
 
 			/**
@@ -190,27 +191,27 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Encoder channel count after Open(), audio only.
-			 * @return Channels, or empty.
+			 * @return Channels, or empty if unavailable or result allocation fails.
 			 */
-			std::optional<int> AudioChannels() const noexcept;
+			StormByte::Safe::Optional<int> AudioChannels() const;
 
 			/**
 			 * @brief Encoder sample rate after Open(), audio only.
-			 * @return Hz, or empty.
+			 * @return Hz, or empty if unavailable or result allocation fails.
 			 */
-			std::optional<int> AudioSampleRate() const noexcept;
+			StormByte::Safe::Optional<int> AudioSampleRate() const;
 
 			/**
 			 * @brief Encoder frame_size after Open(), audio only.
-			 * @return Samples per packet, or empty.
+			 * @return Samples per packet, or empty if unavailable or result allocation fails.
 			 */
-			std::optional<int> AudioFrameSize() const noexcept;
+			StormByte::Safe::Optional<int> AudioFrameSize() const;
 
 			/**
 			 * @brief Encoder sample format after Open(), audio only.
-			 * @return AVSampleFormat as int, or empty.
+			 * @return AVSampleFormat as int, or empty if unavailable or result allocation fails.
 			 */
-			std::optional<int> AudioSampleFormat() const noexcept;
+			StormByte::Safe::Optional<int> AudioSampleFormat() const;
 
 			/**
 			 * @}
@@ -225,7 +226,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Writing-application tag stamped on every encoded stream.
 			 * @return StormByte-Multimedia version. Never empty after construction.
 			 */
-			inline const std::string& EncoderTag() const noexcept {
+			inline const StormByte::Safe::String& EncoderTag() const noexcept {
 				return m_encoderTag;
 			}
 
@@ -242,7 +243,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Pinned FFmpeg encoder name, if any.
 			 * @return Name, or empty.
 			 */
-			inline const std::optional<std::string>& Implementation() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Implementation() const noexcept {
 				return m_implementation;
 			}
 
@@ -250,7 +251,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Pins an FFmpeg encoder name. Empty clears the pin.
 			 * @param name avcodec_find_encoder_by_name key.
 			 */
-			void Implementation(std::string name) noexcept;
+			void Implementation(StormByte::Safe::String name) noexcept;
 
 			/**
 			 * @brief Extra features the caller demands besides Frame HDR.
@@ -297,7 +298,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief CRF/CQ, if set.
 			 * @return Value, or empty.
 			 */
-			inline const std::optional<int>& CRF() const noexcept {
+			inline const StormByte::Safe::Optional<int>& CRF() const noexcept {
 				return m_crf;
 			}
 
@@ -313,7 +314,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Target bitrate, if set.
 			 * @return Bits per second, or empty.
 			 */
-			inline const std::optional<std::int64_t>& BitRate() const noexcept {
+			inline const StormByte::Safe::Optional<std::int64_t>& BitRate() const noexcept {
 				return m_bitRate;
 			}
 
@@ -329,7 +330,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief VBV ceiling, if set.
 			 * @return Bits per second, or empty.
 			 */
-			inline const std::optional<std::int64_t>& MaxBitRate() const noexcept {
+			inline const StormByte::Safe::Optional<std::int64_t>& MaxBitRate() const noexcept {
 				return m_maxBitRate;
 			}
 
@@ -337,13 +338,13 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Encoder preset.
 			 * @param name Preset name.
 			 */
-			void Preset(std::string name) noexcept;
+			void Preset(StormByte::Safe::String name) noexcept;
 
 			/**
 			 * @brief Preset, if set.
 			 * @return Name, or empty.
 			 */
-			inline const std::optional<std::string>& Preset() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Preset() const noexcept {
 				return m_preset;
 			}
 
@@ -351,13 +352,13 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Content tune.
 			 * @param name Tune name.
 			 */
-			void Tune(std::string name) noexcept;
+			void Tune(StormByte::Safe::String name) noexcept;
 
 			/**
 			 * @brief Content tune, if set.
 			 * @return Name, or empty.
 			 */
-			inline const std::optional<std::string>& Tune() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Tune() const noexcept {
 				return m_tune;
 			}
 
@@ -374,7 +375,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Vendor leftovers. Not CRF/preset/tune/bufsize.
 			 * @return Key/value map.
 			 */
-			inline const std::map<std::string, std::string>& FineTune() const noexcept {
+			inline const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& FineTune() const noexcept {
 				return m_fineTune;
 			}
 
@@ -382,7 +383,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Replaces the vendor dict (before open).
 			 * @param options Key/value pairs.
 			 */
-			inline void FineTune(std::map<std::string, std::string> options) noexcept {
+			inline void FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept {
 				m_fineTune = std::move(options);
 			}
 
@@ -403,7 +404,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return `Encoder(<implementation>)` when pinned or selected,
 			 *         otherwise `Encoder(<registry codec name>)`.
 			 */
-			std::string Label() const noexcept override;
+			StormByte::Safe::String Label() const noexcept override;
 
 			/**
 			 * @}
@@ -431,11 +432,11 @@ namespace StormByte::Multimedia::Pipeline {
 			Packet::PointerType Wrap(
 				enum StormByte::Multimedia::Type type, int index,
 				StormByte::Buffer::FIFO payload,
-				std::optional<Property::Duration> pts,
-				std::optional<Property::Duration> dts,
-				std::optional<Property::Duration> duration,
+				StormByte::Safe::Optional<Property::Duration> pts,
+				StormByte::Safe::Optional<Property::Duration> dts,
+				StormByte::Safe::Optional<Property::Duration> duration,
 				bool keyFrame,
-				std::vector<SideData> attachments,
+				StormByte::Safe::Vector<SideData> attachments,
 				std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept;
 
 			/**
@@ -467,19 +468,21 @@ namespace StormByte::Multimedia::Pipeline {
 
 			int m_index;														///< Mux destination order key
 			const Codec* m_codec;											///< Destination codec
-			std::string m_encoderTag;										///< ENCODER metadata
-			std::optional<std::string> m_implementation;					///< Pinned encoder name
+			StormByte::Safe::String m_encoderTag;								///< ENCODER metadata
+			StormByte::Safe::Optional<StormByte::Safe::String> m_implementation;	///< Pinned encoder name
 			Features m_require;												///< Extra required bits
 			Features m_capabilities;										///< Opened capabilities
-			std::optional<int> m_crf;										///< CRF/CQ
-			std::optional<std::int64_t> m_bitRate;							///< Target bitrate
-			std::optional<std::int64_t> m_maxBitRate;						///< VBV ceiling
-			std::optional<std::string> m_preset;							///< Preset
-			std::optional<std::string> m_tune;								///< Tune
-			std::map<std::string, std::string> m_fineTune;					///< Vendor leftovers
+			StormByte::Safe::Optional<int> m_crf;								///< CRF/CQ
+			StormByte::Safe::Optional<std::int64_t> m_bitRate;					///< Target bitrate
+			StormByte::Safe::Optional<std::int64_t> m_maxBitRate;				///< VBV ceiling
+			StormByte::Safe::Optional<StormByte::Safe::String> m_preset;			///< Preset
+			StormByte::Safe::Optional<StormByte::Safe::String> m_tune;			///< Tune
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> m_fineTune;	///< Vendor leftovers
 			std::unique_ptr<Backend::Pipeline::Encoder> m_backend;			///< Encode backend
 			std::optional<std::uint64_t> m_serial;							///< Lineage of the last accepted frame
 			std::uint64_t m_part;											///< Part of the last accepted frame
 			Join m_join{*this};												///< Halt before other members die
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Encoder);

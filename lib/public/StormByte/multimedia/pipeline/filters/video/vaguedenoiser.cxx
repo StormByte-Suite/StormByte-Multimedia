@@ -50,12 +50,14 @@ using StormByte::Multimedia::Pipeline::Filter::Video::VagueDenoiser;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-VagueDenoiser::VagueDenoiser(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> threshold,
-	std::optional<unsigned> steps,
-	std::optional<double> percent) noexcept
-	: Filter::Process(std::move(log), "vaguedenoiser"),
-	m_thrIn(threshold), m_stepsIn(steps), m_pctIn(percent) {}
+VagueDenoiser::VagueDenoiser(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> threshold,
+	StormByte::Safe::Optional<unsigned> steps,
+	StormByte::Safe::Optional<double> percent) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("vaguedenoiser")),
+	m_thrIn(std::move(threshold)), m_stepsIn(std::move(steps)), m_pctIn(std::move(percent)) {}
+
+VagueDenoiser::~VagueDenoiser() noexcept = default;
 
 enum Type VagueDenoiser::Media() const noexcept {
 	return Type::Video;
@@ -69,13 +71,13 @@ void VagueDenoiser::Setup() noexcept {
 	Clean();
 }
 
-std::string VagueDenoiser::Chain() const noexcept {
+StormByte::Safe::String VagueDenoiser::Chain() const noexcept {
 	const double thr = m_thrIn.value_or(2.0);
 	const unsigned steps = m_stepsIn.value_or(6u);
 	const double pct = m_pctIn.value_or(85.0);
-	return std::format(
+	return StormByte::Safe::String(std::format(
 		"vaguedenoiser=threshold={}:nsteps={}:percent={}:method=garrote",
-		thr, steps, pct);
+		thr, steps, pct));
 }
 
 void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept {
@@ -87,14 +89,14 @@ void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
 			Fail("vaguedenoiser: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("vaguedenoiser: AVFilterGraph::Ensure failed");
 		return;

@@ -40,8 +40,7 @@
 
 #include <StormByte/multimedia/property/point.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <optional>
+#include <StormByte/safe/optional.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -51,6 +50,8 @@ namespace StormByte::Multimedia::Property {
 	/**
 	 * @class HDR10
 	 * @brief Mastering display and content light level metadata.
+	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+	 *       remain loaded while their values and provider callbacks are in use.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC HDR10 final {
 		public:
@@ -59,14 +60,22 @@ namespace StormByte::Multimedia::Property {
 			 * @brief Origin of the mastering-display numbers.
 			 */
 			enum class Source {
-				Metadata,	///< Side data from the container / bitstream
-				Heuristics	///< DEFAULT values; file signalled HDR10 without MDM
+				/**
+				 * @brief Side data from the container or bitstream.
+				 */
+				Metadata,
+
+				/**
+				 * @brief Default values when HDR10 is signaled without mastering metadata.
+				 */
+				Heuristics
 			};
 
 			/**
 			 * @brief DEFAULT primaries / luminance, Source::Heuristics.
+			 * @throws StormByte::Exception Safe storage initialization failed.
 			 */
-			HDR10() noexcept;
+			HDR10();
 
 			/**
 			 * @brief Full mastering-display description.
@@ -77,10 +86,11 @@ namespace StormByte::Multimedia::Property {
 			 * @param luminance Min/max luminance pair.
 			 * @param light_level Optional MaxCLL/MaxFALL.
 			 * @param source Metadata or Heuristics.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
 			HDR10(const Point& red, const Point& green, const Point& blue, const Point& white,
-				const Point& luminance, const std::optional<Point>& light_level = std::nullopt,
-				Source source = Source::Metadata) noexcept;
+				const Point& luminance, const StormByte::Safe::Optional<Point>& light_level = std::nullopt,
+				Source source = Source::Metadata);
 
 			/**
 			 * @brief Move overload of the full constructor.
@@ -93,35 +103,41 @@ namespace StormByte::Multimedia::Property {
 			 * @param source Metadata or Heuristics.
 			 */
 			HDR10(Point&& red, Point&& green, Point&& blue, Point&& white,
-				Point&& luminance, std::optional<Point>&& light_level = std::nullopt,
+				Point&& luminance, StormByte::Safe::Optional<Point>&& light_level = std::nullopt,
 				Source source = Source::Metadata) noexcept;
 
 			/**
 			 * @brief Copy constructor.
+			 * @param other Metadata to copy.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
-			HDR10(const HDR10&) = default;
+			HDR10(const HDR10& other);
 
 			/**
 			 * @brief Move constructor.
+			 * @param other Metadata to move.
 			 */
-			HDR10(HDR10&&) noexcept = default;
+			HDR10(HDR10&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~HDR10() noexcept = default;
+			~HDR10() noexcept;
 
 			/**
 			 * @brief Copy assignment.
+			 * @param other Metadata to copy.
 			 * @return *this.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
-			HDR10& operator=(const HDR10&) = default;
+			HDR10& operator=(const HDR10& other);
 
 			/**
 			 * @brief Move assignment.
+			 * @param other Metadata to move.
 			 * @return *this.
 			 */
-			HDR10& operator=(HDR10&&) noexcept = default;
+			HDR10& operator=(HDR10&& other) noexcept;
 
 			/**
 			 * @brief Red primary.
@@ -155,9 +171,9 @@ namespace StormByte::Multimedia::Property {
 
 			/**
 			 * @brief Optional content light level (MaxCLL, MaxFALL).
-			 * @return Light level, or empty.
+			 * @return Borrowed optional light level, valid while this object is alive.
 			 */
-			const std::optional<Point>& LightLevel() const noexcept;
+			const StormByte::Safe::Optional<Point>& LightLevel() const noexcept;
 
 			/**
 			 * @brief Origin of the numbers.
@@ -177,16 +193,32 @@ namespace StormByte::Multimedia::Property {
 			 */
 			void HDR10Plus(bool hdrplus) noexcept;
 
-			static const HDR10 DEFAULT;		///< Fallback mastering display (Heuristics)
+			static const HDR10 DEFAULT;	///< Fallback mastering display with heuristic origin.
 
 		private:
-			Point m_red;							///< Red primary
-			Point m_green;							///< Green primary
-			Point m_blue;							///< Blue primary
-			Point m_white;							///< White point
-			Point m_luminance;						///< Min/max luminance
-			std::optional<Point> m_light_level;		///< MaxCLL / MaxFALL
-			Source m_source;						///< Metadata or Heuristics
-			bool m_hdr10plus;						///< HDR10+ present
+			Point m_red;									///< Red primary.
+
+			Point m_green;									///< Green primary.
+
+			Point m_blue;									///< Blue primary.
+
+			Point m_white;									///< White point.
+
+			Point m_luminance;								///< Minimum and maximum luminance.
+
+			StormByte::Safe::Optional<Point> m_light_level;	///< Optional MaxCLL and MaxFALL values.
+
+			Source m_source;								///< Origin of the mastering display values.
+
+			bool m_hdr10plus;								///< Whether HDR10+ metadata is present.
 	};
 }
+
+/**
+ * @brief Registers completed mastering metadata after its Point dependency.
+ *
+ * Optional light-level storage uses Base's heap and creator callbacks; copying,
+ * movement and destruction are exported by Multimedia. Consumers must use a
+ * compatible provider ABI and keep both providers and callback creators loaded.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::HDR10);

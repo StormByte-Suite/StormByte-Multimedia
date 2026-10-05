@@ -80,7 +80,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			/**
 			 * @brief Destructor.
 			 */
-			~Subtitle() noexcept override = default;
+			~Subtitle() noexcept override;
 
 			/**
 			 * @brief Copy constructor.
@@ -99,14 +99,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @brief Move constructor.
 			 * @param other Backend to take.
 			 */
-			Subtitle(Subtitle&& other) noexcept = default;
+			Subtitle(Subtitle&& other) noexcept;
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Backend to take.
 			 * @return *this.
 			 */
-			Subtitle& operator=(Subtitle&& other) noexcept = default;
+			Subtitle& operator=(Subtitle&& other) noexcept;
 
 			/**
 			 * @brief Whether the FFmpeg decoder is open.
@@ -148,8 +148,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			StormByte::Multimedia::FFmpeg::AVDecoder m_decoder;							///< Opened decoder
 			std::optional<StormByte::Multimedia::FFmpeg::AVSubtitle> m_pendingSub;		///< Pending AVSubtitle
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> m_heldSubtitle;		///< Held subtitle frame
-			std::optional<StormByte::Multimedia::Property::Duration> m_packetPts;		///< Last packet PTS
-			std::optional<StormByte::Multimedia::Property::Duration> m_packetDuration;	///< Last packet duration
+			StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration> m_packetPts;		///< Last packet PTS
+			StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration> m_packetDuration;	///< Last packet duration
 			AVRational m_timeBase;														///< Stream time base
 			bool m_flushed;																///< EOF already signalled
 	};

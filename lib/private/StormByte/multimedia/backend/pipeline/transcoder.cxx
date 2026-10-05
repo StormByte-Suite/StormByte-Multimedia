@@ -38,6 +38,7 @@
 
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
+#include <StormByte/multimedia/exception.hxx>
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
 #include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/multimedia/pipeline/config/video.hxx>
@@ -54,7 +55,6 @@
 
 #include <chrono>
 #include <format>
-#include <memory>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -64,7 +64,14 @@ using namespace StormByte::Multimedia::Backend::Pipeline;
 using StormByte::Logger::Level;
 
 namespace {
-	void JobLog(const std::shared_ptr<StormByte::Logger::Log>& log,
+	template<typename Optional>
+	StormByte::Safe::String ErrorText(const Optional& error, std::string_view fallback) noexcept {
+		if (error)
+			return StormByte::Safe::String{std::string_view{error.value()}};
+		return StormByte::Safe::String{fallback};
+	}
+
+	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
 		Level level, std::string_view text) noexcept {
 		if (!log)
 			return;
@@ -74,13 +81,13 @@ namespace {
 	void RegisterStage(StormByte::Multimedia::Pipeline::JobTelemetry& job,
 		const StormByte::Multimedia::Pipeline::Step& stage) noexcept {
 		auto metrics = stage.Telemetry();
-		std::string name = static_cast<std::string>(metrics->Origin());
+		auto name = metrics->Origin();
 		job.RegisterStage(std::move(name), std::move(metrics));
 	}
 
 	struct TelemetrySummary {
-		std::shared_ptr<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;
-		std::shared_ptr<StormByte::Logger::Log> Logger;
+		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;
+		StormByte::Safe::Shared<StormByte::Logger::Log> Logger;
 
 		~TelemetrySummary() noexcept {
 			if (!Metrics)
@@ -115,7 +122,7 @@ namespace {
 	void ConfigureEncoder(StormByte::Multimedia::Pipeline::Encoder& encoder,
 		const StormByte::Multimedia::Pipeline::Config::Base& config) noexcept {
 		if (config.Implementation().Encoder)
-			encoder.Implementation(*config.Implementation().Encoder);
+			encoder.Implementation(config.Implementation().Encoder.value());
 		if (const auto* video = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Video*>(&config)) {
 			if (video->CRF())
 				encoder.CRF(*video->CRF());
@@ -134,16 +141,16 @@ namespace {
 			if (audio->MaxBitRate())
 				encoder.MaxBitRate(*audio->MaxBitRate());
 			if (audio->Preset())
-				encoder.Preset(*audio->Preset());
+				encoder.Preset(audio->Preset().value());
 		}
 	}
 
 	void StampMuxTags(StormByte::Multimedia::Pipeline::Muxer& mux, int out,
 		const StormByte::Multimedia::Pipeline::Config::Base& config) noexcept {
 		if (config.Language())
-			mux.Language(out, *config.Language());
+			mux.Language(out, config.Language().value());
 		if (config.Title())
-			mux.Title(out, *config.Title());
+			mux.Title(out, config.Title().value());
 	}
 
 	bool Stopping(const Transcoder& coordinator, const std::stop_token& token) noexcept {
@@ -152,7 +159,7 @@ namespace {
 }
 
 Transcoder::Transcoder() noexcept
-: Metrics(std::make_shared<StormByte::Multimedia::Pipeline::JobTelemetry>()) {}
+: Metrics(StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::JobTelemetry>()) {}
 
 Transcoder::~Transcoder() noexcept {
 	RequestCancel();
@@ -172,8 +179,8 @@ void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcep
 	m_analyticsHook = false;
 	{
 		std::lock_guard lock(Lock);
-		Clock = std::make_shared<StormByte::Multimedia::Pipeline::Progress>();
-		if (!job.m_duration || job.m_duration->count() <= 0)
+		Clock = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Progress>();
+		if (!job.m_duration || job.m_duration.value() <= 0)
 			Clock->BeginDurationCalculation();
 	}
 	Status.store(StormByte::Multimedia::Pipeline::Status::Running, std::memory_order_release);
@@ -228,7 +235,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	JobLog(job.Logger(), Level::Notice, "running");
 	job.OnConfigure();
 	if (Status.load(std::memory_order_acquire) == StormByte::Multimedia::Pipeline::Status::Error) {
-		job.OnError(job.Error().value_or("configure failed"));
+			job.OnError(ErrorText(job.Error(), "configure failed"));
 		return;
 	}
 
@@ -241,23 +248,28 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 
 	if (!job.m_reader || !job.m_writer) {
 		job.Fail("reader or writer is not set");
-		job.OnError(job.Error().value_or("reader or writer is not set"));
+		job.OnError(ErrorText(job.Error(), "reader or writer is not set"));
 		return;
 	}
 
 	for (const auto& slot : Mapped) {
 		if (!slot.Config) {
 			job.Fail("track origin " + std::to_string(slot.In) + " has no config");
-			job.OnError(job.Error().value_or("incomplete map"));
+			job.OnError(ErrorText(job.Error(), "incomplete map"));
 			return;
 		}
 	}
 
-	if (!job.m_duration || job.m_duration->count() <= 0) {
+	if (!job.m_duration || job.m_duration.value() <= 0) {
 		Clock->BeginDurationCalculation();
 		job.OnProgress();
 	}
 	auto built = job.EmptyPlan(std::move(job.m_reader), std::move(job.m_writer), job.m_duration);
+	if (!built) {
+		job.Fail("EmptyPlan returned an empty owner");
+		job.OnError(job.Error().value());
+		return;
+	}
 	Clock->SetDurationCalculation(std::nullopt);
 	job.OnProgress();
 	if (Stopping(*this, token)) {
@@ -267,8 +279,20 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	}
 	job.m_armed = true;
 	job.m_consult.reset();
-	for (const auto& slot : Mapped)
-		built->add(StormByte::Multimedia::Pipeline::Track(slot.In, *slot.Config));
+	try {
+		for (const auto& slot : Mapped)
+			built->add(StormByte::Multimedia::Pipeline::Track(slot.In, *slot.Config));
+	}
+	catch (const StormByte::Exception& error) {
+		job.Fail(error.what());
+		job.OnError(ErrorText(job.Error(), "config clone failed"));
+		return;
+	}
+	catch (...) {
+		job.Fail("config clone failed");
+		job.OnError(ErrorText(job.Error(), "config clone failed"));
+		return;
+	}
 	job.OnPlan(*built);
 
 	const auto start = job.OnStart();
@@ -276,7 +300,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		if (start == StormByte::Multimedia::Pipeline::Status::Error) {
 			if (!job.Failed())
 				job.Fail("OnStart rejected the job");
-			job.OnError(job.Error().value_or("OnStart rejected the job"));
+			job.OnError(ErrorText(job.Error(), "OnStart rejected the job"));
 		}
 		else if (start == StormByte::Multimedia::Pipeline::Status::Aborted) {
 			Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
@@ -290,22 +314,22 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	}
 
 	const auto& tube = job.ApplicationLog();
-	auto demux = std::make_shared<StormByte::Multimedia::Pipeline::Demuxer>(tube, Clock);
-	auto mux = std::make_shared<StormByte::Multimedia::Pipeline::Muxer>(tube);
+	auto demux = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Demuxer>(tube, Clock);
+	auto mux = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Muxer>(tube);
 	RegisterStage(*Metrics, *demux);
 	RegisterStage(*Metrics, *mux);
-	std::move(*built) >> *demux;
+	std::move(built) >> *demux;
 	job.m_plan = demux->Plan();
 	*demux >> *mux;
 
 	if (demux->Failed()) {
-		job.Fail(demux->Error().value_or("demux open failed"));
-		job.OnError(job.Error().value_or("demux"));
+		job.Fail(ErrorText(demux->Error(), "demux open failed"));
+		job.OnError(ErrorText(job.Error(), "demux"));
 		return;
 	}
 	if (mux->Failed()) {
-		job.Fail(mux->Error().value_or("mux open failed"));
-		job.OnError(job.Error().value_or("mux"));
+		job.Fail(ErrorText(mux->Error(), "mux open failed"));
+		job.OnError(ErrorText(job.Error(), "mux"));
 		return;
 	}
 	if (Stopping(*this, token)) {
@@ -319,11 +343,11 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 
 	struct EncodeLane {
 		int In = -1;
-		std::shared_ptr<StormByte::Multimedia::Pipeline::Decoder> Decoder;
-		std::shared_ptr<StormByte::Multimedia::Pipeline::Encoder> Encoder;
+		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Decoder> Decoder;
+		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Encoder> Encoder;
 	};
 	std::vector<EncodeLane> lanes;
-	std::vector<std::shared_ptr<StormByte::Multimedia::Pipeline::Remuxer>> remuxes;
+	std::vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Remuxer>> remuxes;
 
 	int muxIndex = 0;
 	for (auto& slot : Mapped) {
@@ -333,13 +357,13 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		StampMuxTags(*mux, muxIndex, *slot.Config);
 		const StormByte::Multimedia::Codec* codec = LeafCodec(slot.Config.get());
 		if (!codec) {
-			auto remux = std::make_shared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);
+			auto remux = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);
 			RegisterStage(*Metrics, *remux);
 			*demux >> *remux;
 			*remux >> *mux;
 			if (mux->Failed() || remux->Failed()) {
-				job.Fail(mux->Error().value_or(remux->Error().value_or("remux reserve failed")));
-				job.OnError(job.Error().value_or("mux"));
+					job.Fail(ErrorText(mux->Error(), ErrorText(remux->Error(), "remux reserve failed")));
+					job.OnError(ErrorText(job.Error(), "mux"));
 				return;
 			}
 			auto stretch = graph.Between(demux, remux);
@@ -348,17 +372,17 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 			remuxes.push_back(std::move(remux));
 		}
 		else {
-			auto decoder = std::make_shared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
-			auto encoder = std::make_shared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
+			auto decoder = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
+			auto encoder = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
 			RegisterStage(*Metrics, *decoder);
 			RegisterStage(*Metrics, *encoder);
 			ConfigureEncoder(*encoder, *slot.Config);
 			*demux >> *decoder;
 			*encoder >> *mux;
 			if (decoder->Failed() || encoder->Failed() || mux->Failed()) {
-				job.Fail(decoder->Error().value_or(encoder->Error().value_or(
-					mux->Error().value_or("encode reserve failed"))));
-				job.OnError(job.Error().value_or("encode"));
+					job.Fail(ErrorText(decoder->Error(), ErrorText(encoder->Error(),
+						ErrorText(mux->Error(), "encode reserve failed"))));
+					job.OnError(ErrorText(job.Error(), "encode"));
 				return;
 			}
 			auto stretch = graph.Between(decoder, encoder);
@@ -374,12 +398,13 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	}
 
 	if (!mux->Armed())
-		mux->Fail("muxer is not armed; missing encoder or remuxer >> muxer");
+		mux->Fail(StormByte::Safe::String{"muxer is not armed; missing encoder or remuxer >> muxer"});
 	for (const auto& filter : Analytics)
 		graph.Add(filter);
 	graph.Close();
-	for (auto& [name, metrics] : graph.StageTelemetries())
-		Metrics->RegisterStage(std::move(name), std::move(metrics));
+	const auto stages = graph.StageTelemetries();
+	for (auto stage : stages)
+		Metrics->RegisterStage(std::move(stage.Name), std::move(stage.Metrics));
 	TickHooks(job, graph);
 
 	while (!Stopping(*this, token)) {
@@ -387,23 +412,23 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		if (Stopping(*this, token))
 			break;
 		if (demux->Failed()) {
-			job.Fail(demux->Error().value_or("demux failed"));
+				job.Fail(ErrorText(demux->Error(), "demux failed"));
 			break;
 		}
 		if (mux->Failed()) {
-			job.Fail(mux->Error().value_or("mux failed"));
+				job.Fail(ErrorText(mux->Error(), "mux failed"));
 			break;
 		}
 
 		bool dead = false;
 		for (auto& lane : lanes) {
 			if (lane.Decoder && lane.Decoder->Failed()) {
-				job.Fail(lane.Decoder->Error().value_or("decoder failed"));
+					job.Fail(ErrorText(lane.Decoder->Error(), "decoder failed"));
 				dead = true;
 				break;
 			}
 			if (lane.Encoder && lane.Encoder->Failed()) {
-				job.Fail(lane.Encoder->Error().value_or("encoder failed"));
+					job.Fail(ErrorText(lane.Encoder->Error(), "encoder failed"));
 				dead = true;
 				break;
 			}
@@ -427,7 +452,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	}
 
 	if (job.Failed()) {
-		job.OnError(job.Error().value_or("transcode failed"));
+		job.OnError(ErrorText(job.Error(), "transcode failed"));
 		return;
 	}
 

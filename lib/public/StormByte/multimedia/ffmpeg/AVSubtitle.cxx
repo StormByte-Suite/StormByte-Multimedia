@@ -92,8 +92,8 @@ std::uint32_t FFmpeg::AVSubtitle::DisplayDurationMs() const noexcept {
 	return ms;
 }
 
-std::string FFmpeg::AVSubtitle::Text() const noexcept {
-	std::string out;
+StormByte::Safe::String FFmpeg::AVSubtitle::Text() const noexcept {
+	StormByte::Safe::String out;
 	if (!m_sub)
 		return out;
 	for (unsigned i = 0; i < m_sub->num_rects; ++i) {
@@ -111,7 +111,7 @@ std::string FFmpeg::AVSubtitle::Text() const noexcept {
 	return out;
 }
 
-void FFmpeg::AVSubtitle::FillText(std::string text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
 	Free();
 	if (!m_sub)
 		m_sub = new ::AVSubtitle{};
@@ -135,12 +135,12 @@ void FFmpeg::AVSubtitle::FillText(std::string text, std::int64_t pts, std::uint3
 
 	if (ass) {
 		m_sub->rects[0]->type = SUBTITLE_ASS;
-		m_sub->rects[0]->ass = av_strdup(text.c_str());
+		m_sub->rects[0]->ass = av_strndup(text.empty() ? "" : text.data(), text.size());
 	}
 
 	else {
 		m_sub->rects[0]->type = SUBTITLE_TEXT;
-		m_sub->rects[0]->text = av_strdup(text.c_str());
+		m_sub->rects[0]->text = av_strndup(text.empty() ? "" : text.data(), text.size());
 	}
 }
 

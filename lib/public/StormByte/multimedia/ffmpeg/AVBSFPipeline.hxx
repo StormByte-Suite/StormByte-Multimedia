@@ -59,7 +59,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			/**
 			 * @brief Default constructor.
 			 */
-			AVBSFPipeline() noexcept = default;
+			AVBSFPipeline() noexcept;
 
 			/**
 			 * @brief Copy constructor (deleted).
@@ -75,7 +75,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			/**
 			 * @brief Destructor.
 			 */
-			~AVBSFPipeline() noexcept = default;
+			~AVBSFPipeline() noexcept;
 
 			/**
 			 * @brief Copy assignment (deleted).
@@ -128,3 +128,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			std::deque<AVBSF> m_filters;	///< Filter chain
 	};
 }
+
+/**
+ * @brief Conditional provider contract: private deque construction, movement and release stay in Multimedia.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVBSFPipeline);

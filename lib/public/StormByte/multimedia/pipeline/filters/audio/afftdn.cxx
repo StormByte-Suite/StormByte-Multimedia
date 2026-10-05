@@ -51,11 +51,13 @@ using StormByte::Multimedia::Pipeline::Filter::Audio::Afftdn;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Afftdn::Afftdn(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> nr, std::optional<double> nf,
-	std::optional<bool> trackNoise) noexcept
+Afftdn::Afftdn(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> nr, StormByte::Safe::Optional<double> nf,
+	StormByte::Safe::Optional<bool> trackNoise) noexcept
 	: Filter::Process(std::move(log), "afftdn"),
 	m_nrIn(nr), m_nfIn(nf), m_trackIn(trackNoise) {}
+
+Afftdn::~Afftdn() noexcept = default;
 
 enum Type Afftdn::Media() const noexcept {
 	return Type::Audio;
@@ -69,11 +71,11 @@ void Afftdn::Setup() noexcept {
 	Clean();
 }
 
-std::string Afftdn::Chain() const noexcept {
+StormByte::Safe::String Afftdn::Chain() const noexcept {
 	const double nr = std::clamp(m_nrIn.value_or(12.0), 0.01, 97.0);
 	const double nf = std::clamp(m_nfIn.value_or(-50.0), -80.0, -20.0);
 	const int tn = m_trackIn.value_or(false) ? 1 : 0;
-	return std::format("afftdn=nr={}:nf={}:tn={}:nt=w:om=o", nr, nf, tn);
+	return StormByte::Safe::String(std::format("afftdn=nr={}:nf={}:tn={}:nt=w:om=o", nr, nf, tn));
 }
 
 void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
@@ -85,7 +87,7 @@ void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

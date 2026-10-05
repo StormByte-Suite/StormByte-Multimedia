@@ -43,6 +43,7 @@
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
 #include <memory>
 #include <utility>
@@ -62,8 +63,8 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @brief Owns the filter chain of one origin track and two ends.
 	 *
 	 * Advanced API. Construct origin and destination as
-	 * @c std::shared_ptr<Step>. Multimedia recommends
-	 * @c std::make_shared so the last owner destroys the Step.
+	 * @c StormByte::Safe::Shared<Step>. Construct concrete stages with
+	 * @c StormByte::Safe::Heap::MakeShared so ownership stays on Base's heap.
 	 *
 	 * Packet / BSF filters may sit between Demuxer and Remuxer.
 	 * Frame / Process filters on that stretch fail at Close.
@@ -102,12 +103,12 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param origin Producer (Decoder / Demuxer). Must not be empty.
 			 * @param destination Consumer (Encoder / Remuxer / Muxer). Must not be empty.
 			 *
-			 * Both ends are real @c shared_ptr. The Step dies when
+			 * Both ends retain Base-heap shared ownership. The Step dies when
 			 * the last Route, Transcoder lane or caller drops it.
 			 */
 			Route(int track,
-				std::shared_ptr<Step> origin,
-				std::shared_ptr<Step> destination) noexcept;
+				StormByte::Safe::Shared<Step> origin,
+				StormByte::Safe::Shared<Step> destination) noexcept;
 
 			/**
 			 * @brief Copy constructor.
@@ -160,7 +161,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * the filter. Launch starts the worker; the worker waits
 			 * on the Pipe until @ref Filters::Close binds a hopper.
 			 */
-			Route& Add(std::shared_ptr<Filter::FFmpeg> filter) noexcept;
+			Route& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
 
 			/**
 			 * @brief Constructs a leaf of type @p T on this track.
@@ -171,8 +172,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			template<typename T, typename... Args>
 			Route& Add(Args&&... args) noexcept {
-				return Add(std::shared_ptr<Filter::FFmpeg>(
-					std::make_shared<T>(std::forward<Args>(args)...)));
+				return Add(StormByte::Safe::Shared<Filter::FFmpeg>(
+					StormByte::Safe::Heap::MakeShared<T>(std::forward<Args>(args)...)));
 			}
 
 			/**
@@ -251,11 +252,12 @@ namespace StormByte::Multimedia::Pipeline {
 			void Observe(Filter::FFmpeg& analytics) noexcept;
 
 			int m_track;													///< Origin stream index
-			std::shared_ptr<Step> m_origin;									///< Producer end
-			std::shared_ptr<Step> m_destination;								///< Consumer end
+			StormByte::Safe::Shared<Step> m_origin;							///< Producer retained through Base-heap shared ownership.
+
+			StormByte::Safe::Shared<Step> m_destination;					///< Consumer retained through Base-heap shared ownership.
 			Lane m_frames;													///< Frame process + analytics
 			Lane m_packets;													///< Packet process + analytics
-			std::vector<std::shared_ptr<Filter::FFmpeg>> m_filters;			///< Owned leaves, Add order
+			std::vector<StormByte::Safe::Shared<Filter::FFmpeg>> m_filters;	///< Base-heap filter owners retained in insertion order.
 			std::vector<Filter::FFmpeg*> m_analytics;						///< Per-stretch and observed globals
 			std::vector<std::unique_ptr<Decoder>> m_looks;					///< Route-owned source and dest look decoders
 	};

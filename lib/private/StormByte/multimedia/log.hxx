@@ -40,8 +40,8 @@
 
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
-#include <memory>
 #include <string_view>
 
 /**
@@ -63,6 +63,6 @@ namespace StormByte::Multimedia {
 	 * First call also sets format (`[%L] %T %c`) and throttle on
 	 * StormByte/Multimedia. Warning, Error and Fatal stay unthrottled.
 	 */
-	std::shared_ptr<StormByte::Logger::Log> STORMBYTE_MULTIMEDIA_PRIVATE UseLog(
-		std::shared_ptr<StormByte::Logger::Log> log, std::string_view leaf) noexcept;
+	STORMBYTE_MULTIMEDIA_PRIVATE StormByte::Safe::Shared<StormByte::Logger::Log> UseLog(
+		StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view leaf) noexcept;
 }

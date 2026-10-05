@@ -39,7 +39,6 @@
 #pragma once
 
 #include <StormByte/buffer/io/buffered_location_reader.hxx>
-#include <StormByte/safe/string.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
@@ -47,20 +46,28 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
+#include <StormByte/safe/function.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 
-#include <chrono>
-#include <filesystem>
-#include <functional>
-#include <optional>
+#include <cstdint>
 #include <unordered_map>
-#include <variant>
 
-/** @brief Multimedia-owned pipeline stages and unit holders. */
+/**
+ * @brief Multimedia-owned pipeline stages and unit holders.
+ */
 namespace StormByte::Multimedia::Backend::Pipeline {
-	/** @brief Demuxer restoring codec metadata from the consultation snapshot. */
+	/**
+	 * @brief Demuxer restoring codec metadata from the consultation snapshot.
+	 */
 	class Demuxer;
 }
 
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
+ */
 namespace StormByte {
 	/**
 	 * @namespace StormByte::Multimedia
@@ -72,9 +79,10 @@ namespace StormByte {
 		 * @brief Private RAII wrappers over libav*.
 		 */
 		namespace FFmpeg {
+			/**
+			 * @brief Open FFmpeg format context used by the probe.
+			 */
 			class AVFormatContext;
-			/** @brief Owned FFmpeg packet used by the duration scanner. */
-			class AVPacket;
 		}
 	}
 }
@@ -106,15 +114,26 @@ namespace StormByte {
 		 *
 		 * Open probes headers and a bounded run of video packets for HDR10+.
 		 * It does not read the whole source for Duration.
+		 * Base, Multimedia and registry providers must remain loaded while
+		 * snapshots, borrowed readers and callback contexts are in use.
 		 *
 		 * @see StormByte::Buffer::IO::BufferedLocationReader
 		 */
 		class STORMBYTE_MULTIMEDIA_PUBLIC File {
 			friend class StormByte::Multimedia::Backend::Pipeline::Demuxer;
 			public:
-				/** @brief Observer receiving monotone byte-based duration scan percentages. */
-				using DurationProgress = std::function<void(double)>;
+				/**
+				 * @brief Provider-owned observer receiving monotone scan percentages.
+				 * @note Supply context, invoke, clone and release callbacks from the
+				 *       provider module. Invocation is synchronous; no callback is retained.
+				 *       Failed statuses and exceptions are ignored during notification.
+				 */
+				using DurationProgress = StormByte::Safe::Function<void(double)>;
 
+				/**
+				 * @brief Copy construction is unavailable for source snapshots.
+				 * @param other Snapshot that cannot be copied.
+				 */
 				File(const File&) = delete;
 
 				/**
@@ -128,8 +147,19 @@ namespace StormByte {
 				 */
 				~File() noexcept;
 
-				File& operator=(const File&) = delete;
-				File& operator=(File&&) = delete;
+				/**
+				 * @brief Copy assignment is unavailable for source snapshots.
+				 * @param other Snapshot that cannot be copied.
+				 * @return This snapshot.
+				 */
+				File& operator=(const File& other) = delete;
+
+				/**
+				 * @brief Move assignment is unavailable because the container is borrowed.
+				 * @param other Snapshot that cannot be assigned.
+				 * @return This snapshot.
+				 */
+				File& operator=(File&& other) = delete;
 
 				/**
 				 * @brief Path label: stored path, or reader.Path() if borrowed.
@@ -147,13 +177,13 @@ namespace StormByte {
 				 * @brief Real streams in container order. Attached pictures are omitted.
 				 * @return Immutable list.
 				 */
-				const Multimedia::Streams& Streams() const noexcept { return m_streams; }
+				const StormByte::Safe::Vector<Stream>& Streams() const noexcept { return m_streams; }
 
 				/**
 				 * @brief Container attachments (covers, fonts). Not listed in Streams().
 				 * @return Attachments captured at Open.
 				 */
-				const Multimedia::Attachments& Attachments() const noexcept;
+				const StormByte::Safe::Vector<Attachment>& Attachments() const noexcept;
 
 				/**
 				 * @brief Container-level tags captured at Open.
@@ -173,51 +203,48 @@ namespace StormByte {
 				 * instance. If Open(..., duration) was used, this is that value, there
 				 * is no extra I/O, and stream durations stay as probed.
 				 */
-				const std::optional<Property::Duration>& Duration() const noexcept;
+				const StormByte::Safe::Optional<Property::Duration>& Duration() const noexcept;
 
 				/**
 				 * @brief Resolve duration while reporting packet scan progress.
 				 * @param progress Byte-position observer; not called for a cached or supplied duration.
 				 * @return Resolved duration, or empty if unavailable.
 				 */
-				const std::optional<Property::Duration>& Duration(const DurationProgress& progress) const noexcept;
+				const StormByte::Safe::Optional<Property::Duration>& Duration(const DurationProgress& progress) const noexcept;
 
 				/**
 				 * @brief Opens and probes @p path. Temporary reader is dropped.
-				 * @param path Media file.
-				 * @param duration Authoritative duration; empty means scan on first Duration().
+				 * @param path UTF-8 media file path, copied into the snapshot.
+				 * @param duration Authoritative nanoseconds; empty means scan on first Duration().
 				 * @return Snapshot or FileOpenException.
 				 */
-				static ExpectedFile Open(const std::filesystem::path& path,
-					std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+				static ExpectedFile Open(const StormByte::Safe::String& path,
+					StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 				/**
 				 * @brief Opens and probes @p reader with AVIO only.
 				 * @param reader Existing origin. Not taken. Rewound before return.
-				 * @param duration Authoritative duration; empty means scan on first Duration().
+				 * @param duration Authoritative nanoseconds; empty means scan on first Duration().
 				 * @return Snapshot or FileOpenException.
 				 */
 				static ExpectedFile Open(StormByte::Buffer::IO::BufferedLocationReader& reader,
-					std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+					StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 			private:
-				using Origin = std::variant<
-					std::filesystem::path,
-					std::reference_wrapper<StormByte::Buffer::IO::BufferedLocationReader>
-				>;
-
-				Origin m_origin;										///< Path or borrowed reader
+				StormByte::Safe::String m_path;						///< Stored local path
+				StormByte::Buffer::IO::BufferedLocationReader* m_reader;	///< Borrowed reader, or nullptr for a local path
 				const class Container& m_container;						///< Registry container
-				mutable Multimedia::Streams m_streams;					///< Probed streams
-				Multimedia::Attachments m_attachments;					///< Covers / attached files
+				mutable StormByte::Safe::Vector<Stream> m_streams;			///< Probed streams
+				StormByte::Safe::Vector<Attachment> m_attachments;			///< Covers / attached files
 				Metadata::File m_metadata;								///< Container tags
-				mutable std::optional<Property::Duration> m_duration;	///< Container duration
+				mutable StormByte::Safe::Optional<Property::Duration> m_duration;	///< Container duration
 				mutable bool m_durationResolved;						///< Caller-supplied or scan done
 				std::unordered_map<int, FFmpeg::AVCodecParameters> m_codecParameters; ///< Probed codec parameters, including harvested HDR metadata.
 
 				/**
 				 * @brief Snapshot constructor.
-				 * @param origin Stored path or borrowed reader.
+				 * @param path Stored UTF-8 path for a local source.
+				 * @param reader Borrowed reader, or nullptr for a local source.
 				 * @param container Registry container.
 				 * @param streams Probed streams.
 				 * @param attachments Probed attachments.
@@ -225,38 +252,41 @@ namespace StormByte {
 				 * @param duration Container duration.
 				 * @param durationResolved true if Duration() must not scan.
 				 */
-				File(Origin origin, const class Container& container,
-					Multimedia::Streams streams, Multimedia::Attachments attachments,
+				File(StormByte::Safe::String path, StormByte::Buffer::IO::BufferedLocationReader* reader,
+					const class Container& container,
+					StormByte::Safe::Vector<Stream> streams, StormByte::Safe::Vector<Attachment> attachments,
 					Metadata::File metadata,
-					std::optional<Property::Duration> duration, bool durationResolved) noexcept;
+					StormByte::Safe::Optional<Property::Duration> duration, bool durationResolved) noexcept;
 
 				/**
 				 * @brief Probe an already constructed reader (AVIO only).
 				 * @param reader Origin used with AVIO.
 				 * @param duration Caller-supplied duration, if any.
-				 * @param origin Path to keep, or borrowed reference.
+				 * @param path Stored UTF-8 path for a local source.
+				 * @param borrowed Borrowed reader, or nullptr for a local source.
 				 * @return Snapshot or FileOpenException.
 				 */
 				static ExpectedFile Probe(StormByte::Buffer::IO::BufferedLocationReader& reader,
-					std::optional<std::chrono::nanoseconds> duration,
-					Origin origin) noexcept;
+					StormByte::Safe::Optional<std::int64_t> duration,
+					StormByte::Safe::String path,
+					StormByte::Buffer::IO::BufferedLocationReader* borrowed) noexcept;
 
 				/**
 				 * @brief Packet scan for container and missing stream durations.
-				 * @param progress Byte-position observer.
+				 * @param progress Borrowed byte-position observer, or nullptr.
 				 */
-				void ResolveDuration(const DurationProgress& progress) const noexcept;
+				void ResolveDuration(const DurationProgress* progress) const noexcept;
 
 				/**
 				 * @brief Opens AVIO on @p reader and scans durations.
 				 * @param reader Origin.
 				 * @param streams Streams to update.
 				 * @param duration Container duration to fill if empty.
-				 * @param progress Packet scan observer.
+				 * @param progress Borrowed packet scan observer, or nullptr.
 				 */
 				static void ScanWithReader(StormByte::Buffer::IO::BufferedLocationReader& reader,
-					Multimedia::Streams& streams,
-					std::optional<Property::Duration>& duration, const DurationProgress& progress) noexcept;
+					StormByte::Safe::Vector<Stream>& streams,
+					StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress) noexcept;
 
 				/**
 				 * @brief Sets HDR10+ on a video stream.
@@ -269,19 +299,29 @@ namespace StormByte {
 				 * @param ctx Open probe context.
 				 * @param streams Streams to mark.
 				 */
-				static void DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, Multimedia::Streams& streams) noexcept;
+				static void DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams) noexcept;
 
 				/**
 				 * @brief Fills missing durations from packet timestamps.
 				 * @param ctx Open probe context.
 				 * @param streams Streams to update.
 				 * @param container Container duration to fill if empty.
-				 * @param progress Observer receiving each successfully processed packet.
+				 * @param reader Borrowed source used to determine byte-based progress.
+				 * @param progress Borrowed scan observer, or nullptr.
+				 * @param percent Last published monotone percentage.
 				 * @return true only if packet reading reached EOF rather than a read error.
 				 */
-				static bool ScanDurations(FFmpeg::AVFormatContext& ctx, Multimedia::Streams& streams,
-					std::optional<Property::Duration>& container,
-					const std::function<void(const FFmpeg::AVPacket&)>& progress) noexcept;
+				static bool ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams,
+					StormByte::Safe::Optional<Property::Duration>& container,
+					StormByte::Buffer::IO::BufferedLocationReader& reader,
+					const DurationProgress* progress, double& percent) noexcept;
 		};
 	}
 }
+
+/**
+ * @brief Registers File snapshots with Multimedia-owned lifetime operations.
+ * @note The private codec map is created, moved and destroyed in Multimedia.
+ *       Borrowed readers, registry containers and provider modules must outlive use.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::File);

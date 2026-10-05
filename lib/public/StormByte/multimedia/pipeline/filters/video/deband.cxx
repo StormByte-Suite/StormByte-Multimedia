@@ -131,12 +131,14 @@ namespace {
 	}
 }
 
-Deband::Deband(std::shared_ptr<StormByte::Logger::Log> log,
+Deband::Deband(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	unsigned range, unsigned threshold, unsigned grain) noexcept
-	: Filter::Process(std::move(log), "deband"),
+	: Filter::Process(std::move(log), StormByte::Safe::String("deband")),
 	m_range(range ? range : 16u),
 	m_threshold(threshold ? threshold : 4u),
 	m_grain(grain ? grain : 2u) {}
+
+Deband::~Deband() noexcept = default;
 
 enum Type Deband::Media() const noexcept {
 	return Type::Video;

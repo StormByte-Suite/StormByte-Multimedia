@@ -42,10 +42,9 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -95,6 +94,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @par ABI contract
+	 * Requires a compatible C++ ABI and the parent Safe ownership contract.
+	 * Create through Base-heap Safe ownership and keep providers loaded until
+	 * destruction; graph allocation and destruction remain provider-owned.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Bm3d: public Filter::Process {
 		public:
@@ -106,16 +109,41 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param range Block-matching radius in pixels. Empty → profile.
 			 * @param bstep Sliding step between processed blocks. Empty → profile.
 			 */
-			Bm3d(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> sigma = {},
-				std::optional<unsigned> group = {},
-				std::optional<unsigned> range = {},
-				std::optional<unsigned> bstep = {}) noexcept;
+			Bm3d(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> sigma = {},
+				Safe::Optional<unsigned> group = {},
+				Safe::Optional<unsigned> range = {},
+				Safe::Optional<unsigned> bstep = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is not allowed.
+			 * @param other Source filter.
+			 */
 			Bm3d(const Bm3d& other) = delete;
+
+			/**
+			 * @brief Move construction is not allowed.
+			 * @param other Source filter.
+			 */
 			Bm3d(Bm3d&& other) noexcept = delete;
-			~Bm3d() noexcept override = default;
+
+			/**
+			 * @brief Releases settings and graph in the provider.
+			 */
+			~Bm3d() noexcept override;
+
+			/**
+			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Bm3d& operator=(const Bm3d& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Bm3d& operator=(Bm3d&& other) noexcept = delete;
 
 			/**
@@ -154,15 +182,17 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			std::string Chain() const noexcept;
 
-			std::optional<double> m_sigmaIn;		///< Caller sigma, or empty
-			std::optional<unsigned> m_groupIn;		///< Caller group, or empty
-			std::optional<unsigned> m_rangeIn;		///< Caller range, or empty
-			std::optional<unsigned> m_bstepIn;		///< Caller bstep, or empty
+			Safe::Optional<double> m_sigmaIn;		///< Caller sigma, or empty
+			Safe::Optional<unsigned> m_groupIn;		///< Caller group, or empty
+			Safe::Optional<unsigned> m_rangeIn;		///< Caller range, or empty
+			Safe::Optional<unsigned> m_bstepIn;		///< Caller bstep, or empty
 			double m_sigma;							///< Effective sigma
 			unsigned m_group;						///< Effective group
 			unsigned m_range;						///< Effective range
 			unsigned m_bstep;						///< Effective bstep
 			bool m_latched;							///< Profile chosen
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused `buffer → bm3d → buffersink`
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused `buffer → bm3d → buffersink`
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Bm3d);

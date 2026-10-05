@@ -39,6 +39,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/matroska/attachment.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
 #include <StormByte/multimedia/container.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
 #include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/multimedia/pipeline/config/video.hxx>
@@ -52,6 +53,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <format>
 #include <span>
 #include <string>
 #include <utility>
@@ -137,12 +139,6 @@ namespace {
 		return NanoTimeBase.Rescale(ns, time_base);
 	}
 
-	std::string AvError(int err) noexcept {
-		char buf[AV_ERROR_MAX_STRING_SIZE];
-		av_strerror(err, buf, sizeof(buf));
-		return buf;
-	}
-
 	std::span<const std::byte> UnreadSpan(const StormByte::Buffer::FIFO& fifo) noexcept {
 		const auto& stored = fifo.Data();
 		const auto avail = fifo.Available();
@@ -180,7 +176,7 @@ namespace {
 		if (packet.KeyFrame())
 			raw->flags |= AV_PKT_FLAG_KEY;
 
-		for (const auto& side : packet.Attachments()) {
+		for (const StormByte::Multimedia::Pipeline::SideData side : packet.Attachments()) {
 			const auto view = UnreadSpan(side.Payload());
 			if (view.empty())
 				continue;
@@ -500,7 +496,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 					track.language = owner.Language(index);
 				if (owner.Title(index))
 					track.title = owner.Title(index);
-				av_dict_set(&stream->metadata, "ENCODER", track.encoder->EncoderTag().c_str(), 0);
+				const auto encoderTag = track.encoder->EncoderTag();
+				av_dict_set(&stream->metadata, "ENCODER", encoderTag.data(), 0);
 			}
 
 			else {
@@ -529,9 +526,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			}
 
 			if (track.language)
-				av_dict_set(&stream->metadata, "language", track.language->c_str(), 0);
+				av_dict_set(&stream->metadata, "language", track.language->data(), 0);
 			if (track.title)
-				av_dict_set(&stream->metadata, "title", track.title->c_str(), 0);
+				av_dict_set(&stream->metadata, "title", track.title->data(), 0);
 
 			if (stream->codecpar) {
 				if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && !haveDefaultVideo) {
@@ -592,7 +589,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const int rc = avformat_write_header(m_ctx, &opts);
 		av_dict_free(&opts);
 		if (rc < 0) {
-			owner.Fail("avformat_write_header failed: " + AvError(rc));
+			owner.Fail(std::format("avformat_write_header failed: {}",
+				StormByte::Multimedia::FFmpeg::ErrorToString(rc)));
 			return false;
 		}
 
@@ -603,8 +601,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			const FFmpeg::AVRational tb{stream->time_base.num, stream->time_base.den};
 			if (tb.num > 0 && tb.den > 0)
 				track.timeBase = tb;
-			if (track.encoder)
-				av_dict_set(&stream->metadata, "ENCODER", track.encoder->EncoderTag().c_str(), 0);
+			if (track.encoder) {
+				const auto encoderTag = track.encoder->EncoderTag();
+				av_dict_set(&stream->metadata, "ENCODER", encoderTag.data(), 0);
+			}
 		}
 
 		m_header = true;
@@ -677,7 +677,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const int rc = av_interleaved_write_frame(m_ctx, raw);
 		av_packet_free(&raw);
 		if (rc < 0) {
-			owner.Fail("av_interleaved_write_frame failed: " + AvError(rc));
+			owner.Fail(std::format("av_interleaved_write_frame failed: {}",
+				StormByte::Multimedia::FFmpeg::ErrorToString(rc)));
 			return false;
 		}
 

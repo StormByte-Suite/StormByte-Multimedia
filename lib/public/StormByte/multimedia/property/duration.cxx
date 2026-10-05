@@ -50,7 +50,7 @@ std::chrono::nanoseconds Duration::Nanoseconds() const noexcept {
 	return m_value;
 }
 
-std::string Duration::ToString() const noexcept {
+StormByte::Safe::String Duration::ToString() const {
 	std::int64_t ns = m_value.count();
 	if (ns < 0)
 		ns = 0;
@@ -64,8 +64,8 @@ std::string Duration::ToString() const noexcept {
 	const std::int64_t hour = total_m / 60;
 
 	if (hour > 0)
-		return std::format("{}:{:02}:{:02}.{:03}", hour, min, sec, milli);
+		return StormByte::Safe::String(std::format("{}:{:02}:{:02}.{:03}", hour, min, sec, milli));
 	if (min > 0)
-		return std::format("{}:{:02}.{:03}", min, sec, milli);
-	return std::format("{}.{:03}", sec, milli);
+		return StormByte::Safe::String(std::format("{}:{:02}.{:03}", min, sec, milli));
+	return StormByte::Safe::String(std::format("{}.{:03}", sec, milli));
 }

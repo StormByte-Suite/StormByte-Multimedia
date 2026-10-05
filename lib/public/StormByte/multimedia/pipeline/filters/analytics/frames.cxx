@@ -53,8 +53,10 @@ namespace {
 	}
 }
 
-CountFrames::CountFrames(std::shared_ptr<StormByte::Logger::Log> log) noexcept
+CountFrames::CountFrames(Safe::Shared<StormByte::Logger::Log> log) noexcept
 : Analytics(std::move(log), "frames") {}
+
+CountFrames::~CountFrames() noexcept = default;
 
 enum Type CountFrames::Media() const noexcept {
 	return Type::Video;
@@ -72,14 +74,15 @@ void CountFrames::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	if (!DistLook(frame.Producer()))
 		return;
-	++m_frames[frame.Track()];
+	auto count = m_frames[frame.Track()];
+	count = static_cast<std::uint64_t>(count) + 1;
 	Log(Level::LowLevel, std::format("count t={} producer={} pts={}",
 		frame.Track(), static_cast<int>(frame.Producer()),
 		frame.Pts() ? frame.Pts()->Nanoseconds().count() : 0));
 }
 
 void CountFrames::Eof() noexcept {
-	for (const auto& [track, n] : m_frames)
+	for (const auto& [track, n] : std::as_const(m_frames))
 		Log(Level::Notice, std::format("t={} frames={}", track, n));
 	Log(Level::Debug, std::format("eof tracks={}", m_frames.size()));
 }
@@ -88,12 +91,12 @@ class StormByte::Multimedia::Pipeline::Filter::Report CountFrames::Report() cons
 	if (m_frames.empty())
 		return { Filter::Report::Status::Failed, {} };
 
-	std::map<std::string, std::string> data;
+	Safe::Map<Safe::String, Safe::String> data;
 	if (m_frames.size() == 1)
-		data.emplace("frames", std::to_string(m_frames.begin()->second));
+		data.emplace(Safe::String("frames"), Safe::String(std::to_string(m_frames.begin()->second)));
 	else {
 		for (const auto& [track, n] : m_frames)
-			data.emplace(std::format("{}.frames", track), std::to_string(n));
+			data.emplace(Safe::String(std::format("{}.frames", track)), Safe::String(std::to_string(n)));
 	}
 	return { Filter::Report::Status::Ok, std::move(data) };
 }

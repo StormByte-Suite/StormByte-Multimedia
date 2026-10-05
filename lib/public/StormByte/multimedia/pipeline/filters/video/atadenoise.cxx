@@ -50,15 +50,17 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Atadenoise;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Atadenoise::Atadenoise(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<unsigned> frames,
-	std::optional<double> lumaA,
-	std::optional<double> lumaB,
-	std::optional<double> chromaA,
-	std::optional<double> chromaB) noexcept
-	: Filter::Process(std::move(log), "atadenoise"),
+Atadenoise::Atadenoise(Safe::Shared<StormByte::Logger::Log> log,
+	Safe::Optional<unsigned> frames,
+	Safe::Optional<double> lumaA,
+	Safe::Optional<double> lumaB,
+	Safe::Optional<double> chromaA,
+	Safe::Optional<double> chromaB) noexcept
+	: Filter::Process(std::move(log), Safe::String("atadenoise")),
 	m_framesIn(frames), m_laIn(lumaA), m_lbIn(lumaB),
 	m_caIn(chromaA), m_cbIn(chromaB) {}
+
+Atadenoise::~Atadenoise() noexcept = default;
 
 enum Type Atadenoise::Media() const noexcept {
 	return Type::Video;
@@ -72,15 +74,15 @@ void Atadenoise::Setup() noexcept {
 	Clean();
 }
 
-std::string Atadenoise::Chain() const noexcept {
+StormByte::Safe::String Atadenoise::Chain() const noexcept {
 	const unsigned s = m_framesIn.value_or(9u);
 	const double la = m_laIn.value_or(0.02);
 	const double lb = m_lbIn.value_or(0.04);
 	const double ca = m_caIn.value_or(0.02);
 	const double cb = m_cbIn.value_or(0.04);
-	return std::format(
+	return Safe::String(std::format(
 		"atadenoise=s={}:0a={}:0b={}:1a={}:1b={}:2a={}:2b={}",
-		s, la, lb, ca, cb, ca, cb);
+		s, la, lb, ca, cb, ca, cb));
 }
 
 void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
@@ -92,14 +94,14 @@ void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
 			Fail("atadenoise: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("atadenoise: AVFilterGraph::Ensure failed");
 		return;

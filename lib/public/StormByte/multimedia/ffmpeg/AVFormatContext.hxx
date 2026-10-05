@@ -40,14 +40,14 @@
 
 #include <StormByte/buffer/consumer.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
+#include <StormByte/multimedia/ffmpeg/AVBSF.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <chrono>
 #include <filesystem>
 #include <memory>
-#include <optional>
-#include <unordered_set>
 
 namespace StormByte::Multimedia {
 	class File;
@@ -123,22 +123,22 @@ namespace StormByte::Multimedia::FFmpeg {
 
 			/**
 			 * @brief Demuxer format name (`iformat->name`).
-			 * @return Name (may be comma-separated ids), or nullptr.
+			 * @return Owned name (may be comma-separated ids), or empty.
 			 */
-			const char* FormatName() const noexcept;
+			Safe::String FormatName() const noexcept;
 
 			/**
 			 * @brief Looks up a container metadata tag.
 			 * @param key Dictionary key (e.g. `"title"`).
-			 * @return Value, or nullptr if missing.
+			 * @return Owned value, or empty if missing; independent of the context lifetime.
 			 */
-			const char* Tag(const char* key) const noexcept;
+			Safe::Optional<Safe::String> Tag(const char* key) const noexcept;
 
 			/**
 			 * @brief Container duration in nanoseconds.
-			 * @return Duration, or empty if unknown.
+			 * @return Duration, or empty if unknown or result allocation fails.
 			 */
-			std::optional<std::chrono::nanoseconds> Duration() const noexcept;
+			Safe::Optional<Property::Duration> Duration() const;
 
 			/**
 			 * @brief Reads the next packet.
@@ -149,7 +149,7 @@ namespace StormByte::Multimedia::FFmpeg {
 
 			/**
 			 * @brief Non-owning stream views.
-			 * @return Set of streams.
+			 * @return Views ordered by stream index; this context must outlive all views.
 			 */
 			Streams Streams() const noexcept;
 
@@ -158,9 +158,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param codec_id Codec id.
 			 * @param stream_id Stream index (time base).
 			 * @param params Codec parameters.
-			 * @return BSF or nullopt.
+			 * @return Base-heap filter owner, or empty if unnecessary or creation failed.
 			 */
-			std::optional<AVBSF> Mp4ToAnnexB(int codec_id, int stream_id, const AVCodecParameters& params) const noexcept;
+			Safe::Unique<AVBSF> Mp4ToAnnexB(int codec_id, int stream_id, const AVCodecParameters& params) const noexcept;
 
 			/**
 			 * @brief Whether an input context is open.
@@ -171,8 +171,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			/**
 			 * @brief Marks streams not in @p wanted as `AVDISCARD_ALL`.
 			 * @param wanted Origin indexes to keep (`AVDISCARD_DEFAULT`).
+			 * @note Looks up indexes directly without allocating an intermediate collection.
 			 */
-			void DiscardUnwanted(const std::unordered_set<int>& wanted) noexcept;
+			void DiscardUnwanted(const Safe::Vector<int>& wanted) noexcept;
 
 		private:
 			struct ConsumerIO;
@@ -230,3 +231,10 @@ namespace StormByte::Multimedia::FFmpeg {
 
 	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVFormatContext>;
 }
+
+/**
+ * @brief Conditional provider contract: context and private AVIO lifetimes stay in Multimedia.
+ * @note Borrowed AVIO and stream views retain their documented owner lifetimes.
+ * Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVFormatContext);

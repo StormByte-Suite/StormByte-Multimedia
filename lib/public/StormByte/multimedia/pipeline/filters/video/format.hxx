@@ -41,6 +41,8 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -81,12 +83,37 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param pixFmt Destination pixel format.
 			 */
-			Format(std::shared_ptr<StormByte::Logger::Log> log, int pixFmt) noexcept;
+			Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt) noexcept;
 
+			/**
+			 * @brief Copy construction is disabled.
+			 * @param other Source filter.
+			 */
 			Format(const Format& other) = delete;
+
+			/**
+			 * @brief Move construction is disabled.
+			 * @param other Source filter.
+			 */
 			Format(Format&& other) noexcept = delete;
-			~Format() noexcept override = default;
+
+			/**
+			 * @brief Releases the filter in its owning module.
+			 */
+			~Format() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Format& operator=(const Format& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Format& operator=(Format&& other) noexcept = delete;
 
 			/**
@@ -112,6 +139,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Process(const Pipeline::Frame& frame) noexcept override;
 
 		private:
-			int m_pixFmt;	///< Destination AVPixelFormat as int
+			int m_pixFmt;	///< Destination AVPixelFormat as an integer.
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Format);

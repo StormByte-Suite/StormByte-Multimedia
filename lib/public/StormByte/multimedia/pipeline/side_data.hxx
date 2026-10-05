@@ -40,9 +40,9 @@
 
 #include <StormByte/buffer/fifo.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -88,11 +88,18 @@ namespace StormByte::Multimedia::Pipeline {
 	class STORMBYTE_MULTIMEDIA_PUBLIC SideData {
 		public:
 			/**
+			 * @brief Empty unnamed blob of kind Other for Safe value storage.
+			 * @throws StormByte::Exception If safe optional storage cannot be allocated.
+			 */
+			SideData();
+
+			/**
 			 * @brief Known kind plus payload.
 			 * @param kind Side-data kind.
 			 * @param payload Raw bytes.
+			 * @throws StormByte::Exception If safe optional storage cannot be allocated.
 			 */
-			SideData(SideDataKind kind, StormByte::Buffer::FIFO payload) noexcept;
+			SideData(SideDataKind kind, StormByte::Buffer::FIFO payload);
 
 			/**
 			 * @brief Other kind plus FFmpeg name and payload.
@@ -100,39 +107,42 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param payload Raw bytes.
 			 *
 			 * Sets @ref Kind to @ref SideDataKind::Other.
+			 * @throws StormByte::Exception If optional storage cannot be allocated.
 			 */
-			SideData(std::string name, StormByte::Buffer::FIFO payload) noexcept;
+			SideData(StormByte::Safe::String name, StormByte::Buffer::FIFO payload);
 
 			/**
 			 * @brief Copy constructor.
 			 * @param other Source blob.
+			 * @throws StormByte::Exception If safe metadata storage cannot be copied.
 			 */
-			SideData(const SideData& other) noexcept = default;
+			SideData(const SideData& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Blob to take.
 			 */
-			SideData(SideData&& other) noexcept = default;
+			SideData(SideData&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~SideData() noexcept = default;
+			~SideData() noexcept;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source blob.
 			 * @return *this.
+			 * @throws StormByte::Exception If safe metadata storage cannot be copied.
 			 */
-			SideData& operator=(const SideData& other) noexcept = default;
+			SideData& operator=(const SideData& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Blob to take.
 			 * @return *this.
 			 */
-			SideData& operator=(SideData&& other) noexcept = default;
+			SideData& operator=(SideData&& other) noexcept;
 
 			/**
 			 * @brief Kind.
@@ -142,9 +152,9 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief libav name when Kind is Other.
-			 * @return Name, or empty.
+			 * @return Borrowed name, or empty; valid until this blob is modified or destroyed.
 			 */
-			const std::optional<std::string>& Name() const noexcept;
+			const StormByte::Safe::Optional<StormByte::Safe::String>& Name() const noexcept;
 
 			/**
 			 * @brief Raw payload.
@@ -159,8 +169,19 @@ namespace StormByte::Multimedia::Pipeline {
 			StormByte::Buffer::FIFO& Payload() noexcept;
 
 		private:
-			SideDataKind m_kind;					///< Kind
-			std::optional<std::string> m_name;		///< Name if Other
-			StormByte::Buffer::FIFO m_payload;		///< Bytes
+			SideDataKind m_kind = SideDataKind::Other;					///< Side-data kind; Other for an empty blob.
+
+			StormByte::Safe::Optional<StormByte::Safe::String> m_name;	///< Optional Base-owned name for an unmapped kind.
+
+			StormByte::Buffer::FIFO m_payload;							///< Buffer-owned bytes, copied independently with this value.
 	};
 }
+
+/**
+ * @brief Admits the completed blob to Safe collections under the provider ABI contract.
+ *
+ * Text and optional storage use Base's heap; FIFO lifetime operations use Buffer's
+ * provider. Copy, move and destruction are exported by Multimedia. Consumers must
+ * use compatible compiler and runtime ABIs and keep these providers loaded.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::SideData);

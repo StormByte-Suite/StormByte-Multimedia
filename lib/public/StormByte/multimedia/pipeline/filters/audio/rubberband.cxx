@@ -50,10 +50,12 @@ using StormByte::Multimedia::Pipeline::Filter::Audio::Rubberband;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Rubberband::Rubberband(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> tempo, std::optional<double> pitch) noexcept
+Rubberband::Rubberband(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> tempo, StormByte::Safe::Optional<double> pitch) noexcept
 	: Filter::Process(std::move(log), "rubberband"),
 	m_tempoIn(tempo), m_pitchIn(pitch) {}
+
+Rubberband::~Rubberband() noexcept = default;
 
 enum Type Rubberband::Media() const noexcept {
 	return Type::Audio;
@@ -67,10 +69,10 @@ void Rubberband::Setup() noexcept {
 	Clean();
 }
 
-std::string Rubberband::Chain() const noexcept {
+StormByte::Safe::String Rubberband::Chain() const noexcept {
 	const double tempo = m_tempoIn.value_or(1.0);
 	const double pitch = m_pitchIn.value_or(1.0);
-	return std::format("rubberband=tempo={}:pitch={}", tempo, pitch);
+	return StormByte::Safe::String(std::format("rubberband=tempo={}:pitch={}", tempo, pitch));
 }
 
 void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
@@ -82,7 +84,7 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

@@ -56,11 +56,12 @@ FFmpeg::AVBSF::~AVBSF() noexcept {
 	Free();
 }
 
-FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(const std::string& name, const AVCodecParameters& params, FFmpeg::AVRational time_base) noexcept {
+FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(std::string_view name, const AVCodecParameters& params, FFmpeg::AVRational time_base) noexcept {
 	if (name.empty() || !params.Get())
 		return Unexpected<BSFError>("Invalid BSF name or parameters");
 
-	const AVBitStreamFilter* filter = av_bsf_get_by_name(name.c_str());
+	const StormByte::Safe::String terminatedName(name);
+	const AVBitStreamFilter* filter = av_bsf_get_by_name(terminatedName.data());
 	if (!filter)
 		return Unexpected<BSFError>("Bitstream filter not found");
 	AVBSFContext* ctx = nullptr;

@@ -42,10 +42,10 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -91,6 +91,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @par ABI contract
+	 * Requires the same compatible C++ ABI and the parent Safe base migration.
+	 * Allocation and destruction must remain creator-owned with providers loaded.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Atadenoise: public Filter::Process {
 		public:
@@ -103,17 +106,42 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param chromaA Chroma |centre| threshold. Empty → 0.02.
 			 * @param chromaB Chroma |step| threshold. Empty → 0.04.
 			 */
-			Atadenoise(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<unsigned> frames = {},
-				std::optional<double> lumaA = {},
-				std::optional<double> lumaB = {},
-				std::optional<double> chromaA = {},
-				std::optional<double> chromaB = {}) noexcept;
+			Atadenoise(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<unsigned> frames = {},
+				Safe::Optional<double> lumaA = {},
+				Safe::Optional<double> lumaB = {},
+				Safe::Optional<double> chromaA = {},
+				Safe::Optional<double> chromaB = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is not allowed.
+			 * @param other Source filter.
+			 */
 			Atadenoise(const Atadenoise& other) = delete;
+
+			/**
+			 * @brief Move construction is not allowed.
+			 * @param other Source filter.
+			 */
 			Atadenoise(Atadenoise&& other) noexcept = delete;
-			~Atadenoise() noexcept override = default;
+
+			/**
+			 * @brief Releases settings and the cached graph in the creator module.
+			 */
+			~Atadenoise() noexcept override;
+
+			/**
+			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Atadenoise& operator=(const Atadenoise& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Atadenoise& operator=(Atadenoise&& other) noexcept = delete;
 
 			/**
@@ -148,13 +176,15 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `atadenoise=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<unsigned> m_framesIn;	///< Caller window, or empty
-			std::optional<double> m_laIn;		///< Caller luma A, or empty
-			std::optional<double> m_lbIn;		///< Caller luma B, or empty
-			std::optional<double> m_caIn;		///< Caller chroma A, or empty
-			std::optional<double> m_cbIn;		///< Caller chroma B, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			Safe::Optional<unsigned> m_framesIn;		///< Caller temporal window, or empty.
+			Safe::Optional<double> m_laIn;			///< Caller luma centre threshold, or empty.
+			Safe::Optional<double> m_lbIn;			///< Caller luma step threshold, or empty.
+			Safe::Optional<double> m_caIn;			///< Caller chroma centre threshold, or empty.
+			Safe::Optional<double> m_cbIn;			///< Caller chroma step threshold, or empty.
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Cached graph allocated and destroyed through Base's heap.
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Atadenoise);

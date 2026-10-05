@@ -196,7 +196,7 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 		bytes.assign(rawBytes, rawBytes + size);
 	}
 
-	std::vector<SideData> attachments;
+	StormByte::Safe::Vector<SideData> attachments;
 	for (int i = 0; i < raw.SideDataCount(); ++i) {
 		int size = 0;
 		const auto* data = raw.SideData(i, size);
@@ -264,8 +264,9 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	}
 
 	const std::string stormName{owner.Destination().Name()};
-	const std::string_view pin = owner.Implementation()
-		? std::string_view{*owner.Implementation()} : std::string_view{};
+	const auto implementation = owner.Implementation();
+	const std::string_view pin = implementation
+		? std::string_view{*implementation} : std::string_view{};
 
 	if (!pin.empty()) {
 		if (avcodec_find_encoder_by_name(std::string(pin).c_str()) == nullptr) {
@@ -314,7 +315,11 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		return std::nullopt;
 	}
 
-	for (const auto& [key, value] : owner.FineTune()) {
+	const auto fineSnapshot = owner.FineTune();
+	std::map<std::string, std::string> fine;
+	for (const auto& [key, value] : fineSnapshot)
+		fine.emplace(std::string{key}, std::string{value});
+	for (const auto& [key, value] : fine) {
 		(void)value;
 		if (key == "bufsize" || key == "vbv-bufsize") {
 			owner.Fail("FineTune cannot set bufsize");
@@ -340,11 +345,10 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	if (row && HasKey(row->bufsize_key) && (owner.BitRate() || owner.MaxBitRate()))
 		opts.emplace(row->bufsize_key, std::to_string(BufSizeBits(owner)));
 	if (owner.Preset() && row && HasKey(row->preset_key))
-		opts.emplace(row->preset_key, *owner.Preset());
+		opts.emplace(row->preset_key, std::string{*owner.Preset()});
 	if (owner.Tune() && row && HasKey(row->style_key))
-		opts.emplace(row->style_key, *owner.Tune());
+		opts.emplace(row->style_key, std::string{*owner.Tune()});
 
-	const auto& fine = owner.FineTune();
 	const bool pack = row && HasKey(row->tune_key);
 	if (pack) {
 		if (!blob.contains("wpp") && !fine.contains("wpp"))
@@ -441,8 +445,11 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		}
 	}
 
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+	for (const auto& [key, value] : opts)
+		options.emplace(StormByte::Safe::String{key}, StormByte::Safe::String{value});
 	auto opened = StormByte::Multimedia::FFmpeg::AVEncoder::Open(
-		const_cast<::AVCodec*>(codec), params, owner.Index(), opts, timeBase);
+		const_cast<::AVCodec*>(codec), params, owner.Index(), options, timeBase);
 	if (!opened.has_value()) {
 		owner.Fail(opened.error() ? opened.error()->what() : "Failed to open encoder");
 		return std::nullopt;
@@ -476,6 +483,6 @@ const StormByte::Multimedia::FFmpeg::AVFrame* Encoder::FrameHandle(
 void Encoder::CommitOpen(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const Opened& opened) noexcept {
 	if (!opened.Implementation().empty())
-		owner.Implementation(opened.Implementation());
+		owner.Implementation(StormByte::Safe::String{opened.Implementation()});
 	owner.m_capabilities = opened.Capabilities();
 }

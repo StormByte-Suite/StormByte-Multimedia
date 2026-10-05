@@ -43,8 +43,7 @@
 #include <StormByte/multimedia/property/hdr10.hxx>
 #include <StormByte/multimedia/property/resolution.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <optional>
+#include <StormByte/safe/optional.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -54,9 +53,17 @@ namespace StormByte::Multimedia::Property {
 	/**
 	 * @class Video
 	 * @brief Per-stream video properties.
+	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+	 *       remain loaded while their values and provider callbacks are in use.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Video final {
 		public:
+			/**
+			 * @brief Constructs unknown video properties without optional metadata.
+			 * @throws StormByte::Exception Safe storage initialization failed.
+			 */
+			Video();
+
 			/**
 			 * @brief Constructs video properties.
 			 * @param color Colorimetry and pixel format.
@@ -66,36 +73,42 @@ namespace StormByte::Multimedia::Property {
 			 * @param sampleAspectRatio Pixel aspect (`sample_aspect_ratio`). Empty if unknown.
 			 */
 			Video(Color color, Resolution resolution,
-				std::optional<HDR10> hdr10 = std::nullopt,
-				std::optional<AVRational> frameRate = std::nullopt,
-				std::optional<AVRational> sampleAspectRatio = std::nullopt) noexcept;
+				StormByte::Safe::Optional<HDR10> hdr10 = std::nullopt,
+				StormByte::Safe::Optional<AVRational> frameRate = std::nullopt,
+				StormByte::Safe::Optional<AVRational> sampleAspectRatio = std::nullopt) noexcept;
 
 			/**
 			 * @brief Copy constructor.
+			 * @param other Properties to copy.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
-			Video(const Video&) = default;
+			Video(const Video& other);
 
 			/**
 			 * @brief Move constructor.
+			 * @param other Properties to move.
 			 */
-			Video(Video&&) noexcept = default;
+			Video(Video&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~Video() noexcept = default;
+			~Video() noexcept;
 
 			/**
 			 * @brief Copy assignment.
+			 * @param other Properties to copy.
 			 * @return *this.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
-			Video& operator=(const Video&) = default;
+			Video& operator=(const Video& other);
 
 			/**
 			 * @brief Move assignment.
+			 * @param other Properties to move.
 			 * @return *this.
 			 */
-			Video& operator=(Video&&) noexcept = default;
+			Video& operator=(Video&& other) noexcept;
 
 			/**
 			 * @brief Colorimetry and pixel format.
@@ -111,27 +124,40 @@ namespace StormByte::Multimedia::Property {
 
 			/**
 			 * @brief Mastering-display metadata, if present.
-			 * @return HDR10, or empty.
+			 * @return Borrowed optional HDR10, valid while this object is alive.
 			 */
-			const std::optional<class HDR10>& HDR10() const noexcept;
+			const StormByte::Safe::Optional<class HDR10>& HDR10() const noexcept;
 
 			/**
 			 * @brief Stream frame rate, if the container exposed one.
-			 * @return AVRational fps (`{24000, 1001}` for 23.976), or empty.
+			 * @return Borrowed optional fps (`{24000, 1001}` for 23.976), valid while this object is alive.
 			 */
-			const std::optional<AVRational>& FrameRate() const noexcept;
+			const StormByte::Safe::Optional<AVRational>& FrameRate() const noexcept;
 
 			/**
 			 * @brief Pixel aspect ratio (`sample_aspect_ratio`).
-			 * @return AVRational SAR (`{8, 9}` anamorphic NTSC, `{1, 1}` square), or empty.
+			 * @return Borrowed optional SAR (`{8, 9}` anamorphic NTSC, `{1, 1}` square), valid while this object is alive.
 			 */
-			const std::optional<AVRational>& SampleAspectRatio() const noexcept;
+			const StormByte::Safe::Optional<AVRational>& SampleAspectRatio() const noexcept;
 
 		private:
-			class Color m_color;						///< Color
-			class Resolution m_resolution;			///< Frame size
-			std::optional<class HDR10> m_hdr10;		///< Optional HDR10
-			std::optional<AVRational> m_frameRate;	///< Optional fps
-			std::optional<AVRational> m_sar;		///< Optional sample aspect ratio
+			class Color m_color;								///< Colorimetry and pixel format.
+
+			class Resolution m_resolution;						///< Frame size.
+
+			StormByte::Safe::Optional<class HDR10> m_hdr10;		///< Optional mastering-display metadata.
+
+			StormByte::Safe::Optional<AVRational> m_frameRate;	///< Optional frames per second.
+
+			StormByte::Safe::Optional<AVRational> m_sar;		///< Optional sample aspect ratio.
 	};
 }
+
+/**
+ * @brief Registers completed video properties after all contained value types.
+ *
+ * Optional metadata uses Base's heap and creator callbacks; copying, movement and
+ * destruction are exported by Multimedia. Compatible provider ABI is required
+ * and providers and callback creators must outlive their dependent values.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::Video);

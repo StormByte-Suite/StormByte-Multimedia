@@ -38,6 +38,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/type_traits.hxx>
 
@@ -54,6 +55,16 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * Derived classes must implement Free(). Get() is protected; each
 	 * derived type re-exports it as private so only its friends (other
 	 * wrappers) may touch the raw pointer.
+	 * @note This base stores and transfers a raw pointer without allocating or
+	 * releasing its resource in the empty destructor. Move assignment dispatches
+	 * Free() virtually before adopting the source pointer. Concrete destructors
+	 * must call their Free() implementation; borrowed resources must not be freed.
+	 * Subclasses must keep heap-affecting operations in their provider module.
+	 * Resource owners must outlive borrowed views, and Multimedia, Base, FFmpeg
+	 * and subclass providers must remain loaded with compatible C++ and FFmpeg ABIs.
+	 * Supported handle specializations are conditionally MaybeSafe, not universally
+	 * Safe. Base Safe pointer factories provide the object heap and destruction
+	 * route; they do not certify arbitrary subclasses or extend provider lifetimes.
 	 */
 	template<typename AVType>
 	class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer {
@@ -106,7 +117,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			}
 
 		protected:
-			std::decay_t<AVType>* m_ptr = nullptr;	///< Owned FFmpeg pointer
+			std::decay_t<AVType>* m_ptr = nullptr;	///< FFmpeg pointer; concrete wrapper defines ownership
 
 			/**
 			 * @brief Const view of the raw FFmpeg pointer.
@@ -151,7 +162,79 @@ namespace StormByte::Multimedia::FFmpeg {
 
 			/**
 			 * @brief Releases the underlying resource.
+			 * @note Implementations must respect borrowing and release owned resources
+			 * through their allocating provider. Concrete destructors must invoke this
+			 * before the empty base destructor runs.
 			 */
 			virtual void Free() noexcept = 0;
 	};
 }
+
+/**
+ * @brief Conditional provider contracts for supported FFmpeg pointer bases.
+ * @note The base type is complete even when its C handle is only forward declared.
+ * Borrowing, virtual Free(), concrete destruction and provider ABI/lifetime
+ * requirements remain the responsibility of each concrete wrapper or subclass.
+ * Other handle types and arbitrary subclasses are not classified by these declarations.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVAudioFifo>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg bitstream-filter pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVBSFContext>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg codec-context pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVCodecContext>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg codec-parameters pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVCodecParameters>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg dictionary pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVDictionary>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg filter-graph pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVFilterGraph>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg format-context pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVFormatContext>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg frame pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVFrame>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg packet pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::AVPacket>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg audio-resampler pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::SwrContext>);
+
+/**
+ * @brief Conditional provider contract for the FFmpeg image-scaler pointer base.
+ * @note Concrete wrappers must honor the ownership and provider requirements of AVPointer.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVPointer<::SwsContext>);

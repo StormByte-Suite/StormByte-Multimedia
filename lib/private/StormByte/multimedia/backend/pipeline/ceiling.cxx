@@ -127,7 +127,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		return cached;
 	}
 
-	Ceiling::Ceiling(std::shared_ptr<const Multimedia::Pipeline::Plan> plan,
+	Ceiling::Ceiling(StormByte::Safe::Shared<const Multimedia::Pipeline::Plan> plan,
 		Multimedia::Pipeline::Producer producer,
 		const Multimedia::Pipeline::Track& track) noexcept
 	: m_frames(0), m_packets(0), m_park(0) {

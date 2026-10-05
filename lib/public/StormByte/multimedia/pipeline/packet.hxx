@@ -44,11 +44,11 @@
 #include <StormByte/multimedia/pipeline/side_data.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <cstdint>
 #include <memory>
-#include <optional>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -69,6 +69,9 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * Copies and @ref Clone share media buffers rather than duplicating
 	 * compressed bytes.
+	 * Metadata accessors borrow their wrappers until this packet is modified or
+	 * destroyed. Safe optional arrow access returns a read-only snapshot for the
+	 * current full expression. Mutable collection access uses write-back proxies.
 	 *
 	 * @see Item
 	 * @see Frame
@@ -84,6 +87,9 @@ namespace StormByte::Multimedia::Pipeline {
 		friend class Muxer;
 
 		public:
+			/**
+			 * @brief Base-heap shared owner of a packet; keep its providers loaded.
+			 */
 			using PointerType = StormByte::Safe::Shared<Packet>;
 
 			/**
@@ -93,8 +99,9 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Empty packet (no payload, track -1, type Unknown).
+			 * @throws StormByte::Exception If safe metadata storage cannot be allocated.
 			 */
-			Packet() noexcept;
+			Packet();
 
 			/**
 			 * @brief Builds a packet.
@@ -113,17 +120,18 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * Encoder stamps the destination codec. Demuxer stamps
 			 * the source stream codec. There is no public setter.
+			 * @throws StormByte::Exception If safe lineage storage cannot be allocated.
 			 */
 			Packet(int track, enum Type type, enum Producer producer,
 				StormByte::Buffer::FIFO payload,
-				std::optional<Property::Duration> pts,
-				std::optional<Property::Duration> dts,
-				std::optional<Property::Duration> duration,
+				StormByte::Safe::Optional<Property::Duration> pts,
+				StormByte::Safe::Optional<Property::Duration> dts,
+				StormByte::Safe::Optional<Property::Duration> duration,
 				bool key_frame,
-				std::vector<SideData> attachments,
+				StormByte::Safe::Vector<SideData> attachments,
 				const StormByte::Multimedia::Codec* codec,
 				std::uint64_t serial,
-				std::uint64_t part) noexcept;
+				std::uint64_t part);
 
 			/**
 			 * @brief Copy. Metadata and FIFO handle are copied; the
@@ -132,8 +140,10 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * Not a deep copy of compressed bytes. @ref Clone uses
 			 * this constructor.
+			 * @throws StormByte::Exception If safe metadata storage cannot be copied.
+			 * @throws std::bad_alloc If the private backend holder cannot be allocated.
 			 */
-			Packet(const Packet& other) noexcept;
+			Packet(const Packet& other);
 
 			/**
 			 * @brief Move constructor.
@@ -152,8 +162,11 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Copy assignment. Same as the copy constructor.
 			 * @param other Source packet.
 			 * @return *this.
+			 * @note The destination is unchanged if copying fails.
+			 * @throws StormByte::Exception If safe metadata storage cannot be copied.
+			 * @throws std::bad_alloc If the private backend holder cannot be allocated.
 			 */
-			Packet& operator=(const Packet& other) noexcept;
+			Packet& operator=(const Packet& other);
 
 			/**
 			 * @brief Move assignment.
@@ -177,7 +190,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Presentation timestamp on the stream clock.
 			 * @return Pts, or empty.
 			 */
-			inline const std::optional<Property::Duration>& Pts() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Duration>& Pts() const noexcept {
 				return m_pts;
 			}
 
@@ -185,7 +198,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Decode timestamp on the stream clock.
 			 * @return Dts, or empty.
 			 */
-			inline const std::optional<Property::Duration>& Dts() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Duration>& Dts() const noexcept {
 				return m_dts;
 			}
 
@@ -193,7 +206,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Packet duration on the stream clock.
 			 * @return Duration, or empty.
 			 */
-			inline const std::optional<Property::Duration>& Duration() const noexcept {
+			inline const StormByte::Safe::Optional<Property::Duration>& Duration() const noexcept {
 				return m_duration;
 			}
 
@@ -223,7 +236,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * travels Demuxer → … → Muxer. Downstream stages copy it.
 			 * @ref Part distinguishes several frames born from the same serial.
 			 */
-			inline const std::optional<std::uint64_t>& Serial() const noexcept {
+			inline const StormByte::Safe::Optional<std::uint64_t>& Serial() const noexcept {
 				return m_serial;
 			}
 
@@ -248,7 +261,8 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Registry codec of this access unit.
-			 * @return Pointer owned by Registry, or nullptr on the sentinel.
+			 * @return Borrowed pointer owned by Registry, or nullptr on the sentinel.
+			 * @note The owning Registry and its provider must outlive this packet and its copies.
 			 */
 			inline const StormByte::Multimedia::Codec* Codec() const noexcept {
 				return m_codec;
@@ -283,7 +297,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Side-data blobs bound to this access unit.
 			 * @return Blobs (HdrPlus, captions, …). Empty when none.
 			 */
-			inline const std::vector<SideData>& Attachments() const noexcept {
+			inline const StormByte::Safe::Vector<SideData>& Attachments() const noexcept {
 				return m_attachments;
 			}
 
@@ -291,7 +305,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Side-data blobs bound to this access unit (mutable).
 			 * @return Blobs.
 			 */
-			inline std::vector<SideData>& Attachments() noexcept {
+			inline StormByte::Safe::Vector<SideData>& Attachments() noexcept {
 				return m_attachments;
 			}
 
@@ -308,6 +322,8 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Turns this unit into the empty sentinel.
+			 * @pre All owning wrappers have already been moved to the destination.
+			 * Their moved-from state is empty; no allocating clear/reset is performed.
 			 */
 			void BecomeEmpty() noexcept;
 
@@ -329,15 +345,38 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			Item::PointerType Move() override;
 
-			StormByte::Buffer::FIFO m_payload;								///< Compressed bytes
-			std::optional<Property::Duration> m_pts;						///< Presentation timestamp
-			std::optional<Property::Duration> m_dts;						///< Decode timestamp
-			std::optional<Property::Duration> m_duration;					///< Packet duration
-			bool m_keyFrame;												///< Key frame
-			std::vector<SideData> m_attachments;							///< Packet side data
-			const StormByte::Multimedia::Codec* m_codec;					///< Registry codec, or nullptr
-			std::optional<std::uint64_t> m_serial;							///< Lineage id born at demux
-			std::uint64_t m_part;											///< Sub-id inside serial
-			std::unique_ptr<Backend::Pipeline::Packet> m_backend;			///< Backend holder
+			StormByte::Buffer::FIFO m_payload;				///< Buffer-owned compressed bytes.
+
+			StormByte::Safe::Optional<Property::Duration> m_pts;		///< Optional presentation timestamp.
+
+			StormByte::Safe::Optional<Property::Duration> m_dts;		///< Optional decode timestamp.
+
+			StormByte::Safe::Optional<Property::Duration> m_duration;	///< Optional packet duration.
+
+			bool m_keyFrame;						///< Whether this access unit is a key frame.
+
+			StormByte::Safe::Vector<SideData> m_attachments;		///< Opaque safe sequence of independently copied side-data blobs.
+
+			const StormByte::Multimedia::Codec* m_codec;			///< Non-owning codec pointer; its Registry must outlive the packet.
+
+			StormByte::Safe::Optional<std::uint64_t> m_serial;		///< Lineage identifier, empty on the sentinel.
+
+			std::uint64_t m_part;						///< Sub-identifier within the lineage, zero on the sentinel.
+
+			std::unique_ptr<Backend::Pipeline::Packet> m_backend;		///< Multimedia-private holder, allocated and destroyed only by its provider.
+											///<
+											///< Never exposed to consumers. All operations affecting this STL owner are
+											///< exported out-of-line; compatible class layout is still required.
 	};
 }
+
+/**
+ * @brief Registers the completed packet under Multimedia's conditional ABI contract.
+ *
+ * Metadata uses Base-owned Safe wrappers, payload uses Buffer, and the private
+ * backend is managed by exported Multimedia lifetime operations. The codec is
+ * borrowed from Registry. Compatible compiler and runtime ABIs are required;
+ * providers and Registry must outlive their dependent packets and wrappers.
+ * This is not a certification of external subclasses.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Packet);

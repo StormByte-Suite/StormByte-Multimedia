@@ -76,7 +76,7 @@ namespace {
 
 	StormByte::Multimedia::FFmpeg::AVCodecParameters FillAudioParams(
 		const StormByte::Multimedia::Pipeline::Frame& frame,
-		const std::optional<std::int64_t>& bitRate,
+		const StormByte::Safe::Optional<std::int64_t>& bitRate,
 		const StormByte::Multimedia::FFmpeg::AVFrame* handle) noexcept {
 		StormByte::Multimedia::FFmpeg::AVCodecParameters params(nullptr);
 		if (bitRate)

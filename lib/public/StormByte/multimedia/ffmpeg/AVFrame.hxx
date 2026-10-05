@@ -46,6 +46,7 @@
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/pipeline/side_data.hxx>
 #include <StormByte/multimedia/property/hdr10.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <cstddef>
 #include <cstdint>
@@ -717,7 +718,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Copies raw SEI/side-data blobs onto the frame.
 			 * @param attachments High-level side data.
 			 */
-			void WriteSideData(const std::vector<StormByte::Multimedia::Pipeline::SideData>& attachments) noexcept;
+			void WriteSideData(const Safe::Vector<StormByte::Multimedia::Pipeline::SideData>& attachments) noexcept;
 
 			/**
 			 * @brief Scales this frame into @p dst (allocates @p dst if empty).
@@ -752,3 +753,9 @@ namespace StormByte::Multimedia::FFmpeg {
 
 	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVFrame>;
 }
+
+/**
+ * @brief Conditional provider contract: frame copies and release use FFmpeg out-of-line.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVFrame);

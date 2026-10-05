@@ -79,7 +79,7 @@ namespace {
 		return StormByte::Multimedia::Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 
-	std::int64_t NsToTicks(const std::optional<StormByte::Multimedia::Property::Duration>& value, StormByte::Multimedia::Property::AVRational timeBase) noexcept {
+	std::int64_t NsToTicks(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value, StormByte::Multimedia::Property::AVRational timeBase) noexcept {
 		if (!value.has_value() || timeBase.num <= 0 || timeBase.den <= 0)
 			return AV_NOPTS_VALUE;
 		return StormByte::Multimedia::Property::AVRational{1, 1000000000}.Rescale(value->Nanoseconds().count(), timeBase);
@@ -87,6 +87,12 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
+	Audio::~Audio() noexcept = default;
+
+	Audio::Audio(Audio&& other) noexcept = default;
+
+	Audio& Audio::operator=(Audio&& other) noexcept = default;
+
 	Audio::Audio(StormByte::Multimedia::FFmpeg::AVDecoder decoder, FFmpeg::AVRational timeBase,
 		std::optional<StormByte::Multimedia::Property::Audio> audio) noexcept
 	: m_decoder(std::move(decoder)), m_audio(std::move(audio)), m_timeBase(timeBase), m_flushed(false) {}
@@ -157,7 +163,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				TicksToPts(holder->Handle().Pts(), m_timeBase),
 				TicksToDuration(holder->Handle().DurationTicks(), m_timeBase),
 				std::nullopt,
-				std::vector<StormByte::Multimedia::Pipeline::SideData>{},
+				StormByte::Safe::Vector<StormByte::Multimedia::Pipeline::SideData>{},
 				m_audio,
 				0,
 				0);

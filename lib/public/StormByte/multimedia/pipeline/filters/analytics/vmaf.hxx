@@ -44,15 +44,25 @@
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <cstdint>
-#include <deque>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
-struct VmafContext;
-struct VmafModel;
+#include <cstddef>
+
+/**
+ * @namespace StormByte::Multimedia::Pipeline::Filter::Video::Detail::VMAF
+ * @brief Provider-owned VMAF implementation state.
+ */
+namespace StormByte::Multimedia::Pipeline::Filter::Video::Detail::VMAF {
+	/**
+	 * @brief Opaque per-track libvmaf context and presentation park.
+	 */
+	struct Lane;
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::Video::Detail::VMAF::Lane>);
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -61,8 +71,8 @@ struct VmafModel;
  * Inherit @ref Filter::Process to rewrite frames, or
  * @ref Filter::Analytics to observe them. Do not inherit
  * @ref Filter::FFmpeg. Attach with
- * @c job.Filter<VMAF>(log, "vmaf_4k_v0.6.1") or
- * @c job.Filter<VMAF>(log, "vmaf_4k_v0.6.1", 8).
+ * @c job.Filter<VMAF>(log, StormByte::Safe::String("vmaf_4k_v0.6.1")) or
+ * @c job.Filter<VMAF>(log, StormByte::Safe::String("vmaf_4k_v0.6.1"), 8).
  */
 namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	/**
@@ -133,8 +143,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * second video track opens another context of the
 			 * same size.
 			 */
-			VMAF(std::shared_ptr<StormByte::Logger::Log> log, std::string model,
-				std::optional<unsigned short> threads = {}) noexcept;
+			VMAF(StormByte::Safe::Shared<StormByte::Logger::Log> log, StormByte::Safe::String model,
+				StormByte::Safe::Optional<unsigned short> threads = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. Each leaf owns libvmaf contexts.
@@ -217,21 +227,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Per-track libvmaf context and presentation park.
 			 */
-			struct Lane {
-				VmafContext* vmaf = nullptr;	///< libvmaf context
-				VmafModel* model = nullptr;	///< Loaded model
-				std::deque<StormByte::Multimedia::FFmpeg::AVFrame> ref;	///< Decoder looks
-				std::deque<StormByte::Multimedia::FFmpeg::AVFrame> dist;	///< Dest looks
-				int width = 0;					///< Latched width
-				int height = 0;					///< Latched height
-				unsigned index = 0;				///< Next accepted libvmaf index
-				unsigned scored = 0;			///< Accepted pairs
-				std::size_t peakRef = 0;		///< Peak parked refs
-				std::size_t peakDist = 0;		///< Peak parked dists
-				std::optional<double> mean;		///< Pooled mean
-				std::optional<double> min;		///< Pooled min
-				bool failed = false;			///< Context or score failure
-			};
+			using Lane = Detail::VMAF::Lane;
 
 			/**
 			 * @brief Copies @p raw into a VmafPicture, scaling to @p tw x @p th.
@@ -295,8 +291,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void DropAll() noexcept;
 
 			static constexpr std::size_t Ceiling = 512;		///< Analytics hopper
-			std::string m_modelName;						///< libvmaf built-in version
-			std::optional<unsigned short> m_threads;		///< Empty: all cores
-			std::map<int, Lane> m_lanes;					///< One context per Frame::Track
+			StormByte::Safe::String m_modelName;						///< libvmaf built-in version
+			StormByte::Safe::Optional<unsigned short> m_threads;		///< Empty: all cores
+			StormByte::Safe::Map<int, StormByte::Safe::Shared<Lane>> m_lanes;	///< One context per Frame::Track
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::VMAF);

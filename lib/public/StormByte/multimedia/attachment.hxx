@@ -41,83 +41,125 @@
 #include <StormByte/buffer/fifo.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <optional>
-#include <string>
-#include <vector>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 
 /**
- * @namespace StormByte::Multimedia
- * @brief Public multimedia types: codecs, containers, streams and files.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia {
+namespace StormByte {
 	/**
-	 * @class Attachment
-	 * @brief Container attachment (cover, fonts). Not a Stream.
-	 *
-	 * avformat exposes Matroska attached files as fake video tracks
-	 * (`AV_DISPOSITION_ATTACHED_PIC`). This type is the real contract.
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia module of the StormByte suite.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Attachment {
-		public:
-			/**
-			 * @brief Builds an attachment.
-			 * @param fileName Source file name, if known.
-			 * @param mimeType MIME type, if known.
-			 * @param payload File bytes.
-			 */
-			Attachment(std::optional<std::string> fileName, std::optional<std::string> mimeType,
-				StormByte::Buffer::FIFO payload) noexcept;
+	namespace Multimedia {
+		/**
+		 * @class Attachment
+		 * @brief Container attachment (cover, fonts). Not a Stream.
+		 *
+		 * avformat exposes Matroska attached files as fake video tracks
+		 * (`AV_DISPOSITION_ATTACHED_PIC`). This type is the real contract.
+		 * Metadata and payload retain creator-owned storage. Base, Buffer and
+		 * Multimedia providers must remain loaded while attachments are in use.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC Attachment {
+			public:
+				/**
+				 * @brief Constructs an empty attachment.
+				 * @throws StormByte::Exception Safe metadata initialization failed.
+				 */
+				Attachment();
 
-			/**
-			 * @brief Copy constructor (deleted).
-			 */
-			Attachment(const Attachment&) = delete;
+				/**
+				 * @brief Builds an attachment.
+				 * @param fileName Source file name, if known.
+				 * @param mimeType MIME type, if known.
+				 * @param payload File bytes.
+				 */
+				Attachment(StormByte::Safe::Optional<StormByte::Safe::String> fileName,
+					StormByte::Safe::Optional<StormByte::Safe::String> mimeType,
+					StormByte::Buffer::FIFO payload) noexcept;
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Attachment(Attachment&&) noexcept = default;
+				/**
+				 * @brief Copies attachment metadata and payload state.
+				 * @param other Attachment to copy.
+				 * @throws StormByte::Exception Safe metadata copying failed.
+				 */
+				Attachment(const Attachment& other);
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Attachment() noexcept = default;
+				/**
+				 * @brief Move constructor.
+				 * @param other Attachment to take.
+				 */
+				Attachment(Attachment&& other) noexcept;
 
-			/**
-			 * @brief Copy assignment (deleted).
-			 * @return *this.
-			 */
-			Attachment& operator=(const Attachment&) = delete;
+				/**
+				 * @brief Destructor.
+				 */
+				~Attachment() noexcept;
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Attachment& operator=(Attachment&&) noexcept = default;
+				/**
+				 * @brief Copies attachment metadata and payload state.
+				 * @param other Attachment to copy.
+				 * @return *this.
+				 * @throws StormByte::Exception Safe storage copying failed.
+				 */
+				Attachment& operator=(const Attachment& other);
 
-			/**
-			 * @brief Original file name.
-			 * @return Name, or empty.
-			 */
-			const std::optional<std::string>& FileName() const noexcept;
+				/**
+				 * @brief Move assignment.
+				 * @param other Attachment to take.
+				 * @return *this.
+				 */
+				Attachment& operator=(Attachment&& other) noexcept;
 
-			/**
-			 * @brief MIME type.
-			 * @return Type, or empty.
-			 */
-			const std::optional<std::string>& MimeType() const noexcept;
+				/**
+				 * @brief Original file name.
+				 * @return Borrowed Safe optional, empty when the name is unknown.
+				 */
+				const StormByte::Safe::Optional<StormByte::Safe::String>& FileName() const noexcept;
 
-			/**
-			 * @brief Attachment bytes.
-			 * @return FIFO.
-			 */
-			const StormByte::Buffer::FIFO& Payload() const noexcept;
+				/**
+				 * @brief MIME type.
+				 * @return Borrowed Safe optional, empty when the type is unknown.
+				 */
+				const StormByte::Safe::Optional<StormByte::Safe::String>& MimeType() const noexcept;
 
-		private:
-			std::optional<std::string> m_fileName;	///< File name
-			std::optional<std::string> m_mimeType;	///< MIME type
-			StormByte::Buffer::FIFO m_payload;	///< Bytes
-	};
+				/**
+				 * @brief Attachment bytes.
+				 * @return Borrowed FIFO, valid while this attachment is alive.
+				 */
+				const StormByte::Buffer::FIFO& Payload() const noexcept;
 
-	using Attachments = std::vector<Attachment>;
+			private:
+				StormByte::Safe::Optional<StormByte::Safe::String> m_fileName;	///< File name
+				StormByte::Safe::Optional<StormByte::Safe::String> m_mimeType;	///< MIME type
+				StormByte::Buffer::FIFO m_payload;							///< Bytes
+		};
+	}
+}
+
+/**
+ * @brief Registers attachments with provider-local move and destruction operations.
+ * @note Attachment metadata and payload retain creator-owned Safe storage.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Attachment);
+
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia module of the StormByte suite.
+	 */
+	namespace Multimedia {
+		/**
+		 * @brief Ordered attachments with creator-owned Safe storage.
+		 */
+		using Attachments = StormByte::Safe::Vector<Attachment>;
+	}
 }

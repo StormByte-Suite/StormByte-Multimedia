@@ -65,14 +65,16 @@ namespace {
 	}
 }
 
-Fieldmatch::Fieldmatch(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<std::string> order,
-	std::optional<std::string> mode,
-	std::optional<std::string> combmatch) noexcept
-	: Filter::Process(std::move(log), "fieldmatch"),
+Fieldmatch::Fieldmatch(Safe::Shared<StormByte::Logger::Log> log,
+	Safe::Optional<Safe::String> order,
+	Safe::Optional<Safe::String> mode,
+	Safe::Optional<Safe::String> combmatch) noexcept
+	: Filter::Process(std::move(log), Safe::String("fieldmatch")),
 	m_orderIn(std::move(order)),
 	m_modeIn(std::move(mode)),
 	m_combIn(std::move(combmatch)) {}
+
+Fieldmatch::~Fieldmatch() noexcept = default;
 
 enum Type Fieldmatch::Media() const noexcept {
 	return Type::Video;
@@ -87,13 +89,13 @@ void Fieldmatch::Setup() noexcept {
 }
 
 std::string Fieldmatch::Chain() const noexcept {
-	std::string order = m_orderIn.value_or("auto");
+	std::string order = std::string(m_orderIn.value_or(Safe::String("auto")));
 	if (!OrderOk(order))
 		order = "auto";
-	std::string mode = m_modeIn.value_or("pc_n");
+	std::string mode = std::string(m_modeIn.value_or(Safe::String("pc_n")));
 	if (!ModeOk(mode))
 		mode = "pc_n";
-	std::string comb = m_combIn.value_or("sc");
+	std::string comb = std::string(m_combIn.value_or(Safe::String("sc")));
 	if (!CombOk(comb))
 		comb = "sc";
 	return std::format("fieldmatch=order={}:mode={}:combmatch={}",
@@ -120,7 +122,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("fieldmatch: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("fieldmatch: AVFilterGraph::Ensure failed");
 		return;

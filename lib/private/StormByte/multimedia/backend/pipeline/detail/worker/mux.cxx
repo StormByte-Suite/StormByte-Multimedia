@@ -49,7 +49,7 @@
 #include <string>
 
 namespace {
-	std::string Ns(const std::optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
 		return std::format("{}", value->Nanoseconds().count());

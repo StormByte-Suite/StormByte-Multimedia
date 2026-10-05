@@ -39,8 +39,13 @@
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
+#include <deque>
 #include <format>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -56,6 +61,25 @@ using StormByte::Multimedia::Pipeline::ToString;
 using StormByte::Multimedia::Type;
 using StormByte::Logger::Level;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
+
+/**
+ * @brief Provider-owned per-track libvmaf context and presentation park.
+ */
+struct StormByte::Multimedia::Pipeline::Filter::Video::Detail::VMAF::Lane {
+	VmafContext* vmaf = nullptr;	///< libvmaf context
+	VmafModel* model = nullptr;	///< Loaded model
+	std::deque<FFrame> ref;		///< Decoder looks
+	std::deque<FFrame> dist;		///< Dest looks
+	int width = 0;				///< Latched width
+	int height = 0;				///< Latched height
+	unsigned index = 0;			///< Next accepted libvmaf index
+	unsigned scored = 0;		///< Accepted pairs
+	std::size_t peakRef = 0;		///< Peak parked refs
+	std::size_t peakDist = 0;		///< Peak parked dists
+	std::optional<double> mean;	///< Pooled mean
+	std::optional<double> min;	///< Pooled min
+	bool failed = false;		///< Context or score failure
+};
 
 namespace {
 	enum VmafPixelFormat Pix(const FFrame& raw) noexcept {
@@ -90,8 +114,8 @@ namespace {
 	}
 }
 
-VMAF::VMAF(std::shared_ptr<StormByte::Logger::Log> log, std::string model,
-	std::optional<unsigned short> threads) noexcept
+VMAF::VMAF(StormByte::Safe::Shared<StormByte::Logger::Log> log, StormByte::Safe::String model,
+	StormByte::Safe::Optional<unsigned short> threads) noexcept
 : Filter::Analytics(std::move(log), "vmaf"),
 	m_modelName(std::move(model)), m_threads(threads) {}
 
@@ -109,7 +133,8 @@ void VMAF::DropParked(Lane& lane) noexcept {
 }
 
 void VMAF::DropAll() noexcept {
-	for (auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
+		Lane& lane = *lanePointer;
 		(void)track;
 		DropParked(lane);
 		if (lane.vmaf) {
@@ -145,8 +170,8 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 	VmafModelConfig modelCfg{};
 	modelCfg.name = "vmaf";
 	modelCfg.flags = VMAF_MODEL_FLAGS_DEFAULT;
-	if (vmaf_model_load(&lane.model, &modelCfg, m_modelName.c_str()) != 0) {
-		Log(Level::Error, std::format("vmaf_model_load({}) failed", m_modelName));
+	if (vmaf_model_load(&lane.model, &modelCfg, m_modelName.Bytes()) != 0) {
+		Log(Level::Error, std::format("vmaf_model_load({}) failed", static_cast<std::string_view>(m_modelName)));
 		vmaf_close(lane.vmaf);
 		lane.vmaf = nullptr;
 		lane.failed = true;
@@ -169,7 +194,7 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 
 void VMAF::Setup() noexcept {
 	Clean();
-	Log(Level::Debug, std::format("setup model={}", m_modelName));
+	Log(Level::Debug, std::format("setup model={}", static_cast<std::string_view>(m_modelName)));
 }
 
 bool VMAF::Fill(const FFrame& raw, int tw, int th, void* out) noexcept {
@@ -296,7 +321,12 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	Lane& lane = m_lanes[frame.Track()];
+	StormByte::Safe::Shared<Lane> lanePointer = m_lanes[frame.Track()];
+	if (!lanePointer) {
+		lanePointer = StormByte::Safe::Heap::MakeShared<Lane>();
+		m_lanes[frame.Track()] = lanePointer;
+	}
+	Lane& lane = *lanePointer;
 	if (lane.failed)
 		return;
 	if (!lane.vmaf && !OpenLane(lane))
@@ -334,7 +364,8 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 
 void VMAF::Eof() noexcept {
 	unsigned scored = 0;
-	for (auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
+		Lane& lane = *lanePointer;
 		Drain(lane);
 		Log(Level::Debug, std::format("eof t={} scored={} ref={} dist={} peak_ref={} peak_dist={} failed={} latch={}x{}",
 			track, lane.scored, lane.ref.size(), lane.dist.size(),
@@ -377,11 +408,12 @@ void VMAF::Eof() noexcept {
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexcept {
-	std::map<std::string, std::string> data;
-	data.emplace("model", m_modelName);
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
+	data.emplace(StormByte::Safe::String("model"), m_modelName);
 	bool failed = m_lanes.empty();
 	unsigned ok = 0;
-	for (const auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : m_lanes) {
+		const Lane& lane = *lanePointer;
 		if (lane.failed || !lane.mean)
 			failed = true;
 		else
@@ -391,11 +423,12 @@ class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexc
 	const bool prefix = m_lanes.size() > 1;
 	auto key = [prefix](int track, const char* name) {
 		if (!prefix)
-			return std::string(name);
-		return std::to_string(track) + "." + name;
+			return StormByte::Safe::String(name);
+		return StormByte::Safe::String(std::format("{}.{}", track, name));
 	};
 
-	for (const auto& [track, lane] : m_lanes) {
+	for (const auto& [track, lanePointer] : m_lanes) {
+		const Lane& lane = *lanePointer;
 		if (lane.mean) {
 			data.emplace(key(track, "vmaf_mean"), std::format("{:.6f}", *lane.mean));
 			data.emplace(key(track, "vmaf_min"), std::format("{:.6f}", *lane.min));

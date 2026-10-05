@@ -50,10 +50,12 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Pad;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Pad::Pad(std::shared_ptr<StormByte::Logger::Log> log,
+Pad::Pad(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	std::uint32_t width, std::uint32_t height) noexcept
-	: Filter::Process(std::move(log), "pad"),
+	: Filter::Process(std::move(log), StormByte::Safe::String("pad")),
 	m_width(width), m_height(height) {}
+
+Pad::~Pad() noexcept = default;
 
 enum Type Pad::Media() const noexcept {
 	return Type::Video;
@@ -67,10 +69,10 @@ void Pad::Setup() noexcept {
 	Clean();
 }
 
-std::string Pad::Chain() const noexcept {
-	return std::format(
+StormByte::Safe::String Pad::Chain() const noexcept {
+	return StormByte::Safe::String(std::format(
 		"pad=width={}:height={}:x=(ow-iw)/2:y=(oh-ih)/2:color=black",
-		m_width, m_height);
+		m_width, m_height));
 }
 
 void Pad::Process(const Pipeline::Frame& frame) noexcept {
@@ -101,14 +103,14 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
 			Fail("pad: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("pad: AVFilterGraph::Ensure failed");
 		return;

@@ -52,10 +52,12 @@ using StormByte::Multimedia::Pipeline::Filter::Audio::Limiter;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Limiter::Limiter(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> ceiling) noexcept
+Limiter::Limiter(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> ceiling) noexcept
 	: Filter::Process(std::move(log), "limiter"),
 	m_ceilIn(ceiling) {}
+
+Limiter::~Limiter() noexcept = default;
 
 enum Type Limiter::Media() const noexcept {
 	return Type::Audio;
@@ -69,11 +71,11 @@ void Limiter::Setup() noexcept {
 	Clean();
 }
 
-std::string Limiter::Chain() const noexcept {
+StormByte::Safe::String Limiter::Chain() const noexcept {
 	const double db = m_ceilIn.value_or(-1.5);
 	double lin = std::pow(10.0, db / 20.0);
 	lin = std::clamp(lin, 0.0625, 1.0);
-	return std::format("alimiter=limit={}:level=0:latency=1", lin);
+	return StormByte::Safe::String(std::format("alimiter=limit={}:level=0:latency=1", lin));
 }
 
 void Limiter::Process(const Pipeline::Frame& frame) noexcept {
@@ -85,7 +87,7 @@ void Limiter::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

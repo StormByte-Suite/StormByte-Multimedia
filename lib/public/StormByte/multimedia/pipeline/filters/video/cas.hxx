@@ -42,10 +42,10 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <memory>
-#include <optional>
-#include <string>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -91,6 +91,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @par ABI contract
+	 * Requires the same compatible C++ ABI and the parent Safe base migration.
+	 * Allocation and destruction must remain creator-owned with providers loaded.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Cas: public Filter::Process {
 		public:
@@ -99,31 +102,37 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param strength Sharpen amount in [0, 1]. Empty → 0.4.
 			 */
-			Cas(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> strength = {}) noexcept;
+			Cas(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> strength = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Source filter.
 			 */
 			Cas(const Cas& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Source filter.
 			 */
 			Cas(Cas&& other) noexcept = delete;
 
 			/**
 			 * @brief Drops the cached graph.
 			 */
-			~Cas() noexcept override = default;
+			~Cas() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Cas& operator=(const Cas& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Cas& operator=(Cas&& other) noexcept = delete;
 
@@ -159,9 +168,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `cas=strength=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_strengthIn;	///< Caller strength, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			Safe::Optional<double> m_strengthIn;								///< Caller strength, or empty.
+
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Cached graph allocated and destroyed through Base's heap.
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Cas);

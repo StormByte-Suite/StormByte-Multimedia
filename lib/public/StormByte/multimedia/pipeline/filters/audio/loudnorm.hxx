@@ -41,11 +41,13 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <ebur128.h>
 
-#include <memory>
-#include <optional>
 #include <vector>
 
 /**
@@ -100,14 +102,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param integrated Target integrated loudness in LUFS. Empty → −23.
 			 * @param truePeak True-peak ceiling in dBTP. Empty → −1.5.
 			 */
-			Loudnorm(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> integrated = {},
-				std::optional<double> truePeak = {}) noexcept;
+			Loudnorm(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> integrated = {},
+				Safe::Optional<double> truePeak = {}) noexcept;
 
+			/**
+			 * @brief Copy construction is disabled.
+			 * @param other Source filter.
+			 */
 			Loudnorm(const Loudnorm& other) = delete;
+
+			/**
+			 * @brief Move construction is disabled.
+			 * @param other Source filter.
+			 */
 			Loudnorm(Loudnorm&& other) noexcept = delete;
+
+			/**
+			 * @brief Releases the provider-owned meter and measurement storage.
+			 */
 			~Loudnorm() noexcept override;
+
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Loudnorm& operator=(const Loudnorm& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Source filter.
+			 * @return This filter.
+			 */
 			Loudnorm& operator=(Loudnorm&& other) noexcept = delete;
 
 			/**
@@ -188,12 +215,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			double m_targetI;					///< Target integrated LUFS
 			double m_targetTp;					///< Target true-peak dBTP
-			ebur128_state* m_st;				///< Meter, or nullptr
+			ebur128_state* m_st;					///< Provider-owned meter, or nullptr
 			int m_channels;						///< Latched channel count
 			int m_rate;							///< Latched sample rate
 			double m_measuredI;					///< Program integrated LUFS
 			double m_measuredLra;				///< Program LRA (LU)
-			std::vector<double> m_tp;			///< True peak per channel (linear)
+			std::vector<double> m_tp;			///< Provider-local true peak per channel (linear)
 			double m_gain;						///< Linear amplitude gain (I only)
 			double m_ceiling;					///< Linear TP ceiling
 			bool m_limit;						///< Gain would exceed TP without ceiling
@@ -201,3 +228,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			unsigned m_frames;					///< Audio frames seen in Measure
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private STL peak storage and the ebur128 meter never leave Multimedia;
+ * all allocation, mutation and destruction execute in its out-of-line methods.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Loudnorm);

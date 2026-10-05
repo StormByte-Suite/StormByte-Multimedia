@@ -45,15 +45,16 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <memory>
-#include <optional>
 #include <set>
-#include <string>
 
 /**
  * @namespace StormByte
@@ -175,7 +176,7 @@ namespace StormByte {
 					 * @brief Muxer. Destination is the Plan writer.
 					 * @param log Shared logger. Empty pointer means no log.
 					 */
-					explicit Muxer(std::shared_ptr<StormByte::Logger::Log> log) noexcept;
+					explicit Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
 
 					/**
 					 * @brief Copy constructor (deleted).
@@ -225,7 +226,7 @@ namespace StormByte {
 					 * @return Pts of the last video packet, or of audio if no video
 					 *         has been written yet.
 					 */
-					std::optional<Property::Duration> Position() const noexcept;
+					StormByte::Safe::Optional<Property::Duration> Position() const noexcept;
 
 					/**
 					 * @brief Destination container.
@@ -275,28 +276,28 @@ namespace StormByte {
 					 * @param output_index Mux destination order key.
 					 * @return Tag, or empty.
 					 */
-					std::optional<std::string> Language(int output_index) const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Language(int output_index) const noexcept;
 
 					/**
 					 * @brief Sets the language tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @param language BCP-47 / ISO tag. Empty clears.
 					 */
-					void Language(int output_index, std::string language) noexcept;
+					void Language(int output_index, StormByte::Safe::String language) noexcept;
 
 					/**
 					 * @brief Title tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @return Title, or empty.
 					 */
-					std::optional<std::string> Title(int output_index) const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Title(int output_index) const noexcept;
 
 					/**
 					 * @brief Sets the title tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @param title Stream title. Empty clears.
 					 */
-					void Title(int output_index, std::string title) noexcept;
+					void Title(int output_index, StormByte::Safe::String title) noexcept;
 
 					/**
 					 * @}
@@ -377,11 +378,11 @@ namespace StormByte {
 					const Container* m_container;										///< Destination container (Plan)
 					std::unique_ptr<Backend::Pipeline::Muxer> m_backend;				///< Format backend
 					Demuxer* m_origin;													///< Set only by demuxer >> muxer. Not owned
-					std::shared_ptr<class Progress> m_progress;							///< Shared tube clock
+					StormByte::Safe::Shared<class Progress> m_progress;				///< Shared tube clock retained through Base-heap ownership.
 					Attachments m_attachments;											///< Catalogue for header write
 					std::set<int> m_wired;												///< Output indices already reserved
-					std::map<int, std::string> m_language;								///< Per-output language
-					std::map<int, std::string> m_title;									///< Per-output title
+					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;			///< Per-output language
+					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;				///< Per-output title
 					std::atomic<bool> m_closed;											///< Set by Finish / Fail
 					std::atomic<std::size_t> m_reserved;								///< Reserved Video/Audio/Subtitle hoppers
 					std::atomic<std::int64_t> m_positionNs;								///< Last written Pts, or -1
@@ -390,3 +391,5 @@ namespace StormByte {
 		}
 	}
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Muxer);

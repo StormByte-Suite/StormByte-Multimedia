@@ -93,7 +93,7 @@ namespace {
 		return StormByte::Multimedia::Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 
-	std::int64_t NsToTicks(const std::optional<StormByte::Multimedia::Property::Duration>& value, FFmpeg::AVRational timeBase) noexcept {
+	std::int64_t NsToTicks(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value, FFmpeg::AVRational timeBase) noexcept {
 		if (!value.has_value() || timeBase.num <= 0 || timeBase.den <= 0)
 			return AV_NOPTS_VALUE;
 		return FFmpeg::AVRational{1, 1000000000}.Rescale(value->Nanoseconds().count(), timeBase);
@@ -129,8 +129,8 @@ namespace {
 		}
 	}
 
-	std::vector<SideData> MapAttachments(const StormByte::Multimedia::FFmpeg::AVFrame& av) noexcept {
-		std::vector<SideData> out;
+	StormByte::Safe::Vector<SideData> MapAttachments(const StormByte::Multimedia::FFmpeg::AVFrame& av) noexcept {
+		StormByte::Safe::Vector<SideData> out;
 		for (int i = 0; i < av.SideDataCount(); ++i) {
 			const AVFrameSideData* sd = av.SideDataAt(i);
 			if (!sd || !sd->data || sd->size <= 0)
@@ -142,7 +142,7 @@ namespace {
 			const auto kind = MapKind(sd->type);
 			if (kind == SideDataKind::Other) {
 				const char* name = av_frame_side_data_name(sd->type);
-				out.emplace_back(name ? std::string(name) : std::string("unknown"),
+				out.emplace_back(StormByte::Safe::String(name ? name : "unknown"),
 					StormByte::Buffer::FIFO{std::move(bytes)});
 			}
 
@@ -214,6 +214,12 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
+	Video::~Video() noexcept = default;
+
+	Video::Video(Video&& other) noexcept = default;
+
+	Video& Video::operator=(Video&& other) noexcept = default;
+
 	Video::Video(StormByte::Multimedia::FFmpeg::AVDecoder decoder, FFmpeg::AVRational timeBase,
 		std::optional<StormByte::Multimedia::Property::Video> video) noexcept
 	: m_decoder(std::move(decoder)), m_video(std::move(video)), m_timeBase(timeBase), m_flushed(false) {}

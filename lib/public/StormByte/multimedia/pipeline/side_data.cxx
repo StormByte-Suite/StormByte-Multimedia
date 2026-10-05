@@ -40,17 +40,29 @@
 
 using namespace StormByte::Multimedia::Pipeline;
 
-SideData::SideData(SideDataKind kind, StormByte::Buffer::FIFO payload) noexcept
+SideData::SideData() = default;
+
+SideData::SideData(SideDataKind kind, StormByte::Buffer::FIFO payload)
 : m_kind(kind), m_payload(std::move(payload)) {}
 
-SideData::SideData(std::string name, StormByte::Buffer::FIFO payload) noexcept
+SideData::SideData(StormByte::Safe::String name, StormByte::Buffer::FIFO payload)
 : m_kind(SideDataKind::Other), m_name(std::move(name)), m_payload(std::move(payload)) {}
+
+SideData::SideData(const SideData& other) = default;
+
+SideData::SideData(SideData&& other) noexcept = default;
+
+SideData::~SideData() noexcept = default;
+
+SideData& SideData::operator=(const SideData& other) = default;
+
+SideData& SideData::operator=(SideData&& other) noexcept = default;
 
 SideDataKind SideData::Kind() const noexcept {
 	return m_kind;
 }
 
-const std::optional<std::string>& SideData::Name() const noexcept {
+const StormByte::Safe::Optional<StormByte::Safe::String>& SideData::Name() const noexcept {
 	return m_name;
 }
 

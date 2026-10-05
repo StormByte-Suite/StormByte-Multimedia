@@ -43,9 +43,10 @@
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/property/channel_layout.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <memory>
-#include <string>
 #include <string_view>
 
 /**
@@ -87,31 +88,37 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param target Destination speaker layout (not a fixed 5.1).
 			 */
-			Upmix(std::shared_ptr<StormByte::Logger::Log> log,
+			Upmix(Safe::Shared<StormByte::Logger::Log> log,
 				Property::ChannelLayout target) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Source filter.
 			 */
 			Upmix(const Upmix& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Source filter.
 			 */
 			Upmix(Upmix&& other) noexcept = delete;
 
 			/**
 			 * @brief Drops the cached graph.
 			 */
-			~Upmix() noexcept override = default;
+			~Upmix() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Upmix& operator=(const Upmix& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Upmix& operator=(Upmix&& other) noexcept = delete;
 
@@ -156,6 +163,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			/**
 			 * @brief FFmpeg layout token for @ref m_target.
 			 * @return Token, or empty when the layout is unknown.
+			 * @note Borrows a string literal valid while Multimedia remains loaded.
 			 */
 			std::string_view LayoutName() const noexcept;
 
@@ -170,31 +178,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param src Model frame (Describe for chl_in).
 			 * @return Filterchain, or empty if @ref LayoutName is empty.
 			 */
-			std::string SurroundChain(const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
+			Safe::String SurroundChain(const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
 
 			/**
 			 * @brief Second chain: `aformat=channel_layouts=…`.
 			 * @return Filterchain, or empty if @ref LayoutName is empty.
 			 */
-			std::string AformatChain() const noexcept;
+			Safe::String AformatChain() const noexcept;
 
 			/**
 			 * @brief Last chain: keep FL/FR, synthesize LFE from the sum.
 			 * @return Filterchain, or empty if @ref LayoutName is empty.
 			 */
-			std::string PanChain() const noexcept;
+			Safe::String PanChain() const noexcept;
 
 			/**
 			 * @brief Opens or reuses @ref m_graph for @p src and @p chain.
 			 * @param src Model audio frame.
-			 * @param chain avfilter filterchain.
+			 * @param chain Borrowed avfilter chain, valid throughout this call; not retained.
 			 * @return false if the graph could not be (re)opened.
 			 */
 			bool EnsureGraph(const StormByte::Multimedia::FFmpeg::AVFrame& src,
 				std::string_view chain) noexcept;
 
 			Property::ChannelLayout m_target;	///< Destination layout
+
 			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
-			Mode m_mode = Mode::None;			///< Active fallback step
+
+			Mode m_mode = Mode::None;	///< Active fallback step
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private graph ownership is allocated and released only by Multimedia.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Upmix);

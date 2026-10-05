@@ -39,106 +39,134 @@
 #pragma once
 
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <string_view>
 
 /**
- * @namespace StormByte::Multimedia
- * @brief Public media types: codecs, registry and stream kinds.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte suite.
  */
-namespace StormByte::Multimedia {
-	class Registry;
-
+namespace StormByte {
 	/**
-	 * @class Codec
-	 * @brief Immutable codec identity owned by Registry.
-	 *
-	 * Name() is the StormByte key. FFmpeg ids live only in the registry map.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public media types: codecs, registry and stream kinds.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Codec {
-		public:
-			/**
-			 * @brief Copy is disabled; instances are unique in the registry.
-			 */
-			Codec(const Codec&) noexcept = delete;
+	namespace Multimedia {
+		/**
+		 * @class Registry
+		 * @brief Process-wide catalog of codecs and containers.
+		 */
+		class Registry;
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Codec(Codec&&) noexcept = default;
+		/**
+		 * @class Codec
+		 * @brief Immutable codec identity owned by Registry.
+		 *
+		 * Name() is the StormByte key. FFmpeg ids live only in the registry map.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC Codec {
+			public:
+				/**
+				 * @brief Copy is disabled; instances are unique in the registry.
+				 * @param other Source codec.
+				 */
+				Codec(const Codec& other) noexcept = delete;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Codec() noexcept = default;
+				/**
+				 * @brief Move constructor executed by the multimedia provider.
+				 * @param other Source codec.
+				 */
+				Codec(Codec&& other) noexcept;
 
-			/**
-			 * @brief Copy assignment is disabled.
-			 * @return *this.
-			 */
-			Codec& operator=(const Codec&) noexcept = delete;
+				/**
+				 * @brief Destroy the identity in the multimedia provider.
+				 */
+				~Codec() noexcept;
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Codec& operator=(Codec&&) noexcept = default;
+				/**
+				 * @brief Copy assignment is disabled.
+				 * @param other Source codec.
+				 * @return *this.
+				 */
+				Codec& operator=(const Codec& other) noexcept = delete;
 
-			/**
-			 * @brief Identity equality (same registry slot).
-			 * @param other Other codec.
-			 * @return true if both refer to the same instance.
-			 */
-			bool operator==(const Codec& other) const noexcept;
+				/**
+				 * @brief Move assignment executed by the multimedia provider.
+				 * @param other Source codec.
+				 * @return *this.
+				 */
+				Codec& operator=(Codec&& other) noexcept;
 
-			/**
-			 * @brief Identity inequality.
-			 * @param other Other codec.
-			 * @return true if they are different instances.
-			 */
-			bool operator!=(const Codec& other) const noexcept;
+				/**
+				 * @brief Identity equality (same registry slot).
+				 * @param other Other codec.
+				 * @return true if both refer to the same instance.
+				 */
+				bool operator==(const Codec& other) const noexcept;
 
-			/**
-			 * @brief Media kind of this codec.
-			 * @return Type value.
-			 */
-			constexpr enum Type Type() const noexcept { return m_type; }
+				/**
+				 * @brief Identity inequality.
+				 * @param other Other codec.
+				 * @return true if they are different instances.
+				 */
+				bool operator!=(const Codec& other) const noexcept;
 
-			/**
-			 * @brief StormByte codec name.
-			 * @return View to a process-lifetime literal.
-			 */
-			constexpr std::string_view Name() const noexcept { return m_name; }
+				/**
+				 * @brief Media kind of this codec.
+				 * @return Type value.
+				 */
+				constexpr enum Type Type() const noexcept { return m_type; }
 
-			/**
-			 * @brief Human description.
-			 * @return View to a process-lifetime literal.
-			 */
-			constexpr std::string_view Description() const noexcept { return m_description; }
+				/**
+				 * @brief StormByte codec name.
+				 * @return View to a process-lifetime literal.
+				 */
+				constexpr std::string_view Name() const noexcept { return m_name; }
 
-			/**
-			 * @brief Tests Read/Write flags.
-			 * @param access Flags to test.
-			 * @return true if every bit in @p access is set.
-			 */
-			bool HasAccess(Access access) const noexcept;
+				/**
+				 * @brief Human description.
+				 * @return View to a process-lifetime literal.
+				 */
+				constexpr std::string_view Description() const noexcept { return m_description; }
 
-		private:
-			friend class Registry;
+				/**
+				 * @brief Tests Read/Write flags.
+				 * @param access Flags to test.
+				 * @return true if every bit in @p access is set.
+				 */
+				bool HasAccess(Access access) const noexcept;
 
-			enum Type m_type;					///< Stream / codec kind
-			std::string_view m_name;			///< StormByte name
-			std::string_view m_description;		///< Description
-			Access m_access;					///< Read and optional Write
+			private:
+				/**
+				 * @brief Registry creates codec identities from static tables.
+				 */
+				friend class Registry;
 
-			/**
-			 * @brief Registry-only constructor.
-			 * @param type Media kind.
-			 * @param name StormByte name (table literal).
-			 * @param description Description (table literal).
-			 * @param access Capability mask.
-			 */
-			constexpr Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept
-			: m_type(type), m_name(name), m_description(description), m_access(access) {}
-	};
+				enum Type m_type;				///< Stream or codec kind.
+
+				std::string_view m_name;		///< Non-owning StormByte name backed by a process-lifetime literal.
+
+				std::string_view m_description;	///< Non-owning description backed by a process-lifetime literal.
+
+				Access m_access;				///< Read and optional write capabilities.
+
+				/**
+				 * @brief Registry-only constructor executed by the multimedia provider.
+				 * @param type Media kind.
+				 * @param name StormByte name (table literal).
+				 * @param description Description (table literal).
+				 * @param access Capability mask.
+				 */
+				Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept;
+		};
+	}
 }
+
+/**
+ * @brief Declare Codec conditionally DLL-safe before use by Safe owners.
+ * @note Names and descriptions refer to provider literals; compatible ABI and
+ * provider lifetime are required. Codec is noncopyable and is not a Safe value
+ * for direct Optional, Map or Vector storage.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Codec);

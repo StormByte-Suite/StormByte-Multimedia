@@ -200,16 +200,16 @@ namespace {
 	}
 }
 
-Crop::Crop(std::shared_ptr<StormByte::Logger::Log> log) noexcept
-	: Filter::Process(std::move(log), "crop"),
+Crop::Crop(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("crop")),
 	m_auto(true), m_released(false), m_skip(false),
 	m_x(0), m_y(0), m_w(0), m_h(0),
 	m_left(0), m_right(0), m_top(0), m_bottom(0), m_stable(0),
 	m_lumaW(0), m_lumaH(0), m_lumaFmt(FFrame::FormatNone()) {}
 
-Crop::Crop(std::shared_ptr<StormByte::Logger::Log> log,
+Crop::Crop(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int x, int y, int width, int height) noexcept
-	: Filter::Process(std::move(log), "crop"),
+	: Filter::Process(std::move(log), StormByte::Safe::String("crop")),
 	m_auto(false), m_released(true), m_skip(false),
 	m_x(x), m_y(y), m_w(width), m_h(height),
 	m_left(0), m_right(0), m_top(0), m_bottom(0), m_stable(0),

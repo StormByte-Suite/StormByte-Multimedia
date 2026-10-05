@@ -51,10 +51,12 @@ using StormByte::Multimedia::Pipeline::Filter::Audio::Adeclick;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Adeclick::Adeclick(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> threshold) noexcept
-	: Filter::Process(std::move(log), "adeclick"),
+Adeclick::Adeclick(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> threshold) noexcept
+:	Filter::Process(std::move(log), "adeclick"),
 	m_thrIn(threshold) {}
+
+Adeclick::~Adeclick() noexcept = default;
 
 enum Type Adeclick::Media() const noexcept {
 	return Type::Audio;
@@ -68,11 +70,11 @@ void Adeclick::Setup() noexcept {
 	Clean();
 }
 
-std::string Adeclick::Chain() const noexcept {
+StormByte::Safe::String Adeclick::Chain() const noexcept {
 	if (!m_thrIn)
-		return "adeclick";
+		return StormByte::Safe::String("adeclick");
 	const double t = std::clamp(*m_thrIn, 1.0, 100.0);
-	return std::format("adeclick=threshold={}", t);
+	return StormByte::Safe::String(std::format("adeclick=threshold={}", t));
 }
 
 void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
@@ -84,7 +86,7 @@ void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

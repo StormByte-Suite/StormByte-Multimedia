@@ -43,8 +43,6 @@
 #include <StormByte/multimedia/property/av_rational.hxx>
 
 #include <cstdint>
-#include <optional>
-#include <string>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -92,7 +90,7 @@ namespace {
 		return sd->data;
 	}
 
-	std::optional<StormByte::Multimedia::Property::AVRational> IfValid(FFmpeg::AVRational r) noexcept {
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::AVRational> IfValid(FFmpeg::AVRational r) noexcept {
 		if (!r.Valid())
 			return std::nullopt;
 		return r;
@@ -102,7 +100,7 @@ namespace {
 		return transfer == Transfer::SMPTE2084 && primaries == Primaries::BT2020;
 	}
 
-	std::optional<HDR10> MapHDR10(const ::AVStream* raw, Transfer transfer, Primaries primaries) noexcept {
+	StormByte::Safe::Optional<HDR10> MapHDR10(const ::AVStream* raw, Transfer transfer, Primaries primaries) noexcept {
 		if (!LooksLikeHDR10(transfer, primaries))
 			return std::nullopt;
 
@@ -121,7 +119,7 @@ namespace {
 		size_t plusSize = 0;
 		const bool hdr10plus = CodecSideData(raw, AV_PKT_DATA_DYNAMIC_HDR10_PLUS, plusSize) != nullptr;
 
-		std::optional<Point> light;
+		StormByte::Safe::Optional<Point> light;
 		if (cll && (cll->MaxCLL || cll->MaxFALL))
 			light = Point{static_cast<int>(cll->MaxCLL), static_cast<int>(cll->MaxFALL)};
 
@@ -375,14 +373,14 @@ StormByte::Multimedia::Stream::Properties FFmpeg::MapProperties(const AVStream& 
 	switch (stream.Type()) {
 		case AVMEDIA_TYPE_VIDEO: {
 			if (params.Width() <= 0 || params.Height() <= 0)
-				return std::monostate{};
+				return {};
 			const auto pix = MapPixelFormat(params.Format());
 			const auto range = MapRange(params.ColorRange());
 			const auto space = MapSpace(params.ColorSpace());
 			const auto primaries = MapPrimaries(params.ColorPrimaries());
 			const auto transfer = MapTransfer(params.ColorTransfer());
 
-			return Video{
+			return {Video{
 				Color{pix, range, space, primaries, transfer},
 				Resolution{
 					static_cast<std::uint32_t>(params.Width()),
@@ -391,29 +389,29 @@ StormByte::Multimedia::Stream::Properties FFmpeg::MapProperties(const AVStream& 
 				MapHDR10(stream.Raw(), transfer, primaries),
 				IfValid(stream.FrameRateRational()),
 				IfValid(stream.SampleAspectRatio())
-			};
+			}, std::nullopt};
 		}
 
 		case AVMEDIA_TYPE_AUDIO: {
 			const int sampleRate = params.SampleRate();
 			const int channels = params.Channels();
 			if (sampleRate <= 0 && channels <= 0)
-				return std::monostate{};
-			std::optional<std::string> profile;
+				return {};
+			StormByte::Safe::Optional<StormByte::Safe::String> profile;
 			const char* name = avcodec_profile_name(static_cast<AVCodecID>(params.CodecId()), params.Profile());
 			if (name && name[0] != '\0')
 				profile = name;
 			const auto bitRate = params.BitRate();
-			return Audio{
+			return {std::nullopt, Audio{
 				MapChannelLayout(FFmpeg::ToRaw(params.ChannelLayout())),
 				static_cast<std::uint32_t>(sampleRate > 0 ? sampleRate : 0),
 				static_cast<std::uint8_t>(channels > 0 ? channels : 0),
 				bitRate > 0 ? static_cast<std::uint64_t>(bitRate) : 0,
 				std::move(profile)
-			};
+			}};
 		}
 
 		default:
-			return std::monostate{};
+			return {};
 	}
 }

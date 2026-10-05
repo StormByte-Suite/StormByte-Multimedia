@@ -62,7 +62,7 @@ namespace {
 		return std::span<const std::byte>{stored.data() + (stored.size() - avail), avail};
 	}
 
-	enum AVCodecID AttachmentCodecId(const std::optional<std::string>& mime) noexcept {
+	enum AVCodecID AttachmentCodecId(const StormByte::Safe::Optional<StormByte::Safe::String>& mime) noexcept {
 		if (!mime)
 			return AV_CODEC_ID_NONE;
 		if (*mime == "image/jpeg" || *mime == "image/jpg")
@@ -106,9 +106,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
 			stream->codecpar->codec_type = AVMEDIA_TYPE_ATTACHMENT;
 			stream->codecpar->codec_id = AttachmentCodecId(attachment.MimeType());
 			if (attachment.FileName())
-				av_dict_set(&stream->metadata, "filename", attachment.FileName()->c_str(), 0);
+				av_dict_set(&stream->metadata, "filename", attachment.FileName()->data(), 0);
 			if (attachment.MimeType())
-				av_dict_set(&stream->metadata, "mimetype", attachment.MimeType()->c_str(), 0);
+				av_dict_set(&stream->metadata, "mimetype", attachment.MimeType()->data(), 0);
 
 			const auto view = UnreadSpan(attachment.Payload());
 			if (view.empty())

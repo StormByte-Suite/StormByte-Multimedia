@@ -17,12 +17,12 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 
 ## What this module does
 
-- **A closed job intention** — `Plan` owns the origin `File` (move-only), the destination `Container`, the output path and the **output** track list. `add` order is mux order. Omit a stream and it is dropped. `Check()` asks whether the intention is well formed, not whether FFmpeg will succeed.
+- **A closed job intention** — `Plan` owns the reader and writer through `Safe::Unique`, a consultation `File` snapshot and the **output** track list. The destination container is resolved from the writer path extension. `add` order is mux order. Omit a stream and it is dropped. `Check()` asks whether the intention is well formed, not whether FFmpeg will succeed.
 - **A tube of workers** — `Plan >> Demuxer >> (Decoder | Remuxer) [>> Filters] >> Encoder? >> Muxer`. Each `Step` is a worker with hoppers. Items are `Packet` (compressed AU) or `Frame` (decoded AU). Timing has no public setters. `Serial` is a monotone tube id, not `nb_frames`.
 - **Two ways in** — `Transcoder` is the File→File facade (inheritable, hookable, zero hacks). The same tube can be wired by hand with `operator>>`. Anything `Transcoder` can do, a hand-built tube can do. If a user-built tube fails, `Transcoder` fails the same way.
 - **Registry** — codecs and containers that actually exist in this build. Look up `"H.265"` / `"hevc"` or `"Matroska"` / `"matroska"`. Output supports Matroska/WebM and MP4 containers, plus audio-only MP3, Ogg and Opus destinations. MP3 and Opus require exactly one audio track; Ogg output is audio-only. Missing name is an error, not a silent fallback.
 - **Filters** — typed leaves on decoded frames or compressed packets (`Scale`, `Watermark`, analytics / VMAF, …). A bad filter is a Warning and the job continues. A broken tube frame is a Fail.
-- **Logging** — every `Step` takes a `std::shared_ptr<StormByte::Logger::Log>` (prefer `ThreadedLog`). Lines use component `StormByte/Multimedia/<stage>` (`Demuxer`, `Transcoder`, `Watermark`, …) and format `[%L] %T %c`. The print floor belongs to the **application**. Module throttle: Window on LowLevel, Drop on Debug and Notice. Warning / Error / Fatal are not throttled.
+- **Logging** — every `Step` takes a `StormByte::Safe::Shared<StormByte::Logger::Log>` (prefer `ThreadedLog`). Lines use component `StormByte/Multimedia/<stage>` (`Demuxer`, `Transcoder`, `Watermark`, …) and format `[%L] %T %c`. The print floor belongs to the **application**. Module throttle: Window on LowLevel, Drop on Debug and Notice. Warning / Error / Fatal are not throttled.
 
 ## The rest of the suite
 
@@ -47,6 +47,7 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
   - [1. Transcoder (File → File)](#1-transcoder-file--file)
   - [2. The tube by hand](#2-the-tube-by-hand)
 - [Plan, items and the tube contract](#plan-items-and-the-tube-contract)
+- [DLL boundaries](#dll-boundaries)
 - [Filters and analytics](#filters-and-analytics)
 - [Logging](#logging)
 - [Build options and distribution](#build-options-and-distribution)
@@ -67,7 +68,7 @@ You either let `Transcoder` assemble a job from a fluent map of origin streams, 
 
 ### 1. Transcoder (File → File)
 
-`Transcoder` is the facade most applications want. It opens a source, lets you name **output** tracks in mux order, attaches filters, picks a destination container and path, and runs the coordinator. The stock class is complete: you do not have to derive anything to remux, recode or filter.
+`Transcoder` is the facade most applications want. Construct it with source and destination paths (or owned reader/writer locations), then name **output** tracks in mux order, attach filters and run the coordinator. The destination container is inferred from the writer path extension. The stock class is complete: you do not have to derive anything to remux, recode or filter.
 
 It is also **designed to be inherited**. Override `EmptyPlan()` / `EmptySettled()` to carry your own fields, or the hooks (`OnConfigure`, `OnStart`, `OnPlan`, `OnSettled`, `OnProgress`, `OnDone`, `OnError`, `OnAborted`) to drive a UI or a batch runner. Override `InstallLog()` so this job’s own lines use another component path; tube stages stay under `StormByte/Multimedia/<stage>`. Hooks are not an escape hatch around the tube. If a hand-wired tube cannot do it, `Transcoder` will not sneak it in.
 
@@ -79,11 +80,12 @@ Open the source, map streams, run, poll:
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
 #include <filesystem>
 #include <iostream>
-#include <memory>
 #include <thread>
 
 using StormByte::Logger::Level;
@@ -94,6 +96,7 @@ using StormByte::Multimedia::Pipeline::Transcoder;
 using StormByte::Multimedia::Pipeline::Filter::Video::Anchor;
 using StormByte::Multimedia::Pipeline::Filter::Video::Scale;
 using StormByte::Multimedia::Pipeline::Filter::Video::Watermark;
+using StormByte::Safe::String;
 
 int main(int argc, char** argv) {
 	if (argc != 3) {
@@ -101,51 +104,43 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	auto logger = std::make_shared<ThreadedLog>(std::cout, Level::Debug, "[%L] %T %c");
-
-	auto opened = Transcoder::Open(logger, argv[1], argv[2]);
-	if (!opened) {
-		std::cerr << opened.error()->what() << '\n';
-		return 1;
-	}
-	auto& job = *opened.value();
+	auto logger = StormByte::Safe::Heap::MakeShared<ThreadedLog>(std::cout, Level::Debug, "[%L] %T %c");
+	Transcoder job{std::filesystem::path{argv[1]}, std::filesystem::path{argv[2]}, logger};
 
 	auto& registry = Registry::Instance();
 	auto hevc = registry.FindCodec("H.265");
 	auto eac3 = registry.FindCodec("E-AC3");
-	auto mkv  = registry.FindContainer("Matroska");
-	if (!hevc || !eac3 || !mkv) {
-		std::cerr << "codec or container missing in this build\n";
+	if (!hevc || !eac3) {
+		std::cerr << "codec missing in this build\n";
 		return 1;
 	}
 
 	// Output order is the order of these calls. Origin index is the argument.
 	job.Video(0)
-		.Codec(*hevc)
-		.Implementation("libx265")
+		.Codec(hevc->get())
+		.Implementation(String{"libx265"})
 		.Filter<Watermark>(logger, std::filesystem::path("/var/lib/marks/logo.png"),
 			Anchor::BottomRight, 25)
 		.Filter<Scale>(logger, 0u, 1080u);
 	job.Audio(1).Remux();          // compressed copy, adapted to the destination
-	job.Audio(2).Codec(*eac3);
+	job.Audio(2).Codec(eac3->get());
 	job.Subtitle(3).Remux();
 	job.Attachments();             // keep attachments; omit this call to drop them
 
-	job.Destination(*mkv, argv[2]);
 	if (job.Failed()) {
-		std::cerr << job.Error().value_or("configure failed") << '\n';
+		std::cerr << job.Error().value_or(String{"configure failed"}) << '\n';
 		return 1;
 	}
 
 	job.Run();                     // non-blocking
 	for (;;) {
 		const auto status = job.Status();
-		if (auto pct = job.Progress())
-			std::cout << "\rprogress " << *pct << "%" << std::flush;
+		if (auto progress = job.Progress())
+			std::cout << '\r' << static_cast<std::string>(*progress) << std::flush;
 		if (status == Status::Done)
 			break;
 		if (status == Status::Error || status == Status::Aborted) {
-			std::cerr << '\n' << job.Error().value_or("job ended") << '\n';
+			std::cerr << '\n' << job.Error().value_or(String{"job ended"}) << '\n';
 			return 1;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
@@ -159,14 +154,14 @@ What that mapping means:
 
 | Call | Effect |
 | --- | --- |
-| `Video(0).Codec(*hevc).Implementation("libx265")` | Decode origin video 0, encode HEVC with that encoder pin. |
+| `Video(0).Codec(hevc->get()).Implementation(String{"libx265"})` | Decode origin video 0, encode HEVC with that encoder pin. |
 | `.Filter<Watermark>(…)` / `.Filter<Scale>(…)` | Frame filters on that encode lane, in registration order. |
 | `Audio(1).Remux()` | Keep the compressed stream. Remux is copy **plus** destination adaptation. There is no separate “Copy” stage. |
-| `Audio(2).Codec(*eac3)` | Recode that origin audio. |
+| `Audio(2).Codec(eac3->get())` | Recode that origin audio. |
 | `Ignore(n)` | Drop origin stream `n`. |
 | `Attachments()` / `Attachments("image/png")` | Keep all attachments, or only a MIME. Default without a call is drop. |
-| `Destination(container, path)` | Closes the intention. Required before `Run()`. |
-| `Filter<Analytics>(…)` on the **job** | Analytics on every encode lane. Not via `Track::Filter`. |
+| `Transcoder(source, destination, logger)` | Supplies locations before mapping; the writer path determines the container. |
+| `Filter<Analytics>(…)` on the **job** | Global analytics on matching encode lanes; `Track::Filter` also accepts track-scoped analytics. |
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
 
@@ -186,6 +181,7 @@ A short recode of one video track into Matroska:
 
 ```cpp
 #include <StormByte/logger/threaded_log.hxx>
+#include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
@@ -193,31 +189,40 @@ A short recode of one video track into Matroska:
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/registry.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
+#include <filesystem>
+#include <iostream>
+#include <utility>
+
+using StormByte::Logger::Level;
 using StormByte::Logger::ThreadedLog;
 using StormByte::Multimedia::Registry;
 using namespace StormByte::Multimedia::Pipeline;
 
-auto logger = std::make_shared<ThreadedLog>(std::cout, Level::Notice, "[%L] %T %c");
+auto logger = StormByte::Safe::Heap::MakeShared<ThreadedLog>(std::cout, Level::Notice, "[%L] %T %c");
 auto& registry = Registry::Instance();
 auto hevc = registry.FindCodec("H.265");
 auto mkv  = registry.FindContainer("Matroska");
+if (!hevc || !mkv)
+	return 1;
 
-File source{/* opened origin */};
-Plan plan{std::move(source), *mkv, "out.mkv"};
-Track video;
-video.Kind = Type::Video;
-video.In   = 0;
-video.Codec(*hevc).Implementation("libx265");
-plan.add(std::move(video));
+Plan plan{std::filesystem::path{"in.mkv"}, std::filesystem::path{"out.mkv"}};
+Config::Video video;
+video.Codec(hevc->get());
+Config::Implementation pins;
+pins.Encoder = StormByte::Safe::String{"libx265"};
+video.Implementation(std::move(pins));
+plan.add(Track{0, std::move(video)});
 if (auto check = plan.Check(); !check)
 	return 1;
 
 Demuxer demux(logger);
 Decoder decode(logger, /* origin track */ 0);
-Encoder encode(logger, /* output index */ 0, *hevc);
-encode.Implementation("libx265");
-Muxer   mux(logger, *mkv);
+Encoder encode(logger, /* output index */ 0, hevc->get());
+encode.Implementation(StormByte::Safe::String{"libx265"});
+Muxer   mux(logger, mkv->get());
 
 std::move(plan) >> demux;
 demux >> decode >> encode >> mux >> std::filesystem::path{"out.mkv"};
@@ -225,25 +230,37 @@ demux >> decode >> encode >> mux >> std::filesystem::path{"out.mkv"};
 
 `operator>>` shares the `Plan` and binds hoppers. `Demuxer` produces `Packet`s and receives nothing. `Decoder` turns those into `Frame`s. `Encoder` produces `Packet`s again. `Muxer` reserves the output slot — remux does not. Fan-out from one demuxer to several decoders / remuxers is the same operator.
 
-`Filters` sits between two `shared_ptr<Step>` ends when you need a filter chain or analytics. `Transcoder` builds that graph for you. By hand:
+`Filters` sits between two `StormByte::Safe::Shared<Step>` ends when you need a filter chain or analytics. `Transcoder` builds that graph for you. By hand:
 
 ```cpp
-auto decode = std::make_shared<Decoder>(logger, 0);
-auto encode = std::make_shared<Encoder>(logger, 0, *hevc);
+#include <StormByte/multimedia/pipeline/filters.hxx>
+#include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
+#include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
+
+auto decode = StormByte::Safe::Heap::MakeShared<Decoder>(logger, 0);
+auto encode = StormByte::Safe::Heap::MakeShared<Encoder>(logger, 0, hevc->get());
 Filters graph;
-graph.Between(decode, encode).Add<Scale>(logger, 1920, 1080);
-graph.Add<Filter::Video::VMAF>(logger, "vmaf_4k_v0.6.1");	// one node, every matching stretch
+graph.Between(decode, encode).Add<Filter::Video::Scale>(logger, 1920u, 1080u);
+graph.Add<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"});	// one node, every matching stretch
 graph.Close();
 ```
 
 ## Plan, items and the tube contract
 
-- **`Plan`** is the whole job. Move-only origin `File`. Destination container and path. `Tracks` is the list of **outputs**. `Check()` is shape, not a rehearsal of FFmpeg.
+- **`Plan`** is the whole job. Owned reader/writer locations, a consultation `File` snapshot, and a destination container resolved from the writer path. `Tracks` is the list of **outputs**. `Check()` is shape, not a rehearsal of FFmpeg.
 - **`Packet`** is a compressed access unit. **`Frame`** is a decoded one. No public timing setters. Mutate pixels through `Decoder` / `Encoder` / a filter `Replace`, not a setter on `Frame`.
 - **`Serial`** is a monotone id assigned by the tube. Public getter, no setter. It is not a frame count.
 - **`Remuxer`** forwards compressed packets and adapts them to the destination. “Copy” as a stage does not exist.
 - **Caps** (`MaxCeiling`, hopper capacity) are real limits. Do not treat EOF as Fail. A filter that cannot overlay a logo disables the overlay (opacity 0, passthrough) and logs a Warning. Fail is reserved for a broken unit from the tube.
 - **Content** behind `Frame` is virtual (passthrough / video / audio). After `Scale`, HDR10+ and friends are recalculated on `Replace`. Metadata is not dropped by `memcmp`.
+
+## DLL boundaries
+
+The public API uses `StormByte::Safe` values (`String`, `Optional`), collections (`Vector`, `Map`, `Pair`) and owners (`Shared`, `Unique`) for owning data that crosses module boundaries. Owners retain provider-local release operations so the exact payload is destroyed by its creating provider. Construct shared owners with `Safe::Heap::MakeShared<T>(…)`; parameters typed as `Safe::String` require explicit `Safe::String{"text"}` construction. Fields holding references to external registry entries are borrowed, not owned: those registries must remain valid for the lifetime of the references.
+
+`STORMBYTE_DECLARE_MAYBE_SAFE` is a provider's responsibility and promise, not an automatic audit: a declared type must keep its members, special members and heap-affecting operations boundary-safe. Consumers and providers still need a compatible C++/STL ABI. All providers supplying live values, owners or callbacks must remain loaded until those objects are released; this is neither arbitrary-ABI compatibility nor a safe-unload guarantee.
+
+For custom payloads, derived `Transcoder` providers must override `EmptyPlan()` / `EmptySettled()` in their own module and create the exact derived payload with `Safe::Shared<Plan>::MakePointer<DerivedPlan>(…)` / `Safe::Unique<TrackSettled>::MakePointer<DerivedSettled>(…)`. Derived `Plan` types must override `Move()` there; derived `TrackSettled` types must override both `Clone()` and `Move()` there. Preserve the dynamic type and its provider-local release operations rather than slicing to the base. `Plan::Clone()` is not supported.
 
 ## Filters and analytics
 
@@ -259,7 +276,7 @@ Write a new filter the same way `Scale` and `Watermark` are written. Do not add 
 
 ## Logging
 
-First argument of every `Step` and filter leaf: `std::shared_ptr<StormByte::Logger::Log>`. Prefer `ThreadedLog` if more than one thread will write.
+First argument of every `Step` and filter leaf: `StormByte::Safe::Shared<StormByte::Logger::Log>`. Prefer `ThreadedLog` if more than one thread will write.
 
 The application logger is scoped at `StormByte/Multimedia/<stage>`. Format is `[%L] %T %c`. Do not put `STMM` or the level name in the payload.
 

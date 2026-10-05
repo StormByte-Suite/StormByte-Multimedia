@@ -56,6 +56,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -83,19 +85,19 @@ namespace {
 		return StormByte::Multimedia::Backend::MakeLocalFileWriter(LocationText(path));
 	}
 
-	void JobLog(const std::shared_ptr<StormByte::Logger::Log>& log,
+	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
 		Level level, std::string_view text) noexcept {
 		if (!log)
 			return;
 		*log << level << text << std::endl;
 	}
 
-	const StormByte::Multimedia::Stream* FindStream(const File& file, int index) noexcept {
+	StormByte::Safe::Optional<StormByte::Multimedia::Stream> FindStream(const File& file, int index) noexcept {
 		for (const auto& stream : file.Streams()) {
 			if (stream.Index() == index)
-				return &stream;
+				return stream;
 		}
-		return nullptr;
+		return {};
 	}
 
 	std::string KindName(StormByte::Multimedia::Type type) noexcept {
@@ -124,7 +126,27 @@ namespace {
 	}
 }
 
-std::string TrackSettled::ToString() const {
+TrackSettled::TrackSettled() = default;
+
+TrackSettled::TrackSettled(const TrackSettled& other) = default;
+
+TrackSettled::TrackSettled(TrackSettled&& other) noexcept = default;
+
+TrackSettled::~TrackSettled() noexcept = default;
+
+TrackSettled& TrackSettled::operator=(const TrackSettled& other) = default;
+
+TrackSettled& TrackSettled::operator=(TrackSettled&& other) noexcept = default;
+
+TrackSettled::PointerType TrackSettled::Clone() const {
+	return MakePointer<TrackSettled>(*this);
+}
+
+TrackSettled::PointerType TrackSettled::Move() {
+	return MakePointer<TrackSettled>(std::move(*this));
+}
+
+StormByte::Safe::String TrackSettled::ToString() const {
 	std::string text = "settled in=" + std::to_string(In)
 		+ " out=" + std::to_string(Out);
 	text += Destination ? " encode" : " remux";
@@ -133,8 +155,8 @@ std::string TrackSettled::ToString() const {
 	if (Destination)
 		text += std::string(" dst=") + std::string(Destination->Name());
 	if (Implementation)
-		text += " impl=" + *Implementation;
-	return text;
+		text += " impl=" + static_cast<std::string>(Implementation.value());
+	return StormByte::Safe::String{std::string_view{text}};
 }
 
 Transcoder::Track::Track(Transcoder& owner, std::size_t slot) noexcept
@@ -170,7 +192,7 @@ Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& 
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::Implementation(std::string name) noexcept {
+Transcoder::Track& Transcoder::Track::Implementation(StormByte::Safe::String name) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	auto& slot = m_owner->m_backend->Mapped[m_slot];
@@ -180,7 +202,7 @@ Transcoder::Track& Transcoder::Track::Implementation(std::string name) noexcept 
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::CRF(int value) noexcept {
+Transcoder::Track& Transcoder::Track::CRF(int value) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	if (auto* video = AsVideo(m_owner->m_backend->Mapped[m_slot].Config.get()))
@@ -188,7 +210,7 @@ Transcoder::Track& Transcoder::Track::CRF(int value) noexcept {
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::BitRate(std::int64_t bits_per_second) noexcept {
+Transcoder::Track& Transcoder::Track::BitRate(std::int64_t bits_per_second) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	auto* config = m_owner->m_backend->Mapped[m_slot].Config.get();
@@ -199,7 +221,7 @@ Transcoder::Track& Transcoder::Track::BitRate(std::int64_t bits_per_second) noex
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::MaxBitRate(std::int64_t bits_per_second) noexcept {
+Transcoder::Track& Transcoder::Track::MaxBitRate(std::int64_t bits_per_second) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	if (auto* audio = AsAudio(m_owner->m_backend->Mapped[m_slot].Config.get()))
@@ -207,7 +229,7 @@ Transcoder::Track& Transcoder::Track::MaxBitRate(std::int64_t bits_per_second) n
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::Preset(std::string name) noexcept {
+Transcoder::Track& Transcoder::Track::Preset(StormByte::Safe::String name) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	auto* config = m_owner->m_backend->Mapped[m_slot].Config.get();
@@ -218,7 +240,7 @@ Transcoder::Track& Transcoder::Track::Preset(std::string name) noexcept {
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::Tune(std::string name) noexcept {
+Transcoder::Track& Transcoder::Track::Tune(StormByte::Safe::String name) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	if (auto* video = AsVideo(m_owner->m_backend->Mapped[m_slot].Config.get()))
@@ -226,7 +248,7 @@ Transcoder::Track& Transcoder::Track::Tune(std::string name) noexcept {
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::FineTune(std::map<std::string, std::string> options) noexcept {
+Transcoder::Track& Transcoder::Track::FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	if (auto* video = AsVideo(m_owner->m_backend->Mapped[m_slot].Config.get()))
@@ -234,14 +256,14 @@ Transcoder::Track& Transcoder::Track::FineTune(std::map<std::string, std::string
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::Language(std::string language) noexcept {
+Transcoder::Track& Transcoder::Track::Language(StormByte::Safe::String language) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	m_owner->m_backend->Mapped[m_slot].Config->Language(std::move(language));
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::Title(std::string title) noexcept {
+Transcoder::Track& Transcoder::Track::Title(StormByte::Safe::String title) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	m_owner->m_backend->Mapped[m_slot].Config->Title(std::move(title));
@@ -250,34 +272,34 @@ Transcoder::Track& Transcoder::Track::Title(std::string title) noexcept {
 
 Transcoder::Transcoder(const std::filesystem::path& source,
 	const std::filesystem::path& destination,
-	std::shared_ptr<StormByte::Logger::Log> logger,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(const std::filesystem::path& source,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-	std::shared_ptr<StormByte::Logger::Log> logger,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 	: Transcoder(LocalReader(source), std::move(writer), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	const std::filesystem::path& destination,
-	std::shared_ptr<StormByte::Logger::Log> logger,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 	: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-	std::shared_ptr<StormByte::Logger::Log> logger,
-	std::optional<std::chrono::nanoseconds> duration) noexcept
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : m_app_log(logger), m_logger(std::move(logger)),
 	m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)), m_writer(std::move(writer)),
-	m_duration(duration && duration->count() > 0 ? duration : std::nullopt),
-	m_backend(std::make_unique<Backend::Pipeline::Transcoder>()),
+	m_duration(duration && duration.value() > 0 ? std::move(duration) : StormByte::Safe::Optional<std::int64_t>{}),
+	m_backend(StormByte::Safe::Unique<Backend::Pipeline::Transcoder>::MakePointer<Backend::Pipeline::Transcoder>()),
 	m_armed(false) {
 	InstallLog();
 	if (!m_app_log)
@@ -303,29 +325,29 @@ void Transcoder::InstallLog() noexcept {
 	JobLog(m_logger, Level::LowLevel, "created");
 }
 
-void Transcoder::Fail(std::string reason) noexcept {
+void Transcoder::Fail(std::string_view reason) noexcept {
 	if (!m_backend)
 		return;
 	std::lock_guard lock(m_backend->Lock);
 	if (m_backend->Status.load(std::memory_order_relaxed) == Status::Error)
 		return;
-	m_backend->Error = std::move(reason);
+	m_backend->Error = StormByte::Safe::String{reason};
 	m_backend->Status.store(Status::Error, std::memory_order_release);
 	m_backend->RequestCancel();
-	JobLog(m_logger, Level::Error, *m_backend->Error);
+	JobLog(m_logger, Level::Error, m_backend->Error.value());
 }
 
 bool Transcoder::ValidSlot(std::size_t slot) const noexcept {
 	return m_backend && slot < m_backend->Mapped.size();
 }
 
-void Transcoder::AttachFilter(std::size_t slot, std::shared_ptr<Filter::FFmpeg> filter) noexcept {
+void Transcoder::AttachFilter(std::size_t slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!ValidSlot(slot) || !filter)
 		return;
 	m_backend->Mapped[slot].Filters.push_back(std::move(filter));
 }
 
-void Transcoder::AttachAnalytics(std::shared_ptr<Filter::FFmpeg> filter) noexcept {
+void Transcoder::AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!m_backend || !filter)
 		return;
 	if (dynamic_cast<Filter::Analytics*>(filter.get()) == nullptr) {
@@ -351,12 +373,12 @@ bool Transcoder::ProbeSource() noexcept {
 		Fail(text);
 		return false;
 	}
-	m_consult = std::make_unique<File>(std::move(*opened));
+	m_consult = StormByte::Safe::Unique<File>::MakePointer<File>(std::move(*opened));
 	JobLog(m_logger, Level::Notice, std::format("probed source {}", std::string_view{path}));
 	return true;
 }
 
-const std::shared_ptr<StormByte::Logger::Log>& Transcoder::Logger() const noexcept {
+const StormByte::Safe::Shared<StormByte::Logger::Log>& Transcoder::Logger() const noexcept {
 	return m_logger;
 }
 
@@ -369,7 +391,7 @@ Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 		return Track(*this, InvalidSlot);
 	}
 
-	const Stream* stream = nullptr;
+	StormByte::Safe::Optional<Stream> stream;
 	if (kind != Type::Attachment) {
 		stream = FindStream(*m_consult, in);
 		if (!stream) {
@@ -408,7 +430,8 @@ Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 	else if (kind == Type::Subtitle)
 		slot.Config = StormByte::Safe::Unique<Config::Base>::MakePointer<Config::Subtitle>();
 	else {
-		const auto& mime = m_consult->Attachments()[static_cast<std::size_t>(in)].MimeType();
+		const Attachment attachment = m_consult->Attachments()[static_cast<std::size_t>(in)];
+		const auto& mime = attachment.MimeType();
 		if (!mime || mime->empty()) {
 			Fail("attachment slot " + std::to_string(in) + " has no MIME");
 			return Track(*this, InvalidSlot);
@@ -448,7 +471,8 @@ Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept {
 
 	const auto& attachments = m_consult->Attachments();
 	for (int i = 0; i < static_cast<int>(attachments.size()); ++i) {
-		const auto& have = attachments[static_cast<std::size_t>(i)].MimeType();
+		const Attachment attachment = attachments[static_cast<std::size_t>(i)];
+		const auto& have = attachment.MimeType();
 		if (have && Detail::MimeMatches(*have, pattern))
 			AddTrack(i, Type::Attachment);
 	}
@@ -521,9 +545,9 @@ bool Transcoder::Failed() const noexcept {
 	return Status() == Status::Error;
 }
 
-std::optional<std::string> Transcoder::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Transcoder::Error() const noexcept {
 	if (!m_backend)
-		return std::nullopt;
+		return {};
 	std::lock_guard lock(m_backend->Lock);
 	return m_backend->Error;
 }
@@ -536,20 +560,20 @@ StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> Transcoder::OutputTel
 	return m_output_telemetry;
 }
 
-Progress::Pointer Transcoder::Progress() const noexcept {
+StormByte::Safe::Shared<const class Progress> Transcoder::Progress() const noexcept {
 	if (!m_backend)
 		return {};
 	std::lock_guard lock(m_backend->Lock);
 	return m_backend->Clock;
 }
 
-std::vector<std::pair<std::string, Filter::Report>> Transcoder::Reports() const noexcept {
+StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> Transcoder::Reports() const noexcept {
 	if (!m_backend)
 		return {};
 	return m_backend->Reports;
 }
 
-std::shared_ptr<const JobTelemetry> Transcoder::Telemetry() const noexcept {
+StormByte::Safe::Shared<const JobTelemetry> Transcoder::Telemetry() const noexcept {
 	if (!m_backend)
 		return {};
 	return m_backend->Metrics;
@@ -560,21 +584,38 @@ Transcoder::operator bool() const noexcept {
 	return status != Status::Error && status != Status::Aborted;
 }
 
-std::unique_ptr<class Plan> Transcoder::EmptyPlan(
+StormByte::Safe::Shared<class Plan> Transcoder::EmptyPlan(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-	std::optional<std::chrono::nanoseconds> duration) const noexcept {
-	return std::make_unique<class Plan>(std::move(reader), std::move(writer), duration,
-		DurationProgress());
+	StormByte::Safe::Optional<std::int64_t> duration) const noexcept {
+	const auto progress = DurationProgress();
+	return StormByte::Safe::Shared<class Plan>::MakePointer<class Plan>(std::move(reader), std::move(writer), std::move(duration),
+		&progress);
 }
 
-StormByte::Multimedia::File::DurationProgress Transcoder::DurationProgress() const noexcept {
-	return [this](double percent) {
-		if (auto clock = std::const_pointer_cast<class Progress>(Progress())) {
-			clock->SetDurationCalculation(percent);
-			const_cast<Transcoder*>(this)->OnProgress();
-		}
-	};
+StormByte::Safe::Function<void(double)> Transcoder::DurationProgress() const noexcept {
+	auto context = std::make_unique<const Transcoder*>(this);
+	StormByte::Safe::Function<void(double)> observer(context.get(),
+		[](void* state, double percent) {
+			const auto* owner = *static_cast<const Transcoder**>(state);
+			if (auto clock = StormByte::Safe::ConstPointerCast<class Progress>(owner->Progress())) {
+				clock->SetDurationCalculation(percent);
+				const_cast<Transcoder*>(owner)->OnProgress();
+			}
+			return StormByte::Safe::Status::Success;
+		},
+		[](const void* state) noexcept -> void* {
+			try {
+				return std::make_unique<const Transcoder*>(*static_cast<const Transcoder* const*>(state)).release();
+			} catch (...) {
+				return nullptr;
+			}
+		},
+		[](void* state) noexcept {
+			const std::unique_ptr<const Transcoder*> owner(static_cast<const Transcoder**>(state));
+		});
+	static_cast<void>(context.release());
+	return observer;
 }
 
 StormByte::Safe::Unique<TrackSettled> Transcoder::EmptySettled() const noexcept {
@@ -594,10 +635,15 @@ void Transcoder::OnSettled(const TrackSettled& row) noexcept {
 }
 
 void Transcoder::OnMeasureDone() noexcept {}
+
 void Transcoder::OnAnalyticsDone() noexcept {}
+
 void Transcoder::OnProgress() noexcept {}
+
 void Transcoder::OnDone() noexcept {}
-void Transcoder::OnError(const std::string&) noexcept {}
+
+void Transcoder::OnError(const StormByte::Safe::String&) noexcept {}
+
 void Transcoder::OnAborted() noexcept {}
 
 void Transcoder::MarkSettled(int in, Encoder& encoder) noexcept {
@@ -608,6 +654,10 @@ void Transcoder::MarkSettled(int in, Encoder& encoder) noexcept {
 			continue;
 		slot.Settled = true;
 		auto row = EmptySettled();
+		if (!row) {
+			Fail("EmptySettled returned an empty owner");
+			return;
+		}
 		row->In = slot.In;
 		row->Out = slot.Out;
 		row->Kind = slot.Kind;
@@ -618,17 +668,28 @@ void Transcoder::MarkSettled(int in, Encoder& encoder) noexcept {
 			row->Destination = audio->Codec();
 		else if (const auto* subtitle = AsSubtitle(slot.Config.get()))
 			row->Destination = subtitle->Codec();
-		row->Implementation = encoder.Implementation();
-		row->Crf = encoder.CRF();
-		row->BitRate = encoder.BitRate();
-		row->MaxBitRate = encoder.MaxBitRate();
-		row->Preset = encoder.Preset();
-		row->Tune = encoder.Tune();
-		row->FineTune = encoder.FineTune();
-		row->SampleFormat = encoder.AudioSampleFormat();
-		row->EncoderChannels = encoder.AudioChannels();
-		row->FrameSize = encoder.AudioFrameSize();
-		row->SampleRate = encoder.AudioSampleRate();
+		if (encoder.Implementation())
+			row->Implementation = StormByte::Safe::String{std::string_view{*encoder.Implementation()}};
+		if (encoder.CRF())
+			row->Crf = *encoder.CRF();
+		if (encoder.BitRate())
+			row->BitRate = *encoder.BitRate();
+		if (encoder.MaxBitRate())
+			row->MaxBitRate = *encoder.MaxBitRate();
+		if (encoder.Preset())
+			row->Preset = StormByte::Safe::String{std::string_view{*encoder.Preset()}};
+		if (encoder.Tune())
+			row->Tune = StormByte::Safe::String{std::string_view{*encoder.Tune()}};
+		for (const auto& [key, value] : encoder.FineTune())
+			row->FineTune[StormByte::Safe::String{std::string_view{key}}] = StormByte::Safe::String{std::string_view{value}};
+		if (encoder.AudioSampleFormat())
+			row->SampleFormat = *encoder.AudioSampleFormat();
+		if (encoder.AudioChannels())
+			row->EncoderChannels = *encoder.AudioChannels();
+		if (encoder.AudioFrameSize())
+			row->FrameSize = *encoder.AudioFrameSize();
+		if (encoder.AudioSampleRate())
+			row->SampleRate = *encoder.AudioSampleRate();
 		OnSettled(*row);
 		return;
 	}

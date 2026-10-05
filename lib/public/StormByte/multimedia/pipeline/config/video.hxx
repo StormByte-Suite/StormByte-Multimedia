@@ -41,11 +41,9 @@
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/map.hxx>
 
 #include <cstdint>
-#include <map>
-#include <optional>
-#include <string>
 #include <utility>
 
 /**
@@ -53,12 +51,22 @@
  * @brief Per-track intention stored by Plan.
  *
  * Not wiring (`operator>>`) and not runtime settled state.
- * An engaged `std::optional` is an explicit override. Calling a
+ * An engaged `StormByte::Safe::Optional` is an explicit override. Calling a
  * setter with an empty value is also an explicit override.
  *
  * @ingroup multimedia_pipeline
  */
 namespace StormByte::Multimedia::Pipeline::Config {
+	/**
+	 * @class Video
+	 * @brief Video-track encoding intention, or Remux without a codec.
+	 * @note Boundary use requires compatible C++ ABIs and loaded providers.
+	 *       Codec registry storage must outlive this config and its copies.
+	 *       Further derived providers must use safe fields and override Clone,
+	 *       Move and lifecycle operations locally without slicing their type.
+	 *       Optional arrow access is a read-only full-expression snapshot;
+	 *       const map iteration returns entry copies, not node references.
+	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Video: public Base {
 		public:
 			/**
@@ -69,39 +77,38 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			/**
 			 * @brief Empty video config (Remux until @ref Codec is set).
 			 */
-			constexpr Video() noexcept
-			: Base(StormByte::Multimedia::Type::Video), m_codec(nullptr) {}
+			Video();
 
 			/**
 			 * @brief Copy constructor.
 			 * @param other Source config.
 			 */
-			Video(const Video& other) noexcept = default;
+			Video(const Video& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Video(Video&& other) noexcept = default;
+			Video(Video&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~Video() noexcept override = default;
+			virtual ~Video() noexcept override;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source config.
 			 * @return *this.
 			 */
-			Video& operator=(const Video& other) noexcept = default;
+			Video& operator=(const Video& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Config to take.
 			 * @return *this.
 			 */
-			Video& operator=(Video&& other) noexcept = default;
+			Video& operator=(Video&& other) noexcept;
 
 			/**
 			 * @}
@@ -111,17 +118,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Deep copy.
 			 * @return Owning pointer to a new @ref Video.
 			 */
-			inline PointerType Clone() const override {
-				return MakePointer<Video>(*this);
-			}
+			PointerType Clone() const override;
 
 			/**
 			 * @brief Move into a new pointer.
 			 * @return Owning pointer to the moved @ref Video.
 			 */
-			inline PointerType Move() override {
-				return MakePointer<Video>(std::move(*this));
-			}
+			PointerType Move() override;
 
 			/**
 			 * @name Encode
@@ -148,7 +151,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief CRF/CQ. Incompatible with BitRate.
 			 * @return Value, or empty.
 			 */
-			inline const std::optional<int>& CRF() const noexcept {
+			inline const StormByte::Safe::Optional<int>& CRF() const noexcept {
 				return m_crf;
 			}
 
@@ -156,13 +159,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets CRF/CQ and clears BitRate.
 			 * @param value Quality value.
 			 */
-			void CRF(int value) noexcept;
+			void CRF(int value);
 
 			/**
 			 * @brief Target bitrate.
 			 * @return Bits per second, or empty.
 			 */
-			inline const std::optional<std::int64_t>& BitRate() const noexcept {
+			inline const StormByte::Safe::Optional<std::int64_t>& BitRate() const noexcept {
 				return m_bitRate;
 			}
 
@@ -170,13 +173,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets target bitrate and clears CRF.
 			 * @param bits_per_second Bits per second.
 			 */
-			void BitRate(std::int64_t bits_per_second) noexcept;
+			void BitRate(std::int64_t bits_per_second);
 
 			/**
 			 * @brief VBV ceiling.
 			 * @return Bits per second, or empty.
 			 */
-			inline const std::optional<std::int64_t>& MaxBitRate() const noexcept {
+			inline const StormByte::Safe::Optional<std::int64_t>& MaxBitRate() const noexcept {
 				return m_maxBitRate;
 			}
 
@@ -184,15 +187,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets VBV ceiling. `bufsize` is derived by the encoder.
 			 * @param bits_per_second Max bitrate.
 			 */
-			inline void MaxBitRate(std::int64_t bits_per_second) noexcept {
-				m_maxBitRate = bits_per_second;
-			}
+			void MaxBitRate(std::int64_t bits_per_second);
 
 			/**
 			 * @brief Encoder preset.
 			 * @return Name, or empty.
 			 */
-			inline const std::optional<std::string>& Preset() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Preset() const noexcept {
 				return m_preset;
 			}
 
@@ -200,13 +201,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets the preset. Empty clears it.
 			 * @param name Preset name (`medium`, `p4`, …).
 			 */
-			void Preset(std::string name) noexcept;
+			void Preset(StormByte::Safe::String name);
 
 			/**
 			 * @brief Content tune.
 			 * @return Name, or empty.
 			 */
-			inline const std::optional<std::string>& Tune() const noexcept {
+			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Tune() const noexcept {
 				return m_tune;
 			}
 
@@ -214,13 +215,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets the tune. Empty clears it.
 			 * @param name Tune name (`animation`, `film`, …).
 			 */
-			void Tune(std::string name) noexcept;
+			void Tune(StormByte::Safe::String name);
 
 			/**
 			 * @brief Vendor leftovers. Not CRF / preset / tune / bufsize.
 			 * @return Key/value map.
 			 */
-			inline const std::map<std::string, std::string>& FineTune() const noexcept {
+			inline const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& FineTune() const noexcept {
 				return m_fineTune;
 			}
 
@@ -228,21 +229,24 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Replaces the vendor dict.
 			 * @param options Key/value pairs.
 			 */
-			inline void FineTune(std::map<std::string, std::string> options) noexcept {
-				m_fineTune = std::move(options);
-			}
+			void FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept;
 
 			/**
 			 * @}
 			 */
 
 		private:
-			const StormByte::Multimedia::Codec* m_codec;			///< Destination codec; nullptr = Remux
-			std::optional<int> m_crf;								///< CRF/CQ
-			std::optional<std::int64_t> m_bitRate;					///< Target bitrate
-			std::optional<std::int64_t> m_maxBitRate;				///< VBV ceiling
-			std::optional<std::string> m_preset;					///< Preset
-			std::optional<std::string> m_tune;						///< Tune
-			std::map<std::string, std::string> m_fineTune;			///< Vendor leftovers
+			const StormByte::Multimedia::Codec* m_codec;										///< Destination codec; nullptr = Remux
+			StormByte::Safe::Optional<int> m_crf;												///< CRF/CQ
+			StormByte::Safe::Optional<std::int64_t> m_bitRate;									///< Target bitrate
+			StormByte::Safe::Optional<std::int64_t> m_maxBitRate;								///< VBV ceiling
+			StormByte::Safe::Optional<StormByte::Safe::String> m_preset;						///< Preset
+			StormByte::Safe::Optional<StormByte::Safe::String> m_tune;							///< Tune
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> m_fineTune;	///< Vendor leftovers
 	};
 }
+
+/**
+ * @brief Declares Video conditionally safe under its documented provider contract.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Config::Video);

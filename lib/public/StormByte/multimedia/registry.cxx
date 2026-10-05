@@ -42,6 +42,7 @@
 #include <tables/container/table.hxx>
 
 #include <string>
+#include <utility>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -77,6 +78,8 @@ Registry::Registry() noexcept {
 	Initialize();
 }
 
+Registry::~Registry() noexcept = default;
+
 Registry& Registry::Instance() noexcept {
 	static Registry instance;
 	return instance;
@@ -107,7 +110,7 @@ ExpectedCodec Registry::FindCodec(std::string_view name) const noexcept {
 	if (it == m_by_name.end())
 		return Unexpected<CodecNotFoundException>(std::string(name));
 
-	return m_codecs[it->second];
+	return CodecRef(m_codecs[it->second]);
 }
 
 ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept {
@@ -115,7 +118,7 @@ ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept 
 	if (it == m_container_by_name.end())
 		return Unexpected<ContainerNotFoundException>(std::string(name));
 
-	return m_containers[it->second];
+	return ContainerRef(m_containers[it->second]);
 }
 
 void Registry::Add(Type type, const Tables::Codec::CodecDef& def) noexcept {
@@ -135,7 +138,7 @@ void Registry::LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> ta
 }
 
 void Registry::LoadCodecs() noexcept {
-	const auto& codecs = Tables::Codec::Catalog::Instance();
+	const auto& codecs 		= Tables::Codec::Catalog::Instance();
 	const auto video		= codecs.All(Type::Video);
 	const auto audio		= codecs.All(Type::Audio);
 	const auto subtitle		= codecs.All(Type::Subtitle);
@@ -193,10 +196,10 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 		auto found = FindCodec(row.codec);
 		if (!found.has_value())
 			continue;
-		const Codec& codec = found.value();
+		const Codec& codec = found.value().get();
 		bool dup = false;
-		for (const Codec& existing : stored.m_allowed) {
-			if (existing == codec) {
+		for (const CodecRef existing : std::as_const(stored.m_allowed)) {
+			if (existing.get() == codec) {
 				dup = true;
 				break;
 			}

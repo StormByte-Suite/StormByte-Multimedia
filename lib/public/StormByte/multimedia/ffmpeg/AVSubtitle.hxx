@@ -40,10 +40,11 @@
 
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
 #include <optional>
-#include <string>
+#include <string_view>
 
 namespace StormByte::Multimedia::FFmpeg {
 	class AVSubtitle;
@@ -115,7 +116,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Concatenated text / ASS from rects.
 			 * @return UTF-8 text, or empty.
 			 */
-			std::string Text() const noexcept;
+			Safe::String Text() const noexcept;
 
 			/**
 			 * @brief Builds one text or ASS rectangle for encoding.
@@ -123,8 +124,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param pts Timestamp in `AV_TIME_BASE`.
 			 * @param duration_ms Display window in milliseconds.
 			 * @param ass true writes `SUBTITLE_ASS`, false writes `SUBTITLE_TEXT`.
+			 * @note Input is borrowed only during this call and copied into FFmpeg-owned storage.
 			 */
-			void FillText(std::string text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept;
+			void FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept;
 
 			/**
 			 * @brief Releases rects (`avsubtitle_free`).
@@ -152,3 +154,9 @@ namespace StormByte::Multimedia::FFmpeg {
 				StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
 	};
 }
+
+/**
+ * @brief Conditional provider contract: subtitle shell and FFmpeg payload release in Multimedia.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVSubtitle);

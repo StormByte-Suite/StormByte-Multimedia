@@ -40,10 +40,12 @@
 #include <StormByte/multimedia/pipeline/filters/video/yadif.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cstdint>
 #include <format>
+#include <utility>
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -116,8 +118,8 @@ namespace {
 	}
 }
 
-Yadif::Yadif(std::shared_ptr<StormByte::Logger::Log> log, bool onlyInterlaced) noexcept
-	: Filter::Process(std::move(log), "yadif"), m_onlyInterlaced(onlyInterlaced) {}
+Yadif::Yadif(StormByte::Safe::Shared<StormByte::Logger::Log> log, bool onlyInterlaced) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("yadif")), m_onlyInterlaced(onlyInterlaced) {}
 
 Yadif::~Yadif() noexcept {
 	Clean();

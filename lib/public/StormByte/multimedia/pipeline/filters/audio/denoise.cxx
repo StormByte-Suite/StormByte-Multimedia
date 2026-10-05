@@ -44,7 +44,6 @@
 #include <cmath>
 #include <cstdint>
 #include <format>
-#include <map>
 #include <utility>
 
 extern "C" {
@@ -105,8 +104,8 @@ namespace {
 	}
 }
 
-Denoise::Denoise(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> nr) noexcept
+Denoise::Denoise(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> nr) noexcept
 	: Filter::ProcessTwoPasses(std::move(log), "denoise"),
 	m_nrIn(nr),
 	m_rate(0),
@@ -117,6 +116,8 @@ Denoise::Denoise(std::shared_ptr<StormByte::Logger::Log> log,
 	m_nf(-50.0),
 	m_nr(std::clamp(nr.value_or(12.0), 1.0, 30.0)),
 	m_matches(0) {}
+
+Denoise::~Denoise() noexcept = default;
 
 enum Type Denoise::Media() const noexcept {
 	return Type::Audio;
@@ -259,8 +260,8 @@ void Denoise::Vote() noexcept {
 		m_nf, m_nr, m_matches, m_cand.size()));
 }
 
-std::string Denoise::Chain() const noexcept {
-	return std::format("afftdn=nr={}:nf={}:tn=0", m_nr, m_nf);
+StormByte::Safe::String Denoise::Chain() const noexcept {
+	return StormByte::Safe::String(std::format("afftdn=nr={}:nf={}:tn=0", m_nr, m_nf));
 }
 
 void Denoise::Measure(const Pipeline::Frame& frame) noexcept {
@@ -291,7 +292,7 @@ void Denoise::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
@@ -345,12 +346,12 @@ void Denoise::Eof() noexcept {
 class StormByte::Multimedia::Pipeline::Filter::Report Denoise::Report() const noexcept {
 	if (!m_voted)
 		return { Filter::Report::Status::Failed, {} };
-	std::map<std::string, std::string> data;
-	data.emplace("skip", m_skip ? "1" : "0");
-	data.emplace("nf", std::format("{:.3f}", m_nf));
-	data.emplace("nr", std::format("{:.3f}", m_nr));
-	data.emplace("matches", std::to_string(m_matches));
-	data.emplace("candidates", std::to_string(m_cand.size()));
-	data.emplace("frames", std::to_string(m_frames));
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
+	data.emplace(StormByte::Safe::String("skip"), m_skip ? "1" : "0");
+	data.emplace(StormByte::Safe::String("nf"), std::format("{:.3f}", m_nf));
+	data.emplace(StormByte::Safe::String("nr"), std::format("{:.3f}", m_nr));
+	data.emplace(StormByte::Safe::String("matches"), std::to_string(m_matches));
+	data.emplace(StormByte::Safe::String("candidates"), std::to_string(m_cand.size()));
+	data.emplace(StormByte::Safe::String("frames"), std::to_string(m_frames));
 	return { Filter::Report::Status::Ok, std::move(data) };
 }

@@ -45,14 +45,15 @@
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/safe/function.hxx>
+#include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/string.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
-#include <memory>
-#include <optional>
 #include <utility>
 
 /**
@@ -110,67 +111,77 @@ namespace StormByte {
 					 * @brief Builds reader and writer from paths.
 					 * @param source Input path.
 					 * @param destination Output path.
-					 * @param duration Authoritative source duration; empty scans the full source.
+					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
 					Plan(const std::filesystem::path& source,
 						const std::filesystem::path& destination,
-						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 					/**
 					 * @brief Builds a local reader and takes @p writer.
 					 * @param source Input path.
 					 * @param writer Owned output location (moved).
-					 * @param duration Authoritative source duration; empty scans the full source.
+					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
 					Plan(const std::filesystem::path& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 					/**
 					 * @brief Takes @p reader and builds a local writer.
 					 * @param reader Owned input location (moved).
 					 * @param destination Output path.
-					 * @param duration Authoritative source duration; empty scans the full source.
+					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						const std::filesystem::path& destination,
-						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 					/**
 					 * @brief Takes both location owners without slicing.
 					 * @param reader Owned input location (moved).
 					 * @param writer Owned output location (moved).
-					 * @param duration Authoritative source duration; empty scans the full source.
+					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-						std::optional<std::chrono::nanoseconds> duration = std::nullopt) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 					/**
 					 * @brief Takes both owners and observes automatic duration resolution.
 					 * @param reader Owned input location.
 					 * @param writer Owned output location.
-					 * @param duration Authoritative duration; absent or non-positive scans the source.
-					 * @param progress Duration scan observer; unused when duration is supplied.
+					 * @param duration Authoritative nanoseconds; absent or non-positive scans the source.
+					 * @param progress Borrowed observer for this call only; null disables updates.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-						std::optional<std::chrono::nanoseconds> duration,
-						const StormByte::Multimedia::File::DurationProgress& progress) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration,
+						const StormByte::Safe::Function<void(double)>* progress) noexcept;
 
-					Plan(const Plan&) = delete;
-					Plan& operator=(const Plan&) = delete;
+					/**
+					 * @brief Copy construction is not supported.
+					 * @param other Source plan.
+					 */
+					Plan(const Plan& other) = delete;
+
+					/**
+					 * @brief Copy assignment is not supported.
+					 * @param other Source plan.
+					 * @return This plan.
+					 */
+					Plan& operator=(const Plan& other) = delete;
 
 					/**
 					 * @brief Move constructor.
 					 * @param other Plan to take.
 					 */
-					Plan(Plan&& other) noexcept = default;
+					Plan(Plan&& other) noexcept;
 
 					/**
 					 * @brief Destructor.
 					 */
-					virtual ~Plan() noexcept = default;
+					virtual ~Plan() noexcept;
 
 					/**
 					 * @brief Move assignment.
@@ -186,15 +197,15 @@ namespace StormByte {
 					/**
 					 * @brief Deep copy is not supported.
 					 */
-					std::unique_ptr<Plan> Clone() const = delete;
+					StormByte::Safe::Shared<Plan> Clone() const = delete;
 
 					/**
 					 * @brief Move into a new pointer.
 					 * @return Owning pointer to the moved @ref Plan.
+					 * @note Derived plans must override this in their provider module,
+					 *       using Shared<Plan>::MakePointer<Derived> to avoid slicing.
 					 */
-					inline std::unique_ptr<Plan> Move() {
-						return std::make_unique<Plan>(std::move(*this));
-					}
+					virtual StormByte::Safe::Shared<Plan> Move();
 
 					/**
 					 * @brief Same as @ref Check having a value.
@@ -314,11 +325,6 @@ namespace StormByte {
 
 				private:
 					/**
-					 * @brief Takes already heap-allocated leaves. No slicing.
-					 * @param reader Owned origin.
-					 * @param writer Owned sink.
-					 */
-					/**
 					 * @brief Resolves the registry container from the writer path.
 					 * @param writer Sink whose Path() has the extension.
 					 * @return Registry container pointer, or nullptr.
@@ -326,13 +332,19 @@ namespace StormByte {
 					static const class Container* ContainerFromWriter(
 						const StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
 
-					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;	///< Input counters retained independently of the reader
-					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;	///< Output counters retained independently of the writer
-					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets
-					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned sink octets
-					std::optional<StormByte::Multimedia::File> m_snapshot;				///< Constructor probe
-					const class Container* m_container;										///< Registry destination
-					class Tracks m_tracks;													///< Tube tracks; index is mux slot
+					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;		///< Input counters retained independently of the reader.
+
+					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;		///< Output counters retained independently of the writer.
+
+					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets.
+
+					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned destination octets.
+
+					StormByte::Safe::Unique<StormByte::Multimedia::File> m_snapshot;					///< Provider-owned constructor probe.
+
+					const class Container* m_container;													///< Borrowed destination container from the registry.
+
+					class Tracks m_tracks;																///< Tube tracks indexed by mux slot.
 			};
 
 			/**
@@ -345,6 +357,20 @@ namespace StormByte {
 			 * is Fail. Does not call @ref Plan::Check and does not bind hoppers.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Demuxer& operator>>(Plan&& plan, Demuxer& demuxer) noexcept;
+
+			/**
+			 * @brief Transfers a shared intention without slicing its dynamic type.
+			 * @param plan Provider-created intention owner.
+			 * @param demuxer Destination stage.
+			 * @return Destination stage.
+			 */
+			STORMBYTE_MULTIMEDIA_PUBLIC Demuxer& operator>>(StormByte::Safe::Shared<Plan> plan, Demuxer& demuxer) noexcept;
 		}
 	}
 }
+
+/**
+ * @brief Registers the completed provider-owned plan.
+ * @note Derived factories must construct the exact payload type in its provider module.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Plan);

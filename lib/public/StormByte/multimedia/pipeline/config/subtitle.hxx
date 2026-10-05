@@ -41,9 +41,8 @@
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/map.hxx>
 
-#include <map>
-#include <string>
 #include <utility>
 
 /**
@@ -51,12 +50,21 @@
  * @brief Per-track intention stored by Plan.
  *
  * Not wiring (`operator>>`) and not runtime settled state.
- * An engaged `std::optional` is an explicit override. Calling a
+ * An engaged `StormByte::Safe::Optional` is an explicit override. Calling a
  * setter with an empty value is also an explicit override.
  *
  * @ingroup multimedia_pipeline
  */
 namespace StormByte::Multimedia::Pipeline::Config {
+	/**
+	 * @class Subtitle
+	 * @brief Subtitle-track encoding intention, or Remux without a codec.
+	 * @note Boundary use requires compatible C++ ABIs and loaded providers.
+	 *       Codec registry storage must outlive this config and its copies.
+	 *       Derived providers must supply safe fields and local lifecycle,
+	 *       Clone and Move overrides that preserve their dynamic type.
+	 *       Const map iteration returns entry copies, not node references.
+	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Subtitle: public Base {
 		public:
 			/**
@@ -67,39 +75,38 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			/**
 			 * @brief Empty subtitle config (Remux until @ref Codec is set).
 			 */
-			constexpr Subtitle() noexcept
-			: Base(StormByte::Multimedia::Type::Subtitle), m_codec(nullptr) {}
+			Subtitle();
 
 			/**
 			 * @brief Copy constructor.
 			 * @param other Source config.
 			 */
-			Subtitle(const Subtitle& other) noexcept = default;
+			Subtitle(const Subtitle& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Subtitle(Subtitle&& other) noexcept = default;
+			Subtitle(Subtitle&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~Subtitle() noexcept override = default;
+			virtual ~Subtitle() noexcept override;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source config.
 			 * @return *this.
 			 */
-			Subtitle& operator=(const Subtitle& other) noexcept = default;
+			Subtitle& operator=(const Subtitle& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Config to take.
 			 * @return *this.
 			 */
-			Subtitle& operator=(Subtitle&& other) noexcept = default;
+			Subtitle& operator=(Subtitle&& other) noexcept;
 
 			/**
 			 * @}
@@ -109,17 +116,13 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Deep copy.
 			 * @return Owning pointer to a new @ref Subtitle.
 			 */
-			inline PointerType Clone() const override {
-				return MakePointer<Subtitle>(*this);
-			}
+			PointerType Clone() const override;
 
 			/**
 			 * @brief Move into a new pointer.
 			 * @return Owning pointer to the moved @ref Subtitle.
 			 */
-			inline PointerType Move() override {
-				return MakePointer<Subtitle>(std::move(*this));
-			}
+			PointerType Move() override;
 
 			/**
 			 * @name Encode
@@ -146,7 +149,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Vendor leftovers.
 			 * @return Key/value map.
 			 */
-			inline const std::map<std::string, std::string>& FineTune() const noexcept {
+			inline const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& FineTune() const noexcept {
 				return m_fineTune;
 			}
 
@@ -154,16 +157,19 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Replaces the vendor dict.
 			 * @param options Key/value pairs.
 			 */
-			inline void FineTune(std::map<std::string, std::string> options) noexcept {
-				m_fineTune = std::move(options);
-			}
+			void FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept;
 
 			/**
 			 * @}
 			 */
 
 		private:
-			const StormByte::Multimedia::Codec* m_codec;			///< Destination codec; nullptr = Remux
-			std::map<std::string, std::string> m_fineTune;			///< Vendor leftovers
+			const StormByte::Multimedia::Codec* m_codec;										///< Destination codec; nullptr = Remux
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> m_fineTune;	///< Vendor leftovers
 	};
 }
+
+/**
+ * @brief Declares Subtitle conditionally safe under its documented provider contract.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Config::Subtitle);

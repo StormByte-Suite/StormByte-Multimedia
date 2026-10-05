@@ -38,6 +38,8 @@
 
 #include <StormByte/multimedia/property/resolution.hxx>
 
+#include <string>
+
 using namespace StormByte::Multimedia::Property;
 
 Resolution::Resolution(std::uint32_t width, std::uint32_t height) noexcept:
@@ -51,21 +53,21 @@ std::uint32_t Resolution::Height() const noexcept {
 	return m_height;
 }
 
-std::string Resolution::Name() const noexcept {
-	return std::to_string(m_width) + "x" + std::to_string(m_height);
+StormByte::Safe::String Resolution::Name() const {
+	return StormByte::Safe::String(std::to_string(m_width) + "x" + std::to_string(m_height));
 }
 
-std::string Resolution::StandardName() const noexcept {
+StormByte::Safe::String Resolution::StandardName() const {
 	if (m_height > 2160)
-		return "4K+";
+		return StormByte::Safe::String("4K+");
 	else if (m_height > 1080)
-		return "4K";
+		return StormByte::Safe::String("4K");
 	else if (m_height > 720)
-		return "1080p";
+		return StormByte::Safe::String("1080p");
 	else if (m_height > 480)
-		return "720p";
+		return StormByte::Safe::String("720p");
 	else if (m_height > 240)
-		return "480p";
+		return StormByte::Safe::String("480p");
 	else
-		return "240p";
+		return StormByte::Safe::String("240p");
 }

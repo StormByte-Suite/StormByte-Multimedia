@@ -49,7 +49,7 @@
 #include <string>
 
 namespace {
-	std::string Ns(const std::optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
 		return std::format("{}", value->Nanoseconds().count());
@@ -93,7 +93,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (Stopping())
 			return;
 		if (m_owner.m_origin->Failed() || !m_owner.m_origin->Ready()) {
-			Fail(m_owner.m_origin->Error().value_or("demuxer failed"));
+			const auto reason = m_owner.m_origin->Error().value_or(StormByte::Safe::String("demuxer failed"));
+			Fail(static_cast<std::string>(reason));
 			return;
 		}
 
@@ -105,7 +106,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_part = 0;
 		m_owner.m_inDts.reset();
 		Log(Level::Notice, std::format("open t={} impl={}",
-			m_owner.m_index, m_owner.m_implementation.value_or("auto")));
+			m_owner.m_index, m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})));
 	}
 
 	void Decode::Process(Item::PointerType item) noexcept {
@@ -141,9 +142,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		if (m_owner.m_serial != packet->Serial()) {
-			m_owner.m_serial = packet->Serial();
+			m_owner.m_serial = *packet->Serial();
 			m_owner.m_part = 0;
-			m_owner.m_inDts = packet->Dts();
+			if (packet->Dts())
+				m_owner.m_inDts = *packet->Dts();
+			else
+				m_owner.m_inDts.reset();
 		}
 
 		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={}",

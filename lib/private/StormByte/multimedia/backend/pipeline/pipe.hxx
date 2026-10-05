@@ -42,9 +42,11 @@
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/visibility.h>
 
+#include <chrono>
 #include <condition_variable>
 #include <cstddef>
 #include <deque>
+#include <mutex>
 #include <unordered_set>
 
 /**
@@ -67,7 +69,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 * Item flow is left to right, same as the public tube:
 	 * @c pipe << item / @c item >> pipe write to Out (Push,
 	 * blocks on the bound consumer Capacity). @c pipe >> item
-	 * is Pop from In only; Wait stays on the Host.
+		 * is Pop from In only; the Host delegates Wait to this Pipe.
 	 *
 	 * The free @c operator>>(item, pipe) overloads are declared
 	 * in this namespace (not friend-only) so GCC can define them
@@ -80,26 +82,73 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 */
 	class STORMBYTE_MULTIMEDIA_PRIVATE Pipe {
 		public:
+			/**
+			 * @brief Unit carried by the stage hoppers.
+			 */
 			using Item = StormByte::Multimedia::Pipeline::Item;
+
+			/**
+			 * @brief Track-keyed sink retaining boundary-safe unit pointers.
+			 */
 			using ItemSink = StormByte::Buffer::Sink<Item::PointerType>;
 
 			/**
-			 * @brief Empty hoppers that Notify @p wake on Bind.
-			 * @param wake Consumer CV of the owning stage.
+			 * @brief Creates empty hoppers and provider-owned wait synchronization.
 			 */
-			explicit Pipe(std::condition_variable& wake) noexcept;
+			Pipe() noexcept;
 
+			/**
+			 * @brief Copying a registered consumer is not allowed.
+			 * @param other Source pipe.
+			 */
 			Pipe(const Pipe& other) = delete;
+
+			/**
+			 * @brief Moving a registered consumer is not allowed.
+			 * @param other Source pipe.
+			 */
 			Pipe(Pipe&& other) noexcept = delete;
+
+			/**
+			 * @brief Copy assignment is not allowed.
+			 * @param other Source pipe.
+			 * @return This pipe.
+			 */
 			Pipe& operator=(const Pipe& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed.
+			 * @param other Source pipe.
+			 * @return This pipe.
+			 */
 			Pipe& operator=(Pipe&& other) noexcept = delete;
+
 			/**
 			 * @brief Drops @c Notify on In, Out and clone hoppers.
 			 *
-			 * The owner CV is destroyed after this Pipe. A later producer
-			 * Eof must not signal it.
+			 * Registrations are removed before the owned CV is destroyed.
 			 */
 			~Pipe() noexcept;
+
+			/**
+			 * @brief Notifies all stage waiters.
+			 */
+			void Wake() noexcept;
+
+			/**
+			 * @brief Waits on the owner predicate and completes under the wait lock.
+			 * @param owner Provider-local context, valid throughout the call.
+			 * @param ready Predicate evaluated with the wait mutex held.
+			 * @param completed Records elapsed wait time and runs the owner wake hook.
+			 *
+			 * Callbacks must be non-null and are invoked synchronously, never retained.
+			 * Timing starts after acquiring the mutex. The completion callback runs
+			 * before releasing it, preserving the owner's post-wake lock scope.
+			 * Notifications are not stored events; producer/predicate coordination
+			 * remains the owner's responsibility.
+			 */
+			void Wait(void* owner, bool (*ready)(void*) noexcept,
+				void (*completed)(void*, std::chrono::nanoseconds) noexcept) noexcept;
 
 			/**
 			 * @brief Input hopper.
@@ -136,7 +185,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void Capacity(int track, std::size_t n) noexcept;
 
 			/**
-			 * @brief Registers @p wake on In (Launch and Bind).
+			 * @brief Registers the owned consumer CV on In (Launch and Bind).
 			 */
 			void Listen() noexcept;
 
@@ -193,11 +242,21 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					 */
 					Pipe& operator>>(Pipe& dest) noexcept;
 
-			    private:
+				private:
+					/**
+					 * @brief Allows the owning Pipe to construct a lane.
+					 */
 					friend class Pipe;
+
+					/**
+					 * @brief Selects a track of a borrowed source pipe.
+					 * @param from Source pipe, which must outlive the lane.
+					 * @param track Hopper key.
+					 */
 					Lane(Pipe& from, int track) noexcept;
-					Pipe* m_from;
-					int m_track;
+
+					Pipe* m_from;	///< Borrowed source pipe
+					int m_track;	///< Selected hopper key
 			};
 
 			/**
@@ -256,13 +315,19 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			friend Pipe& operator>>(Item::PointerType&& item, Pipe& pipe) noexcept;
 
 		private:
-			std::condition_variable* m_wake;	///< Owner Wait CV
+			std::condition_variable m_wake;				///< Provider-owned consumer CV
+			std::mutex m_wait;							///< Mutex held through wait completion
 			ItemSink m_in;						///< Input buckets
 			ItemSink m_out;						///< Output buckets
+
+			/**
+			 * @brief Track-specific clone destination.
+			 */
 			struct Fork {
-				int track;
-				ItemSink hopper;
+				int track;		///< Hopper key to clone
+				ItemSink hopper;	///< Bound clone output
 			};
+
 			std::deque<Fork> m_forks;			///< CloneTo dests
 			std::unordered_set<int> m_inTracks;	///< Keys already wired on In
 	};

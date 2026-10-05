@@ -51,10 +51,12 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Cas;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Cas::Cas(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> strength) noexcept
-	: Filter::Process(std::move(log), "cas"),
+Cas::Cas(Safe::Shared<StormByte::Logger::Log> log,
+	Safe::Optional<double> strength) noexcept
+	: Filter::Process(std::move(log), Safe::String("cas")),
 	m_strengthIn(strength) {}
+
+Cas::~Cas() noexcept = default;
 
 enum Type Cas::Media() const noexcept {
 	return Type::Video;
@@ -68,9 +70,9 @@ void Cas::Setup() noexcept {
 	Clean();
 }
 
-std::string Cas::Chain() const noexcept {
+StormByte::Safe::String Cas::Chain() const noexcept {
 	const double strength = std::clamp(m_strengthIn.value_or(0.4), 0.0, 1.0);
-	return std::format("cas=strength={}", strength);
+	return Safe::String(std::format("cas=strength={}", strength));
 }
 
 void Cas::Process(const Pipeline::Frame& frame) noexcept {
@@ -86,14 +88,14 @@ void Cas::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
 			Fail("cas: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("cas: AVFilterGraph::Ensure failed");
 		return;

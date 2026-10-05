@@ -49,7 +49,7 @@
 #include <thread>
 
 namespace {
-	std::string Ns(const std::optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
 		return std::format("{}", value->Nanoseconds().count());
@@ -98,12 +98,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (opening)
 			Log(Level::Notice, std::format("open t={} codec={} impl={}",
 				m_owner.m_index, std::string(m_owner.m_codec->Name()),
-				m_owner.m_implementation.value_or("auto")));
+				m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})));
 
 		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={}",
 			m_owner.m_index, *frame->Serial(), frame->Part(),
 			Ns(frame->Pts()), Ns(frame->Dts())));
-		m_owner.m_serial = frame->Serial();
+		m_owner.m_serial = *frame->Serial();
 		m_owner.m_part = frame->Part();
 
 		while (!m_owner.m_backend->Push(m_owner, frame)) {

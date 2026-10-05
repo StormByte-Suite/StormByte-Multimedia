@@ -50,10 +50,12 @@ using StormByte::Multimedia::Pipeline::Filter::Audio::Resample;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Resample::Resample(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<int> rate) noexcept
+Resample::Resample(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<int> rate) noexcept
 	: Filter::Process(std::move(log), "resample"),
 	m_rateIn(rate) {}
+
+Resample::~Resample() noexcept = default;
 
 enum Type Resample::Media() const noexcept {
 	return Type::Audio;
@@ -71,8 +73,8 @@ int Resample::Rate() const noexcept {
 	return m_rateIn.value_or(48000);
 }
 
-std::string Resample::Chain() const noexcept {
-	return std::format("aresample=osr={}", Rate());
+StormByte::Safe::String Resample::Chain() const noexcept {
+	return StormByte::Safe::String(std::format("aresample=osr={}", Rate()));
 }
 
 void Resample::Process(const Pipeline::Frame& frame) noexcept {
@@ -95,7 +97,7 @@ void Resample::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

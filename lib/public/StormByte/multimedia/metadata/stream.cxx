@@ -38,14 +38,48 @@
 
 #include <StormByte/multimedia/metadata/stream.hxx>
 
-using StormByte::Multimedia::Metadata::Stream;
+using namespace StormByte;
+using namespace StormByte::Multimedia::Metadata;
 
-const std::optional<std::string>& Stream::Title() const noexcept { return m_title; }
-const std::optional<std::string>& Stream::Language() const noexcept { return m_language; }
-std::optional<std::uint64_t> Stream::BitRate() const noexcept { return m_bitRate; }
+Disposition::Disposition() noexcept = default;
+
+Disposition::Disposition(DispositionFlag flag) noexcept
+: StormByte::Bitmask<Disposition, DispositionFlag>(flag) {}
+
+Disposition::Disposition(const class Disposition& disposition) noexcept = default;
+
+Disposition::Disposition(class Disposition&& disposition) noexcept = default;
+
+Disposition::~Disposition() noexcept = default;
+
+Disposition& Disposition::operator=(const class Disposition& disposition) noexcept = default;
+
+Disposition& Disposition::operator=(class Disposition&& disposition) noexcept = default;
+
+Stream::Stream() = default;
+
+Stream::Stream(const Stream& other) = default;
+
+Stream::Stream(Stream&& other) noexcept = default;
+
+Stream::~Stream() noexcept = default;
+
+Stream& Stream::operator=(const Stream& other) = default;
+
+Stream& Stream::operator=(Stream&& other) noexcept = default;
+
+const Safe::Optional<Safe::String>& Stream::Title() const noexcept { return m_title; }
+
+const Safe::Optional<Safe::String>& Stream::Language() const noexcept { return m_language; }
+
+Safe::Optional<std::uint64_t> Stream::BitRate() const { return m_bitRate; }
+
 StormByte::Multimedia::Metadata::Disposition Stream::Disposition() const noexcept { return m_disposition; }
 
-void Stream::Title(std::string title) noexcept { m_title = std::move(title); }
-void Stream::Language(std::string language) noexcept { m_language = std::move(language); }
-void Stream::BitRate(std::uint64_t bitRate) noexcept { m_bitRate = bitRate; }
+void Stream::Title(Safe::String title) { m_title = std::move(title); }
+
+void Stream::Language(Safe::String language) { m_language = std::move(language); }
+
+void Stream::BitRate(std::uint64_t bitRate) { m_bitRate = bitRate; }
+
 void Stream::Disposition(class Disposition disposition) noexcept { m_disposition = disposition; }

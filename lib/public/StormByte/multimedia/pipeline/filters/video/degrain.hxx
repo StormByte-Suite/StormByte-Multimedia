@@ -43,16 +43,13 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
-#include <deque>
-#include <memory>
-#include <optional>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -152,6 +149,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Fftdnoiz
 	 * @see StormByte::Multimedia::Pipeline::Filter::ProcessTwoPasses
+	 * @par Boundary ownership
+	 * Requires a compatible C++ ABI, including compatible STL layouts, and the
+	 * Multimedia, Logger, Base and FFmpeg providers to remain loaded. Own the leaf
+		 * through Base-heap Safe pointers. A Base-heap Safe unique owner holds opaque
+		 * provider state. Private STL storage and frame owners never cross the
+		 * interface: all their allocation, mutation and destruction execute in
+		 * out-of-line Multimedia methods. The leaf cannot be copied or moved.
+	 * This is conditional provider ownership, not an ABI-independent STL guarantee.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Degrain: public Filter::ProcessTwoPasses {
 		public:
@@ -162,10 +167,19 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 *        Empty uses 4.0; zero disables filtering. Non-finite values fail
 			 *        at setup/measurement. Finite values are clamped to [0, 100].
 			 */
-			Degrain(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> sigmaCap = {}) noexcept;
+			Degrain(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> sigmaCap = {}) noexcept;
 
+			/**
+			 * @brief Copying the provider-owned leaf is disabled.
+			 * @param other Leaf that cannot be copied.
+			 */
 			Degrain(const Degrain& other) = delete;
+
+			/**
+			 * @brief Moving the mounted leaf is disabled.
+			 * @param other Leaf that cannot be moved.
+			 */
 			Degrain(Degrain&& other) noexcept = delete;
 
 			/**
@@ -173,7 +187,18 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			~Degrain() noexcept override;
 
+			/**
+			 * @brief Copy assignment is disabled.
+			 * @param other Leaf that cannot be copied.
+			 * @return Assignment is unavailable.
+			 */
 			Degrain& operator=(const Degrain& other) = delete;
+
+			/**
+			 * @brief Move assignment is disabled.
+			 * @param other Leaf that cannot be moved.
+			 * @return Assignment is unavailable.
+			 */
 			Degrain& operator=(Degrain&& other) noexcept = delete;
 
 			/**
@@ -216,7 +241,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			class Filter::Report Report() const noexcept override;
 
 		private:
-			/** @cond INTERNAL */
+			/**
+			 * @cond INTERNAL
+			 */
 			/**
 			 * @brief Horizontal region count.
 			 */
@@ -232,28 +259,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			using RegionMap = std::array<float, GridWidth * GridHeight>;
 
-			/**
-			 * @brief Compact measurement retained after its pixels leave the ring.
-			 */
-			struct Row {
-				int64_t pts = 0; ///< Original presentation timestamp.
-				RegionMap regions{}; ///< Continuous regional targets; zero is no-op.
-				std::size_t group = 0; ///< Brightness/geometry/timestamp continuity group.
-				int width = 0; ///< Original measurement width.
-				int height = 0; ///< Original measurement height.
-				int format = 0; ///< Original pixel format.
-				bool valid = true; ///< False for all occurrences of an ambiguous PTS.
-			};
-
-			/**
-			 * @brief One of at most eleven measurement pictures.
-			 */
-			struct Slot {
-				std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFrame> pic; ///< Software YUV420P measurement copy.
-				RegionMap means{}; ///< Regional luma averages for lighting compensation.
-				std::size_t row = 0; ///< Constant-time index into the compact rows.
-				bool scored = false; ///< Prevents rescoring during EOF/boundary draining.
-			};
+			struct STORMBYTE_MULTIMEDIA_PRIVATE State;	///< Provider-only measurement storage and frame owners.
 
 			/**
 			 * @brief Convert @p src to YUV420P, isolate boundaries and score the ring centre.
@@ -262,8 +268,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void PushFrame(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
 
 			/**
-			 * @brief Fill one @ref Row from ring slot @p idx using up to five neighbours each side.
-			 * @param idx Index in @ref m_ring. No-op if already scored or tiny.
+			 * @brief Fill one measurement row from ring slot @p idx using up to five neighbours each side.
+			 * @param idx Index in the provider-owned ring. No-op if already scored or tiny.
 			 */
 			void ScoreCenter(std::size_t idx) noexcept;
 
@@ -308,25 +314,23 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			static double RegionTarget(const RegionMap& regions, double horizontal,
 				double vertical) noexcept;
 
-			std::optional<double> m_capIn; ///< Caller ceiling, or empty for 4.0.
-			std::deque<Slot> m_ring; ///< Bounded measurement pixel storage.
-			std::vector<Row> m_row; ///< One compact row per unique measured PTS.
-			std::unordered_map<int64_t, std::size_t> m_lookup; ///< Constant-time PTS-to-row lookup.
-			std::unordered_set<int64_t> m_processed; ///< Encode timestamps already encountered.
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFrame> m_previous; ///< Previous real, unfiltered encode input.
-			std::optional<std::size_t> m_previousRow; ///< Previous encode row, absent after a discontinuity.
-			std::optional<int64_t> m_lastPts; ///< Last measurement PTS, absent after a gap.
-			std::size_t m_group = 0; ///< Current continuity group.
-			unsigned m_frames = 0; ///< Measurement inputs seen, including rejected inputs.
-			bool m_voted = false; ///< Measurement finalized.
-			double m_sigmaMin = 0.0; ///< Minimum nonzero regional target.
-			double m_sigmaP50 = 0.0; ///< Median nonzero regional target.
-			double m_sigmaMax = 0.0; ///< Maximum regional target.
-			unsigned m_ran = 0; ///< Frames with positive measured targets.
-			unsigned m_skipped = 0; ///< Measured frames with zero/invalid targets.
-			unsigned m_applied = 0; ///< Successfully blended encode frames.
-			unsigned m_unsupported = 0; ///< Unsupported encode formats passed through.
-			unsigned m_rejected = 0; ///< Missing/duplicate/unconvertible measurement inputs.
-			/** @endcond */
+			Safe::Optional<double> m_capIn;			///< Caller ceiling, or empty for 4.0.
+			Safe::Unique<State> m_state;				///< Base-heap state constructed and destroyed only by the provider.
+			std::size_t m_group = 0;					///< Current continuity group.
+			unsigned m_frames = 0;					///< Measurement inputs seen, including rejected inputs.
+			bool m_voted = false;					///< Measurement finalized.
+			double m_sigmaMin = 0.0;					///< Minimum nonzero regional target.
+			double m_sigmaP50 = 0.0;					///< Median nonzero regional target.
+			double m_sigmaMax = 0.0;					///< Maximum regional target.
+			unsigned m_ran = 0;						///< Frames with positive measured targets.
+			unsigned m_skipped = 0;					///< Measured frames with zero/invalid targets.
+			unsigned m_applied = 0;					///< Successfully blended encode frames.
+			unsigned m_unsupported = 0;				///< Unsupported encode formats passed through.
+			unsigned m_rejected = 0;					///< Missing/duplicate/unconvertible measurement inputs.
+			/**
+			 * @endcond
+			 */
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Degrain);

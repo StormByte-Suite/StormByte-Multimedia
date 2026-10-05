@@ -42,9 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
-#include <memory>
-#include <optional>
 #include <string>
 
 /**
@@ -93,6 +95,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Process
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @par Conditional DLL safety
+	 * Requires a compatible C++ ABI and all providers to remain loaded while
+	 * objects, handles or callbacks exist. Create the leaf on Base's heap through
+	 * a Safe owner. Private storage is created, used and destroyed out of line
+	 * by the provider; the private Chain string never transfers ownership to callers.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Deflicker: public Filter::Process {
 		public:
@@ -103,32 +110,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param mode Average kind: @c am, @c gm, @c hm, @c qm, @c cm,
 			 *        @c pm or @c median. Empty → @c am.
 			 */
-			Deflicker(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<unsigned> size = {},
-				std::optional<std::string> mode = {}) noexcept;
+			Deflicker(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<unsigned> size = {},
+				Safe::Optional<Safe::String> mode = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Leaf that cannot be copied.
 			 */
 			Deflicker(const Deflicker& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Leaf that cannot be moved.
 			 */
 			Deflicker(Deflicker&& other) noexcept = delete;
 
 			/**
 			 * @brief Drops the cached graph.
 			 */
-			~Deflicker() noexcept override = default;
+			~Deflicker() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Leaf that cannot be copied.
+			 * @return No value; this operation is deleted.
 			 */
 			Deflicker& operator=(const Deflicker& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Leaf that cannot be moved.
+			 * @return No value; this operation is deleted.
 			 */
 			Deflicker& operator=(Deflicker&& other) noexcept = delete;
 
@@ -166,8 +179,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			std::string Chain() const noexcept;
 
-			std::optional<unsigned> m_sizeIn;	///< Caller window, or empty
-			std::optional<std::string> m_modeIn;	///< Caller mode, or empty
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			Safe::Optional<unsigned> m_sizeIn;										///< Caller window, or empty
+			Safe::Optional<Safe::String> m_modeIn;									///< Caller mode, or empty
+			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;		///< Reused graph
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Deflicker);

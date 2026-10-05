@@ -39,6 +39,7 @@
 #pragma once
 
 #include <StormByte/bitmask.hxx>
+#include <StormByte/buffer/hopper.hxx>
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/pipeline/exception.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -49,10 +50,14 @@
 
 /**
  * @namespace StormByte::Buffer
- * @brief Hopper and Sink live in StormByte-Buffer. Forward only here.
+ * @brief Typed item queues provided by StormByte-Buffer.
  */
 namespace StormByte::Buffer {
-	template<Type::MoveConstructible T>
+	/**
+	 * @brief Forward declaration using Buffer's typed queue contract.
+	 * @tparam T Nonthrowing Safe value supported by Hopper.
+	 */
+	template<Detail::HopperValue T>
 	class Sink;
 }
 

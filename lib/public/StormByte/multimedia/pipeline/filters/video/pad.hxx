@@ -42,10 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
-#include <memory>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -79,6 +80,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Crop
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @par ABI contract
+	 * Requires the same compatible C++ ABI and a Safe-migrated parent base.
+	 * Allocation and destruction must remain creator-owned; graph storage
+	 * is created and released by out-of-line Multimedia functions.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Pad: public Filter::Process {
 		public:
@@ -88,13 +93,38 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param width Destination width in pixels.
 			 * @param height Destination height in pixels.
 			 */
-			Pad(std::shared_ptr<StormByte::Logger::Log> log,
+			Pad(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				std::uint32_t width, std::uint32_t height) noexcept;
 
+			/**
+			 * @brief Copy construction is not allowed for a mounted leaf.
+			 * @param other Source leaf.
+			 */
 			Pad(const Pad& other) = delete;
+
+			/**
+			 * @brief Move construction is not allowed for a mounted leaf.
+			 * @param other Source leaf.
+			 */
 			Pad(Pad&& other) noexcept = delete;
-			~Pad() noexcept override = default;
+
+			/**
+			 * @brief Releases graph storage in the creating module.
+			 */
+			~Pad() noexcept override;
+
+			/**
+			 * @brief Copy assignment is not allowed for a mounted leaf.
+			 * @param other Source leaf.
+			 * @return This leaf.
+			 */
 			Pad& operator=(const Pad& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed for a mounted leaf.
+			 * @param other Source leaf.
+			 * @return This leaf.
+			 */
 			Pad& operator=(Pad&& other) noexcept = delete;
 
 			/**
@@ -129,10 +159,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `pad=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
-			std::uint32_t m_width;	///< Destination width
-			std::uint32_t m_height;	///< Destination height
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;
+			std::uint32_t m_width;																	///< Destination width in pixels
+			std::uint32_t m_height;																	///< Destination height in pixels
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Creator-owned graph
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Pad);

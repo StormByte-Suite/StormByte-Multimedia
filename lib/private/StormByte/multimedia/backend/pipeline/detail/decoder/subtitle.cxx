@@ -64,7 +64,7 @@ using StormByte::Multimedia::Pipeline::SideData;
 using StormByte::Multimedia::Type;
 
 namespace {
-	std::optional<StormByte::Multimedia::Property::Duration> TicksToPts(std::int64_t ticks, StormByte::Multimedia::Property::AVRational timeBase) noexcept {
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration> TicksToPts(std::int64_t ticks, StormByte::Multimedia::Property::AVRational timeBase) noexcept {
 		if (ticks == AV_NOPTS_VALUE || ticks < 0 || timeBase.num <= 0 || timeBase.den <= 0)
 			return std::nullopt;
 		const std::int64_t ns = timeBase.Rescale(ticks, StormByte::Multimedia::Property::AVRational{1, 1000000000});
@@ -73,7 +73,7 @@ namespace {
 		return StormByte::Multimedia::Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 
-	std::int64_t NsToTicks(const std::optional<StormByte::Multimedia::Property::Duration>& value, StormByte::Multimedia::Property::AVRational timeBase) noexcept {
+	std::int64_t NsToTicks(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value, StormByte::Multimedia::Property::AVRational timeBase) noexcept {
 		if (!value.has_value() || timeBase.num <= 0 || timeBase.den <= 0)
 			return AV_NOPTS_VALUE;
 		return StormByte::Multimedia::Property::AVRational{1, 1000000000}.Rescale(value->Nanoseconds().count(), timeBase);
@@ -81,6 +81,12 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
+	Subtitle::~Subtitle() noexcept = default;
+
+	Subtitle::Subtitle(Subtitle&& other) noexcept = default;
+
+	Subtitle& Subtitle::operator=(Subtitle&& other) noexcept = default;
+
 	Subtitle::Subtitle(StormByte::Multimedia::FFmpeg::AVDecoder decoder, FFmpeg::AVRational timeBase) noexcept
 	: m_decoder(std::move(decoder)), m_timeBase(timeBase), m_flushed(false) {}
 
@@ -171,7 +177,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		if (!pts)
 			pts = m_packetPts;
 
-		std::optional<StormByte::Multimedia::Property::Duration> duration;
+		StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration> duration;
 		if (sub.DisplayDurationMs() > 0)
 			duration = StormByte::Multimedia::Property::Duration{std::chrono::milliseconds{sub.DisplayDurationMs()}};
 		if (!duration)
@@ -188,7 +194,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				std::move(pts),
 				std::move(duration),
 				std::nullopt,
-				std::vector<SideData>{},
+				StormByte::Safe::Vector<SideData>{},
 				std::nullopt,
 				0,
 				0);

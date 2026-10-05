@@ -53,10 +53,12 @@ using StormByte::Multimedia::Property::ToString;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Downmix::Downmix(std::shared_ptr<StormByte::Logger::Log> log,
+Downmix::Downmix(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	ChannelLayout target) noexcept
 	: Filter::Process(std::move(log), "downmix"),
 	m_target(target) {}
+
+Downmix::~Downmix() noexcept = default;
 
 enum Type Downmix::Media() const noexcept {
 	return Type::Audio;
@@ -90,18 +92,18 @@ std::string_view Downmix::LayoutName() const noexcept {
 	}
 }
 
-std::string Downmix::AformatChain() const noexcept {
+StormByte::Safe::String Downmix::AformatChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
-	return std::format("aformat=channel_layouts={}", name);
+	return StormByte::Safe::String(std::format("aformat=channel_layouts={}", name));
 }
 
-std::string Downmix::PanChain() const noexcept {
+StormByte::Safe::String Downmix::PanChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
-	return std::format("pan={}|FL=FL+0.707*LFE|FR=FR+0.707*LFE", name);
+	return StormByte::Safe::String(std::format("pan={}|FL=FL+0.707*LFE|FR=FR+0.707*LFE", name));
 }
 
 bool Downmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
@@ -144,7 +146,7 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string aformat = AformatChain();
+	const StormByte::Safe::String aformat = AformatChain();
 	if (aformat.empty()) {
 		Fail("downmix: unknown target layout");
 		return;
@@ -159,7 +161,7 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 		}
 	}
 	if (m_pan) {
-		const std::string pan = PanChain();
+		const StormByte::Safe::String pan = PanChain();
 		if (!EnsureGraph(src, pan)) {
 			Fail("downmix: AVFilterGraph::Open failed");
 			return;

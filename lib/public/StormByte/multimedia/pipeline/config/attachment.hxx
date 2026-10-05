@@ -41,7 +41,6 @@
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <string>
 #include <string_view>
 #include <utility>
 
@@ -50,7 +49,7 @@
  * @brief Per-track intention stored by Plan.
  *
  * Not wiring (`operator>>`) and not runtime settled state.
- * An engaged `std::optional` is an explicit override. Calling a
+ * An engaged `StormByte::Safe::Optional` is an explicit override. Calling a
  * setter with an empty value is also an explicit override.
  *
  * @ingroup multimedia_pipeline
@@ -67,6 +66,9 @@ namespace StormByte::Multimedia::Pipeline::Config {
 	 * @ref MimeType is required. Wildcards (`image/*`) are not valid.
 	 *
 	 * @todo Replace @ref MimeType with an enum.
+	 * @note Boundary use requires compatible C++ ABIs and loaded providers.
+	 *       Derived providers must supply safe fields and local lifecycle,
+	 *       Clone and Move overrides that preserve their dynamic type.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -81,46 +83,44 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Builds from a mime view (copied).
 			 * @param mime_type Concrete MIME type (`image/jpeg`, `font/ttf`, …).
 			 */
-			explicit Attachment(std::string_view mime_type) noexcept
-			: Base(StormByte::Multimedia::Type::Attachment), m_mimeType(mime_type) {}
+			explicit Attachment(std::string_view mime_type);
 
 			/**
 			 * @brief Builds from a moved mime string.
 			 * @param mime_type Concrete MIME type.
 			 */
-			explicit Attachment(std::string&& mime_type) noexcept
-			: Base(StormByte::Multimedia::Type::Attachment), m_mimeType(std::move(mime_type)) {}
+			explicit Attachment(StormByte::Safe::String mime_type);
 
 			/**
 			 * @brief Copy constructor.
 			 * @param other Source config.
 			 */
-			Attachment(const Attachment& other) noexcept = default;
+			Attachment(const Attachment& other);
 
 			/**
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Attachment(Attachment&& other) noexcept = default;
+			Attachment(Attachment&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			virtual ~Attachment() noexcept override = default;
+			virtual ~Attachment() noexcept override;
 
 			/**
 			 * @brief Copy assignment.
 			 * @param other Source config.
 			 * @return *this.
 			 */
-			Attachment& operator=(const Attachment& other) noexcept = default;
+			Attachment& operator=(const Attachment& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Config to take.
 			 * @return *this.
 			 */
-			Attachment& operator=(Attachment&& other) noexcept = default;
+			Attachment& operator=(Attachment&& other) noexcept;
 
 			/**
 			 * @}
@@ -130,23 +130,19 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Deep copy.
 			 * @return Owning pointer to a new @ref Attachment.
 			 */
-			inline PointerType Clone() const override {
-				return MakePointer<Attachment>(*this);
-			}
+			PointerType Clone() const override;
 
 			/**
 			 * @brief Move into a new pointer.
 			 * @return Owning pointer to the moved @ref Attachment.
 			 */
-			inline PointerType Move() override {
-				return MakePointer<Attachment>(std::move(*this));
-			}
+			PointerType Move() override;
 
 			/**
 			 * @brief Concrete MIME type. Not a wildcard.
 			 * @return MIME string.
 			 */
-			inline const std::string& MimeType() const noexcept {
+			inline const StormByte::Safe::String& MimeType() const noexcept {
 				return m_mimeType;
 			}
 
@@ -154,19 +150,20 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Replaces the MIME type (moved).
 			 * @param mime_type Concrete MIME type. Not a wildcard.
 			 */
-			inline void MimeType(std::string&& mime_type) noexcept {
-				m_mimeType = std::move(mime_type);
-			}
+			void MimeType(StormByte::Safe::String mime_type) noexcept;
 
 			/**
 			 * @brief Replaces the MIME type (copied from a view).
 			 * @param mime_type Concrete MIME type. Not a wildcard.
 			 */
-			inline void MimeType(std::string_view mime_type) noexcept {
-				m_mimeType = mime_type;
-			}
+			void MimeType(std::string_view mime_type) noexcept;
 
 		private:
-			std::string m_mimeType;	///< Concrete MIME type; no wildcards
+			StormByte::Safe::String m_mimeType;	///< Concrete MIME type; no wildcards
 	};
 }
+
+/**
+ * @brief Declares Attachment conditionally safe under its documented provider contract.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Config::Attachment);

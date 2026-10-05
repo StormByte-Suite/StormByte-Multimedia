@@ -39,6 +39,7 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/type_traits/safe.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -51,6 +52,11 @@ namespace StormByte::Multimedia::Property {
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Point final {
 		public:
+			/**
+			 * @brief Constructs the zero point for Safe value storage.
+			 */
+			Point() noexcept = default;
+
 			/**
 			 * @brief Constructs a point.
 			 * @param x X coordinate.
@@ -109,7 +115,16 @@ namespace StormByte::Multimedia::Property {
 			static Point Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept;
 
 		private:
-			int m_x;	///< X
-			int m_y;	///< Y
+			int m_x = 0;	///< X coordinate, initialized to zero.
+
+			int m_y = 0;	///< Y coordinate, initialized to zero.
 	};
 }
+
+/**
+ * @brief Registers the completed integer pair for Safe value storage.
+ *
+ * Copy, move and destruction own no heap storage. Consumers must use a compatible
+ * integer/class ABI and keep the Multimedia provider loaded for exported operations.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::Point);

@@ -40,10 +40,10 @@
 
 #include <StormByte/multimedia/property/channel_layout.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -53,9 +53,17 @@ namespace StormByte::Multimedia::Property {
 	/**
 	 * @class Audio
 	 * @brief Per-stream audio properties.
+	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+	 *       remain loaded while their values and provider callbacks are in use.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Audio final {
 		public:
+			/**
+			 * @brief Constructs unknown audio properties with no codec profile.
+			 * @throws StormByte::Exception Safe storage initialization failed.
+			 */
+			Audio();
+
 			/**
 			 * @brief Constructs audio properties.
 			 * @param layout Speaker layout.
@@ -65,34 +73,40 @@ namespace StormByte::Multimedia::Property {
 			 * @param profile Optional codec profile name.
 			 */
 			Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
-				std::uint64_t bitrate = 0, std::optional<std::string> profile = std::nullopt) noexcept;
+				std::uint64_t bitrate = 0, StormByte::Safe::Optional<StormByte::Safe::String> profile = std::nullopt) noexcept;
 
 			/**
 			 * @brief Copy constructor.
+			 * @param other Properties to copy.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
-			Audio(const Audio&) = default;
+			Audio(const Audio& other);
 
 			/**
 			 * @brief Move constructor.
+			 * @param other Properties to move.
 			 */
-			Audio(Audio&&) noexcept = default;
+			Audio(Audio&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
 			 */
-			~Audio() noexcept = default;
+			~Audio() noexcept;
 
 			/**
 			 * @brief Copy assignment.
+			 * @param other Properties to copy.
 			 * @return *this.
+			 * @throws StormByte::Exception Safe storage copying failed.
 			 */
-			Audio& operator=(const Audio&) = default;
+			Audio& operator=(const Audio& other);
 
 			/**
 			 * @brief Move assignment.
+			 * @param other Properties to move.
 			 * @return *this.
 			 */
-			Audio& operator=(Audio&&) noexcept = default;
+			Audio& operator=(Audio&& other) noexcept;
 
 			/**
 			 * @brief Speaker layout.
@@ -120,15 +134,28 @@ namespace StormByte::Multimedia::Property {
 
 			/**
 			 * @brief Codec profile name, if present.
-			 * @return Profile, or empty.
+			 * @return Borrowed optional profile, valid while this object is alive.
 			 */
-			const std::optional<std::string>& Profile() const noexcept;
+			const StormByte::Safe::Optional<StormByte::Safe::String>& Profile() const noexcept;
 
 		private:
-			ChannelLayout m_layout;					///< Speaker layout
-			std::uint32_t m_sample_rate;			///< Sample rate (Hz)
-			std::uint8_t m_channels;				///< Channel count
-			std::uint64_t m_bitrate;				///< Bitrate (bits/s)
-			std::optional<std::string> m_profile;	///< Optional profile
+			ChannelLayout m_layout = ChannelLayout::Unknown;				///< Speaker layout, initialized to unknown.
+
+			std::uint32_t m_sample_rate = 0;								///< Sample rate in Hz, initialized to zero.
+
+			std::uint8_t m_channels = 0;									///< Channel count, initialized to zero.
+
+			std::uint64_t m_bitrate = 0;									///< Bitrate in bits per second, initialized to zero.
+
+			StormByte::Safe::Optional<StormByte::Safe::String> m_profile;	///< Optional Base-owned codec profile.
 	};
 }
+
+/**
+ * @brief Registers the completed audio description for Safe value storage.
+ *
+ * Profile text and optional storage use Base's heap and creator callbacks; value
+ * lifetime operations are exported by Multimedia. Compatible provider ABI is
+ * required and providers and callback creators must outlive their dependent values.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::Audio);

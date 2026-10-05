@@ -40,15 +40,28 @@
 
 using namespace StormByte::Multimedia;
 
-Attachment::Attachment(std::optional<std::string> fileName, std::optional<std::string> mimeType,
+Attachment::Attachment() = default;
+
+Attachment::Attachment(StormByte::Safe::Optional<StormByte::Safe::String> fileName,
+	StormByte::Safe::Optional<StormByte::Safe::String> mimeType,
 	StormByte::Buffer::FIFO payload) noexcept
 : m_fileName(std::move(fileName)), m_mimeType(std::move(mimeType)), m_payload(std::move(payload)) {}
 
-const std::optional<std::string>& Attachment::FileName() const noexcept {
+Attachment::Attachment(const Attachment& other) = default;
+
+Attachment::Attachment(Attachment&& other) noexcept = default;
+
+Attachment::~Attachment() noexcept = default;
+
+Attachment& Attachment::operator=(const Attachment& other) = default;
+
+Attachment& Attachment::operator=(Attachment&& other) noexcept = default;
+
+const StormByte::Safe::Optional<StormByte::Safe::String>& Attachment::FileName() const noexcept {
 	return m_fileName;
 }
 
-const std::optional<std::string>& Attachment::MimeType() const noexcept {
+const StormByte::Safe::Optional<StormByte::Safe::String>& Attachment::MimeType() const noexcept {
 	return m_mimeType;
 }
 

@@ -127,8 +127,8 @@ namespace {
 	}
 }
 
-Bwdif::Bwdif(std::shared_ptr<StormByte::Logger::Log> log, bool onlyInterlaced) noexcept
-	: Filter::Process(std::move(log), "bwdif"), m_onlyInterlaced(onlyInterlaced) {}
+Bwdif::Bwdif(StormByte::Safe::Shared<StormByte::Logger::Log> log, bool onlyInterlaced) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("bwdif")), m_onlyInterlaced(onlyInterlaced) {}
 
 Bwdif::~Bwdif() noexcept {
 	Clean();

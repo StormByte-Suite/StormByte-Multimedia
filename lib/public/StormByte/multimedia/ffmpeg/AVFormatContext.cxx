@@ -49,8 +49,8 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <set>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 extern "C" {
@@ -325,26 +325,32 @@ void FFmpeg::AVFormatContext::HarvestSideData() noexcept {
 	}
 }
 
-const char* FFmpeg::AVFormatContext::FormatName() const noexcept {
+StormByte::Safe::String FFmpeg::AVFormatContext::FormatName() const noexcept {
 	if (!m_ptr || !m_ptr->iformat)
-		return nullptr;
-	return m_ptr->iformat->name;
+		return {};
+	return StormByte::Safe::String(m_ptr->iformat->name);
 }
 
-const char* FFmpeg::AVFormatContext::Tag(const char* key) const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> FFmpeg::AVFormatContext::Tag(const char* key) const noexcept {
 	if (!m_ptr || !m_ptr->metadata || !key)
-		return nullptr;
+		return {};
 	const AVDictionaryEntry* entry = av_dict_get(m_ptr->metadata, key, nullptr, 0);
-	return entry ? entry->value : nullptr;
+	if (!entry)
+		return {};
+	return StormByte::Safe::String(entry->value);
 }
 
-std::optional<std::chrono::nanoseconds> FFmpeg::AVFormatContext::Duration() const noexcept {
+StormByte::Safe::Optional<Property::Duration> FFmpeg::AVFormatContext::Duration() const {
 	if (!m_ptr || m_ptr->duration == AV_NOPTS_VALUE)
-		return std::nullopt;
+		return {};
 	const std::int64_t ns = av_rescale_q(m_ptr->duration, ::AVRational{1, AV_TIME_BASE}, ::AVRational{1, 1000000000});
 	if (ns < 0)
-		return std::nullopt;
-	return std::chrono::nanoseconds{ns};
+		return {};
+	try {
+		return Property::Duration(std::chrono::nanoseconds{ns});
+	} catch (...) {
+		return {};
+	}
 }
 
 FFmpeg::OperationResult FFmpeg::AVFormatContext::ReadPacket(AVPacket& packet) noexcept {
@@ -384,15 +390,18 @@ FFmpeg::Streams FFmpeg::AVFormatContext::Streams() const noexcept {
 	if (!m_ptr || m_ptr->nb_streams == 0)
 		return out;
 
+	std::set<AVStream> ordered;
 	for (unsigned i = 0; i < m_ptr->nb_streams; ++i)
-		out.emplace(AVStream(m_ptr->streams[i]));
+		ordered.emplace(m_ptr->streams[i]);
+	for (const auto& stream : ordered)
+		out.push_back(stream);
 
 	return out;
 }
 
-std::optional<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
+StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
 	if (!m_ptr || !m_ptr->iformat || !m_ptr->iformat->name)
-		return std::nullopt;
+		return {};
 
 	const std::string fmt_name = m_ptr->iformat->name;
 
@@ -402,14 +411,14 @@ std::optional<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, 
 		fmt_name.find("mov") != std::string::npos;
 
 	if (!is_mp4_like)
-		return std::nullopt;
+		return {};
 
 	std::string bsf_name;
 	switch (codec_id) {
 		case AV_CODEC_ID_HEVC: bsf_name = "hevc_mp4toannexb"; break;
 		case AV_CODEC_ID_H264: bsf_name = "h264_mp4toannexb"; break;
 		case AV_CODEC_ID_AV1:  bsf_name = "av1_mp4toannexb"; break;
-		default:               return std::nullopt;
+		default:               return {};
 	}
 
 	auto expected_bsf = FFmpeg::AVBSF::Create(
@@ -419,22 +428,29 @@ std::optional<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, 
 	);
 
 	if (expected_bsf)
-		return std::move(expected_bsf.value());
-	return std::nullopt;
+		return StormByte::Safe::Unique<AVBSF>::MakePointer<AVBSF>(std::move(expected_bsf.value()));
+	return {};
 }
 
 FFmpeg::AVFormatContext::operator bool() const noexcept {
 	return m_ptr != nullptr;
 }
 
-void FFmpeg::AVFormatContext::DiscardUnwanted(const std::unordered_set<int>& wanted) noexcept {
+void FFmpeg::AVFormatContext::DiscardUnwanted(const StormByte::Safe::Vector<int>& wanted) noexcept {
 	if (!m_ptr)
 		return;
 	for (unsigned i = 0; i < m_ptr->nb_streams; ++i) {
 		::AVStream* avs = m_ptr->streams[i];
 		if (!avs)
 			continue;
-		avs->discard = wanted.contains(avs->index) ? AVDISCARD_DEFAULT : AVDISCARD_ALL;
+		bool keep = false;
+		for (const int index : wanted) {
+			if (index == avs->index) {
+				keep = true;
+				break;
+			}
+		}
+		avs->discard = keep ? AVDISCARD_DEFAULT : AVDISCARD_ALL;
 	}
 }
 

@@ -45,19 +45,31 @@ const HDR10 HDR10::DEFAULT = {
 	std::nullopt, HDR10::Source::Heuristics
 };
 
-HDR10::HDR10() noexcept:
-HDR10(DEFAULT) {}
+HDR10::HDR10():
+m_red(34000, 16000), m_green(13250, 34500), m_blue(7500, 3000),
+m_white(15635, 16450), m_luminance(1, 10000000),
+m_source(Source::Heuristics), m_hdr10plus(false) {}
 
 HDR10::HDR10(const Point& red, const Point& green, const Point& blue, const Point& white,
-	const Point& luminance, const std::optional<Point>& light_level, Source source) noexcept:
+	const Point& luminance, const StormByte::Safe::Optional<Point>& light_level, Source source):
 m_red(red), m_green(green), m_blue(blue), m_white(white),
 m_luminance(luminance), m_light_level(light_level), m_source(source), m_hdr10plus(false) {}
 
 HDR10::HDR10(Point&& red, Point&& green, Point&& blue, Point&& white,
-	Point&& luminance, std::optional<Point>&& light_level, Source source) noexcept:
+	Point&& luminance, StormByte::Safe::Optional<Point>&& light_level, Source source) noexcept:
 m_red(std::move(red)), m_green(std::move(green)), m_blue(std::move(blue)),
 m_white(std::move(white)), m_luminance(std::move(luminance)), m_light_level(std::move(light_level)),
 m_source(source), m_hdr10plus(false) {}
+
+HDR10::HDR10(const HDR10& other) = default;
+
+HDR10::HDR10(HDR10&& other) noexcept = default;
+
+HDR10::~HDR10() noexcept = default;
+
+HDR10& HDR10::operator=(const HDR10& other) = default;
+
+HDR10& HDR10::operator=(HDR10&& other) noexcept = default;
 
 const Point& HDR10::Red() const noexcept {
 	return m_red;
@@ -79,7 +91,7 @@ const Point& HDR10::Luminance() const noexcept {
 	return m_luminance;
 }
 
-const std::optional<Point>& HDR10::LightLevel() const noexcept {
+const StormByte::Safe::Optional<Point>& HDR10::LightLevel() const noexcept {
 	return m_light_level;
 }
 

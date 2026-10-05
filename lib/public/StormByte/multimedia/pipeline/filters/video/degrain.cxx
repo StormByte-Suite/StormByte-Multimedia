@@ -39,14 +39,21 @@
 #include <StormByte/multimedia/pipeline/filters/video/degrain.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <deque>
 #include <format>
 #include <limits>
-#include <map>
+#include <memory>
+#include <optional>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 extern "C" {
 	#include <libavutil/pixfmt.h>
@@ -57,6 +64,42 @@ using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
+
+/**
+ * @brief Provider-only measurement storage and frame owners.
+ */
+struct Degrain::State {
+	/**
+	 * @brief Compact measurement retained after its pixels leave the ring.
+	 */
+	struct Row {
+		int64_t pts = 0;			///< Original presentation timestamp.
+		RegionMap regions{};		///< Continuous regional targets; zero is no-op.
+		std::size_t group = 0;	///< Brightness/geometry/timestamp continuity group.
+		int width = 0;			///< Original measurement width.
+		int height = 0;			///< Original measurement height.
+		int format = 0;			///< Original pixel format.
+		bool valid = true;		///< False for all occurrences of an ambiguous PTS.
+	};
+
+	/**
+	 * @brief One of at most eleven measurement pictures.
+	 */
+	struct Slot {
+		std::unique_ptr<FFrame> pic;	///< Provider-owned software YUV420P measurement copy.
+		RegionMap means{};			///< Regional luma averages for lighting compensation.
+		std::size_t row = 0;			///< Constant-time index into the compact rows.
+		bool scored = false;		///< Prevents rescoring during EOF/boundary draining.
+	};
+
+	std::deque<Slot> ring;						///< Bounded measurement pixel storage.
+	std::vector<Row> row;						///< Compact rows per unique measured PTS.
+	std::unordered_map<int64_t, std::size_t> lookup;	///< PTS-to-row lookup.
+	std::unordered_set<int64_t> processed;		///< Encode timestamps already encountered.
+	std::unique_ptr<FFrame> previous;				///< Previous real, unfiltered encode input.
+	std::optional<std::size_t> previousRow;		///< Previous encode row, absent after a discontinuity.
+	std::optional<int64_t> lastPts;				///< Last measurement PTS, absent after a gap.
+};
 
 /*
  * Detection intent
@@ -166,9 +209,10 @@ namespace {
 	}
 }
 
-Degrain::Degrain(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> sigmaCap) noexcept
-	: Filter::ProcessTwoPasses(std::move(log), "degrain"), m_capIn(sigmaCap) {}
+Degrain::Degrain(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> sigmaCap) noexcept
+	: Filter::ProcessTwoPasses(std::move(log), StormByte::Safe::String("degrain")),
+		m_capIn(std::move(sigmaCap)), m_state(StormByte::Safe::Heap::MakeUnique<State>()) {}
 
 Degrain::~Degrain() noexcept = default;
 
@@ -177,13 +221,13 @@ enum Type Degrain::Media() const noexcept {
 }
 
 void Degrain::Clean() noexcept {
-	m_ring.clear();
-	m_row.clear();
-	m_lookup.clear();
-	m_processed.clear();
-	m_previous.reset();
-	m_previousRow.reset();
-	m_lastPts.reset();
+	m_state->ring.clear();
+	m_state->row.clear();
+	m_state->lookup.clear();
+	m_state->processed.clear();
+	m_state->previous.reset();
+	m_state->previousRow.reset();
+	m_state->lastPts.reset();
 	m_group = 0;
 	m_frames = 0;
 	m_voted = false;
@@ -199,35 +243,35 @@ void Degrain::Clean() noexcept {
 
 void Degrain::Setup() noexcept {
 	// Setup occurs between passes: retain measured targets, never encode history.
-	m_processed.clear();
-	m_previous.reset();
-	m_previousRow.reset();
+	m_state->processed.clear();
+	m_state->previous.reset();
+	m_state->previousRow.reset();
 	m_applied = 0;
 	m_unsupported = 0;
-	if (m_capIn && !std::isfinite(*m_capIn))
+	if (m_capIn && !std::isfinite(m_capIn.value_or(DefaultCap)))
 		Fail("degrain: sigma cap must be finite");
 }
 
 void Degrain::PushFrame(const FFrame& source) noexcept {
 	++m_frames;
 	const int64_t pts = source.Pts();
-	const auto found = m_lookup.find(pts);
-	if (pts == MissingPts || found != m_lookup.end()) {
+	const auto found = m_state->lookup.find(pts);
+	if (pts == MissingPts || found != m_state->lookup.end()) {
 		// All measured occurrences of a duplicate are ambiguous, including the first.
 		// Keeping the lookup entry prevents a third occurrence from becoming valid.
-		if (found != m_lookup.end()) {
-			m_row[found->second].valid = false;
-			m_row[found->second].regions.fill(0.0f);
+		if (found != m_state->lookup.end()) {
+			m_state->row[found->second].valid = false;
+			m_state->row[found->second].regions.fill(0.0f);
 		}
 		++m_rejected;
 		FlushRing();
 		++m_group;
-		m_lastPts.reset();
+		m_state->lastPts.reset();
 		return;
 	}
-	if (m_ring.size() == RingMax)
-		m_ring.pop_front();
-	Slot slot;
+	if (m_state->ring.size() == RingMax)
+		m_state->ring.pop_front();
+	State::Slot slot;
 	slot.pic = std::make_unique<FFrame>();
 	slot.pic->Format(FFrame::FormatYUV420P());
 	if (source.Hardware() || source.Width() < 16 || source.Height() < 16
@@ -236,7 +280,7 @@ void Degrain::PushFrame(const FFrame& source) noexcept {
 		++m_rejected;
 		FlushRing();
 		++m_group;
-		m_lastPts.reset();
+		m_state->lastPts.reset();
 		return;
 	}
 
@@ -258,10 +302,10 @@ void Degrain::PushFrame(const FFrame& source) noexcept {
 			slot.means[regionY * GridWidth + regionX] = static_cast<float>(sum / 64.0);
 		}
 	}
-	bool boundary = m_lastPts && pts <= *m_lastPts;
-	if (!m_ring.empty()) {
-		const auto& previous = m_ring.back();
-		const auto& row = m_row[previous.row];
+	bool boundary = m_state->lastPts && pts <= *m_state->lastPts;
+	if (!m_state->ring.empty()) {
+		const auto& previous = m_state->ring.back();
+		const auto& row = m_state->row[previous.row];
 		boundary = boundary || row.width != source.Width() || row.height != source.Height()
 			|| row.format != source.Format();
 		double signedDifference = 0.0;
@@ -278,27 +322,27 @@ void Degrain::PushFrame(const FFrame& source) noexcept {
 		FlushRing();
 		++m_group;
 	}
-	m_lastPts = pts;
-	slot.row = m_row.size();
-	Row row;
+	m_state->lastPts = pts;
+	slot.row = m_state->row.size();
+	State::Row row;
 	row.pts = pts;
 	row.group = m_group;
 	row.width = source.Width();
 	row.height = source.Height();
 	row.format = source.Format();
-	m_lookup.emplace(pts, slot.row);
-	m_row.push_back(row);
-	m_ring.push_back(std::move(slot));
-	if (m_ring.size() > RingSpan)
-		ScoreCenter(m_ring.size() - 1 - RingSpan);
+	m_state->lookup.emplace(pts, slot.row);
+	m_state->row.push_back(row);
+	m_state->ring.push_back(std::move(slot));
+	if (m_state->ring.size() > RingSpan)
+		ScoreCenter(m_state->ring.size() - 1 - RingSpan);
 }
 
 void Degrain::ScoreCenter(std::size_t index) noexcept {
-	if (index >= m_ring.size() || m_ring[index].scored)
+	if (index >= m_state->ring.size() || m_state->ring[index].scored)
 		return;
-	auto& slot = m_ring[index];
+	auto& slot = m_state->ring[index];
 	slot.scored = true;
-	auto& row = m_row[slot.row];
+	auto& row = m_state->row[slot.row];
 	if (!row.valid)
 		return;
 	const auto& current = *slot.pic;
@@ -357,14 +401,14 @@ void Degrain::ScoreCenter(std::size_t index) noexcept {
 					std::size_t accepted = 0;
 					std::size_t candidates = 0;
 					const std::size_t first = index > RingSpan ? index - RingSpan : 0;
-					const std::size_t last = std::min(m_ring.size() - 1, index + RingSpan);
+					const std::size_t last = std::min(m_state->ring.size() - 1, index + RingSpan);
 					for (std::size_t neighbour = first; neighbour <= last; ++neighbour) {
-						if (neighbour == index || !m_row[m_ring[neighbour].row].valid)
+						if (neighbour == index || !m_state->row[m_state->ring[neighbour].row].valid)
 							continue;
 						++candidates;
-						const auto& other = *m_ring[neighbour].pic;
+						const auto& other = *m_state->ring[neighbour].pic;
 						const double otherLow = Box(other, horizontal, vertical, 1);
-						const double brightness = m_ring[neighbour].means[region] - slot.means[region];
+						const double brightness = m_state->ring[neighbour].means[region] - slot.means[region];
 						// Subtract each cell's brightness drift before testing whether
 						// this coordinate still observes the same low-frequency surface.
 						// No search, warping or motion compensation is performed. Even
@@ -418,17 +462,17 @@ void Degrain::ScoreCenter(std::size_t index) noexcept {
 
 void Degrain::FlushRing() noexcept {
 	// Keep all remaining neighbours until every tail picture has been scored.
-	for (std::size_t index = 0; index < m_ring.size(); ++index)
+	for (std::size_t index = 0; index < m_state->ring.size(); ++index)
 		ScoreCenter(index);
-	m_ring.clear();
+	m_state->ring.clear();
 }
 
 void Degrain::Decide() noexcept {
 	if (m_voted)
 		return;
-	if (m_capIn && !std::isfinite(*m_capIn)) {
+	if (m_capIn && !std::isfinite(m_capIn.value_or(DefaultCap))) {
 		Fail("degrain: sigma cap must be finite");
-		m_ring.clear();
+		m_state->ring.clear();
 		m_voted = true;
 		return;
 	}
@@ -436,8 +480,8 @@ void Degrain::Decide() noexcept {
 	m_voted = true;
 	RegionMap previousRaw{};
 	std::vector<double> strengths;
-	for (std::size_t index = 0; index < m_row.size(); ++index) {
-		auto& row = m_row[index];
+	for (std::size_t index = 0; index < m_state->row.size(); ++index) {
+		auto& row = m_state->row[index];
 		const RegionMap raw = row.regions;
 		if (!row.valid)
 			row.regions.fill(0.0f);
@@ -450,14 +494,14 @@ void Degrain::Decide() noexcept {
 				// and cannot cross a brightness cut, flash, format or PTS gap.
 				double target = 0.7 * raw[region];
 				double weight = 0.7;
-				if (index > 0 && m_row[index - 1].valid && m_row[index - 1].group == row.group
+				if (index > 0 && m_state->row[index - 1].valid && m_state->row[index - 1].group == row.group
 					&& previousRaw[region] > 0.0f) {
 					target += 0.15 * previousRaw[region];
 					weight += 0.15;
 				}
-				if (index + 1 < m_row.size() && m_row[index + 1].valid && m_row[index + 1].group == row.group
-					&& m_row[index + 1].regions[region] > 0.0f) {
-					target += 0.15 * m_row[index + 1].regions[region];
+				if (index + 1 < m_state->row.size() && m_state->row[index + 1].valid && m_state->row[index + 1].group == row.group
+					&& m_state->row[index + 1].regions[region] > 0.0f) {
+					target += 0.15 * m_state->row[index + 1].regions[region];
 					weight += 0.15;
 				}
 				row.regions[region] = ClampedTarget(target / weight,
@@ -573,25 +617,25 @@ bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
 }
 
 bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
-	const auto found = m_lookup.find(source.Pts());
-	if (source.Pts() == MissingPts || found == m_lookup.end() || !m_processed.insert(source.Pts()).second
-		|| !m_row[found->second].valid || m_row[found->second].width != source.Width()
-		|| m_row[found->second].height != source.Height() || m_row[found->second].format != source.Format()) {
-		m_previous.reset();
-		m_previousRow.reset();
+	const auto found = m_state->lookup.find(source.Pts());
+	if (source.Pts() == MissingPts || found == m_state->lookup.end() || !m_state->processed.insert(source.Pts()).second
+		|| !m_state->row[found->second].valid || m_state->row[found->second].width != source.Width()
+		|| m_state->row[found->second].height != source.Height() || m_state->row[found->second].format != source.Format()) {
+		m_state->previous.reset();
+		m_state->previousRow.reset();
 		return false;
 	}
 	if (!source.PlanarInteger()) {
 		++m_unsupported;
-		m_previous.reset();
-		m_previousRow.reset();
+		m_state->previous.reset();
+		m_state->previousRow.reset();
 		return false;
 	}
 	const std::size_t index = found->second;
-	const auto& row = m_row[index];
-	const FFrame& previous = m_previous && m_previousRow && *m_previousRow + 1 == index
-		&& m_row[*m_previousRow].group == row.group && SameLayout(*m_previous, source)
-		? *m_previous : source;
+	const auto& row = m_state->row[index];
+	const FFrame& previous = m_state->previous && m_state->previousRow && *m_state->previousRow + 1 == index
+		&& m_state->row[*m_state->previousRow].group == row.group && SameLayout(*m_state->previous, source)
+		? *m_state->previous : source;
 	const double maximum = std::min(std::clamp(m_capIn.value_or(DefaultCap), 0.0, 100.0),
 		static_cast<double>(*std::max_element(row.regions.begin(), row.regions.end())));
 	FFrame filtered;
@@ -640,21 +684,21 @@ bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
 	}
 	// Remember the REAL input even when its targets are zero, never a filtered
 	// result. This prevents feedback and bounds encode history to one picture.
-	if (!m_previous)
-		m_previous = std::make_unique<FFrame>();
-	if (!m_previous->AllocVideo(source.Width(), source.Height(), source.Format())
-		|| !m_previous->Copy(source) || !m_previous->CopyProps(source)) {
+	if (!m_state->previous)
+		m_state->previous = std::make_unique<FFrame>();
+	if (!m_state->previous->AllocVideo(source.Width(), source.Height(), source.Format())
+		|| !m_state->previous->Copy(source) || !m_state->previous->CopyProps(source)) {
 		Fail("degrain: previous input copy failed");
 		return false;
 	}
-	m_previousRow = index;
+	m_state->previousRow = index;
 	return maximum > 0.0;
 }
 
 void Degrain::Measure(const Pipeline::Frame& frame) noexcept {
 	if (frame.Type() != Type::Video || m_voted)
 		return;
-	if (m_capIn && !std::isfinite(*m_capIn)) {
+	if (m_capIn && !std::isfinite(m_capIn.value_or(DefaultCap))) {
 		Fail("degrain: sigma cap must be finite");
 		return;
 	}
@@ -670,7 +714,7 @@ void Degrain::Process(const Pipeline::Frame& frame) noexcept {
 		Decide();
 	if (m_ran == 0)
 		return;
-	if (m_capIn && !std::isfinite(*m_capIn))
+	if (m_capIn && !std::isfinite(m_capIn.value_or(DefaultCap)))
 		return;
 	const FFrame& source = AVFrame();
 	if (!source)
@@ -684,24 +728,24 @@ void Degrain::Process(const Pipeline::Frame& frame) noexcept {
 
 void Degrain::Eof() noexcept {
 	Decide();
-	m_previous.reset();
-	m_previousRow.reset();
+	m_state->previous.reset();
+	m_state->previousRow.reset();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const noexcept {
 	const bool ok = m_voted && m_ran > 0;
-	std::map<std::string, std::string> data;
-	data.emplace("status", ok ? "ok" : "noop");
-	data.emplace("frames", std::to_string(m_frames));
-	data.emplace("ran", std::to_string(m_ran));
-	data.emplace("skipped", std::to_string(m_skipped));
-	data.emplace("groups", std::to_string(m_row.empty() ? 0 : m_group + 1));
-	data.emplace("applied", std::to_string(m_applied));
-	data.emplace("unsupported", std::to_string(m_unsupported));
-	data.emplace("rejected", std::to_string(m_rejected));
-	data.emplace("sigma", std::format("{:.3f}", m_sigmaP50));
-	data.emplace("sigma_min", std::format("{:.3f}", m_sigmaMin));
-	data.emplace("sigma_max", std::format("{:.3f}", m_sigmaMax));
-	data.emplace("sigma_p50", std::format("{:.3f}", m_sigmaP50));
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
+	data.emplace(StormByte::Safe::String("status"), StormByte::Safe::String(ok ? "ok" : "noop"));
+	data.emplace(StormByte::Safe::String("frames"), StormByte::Safe::String(std::to_string(m_frames)));
+	data.emplace(StormByte::Safe::String("ran"), StormByte::Safe::String(std::to_string(m_ran)));
+	data.emplace(StormByte::Safe::String("skipped"), StormByte::Safe::String(std::to_string(m_skipped)));
+	data.emplace(StormByte::Safe::String("groups"), StormByte::Safe::String(std::to_string(m_state->row.empty() ? 0 : m_group + 1)));
+	data.emplace(StormByte::Safe::String("applied"), StormByte::Safe::String(std::to_string(m_applied)));
+	data.emplace(StormByte::Safe::String("unsupported"), StormByte::Safe::String(std::to_string(m_unsupported)));
+	data.emplace(StormByte::Safe::String("rejected"), StormByte::Safe::String(std::to_string(m_rejected)));
+	data.emplace(StormByte::Safe::String("sigma"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaP50)));
+	data.emplace(StormByte::Safe::String("sigma_min"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaMin)));
+	data.emplace(StormByte::Safe::String("sigma_max"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaMax)));
+	data.emplace(StormByte::Safe::String("sigma_p50"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaP50)));
 	return Filter::Report(ok ? Filter::Report::Status::Ok : Filter::Report::Status::None, std::move(data));
 }

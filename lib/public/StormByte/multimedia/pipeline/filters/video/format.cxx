@@ -49,9 +49,11 @@ using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Filter::Video::Format;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 
-Format::Format(std::shared_ptr<StormByte::Logger::Log> log, int pixFmt) noexcept
-	: Filter::Process(std::move(log), "format"),
+Format::Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt) noexcept
+	: Filter::Process(std::move(log), Safe::String("format")),
 	m_pixFmt(pixFmt) {}
+
+Format::~Format() noexcept = default;
 
 enum Type Format::Media() const noexcept {
 	return Type::Video;

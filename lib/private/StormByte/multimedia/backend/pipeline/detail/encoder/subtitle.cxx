@@ -275,6 +275,12 @@ namespace {
 	}
 }
 
+Subtitle::~Subtitle() noexcept = default;
+
+Subtitle::Subtitle(Subtitle&& other) noexcept = default;
+
+Subtitle& Subtitle::operator=(Subtitle&& other) noexcept = default;
+
 Subtitle::Subtitle() noexcept
 : m_timeBase{1, AV_TIME_BASE},
 	m_index(0),
@@ -330,7 +336,7 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 		durationMs = 1;
 
 	const FFmpeg::AVRational tb = (m_timeBase.num > 0) ? m_timeBase : FFmpeg::AVRational{1, AV_TIME_BASE};
-	const auto impl = owner.Implementation() ? *owner.Implementation() : std::string{};
+	const StormByte::Safe::String impl = owner.Implementation().value_or(StormByte::Safe::String{});
 	std::string text = m_heldText;
 
 	if (PlainTextDest(impl)) {
@@ -355,7 +361,7 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 		if (WantsAssRect(impl))
 			text = WrapAss(std::move(text), m_heldStartNs, m_heldStartNs + durationNs);
 		StormByte::Multimedia::FFmpeg::AVSubtitle sub;
-		sub.FillText(std::move(text), m_heldPts, durationMs, WantsAssRect(impl));
+		sub.FillText(StormByte::Safe::String(text), m_heldPts, durationMs, WantsAssRect(impl));
 		if (!m_encoder || m_encoder->EncodeSubtitle(sub, m_scratch)
 			!= StormByte::Multimedia::FFmpeg::OperationResult::Success) {
 			owner.Fail("failed to encode subtitle");

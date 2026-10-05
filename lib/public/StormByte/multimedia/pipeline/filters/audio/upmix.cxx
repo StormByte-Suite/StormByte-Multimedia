@@ -54,10 +54,12 @@ using StormByte::Multimedia::Property::ToString;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Upmix::Upmix(std::shared_ptr<StormByte::Logger::Log> log,
+Upmix::Upmix(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	ChannelLayout target) noexcept
 	: Filter::Process(std::move(log), "upmix"),
 	m_target(target) {}
+
+Upmix::~Upmix() noexcept = default;
 
 enum Type Upmix::Media() const noexcept {
 	return Type::Audio;
@@ -105,40 +107,40 @@ bool Upmix::TargetHasLfe() const noexcept {
 	}
 }
 
-std::string Upmix::SurroundChain(const FFrame& src) const noexcept {
+StormByte::Safe::String Upmix::SurroundChain(const FFrame& src) const noexcept {
 	const auto out = LayoutName();
 	if (out.empty())
 		return {};
 	const auto inLayout = src.ChannelLayout();
-	const std::string in = inLayout ? inLayout.Describe() : std::string{};
+	const StormByte::Safe::String in = inLayout ? inLayout.Describe() : StormByte::Safe::String{};
 	const int lfe = TargetHasLfe() ? 1 : 0;
 	if (!in.empty())
-		return std::format(
+		return StormByte::Safe::String(std::format(
 			"surround=chl_in={}:chl_out={}:lfe={}:lfe_mode=add:lfe_low=128:lfe_high=256",
-			in, out, lfe);
-	return std::format(
+			in, out, lfe));
+	return StormByte::Safe::String(std::format(
 		"surround=chl_out={}:lfe={}:lfe_mode=add:lfe_low=128:lfe_high=256",
-		out, lfe);
+		out, lfe));
 }
 
-std::string Upmix::AformatChain() const noexcept {
+StormByte::Safe::String Upmix::AformatChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
-	return std::format("aformat=channel_layouts={}", name);
+	return StormByte::Safe::String(std::format("aformat=channel_layouts={}", name));
 }
 
-std::string Upmix::PanChain() const noexcept {
+StormByte::Safe::String Upmix::PanChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
 	if (TargetHasLfe())
-		return std::format(
+		return StormByte::Safe::String(std::format(
 			"pan={}|FL=FL|FR=FR|FC=0.707*FL+0.707*FR|LFE=0.5*FL+0.5*FR|BL=FL|BR=FR|SL=FL|SR=FR",
-			name);
-	return std::format(
+			name));
+	return StormByte::Safe::String(std::format(
 		"pan={}|FL=FL|FR=FR|FC=0.707*FL+0.707*FR|BL=FL|BR=FR|SL=FL|SR=FR",
-		name);
+		name));
 }
 
 bool Upmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
@@ -182,7 +184,7 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 	}
 
 	if (m_mode == Mode::None || m_mode == Mode::Surround) {
-		const std::string surround = SurroundChain(src);
+		const StormByte::Safe::String surround = SurroundChain(src);
 		if (EnsureGraph(src, surround)) {
 			m_mode = Mode::Surround;
 		} else {

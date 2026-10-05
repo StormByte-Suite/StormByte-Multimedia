@@ -49,6 +49,7 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <format>
 #include <utility>
@@ -67,14 +68,14 @@ using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
 namespace {
-	std::string Ns(const std::optional<Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
 		return std::format("{}", value->Nanoseconds().count());
 	}
 }
 
-Encoder::Encoder(std::shared_ptr<StormByte::Logger::Log> log,
+Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int output_index, const Codec& codec) noexcept
 : Step(std::move(log), Producer::Encoder, Kinds{Kind::Frame}, Kinds{Kind::Packet}),
 	m_index(output_index), m_codec(&codec),
@@ -94,8 +95,8 @@ Encoder::Encoder(std::shared_ptr<StormByte::Logger::Log> log,
 			return;
 	}
 
-	Mount(std::make_unique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		std::make_unique<Backend::Pipeline::Detail::Worker::Encode>(*this));
+	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Encode>(*this));
 	Launch();
 }
 
@@ -110,52 +111,69 @@ bool Encoder::Opened() const noexcept {
 }
 
 std::size_t Encoder::InputCeiling() const noexcept {
-	const auto* track = Backend::Pipeline::TrackByIn(Plan(), m_index);
-	if (!track && Plan() && m_index >= 0
-		&& static_cast<std::size_t>(m_index) < Plan()->Tracks().size())
-		track = &Plan()->Tracks()[static_cast<std::size_t>(m_index)];
+	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
+	const auto* track = Backend::Pipeline::TrackByIn(plan, m_index);
+	if (!track && plan && m_index >= 0
+		&& static_cast<std::size_t>(m_index) < plan->Tracks().size())
+		track = &plan->Tracks()[static_cast<std::size_t>(m_index)];
 	if (!track)
 		return 0;
-	const Backend::Pipeline::Ceiling cap{Plan(), Producer::Encoder, *track};
+	const Backend::Pipeline::Ceiling cap{plan, Producer::Encoder, *track};
 	return cap.Frames() != 0 ? cap.Frames() : cap.Packets();
 }
 
-std::optional<int> Encoder::AudioChannels() const noexcept {
+StormByte::Safe::Optional<int> Encoder::AudioChannels() const {
 	const auto* ctx = (m_backend && m_backend->IsOpen()) ? m_backend->Context() : nullptr;
 	if (!ctx || ctx->ch_layout.nb_channels <= 0)
 		return std::nullopt;
-	return ctx->ch_layout.nb_channels;
+	try {
+		return ctx->ch_layout.nb_channels;
+	} catch (...) {
+		return std::nullopt;
+	}
 }
 
-std::optional<int> Encoder::AudioSampleRate() const noexcept {
+StormByte::Safe::Optional<int> Encoder::AudioSampleRate() const {
 	const auto* ctx = (m_backend && m_backend->IsOpen()) ? m_backend->Context() : nullptr;
 	if (!ctx || ctx->sample_rate <= 0)
 		return std::nullopt;
-	return ctx->sample_rate;
+	try {
+		return ctx->sample_rate;
+	} catch (...) {
+		return std::nullopt;
+	}
 }
 
-std::optional<int> Encoder::AudioFrameSize() const noexcept {
+StormByte::Safe::Optional<int> Encoder::AudioFrameSize() const {
 	const auto* ctx = (m_backend && m_backend->IsOpen()) ? m_backend->Context() : nullptr;
 	if (!ctx || ctx->frame_size <= 0)
 		return std::nullopt;
-	return ctx->frame_size;
+	try {
+		return ctx->frame_size;
+	} catch (...) {
+		return std::nullopt;
+	}
 }
 
-std::optional<int> Encoder::AudioSampleFormat() const noexcept {
+StormByte::Safe::Optional<int> Encoder::AudioSampleFormat() const {
 	const auto* ctx = (m_backend && m_backend->IsOpen()) ? m_backend->Context() : nullptr;
 	if (!ctx || ctx->sample_fmt == AV_SAMPLE_FMT_NONE)
 		return std::nullopt;
-	return static_cast<int>(ctx->sample_fmt);
+	try {
+		return static_cast<int>(ctx->sample_fmt);
+	} catch (...) {
+		return std::nullopt;
+	}
 }
 
-void Encoder::Implementation(std::string name) noexcept {
+void Encoder::Implementation(StormByte::Safe::String name) noexcept {
 	if (name.empty())
 		m_implementation.reset();
 	else
 		m_implementation = std::move(name);
 }
 
-void Encoder::Preset(std::string name) noexcept {
+void Encoder::Preset(StormByte::Safe::String name) noexcept {
 	if (Failed())
 		return;
 	if (name.empty()) {
@@ -166,7 +184,7 @@ void Encoder::Preset(std::string name) noexcept {
 	m_preset = std::move(name);
 }
 
-void Encoder::Tune(std::string name) noexcept {
+void Encoder::Tune(StormByte::Safe::String name) noexcept {
 	if (Failed())
 		return;
 	if (m_codec->Type() != Type::Video) {
@@ -189,11 +207,11 @@ void Encoder::Emit(Packet::PointerType packet) noexcept {
 Packet::PointerType Encoder::Wrap(
 	enum StormByte::Multimedia::Type type, int index,
 	StormByte::Buffer::FIFO payload,
-	std::optional<Property::Duration> pts,
-	std::optional<Property::Duration> dts,
-	std::optional<Property::Duration> duration,
+	StormByte::Safe::Optional<Property::Duration> pts,
+	StormByte::Safe::Optional<Property::Duration> dts,
+	StormByte::Safe::Optional<Property::Duration> duration,
 	bool keyFrame,
-	std::vector<SideData> attachments,
+	StormByte::Safe::Vector<SideData> attachments,
 	std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept {
 	if (!m_serial) {
 		Fail("encoder packet has no serial");
@@ -262,8 +280,8 @@ const void* Encoder::FrameHandle(const Frame& frame) noexcept {
 	return frame.m_backend ? &frame.m_backend->Handle() : nullptr;
 }
 
-std::string Encoder::Label() const noexcept {
+StormByte::Safe::String Encoder::Label() const noexcept {
 	if (m_implementation && !m_implementation->empty())
-		return "Encoder(" + *m_implementation + ")";
-	return "Encoder(" + std::string(m_codec->Name()) + ")";
+		return StormByte::Safe::String(std::format("Encoder({})", *m_implementation));
+	return StormByte::Safe::String("Encoder(" + std::string(m_codec->Name()) + ")");
 }

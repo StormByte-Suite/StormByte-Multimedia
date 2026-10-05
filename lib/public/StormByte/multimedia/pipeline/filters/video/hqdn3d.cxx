@@ -131,10 +131,10 @@ namespace {
 	}
 }
 
-Hqdn3d::Hqdn3d(std::shared_ptr<StormByte::Logger::Log> log,
+Hqdn3d::Hqdn3d(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	double lumaSpatial, double chromaSpatial,
 	double lumaTemporal, double chromaTemporal) noexcept
-	: Filter::Process(std::move(log), "hqdn3d"),
+	: Filter::Process(std::move(log), StormByte::Safe::String("hqdn3d")),
 	m_ls(lumaSpatial > 0.0 ? lumaSpatial : 4.0),
 	m_cs(chromaSpatial > 0.0 ? chromaSpatial : 3.0),
 	m_lt(lumaTemporal > 0.0 ? lumaTemporal : 6.0),

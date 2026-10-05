@@ -41,34 +41,62 @@
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <cstdint>
-#include <map>
-#include <memory>
-#include <string>
 
 /**
- * @class CountFrames
- * @brief Counts dest-look units (Encoder / Remuxer).
- *
- * Attach per track or with @c job.Filter. Report keys follow
- * VMAF: flat @c frames when one track, @c N.frames when several.
- *
- * @ingroup multimedia_pipeline
+ * @namespace StormByte::Multimedia::Pipeline::Filter::Video
+ * @brief Video leaves (Process and Analytics).
  */
 namespace StormByte::Multimedia::Pipeline::Filter::Video {
+	/**
+	 * @class CountFrames
+	 * @brief Counts dest-look units (Encoder / Remuxer).
+	 *
+	 * Attach per track or with @c job.Filter. Report keys follow
+	 * VMAF: flat @c frames when one track, @c N.frames when several.
+	 *
+	 * @ingroup multimedia_pipeline
+	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC CountFrames: public Analytics {
 		public:
 			/**
 			 * @brief Named counter.
 			 * @param log Shared logger. Empty pointer means no log.
 			 */
-			explicit CountFrames(std::shared_ptr<StormByte::Logger::Log> log) noexcept;
+			explicit CountFrames(Safe::Shared<StormByte::Logger::Log> log) noexcept;
 
+			/**
+			 * @brief Copy is not allowed.
+			 * @param other Source leaf.
+			 */
 			CountFrames(const CountFrames& other) = delete;
+
+			/**
+			 * @brief Move is not allowed.
+			 * @param other Source leaf.
+			 */
 			CountFrames(CountFrames&& other) noexcept = delete;
-			~CountFrames() noexcept override = default;
+
+			/**
+			 * @brief Releases counts in the provider module.
+			 */
+			~CountFrames() noexcept override;
+
+			/**
+			 * @brief Copy assignment is not allowed.
+			 * @param other Source leaf.
+			 * @return This leaf.
+			 */
 			CountFrames& operator=(const CountFrames& other) = delete;
+
+			/**
+			 * @brief Move assignment is not allowed.
+			 * @param other Source leaf.
+			 * @return This leaf.
+			 */
 			CountFrames& operator=(CountFrames&& other) noexcept = delete;
 
 			/**
@@ -105,6 +133,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			class Filter::Report Report() const noexcept override;
 
 		private:
-			std::map<int, std::uint64_t> m_frames;	///< Per-track dest counts
+			Safe::Map<int, std::uint64_t> m_frames;	///< Per-track destination counts with provider-owned nodes.
 	};
 }
+
+/**
+ * @brief Conditional DLL safety requires the Analytics provider contract and
+ * compatible C++ ABI. Keep Multimedia, Base and logger providers loaded until
+ * this leaf and all shared owners have been destroyed.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::CountFrames);

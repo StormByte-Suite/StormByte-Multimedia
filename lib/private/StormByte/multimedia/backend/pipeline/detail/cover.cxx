@@ -66,30 +66,30 @@ namespace {
 		return !type.empty() && !subtype.empty();
 	}
 
-	std::optional<std::string> StreamTag(const StormByte::Multimedia::FFmpeg::AVStream& stream, const char* key) noexcept {
-		const char* value = stream.Tag(key);
-		if (!value || value[0] == '\0')
+	StormByte::Safe::Optional<StormByte::Safe::String> StreamTag(const StormByte::Multimedia::FFmpeg::AVStream& stream, const char* key) noexcept {
+		auto value = stream.Tag(key);
+		if (!value || value->empty())
 			return std::nullopt;
-		return std::string{value};
+		return value;
 	}
 
-	std::optional<std::string> GuessMime(int codecId) noexcept {
+	StormByte::Safe::Optional<StormByte::Safe::String> GuessMime(int codecId) noexcept {
 		switch (static_cast<AVCodecID>(codecId)) {
 			case AV_CODEC_ID_MJPEG:
 			case AV_CODEC_ID_MJPEGB:
 			case AV_CODEC_ID_JPEGLS:
-				return std::string{"image/jpeg"};
+				return StormByte::Safe::String{"image/jpeg"};
 			case AV_CODEC_ID_PNG:
 			case AV_CODEC_ID_APNG:
-				return std::string{"image/png"};
+				return StormByte::Safe::String{"image/png"};
 			case AV_CODEC_ID_BMP:
-				return std::string{"image/bmp"};
+				return StormByte::Safe::String{"image/bmp"};
 			case AV_CODEC_ID_GIF:
-				return std::string{"image/gif"};
+				return StormByte::Safe::String{"image/gif"};
 			case AV_CODEC_ID_WEBP:
-				return std::string{"image/webp"};
+				return StormByte::Safe::String{"image/webp"};
 			case AV_CODEC_ID_TIFF:
-				return std::string{"image/tiff"};
+				return StormByte::Safe::String{"image/tiff"};
 			default:
 				return std::nullopt;
 		}
@@ -136,10 +136,10 @@ namespace StormByte::Multimedia::Detail {
 	}
 
 	Multimedia::Attachment MakeAttachment(const FFmpeg::AVStream& stream) noexcept {
-		std::optional<std::string> name = StreamTag(stream, "filename");
+		auto name = StreamTag(stream, "filename");
 		if (!name)
 			name = StreamTag(stream, "title");
-		std::optional<std::string> mime = StreamTag(stream, "mimetype");
+		auto mime = StreamTag(stream, "mimetype");
 		if (!mime) {
 			const FFmpeg::AVCodecParameters params = stream.CodecParameters();
 			mime = GuessMime(params.CodecId());
@@ -158,7 +158,8 @@ namespace StormByte::Multimedia::Detail {
 	CollectedAttachments CollectAttachments(const FFmpeg::AVFormatContext& ctx) noexcept {
 		CollectedAttachments out;
 		const bool hasPrimaryVideo = HasPrimaryVideo(ctx);
-		for (const auto& stream : ctx.Streams()) {
+		const auto streams = ctx.Streams();
+		for (const auto& stream : streams) {
 			if (!IsContainerAttachment(stream) && !IsCoverStream(stream, hasPrimaryVideo))
 				continue;
 			out.items.push_back(MakeAttachment(stream));
@@ -173,12 +174,14 @@ namespace StormByte::Multimedia::Detail {
 		const bool hasPrimaryVideo = HasPrimaryVideo(ctx);
 		std::unordered_map<int, std::size_t> empty;
 		std::size_t slot = 0;
-		for (const auto& stream : ctx.Streams()) {
+		const auto streams = ctx.Streams();
+		for (const auto& stream : streams) {
 			if (!IsContainerAttachment(stream) && !IsCoverStream(stream, hasPrimaryVideo))
 				continue;
 			if (slot >= items.size())
 				break;
-				if (items[slot].Payload().Available() == 0)
+			const auto attachment = std::as_const(items).at(slot);
+			if (attachment.Payload().Available() == 0)
 				empty.emplace(stream.Index(), slot);
 			++slot;
 		}
@@ -197,9 +200,9 @@ namespace StormByte::Multimedia::Detail {
 
 			const auto it = empty.find(packet.StreamIndex());
 			if (it != empty.end() && packet.Data() && packet.Size() > 0) {
-				auto& dest = items[it->second];
-							if (dest.Payload().Available() == 0) {
-					dest = Multimedia::Attachment{dest.FileName(), dest.MimeType(),
+				const auto dest = std::as_const(items).at(it->second);
+				if (dest.Payload().Available() == 0) {
+					items[it->second] = Multimedia::Attachment{dest.FileName(), dest.MimeType(),
 						BytesToFifo(packet.Data(), packet.Size())};
 					empty.erase(it);
 				}

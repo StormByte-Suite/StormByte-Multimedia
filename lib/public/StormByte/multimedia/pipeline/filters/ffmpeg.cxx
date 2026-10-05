@@ -52,8 +52,11 @@
 
 #include <algorithm>
 #include <chrono>
+#include <deque>
 #include <format>
 #include <limits>
+#include <memory>
+#include <string>
 #include <utility>
 
 using StormByte::Multimedia::Pipeline::Filter::Analytics;
@@ -81,7 +84,7 @@ namespace {
 		return static_cast<const StormByte::Multimedia::Pipeline::Packet&>(item).Part();
 	}
 
-	std::optional<std::uint64_t> SerialOf(const StormByte::Multimedia::Pipeline::Item& item) noexcept {
+	StormByte::Safe::Optional<std::uint64_t> SerialOf(const StormByte::Multimedia::Pipeline::Item& item) noexcept {
 		if (item.Kind() == Kind::Frame)
 			return static_cast<const StormByte::Multimedia::Pipeline::Frame&>(item).Serial();
 		return static_cast<const StormByte::Multimedia::Pipeline::Packet&>(item).Serial();
@@ -110,7 +113,7 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 		}
 
 		void Fail(std::string reason) noexcept override {
-			m_owner.Fail(std::move(reason));
+			m_owner.Fail(StormByte::Safe::String(reason));
 		}
 
 		void Log(StormByte::Logger::Level level, std::string_view message) noexcept override {
@@ -143,7 +146,7 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 
 		void BecameReady() noexcept override {
 			m_owner.Log(Level::Debug, "ready");
-			m_owner.m_wake.notify_all();
+			m_owner.Wake();
 		}
 
 		void RecordWork(std::chrono::nanoseconds duration) noexcept override {
@@ -163,16 +166,25 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 		FFmpeg& m_owner;
 };
 
-FFmpeg::FFmpeg(std::shared_ptr<StormByte::Logger::Log> log,
-	std::string name, Kinds receives, Kinds produces) noexcept
+class FFmpeg::PrivateState {
+	public:
+		explicit PrivateState(FFmpeg& owner) noexcept
+		:	surface(owner) {}
+
+		StormByte::Multimedia::Backend::Pipeline::Pipe pipe;					///< Input/output queues and wait synchronization
+		Surface surface;														///< Host adapter borrowing the owning filter
+		std::unique_ptr<StormByte::Multimedia::Backend::Pipeline::Pumper> pumper;	///< Worker driver allocated and destroyed in Multimedia
+		std::deque<Item::PointerType> queue;										///< Held input items awaiting delayed filter output
+};
+
+FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	std::string_view name, Kinds receives, Kinds produces) noexcept
 :	m_log(std::move(log)),
-	m_name(std::move(name)),
+	m_name(name),
 	m_receives(receives),
 	m_produces(produces),
-	m_wake(),
-	m_pipe(std::make_unique<StormByte::Multimedia::Backend::Pipeline::Pipe>(m_wake)),
-	m_telemetry(std::make_shared<StormByte::Multimedia::Pipeline::StageTelemetry>()),
-	m_surface(std::make_unique<Surface>(*this)),
+	m_state(new PrivateState(*this)),
+	m_telemetry(StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
 	m_workMin(std::numeric_limits<std::int64_t>::max()),
@@ -180,22 +192,26 @@ FFmpeg::FFmpeg(std::shared_ptr<StormByte::Logger::Log> log,
 	m_lastWork(0),
 	m_hold(0),
 	m_heldFor(0) {
-	m_pumper = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face());
-	m_pumper->Bind(std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Filter>(*this));
+	m_state->pumper = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face());
+	m_state->pumper->Bind(std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Filter>(*this));
 }
 
 FFmpeg::~FFmpeg() noexcept {
 	Halt();
+	delete m_state;
 }
 
-std::string FFmpeg::Name() const noexcept {
-	return std::string(ToString(Media())) + "/" + m_name;
+StormByte::Safe::String FFmpeg::Name() const noexcept {
+	StormByte::Safe::String name(ToString(Media()));
+	name.append("/");
+	name.append(m_name);
+	return name;
 }
 
-std::shared_ptr<const StormByte::Multimedia::Pipeline::StageTelemetry> FFmpeg::Telemetry() const noexcept {
-	const std::string origin = Name();
+StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::StageTelemetry> FFmpeg::Telemetry() const noexcept {
+	const StormByte::Safe::String origin = Name();
 	m_telemetry->SetOrigin(origin);
-	return m_telemetry;
+	return StormByte::Safe::StaticPointerCast<const StormByte::Multimedia::Pipeline::StageTelemetry>(m_telemetry);
 }
 
 void FFmpeg::Process(const Pipeline::Frame&) noexcept {}
@@ -207,8 +223,8 @@ class StormByte::Multimedia::Pipeline::Filter::Report FFmpeg::Report() const noe
 }
 
 State FFmpeg::Status() const noexcept {
-	if (m_pumper)
-		return m_pumper->Status();
+	if (m_state->pumper)
+		return m_state->pumper->Status();
 	return m_error ? State::Failed : State::Created;
 }
 
@@ -216,7 +232,7 @@ bool FFmpeg::Failed() const noexcept {
 	return Status() == State::Failed;
 }
 
-const std::optional<std::string>& FFmpeg::Error() const noexcept {
+const StormByte::Safe::Optional<StormByte::Safe::String>& FFmpeg::Error() const noexcept {
 	return m_error;
 }
 
@@ -234,27 +250,32 @@ void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexc
 	*m_log << level << message << std::endl;
 }
 
-void FFmpeg::Fail(std::string reason) noexcept {
+void FFmpeg::Fail(StormByte::Safe::String reason) noexcept {
 	m_hold = 0;
 	m_heldFor = 0;
-	m_queue.clear();
-	m_telemetry->SetError(reason);
+	m_state->queue.clear();
+	m_telemetry->SetError(StormByte::Safe::String(reason));
 	m_error = std::move(reason);
-	Log(Level::Error, *m_error);
-	if (m_pumper)
-		m_pumper->Fail(*m_error);
+	const StormByte::Safe::String message = std::as_const(m_error).value();
+	Log(Level::Error, message);
+	if (m_state->pumper)
+		m_state->pumper->Fail(static_cast<std::string>(message));
 	CloseHoppers();
-	m_wake.notify_all();
+	Wake();
+}
+
+void FFmpeg::Fail(std::string_view reason) noexcept {
+	Fail(StormByte::Safe::String(reason));
 }
 
 void FFmpeg::Hold(std::uint8_t n) noexcept {
 	if (Held()) {
-		Fail("Hold while already Held");
+		Fail(StormByte::Safe::String("Hold while already Held"));
 		return;
 	}
 
 	if (!m_current) {
-		Fail("Hold without a unit");
+		Fail(StormByte::Safe::String("Hold without a unit"));
 		return;
 	}
 
@@ -270,7 +291,7 @@ void FFmpeg::Release() noexcept {
 	Log(Level::Debug, std::format("release held={}", static_cast<unsigned>(m_heldFor)));
 	m_hold = 0;
 	m_heldFor = 0;
-	auto parked = std::move(m_queue);
+	auto parked = std::move(m_state->queue);
 	if (m_current) {
 		const bool queued = !parked.empty() &&
 			std::find(parked.begin(), parked.end(), m_current) != parked.end();
@@ -366,7 +387,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 	}
 	if (frame->m_backend && frame->m_backend->Handle().Get()
 		&& incoming.Get() == frame->m_backend->Handle().Get()) {
-		Fail("Save of the current frame; paint a new AVFrame");
+		Fail(StormByte::Safe::String("Save of the current frame; paint a new AVFrame"));
 		return;
 	}
 	if (!frame->m_backend)
@@ -394,7 +415,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 	}
 	if (packet->m_backend && packet->m_backend->Handle().Get()
 		&& incoming.Get() == packet->m_backend->Handle().Get()) {
-		Fail("Save of the current packet; emit a new AVPacket");
+		Fail(StormByte::Safe::String("Save of the current packet; emit a new AVPacket"));
 		return;
 	}
 	if (!packet->m_backend)
@@ -407,8 +428,10 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 }
 
 void FFmpeg::Open() noexcept {
-	m_log = StormByte::Multimedia::UseLog(m_log, std::string("Filters/") + Name());
-	NameThread("SB/MM:" + m_name);
+	StormByte::Safe::String scope("Filters/");
+	scope.append(Name());
+	m_log = StormByte::Multimedia::UseLog(m_log, scope);
+	NameThread(std::string("SB/MM:").append(std::string_view(m_name)));
 	Log(Level::Notice, "setup");
 	Clean();
 	Setup();
@@ -421,14 +444,14 @@ void FFmpeg::LastChance(const Pipeline::Packet&) noexcept {}
 void FFmpeg::Park() noexcept {
 	if (!m_current)
 		return;
-	if (!m_queue.empty() && m_queue.back() == m_current)
+	if (!m_state->queue.empty() && m_state->queue.back() == m_current)
 		return;
 	if (m_heldFor >= m_hold) {
-		Fail("Hold exceeded");
+		Fail(StormByte::Safe::String("Hold exceeded"));
 		return;
 	}
 
-	m_queue.push_back(m_current);
+	m_state->queue.push_back(m_current);
 	++m_heldFor;
 }
 
@@ -481,7 +504,7 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 		if (m_heldFor >= m_hold) {
 			CallLastChance();
 			if (Held()) {
-				Fail("Hold exceeded");
+				Fail(StormByte::Safe::String("Hold exceeded"));
 				return;
 			}
 		}
@@ -498,11 +521,11 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 
 void FFmpeg::Finish() noexcept {
 	if (Held()) {
-		if (!m_current && !m_queue.empty())
-			m_current = m_queue.back();
+		if (!m_current && !m_state->queue.empty())
+			m_current = m_state->queue.back();
 		CallLastChance();
 		if (Held())
-			Fail("Hold + EoF without Release");
+			Fail(StormByte::Safe::String("Hold + EoF without Release"));
 	}
 
 	if (!Failed())
@@ -512,59 +535,60 @@ void FFmpeg::Finish() noexcept {
 void FFmpeg::Emit(Pipeline::Item::PointerType item) noexcept {
 	if (item)
 		m_telemetry->RecordOutput(item->Kind());
-	item >> *m_pipe;
+	item >> m_state->pipe;
 }
 
 void FFmpeg::Wait() noexcept {
 	Log(Level::LowLevel, "wait");
-	std::unique_lock lock(m_wait);
-	const auto started = std::chrono::steady_clock::now();
-	m_wake.wait(lock, [this] {
-		if (Stopping() || m_pipe->Ready())
+	m_state->pipe.Wait(this, [](void* owner) noexcept {
+		auto& filter = *static_cast<FFmpeg*>(owner);
+		if (filter.Stopping() || filter.pipe().Ready())
 			return true;
-		if (!MeasuringTwoPass())
+		if (!filter.MeasuringTwoPass())
 			return false;
-		auto* two = static_cast<const ProcessTwoPasses*>(this);
+		auto* two = static_cast<const ProcessTwoPasses*>(&filter);
 		if (two->m_measureOwner && two->m_measureOwner->MeasureReadyToFinish())
 			return true;
 		return two->m_measureClosed.load(std::memory_order_acquire)
 			&& !two->m_measureDrained.load(std::memory_order_acquire)
-			&& !m_pipe->Ready();
+			&& !filter.pipe().Ready();
+	}, [](void* owner, std::chrono::nanoseconds duration) noexcept {
+		auto& filter = *static_cast<FFmpeg*>(owner);
+		filter.m_telemetry->RecordWait(duration);
+		filter.Log(Level::LowLevel, "wake");
+		if (filter.MeasuringTwoPass()) {
+			auto* two = static_cast<ProcessTwoPasses*>(&filter);
+			if (two->m_measureClosed.load(std::memory_order_acquire) && !filter.pipe().Ready())
+				two->DrainMeasure();
+			if (two->m_measureOwner)
+				two->m_measureOwner->MaybeFinishMeasure();
+		}
 	});
-	m_telemetry->RecordWait(std::chrono::steady_clock::now() - started);
-	Log(Level::LowLevel, "wake");
-	if (MeasuringTwoPass()) {
-		auto* two = static_cast<ProcessTwoPasses*>(this);
-		if (two->m_measureClosed.load(std::memory_order_acquire) && !pipe().Ready())
-			two->DrainMeasure();
-		if (two->m_measureOwner)
-			two->m_measureOwner->MaybeFinishMeasure();
-	}
 }
 
 void FFmpeg::Launch() noexcept {
-	if (!m_pumper || Stopping())
+	if (!m_state->pumper || Stopping())
 		return;
 	Log(Level::LowLevel, "launch");
-	m_pipe->Listen();
-	m_pumper->Launch();
+	m_state->pipe.Listen();
+	m_state->pumper->Launch();
 }
 
 void FFmpeg::Halt() noexcept {
 	Stop();
-	if (m_pumper)
-		m_pumper->Halt();
+	if (m_state->pumper)
+		m_state->pumper->Halt();
 }
 
 void FFmpeg::Stop() noexcept {
 	const State state = Status();
 	const bool signaled = state == State::Created || state == State::Ready;
-	if (m_pumper)
-		m_pumper->Stop();
+	if (m_state->pumper)
+		m_state->pumper->Stop();
 	if (signaled)
 		Log(Level::LowLevel, "stop");
 	CloseHoppers();
-	m_wake.notify_all();
+	Wake();
 }
 
 bool FFmpeg::Stopping() const noexcept {
@@ -573,23 +597,23 @@ bool FFmpeg::Stopping() const noexcept {
 }
 
 StormByte::Multimedia::Backend::Pipeline::Host& FFmpeg::Face() noexcept {
-	return *m_surface;
+	return m_state->surface;
 }
 
-std::condition_variable& FFmpeg::Wake() noexcept {
-	return m_wake;
+void FFmpeg::Wake() noexcept {
+	m_state->pipe.Wake();
 }
 
 StormByte::Multimedia::Backend::Pipeline::Pipe& FFmpeg::pipe() noexcept {
-	return *m_pipe;
+	return m_state->pipe;
 }
 
 const StormByte::Multimedia::Backend::Pipeline::Pipe& FFmpeg::pipe() const noexcept {
-	return *m_pipe;
+	return m_state->pipe;
 }
 
 void FFmpeg::CloseHoppers() noexcept {
-	m_pipe->Close();
+	m_state->pipe.Close();
 }
 
 void FFmpeg::RecordWork(std::int64_t microseconds) noexcept {
@@ -618,19 +642,19 @@ void FFmpeg::Clean() noexcept {}
 
 void FFmpeg::Setup() noexcept {}
 
-Process::Process(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept
-: FFmpeg(std::move(log), std::move(name), Kinds{Kind::Frame}, Kinds{Kind::Frame}) {}
+Process::Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+: FFmpeg(std::move(log), name, Kinds{Kind::Frame}, Kinds{Kind::Frame}) {}
 
-Process::Process(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+Process::Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 	Kinds receives, Kinds produces) noexcept
-: FFmpeg(std::move(log), std::move(name), receives, produces) {}
+: FFmpeg(std::move(log), name, receives, produces) {}
 
-ProcessTwoPasses::ProcessTwoPasses(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept
-: StormByte::Multimedia::Pipeline::Filter::Process(std::move(log), std::move(name)) {}
+ProcessTwoPasses::ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+: StormByte::Multimedia::Pipeline::Filter::Process(std::move(log), name) {}
 
-ProcessTwoPasses::ProcessTwoPasses(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+ProcessTwoPasses::ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 	Kinds receives, Kinds produces) noexcept
-: StormByte::Multimedia::Pipeline::Filter::Process(std::move(log), std::move(name), receives, produces) {}
+: StormByte::Multimedia::Pipeline::Filter::Process(std::move(log), name, receives, produces) {}
 
 bool ProcessTwoPasses::Measuring() const noexcept {
 	return m_measuring;
@@ -659,7 +683,7 @@ void ProcessTwoPasses::BindMeasure(StormByte::Multimedia::Pipeline::Filters* own
 
 void ProcessTwoPasses::MeasureSourceClosed() noexcept {
 	m_measureClosed.store(true, std::memory_order_release);
-	Wake().notify_all();
+	Wake();
 }
 
 void ProcessTwoPasses::DrainMeasure() noexcept {
@@ -673,16 +697,16 @@ void ProcessTwoPasses::DrainMeasure() noexcept {
 		m_measureOwner->OnMeasureFilterDrained();
 }
 
-Packet::Packet(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept
-: FFmpeg(std::move(log), std::move(name), Kinds{Kind::Packet}, Kinds{Kind::Packet}) {}
+Packet::Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+: FFmpeg(std::move(log), name, Kinds{Kind::Packet}, Kinds{Kind::Packet}) {}
 
-Packet::Packet(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+Packet::Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 	Kinds receives, Kinds produces) noexcept
-: FFmpeg(std::move(log), std::move(name), receives, produces) {}
+: FFmpeg(std::move(log), name, receives, produces) {}
 
-Analytics::Analytics(std::shared_ptr<StormByte::Logger::Log> log, std::string name) noexcept
-: FFmpeg(std::move(log), std::move(name), Kinds{Kind::Frame}, Kinds{}) {}
+Analytics::Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+: FFmpeg(std::move(log), name, Kinds{Kind::Frame}, Kinds{}) {}
 
-Analytics::Analytics(std::shared_ptr<StormByte::Logger::Log> log, std::string name,
+Analytics::Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
 	Kinds receives, Kinds produces) noexcept
-: FFmpeg(std::move(log), std::move(name), receives, produces) {}
+: FFmpeg(std::move(log), name, receives, produces) {}

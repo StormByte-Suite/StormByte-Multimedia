@@ -42,10 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <memory>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -85,33 +86,39 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param nf Noise floor in dB. Empty → −50.
 			 * @param trackNoise Enable floor tracking (`tn`). Empty → false.
 			 */
-			Afftdn(std::shared_ptr<StormByte::Logger::Log> log,
-				std::optional<double> nr = {},
-				std::optional<double> nf = {},
-				std::optional<bool> trackNoise = {}) noexcept;
+			Afftdn(Safe::Shared<StormByte::Logger::Log> log,
+				Safe::Optional<double> nr = {},
+				Safe::Optional<double> nf = {},
+				Safe::Optional<bool> trackNoise = {}) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
+			 * @param other Source filter.
 			 */
 			Afftdn(const Afftdn& other) = delete;
 
 			/**
 			 * @brief Move is not allowed. The tube owns the mounted leaf.
+			 * @param other Source filter.
 			 */
 			Afftdn(Afftdn&& other) noexcept = delete;
 
 			/**
 			 * @brief Drops the cached graph.
 			 */
-			~Afftdn() noexcept override = default;
+			~Afftdn() noexcept override;
 
 			/**
 			 * @brief Copy assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Afftdn& operator=(const Afftdn& other) = delete;
 
 			/**
 			 * @brief Move assignment is not allowed.
+			 * @param other Source filter.
+			 * @return This filter.
 			 */
 			Afftdn& operator=(Afftdn&& other) noexcept = delete;
 
@@ -147,11 +154,18 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `afftdn=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			Safe::String Chain() const noexcept;
 
-			std::optional<double> m_nrIn;		///< Caller nr, or empty
-			std::optional<double> m_nfIn;		///< Caller nf, or empty
-			std::optional<bool> m_trackIn;		///< Caller tn, or empty
+			Safe::Optional<double> m_nrIn;		///< Caller nr, or empty
+			Safe::Optional<double> m_nfIn;		///< Caller nf, or empty
+			Safe::Optional<bool> m_trackIn;		///< Caller tn, or empty
+
 			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
 	};
 }
+
+/**
+ * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
+ * @note Private graph ownership is allocated and released only by Multimedia.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Afftdn);

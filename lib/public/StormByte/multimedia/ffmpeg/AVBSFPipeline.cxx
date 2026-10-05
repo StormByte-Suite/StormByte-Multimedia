@@ -41,6 +41,10 @@
 
 using namespace StormByte::Multimedia::FFmpeg;
 
+AVBSFPipeline::AVBSFPipeline() noexcept = default;
+
+AVBSFPipeline::~AVBSFPipeline() noexcept = default;
+
 AVBSFPipeline::AVBSFPipeline(AVBSFPipeline&& other) noexcept:
 m_filters(std::move(other.m_filters)) {
 	other.m_filters.clear();

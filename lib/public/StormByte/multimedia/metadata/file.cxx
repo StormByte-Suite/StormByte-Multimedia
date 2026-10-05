@@ -38,30 +38,65 @@
 
 #include <StormByte/multimedia/metadata/file.hxx>
 
-using StormByte::Multimedia::Metadata::File;
+using namespace StormByte;
+using namespace StormByte::Multimedia::Metadata;
 
-const std::optional<std::string>& File::Title() const noexcept { return m_title; }
-const std::optional<std::string>& File::Artist() const noexcept { return m_artist; }
-const std::optional<std::string>& File::Album() const noexcept { return m_album; }
-const std::optional<std::string>& File::AlbumArtist() const noexcept { return m_albumArtist; }
-const std::optional<std::string>& File::Composer() const noexcept { return m_composer; }
-const std::optional<std::string>& File::Genre() const noexcept { return m_genre; }
-const std::optional<std::string>& File::Comment() const noexcept { return m_comment; }
-const std::optional<std::string>& File::Copyright() const noexcept { return m_copyright; }
-const std::optional<std::string>& File::Encoder() const noexcept { return m_encoder; }
-const std::optional<std::string>& File::Date() const noexcept { return m_date; }
-std::optional<unsigned> File::Track() const noexcept { return m_track; }
-std::optional<unsigned> File::Disc() const noexcept { return m_disc; }
+File::File() = default;
 
-void File::Title(std::string title) noexcept { m_title = std::move(title); }
-void File::Artist(std::string artist) noexcept { m_artist = std::move(artist); }
-void File::Album(std::string album) noexcept { m_album = std::move(album); }
-void File::AlbumArtist(std::string albumArtist) noexcept { m_albumArtist = std::move(albumArtist); }
-void File::Composer(std::string composer) noexcept { m_composer = std::move(composer); }
-void File::Genre(std::string genre) noexcept { m_genre = std::move(genre); }
-void File::Comment(std::string comment) noexcept { m_comment = std::move(comment); }
-void File::Copyright(std::string copyright) noexcept { m_copyright = std::move(copyright); }
-void File::Encoder(std::string encoder) noexcept { m_encoder = std::move(encoder); }
-void File::Date(std::string date) noexcept { m_date = std::move(date); }
-void File::Track(unsigned track) noexcept { m_track = track; }
-void File::Disc(unsigned disc) noexcept { m_disc = disc; }
+File::File(const File& other) = default;
+
+File::File(File&& other) noexcept = default;
+
+File::~File() noexcept = default;
+
+File& File::operator=(const File& other) = default;
+
+File& File::operator=(File&& other) noexcept = default;
+
+const Safe::Optional<Safe::String>& File::Title() const noexcept { return m_title; }
+
+const Safe::Optional<Safe::String>& File::Artist() const noexcept { return m_artist; }
+
+const Safe::Optional<Safe::String>& File::Album() const noexcept { return m_album; }
+
+const Safe::Optional<Safe::String>& File::AlbumArtist() const noexcept { return m_albumArtist; }
+
+const Safe::Optional<Safe::String>& File::Composer() const noexcept { return m_composer; }
+
+const Safe::Optional<Safe::String>& File::Genre() const noexcept { return m_genre; }
+
+const Safe::Optional<Safe::String>& File::Comment() const noexcept { return m_comment; }
+
+const Safe::Optional<Safe::String>& File::Copyright() const noexcept { return m_copyright; }
+
+const Safe::Optional<Safe::String>& File::Encoder() const noexcept { return m_encoder; }
+
+const Safe::Optional<Safe::String>& File::Date() const noexcept { return m_date; }
+
+Safe::Optional<unsigned> File::Track() const { return m_track; }
+
+Safe::Optional<unsigned> File::Disc() const { return m_disc; }
+
+void File::Title(Safe::String title) { m_title = std::move(title); }
+
+void File::Artist(Safe::String artist) { m_artist = std::move(artist); }
+
+void File::Album(Safe::String album) { m_album = std::move(album); }
+
+void File::AlbumArtist(Safe::String albumArtist) { m_albumArtist = std::move(albumArtist); }
+
+void File::Composer(Safe::String composer) { m_composer = std::move(composer); }
+
+void File::Genre(Safe::String genre) { m_genre = std::move(genre); }
+
+void File::Comment(Safe::String comment) { m_comment = std::move(comment); }
+
+void File::Copyright(Safe::String copyright) { m_copyright = std::move(copyright); }
+
+void File::Encoder(Safe::String encoder) { m_encoder = std::move(encoder); }
+
+void File::Date(Safe::String date) { m_date = std::move(date); }
+
+void File::Track(unsigned track) { m_track = track; }
+
+void File::Disc(unsigned disc) { m_disc = disc; }

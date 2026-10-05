@@ -42,6 +42,7 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
 #include <cstddef>
 #include <memory>
@@ -99,7 +100,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param in Origin stream index.
 			 */
-			explicit Remuxer(std::shared_ptr<StormByte::Logger::Log> log, int in) noexcept;
+			explicit Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept;
 
 			/**
 			 * @brief Copy constructor.
@@ -163,7 +164,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return `Remuxer(<origin codec name>)` when the Plan
 			 *         lists @ref In, otherwise `Remuxer(t=<index>)`.
 			 */
-			std::string Label() const noexcept override;
+			StormByte::Safe::String Label() const noexcept override;
 
 			/**
 			 * @}
@@ -179,3 +180,5 @@ namespace StormByte::Multimedia::Pipeline {
 			Join m_join{*this};							///< Halt before other members die
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Remuxer);

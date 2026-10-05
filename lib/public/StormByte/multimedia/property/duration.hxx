@@ -39,9 +39,9 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Property
@@ -51,9 +51,16 @@ namespace StormByte::Multimedia::Property {
 	/**
 	 * @class Duration
 	 * @brief Media duration stored as nanoseconds.
+	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+	 *       remain loaded while their values and provider callbacks are in use.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Duration final {
 		public:
+			/**
+			 * @brief Constructs a zero duration for Safe value storage.
+			 */
+			Duration() noexcept = default;
+
 			/**
 			 * @brief Constructs from nanoseconds.
 			 * @param value Duration.
@@ -101,10 +108,21 @@ namespace StormByte::Multimedia::Property {
 			/**
 			 * @brief `[HH:][MM:]SS.mmm` (hours/minutes omitted when zero).
 			 * @return Human-readable text.
+			 * @throws StormByte::Exception If Base-owned text cannot be allocated.
+			 * @throws std::bad_alloc If temporary formatting storage cannot be allocated.
 			 */
-			std::string ToString() const noexcept;
+			StormByte::Safe::String ToString() const;
 
 		private:
-			std::chrono::nanoseconds m_value;	///< Duration
+			std::chrono::nanoseconds m_value{};	///< Duration value, initialized to zero.
 	};
 }
+
+/**
+ * @brief Registers the completed duration under a compatible-toolchain ABI contract.
+ *
+ * The chrono representation owns no heap storage but retains its standard-library
+ * ABI. Formatting returns Base-owned text. Consumers must use a compatible chrono
+ * representation and keep the Multimedia and Base providers loaded.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Property::Duration);

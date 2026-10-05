@@ -44,6 +44,7 @@
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/safe/map.hxx>
 
 #include <cstdint>
 #include <map>
@@ -76,7 +77,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Move constructor.
 			 * @param other Source encoder.
 			 */
-			AVEncoder(AVEncoder&& other) noexcept = default;
+			AVEncoder(AVEncoder&& other) noexcept;
 
 			/**
 			 * @brief Destructor.
@@ -94,7 +95,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param other Source encoder.
 			 * @return *this.
 			 */
-			AVEncoder& operator=(AVEncoder&& other) noexcept = default;
+			AVEncoder& operator=(AVEncoder&& other) noexcept;
 
 			/**
 			 * @brief Opens an encoder; may attach BSF from @p fmt.
@@ -116,7 +117,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @return Encoder or EncoderError.
 			 */
 			static ExpectedAVEncoder Open(AVCodec* codec, const AVCodecParameters& params, int stream_index,
-				const std::map<std::string, std::string>& options, AVRational time_base) noexcept;
+				const Safe::Map<Safe::String, Safe::String>& options, AVRational time_base) noexcept;
 
 			/**
 			 * @brief Sends a frame to the encoder.
@@ -261,3 +262,9 @@ namespace StormByte::Multimedia::FFmpeg {
 
 	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVCodecContext>;
 }
+
+/**
+ * @brief Conditional provider contract: codec, filter and HDR storage lifetimes stay in Multimedia.
+ * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVEncoder);

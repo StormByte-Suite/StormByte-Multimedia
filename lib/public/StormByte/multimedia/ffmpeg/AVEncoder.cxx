@@ -215,12 +215,16 @@ namespace {
 FFmpeg::AVEncoder::AVEncoder(::AVCodecContext* ctx) noexcept
 :AVPointer(ctx) {}
 
+FFmpeg::AVEncoder::AVEncoder(AVEncoder&& other) noexcept = default;
+
+FFmpeg::AVEncoder& FFmpeg::AVEncoder::operator=(AVEncoder&& other) noexcept = default;
+
 FFmpeg::AVEncoder::~AVEncoder() noexcept {
 	Free();
 }
 
 FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(AVCodec* codec, const AVCodecParameters& params, int stream_index,
-	const std::map<std::string, std::string>& options, FFmpeg::AVRational time_base) noexcept {
+	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base) noexcept {
 	if (!codec || !params.Get())
 		return Unexpected<FFmpeg::EncoderError>("Invalid codec or parameters");
 
@@ -263,9 +267,9 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(AVCodec* codec, const AVCodecP
 	for (const auto& [key, value] : options) {
 		if (key.empty())
 			continue;
-		if (av_opt_set(ctx, key.c_str(), value.c_str(), AV_OPT_SEARCH_CHILDREN) < 0) {
+		if (av_opt_set(ctx, key.data(), value.empty() ? "" : value.data(), AV_OPT_SEARCH_CHILDREN) < 0) {
 			avcodec_free_context(&ctx);
-			return Unexpected<FFmpeg::EncoderError>("failed to set encoder option '" + key + "'");
+			return Unexpected<FFmpeg::EncoderError>("failed to set encoder option '{}'", key);
 		}
 	}
 

@@ -51,12 +51,14 @@ using StormByte::Multimedia::Pipeline::Filter::Video::Fftdnoiz;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
-Fftdnoiz::Fftdnoiz(std::shared_ptr<StormByte::Logger::Log> log,
-	std::optional<double> sigma,
-	std::optional<unsigned> prev,
-	std::optional<unsigned> next) noexcept
-	: Filter::Process(std::move(log), "fftdnoiz"),
-	m_sigmaIn(sigma), m_prevIn(prev), m_nextIn(next) {}
+Fftdnoiz::Fftdnoiz(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::Optional<double> sigma,
+	StormByte::Safe::Optional<unsigned> prev,
+	StormByte::Safe::Optional<unsigned> next) noexcept
+	: Filter::Process(std::move(log), StormByte::Safe::String("fftdnoiz")),
+	m_sigmaIn(std::move(sigma)), m_prevIn(std::move(prev)), m_nextIn(std::move(next)) {}
+
+Fftdnoiz::~Fftdnoiz() noexcept = default;
 
 enum Type Fftdnoiz::Media() const noexcept {
 	return Type::Video;
@@ -70,13 +72,13 @@ void Fftdnoiz::Setup() noexcept {
 	Clean();
 }
 
-std::string Fftdnoiz::Chain() const noexcept {
+StormByte::Safe::String Fftdnoiz::Chain() const noexcept {
 	const double sigma = std::clamp(m_sigmaIn.value_or(1.0), 0.0, 100.0);
 	const unsigned prev = std::min(m_prevIn.value_or(1u), 1u);
 	const unsigned next = std::min(m_nextIn.value_or(1u), 1u);
-	return std::format(
+	return StormByte::Safe::String(std::format(
 		"fftdnoiz=sigma={}:prev={}:next={}:block=32:overlap=0.5",
-		sigma, prev, next);
+		sigma, prev, next));
 }
 
 void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
@@ -92,14 +94,14 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {
 			Fail("fftdnoiz: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::Heap::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("fftdnoiz: AVFilterGraph::Ensure failed");
 		return;

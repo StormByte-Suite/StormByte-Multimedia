@@ -40,36 +40,271 @@
 
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/exception.hxx>
-
-#include <functional>
-#include <memory>
-#include <vector>
+#include <StormByte/multimedia/stream.hxx>
+#include <StormByte/safe/vector.hxx>
 
 /**
- * @namespace StormByte::Multimedia
- * @brief Public media types: codecs, containers, registry and stream kinds.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia {
-	class Codec;
-	class Container;
-	class File;
-	class Stream;
-
+namespace StormByte {
 	/**
-	 * @namespace StormByte::Multimedia::Pipeline
-	 * @brief Demux / decode / filter / encode / mux types.
-	 *
-	 * @ingroup multimedia_pipeline
+	 * @namespace StormByte::Multimedia
+	 * @brief Public media types: codecs, containers, registry and stream kinds.
 	 */
-	namespace Pipeline {
-		class Transcoder;	///< File-to-file job facade.
-	}
+	namespace Multimedia {
+		/**
+		 * @class Codec
+		 * @brief Codec identity owned by the multimedia registry.
+		 */
+		class Codec;
+		/**
+		 * @class Container
+		 * @brief Container identity owned by the multimedia registry.
+		 */
+		class Container;
+		/**
+		 * @class File
+		 * @brief Multimedia file facade.
+		 */
+		class File;
+		/**
+		 * @class Stream
+		 * @brief Multimedia stream facade.
+		 */
+		class Stream;
 
-	using ExpectedCodec = StormByte::Expected<const Codec&, CodecNotFoundException>;								///< Result of FindCodec
-	using ExpectedContainer = StormByte::Expected<const Container&, ContainerNotFoundException>;					///< Result of FindContainer
-	using ExpectedFile = StormByte::Expected<File, FileOpenException>;												///< Result of OpenFile
-	using ExpectedTranscoder = StormByte::Expected<std::unique_ptr<Pipeline::Transcoder>, TranscodeException>;		///< Result of Transcoder::Open
-	using CodecRefs = std::vector<std::reference_wrapper<const Codec>>;												///< List of codec references
-	using ContainerRefs = std::vector<std::reference_wrapper<const Container>>;									///< List of container references
-	using Streams = std::vector<Stream>;																			///< Ordered streams
+		/**
+		 * @class CodecRef
+		 * @brief Trivial borrowed codec handle; never owns or deletes the codec.
+		 * @note The codec must outlive every handle. Registry handles are valid until
+		 * registry teardown, with the provider loaded and a compatible compiler,
+		 * standard-library ABI and provider layout. Empty handles cannot be dereferenced.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC CodecRef {
+			public:
+				/**
+				 * @brief Constructs an empty handle.
+				 */
+				constexpr CodecRef() noexcept = default;
+
+				/**
+				 * @brief Borrows a codec.
+				 * @param codec Codec that must outlive the handle.
+				 */
+				constexpr CodecRef(const Codec& codec) noexcept: m_codec(&codec) {}
+
+				/**
+				 * @brief Copies the borrowed pointer.
+				 * @param other Source handle.
+				 */
+				constexpr CodecRef(const CodecRef& other) noexcept = default;
+
+				/**
+				 * @brief Copies the borrowed pointer without clearing the source.
+				 * @param other Source handle.
+				 */
+				constexpr CodecRef(CodecRef&& other) noexcept = default;
+
+				/**
+				 * @brief Destroys the handle, not its codec.
+				 */
+				~CodecRef() noexcept = default;
+
+				/**
+				 * @brief Copies the borrowed pointer.
+				 * @param other Source handle.
+				 * @return This handle.
+				 */
+				constexpr CodecRef& operator=(const CodecRef& other) noexcept = default;
+
+				/**
+				 * @brief Copies the borrowed pointer without clearing the source.
+				 * @param other Source handle.
+				 * @return This handle.
+				 */
+				constexpr CodecRef& operator=(CodecRef&& other) noexcept = default;
+
+				/**
+				 * @brief Tests whether a codec is borrowed.
+				 * @return True for a nonempty handle.
+				 */
+				constexpr explicit operator bool() const noexcept { return m_codec != nullptr; }
+
+				/**
+				 * @brief Gets the borrowed codec, preserving reference_wrapper syntax.
+				 * @pre The handle is nonempty and its codec is alive.
+				 * @return Borrowed codec.
+				 */
+				constexpr const Codec& get() const noexcept { return *m_codec; }
+
+				/**
+				 * @brief Converts to the borrowed codec reference.
+				 * @pre The handle is nonempty and its codec is alive.
+				 * @return Borrowed codec.
+				 */
+				constexpr operator const Codec&() const noexcept { return get(); }
+
+			private:
+				const Codec* m_codec = nullptr;	///< Borrowed codec; never deleted.
+		};
+
+		/**
+		 * @class ContainerRef
+		 * @brief Trivial borrowed container handle; never owns or deletes the container.
+		 * @note The container must outlive every handle. Registry handles are valid until
+		 * registry teardown, with the provider loaded and a compatible compiler,
+		 * standard-library ABI and provider layout. Empty handles cannot be dereferenced.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC ContainerRef {
+			public:
+				/**
+				 * @brief Constructs an empty handle.
+				 */
+				constexpr ContainerRef() noexcept = default;
+
+				/**
+				 * @brief Borrows a container.
+				 * @param container Container that must outlive the handle.
+				 */
+				constexpr ContainerRef(const Container& container) noexcept: m_container(&container) {}
+
+				/**
+				 * @brief Copies the borrowed pointer.
+				 * @param other Source handle.
+				 */
+				constexpr ContainerRef(const ContainerRef& other) noexcept = default;
+
+				/**
+				 * @brief Copies the borrowed pointer without clearing the source.
+				 * @param other Source handle.
+				 */
+				constexpr ContainerRef(ContainerRef&& other) noexcept = default;
+
+				/**
+				 * @brief Destroys the handle, not its container.
+				 */
+				~ContainerRef() noexcept = default;
+
+				/**
+				 * @brief Copies the borrowed pointer.
+				 * @param other Source handle.
+				 * @return This handle.
+				 */
+				constexpr ContainerRef& operator=(const ContainerRef& other) noexcept = default;
+
+				/**
+				 * @brief Copies the borrowed pointer without clearing the source.
+				 * @param other Source handle.
+				 * @return This handle.
+				 */
+				constexpr ContainerRef& operator=(ContainerRef&& other) noexcept = default;
+
+				/**
+				 * @brief Tests whether a container is borrowed.
+				 * @return True for a nonempty handle.
+				 */
+				constexpr explicit operator bool() const noexcept { return m_container != nullptr; }
+
+				/**
+				 * @brief Gets the borrowed container, preserving reference_wrapper syntax.
+				 * @pre The handle is nonempty and its container is alive.
+				 * @return Borrowed container.
+				 */
+				constexpr const Container& get() const noexcept { return *m_container; }
+
+				/**
+				 * @brief Converts to the borrowed container reference.
+				 * @pre The handle is nonempty and its container is alive.
+				 * @return Borrowed container.
+				 */
+				constexpr operator const Container&() const noexcept { return get(); }
+
+			private:
+				const Container* m_container = nullptr;	///< Borrowed container; never deleted.
+		};
+	}
+}
+
+/**
+ * @brief Declare the borrowed codec handle conditionally DLL-safe.
+ * @note The codec and compatible multimedia provider must remain alive during use.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::CodecRef);
+
+/**
+ * @brief Declare the borrowed container handle conditionally DLL-safe.
+ * @note The container and compatible multimedia provider must remain alive during use.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::ContainerRef);
+
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
+ */
+namespace StormByte {
+	/**
+	 * @namespace StormByte::Multimedia
+	 * @brief Public media types: codecs, containers, registry and stream kinds.
+	 */
+	namespace Multimedia {
+
+		/**
+		 * @namespace StormByte::Multimedia::Pipeline
+		 * @brief Demux / decode / filter / encode / mux types.
+		 *
+		 * @ingroup multimedia_pipeline
+		 */
+		namespace Pipeline {
+			/**
+			 * @class Transcoder
+			 * @brief File-to-file job facade.
+			 */
+			class Transcoder;
+		}
+
+		/**
+		 * @typedef ExpectedCodec
+		 * @brief Result of FindCodec.
+		 * @note Borrows a registry identity; compatible ABI and provider lifetime
+		 * are required. This alias does not acquire codec ownership.
+		 */
+		using ExpectedCodec = StormByte::Expected<CodecRef, CodecNotFoundException>;
+
+		/**
+		 * @typedef ExpectedContainer
+		 * @brief Result of FindContainer.
+		 * @note Borrows a registry identity; compatible ABI and provider lifetime
+		 * are required. This alias does not acquire container ownership.
+		 */
+		using ExpectedContainer = StormByte::Expected<ContainerRef, ContainerNotFoundException>;
+
+		/**
+		 * @typedef ExpectedFile
+		 * @brief Result of OpenFile.
+		 */
+		using ExpectedFile = StormByte::Expected<File, FileOpenException>;
+
+		/**
+		 * @typedef ExpectedTranscoder
+		 * @brief Result of Transcoder::Open.
+		 */
+		using ExpectedTranscoder = StormByte::Expected<Safe::Unique<Pipeline::Transcoder>, TranscodeException>;
+
+		/**
+		 * @typedef CodecRefs
+		 * @brief Safe-owned list of borrowed codecs, not codec ownership.
+		 * @note Each nonempty handle requires its codec and provider to remain alive.
+		 * Safe owner callbacks retain allocation and destruction in the owning module.
+		 */
+		using CodecRefs = Safe::Vector<CodecRef>;
+
+		/**
+		 * @typedef ContainerRefs
+		 * @brief Safe-owned list of borrowed containers, not container ownership.
+		 * @note Each nonempty handle requires its container and provider to remain alive.
+		 * Safe owner callbacks retain allocation and destruction in the owning module.
+		 */
+		using ContainerRefs = Safe::Vector<ContainerRef>;
+	}
 }

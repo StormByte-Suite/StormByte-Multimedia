@@ -40,9 +40,9 @@
 
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/ffmpeg/exception.hxx>
-
-#include <set>
-#include <string>
+#include <StormByte/multimedia/ffmpeg/AVStream.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -70,12 +70,15 @@ namespace StormByte::Multimedia::FFmpeg {
 	using ExpectedAVDecoder = StormByte::Expected<AVDecoder, FFmpeg::DecoderError>;			///< Open decoder
 	using ExpectedAVEncoder = StormByte::Expected<AVEncoder, FFmpeg::EncoderError>;			///< Open encoder
 	using ExpectedAVBSF = StormByte::Expected<AVBSF, FFmpeg::BSFError>;				///< Create BSF
-	using Streams = std::set<AVStream>;								///< Stream set
+	/**
+	 * @brief Ordered snapshots of borrowed stream views; the format context must outlive them.
+	 */
+	using Streams = Safe::Vector<AVStream>;
 
 	/**
 	 * @brief Converts an FFmpeg error code to a string.
 	 * @param errnum Code from av_strerror.
 	 * @return Human-readable message.
 	 */
-	STORMBYTE_MULTIMEDIA_PUBLIC std::string ErrorToString(int errnum);
+	STORMBYTE_MULTIMEDIA_PUBLIC Safe::String ErrorToString(int errnum);
 }
