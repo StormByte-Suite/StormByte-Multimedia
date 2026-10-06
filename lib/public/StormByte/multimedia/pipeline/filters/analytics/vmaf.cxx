@@ -41,7 +41,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdio>
 #include <cstring>
 #include <deque>
 #include <format>
@@ -372,11 +371,6 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
-	if (lane.scored != 0 && lane.scored % 128 == 0)
-		std::fprintf(stderr, "OWNER_SNAPSHOT filter=%p scored=%u queue=%zu cap=%zu ref=%zu dist=%zu\n",
-			static_cast<void*>(this), lane.scored,
-			static_cast<std::size_t>(pipe().In().Size(frame.Track())),
-			static_cast<std::size_t>(pipe().In().Capacity(frame.Track())), lane.ref.size(), lane.dist.size());
 }
 
 void VMAF::Eof() noexcept {

@@ -24,8 +24,7 @@ elseif(WITH_EBUR128 STREQUAL "BUNDLED")
 		"ebur128"
 		"GIT={RESET;PATCH=${EBUR128_PATCH};TITLE=CMake 4}"
 	)
+	buildmaster_link(StormByte-Multimedia ebur128)
 else()
 	message(FATAL_ERROR "WITH_EBUR128 must be SYSTEM or BUNDLED (got '${WITH_EBUR128}')")
 endif()
-
-buildmaster_link(StormByte-Multimedia ebur128)
