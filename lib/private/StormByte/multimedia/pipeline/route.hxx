@@ -76,8 +76,9 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ref Backend::Pipeline::Pipe::CloneTo the origin Pipe
 	 * onto each Analytics (decode look). Packet origins spawn a
 	 * Route-owned Decoder so Analytics still sees frames with
-	 * @ref Producer::Decoder. Destination packet producers spawn
-	 * a look Decoder from a CloneTo of dest Out. The last
+	 * @ref Producer::Decoder. All observers of that origin share its decoder
+	 * through independently cloned frame facades. Destination packet producers
+	 * similarly share a separate look Decoder from a CloneTo of dest Out. The last
 	 * Analytics Pipe Out is @c StormByte::Buffer::Sink::Drain.
 	 *
 	 * Close is private: add Routes through @ref Filters and call

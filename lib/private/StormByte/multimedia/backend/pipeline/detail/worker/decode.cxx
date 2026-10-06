@@ -203,7 +203,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				return;
 			Frame::PointerType frame = m_owner.m_backend->Receive(m_owner);
 			if (!frame)
-				return;
+				break;
 			m_owner.StampLineage(*frame);
 			m_owner.StampLook(*frame);
 			Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={}",
@@ -212,5 +212,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			Emit(std::move(frame));
 			m_owner.RecordWork(ElapsedUs(started));
 		}
+		m_owner.m_backend.reset();
 	}
 }

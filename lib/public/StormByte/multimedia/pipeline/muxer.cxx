@@ -205,10 +205,13 @@ std::size_t Muxer::ExpectedSlots() const noexcept {
 }
 
 bool Muxer::Armed() const noexcept {
+	const auto reserved = m_reserved.load(std::memory_order_acquire);
+	if (reserved == 0)
+		return false;
 	const auto expected = ExpectedSlots();
 	if (expected == 0)
 		return false;
-	return m_reserved.load(std::memory_order_acquire) == expected;
+	return reserved == expected;
 }
 
 bool Muxer::Ready() const noexcept {
@@ -258,10 +261,10 @@ void Muxer::Title(int output_index, StormByte::Safe::String title) noexcept {
 }
 
 void Muxer::WaitArmed() noexcept {
-	pipe().Wait(this, [](void* context) noexcept {
+	pipe().WaitWake(this, [](void* context) noexcept {
 		const auto& owner = *static_cast<Muxer*>(context);
-		return owner.Failed() || owner.Status() == State::Stopping || owner.Armed();
-	}, [](void*, std::chrono::nanoseconds) noexcept {});
+		return owner.Stopping() || owner.Armed();
+	});
 }
 
 bool Muxer::SpawnBackend() noexcept {

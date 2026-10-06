@@ -438,7 +438,8 @@ StormByte::Safe::Vector<TelemetryStage> Filters::StageTelemetries() const noexce
 	for (const auto& item : m_reports) {
 		if (!item.Filter)
 			continue;
-		std::string name = std::format("{}[", item.Filter->Name());
+		const auto leafName = item.Filter->Name();
+		std::string name = std::format("{}[", static_cast<std::string_view>(leafName));
 		name += item.Track ? std::to_string(*item.Track) : "general";
 		name += "]";
 		auto metrics = item.Filter->Telemetry();

@@ -36,10 +36,12 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 
 #include <algorithm>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <deque>
 #include <format>
@@ -197,7 +199,7 @@ void VMAF::Setup() noexcept {
 	Log(Level::Debug, std::format("setup model={}", static_cast<std::string_view>(m_modelName)));
 }
 
-bool VMAF::Fill(const FFrame& raw, int tw, int th, void* out) noexcept {
+bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexcept {
 	auto* pic = static_cast<VmafPicture*>(out);
 	if (!raw || !pic || tw <= 0 || th <= 0)
 		return false;
@@ -205,8 +207,18 @@ bool VMAF::Fill(const FFrame& raw, int tw, int th, void* out) noexcept {
 	const auto fmt = Pix(raw);
 	if (fmt == VMAF_PIX_FMT_UNKNOWN)
 		return false;
-	if (vmaf_picture_alloc(pic, fmt, bpc, static_cast<unsigned>(tw), static_cast<unsigned>(th)) != 0)
-		return false;
+	if (lane.scored == 0) {
+		if (vmaf_picture_alloc(pic, fmt, bpc, static_cast<unsigned>(tw), static_cast<unsigned>(th)) != 0)
+			return false;
+	}
+	else {
+		if (vmaf_fetch_preallocated_picture(lane.vmaf, pic) != 0)
+			return false;
+		if (pic->pix_fmt != fmt || pic->bpc != bpc) {
+			vmaf_picture_unref(pic);
+			return false;
+		}
+	}
 
 	const FFrame* src = &raw;
 	FFrame scaled;
@@ -262,8 +274,8 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 
 	VmafPicture pref{};
 	VmafPicture pdist{};
-	if (!Fill(ref, lane.width, lane.height, &pref)
-		|| !Fill(dist, lane.width, lane.height, &pdist)) {
+	if (!Fill(lane, ref, lane.width, lane.height, &pref)
+		|| !Fill(lane, dist, lane.width, lane.height, &pdist)) {
 		Log(Level::Warning, std::format(
 			"skip pair, fill failed ref={}x{} dist={}x{} latch={}x{}",
 			ref.Width(), ref.Height(), dist.Width(), dist.Height(),
@@ -360,6 +372,11 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
+	if (lane.scored != 0 && lane.scored % 128 == 0)
+		std::fprintf(stderr, "OWNER_SNAPSHOT filter=%p scored=%u queue=%zu cap=%zu ref=%zu dist=%zu\n",
+			static_cast<void*>(this), lane.scored,
+			static_cast<std::size_t>(pipe().In().Size(frame.Track())),
+			static_cast<std::size_t>(pipe().In().Capacity(frame.Track())), lane.ref.size(), lane.dist.size());
 }
 
 void VMAF::Eof() noexcept {

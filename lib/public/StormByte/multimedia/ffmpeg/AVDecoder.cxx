@@ -37,6 +37,7 @@
  */
 
 #include <StormByte/multimedia/ffmpeg/AVBSF.hxx>
+#include <StormByte/multimedia/backend/ffmpeg/AVPool.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/AVDecoder.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFormatContext.hxx>
@@ -74,8 +75,13 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCod
 	ctx->thread_count = 0;
 	ctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
 
-	if (avcodec_open2(ctx, codec, nullptr) < 0) {
+	if (Backend::FFmpeg::AVPool::Attach(*ctx) < 0) {
 		avcodec_free_context(&ctx);
+		return Unexpected<DecoderError>("Failed to allocate shared video pool owner");
+	}
+
+	if (avcodec_open2(ctx, codec, nullptr) < 0) {
+		Backend::FFmpeg::AVPool::Release(ctx);
 		return Unexpected<DecoderError>("Failed to open decoder");
 	}
 
@@ -191,7 +197,7 @@ FFmpeg::OperationResult FFmpeg::AVDecoder::DecodeSubtitle(AVPacket& pkt, FFmpeg:
 
 void FFmpeg::AVDecoder::Free() noexcept {
 	if (m_ptr) {
-		avcodec_free_context(&m_ptr);
+		Backend::FFmpeg::AVPool::Release(m_ptr);
 		m_ptr = nullptr;
 	}
 }

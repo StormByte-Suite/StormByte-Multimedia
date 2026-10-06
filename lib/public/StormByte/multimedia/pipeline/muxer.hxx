@@ -111,7 +111,8 @@ namespace StormByte {
 			 * @return @p encoder.
 			 *
 			 * Binds the Plan on the first reservation. Opens the Plan
-			 * writer for output.
+			 * writer for output. Releases setup when all muxable tracks
+			 * required by the Plan have been reserved.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
 
@@ -122,7 +123,8 @@ namespace StormByte {
 			 * @return @p remuxer.
 			 *
 			 * Binds the Plan on the first reservation. Opens the Plan
-			 * writer for output.
+			 * writer for output. Releases setup when all muxable tracks
+			 * required by the Plan have been reserved.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
 
@@ -175,6 +177,9 @@ namespace StormByte {
 					/**
 					 * @brief Muxer. Destination is the Plan writer.
 					 * @param log Shared logger. Empty pointer means no log.
+					 * @note Starts execution immediately. Setup waits until encoder/remuxer
+					 * connections reserve all muxable tracks required by the Plan, or the
+					 * stage is stopped or fails.
 					 */
 					explicit Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
 
@@ -307,7 +312,7 @@ namespace StormByte {
 					using Step::Log;
 
 					/**
-					 * @brief Blocks until Armed, Failed or Stopping.
+					 * @brief Blocks until Armed or execution is stopping, stopped or failed.
 					 */
 					void WaitArmed() noexcept;
 

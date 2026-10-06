@@ -42,6 +42,7 @@
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/visibility.h>
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
@@ -136,6 +137,17 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void Wake() noexcept;
 
 			/**
+			 * @brief Waits for a stored notification until a predicate is satisfied.
+			 * @param owner Provider-local context valid throughout the call.
+			 * @param ready Non-null predicate reading synchronized control state.
+			 * @note Predicate changes must be published before Wake. Notifications
+			 * between predicate evaluation and waiting are retained by a generation
+			 * counter. Registered input hoppers publish data and EOF notifications
+			 * to the same counter.
+			 */
+			void WaitWake(void* owner, bool (*ready)(void*) noexcept) noexcept;
+
+			/**
 			 * @brief Waits on the owner predicate and completes under the wait lock.
 			 * @param owner Provider-local context, valid throughout the call.
 			 * @param ready Predicate evaluated with the wait mutex held.
@@ -144,8 +156,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Callbacks must be non-null and are invoked synchronously, never retained.
 			 * Timing starts after acquiring the mutex. The completion callback runs
 			 * before releasing it, preserving the owner's post-wake lock scope.
-			 * Notifications are not stored events; producer/predicate coordination
-			 * remains the owner's responsibility.
+			 * Data, EOF and explicit wake notifications are retained by a generation
+			 * counter, including those racing with predicate evaluation.
 			 */
 			void Wait(void* owner, bool (*ready)(void*) noexcept,
 				void (*completed)(void*, std::chrono::nanoseconds) noexcept) noexcept;
@@ -317,6 +329,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		private:
 			std::condition_variable m_wake;				///< Provider-owned consumer CV
 			std::mutex m_wait;							///< Mutex held through wait completion
+			std::atomic<std::size_t> m_wakeGeneration{0};	///< Published explicit control notifications
 			ItemSink m_in;						///< Input buckets
 			ItemSink m_out;						///< Output buckets
 

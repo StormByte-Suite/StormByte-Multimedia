@@ -69,6 +69,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Mux::Setup() noexcept {
+		m_owner.WaitArmed();
+		if (m_owner.Stopping())
+			return;
 		if (!m_owner.m_backend)
 			Fail("muxer has no backend");
 	}

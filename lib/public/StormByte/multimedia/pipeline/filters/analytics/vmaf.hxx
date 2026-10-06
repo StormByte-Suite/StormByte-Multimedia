@@ -231,6 +231,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Copies @p raw into a VmafPicture, scaling to @p tw x @p th.
+			 * @param lane Context whose existing picture pool supplies reusable storage.
 			 * @param raw Source RAII frame.
 			 * @param tw Target width (latch).
 			 * @param th Target height (latch).
@@ -242,7 +243,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * On a failed read, the caller still owns both
 			 * pictures and must unref them.
 			 */
-			bool Fill(const StormByte::Multimedia::FFmpeg::AVFrame& raw,
+			bool Fill(Lane& lane, const StormByte::Multimedia::FFmpeg::AVFrame& raw,
 				int tw, int th, void* out) noexcept;
 
 			/**

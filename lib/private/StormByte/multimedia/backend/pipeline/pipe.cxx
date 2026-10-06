@@ -90,18 +90,29 @@ void Pipe::Capacity(int track, std::size_t n) noexcept {
 }
 
 void Pipe::Listen() noexcept {
-	m_in.Notify(m_wake);
+	m_in.Notify(m_wake, m_wakeGeneration);
 }
 
 void Pipe::Wake() noexcept {
+	m_wakeGeneration.fetch_add(1, std::memory_order_release);
+	m_wakeGeneration.notify_all();
 	m_wake.notify_all();
+}
+
+void Pipe::WaitWake(void* owner, bool (*ready)(void*) noexcept) noexcept {
+	for (;;) {
+		const auto generation = m_wakeGeneration.load(std::memory_order_acquire);
+		if (ready(owner))
+			return;
+		m_wakeGeneration.wait(generation, std::memory_order_acquire);
+	}
 }
 
 void Pipe::Wait(void* owner, bool (*ready)(void*) noexcept,
 	void (*completed)(void*, std::chrono::nanoseconds) noexcept) noexcept {
 	std::unique_lock lock(m_wait);
 	const auto started = std::chrono::steady_clock::now();
-	m_wake.wait(lock, [owner, ready] { return ready(owner); });
+	WaitWake(owner, ready);
 	completed(owner, std::chrono::steady_clock::now() - started);
 }
 
@@ -116,7 +127,10 @@ Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
 	dest.Listen();
 	m_forks.emplace_back();
 	m_forks.back().track = track;
-	m_forks.back().hopper.To(track) >> dest.In();
+	if (dest.m_inTracks.contains(track))
+		dest.In().To(track) >> m_forks.back().hopper;
+	else
+		m_forks.back().hopper.To(track) >> dest.In();
 	dest.m_inTracks.insert(track);
 	return dest;
 }

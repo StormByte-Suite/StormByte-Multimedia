@@ -233,15 +233,32 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 
 	if (!origin.Produces().Has(Kind::Packet))
 		return;
+	for (const auto& look : m_looks) {
+		if (look->m_lookStamp)
+			continue;
+		look->pipe().CloneTo(m_track, analytics.pipe());
+		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+		return;
+	}
 	std::unique_ptr<Decoder> look(new Decoder(origin.m_log, m_track, Decoder::SourceLook{}));
 	origin.pipe().CloneTo(m_track, look->pipe());
-	look->pipe().To(m_track) >> analytics.pipe();
+	look->pipe().CloneTo(m_track, analytics.pipe());
+	look->pipe().Drain();
 	Cap(look->pipe(), m_track, look->InputCeiling());
 	Cap(analytics.pipe(), m_track, analytics.InputCeiling());
 	m_looks.push_back(std::move(look));
 }
 
 void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
+	if (destination.m_name != Producer::Remuxer && destination.m_name != Producer::Encoder)
+		return;
+	for (const auto& held : m_looks) {
+		if (held->m_lookStamp != destination.m_name)
+			continue;
+		held->pipe().CloneTo(m_track, analytics.pipe());
+		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+		return;
+	}
 	std::unique_ptr<Decoder> look;
 	if (destination.m_name == Producer::Remuxer)
 		look.reset(new Decoder(destination.m_log, m_track, Decoder::RemuxLook{}));
@@ -251,7 +268,8 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 		return;
 	look->pipe().Listen();
 	destination.pipe().CloneTo(m_track, look->pipe());
-	look->pipe().To(m_track) >> analytics.pipe();
+	look->pipe().CloneTo(m_track, analytics.pipe());
+	look->pipe().Drain();
 	Cap(look->pipe(), m_track, look->InputCeiling());
 	Cap(analytics.pipe(), m_track, analytics.InputCeiling());
 	m_looks.push_back(std::move(look));
