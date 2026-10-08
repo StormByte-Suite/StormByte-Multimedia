@@ -3,6 +3,7 @@
 #include <StormByte/logger/threaded_log.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 
 #include <chrono>
@@ -22,6 +23,8 @@ using namespace std::string_view_literals;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
 		if (!IsTerminal(job.Status())) {
+			std::cerr << "[DETAIL] Transcoder timeout: "
+				<< static_cast<StormByte::Safe::String>(*job.Telemetry()) << std::endl;
 			job.Cancel();
 			return 1;
 		}

@@ -356,7 +356,14 @@ void Step::Halt() noexcept {
 Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept {
 	if (!to.m_plan)
 		to.m_plan = from.m_plan;
-	from.pipe() >> to.pipe();
+	if (to.m_plan) {
+		for (const auto& track : to.m_plan->Tracks()) {
+			if (track && track->Type() != Type::Attachment)
+				from.pipe().To(track->In()) >> to.pipe();
+		}
+	}
+	else
+		from.pipe() >> to.pipe();
 	if (const std::size_t cap = to.InputCeiling(); cap > 0 && to.m_plan) {
 		const auto& tracks = to.m_plan->Tracks();
 		for (auto it = tracks.begin(); it != tracks.end(); ++it) {

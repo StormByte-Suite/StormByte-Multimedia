@@ -299,6 +299,6 @@ StormByte::Safe::String Decoder::Label() const noexcept {
 	}
 
 	if (m_implementation && !m_implementation->empty())
-		return StormByte::Safe::String(std::format("Decoder({})", *m_implementation));
+		return StormByte::Safe::String(std::format("Decoder({})", std::string_view{*m_implementation}));
 	return StormByte::Safe::String("Decoder(t=" + std::to_string(m_index) + ")");
 }

@@ -231,7 +231,9 @@ int main() {
 	Muxer mux(logger);
 	std::move(plan) >> demux;
 	demux >> mux;
-	demux >> decode >> encode >> mux;
+	demux >> decode;
+	decode >> encode;
+	encode >> mux;
 
 	while (mux.Status() != State::Stopped && !mux.Failed()) {
 		if (demux.Failed() || decode.Failed() || encode.Failed()) {

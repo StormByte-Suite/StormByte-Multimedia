@@ -29,6 +29,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Create planned per-track hopper connections before generic stage transfer, avoiding blocked producers and consumers when stages are wired before their first item. Reserve manual encoder mux streams through a separate typed `Encoder >> Muxer` connection.
+- Format decoder implementation labels as text rather than character ranges.
 - Honor explicit decoder names and manual Plan decoder pins when opening origin decoders. Missing or codec-mismatched implementations fail instead of silently using the default decoder.
 - Avoid unnecessary stream and attachment copies in read-only test range loops.
 - Normalize unspecified PCM input layouts consistently with libswresample during sample-format conversion, using a temporary frame reference without modifying the original samples or channel count.

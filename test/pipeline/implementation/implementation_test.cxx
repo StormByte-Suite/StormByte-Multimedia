@@ -7,6 +7,7 @@
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
+#include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
@@ -60,7 +61,9 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 	Muxer muxer{noLogger};
 	std::move(plan) >> demuxer;
 	demuxer >> muxer;
-	demuxer >> decoder >> encoder >> muxer;
+	demuxer >> decoder;
+	decoder >> encoder;
+	encoder >> muxer;
 	TEST_REQUIRE(decoder.Implementation());
 	TEST_REQUIRE(TestView(decoder.Implementation().value()) == pin);
 	if (!expectedError.empty()) {
@@ -79,6 +82,9 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 		&& std::chrono::steady_clock::now() < deadline)
 		std::this_thread::sleep_for(10ms);
 	for (const Step* stage : std::array<const Step*, 4>{&demuxer, &decoder, &encoder, &muxer}) {
+		if (muxer.Status() != State::Stopped)
+			std::cerr << "[DETAIL] Manual timeout state=" << static_cast<int>(stage->Status()) << " "
+				<< static_cast<StormByte::Safe::String>(*stage->Telemetry()) << std::endl;
 		if (stage->Failed())
 			std::cerr << "[DETAIL] Manual decoder-pin pipeline: "
 				<< stage->Error().value_or(StormByte::Safe::String{"no error message"}) << std::endl;
