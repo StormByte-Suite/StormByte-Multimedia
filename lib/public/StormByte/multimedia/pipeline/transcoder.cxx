@@ -195,11 +195,26 @@ Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& 
 }
 
 Transcoder::Track& Transcoder::Track::Implementation(StormByte::Safe::String name) {
+	return Implementation(ImplementationSide::Encoder, std::move(name));
+}
+
+Transcoder::Track& Transcoder::Track::Implementation(ImplementationSide side, StormByte::Safe::String name) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	auto& slot = m_owner->m_backend->Mapped[m_slot];
 	auto impl = slot.Config->Implementation();
-	impl.Encoder = std::move(name);
+	StormByte::Safe::Optional<StormByte::Safe::String>* pin = nullptr;
+	switch (side) {
+		case ImplementationSide::Decoder: pin = &impl.Decoder; break;
+		case ImplementationSide::Encoder: pin = &impl.Encoder; break;
+		default:
+			m_owner->Fail("implementation side is invalid");
+			return *this;
+	}
+	if (name.empty())
+		pin->reset();
+	else
+		*pin = std::move(name);
 	slot.Config->Implementation(std::move(impl));
 	return *this;
 }

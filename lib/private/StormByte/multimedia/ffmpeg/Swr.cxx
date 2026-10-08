@@ -80,6 +80,15 @@ FFmpeg::Swr FFmpeg::Swr::Open(const FFmpeg::AVChannelLayout& out_layout, int out
 bool FFmpeg::Swr::Convert(const AVFrame& src, AVFrame& dst) const noexcept {
 	if (!m_ptr || !src.Get() || !dst.Get())
 		return false;
+	if (src.Get()->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
+		AVFrame normalized;
+		if (!normalized.Ref(src))
+			return false;
+		const int channels = normalized.Get()->ch_layout.nb_channels;
+		av_channel_layout_uninit(&normalized.Get()->ch_layout);
+		av_channel_layout_default(&normalized.Get()->ch_layout, channels);
+		return swr_convert_frame(m_ptr, dst.Get(), normalized.Get()) >= 0;
+	}
 	return swr_convert_frame(m_ptr, dst.Get(), src.Get()) >= 0;
 }
 

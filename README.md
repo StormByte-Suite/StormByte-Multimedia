@@ -159,6 +159,7 @@ What that mapping means:
 | `.Filter<Watermark>(…)` / `.Filter<Scale>(…)` | Frame filters on that encode lane, in registration order. |
 | `Audio(1).Remux()` | Keep the compressed stream. Remux is copy **plus** destination adaptation. There is no separate “Copy” stage. |
 | `Audio(2).Codec(eac3->get())` | Recode that origin audio. |
+| `.Implementation(ImplementationSide::Decoder, String{"libdav1d"})` | Pin the source decoder on a recode track; unavailable or codec-mismatched names fail without fallback. |
 | `Ignore(n)` | Drop origin stream `n`. |
 | `Attachments()` / `Attachments("image/png")` | Keep all attachments, or only a MIME. Default without a call is drop. |
 | `Transcoder(source, destination, logger)` | Supplies locations before mapping; the writer path determines the container. |
@@ -173,6 +174,8 @@ Capture `job.Telemetry()` before `Run()` if the final snapshot must outlive the 
 `JobTelemetry::PeakMemory()` (also `MemoryMaximum()`) is the highest sampled process resident set size in bytes; `MemoryMinimum()` and `MemoryCurrent()` report the lowest sample and last sample. The coordinator samples nominally every 20 ms and at job start/end. These values are process-wide RSS, not memory attributed to an individual stage; OS sampling may miss short-lived peaks and can be unavailable on unsupported platforms.
 
 Quality knobs on a recode track are the obvious ones: `CRF`, `BitRate`, `MaxBitRate`, `Preset`, `Tune`, `FineTune`, plus `Language` / `Title` overrides.
+
+`Implementation(ImplementationSide::Encoder, String{"libsvtav1"})` selects the encoder; `Implementation(ImplementationSide::Decoder, String{"libdav1d"})` independently selects the decoder. The one-argument `Implementation(name)` remains shorthand for the encoder. An empty name restores default selection for that side. Pins must match the destination and source codecs respectively. A manual pipeline can set `Config::Implementation::Decoder` on the Plan track or call `Decoder::Implementation` before wiring; an explicit stage pin takes precedence over the Plan pin. Remux does not open an origin decoder and ignores these pins.
 
 Audio layout adaptation permits automatic 7.1-to-5.1 encoding to AC-3/E-AC3 without a manual downmix filter. MP3 encoding rejects input with more than two channels unless an explicit downmix filter reduces it first. Configuration errors remain terminal: calling `Run()` on a failed job preserves its original error instead of starting processing.
 
@@ -359,6 +362,8 @@ cmake --build build
 The in-tree CMake target is `StormByte::Multimedia`. The library is `StormByte-Multimedia`; its runtime dependencies must be deployed with a compatible ABI. Include path: the public install prefix, headers as `#include <StormByte/multimedia/file.hxx>`. Run `cmake --install build --prefix <prefix>` after building to install the configured library and headers.
 
 ## Tests
+
+Pipeline cases are split into remux, analytics, video, audio, OCR, negative-input/configuration and decoder-implementation executables under `test/pipeline`. Common helpers are compiled once in a static test support library; category-local edits rebuild only the affected executable. Individual CTest names remain `pipeline.test_*`.
 
 Configure with `-DENABLE_TEST=ON`, build, then run CTest from the test registration root:
 

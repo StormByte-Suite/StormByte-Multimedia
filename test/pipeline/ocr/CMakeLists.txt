@@ -1,0 +1,4 @@
+add_executable(MultimediaPipelineOcrTests ocr_test.cxx)
+target_link_libraries(MultimediaPipelineOcrTests PRIVATE multimedia_pipeline_test_support)
+
+add_pipeline_test(MultimediaPipelineOcrTests test_transcoder_ocr_japanese_pgs_to_subrip)

@@ -394,6 +394,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			RegisterStage(*Metrics, *decoder);
 			RegisterStage(*Metrics, *encoder);
 			ConfigureEncoder(*encoder, *slot.Config);
+			if (slot.Config->Implementation().Decoder)
+				decoder->Implementation(slot.Config->Implementation().Decoder.value());
 			*demux >> *decoder;
 			*encoder >> *mux;
 			if (decoder->Failed() || encoder->Failed() || mux->Failed()) {

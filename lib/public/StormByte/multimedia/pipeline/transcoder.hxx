@@ -88,6 +88,22 @@ namespace StormByte::Multimedia::Pipeline {
 	class Transcoder;
 
 	/**
+	 * @enum ImplementationSide
+	 * @brief Codec stage selected by a track implementation pin.
+	 * @ingroup multimedia_pipeline
+	 */
+	enum class ImplementationSide {
+		/**
+		 * @brief Source decoder implementation.
+		 */
+		Decoder,
+		/**
+		 * @brief Destination encoder implementation.
+		 */
+		Encoder
+	};
+
+	/**
 	 * @enum Status
 	 * @brief Lifecycle of a Transcoder instance.
 	 *
@@ -329,6 +345,14 @@ namespace StormByte::Multimedia::Pipeline {
 					 * @return *this.
 					 */
 					Track& Implementation(StormByte::Safe::String name);
+
+					/**
+					 * @brief Pins an FFmpeg implementation for either side of an encoded track.
+					 * @param side Source decoder or destination encoder.
+					 * @param name Implementation name; empty selects the default.
+					 * @return *this.
+					 */
+					Track& Implementation(ImplementationSide side, StormByte::Safe::String name);
 
 					/**
 					 * @brief Sets CRF/CQ. Clears BitRate.

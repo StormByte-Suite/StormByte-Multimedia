@@ -21,6 +21,18 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Added
+
+- `Transcoder::Track::Implementation(ImplementationSide, name)` for independent decoder/encoder selection, retaining the one-argument encoder shorthand, and six facade/manual decoder-pin regression cases covering successful selection, missing implementations and codec mismatches.
+- Encoder table entries for bundled Kvazaar and OpenH264, preserving x265/x264 as preferred implementations.
+- Category-specific pipeline test executables with shared compiled helpers to reduce recompilation while preserving individual CTest cases.
+
+### Fixed
+
+- Honor explicit decoder names and manual Plan decoder pins when opening origin decoders. Missing or codec-mismatched implementations fail instead of silently using the default decoder.
+- Avoid unnecessary stream and attachment copies in read-only test range loops.
+- Normalize unspecified PCM input layouts consistently with libswresample during sample-format conversion, using a temporary frame reference without modifying the original samples or channel count.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-08

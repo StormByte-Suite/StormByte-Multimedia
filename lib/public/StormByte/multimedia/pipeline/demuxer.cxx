@@ -237,6 +237,16 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	}
 	if (const auto plan = decoder.Plan(); plan) {
 		try {
+			if (!decoder.Implementation()) {
+				for (const auto& track : plan->Tracks()) {
+					if (!track || track->In() != decoder.Index() || !track->Config())
+						continue;
+					const auto& implementation = track->Config()->Implementation();
+					if (implementation.Decoder)
+						decoder.Implementation(implementation.Decoder.value());
+					break;
+				}
+			}
 			for (const auto stream : plan->Snapshot().Streams()) {
 				if (stream.Index() != decoder.Index())
 					continue;

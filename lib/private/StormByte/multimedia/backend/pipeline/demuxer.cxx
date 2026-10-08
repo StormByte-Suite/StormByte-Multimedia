@@ -336,7 +336,18 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 		return {};
 	}
 
-	const ::AVCodec* codec = avcodec_find_decoder(static_cast<::AVCodecID>(params->CodecId()));
+	const auto& implementation = decoder.Implementation();
+	const ::AVCodec* codec = implementation
+		? avcodec_find_decoder_by_name(implementation->data())
+		: avcodec_find_decoder(static_cast<::AVCodecID>(params->CodecId()));
+	if (!codec) {
+		decoder.Fail(implementation ? "decoder implementation is unavailable" : "decoder is unavailable");
+		return {};
+	}
+	if (codec->id != static_cast<::AVCodecID>(params->CodecId())) {
+		decoder.Fail("decoder implementation does not match source codec");
+		return {};
+	}
 	auto opened = FFmpeg::AVDecoder::Open(
 		const_cast<::AVCodec*>(codec), *params, *m_ctx->format, decoder.Index());
 	if (!opened.has_value()) {

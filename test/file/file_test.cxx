@@ -157,7 +157,7 @@ int test_anime_like_mkv_languages_and_font() {
 	TEST_REQUIRE(file.Attachments().size() == 1);
 
 	bool sawFont = false;
-	for (const auto attachment : file.Attachments()) {
+	for (const auto& attachment : file.Attachments()) {
 		const auto name = attachment.FileName();
 		TEST_REQUIRE(name);
 		sawFont = sawFont || TestView(name.value()) == "ipag-mona.ttf"sv;
