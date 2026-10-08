@@ -93,7 +93,8 @@ namespace {
 	bool IsSupportedOutput(std::string_view name) noexcept {
 		return EqualsIgnoreCase(name, "matroska") || EqualsIgnoreCase(name, "webm")
 			|| EqualsIgnoreCase(name, "mp4") || EqualsIgnoreCase(name, "mp3")
-			|| EqualsIgnoreCase(name, "ogg") || EqualsIgnoreCase(name, "opus");
+			|| EqualsIgnoreCase(name, "ogg") || EqualsIgnoreCase(name, "opus")
+			|| EqualsIgnoreCase(name, "AC-3") || EqualsIgnoreCase(name, "WAV");
 	}
 
 	bool ValidateOutputShape(const Plan& plan, const Container& container, std::string& reason) {
@@ -124,8 +125,9 @@ namespace {
 		}
 
 		const auto name = container.Name();
-		if ((EqualsIgnoreCase(name, "mp3") || EqualsIgnoreCase(name, "opus"))
-				&& (audio != 1 || nonAudio || muxable != 1)) {
+		if ((EqualsIgnoreCase(name, "mp3") || EqualsIgnoreCase(name, "opus")
+				|| EqualsIgnoreCase(name, "AC-3") || EqualsIgnoreCase(name, "WAV"))
+			&& (audio != 1 || nonAudio || muxable != 1)) {
 			reason = std::string(name) + " output requires exactly one audio track";
 			return false;
 		}

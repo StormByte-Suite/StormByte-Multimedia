@@ -58,6 +58,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cctype>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -95,8 +96,20 @@ namespace {
 		return Unexpected(FilePathOpenException(label, reason));
 	}
 
-	ExpectedContainer ResolveContainer(std::string_view formatName) noexcept {
+	ExpectedContainer ResolveContainer(std::string_view formatName, std::string_view path) noexcept {
 		auto& registry = Registry::Instance();
+		const auto separator = path.find_last_of("/\\");
+		const auto dot = path.find_last_of('.');
+		if (dot != std::string_view::npos && dot + 1 < path.size() &&
+			(separator == std::string_view::npos || dot > separator)) {
+			std::string extension{path.substr(dot + 1)};
+			std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char character) {
+				return static_cast<char>(std::tolower(character));
+			});
+			auto byExtension = registry.FindContainer(extension);
+			if (byExtension.has_value())
+				return byExtension;
+		}
 		std::string_view rest = formatName;
 		while (!rest.empty()) {
 			const auto comma = rest.find(',');
@@ -444,7 +457,7 @@ ExpectedFile File::Probe(BufferedLocationReader& reader,
 		return FailOpen(label, "unknown container format");
 	}
 
-	auto container = ResolveContainer(formatName);
+	auto container = ResolveContainer(formatName, label);
 	if (!container.has_value()) {
 		static_cast<void>(reader.Rewind());
 		return FailOpen(label, container.error()->what());

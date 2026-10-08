@@ -194,6 +194,11 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 	m_container_by_name.emplace(StormByte::Safe::String(storedContainer.Name()), StormByte::Size{i});
 	if (ext && ext[0] != '\0')
 		m_container_by_name.emplace(StormByte::Safe::String(ext), StormByte::Size{i});
+	for (std::size_t extensionIndex = 1; extensionIndex < def.ExtensionCount(); ++extensionIndex) {
+		const char* extension = def.Extension(extensionIndex);
+		if (extension && extension[0] != '\0')
+			m_container_by_name.emplace(StormByte::Safe::String(extension), StormByte::Size{i});
+	}
 	for (std::size_t n = 0; n < def.FfmpegIdCount(); ++n)
 		m_container_by_name.emplace(StormByte::Safe::String(def.FfmpegId(n)), StormByte::Size{i});
 

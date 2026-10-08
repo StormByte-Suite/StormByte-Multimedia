@@ -368,6 +368,20 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		track.inIndex = inIndex;
 		track.language = owner.Language(out);
 		track.title = owner.Title(out);
+		if (!track.language || !track.title) {
+			const auto plan = owner.Plan();
+			if (plan) {
+				for (const auto stream : plan->Snapshot().Streams()) {
+					if (stream.Index() != inIndex)
+						continue;
+					if (!track.language)
+						track.language = stream.Metadata().Language();
+					if (!track.title)
+						track.title = stream.Metadata().Title();
+					break;
+				}
+			}
+		}
 		m_tracks.emplace(out, std::move(track));
 		m_inToOut.emplace(inIndex, out);
 		return true;
