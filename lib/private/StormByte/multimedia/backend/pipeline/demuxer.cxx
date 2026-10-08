@@ -79,11 +79,9 @@ namespace FFmpeg = StormByte::Multimedia::FFmpeg;
 
 namespace {
 	std::optional<Property::Duration> TicksToPts(std::int64_t ticks, Property::AVRational timeBase) noexcept {
-		if (ticks == AV_NOPTS_VALUE || ticks < 0 || timeBase.num <= 0 || timeBase.den <= 0)
+		if (ticks == AV_NOPTS_VALUE || timeBase.num <= 0 || timeBase.den <= 0)
 			return std::nullopt;
 		const std::int64_t ns = timeBase.Rescale(ticks, Property::AVRational{1, 1000000000});
-		if (ns < 0)
-			return std::nullopt;
 		return Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 

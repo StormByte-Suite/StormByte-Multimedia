@@ -307,6 +307,10 @@ bool Muxer::ArmOctets() noexcept {
 		Fail("muxer writer open failed");
 		return false;
 	}
+	if (writer.Truncate().status != StormByte::Buffer::IO::Status::Ok) {
+		Fail("muxer writer truncate failed");
+		return false;
+	}
 
 	if (!m_backend->BindSink(*this))
 		return false;
