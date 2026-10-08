@@ -401,6 +401,10 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		params.CodecId(static_cast<int>(codec->id));
 		params.CodecType(static_cast<int>(codec->type));
 		if (codec->type == AVMEDIA_TYPE_AUDIO) {
+			if (codec->id == AV_CODEC_ID_MP3 && params.Channels() > 2) {
+				owner.Fail("MP3 encoder has unsupported channel layout; use an explicit downmix filter");
+				return std::nullopt;
+			}
 			if (params.Format() == AV_SAMPLE_FMT_NONE) {
 				const void* configs = nullptr;
 				int count = 0;
@@ -430,6 +434,7 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 					}
 
 					if (!supported) {
+						// Automatic 7.1 to 5.1 conversion is allowed for AC-3/E-AC3 without a manual downmix filter.
 						const ::AVChannelLayout* best = &list[0];
 						const int n = have.NbChannels();
 						for (int i = 0; i < count; ++i) {

@@ -112,6 +112,9 @@ namespace StormByte::Multimedia::Detail {
 		std::string subtype;
 		if (!SplitMime(pattern, type, subtype))
 			return false;
+		if ((type.find('*') != std::string::npos && type != "*")
+			|| (subtype.find('*') != std::string::npos && subtype != "*"))
+			return false;
 		if (type == "*" && subtype != "*")
 			return false;
 		return true;

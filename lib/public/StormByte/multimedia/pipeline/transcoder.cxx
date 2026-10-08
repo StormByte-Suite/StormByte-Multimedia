@@ -504,6 +504,8 @@ void Transcoder::Run() noexcept {
 	if (!m_backend)
 		return;
 	const auto current = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
+	if (current == Status::Error)
+		return;
 	if (current == Status::Running || current == Status::Paused || m_armed) {
 		Fail("Run was already called");
 		return;

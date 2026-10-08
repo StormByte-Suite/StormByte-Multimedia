@@ -1,0 +1,31 @@
+IPA Mona test-font redistribution notices
+==========================================
+
+This fixture includes IPAMonaGothic (ipag-mona.ttf), package
+media-fonts/ipamonafont 1.0.8. Gentoo declares the package licenses as
+grass-ipafonts, mplus-fonts, and public-domain. The font is identified as an
+IPA font and is redistributed with the applicable notices below.
+
+Terms of redistribution of IPA fonts (GRASS Japan / Orkney / IPA)
+-----------------------------------------------------------------
+Redistribution of IPA fonts delivered or distributed by the GRASS Japan web
+site administrator and Orkney Inc. as part of GRASS GIS / MapServer / PostGIS
+is permitted provided that:
+
+1. Redistribution is allowed only when the fonts are bundled with software
+   and this document is attached.
+2. The redistributed fonts must be clearly identified as IPA fonts.
+3. Conditions 1 and 2 also apply to modified IPA fonts and derivatives.
+4. The GRASS Japan web site administrator, Orkney Inc., and the Information-
+   technology Promotion Agency, Japan, are not liable for problems caused by
+   the fonts.
+
+M+ Fonts License_E
+------------------
+These fonts are free software. Unlimited permission is granted to use, copy,
+and distribute them, with or without modification, commercially or
+noncommercially. They are provided "AS IS" without warranty.
+
+Public domain notice
+--------------------
+The relevant software is in the public domain.

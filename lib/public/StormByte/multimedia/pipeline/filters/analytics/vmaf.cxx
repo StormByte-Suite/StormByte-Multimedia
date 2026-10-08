@@ -441,8 +441,8 @@ class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexc
 	for (const auto& [track, lanePointer] : m_lanes) {
 		const Lane& lane = *lanePointer;
 		if (lane.mean) {
-			data.emplace(key(track, "vmaf_mean"), std::format("{:.6f}", *lane.mean));
-			data.emplace(key(track, "vmaf_min"), std::format("{:.6f}", *lane.min));
+			data.emplace(key(track, "vmaf_mean"), std::format("{:.17g}", *lane.mean));
+			data.emplace(key(track, "vmaf_min"), std::format("{:.17g}", *lane.min));
 		}
 
 		data.emplace(key(track, "frames"), std::to_string(lane.scored));

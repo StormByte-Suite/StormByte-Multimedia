@@ -173,6 +173,8 @@ Capture `job.Telemetry()` before `Run()` if the final snapshot must outlive the 
 
 Quality knobs on a recode track are the obvious ones: `CRF`, `BitRate`, `MaxBitRate`, `Preset`, `Tune`, `FineTune`, plus `Language` / `Title` overrides.
 
+Audio layout adaptation permits automatic 7.1-to-5.1 encoding to AC-3/E-AC3 without a manual downmix filter. MP3 encoding rejects input with more than two channels unless an explicit downmix filter reduces it first. Configuration errors remain terminal: calling `Run()` on a failed job preserves its original error instead of starting processing.
+
 ### 2. The tube by hand
 
 Same workers, no facade. You own construction, binding and lifetime. This is what you want for a custom graph (several destinations, an extra sink, a filter that is not on `Transcoder`’s fluent map — as long as it is still a `Step` / `Filter` the tube already understands).

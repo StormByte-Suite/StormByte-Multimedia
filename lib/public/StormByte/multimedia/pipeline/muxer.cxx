@@ -277,6 +277,11 @@ bool Muxer::SpawnBackend() noexcept {
 		Fail("muxer has no plan");
 		return false;
 	}
+	const auto check = m_plan->Check();
+	if (!check) {
+		Fail(check.error()->what());
+		return false;
+	}
 
 	m_container = &m_plan->Container();
 	if (!m_container->HasAccess(Access{Operation::Write})) {

@@ -704,7 +704,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			return;
 		for (const auto& [index, track] : m_tracks) {
 			if (track.encoder && track.encoder->Failed()) {
-				owner.Fail("encoder failed");
+				owner.Fail(track.encoder->Error().value_or(StormByte::Safe::String{"encoder failed"}));
 				return;
 			}
 		}
