@@ -156,7 +156,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			Safe::Optional<double> m_thrIn;	///< Caller threshold, or empty for the FFmpeg default.
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Graph allocated and released only by the provider.
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }
 

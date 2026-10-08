@@ -46,7 +46,6 @@
 #include <cstdint>
 #include <format>
 #include <limits>
-#include <vector>
 
 extern "C" {
 	#include <libavutil/samplefmt.h>
@@ -228,7 +227,7 @@ bool Loudnorm::OpenMeter(int channels, int rate) noexcept {
 		return false;
 	m_channels = channels;
 	m_rate = rate;
-	m_tp.assign(static_cast<std::size_t>(channels), 0.0);
+	m_tp = StormByte::Safe::Vector<double>(static_cast<std::size_t>(channels), 0.0);
 	for (int i = 0; i < channels; ++i)
 		ebur128_set_channel(m_st, static_cast<unsigned>(i), MapChannel(i, channels));
 	return true;
@@ -242,7 +241,7 @@ bool Loudnorm::Add(const FFrame& src) noexcept {
 	const int fmt = src.Format();
 	if (n <= 0 || ch <= 0)
 		return false;
-	std::vector<float> interleaved(static_cast<std::size_t>(n) * static_cast<std::size_t>(ch));
+	StormByte::Safe::Vector<float> interleaved(static_cast<std::size_t>(n) * static_cast<std::size_t>(ch));
 	for (int i = 0; i < n; ++i) {
 		for (int c = 0; c < ch; ++c)
 			interleaved[static_cast<std::size_t>(i) * static_cast<std::size_t>(ch) + static_cast<std::size_t>(c)]

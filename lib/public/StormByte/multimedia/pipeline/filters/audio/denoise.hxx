@@ -47,9 +47,26 @@
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 
-#include <memory>
-#include <vector>
+/**
+ * @namespace StormByte::Multimedia::Pipeline::Filter::Audio::Detail
+ * @brief Provider-internal audio filter state types.
+ */
+namespace StormByte::Multimedia::Pipeline::Filter::Audio::Detail {
+	/**
+	 * @struct DenoiseCandidate
+	 * @brief Room-tone signature used by the Denoise vote.
+	 */
+	struct DenoiseCandidate {
+		double rmsDb = 0.0;	///< Window RMS in dB.
+		double crest = 0.0;	///< Peak-to-RMS ratio.
+		double zcr = 0.0;	///< Zero-crossing ratio.
+		double hp = 0.0;	///< High-pass energy ratio.
+	};
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Detail::DenoiseCandidate);
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -173,14 +190,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 		private:
 			/**
-			 * @brief Provider-local room-tone signature used by the vote.
+			 * @typedef Candidate
+			 * @brief Provider-local alias for a room-tone signature.
 			 */
-			struct Candidate {
-				double rmsDb = 0.0;	///< Window RMS in dB
-				double crest = 0.0;	///< Peak-to-RMS ratio
-				double zcr = 0.0;	///< Zero-crossing ratio
-				double hp = 0.0;		///< High-pass energy ratio
-			};
+			using Candidate = Detail::DenoiseCandidate;
 
 			/**
 			 * @brief Mixes @p src into the measure window and emits candidates.
@@ -205,8 +218,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			Safe::String Chain() const noexcept;
 
 			Safe::Optional<double> m_nrIn;	///< Caller noise reduction, or empty
-			std::vector<float> m_acc;		///< Provider-local measurement samples
-			std::vector<Candidate> m_cand;	///< Provider-local candidate signatures
+			StormByte::Safe::Vector<float> m_acc;	///< Base-owned measurement samples.
+			StormByte::Safe::Vector<Candidate> m_cand;	///< Base-owned candidate signatures.
 			int m_rate;						///< Latched sample rate
 			int m_win;						///< Measurement window size
 			unsigned m_frames;				///< Measured audio frame count
@@ -216,13 +229,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			double m_nr;						///< Resolved noise reduction in dB
 			int m_matches;					///< Matching room-tone signatures
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Provider-owned graph
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }
 
 /**
  * @brief Requires compatible C++ ABI and loaded Multimedia, Base and Logger providers.
- * @note Private STL measurement storage and graph ownership never leave Multimedia;
+ * @note Base-owned measurement storage and graph ownership never leave Multimedia;
  * all allocation, mutation and destruction execute in its out-of-line methods.
  */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Audio::Denoise);

@@ -47,7 +47,7 @@ using PublicDecoder = StormByte::Multimedia::Pipeline::Decoder;
 using PublicFrame = StormByte::Multimedia::Pipeline::Frame;
 
 void Decoder::BindFrame(PublicDecoder& owner, PublicFrame& frame,
-	std::unique_ptr<Frame> holder) noexcept {
+	StormByte::Safe::Unique<Frame> holder) noexcept {
 	owner.Attach(frame, std::move(holder));
 }
 

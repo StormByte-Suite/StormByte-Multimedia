@@ -159,7 +159,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			Safe::Optional<double> m_tempoIn;	///< Caller tempo, or empty
 			Safe::Optional<double> m_pitchIn;	///< Caller pitch, or empty
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }
 

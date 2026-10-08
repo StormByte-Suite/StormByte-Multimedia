@@ -223,8 +223,10 @@ FFmpeg::AVEncoder::~AVEncoder() noexcept {
 	Free();
 }
 
-FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(AVCodec* codec, const AVCodecParameters& params, int stream_index,
+FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base) noexcept {
+	const std::string codec_name_copy{codec_name};
+	const AVCodec* codec = avcodec_find_encoder_by_name(codec_name_copy.c_str());
 	if (!codec || !params.Get())
 		return Unexpected<FFmpeg::EncoderError>("Invalid codec or parameters");
 
@@ -301,8 +303,8 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(AVCodec* codec, const AVCodecP
 	return enc;
 }
 
-FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(AVCodec* codec, const AVCodecParameters& params, const FFmpeg::AVFormatContext& fmt, int stream_index) noexcept {
-	auto opened = Open(codec, params, stream_index, {}, FFmpeg::AVRational{0, 1});
+FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, const FFmpeg::AVFormatContext& fmt, int stream_index) noexcept {
+	auto opened = Open(codec_name, params, stream_index, {}, FFmpeg::AVRational{0, 1});
 	if (!opened.has_value())
 		return opened;
 	auto bsf = fmt.Mp4ToAnnexB(params.CodecId(), stream_index, params);
@@ -317,7 +319,7 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
 		if (!t35.empty()) {
 			const std::int64_t pts = frame.Pts();
 			if (pts != AV_NOPTS_VALUE)
-				m_hdrPlusT35[pts] = std::move(t35);
+				m_hdrPlusT35.insert_or_assign(pts, Safe::Binary{std::move(t35)});
 		}
 	}
 
@@ -393,7 +395,11 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept
 		const std::int64_t pts = tmp.Pts();
 		auto found = m_hdrPlusT35.find(pts);
 		if (found != m_hdrPlusT35.end()) {
-			if (!PrependHevcSei(tmp, found->second))
+			std::vector<std::uint8_t> t35;
+			t35.reserve(static_cast<std::size_t>(found->second.size()));
+			for (const std::byte value : found->second)
+				t35.push_back(std::to_integer<std::uint8_t>(value));
+			if (!PrependHevcSei(tmp, t35))
 				return OperationResult::Error;
 			m_hdrPlusT35.erase(found);
 		}

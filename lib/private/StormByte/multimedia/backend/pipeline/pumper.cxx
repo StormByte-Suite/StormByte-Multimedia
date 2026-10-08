@@ -38,6 +38,7 @@
 
 #include <StormByte/multimedia/backend/pipeline/pumper.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
+#include <StormByte/safe/memory_order.hxx>
 
 #include <chrono>
 #include <utility>
@@ -59,13 +60,13 @@ namespace {
 
 Pumper::Pumper(Host& host) noexcept
 :	m_host(host),
-	m_state(State::Created) {}
+	m_state(static_cast<int>(State::Created)) {}
 
 Pumper::~Pumper() noexcept {
 	Halt();
 }
 
-void Pumper::Bind(std::unique_ptr<Worker> worker) noexcept {
+void Pumper::Bind(StormByte::Safe::Unique<Worker> worker) noexcept {
 	if (m_thread.joinable() || m_worker || !worker)
 		return;
 	m_worker = std::move(worker);
@@ -74,8 +75,7 @@ void Pumper::Bind(std::unique_ptr<Worker> worker) noexcept {
 void Pumper::Launch() noexcept {
 	if (m_thread.joinable() || !m_worker || Stopping())
 		return;
-	m_thread = std::jthread([this](std::stop_token token) {
-		(void)token;
+	m_thread = StormByte::Safe::Thread([this]() {
 		auto& telemetry = m_host.Telemetry();
 		telemetry.Start();
 		const auto setup_started = std::chrono::steady_clock::now();
@@ -86,9 +86,9 @@ void Pumper::Launch() noexcept {
 			telemetry.Finish();
 			return;
 		}
-		State expected = State::Created;
-		if (!m_state.compare_exchange_strong(expected, State::Ready,
-				std::memory_order_acq_rel, std::memory_order_acquire)) {
+		int expected = static_cast<int>(State::Created);
+		if (!m_state.compare_exchange_strong(expected, static_cast<int>(State::Ready),
+				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire)) {
 			telemetry.SetState(Status());
 			telemetry.Finish();
 			return;
@@ -97,12 +97,12 @@ void Pumper::Launch() noexcept {
 		m_host.BecameReady();
 		Pump();
 		m_host.CloseOutput();
-		expected = State::Stopping;
-		if (!m_state.compare_exchange_strong(expected, State::Stopped,
-				std::memory_order_acq_rel, std::memory_order_acquire)) {
-			expected = State::Ready;
-			m_state.compare_exchange_strong(expected, State::Stopped,
-				std::memory_order_acq_rel, std::memory_order_acquire);
+		expected = static_cast<int>(State::Stopping);
+		if (!m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),
+				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire)) {
+			expected = static_cast<int>(State::Ready);
+			m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),
+				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire);
 		}
 
 		m_host.Log(Level::LowLevel, "stopped");
@@ -113,26 +113,24 @@ void Pumper::Launch() noexcept {
 
 void Pumper::Halt() noexcept {
 	Stop();
-	if (m_thread.joinable()) {
-		m_thread.request_stop();
+	if (m_thread.joinable())
 		m_thread.join();
-	}
 
-	State expected = State::Stopping;
-	if (!m_state.compare_exchange_strong(expected, State::Stopped,
-			std::memory_order_acq_rel, std::memory_order_acquire)) {
-		expected = State::Ready;
-		m_state.compare_exchange_strong(expected, State::Stopped,
-			std::memory_order_acq_rel, std::memory_order_acquire);
+	int expected = static_cast<int>(State::Stopping);
+	if (!m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),
+			StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire)) {
+		expected = static_cast<int>(State::Ready);
+		m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),
+			StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire);
 	}
 	m_host.Telemetry().SetState(Status());
 }
 
 void Pumper::Stop() noexcept {
-	State current = m_state.load(std::memory_order_acquire);
-	while (current == State::Created || current == State::Ready) {
-		if (m_state.compare_exchange_weak(current, State::Stopping,
-				std::memory_order_acq_rel, std::memory_order_acquire)) {
+	int current = m_state.load(StormByte::Safe::MemoryOrder::Acquire);
+	while (current == static_cast<int>(State::Created) || current == static_cast<int>(State::Ready)) {
+		if (m_state.compare_exchange_weak(current, static_cast<int>(State::Stopping),
+				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire)) {
 			m_host.Telemetry().SetState(State::Stopping);
 			break;
 		}
@@ -140,14 +138,14 @@ void Pumper::Stop() noexcept {
 }
 
 State Pumper::Status() const noexcept {
-	return m_state.load(std::memory_order_acquire);
+	return static_cast<State>(m_state.load(StormByte::Safe::MemoryOrder::Acquire));
 }
 
 bool Pumper::Failed() const noexcept {
 	return Status() == State::Failed;
 }
 
-const std::optional<std::string>& Pumper::Error() const noexcept {
+const StormByte::Safe::Optional<StormByte::Safe::String>& Pumper::Error() const noexcept {
 	return m_error;
 }
 
@@ -156,12 +154,12 @@ bool Pumper::Stopping() const noexcept {
 	return state == State::Stopping || state == State::Stopped || state == State::Failed;
 }
 
-void Pumper::Fail(std::string reason) noexcept {
-	m_error = std::move(reason);
-	State current = m_state.load(std::memory_order_acquire);
-	while (!Terminal(current)) {
-		if (m_state.compare_exchange_weak(current, State::Failed,
-				std::memory_order_acq_rel, std::memory_order_acquire))
+void Pumper::Fail(std::string_view reason) noexcept {
+	m_error = StormByte::Safe::String(reason);
+	int current = m_state.load(StormByte::Safe::MemoryOrder::Acquire);
+	while (!Terminal(static_cast<State>(current))) {
+		if (m_state.compare_exchange_weak(current, static_cast<int>(State::Failed),
+				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire))
 			break;
 	}
 	m_host.Telemetry().SetState(Status());

@@ -49,6 +49,7 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/pointers.hxx>
 
 #include <algorithm>
@@ -62,7 +63,7 @@ using StormByte::Logger::Level;
 using StormByte::Buffer::IO::BufferedFileReader;
 
 namespace {
-	std::string Ns(const std::optional<Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
 		return std::format("{}", value->Nanoseconds().count());
@@ -70,15 +71,15 @@ namespace {
 }
 
 Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
-: Demuxer(std::move(log), StormByte::Safe::Heap::MakeShared<class Progress>()) {}
+: Demuxer(std::move(log), StormByte::Safe::MakeShared<class Progress>()) {}
 
 Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Shared<class Progress> progress) noexcept
 : Step(std::move(log), Producer::Demuxer, Kinds{}, Kinds{Kind::Packet}),
 	m_eof(false), m_positionNs(-1),
-	m_progress(progress ? std::move(progress) : StormByte::Safe::Heap::MakeShared<class Progress>()) {
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Source>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Demux>(*this));
+	m_progress(progress ? std::move(progress) : StormByte::Safe::MakeShared<class Progress>()) {
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Source>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Demux>(*this));
 	Launch();
 }
 
@@ -93,7 +94,7 @@ bool Demuxer::Eof() const noexcept {
 }
 
 StormByte::Safe::Optional<Property::Duration> Demuxer::Position() const noexcept {
-	const std::int64_t ns = m_positionNs.load(std::memory_order_acquire);
+	const std::int64_t ns = m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (ns < 0)
 		return std::nullopt;
 	return Property::Duration{std::chrono::nanoseconds{ns}};
@@ -104,7 +105,7 @@ Progress::Pointer Demuxer::Progress() const noexcept {
 }
 
 void Demuxer::WaitForPlan() noexcept {
-	std::unique_lock lock(m_planMutex);
+	StormByte::Safe::UniqueLock lock(m_planMutex);
 	m_planPresent.wait(lock, [this]() {
 		return Stopping() || static_cast<bool>(m_plan);
 	});
@@ -132,7 +133,7 @@ void Demuxer::ReachedEof() noexcept {
 	m_eof = true;
 }
 
-void Demuxer::Measure(std::vector<int> tracks) noexcept {
+void Demuxer::Measure(StormByte::Safe::Vector<int> tracks) noexcept {
 	m_measureTracks = std::move(tracks);
 	m_measuring = !m_measureTracks.empty();
 	m_eof = false;
@@ -160,7 +161,7 @@ bool Demuxer::Rewind() noexcept {
 	if (!m_backend || !m_backend->Rewind(*this))
 		return false;
 	m_eof = false;
-	m_positionNs.store(-1, std::memory_order_release);
+	m_positionNs.store(-1, StormByte::Safe::MemoryOrder::Release);
 	m_nextSerial.clear();
 	m_measuring = false;
 	m_measureTracks.clear();
@@ -179,7 +180,7 @@ StormByte::Buffer::IO::BufferedLocationReader& Demuxer::Origin() noexcept {
 	return m_plan->Reader();
 }
 
-std::unique_ptr<Backend::Pipeline::Decoder> Demuxer::OpenDecoder(Decoder& decoder) noexcept {
+StormByte::Safe::Unique<Backend::Pipeline::Decoder> Demuxer::OpenDecoder(Decoder& decoder) noexcept {
 	if (!m_backend || !m_backend->IsOpen()) {
 		decoder.Fail("demuxer is not open");
 		return {};
@@ -192,11 +193,11 @@ Packet::PointerType Demuxer::Wrap(
 	int track,
 	Type type,
 	StormByte::Buffer::FIFO payload,
-	std::optional<Property::Duration> pts,
-	std::optional<Property::Duration> dts,
-	std::optional<Property::Duration> duration,
+	StormByte::Safe::Optional<Property::Duration> pts,
+	StormByte::Safe::Optional<Property::Duration> dts,
+	StormByte::Safe::Optional<Property::Duration> duration,
 	bool keyframe,
-	std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept {
+	StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept {
 	if (m_measuring) {
 		const auto& tracks = m_measureTracks;
 		if (std::find(tracks.begin(), tracks.end(), track) == tracks.end())
@@ -206,7 +207,7 @@ Packet::PointerType Demuxer::Wrap(
 	const std::uint64_t serial = m_nextSerial[track]++;
 	Log(Level::LowLevel, std::format("t={} {} {}:0 pts={} dts={} dur={} key={} bytes={}",
 		track, ToString(type), serial, Ns(pts), Ns(dts), Ns(duration),
-		keyframe ? 1 : 0, static_cast<std::size_t>(payload.Size())));
+		keyframe ? 1 : 0, static_cast<std::uint64_t>(payload.Size())));
 	auto packet = Packet::PointerType::MakePointer<Packet>(
 		track,
 		type,

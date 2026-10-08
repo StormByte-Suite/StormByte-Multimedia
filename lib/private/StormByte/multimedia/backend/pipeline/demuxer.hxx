@@ -118,7 +118,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param decoder Destination decoder.
 			 * @return Opened leaf, or empty after decoder.Fail().
 			 */
-			std::unique_ptr<Decoder> OpenDecoder(
+			StormByte::Safe::Unique<Decoder> OpenDecoder(
 				StormByte::Multimedia::Pipeline::Demuxer& owner,
 				StormByte::Multimedia::Pipeline::Decoder& decoder) noexcept;
 
@@ -138,6 +138,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 		private:
 			class Context;
-			std::unique_ptr<Context> m_ctx;
+			StormByte::Safe::Unique<Context> m_ctx;
 	};
 }

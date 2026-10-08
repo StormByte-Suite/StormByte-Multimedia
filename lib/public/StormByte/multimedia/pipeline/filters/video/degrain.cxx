@@ -212,7 +212,7 @@ namespace {
 Degrain::Degrain(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<double> sigmaCap) noexcept
 	: Filter::ProcessTwoPasses(std::move(log), StormByte::Safe::String("degrain")),
-		m_capIn(std::move(sigmaCap)), m_state(StormByte::Safe::Heap::MakeUnique<State>()) {}
+		m_capIn(std::move(sigmaCap)), m_state(StormByte::Safe::MakeUnique<State>()) {}
 
 Degrain::~Degrain() noexcept = default;
 

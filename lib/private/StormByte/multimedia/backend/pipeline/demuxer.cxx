@@ -123,7 +123,7 @@ class StormByte::Multimedia::Backend::Pipeline::Demuxer::Context {
 };
 
 StormByte::Multimedia::Backend::Pipeline::Demuxer::Demuxer() noexcept
-: m_ctx(std::make_unique<Context>()) {}
+: m_ctx(StormByte::Safe::MakeUnique<Context>()) {}
 
 StormByte::Multimedia::Backend::Pipeline::Demuxer::~Demuxer() noexcept {
 	Close();
@@ -136,7 +136,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::IsOpen() const noexcept 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 	StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept {
 	if (!m_ctx)
-		m_ctx = std::make_unique<Context>();
+		m_ctx = StormByte::Safe::MakeUnique<Context>();
 	if (m_ctx->format) {
 		owner.Fail("demuxer is already open");
 		return false;
@@ -193,8 +193,8 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 			if (!stream->codecpar || stream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
 				continue;
 			const auto found = parameters.find(stream->index);
-			if (found == parameters.end() || found->second.CodecId() != stream->codecpar->codec_id
-				|| !found->second.Export(stream->codecpar)) {
+			if (found == parameters.end() || found->second->CodecId() != stream->codecpar->codec_id
+				|| !found->second->Export(stream->codecpar)) {
 				restored = false;
 				break;
 			}
@@ -262,7 +262,7 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 		if (const auto found = m_ctx->timeBase.find(index); found != m_ctx->timeBase.end())
 			tb = found->second;
 
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		const auto* data = m_ctx->scratch.Data();
 		const int size = m_ctx->scratch.Size();
 		if (data && size > 0) {
@@ -270,7 +270,7 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 			bytes.assign(rawb, rawb + size);
 		}
 
-		auto holder = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Packet>();
+		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Packet>();
 		const auto streams = m_ctx->format->Streams();
 		for (const auto& stream : streams) {
 			if (stream.Index() != index)
@@ -309,7 +309,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Rewind(
 	return true;
 }
 
-std::unique_ptr<StormByte::Multimedia::Backend::Pipeline::Decoder>
+StormByte::Safe::Unique<StormByte::Multimedia::Backend::Pipeline::Decoder>
 StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 	StormByte::Multimedia::Pipeline::Demuxer&,
 	StormByte::Multimedia::Pipeline::Decoder& decoder) noexcept {
@@ -347,18 +347,18 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 	}
 
 	if (mapped.has_value() && mapped->first) {
-		return std::make_unique<Detail::Decoder::Video>(
+		return StormByte::Safe::MakeUnique<Detail::Decoder::Video>(
 			std::move(opened.value()), timeBase,
 			*mapped->first);
 	}
 
 	if (mapped.has_value() && mapped->second) {
-		return std::make_unique<Detail::Decoder::Audio>(
+		return StormByte::Safe::MakeUnique<Detail::Decoder::Audio>(
 			std::move(opened.value()), timeBase,
 			*mapped->second);
 	}
 
-	return std::make_unique<Detail::Decoder::Subtitle>(
+	return StormByte::Safe::MakeUnique<Detail::Decoder::Subtitle>(
 		std::move(opened.value()), timeBase);
 }
 

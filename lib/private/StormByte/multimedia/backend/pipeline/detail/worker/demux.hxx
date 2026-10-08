@@ -41,14 +41,17 @@
 #include <StormByte/multimedia/backend/pipeline/worker.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
+#include <StormByte/safe/condition_variable.hxx>
+#include <StormByte/safe/list.hxx>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/mutex.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/thread.hxx>
+#include <StormByte/safe/unique_lock.hxx>
+#include <StormByte/safe/vector.hxx>
 
-#include <atomic>
-#include <condition_variable>
 #include <cstddef>
-#include <deque>
-#include <mutex>
-#include <thread>
-#include <unordered_map>
 
 namespace StormByte::Multimedia::Pipeline {
 	class Demuxer;
@@ -61,6 +64,60 @@ namespace StormByte::Multimedia::Pipeline {
  * @ingroup multimedia_pipeline
  */
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
+	class Demux;
+
+	/**
+	 * @class FeedThread
+	 * @brief Base-owned per-track feeder joined before its Demux owner dies.
+	 */
+	class STORMBYTE_MULTIMEDIA_PRIVATE FeedThread final {
+		public:
+			/**
+			 * @brief Starts the feeder for @p track.
+			 * @param owner Demux whose lifetime extends through Join.
+			 * @param track Origin stream index.
+			 */
+			FeedThread(Demux& owner, int track);
+
+			FeedThread(const FeedThread&) = delete;
+
+			FeedThread(FeedThread&&) noexcept = delete;
+
+			/**
+			 * @brief Joins the execution before releasing this handle.
+			 */
+			~FeedThread() noexcept;
+
+			FeedThread& operator=(const FeedThread&) = delete;
+
+			FeedThread& operator=(FeedThread&&) noexcept = delete;
+
+			/**
+			 * @brief Track assigned to this feeder.
+			 * @return Origin stream index.
+			 */
+			int Track() const noexcept;
+
+			/**
+			 * @brief Joins the feeder if it is running.
+			 */
+			void Join() noexcept;
+
+		private:
+			StormByte::Safe::Thread m_thread;	///< Base-owned execution.
+			int m_track;	///< Origin stream index.
+	};
+	}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::Worker::FeedThread);
+
+	/**
+	 * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker
+	 * @brief Concrete stage bodies.
+	 *
+	 * @ingroup multimedia_pipeline
+	 */
+	namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	/**
 	 * @class Demux
 	 * @brief Reads interleaved packets from the Plan origin.
@@ -101,6 +158,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			void Process(StormByte::Multimedia::Pipeline::Item::PointerType item) noexcept override;
 
 		private:
+			friend class FeedThread;
+
 			void Flush() noexcept override;
 
 			/**
@@ -129,10 +188,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			static constexpr std::size_t ParkCeiling = 2048;	///< Per-track compressed park
 
 			StormByte::Multimedia::Pipeline::Demuxer& m_owner;	///< Public demuxer
-			std::unordered_map<int, std::deque<StormByte::Multimedia::Pipeline::Packet::PointerType>> m_park;
-			std::unordered_map<int, std::thread> m_feeds;		///< One Emit thread per track
-			mutable std::mutex m_parkMutex;					///< Guards @ref m_park
-			std::condition_variable m_parkCv;				///< Read / feeder rendezvous
-			std::atomic<bool> m_feedStop{false};			///< Feeder halt
+			StormByte::Safe::Map<int, StormByte::Safe::List<StormByte::Multimedia::Pipeline::Packet::PointerType>> m_park;
+			StormByte::Safe::Vector<StormByte::Safe::Shared<FeedThread>> m_feeds;	///< One Base-owned feeder per track.
+			mutable StormByte::Safe::Mutex m_parkMutex;	///< Guards @ref m_park.
+			StormByte::Safe::ConditionVariable m_parkCv;	///< Read / feeder rendezvous.
+			StormByte::Safe::Atomic<bool> m_feedStop{false};	///< Feeder halt.
 	};
 }

@@ -36,7 +36,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
-#include <StormByte/binary_data.hxx>
+#include <StormByte/safe/binary.hxx>
 #include <StormByte/multimedia/ffmpeg/Sws.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 
@@ -58,8 +58,8 @@ using Level = StormByte::Logger::Level;
  */
 struct Watermark::Implementation {
 	std::filesystem::path path;	///< Native logo file path converted from UTF-8.
-	StormByte::BinaryData bytes;	///< Encoded file bytes.
-	StormByte::BinaryData rgba;	///< Decoded RGBA8888 bytes.
+	StormByte::Safe::Binary bytes;	///< Encoded file bytes.
+	StormByte::Safe::Binary rgba;	///< Decoded RGBA8888 bytes.
 	std::unique_ptr<StormByte::Multimedia::FFmpeg::Sws> swsLuma;	///< Cached source-to-gray scale owner.
 	std::unique_ptr<FFrame> luma;	///< Cached GRAY8 view.
 };

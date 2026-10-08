@@ -38,12 +38,9 @@
 
 #pragma once
 
-#include <StormByte/multimedia/ffmpeg/AVChannelLayout.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <cstdint>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -53,95 +50,103 @@ namespace StormByte::Multimedia::FFmpeg {
 	class AVFrame;
 
 	/**
-	 * @class Swr
-	 * @brief RAII `SwrContext` for audio convert / resample.
+	 * @class AudioFifo
+	 * @brief RAII `AVAudioFifo` for sample buffering (loudnorm / encoder).
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Swr: public AVPointer<::SwrContext> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AudioFifo: public AVPointer<::AVAudioFifo> {
 		public:
 			/**
-			 * @brief Move constructor. Transfers the resampler.
-			 * @param other Source resampler; left empty.
+			 * @brief Move constructor. Transfers the fifo.
+			 * @param other Source fifo; left empty.
 			 */
-			Swr(Swr&& other) noexcept = default;
+			AudioFifo(AudioFifo&& other) noexcept = default;
 
 			/**
-			 * @brief Destructor. Frees the `SwrContext`.
+			 * @brief Destructor. Frees the `AVAudioFifo`.
 			 */
-			~Swr() noexcept override;
+			~AudioFifo() noexcept override;
 
 			/**
 			 * @brief Move assignment. Frees *this, then takes @p other.
-			 * @param other Source resampler; left empty.
+			 * @param other Source fifo; left empty.
 			 * @return *this.
 			 */
-			Swr& operator=(Swr&& other) noexcept = default;
+			AudioFifo& operator=(AudioFifo&& other) noexcept = default;
 
 			/**
-			 * @brief Whether a resampler context is open.
-			 * @return true if `Convert` can run.
+			 * @brief Whether a fifo is allocated.
+			 * @return true if @ref Write / @ref Read can run.
 			 */
 			explicit operator bool() const noexcept;
 
 			/**
-			 * @brief Opens a resampler. Empty wrapper on failure.
-			 * @param out_layout Destination channel layout.
-			 * @param out_fmt Destination `AVSampleFormat` as int.
-			 * @param out_rate Destination sample rate in Hz.
-			 * @param in_layout Source channel layout.
-			 * @param in_fmt Source `AVSampleFormat` as int.
-			 * @param in_rate Source sample rate in Hz.
-			 * @return Open resampler, or empty on failure.
+			 * @brief Allocates a fifo. Empty wrapper on failure.
+			 * @param sample_fmt `AVSampleFormat` as int.
+			 * @param channels Channel count.
+			 * @param nb_samples Initial capacity in samples.
+			 * @return Open fifo, or empty on failure.
 			 */
-			static Swr Open(const AVChannelLayout& out_layout, int out_fmt, int out_rate,
-				const AVChannelLayout& in_layout, int in_fmt, int in_rate) noexcept;
+			static AudioFifo Open(int sample_fmt, int channels, int nb_samples) noexcept;
 
 			/**
-			 * @brief Converts @p src into @p dst (`swr_convert_frame`).
-			 * @param src Source frame.
-			 * @param dst Destination frame (geometry already set).
+			 * @brief Samples currently stored.
+			 * @return Sample count, or 0.
+			 */
+			int Size() const noexcept;
+
+			/**
+			 * @brief Free sample slots.
+			 * @return Remaining capacity, or 0.
+			 */
+			int Space() const noexcept;
+
+			/**
+			 * @brief Appends @p src samples to the fifo.
+			 * @param src Source audio frame.
 			 * @return false on failure.
 			 */
-			bool Convert(const AVFrame& src, AVFrame& dst) const noexcept;
+			bool Write(const AVFrame& src) noexcept;
 
 			/**
-			 * @brief Flushes delayed samples into @p dst (`swr_convert_frame` with a null source).
-			 * @param dst Destination frame (geometry already set).
+			 * @brief Reads @p nb_samples into @p dst (already allocated).
+			 * @param dst Destination audio frame.
+			 * @param nb_samples Samples to read.
 			 * @return false on failure.
 			 */
-			bool Drain(AVFrame& dst) const noexcept;
+			bool Read(AVFrame& dst, int nb_samples) noexcept;
 
 			/**
-			 * @brief Buffered delay in units of 1/@p base seconds (`swr_get_delay`).
-			 * @param base Unit. Pass the input sample rate to get samples.
-			 * @return Delay, or 0.
+			 * @brief Grows the fifo so it can hold at least @p nb_samples.
+			 * @param nb_samples Minimum capacity in samples.
+			 * @return false on failure.
 			 */
-			std::int64_t Delay(std::int64_t base) const noexcept;
+			bool Realloc(int nb_samples) noexcept;
 
 		private:
 			/**
-			 * @brief Adopts an opened `SwrContext`.
-			 * @param ctx libswresample context, or nullptr.
+			 * @brief Adopts an allocated fifo.
+			 * @param fifo libavutil fifo, or nullptr.
 			 */
-			explicit Swr(::SwrContext* ctx) noexcept;
+			explicit AudioFifo(::AVAudioFifo* fifo) noexcept;
 
 			/**
-			 * @brief Deleted. Use @ref Open; an empty resampler is not useful.
+			 * @brief Deleted. Use @ref Open; an empty fifo is not useful.
 			 */
-			Swr() = delete;
+			AudioFifo() = delete;
 
 			/**
-			 * @brief Frees the resampler (`swr_free`).
+			 * @brief Frees the fifo (`av_audio_fifo_free`).
 			 */
 			void Free() noexcept override;
 
-			using AVPointer<::SwrContext>::Get;
+			using AVPointer<::AVAudioFifo>::Get;
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::SwrContext>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVAudioFifo>;
 }
 
 /**
- * @brief Conditional provider contract: resampler storage is released through FFmpeg out-of-line.
+ * @brief Conditional provider contract: FIFO storage is released through FFmpeg out-of-line.
  * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
  */
-STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::Swr);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AudioFifo);

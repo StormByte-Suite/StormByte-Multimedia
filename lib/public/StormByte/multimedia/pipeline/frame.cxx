@@ -77,7 +77,7 @@ Frame::Frame(const Frame& other)
 	m_serial(other.m_serial),
 	m_part(other.m_part) {
 	if (other.m_backend)
-		m_backend = std::make_unique<Backend::Pipeline::Frame>(*other.m_backend);
+		m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Frame>(*other.m_backend);
 }
 
 Frame::Frame(Frame&& other) noexcept
@@ -138,7 +138,7 @@ void Frame::BecomeEmpty() noexcept {
 
 StormByte::Buffer::FIFO& Frame::Payload() noexcept {
 	if (m_backend && !m_backend->PayloadReady()) {
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		m_backend->Handle().CopyPrimaryBuffer(bytes);
 		m_payload = StormByte::Buffer::FIFO{std::move(bytes)};
 		m_backend->PayloadReady(true);
@@ -147,7 +147,7 @@ StormByte::Buffer::FIFO& Frame::Payload() noexcept {
 	return m_payload;
 }
 
-void Frame::Bind(std::unique_ptr<Backend::Pipeline::Frame> backend) noexcept {
+void Frame::Bind(StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept {
 	m_backend = std::move(backend);
 }
 

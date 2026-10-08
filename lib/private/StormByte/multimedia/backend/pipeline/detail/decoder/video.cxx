@@ -135,7 +135,7 @@ namespace {
 			const AVFrameSideData* sd = av.SideDataAt(i);
 			if (!sd || !sd->data || sd->size <= 0)
 				continue;
-			StormByte::BinaryData bytes;
+			StormByte::Safe::Binary bytes;
 			bytes.assign(
 				reinterpret_cast<const std::byte*>(sd->data),
 				reinterpret_cast<const std::byte*>(sd->data) + sd->size);
@@ -221,7 +221,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	Video& Video::operator=(Video&& other) noexcept = default;
 
 	Video::Video(StormByte::Multimedia::FFmpeg::AVDecoder decoder, FFmpeg::AVRational timeBase,
-		std::optional<StormByte::Multimedia::Property::Video> video) noexcept
+		StormByte::Safe::Optional<StormByte::Multimedia::Property::Video> video) noexcept
 	: m_decoder(std::move(decoder)), m_video(std::move(video)), m_timeBase(timeBase), m_flushed(false) {}
 
 	bool Video::IsOpen() const noexcept {
@@ -236,7 +236,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		}
 
 		StormByte::Multimedia::FFmpeg::AVPacket raw;
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		const auto n = packet->Payload().Available();
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
@@ -271,7 +271,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Video::Receive(
 		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
-		auto holder = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Frame>();
+		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Frame>();
 		const auto result = m_decoder.ReceiveFrame(holder->Handle());
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain
 			|| result == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)

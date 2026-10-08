@@ -87,52 +87,58 @@ Registry& Registry::Instance() noexcept {
 
 CodecRefs Registry::CodecList(Type type) const noexcept {
 	CodecRefs out;
-	const auto it = m_by_type.find(type);
-	if (it == m_by_type.end())
+	const auto start = m_by_type_start.find(type);
+	const auto count = m_by_type_count.find(type);
+	if (start == m_by_type_start.end() || count == m_by_type_count.end())
 		return out;
 
-	out.reserve(it->second.size());
-	for (const std::size_t i : it->second)
-		out.emplace_back(m_codecs[i]);
+	out.reserve(static_cast<std::size_t>(count->second));
+	const std::size_t first = start->second;
+	const std::size_t last = first + static_cast<std::size_t>(count->second);
+	for (std::size_t i = first; i < last; ++i)
+		out.emplace_back(*m_codecs[i]);
 	return out;
 }
 
 ContainerRefs Registry::ContainerList() const noexcept {
 	ContainerRefs out;
 	out.reserve(m_containers.size());
-	for (const Container& container : m_containers)
-		out.emplace_back(container);
+	for (const auto& container : m_containers)
+		out.emplace_back(*container);
 	return out;
 }
 
 ExpectedCodec Registry::FindCodec(std::string_view name) const noexcept {
-	const auto it = m_by_name.find(name);
+	const auto it = m_by_name.find(StormByte::Safe::String(name));
 	if (it == m_by_name.end())
 		return Unexpected<CodecNotFoundException>(std::string(name));
 
-	return CodecRef(m_codecs[it->second]);
+	return CodecRef(*m_codecs[static_cast<std::size_t>(it->second)]);
 }
 
 ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept {
-	const auto it = m_container_by_name.find(name);
+	const auto it = m_container_by_name.find(StormByte::Safe::String(name));
 	if (it == m_container_by_name.end())
 		return Unexpected<ContainerNotFoundException>(std::string(name));
 
-	return ContainerRef(m_containers[it->second]);
+	return ContainerRef(*m_containers[static_cast<std::size_t>(it->second)]);
 }
 
 void Registry::Add(Type type, const Tables::Codec::CodecDef& def) noexcept {
 	const std::size_t i = m_codecs.size();
-	m_codecs.push_back(Codec(type, def.name, def.description, ProbeAccess(def)));
-	const Codec& stored = m_codecs[i];
+	Codec codec(type, def.name, def.description, ProbeAccess(def));
+	auto stored = StormByte::Safe::Shared<Codec>::MakePointer<Codec>(std::move(codec));
+	m_codecs.push_back(stored);
+	const Codec& storedCodec = *m_codecs[i];
 
-	m_by_name.emplace(stored.Name(), i);
+	m_by_name.emplace(StormByte::Safe::String(storedCodec.Name()), StormByte::Size{i});
 	for (std::size_t n = 0; n < def.FfmpegIdCount(); ++n)
-		m_by_name.emplace(def.FfmpegId(n), i);
-	m_by_type[type].push_back(i);
+		m_by_name.emplace(StormByte::Safe::String(def.FfmpegId(n)), StormByte::Size{i});
 }
 
 void Registry::LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> table) noexcept {
+	m_by_type_start[type] = StormByte::Size{m_codecs.size()};
+	m_by_type_count[type] = StormByte::Size{table.size()};
 	for (const Tables::Codec::CodecDef& def : table)
 		Add(type, def);
 }
@@ -146,7 +152,8 @@ void Registry::LoadCodecs() noexcept {
 
 	m_codecs.reserve(video.size() + audio.size() + subtitle.size() + attachment.size());
 	m_by_name.reserve((video.size() + audio.size() + subtitle.size() + attachment.size()) * 2);
-	m_by_type.reserve(4);
+	m_by_type_start.reserve(4);
+	m_by_type_count.reserve(4);
 
 	LoadCodecs(Type::Video, video);
 	LoadCodecs(Type::Audio, audio);
@@ -174,22 +181,24 @@ Access Registry::ProbeContainer(const Tables::Container::ContainerDef& def) cons
 void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 	const char* ext = def.PrimaryExtension();
 	const std::size_t i = m_containers.size();
-	m_containers.push_back(Container(
+	Container container(
 		def.name,
 		def.description,
 		ext ? std::string_view{ext} : std::string_view{},
 		ProbeContainer(def)
-	));
-	Container& stored = m_containers[i];
+	);
+	auto stored = StormByte::Safe::Shared<Container>::MakePointer<Container>(std::move(container));
+	m_containers.push_back(stored);
+	Container& storedContainer = *m_containers[i];
 
-	m_container_by_name.emplace(stored.Name(), i);
+	m_container_by_name.emplace(StormByte::Safe::String(storedContainer.Name()), StormByte::Size{i});
 	if (ext && ext[0] != '\0')
-		m_container_by_name.emplace(ext, i);
+		m_container_by_name.emplace(StormByte::Safe::String(ext), StormByte::Size{i});
 	for (std::size_t n = 0; n < def.FfmpegIdCount(); ++n)
-		m_container_by_name.emplace(def.FfmpegId(n), i);
+		m_container_by_name.emplace(StormByte::Safe::String(def.FfmpegId(n)), StormByte::Size{i});
 
 	const auto rows = Tables::Container::Catalog::Instance().Compat(def);
-	stored.m_allowed.reserve(rows.size());
+	storedContainer.m_allowed.reserve(rows.size());
 	for (const auto& row : rows) {
 		if (!row.codec)
 			continue;
@@ -198,7 +207,7 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 			continue;
 		const Codec& codec = found.value().get();
 		bool dup = false;
-		for (const CodecRef existing : std::as_const(stored.m_allowed)) {
+		for (const CodecRef existing : std::as_const(storedContainer.m_allowed)) {
 			if (existing.get() == codec) {
 				dup = true;
 				break;
@@ -206,7 +215,7 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 		}
 
 		if (!dup)
-			stored.m_allowed.emplace_back(codec);
+			storedContainer.m_allowed.emplace_back(codec);
 	}
 }
 

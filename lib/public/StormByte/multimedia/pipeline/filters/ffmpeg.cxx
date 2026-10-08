@@ -46,6 +46,7 @@
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
+#include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -112,8 +113,8 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 			return m_owner.Stopping();
 		}
 
-		void Fail(std::string reason) noexcept override {
-			m_owner.Fail(StormByte::Safe::String(reason));
+		void Fail(std::string_view reason) noexcept override {
+			m_owner.Fail(reason);
 		}
 
 		void Log(StormByte::Logger::Level level, std::string_view message) noexcept override {
@@ -184,7 +185,7 @@ FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	m_receives(receives),
 	m_produces(produces),
 	m_state(new PrivateState(*this)),
-	m_telemetry(StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::StageTelemetry>()),
+	m_telemetry(StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
 	m_workMin(std::numeric_limits<std::int64_t>::max()),
@@ -193,7 +194,7 @@ FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	m_hold(0),
 	m_heldFor(0) {
 	m_state->pumper = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face());
-	m_state->pumper->Bind(std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Filter>(*this));
+	m_state->pumper->Bind(StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Filter>(*this));
 }
 
 FFmpeg::~FFmpeg() noexcept {
@@ -391,7 +392,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 		return;
 	}
 	if (!frame->m_backend)
-		frame->m_backend = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Frame>();
+		frame->m_backend = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Frame>();
 	frame->m_payload = StormByte::Buffer::FIFO{};
 	frame->m_backend->Put(*frame, incoming.Detach());
 	if (!frame->m_backend->Warning().empty())
@@ -419,7 +420,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 		return;
 	}
 	if (!packet->m_backend)
-		packet->m_backend = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Packet>();
+		packet->m_backend = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Packet>();
 	packet->m_payload = StormByte::Buffer::FIFO{};
 	packet->m_backend->Handle().Reset(incoming.Detach());
 	packet->m_backend->BindProperties(*packet);
@@ -549,8 +550,8 @@ void FFmpeg::Wait() noexcept {
 		auto* two = static_cast<const ProcessTwoPasses*>(&filter);
 		if (two->m_measureOwner && two->m_measureOwner->MeasureReadyToFinish())
 			return true;
-		return two->m_measureClosed.load(std::memory_order_acquire)
-			&& !two->m_measureDrained.load(std::memory_order_acquire)
+		return two->m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire)
+			&& !two->m_measureDrained.load(StormByte::Safe::MemoryOrder::Acquire)
 			&& !filter.pipe().Ready();
 	}, [](void* owner, std::chrono::nanoseconds duration) noexcept {
 		auto& filter = *static_cast<FFmpeg*>(owner);
@@ -558,7 +559,7 @@ void FFmpeg::Wait() noexcept {
 		filter.Log(Level::LowLevel, "wake");
 		if (filter.MeasuringTwoPass()) {
 			auto* two = static_cast<ProcessTwoPasses*>(&filter);
-			if (two->m_measureClosed.load(std::memory_order_acquire) && !filter.pipe().Ready())
+			if (two->m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire) && !filter.pipe().Ready())
 				two->DrainMeasure();
 			if (two->m_measureOwner)
 				two->m_measureOwner->MaybeFinishMeasure();
@@ -664,16 +665,16 @@ void ProcessTwoPasses::Measured() noexcept {}
 
 void ProcessTwoPasses::EnterMeasure() noexcept {
 	m_measuring = true;
-	m_measureClosed.store(false, std::memory_order_release);
-	m_measureDrained.store(false, std::memory_order_release);
+	m_measureClosed.store(false, StormByte::Safe::MemoryOrder::Release);
+	m_measureDrained.store(false, StormByte::Safe::MemoryOrder::Release);
 }
 
 void ProcessTwoPasses::LeaveMeasure() noexcept {
 	Eof();
 	DumpWork();
 	m_measuring = false;
-	m_measureClosed.store(false, std::memory_order_release);
-	m_measureDrained.store(false, std::memory_order_release);
+	m_measureClosed.store(false, StormByte::Safe::MemoryOrder::Release);
+	m_measureDrained.store(false, StormByte::Safe::MemoryOrder::Release);
 	Measured();
 }
 
@@ -682,16 +683,16 @@ void ProcessTwoPasses::BindMeasure(StormByte::Multimedia::Pipeline::Filters* own
 }
 
 void ProcessTwoPasses::MeasureSourceClosed() noexcept {
-	m_measureClosed.store(true, std::memory_order_release);
+	m_measureClosed.store(true, StormByte::Safe::MemoryOrder::Release);
 	Wake();
 }
 
 void ProcessTwoPasses::DrainMeasure() noexcept {
-	if (!m_measureClosed.load(std::memory_order_acquire))
+	if (!m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire))
 		return;
 	bool expected = false;
 	if (!m_measureDrained.compare_exchange_strong(expected, true,
-			std::memory_order_acq_rel, std::memory_order_acquire))
+			StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire))
 		return;
 	if (m_measureOwner)
 		m_measureOwner->OnMeasureFilterDrained();

@@ -52,16 +52,35 @@
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/memory_order.hxx>
 
 #include <chrono>
 #include <format>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
 
 using namespace StormByte::Multimedia::Backend::Pipeline;
 using StormByte::Logger::Level;
+
+TranscoderSlot::TranscoderSlot(const TranscoderSlot& other)
+: In(other.In), Out(other.Out), Kind(other.Kind), Source(other.Source),
+	Config(other.Config ? other.Config->Clone() : StormByte::Safe::Unique<StormByte::Multimedia::Pipeline::Config::Base>{}),
+	Filters(other.Filters), Settled(other.Settled) {}
+
+TranscoderSlot::TranscoderSlot(TranscoderSlot&& other) noexcept = default;
+
+TranscoderSlot::~TranscoderSlot() noexcept = default;
+
+TranscoderSlot& TranscoderSlot::operator=(const TranscoderSlot& other) {
+	if (this == &other)
+		return *this;
+	TranscoderSlot replacement(other);
+	*this = std::move(replacement);
+	return *this;
+}
+
+TranscoderSlot& TranscoderSlot::operator=(TranscoderSlot&& other) noexcept = default;
 
 namespace {
 	template<typename Optional>
@@ -153,13 +172,13 @@ namespace {
 			mux.Title(out, config.Title().value());
 	}
 
-	bool Stopping(const Transcoder& coordinator, const std::stop_token& token) noexcept {
-		return token.stop_requested() || coordinator.Cancel.load(std::memory_order_acquire);
+	bool Stopping(const Transcoder& coordinator) noexcept {
+		return coordinator.Cancel.load(StormByte::Safe::MemoryOrder::Acquire);
 	}
 }
 
 Transcoder::Transcoder() noexcept
-: Metrics(StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::JobTelemetry>()) {}
+: Metrics(StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::JobTelemetry>()) {}
 
 Transcoder::~Transcoder() noexcept {
 	RequestCancel();
@@ -167,33 +186,31 @@ Transcoder::~Transcoder() noexcept {
 }
 
 void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept {
-	const auto current = Status.load(std::memory_order_acquire);
+	const auto current = Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (current == StormByte::Multimedia::Pipeline::Status::Running
 		|| current == StormByte::Multimedia::Pipeline::Status::Paused) {
 		job.Fail("Run was already called");
 		return;
 	}
-	Cancel.store(false, std::memory_order_release);
-	Paused.store(false, std::memory_order_release);
+	Cancel.store(false, StormByte::Safe::MemoryOrder::Release);
+	Paused.store(false, StormByte::Safe::MemoryOrder::Release);
 	m_measureHook = false;
 	m_analyticsHook = false;
 	{
-		std::lock_guard lock(Lock);
-		Clock = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Progress>();
+		StormByte::Safe::UniqueLock lock(Lock);
+			Clock = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Progress>();
 		if (!job.m_duration || job.m_duration.value() <= 0)
 			Clock->BeginDurationCalculation();
 	}
-	Status.store(StormByte::Multimedia::Pipeline::Status::Running, std::memory_order_release);
-	m_worker = std::jthread([this, &job](std::stop_token token) {
-		Run(job, token);
+	Status.store(StormByte::Multimedia::Pipeline::Status::Running, StormByte::Safe::MemoryOrder::Release);
+	m_worker = StormByte::Safe::Thread([this, &job]() {
+		Run(job);
 	});
 }
 
 void Transcoder::RequestCancel() noexcept {
-	Cancel.store(true, std::memory_order_release);
-	Paused.store(false, std::memory_order_release);
-	if (m_worker.joinable())
-		m_worker.request_stop();
+	Cancel.store(true, StormByte::Safe::MemoryOrder::Release);
+	Paused.store(false, StormByte::Safe::MemoryOrder::Release);
 	PauseCv.notify_all();
 }
 
@@ -203,10 +220,10 @@ void Transcoder::Join() noexcept {
 }
 
 void Transcoder::WaitIfPaused() noexcept {
-	std::unique_lock wait(PauseMutex);
+	StormByte::Safe::UniqueLock wait(PauseMutex);
 	PauseCv.wait(wait, [this]() {
-		return Cancel.load(std::memory_order_acquire)
-			|| !Paused.load(std::memory_order_acquire);
+		return Cancel.load(StormByte::Safe::MemoryOrder::Acquire)
+			|| !Paused.load(StormByte::Safe::MemoryOrder::Acquire);
 	});
 }
 
@@ -227,20 +244,20 @@ void Transcoder::TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
 	job.OnProgress();
 }
 
-void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop_token token) noexcept {
+void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept {
 	NameThread("MM-Transcoder");
 	Metrics->SampleMemory();
 	TelemetrySummary summary{Metrics, job.Logger()};
 	const auto started = std::chrono::steady_clock::now();
 	JobLog(job.Logger(), Level::Notice, "running");
 	job.OnConfigure();
-	if (Status.load(std::memory_order_acquire) == StormByte::Multimedia::Pipeline::Status::Error) {
+	if (Status.load(StormByte::Safe::MemoryOrder::Acquire) == StormByte::Multimedia::Pipeline::Status::Error) {
 			job.OnError(ErrorText(job.Error(), "configure failed"));
 		return;
 	}
 
-	if (Stopping(*this, token)) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
+	if (Stopping(*this)) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
 		JobLog(job.Logger(), Level::Notice, "aborted");
 		job.OnAborted();
 		return;
@@ -272,8 +289,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	}
 	Clock->SetDurationCalculation(std::nullopt);
 	job.OnProgress();
-	if (Stopping(*this, token)) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
+	if (Stopping(*this)) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
 		job.OnAborted();
 		return;
 	}
@@ -303,19 +320,19 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 			job.OnError(ErrorText(job.Error(), "OnStart rejected the job"));
 		}
 		else if (start == StormByte::Multimedia::Pipeline::Status::Aborted) {
-			Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
+			Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
 			JobLog(job.Logger(), Level::Notice, "aborted");
 			job.OnAborted();
 		}
 		else {
-			Status.store(StormByte::Multimedia::Pipeline::Status::Stopped, std::memory_order_release);
+			Status.store(StormByte::Multimedia::Pipeline::Status::Stopped, StormByte::Safe::MemoryOrder::Release);
 		}
 		return;
 	}
 
 	const auto& tube = job.ApplicationLog();
-	auto demux = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Demuxer>(tube, Clock);
-	auto mux = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Muxer>(tube);
+	auto demux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Demuxer>(tube, Clock);
+	auto mux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Muxer>(tube);
 	RegisterStage(*Metrics, *demux);
 	RegisterStage(*Metrics, *mux);
 	std::move(built) >> *demux;
@@ -332,8 +349,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		job.OnError(ErrorText(job.Error(), "mux"));
 		return;
 	}
-	if (Stopping(*this, token)) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
+	if (Stopping(*this)) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
 		JobLog(job.Logger(), Level::Notice, "aborted");
 		job.OnAborted();
 		return;
@@ -357,7 +374,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		StampMuxTags(*mux, muxIndex, *slot.Config);
 		const StormByte::Multimedia::Codec* codec = LeafCodec(slot.Config.get());
 		if (!codec) {
-			auto remux = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);
+					auto remux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);
 			RegisterStage(*Metrics, *remux);
 			*demux >> *remux;
 			*remux >> *mux;
@@ -372,8 +389,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 			remuxes.push_back(std::move(remux));
 		}
 		else {
-			auto decoder = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
-			auto encoder = StormByte::Safe::Heap::MakeShared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
+					auto decoder = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
+					auto encoder = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
 			RegisterStage(*Metrics, *decoder);
 			RegisterStage(*Metrics, *encoder);
 			ConfigureEncoder(*encoder, *slot.Config);
@@ -407,9 +424,9 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		Metrics->RegisterStage(std::move(stage.Name), std::move(stage.Metrics));
 	TickHooks(job, graph);
 
-	while (!Stopping(*this, token)) {
+	while (!Stopping(*this)) {
 		WaitIfPaused();
-		if (Stopping(*this, token))
+		if (Stopping(*this))
 			break;
 		if (demux->Failed()) {
 				job.Fail(ErrorText(demux->Error(), "demux failed"));
@@ -443,9 +460,9 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
-	if (Stopping(*this, token)
-		&& Status.load(std::memory_order_acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, std::memory_order_release);
+	if (Stopping(*this)
+		&& Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
 		JobLog(job.Logger(), Level::Notice, "aborted");
 		job.OnAborted();
 		return;
@@ -456,7 +473,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 		return;
 	}
 
-	while (!Stopping(*this, token) && !graph.Idle()) {
+	while (!Stopping(*this) && !graph.Idle()) {
 		TickHooks(job, graph);
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
@@ -464,7 +481,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop
 	Reports = graph.Reports();
 	TickHooks(job, graph);
 
-	Status.store(StormByte::Multimedia::Pipeline::Status::Done, std::memory_order_release);
+	Status.store(StormByte::Multimedia::Pipeline::Status::Done, StormByte::Safe::MemoryOrder::Release);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now() - started).count();
 	JobLog(job.Logger(), Level::Info, std::format("done tracks={} {}ms", Mapped.size(), ms));

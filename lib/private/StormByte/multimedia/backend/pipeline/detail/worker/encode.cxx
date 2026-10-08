@@ -98,7 +98,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (opening)
 			Log(Level::Notice, std::format("open t={} codec={} impl={}",
 				m_owner.m_index, std::string(m_owner.m_codec->Name()),
-				m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})));
+				std::string_view{m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})}));
 
 		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={}",
 			m_owner.m_index, *frame->Serial(), frame->Part(),

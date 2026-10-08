@@ -42,12 +42,11 @@
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
 #include <StormByte/multimedia/ffmpeg/AVBSF.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
-#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/multimedia/ffmpeg/backend_typedefs.hxx>
 #include <StormByte/safe/pointers.hxx>
 
 #include <chrono>
 #include <filesystem>
-#include <memory>
 
 namespace StormByte::Multimedia {
 	class File;
@@ -71,7 +70,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class AVFormatContext
 	 * @brief RAII input format context (demuxer).
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVFormatContext: public AVPointer<::AVFormatContext> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVFormatContext: public AVPointer<::AVFormatContext> {
 		friend class StormByte::Multimedia::File;
 		friend class StormByte::Multimedia::Backend::Pipeline::Demuxer;
 
@@ -178,7 +177,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		private:
 			struct ConsumerIO;
 
-			std::unique_ptr<ConsumerIO> m_io;	///< Custom AVIO state (Consumer opens)
+			Safe::Unique<ConsumerIO> m_io;	///< Base-owned custom AVIO state (Consumer opens).
 			bool m_avioBorrowed;				///< true: @c pb is not owned
 
 			/**
@@ -187,7 +186,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param io Optional Consumer AVIO state.
 			 * @param avioBorrowed true if @c pb must outlive this context.
 			 */
-			explicit AVFormatContext(::AVFormatContext* ctx, std::unique_ptr<ConsumerIO> io,
+			explicit AVFormatContext(::AVFormatContext* ctx, Safe::Unique<ConsumerIO> io,
 				bool avioBorrowed = false) noexcept;
 
 			/**
@@ -229,7 +228,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			using AVPointer<::AVFormatContext>::Get;
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVFormatContext>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVFormatContext>;
 }
 
 /**

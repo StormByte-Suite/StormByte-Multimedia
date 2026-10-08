@@ -46,13 +46,13 @@
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
+#include <StormByte/safe/condition_variable.hxx>
+#include <StormByte/safe/mutex.hxx>
+#include <StormByte/safe/thread.hxx>
+#include <StormByte/safe/unique_lock.hxx>
+#include <StormByte/safe/vector.hxx>
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <stop_token>
-#include <thread>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline
@@ -69,15 +69,65 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 */
 	class STORMBYTE_MULTIMEDIA_PRIVATE TranscoderSlot {
 		public:
+			/**
+			 * @brief Empty slot.
+			 */
+			TranscoderSlot() noexcept = default;
+
+			/**
+			 * @brief Deep-copies the config and copies Base-owned filter handles.
+			 * @param other Source slot.
+			 */
+			TranscoderSlot(const TranscoderSlot& other);
+
+			/**
+			 * @brief Transfers the config owner and filter handles.
+			 * @param other Source slot.
+			 */
+			TranscoderSlot(TranscoderSlot&& other) noexcept;
+
+			/**
+			 * @brief Destroys the slot in its provider module.
+			 */
+			~TranscoderSlot() noexcept;
+
+			/**
+			 * @brief Deep-copies the config and copies Base-owned filter handles.
+			 * @param other Source slot.
+			 * @return This slot.
+			 */
+			TranscoderSlot& operator=(const TranscoderSlot& other);
+
+			/**
+			 * @brief Transfers the slot state.
+			 * @param other Source slot.
+			 * @return This slot.
+			 */
+			TranscoderSlot& operator=(TranscoderSlot&& other) noexcept;
+
 			int In = -1;								///< Origin stream index
 			int Out = -1;								///< Mux destination order
 			StormByte::Multimedia::Type Kind = StormByte::Multimedia::Type::Unknown;	///< Media kind
 			const StormByte::Multimedia::Codec* Source = nullptr;	///< Origin codec from consultation
 			StormByte::Safe::Unique<StormByte::Multimedia::Pipeline::Config::Base> Config;	///< Track intention
-			std::vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Filters;	///< Stretch leaves
+			StormByte::Safe::Vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Filters;	///< Stretch leaves
 			bool Settled = false;						///< OnSettled already fired
 	};
+	}
 
+	/**
+	 * @brief Registers provider-owned slot state for Base Safe::Vector storage.
+	 * @note Config copies clone through Multimedia; codec is a borrowed registry pointer.
+	 */
+	STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::TranscoderSlot);
+
+	/**
+	 * @namespace StormByte::Multimedia::Backend::Pipeline
+	 * @brief Multimedia-owned pipeline stages and unit holders.
+	 *
+	 * @ingroup multimedia_pipeline
+	 */
+	namespace StormByte::Multimedia::Backend::Pipeline {
 	/**
 	 * @class Transcoder
 	 * @brief Runs one reader-to-writer job for the public Transcoder facade.
@@ -95,9 +145,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			Transcoder() noexcept;
 
-			/**
-			 * @brief Requests stop and joins the worker.
-			 */
 			~Transcoder() noexcept;
 
 			/**
@@ -147,19 +194,19 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			void WaitIfPaused() noexcept;
 
-			mutable std::mutex Lock;					///< Status / Error
-			std::mutex PauseMutex;						///< PauseCv
-			std::condition_variable PauseCv;			///< Pause waiters
-			std::atomic<StormByte::Multimedia::Pipeline::Status> Status {
+			mutable StormByte::Safe::Mutex Lock;	///< Status / Error
+			StormByte::Safe::Mutex PauseMutex;		///< PauseCv
+			StormByte::Safe::ConditionVariable PauseCv;	///< Pause waiters
+			StormByte::Safe::Atomic<StormByte::Multimedia::Pipeline::Status> Status {
 				StormByte::Multimedia::Pipeline::Status::Stopped
 			};											///< Public job lifecycle
-			std::atomic<bool> Cancel { false };			///< Cancel requested
-			std::atomic<bool> Paused { false };			///< Coordinator is paused
+			StormByte::Safe::Atomic<bool> Cancel { false };	///< Cancel requested
+			StormByte::Safe::Atomic<bool> Paused { false };	///< Coordinator is paused
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Progress> Clock;	///< Demuxer clock
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;	///< Retained stage and process metrics
 			StormByte::Safe::Optional<StormByte::Safe::String> Error;			///< Failure text
-			std::vector<TranscoderSlot> Mapped;			///< Fluent map, mux order
-			std::vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Analytics;	///< Global analytics
+			StormByte::Safe::Vector<TranscoderSlot> Mapped;	///< Fluent map, mux order
+			StormByte::Safe::Vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Analytics;	///< Global analytics
 			StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, StormByte::Multimedia::Pipeline::Filter::Report>> Reports;	///< Snapshots at Done
 
 		private:
@@ -168,7 +215,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param job Public facade.
 			 * @param token Stop token of the worker.
 			 */
-			void Run(StormByte::Multimedia::Pipeline::Transcoder& job, std::stop_token token) noexcept;
+			void Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept;
 
 			/**
 			 * @brief Forwards analytics idle and fires measure / analytics / progress hooks once.
@@ -178,7 +225,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
 				StormByte::Multimedia::Pipeline::Filters& graph) noexcept;
 
-			std::jthread m_worker;						///< Coordinator thread
+			StormByte::Safe::Thread m_worker;		///< Coordinator thread
 			bool m_measureHook = false;					///< OnMeasureDone already fired
 			bool m_analyticsHook = false;				///< OnAnalyticsDone already fired
 	};

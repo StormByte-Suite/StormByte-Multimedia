@@ -160,7 +160,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			Safe::Optional<double> m_nfIn;		///< Caller nf, or empty
 			Safe::Optional<bool> m_trackIn;		///< Caller tn, or empty
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }
 

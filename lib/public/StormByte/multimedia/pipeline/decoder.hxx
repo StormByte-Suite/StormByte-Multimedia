@@ -44,15 +44,13 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <optional>
 #include <string>
 
 /**
@@ -319,6 +317,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			struct SourceLook {};
 
+		public:
 			/**
 			 * @brief Post-encode recon for Analytics.
 			 * @param log Shared logger.
@@ -359,6 +358,7 @@ namespace StormByte::Multimedia::Pipeline {
 			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				int track, SourceLook tag) noexcept;
 
+		private:
 			using Step::Log;
 
 			/**
@@ -373,13 +373,13 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Pins the opened backend.
 			 * @param backend Opened decode backend.
 			 */
-			void Bind(std::unique_ptr<Backend::Pipeline::Decoder> backend) noexcept;
+			void Bind(StormByte::Safe::Unique<Backend::Pipeline::Decoder> backend) noexcept;
 
 			/**
 			 * @brief Opens the decode backend from the bound demuxer.
 			 * @return Backend, or empty after Fail.
 			 */
-			std::unique_ptr<Backend::Pipeline::Decoder> OpenOrigin() noexcept;
+			StormByte::Safe::Unique<Backend::Pipeline::Decoder> OpenOrigin() noexcept;
 
 			/**
 			 * @brief Copies origin File tags onto this decoder.
@@ -427,7 +427,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param frame Public unit.
 			 * @param backend Holder of the FFmpeg frame. May be empty.
 			 */
-			void Attach(Frame& frame, std::unique_ptr<Backend::Pipeline::Frame> backend) noexcept;
+			void Attach(Frame& frame, StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept;
 
 			/**
 			 * @brief Closes the duration of a subtitle cue on @p frame.
@@ -489,14 +489,14 @@ namespace StormByte::Multimedia::Pipeline {
 			Features m_capabilities;								///< Opened row bits
 			Demuxer* m_origin = nullptr;							///< Origin demuxer, origin mode
 			Filters* m_analytics = nullptr;							///< Dest-look clock; null on origin decode
-			std::unique_ptr<Backend::Pipeline::Decoder> m_backend;	///< Decode backend
-			std::optional<std::uint64_t> m_serial;					///< Last packet Serial
+			StormByte::Safe::Unique<Backend::Pipeline::Decoder> m_backend;	///< Decode backend
+			StormByte::Safe::Optional<std::uint64_t> m_serial;	///< Last packet Serial
 			std::uint64_t m_part;									///< Part within Serial
 			StormByte::Safe::Optional<Property::Duration> m_inDts;		///< Dts of last packet
 			bool m_look = false;									///< Opens from Packet codecpar
-			std::optional<Producer> m_lookStamp;					///< Dest-look Producer, or empty
-			std::atomic<bool> m_measureClosed{false};				///< Origin will not send more measure packets
-			std::atomic<bool> m_measureDrained{false};				///< OnMeasureDrained already ran
+			StormByte::Safe::Optional<Producer> m_lookStamp;	///< Dest-look Producer, or empty
+			StormByte::Safe::Atomic<bool> m_measureClosed{false};	///< Origin will not send more measure packets
+			StormByte::Safe::Atomic<bool> m_measureDrained{false};	///< OnMeasureDrained already ran
 			Join m_join{*this};										///< Halt before other members die
 	};
 }

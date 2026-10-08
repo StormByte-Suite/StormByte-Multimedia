@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/pointers.hxx>
 
 #include <cctype>
@@ -163,24 +164,24 @@ Muxer::Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
 	m_closed(false),
 	m_reserved(0),
 	m_positionNs(-1) {
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Sink>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Mux>(*this));
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Sink>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Mux>(*this));
 	Launch();
 }
 
 Muxer::~Muxer() noexcept = default;
 
 Muxer::operator bool() const noexcept {
-	return !Failed() && !m_closed.load(std::memory_order_acquire) && Ready()
+	return !Failed() && !m_closed.load(StormByte::Safe::MemoryOrder::Acquire) && Ready()
 		&& m_backend && m_backend->IsOpen();
 }
 
 bool Muxer::Closed() const noexcept {
-	return m_closed.load(std::memory_order_acquire) || Failed();
+	return m_closed.load(StormByte::Safe::MemoryOrder::Acquire) || Failed();
 }
 
 StormByte::Safe::Optional<Property::Duration> Muxer::Position() const noexcept {
-	const std::int64_t ns = m_positionNs.load(std::memory_order_acquire);
+	const std::int64_t ns = m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (ns < 0)
 		return std::nullopt;
 	return Property::Duration{std::chrono::nanoseconds{ns}};
@@ -205,7 +206,7 @@ std::size_t Muxer::ExpectedSlots() const noexcept {
 }
 
 bool Muxer::Armed() const noexcept {
-	const auto reserved = m_reserved.load(std::memory_order_acquire);
+	const auto reserved = m_reserved.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (reserved == 0)
 		return false;
 	const auto expected = ExpectedSlots();
@@ -291,7 +292,7 @@ bool Muxer::SpawnBackend() noexcept {
 		Fail(std::move(reason));
 		return false;
 	}
-	m_backend = std::make_unique<Backend::Pipeline::Detail::Muxer::FFmpeg::Container>();
+	m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Muxer::FFmpeg::Container>();
 	return true;
 }
 
@@ -388,7 +389,7 @@ Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& mu
 	encoder.pipe().To(encoder.Index()) >> muxer.pipe();
 	if (const std::size_t cap = muxer.InputCeiling(); cap > 0)
 		muxer.pipe().Capacity(encoder.Index(), cap);
-	muxer.m_reserved.fetch_add(1, std::memory_order_acq_rel);
+	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
 	muxer.Log(Level::Debug, std::format("reserve encoder t={}", encoder.Index()));
 	if (muxer.Armed())
 		muxer.Wake();
@@ -418,7 +419,7 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& mu
 	remuxer.pipe().To(remuxer.In()) >> muxer.pipe();
 	if (const std::size_t cap = muxer.InputCeiling(); cap > 0)
 		muxer.pipe().Capacity(remuxer.In(), cap);
-	muxer.m_reserved.fetch_add(1, std::memory_order_acq_rel);
+	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
 	muxer.Log(Level::Debug, std::format("reserve remux t={}", remuxer.In()));
 	if (muxer.Armed())
 		muxer.Wake();

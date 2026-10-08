@@ -61,7 +61,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		 * @note Copies borrow the same stream. The owning format context must outlive
 		 * every view. Providers must remain loaded and use a compatible C++ and FFmpeg ABI.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVStream {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVStream {
 		public:
 						/**
 						 * @brief Constructs an empty non-owning view.

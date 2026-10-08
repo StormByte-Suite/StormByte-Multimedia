@@ -39,13 +39,14 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 #include <StormByte/type_traits/safe.hxx>
+#include <StormByte/thread_lock.hxx>
 
 #include <cstdint>
-#include <mutex>
 #include <string>
 
 /**
@@ -328,7 +329,11 @@ namespace StormByte {
 					 */
 					void SetDurationCalculation(StormByte::Safe::Optional<double> percent) noexcept;
 
-					mutable std::recursive_mutex m_lock;						///< Protects all clock values and snapshots.
+					mutable StormByte::ThreadLock m_reentrantLock;	///< Serializes callers and tracks the owning thread.
+
+					mutable StormByte::Safe::Mutex m_lock;	///< Protects all clock values at the outermost lock level.
+
+					mutable std::uint32_t m_lockDepth = 0;	///< Reentrant levels owned under m_reentrantLock.
 					bool m_calculatingDuration = false;						///< Duration preparation or byte scanning is active.
 					mutable char m_durationIndicator = '|';					///< Last preparation symbol, frozen while scanning.
 					StormByte::Safe::Optional<double> m_durationCalculation;	///< Active monotone duration scan estimate.

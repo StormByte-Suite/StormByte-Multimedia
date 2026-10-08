@@ -52,6 +52,8 @@
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/stream.hxx>
+#include <StormByte/safe/memory_order.hxx>
+#include <StormByte/safe/unique_lock.hxx>
 #include <StormByte/safe/wstring.hxx>
 
 #include <algorithm>
@@ -116,7 +118,7 @@ namespace {
 		return dynamic_cast<Config::Subtitle*>(config);
 	}
 
-	bool AlreadyMapped(const std::vector<StormByte::Multimedia::Backend::Pipeline::TranscoderSlot>& mapped,
+	bool AlreadyMapped(const StormByte::Safe::Vector<StormByte::Multimedia::Backend::Pipeline::TranscoderSlot>& mapped,
 		int in, StormByte::Multimedia::Type kind) noexcept {
 		for (const auto& slot : mapped) {
 			if (slot.In == in && slot.Kind == kind)
@@ -314,7 +316,7 @@ Transcoder::~Transcoder() noexcept {
 	JobLog(m_logger, Level::LowLevel, "destroy");
 	if (!m_backend)
 		return;
-	const auto status = m_backend->Status.load(std::memory_order_acquire);
+	const auto status = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (status == Status::Running || status == Status::Paused)
 		Cancel();
 	m_backend->Join();
@@ -328,11 +330,11 @@ void Transcoder::InstallLog() noexcept {
 void Transcoder::Fail(std::string_view reason) noexcept {
 	if (!m_backend)
 		return;
-	std::lock_guard lock(m_backend->Lock);
-	if (m_backend->Status.load(std::memory_order_relaxed) == Status::Error)
+	StormByte::Safe::UniqueLock lock(m_backend->Lock);
+	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Relaxed) == Status::Error)
 		return;
 	m_backend->Error = StormByte::Safe::String{reason};
-	m_backend->Status.store(Status::Error, std::memory_order_release);
+	m_backend->Status.store(Status::Error, StormByte::Safe::MemoryOrder::Release);
 	m_backend->RequestCancel();
 	JobLog(m_logger, Level::Error, m_backend->Error.value());
 }
@@ -462,7 +464,7 @@ Transcoder& Transcoder::Attachments() noexcept {
 }
 
 Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept {
-	if (!Detail::MimePatternOk(pattern)) {
+	if (!StormByte::Multimedia::Detail::MimePatternOk(pattern)) {
 		Fail("attachment MIME pattern is not exact, type-star or star-star");
 		return *this;
 	}
@@ -473,7 +475,7 @@ Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept {
 	for (int i = 0; i < static_cast<int>(attachments.size()); ++i) {
 		const Attachment attachment = attachments[static_cast<std::size_t>(i)];
 		const auto& have = attachment.MimeType();
-		if (have && Detail::MimeMatches(*have, pattern))
+		if (have && StormByte::Multimedia::Detail::MimeMatches(*have, pattern))
 			AddTrack(i, Type::Attachment);
 	}
 	return *this;
@@ -501,7 +503,7 @@ Transcoder& Transcoder::Ignore(int in) noexcept {
 void Transcoder::Run() noexcept {
 	if (!m_backend)
 		return;
-	const auto current = m_backend->Status.load(std::memory_order_acquire);
+	const auto current = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (current == Status::Running || current == Status::Paused || m_armed) {
 		Fail("Run was already called");
 		return;
@@ -517,20 +519,20 @@ void Transcoder::Cancel() noexcept {
 void Transcoder::Pause() noexcept {
 	if (!m_backend)
 		return;
-	if (m_backend->Status.load(std::memory_order_acquire) != Status::Running)
+	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Running)
 		return;
-	m_backend->Paused.store(true, std::memory_order_release);
-	m_backend->Status.store(Status::Paused, std::memory_order_release);
+	m_backend->Paused.store(true, StormByte::Safe::MemoryOrder::Release);
+	m_backend->Status.store(Status::Paused, StormByte::Safe::MemoryOrder::Release);
 	JobLog(m_logger, Level::Notice, "paused");
 }
 
 void Transcoder::Resume() noexcept {
 	if (!m_backend)
 		return;
-	if (m_backend->Status.load(std::memory_order_acquire) != Status::Paused)
+	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Paused)
 		return;
-	m_backend->Paused.store(false, std::memory_order_release);
-	m_backend->Status.store(Status::Running, std::memory_order_release);
+	m_backend->Paused.store(false, StormByte::Safe::MemoryOrder::Release);
+	m_backend->Status.store(Status::Running, StormByte::Safe::MemoryOrder::Release);
 	m_backend->PauseCv.notify_all();
 	JobLog(m_logger, Level::Notice, "resumed");
 }
@@ -538,7 +540,7 @@ void Transcoder::Resume() noexcept {
 enum Status Transcoder::Status() const noexcept {
 	if (!m_backend)
 		return Status::Error;
-	return m_backend->Status.load(std::memory_order_acquire);
+	return m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
 }
 
 bool Transcoder::Failed() const noexcept {
@@ -548,7 +550,7 @@ bool Transcoder::Failed() const noexcept {
 StormByte::Safe::Optional<StormByte::Safe::String> Transcoder::Error() const noexcept {
 	if (!m_backend)
 		return {};
-	std::lock_guard lock(m_backend->Lock);
+	StormByte::Safe::UniqueLock lock(m_backend->Lock);
 	return m_backend->Error;
 }
 
@@ -563,7 +565,7 @@ StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> Transcoder::OutputTel
 StormByte::Safe::Shared<const class Progress> Transcoder::Progress() const noexcept {
 	if (!m_backend)
 		return {};
-	std::lock_guard lock(m_backend->Lock);
+	StormByte::Safe::UniqueLock lock(m_backend->Lock);
 	return m_backend->Clock;
 }
 

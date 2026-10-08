@@ -299,7 +299,7 @@ void Denoise::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("denoise: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("denoise: AVFilterGraph::Ensure failed");
 		return;

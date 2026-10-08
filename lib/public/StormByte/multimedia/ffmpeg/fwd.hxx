@@ -38,6 +38,8 @@
 
 #pragma once
 
+#include <StormByte/type_traits/safe.hxx>
+
 /**
  * @file fwd.hxx
  * @brief Incomplete FFmpeg types for RAII headers. Do not include libav* here.
@@ -67,3 +69,17 @@ extern "C" {
 	struct SwrContext;
 	struct SwsContext;
 }
+
+/**
+ * @namespace StormByte::Multimedia::FFmpeg
+ * @brief Private RAII wrappers over libav*.
+ */
+namespace StormByte::Multimedia::FFmpeg {
+	class AVCodecParameters;
+}
+
+/**
+ * @brief Declare the private codec-parameter wrapper conditionally DLL-safe.
+ * @note Its provider owns FFmpeg allocations; Multimedia and Base must remain loaded.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVCodecParameters);

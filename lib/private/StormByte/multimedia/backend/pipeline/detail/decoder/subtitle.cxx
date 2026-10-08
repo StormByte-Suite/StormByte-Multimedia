@@ -102,7 +102,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		}
 
 		StormByte::Multimedia::FFmpeg::AVPacket raw;
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		const auto n = packet->Payload().Available();
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
@@ -149,7 +149,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		m_pendingSub.reset();
 
 		auto text = sub.Text();
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		if (!text.empty()) {
 			bytes.assign(
 				reinterpret_cast<const std::byte*>(text.data()),

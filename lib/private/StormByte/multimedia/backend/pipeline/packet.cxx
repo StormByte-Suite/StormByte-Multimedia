@@ -54,7 +54,7 @@ Packet& Packet::operator=(const Packet& other) noexcept {
 	return *this;
 }
 
-void Packet::Parameters(std::optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> params) noexcept {
+void Packet::Parameters(StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> params) noexcept {
 	m_params = std::move(params);
 }
 

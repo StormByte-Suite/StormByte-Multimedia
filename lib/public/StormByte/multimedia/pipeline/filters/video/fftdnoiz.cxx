@@ -101,7 +101,7 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("fftdnoiz: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = StormByte::Safe::Heap::MakeUnique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("fftdnoiz: AVFilterGraph::Ensure failed");
 		return;

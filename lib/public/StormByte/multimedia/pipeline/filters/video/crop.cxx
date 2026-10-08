@@ -260,7 +260,7 @@ const FFrame* Crop::Luma(const FFrame& src) noexcept {
 	if (m_luma && (m_lumaW != src.Width() || m_lumaH != src.Height() || m_lumaFmt != src.Format()))
 		DropLuma();
 	if (!m_luma) {
-		auto luma = std::make_unique<FFrame>();
+		auto luma = StormByte::Safe::MakeUnique<FFrame>();
 		luma->Format(FFrame::FormatGray8());
 		if (!src.ScaleTo(*luma, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {

@@ -57,8 +57,8 @@ bool Worker::Stopping() const noexcept {
 	return m_host.Stopping();
 }
 
-void Worker::Fail(std::string reason) noexcept {
-	m_host.Fail(std::move(reason));
+void Worker::Fail(std::string_view reason) noexcept {
+	m_host.Fail(reason);
 }
 
 void Worker::Log(StormByte::Logger::Level level, std::string_view message) noexcept {

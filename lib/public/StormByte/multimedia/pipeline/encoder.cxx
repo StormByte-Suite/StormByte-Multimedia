@@ -82,21 +82,21 @@ Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	m_encoderTag("StormByte-Multimedia " STORMBYTE_MULTIMEDIA_VERSION), m_part(0) {
 	switch (codec.Type()) {
 		case Type::Video:
-			m_backend = std::make_unique<Backend::Pipeline::Detail::Encoder::Video>();
+			m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Encoder::Video>();
 			break;
 		case Type::Audio:
-			m_backend = std::make_unique<Backend::Pipeline::Detail::Encoder::Audio>();
+			m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Encoder::Audio>();
 			break;
 		case Type::Subtitle:
-			m_backend = std::make_unique<Backend::Pipeline::Detail::Encoder::Subtitle>();
+			m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Encoder::Subtitle>();
 			break;
 		default:
 			Fail("encoder destination type is not video, audio or subtitle");
 			return;
 	}
 
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Encode>(*this));
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Encode>(*this));
 	Launch();
 }
 
@@ -212,7 +212,7 @@ Packet::PointerType Encoder::Wrap(
 	StormByte::Safe::Optional<Property::Duration> duration,
 	bool keyFrame,
 	StormByte::Safe::Vector<SideData> attachments,
-	std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept {
+	StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept {
 	if (!m_serial) {
 		Fail("encoder packet has no serial");
 		return {};

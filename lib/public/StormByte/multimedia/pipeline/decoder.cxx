@@ -53,6 +53,7 @@
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
+#include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/pointers.hxx>
 
@@ -72,8 +73,8 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, DecoderFlags flags) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags(flags), m_part(0), m_look(false) {
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
@@ -81,8 +82,8 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, EncodeLook) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true), m_lookStamp(Producer::Encoder) {
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
@@ -90,8 +91,8 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, RemuxLook) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true), m_lookStamp(Producer::Remuxer) {
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
@@ -99,8 +100,8 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	int track, SourceLook) noexcept
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true) {
-	Mount(StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::Heap::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Decode>(*this));
 	Launch();
 }
 
@@ -126,7 +127,7 @@ void Decoder::Implementation(StormByte::Safe::String name) noexcept {
 		m_implementation = std::move(name);
 }
 
-void Decoder::Attach(Frame& frame, std::unique_ptr<Backend::Pipeline::Frame> backend) noexcept {
+void Decoder::Attach(Frame& frame, StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept {
 	frame.m_language = m_language;
 	frame.m_title = m_title;
 	frame.Bind(std::move(backend));
@@ -155,12 +156,12 @@ void Decoder::StampLook(Frame& frame) noexcept {
 		m_analytics->NoteAnalytics(pts->Nanoseconds().count());
 }
 
-void Decoder::Bind(std::unique_ptr<Backend::Pipeline::Decoder> backend) noexcept {
+void Decoder::Bind(StormByte::Safe::Unique<Backend::Pipeline::Decoder> backend) noexcept {
 	m_backend = std::move(backend);
 	m_capabilities = Features{};
 }
 
-std::unique_ptr<Backend::Pipeline::Decoder> Decoder::OpenOrigin() noexcept {
+StormByte::Safe::Unique<Backend::Pipeline::Decoder> Decoder::OpenOrigin() noexcept {
 	if (!m_origin)
 		return {};
 	return m_origin->OpenDecoder(*this);
@@ -186,18 +187,18 @@ void Decoder::AttachOrigin(Demuxer& demuxer) noexcept {
 void Decoder::MeasureSourceClosed() noexcept {
 	if (m_look)
 		return;
-	m_measureClosed.store(true, std::memory_order_release);
+	m_measureClosed.store(true, StormByte::Safe::MemoryOrder::Release);
 	Wake();
 }
 
 void Decoder::DrainMeasure() noexcept {
 	if (m_look)
 		return;
-	if (!m_measureClosed.load(std::memory_order_acquire))
+	if (!m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire))
 		return;
 	bool expected = false;
 	if (!m_measureDrained.compare_exchange_strong(expected, true,
-			std::memory_order_acq_rel, std::memory_order_acquire))
+			StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire))
 		return;
 	if (Failed())
 		return;
@@ -212,15 +213,15 @@ void Decoder::DrainMeasure() noexcept {
 bool Decoder::WakeNow() const noexcept {
 	if (m_look)
 		return false;
-	return m_measureClosed.load(std::memory_order_acquire)
-		&& !m_measureDrained.load(std::memory_order_acquire)
+	return m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire)
+		&& !m_measureDrained.load(StormByte::Safe::MemoryOrder::Acquire)
 		&& !pipe().Ready();
 }
 
 void Decoder::AfterWait() noexcept {
 	if (m_look)
 		return;
-	if (m_measureClosed.load(std::memory_order_acquire) && !pipe().Ready())
+	if (m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire) && !pipe().Ready())
 		DrainMeasure();
 }
 
@@ -270,17 +271,17 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 
 	const StormByte::Multimedia::FFmpeg::AVRational timeBase{1, 1000000000};
 	if (packet.Type() == Type::Video) {
-		Bind(std::make_unique<Backend::Pipeline::Detail::Decoder::Video>(
+		Bind(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Decoder::Video>(
 			std::move(*opened), timeBase, std::nullopt));
 	}
 
 	else if (packet.Type() == Type::Audio) {
-		Bind(std::make_unique<Backend::Pipeline::Detail::Decoder::Audio>(
+		Bind(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Decoder::Audio>(
 			std::move(*opened), timeBase, std::nullopt));
 	}
 
 	else {
-		Bind(std::make_unique<Backend::Pipeline::Detail::Decoder::Subtitle>(
+		Bind(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Decoder::Subtitle>(
 			std::move(*opened), timeBase));
 	}
 

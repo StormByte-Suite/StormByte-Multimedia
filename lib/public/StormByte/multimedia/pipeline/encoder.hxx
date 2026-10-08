@@ -54,8 +54,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <optional>
+#include <StormByte/safe/optional.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline
@@ -437,7 +436,7 @@ namespace StormByte::Multimedia::Pipeline {
 				StormByte::Safe::Optional<Property::Duration> duration,
 				bool keyFrame,
 				StormByte::Safe::Vector<SideData> attachments,
-				std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept;
+				StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept;
 
 			/**
 			 * @brief Copies codecpar / time_base onto a mux stream.
@@ -478,8 +477,8 @@ namespace StormByte::Multimedia::Pipeline {
 			StormByte::Safe::Optional<StormByte::Safe::String> m_preset;			///< Preset
 			StormByte::Safe::Optional<StormByte::Safe::String> m_tune;			///< Tune
 			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> m_fineTune;	///< Vendor leftovers
-			std::unique_ptr<Backend::Pipeline::Encoder> m_backend;			///< Encode backend
-			std::optional<std::uint64_t> m_serial;							///< Lineage of the last accepted frame
+			StormByte::Safe::Unique<Backend::Pipeline::Encoder> m_backend;	///< Encode backend
+			StormByte::Safe::Optional<std::uint64_t> m_serial;			///< Lineage of the last accepted frame
 			std::uint64_t m_part;											///< Part of the last accepted frame
 			Join m_join{*this};												///< Halt before other members die
 	};

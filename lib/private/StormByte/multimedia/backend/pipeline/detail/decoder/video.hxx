@@ -47,6 +47,7 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/property/video.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
 
 #include <memory>
 #include <optional>
@@ -78,7 +79,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 */
 			Video(StormByte::Multimedia::FFmpeg::AVDecoder decoder,
 				AVRational timeBase,
-				std::optional<StormByte::Multimedia::Property::Video> video) noexcept;
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Video> video) noexcept;
 
 			/**
 			 * @brief Destructor.
@@ -150,7 +151,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		private:
 			StormByte::Multimedia::FFmpeg::AVDecoder m_decoder;				///< Opened decoder
 			StormByte::Multimedia::FFmpeg::AVFrame m_scratch;				///< Receive scratch
-			std::optional<StormByte::Multimedia::Property::Video> m_video;	///< Stream video properties
+			StormByte::Safe::Optional<StormByte::Multimedia::Property::Video> m_video;	///< Stream video properties.
 			AVRational m_timeBase;											///< Stream time base
 			bool m_flushed;													///< EOF already signalled
 	};

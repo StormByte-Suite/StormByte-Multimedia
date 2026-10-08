@@ -64,7 +64,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class AVSubtitle
 	 * @brief RAII wrapper for ::AVSubtitle (`avsubtitle_free`).
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVSubtitle {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVSubtitle {
 		public:
 			/**
 			 * @brief Empty subtitle.

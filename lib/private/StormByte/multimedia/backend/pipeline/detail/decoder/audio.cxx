@@ -94,7 +94,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	Audio& Audio::operator=(Audio&& other) noexcept = default;
 
 	Audio::Audio(StormByte::Multimedia::FFmpeg::AVDecoder decoder, FFmpeg::AVRational timeBase,
-		std::optional<StormByte::Multimedia::Property::Audio> audio) noexcept
+		StormByte::Safe::Optional<StormByte::Multimedia::Property::Audio> audio) noexcept
 	: m_decoder(std::move(decoder)), m_audio(std::move(audio)), m_timeBase(timeBase), m_flushed(false) {}
 
 	bool Audio::IsOpen() const noexcept {
@@ -109,7 +109,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		}
 
 		StormByte::Multimedia::FFmpeg::AVPacket raw;
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		const auto n = packet->Payload().Available();
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
@@ -144,7 +144,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Audio::Receive(
 		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
-		auto holder = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Frame>();
+		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Frame>();
 		const auto result = m_decoder.ReceiveFrame(holder->Handle());
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain
 			|| result == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)

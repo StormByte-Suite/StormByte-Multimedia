@@ -41,12 +41,13 @@
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/unordered_map.hxx>
+#include <StormByte/safe/vector.hxx>
+#include <StormByte/size.hxx>
 
-#include <functional>
 #include <span>
 #include <string_view>
-#include <unordered_map>
-#include <vector>
 
 /**
  * @namespace StormByte
@@ -168,27 +169,6 @@ namespace StormByte {
 
 			private:
 				/**
-				 * @struct NameHash
-				 * @brief Transparent hasher for string_view map keys.
-				 */
-				struct NameHash {
-					/**
-					 * @typedef is_transparent
-					 * @brief Enables heterogeneous lookup.
-					 */
-					using is_transparent = void;
-
-					/**
-					 * @brief Hashes a view.
-					 * @param view Key.
-					 * @return Hash.
-					 */
-					std::size_t operator()(std::string_view view) const noexcept {
-						return std::hash<std::string_view>{}(view);
-					}
-				};
-
-				/**
 				 * @brief Loads tables and probes FFmpeg.
 				 */
 				Registry() noexcept;
@@ -240,18 +220,24 @@ namespace StormByte {
 				 */
 				Access ProbeContainer(const Tables::Container::ContainerDef& def) const noexcept;
 
-				std::vector<Codec> m_codecs;																		///< Owned codec instances
-				std::unordered_map<std::string_view, std::size_t, NameHash, std::equal_to<>> m_by_name;				///< Codec name / FFmpeg id → index
-				std::unordered_map<Type, std::vector<std::size_t>> m_by_type;										///< Type → codec indices
-				std::vector<Container> m_containers;																	///< Owned container instances
-				std::unordered_map<std::string_view, std::size_t, NameHash, std::equal_to<>> m_container_by_name;	///< Container name / FFmpeg id → index
+				StormByte::Safe::Vector<StormByte::Safe::Shared<Codec>> m_codecs; ///< Stable, Base-owned codec instances.
+
+				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_by_name; ///< Owned codec key to index.
+
+				StormByte::Safe::UnorderedMap<Type, StormByte::Size> m_by_type_start; ///< First contiguous codec index per type.
+
+				StormByte::Safe::UnorderedMap<Type, StormByte::Size> m_by_type_count; ///< Codec count per type.
+
+				StormByte::Safe::Vector<StormByte::Safe::Shared<Container>> m_containers; ///< Stable, Base-owned container instances.
+
+				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_container_by_name; ///< Owned container key to index.
 		};
 	}
 }
 
 /**
  * @brief Declare the provider-owned singleton conditionally DLL-safe.
- * @note Its STL storage is private and operated on by the loaded provider;
- * consumers require a compatible compiler, standard-library ABI and layout.
+ * @note Base Safe storage and borrowed identities require the multimedia
+ * provider to remain loaded; callers must not destroy the singleton.
  */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Registry);

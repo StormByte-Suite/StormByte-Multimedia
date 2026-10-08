@@ -40,8 +40,9 @@
 
 #include <StormByte/multimedia/ffmpeg/AVBSF.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/vector.hxx>
 
-#include <deque>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -54,7 +55,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class AVBSFPipeline
 	 * @brief Ordered chain of bitstream filters applied to packets.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVBSFPipeline {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVBSFPipeline {
 		public:
 			/**
 			 * @brief Default constructor.
@@ -125,12 +126,12 @@ namespace StormByte::Multimedia::FFmpeg {
 			bool Empty() const noexcept;
 
 		private:
-			std::deque<AVBSF> m_filters;	///< Filter chain
+			StormByte::Safe::Vector<StormByte::Safe::Shared<AVBSF>> m_filters;	///< Base-owned filter chain.
 	};
 }
 
 /**
- * @brief Conditional provider contract: private deque construction, movement and release stay in Multimedia.
+ * @brief Conditional provider contract: filter handles use Base storage and FFmpeg contexts release in Multimedia.
  * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
  */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVBSFPipeline);

@@ -37,6 +37,8 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
+#include <StormByte/safe/memory_order.hxx>
+#include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/backend/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
@@ -44,9 +46,8 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 
 #include <format>
-#include <memory>
 #include <utility>
-#include <vector>
+#include <algorithm>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	using StormByte::Multimedia::Pipeline::CheckResult;
@@ -54,6 +55,22 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	using StormByte::Multimedia::Pipeline::Item;
 	using StormByte::Multimedia::Pipeline::Packet;
 	using StormByte::Logger::Level;
+
+	FeedThread::FeedThread(Demux& owner, int track)
+	: m_thread([&owner, track]() { owner.FeedTrack(track); }), m_track(track) {}
+
+	FeedThread::~FeedThread() noexcept {
+		Join();
+	}
+
+	int FeedThread::Track() const noexcept {
+		return m_track;
+	}
+
+	void FeedThread::Join() noexcept {
+		if (m_thread.joinable())
+			m_thread.join();
+	}
 
 	Demux::Demux(Demuxer& owner) noexcept
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
@@ -64,19 +81,19 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	}
 
 	void Demux::StopFeed() noexcept {
-		m_feedStop.store(true, std::memory_order_release);
+		m_feedStop.store(true, StormByte::Safe::MemoryOrder::Release);
 		m_parkCv.notify_all();
-		for (auto& [track, th] : m_feeds) {
-			if (th.joinable())
-				th.join();
-		}
+		for (auto& feeder : m_feeds)
+			feeder->Join();
 		m_feeds.clear();
 	}
 
 	void Demux::EnsureFeed(int track) noexcept {
-		if (m_feeds.contains(track))
+		if (std::find_if(m_feeds.begin(), m_feeds.end(), [track](const auto& feeder) {
+				return feeder->Track() == track;
+			}) != m_feeds.end())
 			return;
-		m_feeds.emplace(track, std::thread([this, track]() { FeedTrack(track); }));
+		m_feeds.push_back(StormByte::Safe::Shared<FeedThread>::MakePointer<FeedThread>(*this, track));
 	}
 
 	bool Demux::ParkPending() const noexcept {
@@ -92,12 +109,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		for (;;) {
 			Packet::PointerType packet;
 			{
-				std::unique_lock lock(m_parkMutex);
+				StormByte::Safe::UniqueLock lock(m_parkMutex);
 				m_parkCv.wait(lock, [this, track]() {
-					return m_feedStop.load(std::memory_order_acquire)
+					return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
 						|| !m_park[track].empty();
 				});
-				if (m_feedStop.load(std::memory_order_acquire) && m_park[track].empty())
+				if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire) && m_park[track].empty())
 					return;
 				if (m_park[track].empty())
 					continue;
@@ -121,14 +138,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		m_owner.m_backend = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Demuxer>();
+		m_owner.m_backend = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Demuxer>();
 		if (!m_owner.m_backend->Open(m_owner))
 			return;
 
 		m_owner.m_eof = false;
-		m_owner.m_positionNs.store(-1, std::memory_order_release);
+		m_owner.m_positionNs.store(-1, StormByte::Safe::MemoryOrder::Release);
 		m_owner.m_nextSerial.clear();
-		m_feedStop.store(false, std::memory_order_release);
+		m_feedStop.store(false, StormByte::Safe::MemoryOrder::Release);
 			Log(Level::Notice, std::format("open {}", std::string_view{m_owner.Origin().Path()}));
 	}
 
@@ -167,9 +184,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			// an empty hopper. Drain the park on this thread, then stop.
 			m_parkCv.notify_all();
 			for (;;) {
-				std::vector<Packet::PointerType> leftover;
+				StormByte::Safe::Vector<Packet::PointerType> leftover;
 				{
-					std::unique_lock lock(m_parkMutex);
+					StormByte::Safe::UniqueLock lock(m_parkMutex);
 					if (!ParkPending())
 						break;
 					for (auto& [track, queue] : m_park) {
@@ -192,17 +209,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		if (const auto& pts = packet->Pts(); pts)
-			m_owner.m_positionNs.store(pts->Nanoseconds().count(), std::memory_order_release);
+			m_owner.m_positionNs.store(pts->Nanoseconds().count(), StormByte::Safe::MemoryOrder::Release);
 
 		const int track = packet->Track();
 		{
-			std::unique_lock lock(m_parkMutex);
+			StormByte::Safe::UniqueLock lock(m_parkMutex);
 			EnsureFeed(track);
 			m_parkCv.wait(lock, [this, track]() {
-				return m_feedStop.load(std::memory_order_acquire)
+				return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
 					|| m_park[track].size() < ParkCeiling;
 			});
-			if (m_feedStop.load(std::memory_order_acquire))
+			if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire))
 				return;
 			m_park[track].push_back(std::move(packet));
 		}

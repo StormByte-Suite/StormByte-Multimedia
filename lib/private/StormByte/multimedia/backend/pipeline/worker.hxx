@@ -42,7 +42,6 @@
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <string>
 #include <string_view>
 
 /**
@@ -140,7 +139,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Forwards Fail to the Host.
 			 * @param reason Message.
 			 */
-			void Fail(std::string reason) noexcept;
+			void Fail(std::string_view reason) noexcept;
 
 			/**
 			 * @brief Forwards Log to the Host.

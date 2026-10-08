@@ -40,8 +40,8 @@
 
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
-#include <memory>
 #include <string>
 
 extern "C" {
@@ -108,7 +108,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Video and Audio leaves land under Detail::Content.
 			 * Until those files exist every type is passthrough.
 			 */
-			static std::unique_ptr<Content> For(StormByte::Multimedia::Type type) noexcept;
+			static StormByte::Safe::Unique<Content> For(StormByte::Multimedia::Type type) noexcept;
 
 			/**
 			 * @brief Make extras on @p after match the card of @p before.

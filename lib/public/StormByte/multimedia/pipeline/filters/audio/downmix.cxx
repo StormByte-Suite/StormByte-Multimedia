@@ -113,7 +113,7 @@ bool Downmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened)
 			return false;
-		m_graph = std::make_unique<FGraph>(std::move(opened));
+		m_graph = StormByte::Safe::MakeUnique<FGraph>(std::move(opened));
 		return true;
 	}
 	return m_graph->Ensure(src, chain);

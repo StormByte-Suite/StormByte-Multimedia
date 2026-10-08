@@ -78,7 +78,7 @@ Packet::Packet(const Packet& other)
 	m_serial(other.m_serial),
 	m_part(other.m_part) {
 	if (other.m_backend)
-		m_backend = std::make_unique<Backend::Pipeline::Packet>(*other.m_backend);
+		m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Packet>(*other.m_backend);
 }
 
 Packet::Packet(Packet&& other) noexcept
@@ -135,7 +135,7 @@ void Packet::BecomeEmpty() noexcept {
 	m_backend.reset();
 }
 
-void Packet::Bind(std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept {
+void Packet::Bind(StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept {
 	m_backend = std::move(backend);
 }
 

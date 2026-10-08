@@ -44,6 +44,7 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pair.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
@@ -51,11 +52,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <optional>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace StormByte::Multimedia::Backend::Pipeline {
 	class Transcoder;
@@ -71,9 +69,43 @@ namespace StormByte::Multimedia::Pipeline {
 	class Decoder;
 	class Demuxer;
 	class Route;
+	namespace Detail {
+		/**
+		 * @struct FiltersStretch
+		 * @brief Provider-owned route binding stored by the Filters facade.
+		 */
+		struct FiltersStretch {
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Step> Origin;	///< Decoder / Demuxer / Encoder.
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Step> Destination;	///< Encoder / Remuxer / Muxer.
+			int Track = -1;	///< Hopper key.
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Route> Lane;	///< Wired chain.
+			StormByte::Safe::Optional<int> Scope;	///< Optional track scope.
+		};
+
+		/**
+		 * @struct FiltersAttached
+		 * @brief Provider-owned filter and optional track binding.
+		 */
+		struct FiltersAttached {
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg> Filter;	///< Leaf.
+			StormByte::Safe::Optional<int> Track;	///< Stretch track, or none if global.
+		};
+	}
+}
+
+	STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Detail::FiltersStretch);
+	STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Detail::FiltersAttached);
 
 	/**
-	 * @class Filters
+	 * @namespace StormByte::Multimedia::Pipeline
+	 * @brief Demux / decode / filter / encode / mux types.
+	 *
+	 * @ingroup multimedia_pipeline
+	 */
+	namespace StormByte::Multimedia::Pipeline {
+
+		/**
+		 * @class Filters
 	 * @brief Optional facade: Between stretches, Add filters, Close.
 	 *
 	 * Use @ref Between to select connected stages, @ref Handle::Add
@@ -247,6 +279,18 @@ namespace StormByte::Multimedia::Pipeline {
 
 		private:
 			/**
+			 * @typedef Stretch
+			 * @brief Route-binding record stored in the facade.
+			 */
+			using Stretch = Detail::FiltersStretch;
+
+			/**
+			 * @typedef Attached
+			 * @brief Analytics/report binding stored in the facade.
+			 */
+			using Attached = Detail::FiltersAttached;
+
+			/**
 			 * @brief Whether a measure pass started by @ref Close is active.
 			 * @return true until FinishMeasure, otherwise false.
 			 */
@@ -332,30 +376,11 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 			void NoteMeasure(std::int64_t ns) noexcept;
 
-			/**
-			 * @brief One origin / destination pair and its Route.
-			 */
-			struct Stretch {
-				StormByte::Safe::Shared<Step> Origin;			///< Decoder / Demuxer / Encoder
-				StormByte::Safe::Shared<Step> Destination;		///< Encoder / Remuxer / Muxer
-				int Track = -1;							///< Hopper key
-				std::unique_ptr<Route> Lane;			///< Wired chain
-				std::optional<int> Scope;				///< Optional track scope
-			};
-
-			/**
-			 * @brief A mounted leaf and the track it is bound to.
-			 */
-			struct Attached {
-				StormByte::Safe::Shared<Filter::FFmpeg> Filter;	///< Leaf
-				std::optional<int> Track;				///< Stretch track, or none if global
-			};
-
-			std::vector<Stretch> m_stretches;			///< Between() order
-			std::vector<Attached> m_globals;			///< Global analytics
-			std::vector<Attached> m_reports;			///< Leaves that may Report()
-			std::vector<int> m_measureTracks;			///< Tracks given to Demuxer::Measure
-			std::vector<int> m_measureDrained;			///< Tracks that finished DrainMeasure
+			StormByte::Safe::Vector<Stretch> m_stretches;	///< Between() order.
+			StormByte::Safe::Vector<Attached> m_globals;	///< Global analytics.
+			StormByte::Safe::Vector<Attached> m_reports;	///< Leaves that may Report().
+			StormByte::Safe::Vector<int> m_measureTracks;	///< Tracks given to Demuxer::Measure.
+			StormByte::Safe::Vector<int> m_measureDrained;	///< Tracks that finished DrainMeasure
 			std::size_t m_measureFilterCount = 0;		///< ProcessTwoPasses leaves in this pass
 			std::size_t m_measureFiltersDrained = 0;	///< Those leaves that finished Measure
 			bool m_measuring = false;					///< After Close, before FinishMeasure

@@ -188,7 +188,7 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 	StormByte::Multimedia::Pipeline::Encoder& owner,
 	enum Type type, int index, const StormByte::Multimedia::FFmpeg::AVPacket& raw,
 	AVRational timeBase, bool keepPacketHdrPlus) noexcept {
-	StormByte::BinaryData bytes;
+	StormByte::Safe::Binary bytes;
 	const auto* data = raw.Data();
 	const int size = raw.Size();
 	if (data && size > 0) {
@@ -209,7 +209,7 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 			&& type != AV_PKT_DATA_MASTERING_DISPLAY_METADATA
 			&& type != AV_PKT_DATA_CONTENT_LIGHT_LEVEL)
 			continue;
-		StormByte::BinaryData blob;
+		StormByte::Safe::Binary blob;
 		blob.assign(
 			reinterpret_cast<const std::byte*>(data),
 			reinterpret_cast<const std::byte*>(data) + size);
@@ -231,7 +231,7 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 		}
 	}
 
-	auto holder = std::make_unique<Packet>();
+	auto holder = StormByte::Safe::MakeUnique<Packet>();
 	holder->Handle(raw.Ref());
 	if (owner.m_backend) {
 		if (const auto* ctx = owner.m_backend->Context(); ctx) {
@@ -449,7 +449,7 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	for (const auto& [key, value] : opts)
 		options.emplace(StormByte::Safe::String{key}, StormByte::Safe::String{value});
 	auto opened = StormByte::Multimedia::FFmpeg::AVEncoder::Open(
-		const_cast<::AVCodec*>(codec), params, owner.Index(), options, timeBase);
+		row->name, params, owner.Index(), options, timeBase);
 	if (!opened.has_value()) {
 		owner.Fail(opened.error() ? opened.error()->what() : "Failed to open encoder");
 		return std::nullopt;

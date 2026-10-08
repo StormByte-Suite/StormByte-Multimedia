@@ -41,8 +41,7 @@
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/visibility.h>
-
-#include <optional>
+#include <StormByte/safe/optional.hxx>
 
 namespace StormByte::Multimedia::Pipeline {
 	class Packet;
@@ -174,7 +173,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Deep-copies @p params onto this holder.
 			 * @param params Source parameters. Empty clears the stamp.
 			 */
-			void Parameters(std::optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> params) noexcept;
+			void Parameters(StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> params) noexcept;
 
 			/**
 			 * @}
@@ -188,6 +187,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 		private:
 			StormByte::Multimedia::FFmpeg::AVPacket m_handle;	///< FFmpeg packet
-			std::optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> m_params;	///< Producer codecpar
+			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> m_params;	///< Producer codecpar.
 	};
 }

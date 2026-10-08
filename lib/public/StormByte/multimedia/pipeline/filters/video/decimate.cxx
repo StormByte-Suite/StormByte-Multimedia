@@ -100,7 +100,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("decimate: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
+		m_graph = Safe::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("decimate: AVFilterGraph::Ensure failed");
 		return;

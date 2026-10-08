@@ -41,18 +41,19 @@
 #include <StormByte/buffer/io/buffered_location_reader.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
-#include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
+#include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/metadata/file.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
 #include <StormByte/safe/function.hxx>
 #include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
+#include <StormByte/safe/unordered_map.hxx>
 #include <StormByte/safe/vector.hxx>
 
 #include <cstdint>
-#include <unordered_map>
 
 /**
  * @brief Multimedia-owned pipeline stages and unit holders.
@@ -239,7 +240,7 @@ namespace StormByte {
 				Metadata::File m_metadata;								///< Container tags
 				mutable StormByte::Safe::Optional<Property::Duration> m_duration;	///< Container duration
 				mutable bool m_durationResolved;						///< Caller-supplied or scan done
-				std::unordered_map<int, FFmpeg::AVCodecParameters> m_codecParameters; ///< Probed codec parameters, including harvested HDR metadata.
+				StormByte::Safe::UnorderedMap<int, StormByte::Safe::Shared<FFmpeg::AVCodecParameters>> m_codecParameters;	///< Probed codec parameters, including harvested HDR metadata.
 
 				/**
 				 * @brief Snapshot constructor.

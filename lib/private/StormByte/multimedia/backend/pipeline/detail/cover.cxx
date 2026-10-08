@@ -98,7 +98,7 @@ namespace {
 	StormByte::Buffer::FIFO BytesToFifo(const std::uint8_t* data, int size) noexcept {
 		if (!data || size <= 0)
 			return StormByte::Buffer::FIFO{};
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		bytes.assign(
 			reinterpret_cast<const std::byte*>(data),
 			reinterpret_cast<const std::byte*>(data) + size);

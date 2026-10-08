@@ -144,7 +144,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			void BindFrame(StormByte::Multimedia::Pipeline::Decoder& owner,
 				StormByte::Multimedia::Pipeline::Frame& frame,
-				std::unique_ptr<Frame> holder) noexcept;
+				StormByte::Safe::Unique<Frame> holder) noexcept;
 
 			/**
 			 * @brief Closes a subtitle cue through the public decoder.

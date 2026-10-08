@@ -48,7 +48,6 @@
 #include <StormByte/safe/vector.hxx>
 
 #include <cstdint>
-#include <memory>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -318,7 +317,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Adopts a backend packet.
 			 * @param backend Backend holder.
 			 */
-			void Bind(std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept;
+			void Bind(StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept;
 
 			/**
 			 * @brief Turns this unit into the empty sentinel.
@@ -363,10 +362,7 @@ namespace StormByte::Multimedia::Pipeline {
 
 			std::uint64_t m_part;						///< Sub-identifier within the lineage, zero on the sentinel.
 
-			std::unique_ptr<Backend::Pipeline::Packet> m_backend;		///< Multimedia-private holder, allocated and destroyed only by its provider.
-											///<
-											///< Never exposed to consumers. All operations affecting this STL owner are
-											///< exported out-of-line; compatible class layout is still required.
+			StormByte::Safe::Unique<Backend::Pipeline::Packet> m_backend;	///< Multimedia-private FFmpeg packet holder.
 	};
 }
 

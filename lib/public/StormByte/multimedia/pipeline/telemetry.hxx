@@ -40,16 +40,16 @@
 
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
+#include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 #include <StormByte/safe/vector.hxx>
 #include <StormByte/telemetry.hxx>
 
-#include <atomic>
 #include <chrono>
 #include <cstdint>
-#include <mutex>
 #include <string_view>
 
 /**
@@ -273,41 +273,41 @@ namespace StormByte {
 					operator StormByte::Safe::String() const override;
 
 				private:
-					std::atomic<std::uint64_t> m_process_calls;						///< Process calls.
+					StormByte::Safe::Atomic<std::uint64_t> m_process_calls;	///< Process calls.
 
-					std::atomic<std::uint64_t> m_input_frames;						///< Consumed frames.
+					StormByte::Safe::Atomic<std::uint64_t> m_input_frames;	///< Consumed frames.
 
-					std::atomic<std::uint64_t> m_input_packets;						///< Consumed packets.
+					StormByte::Safe::Atomic<std::uint64_t> m_input_packets;	///< Consumed packets.
 
-					std::atomic<std::uint64_t> m_output_frames;						///< Emitted frames.
+					StormByte::Safe::Atomic<std::uint64_t> m_output_frames;	///< Emitted frames.
 
-					std::atomic<std::uint64_t> m_output_packets;					///< Emitted packets.
+					StormByte::Safe::Atomic<std::uint64_t> m_output_packets;	///< Emitted packets.
 
-					std::atomic<std::int64_t> m_process_total_ns;					///< Total Process duration.
+					StormByte::Safe::Atomic<std::int64_t> m_process_total_ns;	///< Total Process duration.
 
-					std::atomic<std::int64_t> m_process_min_ns;						///< Minimum Process duration.
+					StormByte::Safe::Atomic<std::int64_t> m_process_min_ns;	///< Minimum Process duration.
 
-					std::atomic<std::int64_t> m_process_max_ns;						///< Maximum Process duration.
+					StormByte::Safe::Atomic<std::int64_t> m_process_max_ns;	///< Maximum Process duration.
 
-					std::atomic<std::uint64_t> m_wait_count;						///< Blocking waits.
+					StormByte::Safe::Atomic<std::uint64_t> m_wait_count;	///< Blocking waits.
 
-					std::atomic<std::int64_t> m_wait_total_ns;						///< Total blocking wait duration.
+					StormByte::Safe::Atomic<std::int64_t> m_wait_total_ns;	///< Total blocking wait duration.
 
-					std::atomic<std::int64_t> m_wait_max_ns;						///< Maximum blocking wait duration.
+					StormByte::Safe::Atomic<std::int64_t> m_wait_max_ns;	///< Maximum blocking wait duration.
 
-					std::atomic<std::int64_t> m_setup_ns;							///< Setup duration.
+					StormByte::Safe::Atomic<std::int64_t> m_setup_ns;	///< Setup duration.
 
-					std::atomic<std::int64_t> m_started_ns;							///< Steady-clock start tick.
+					StormByte::Safe::Atomic<std::int64_t> m_started_ns;	///< Steady-clock start tick.
 
-					std::atomic<std::int64_t> m_finished_ns;						///< Steady-clock finish tick.
+					StormByte::Safe::Atomic<std::int64_t> m_finished_ns;	///< Steady-clock finish tick.
 
-					std::atomic<State> m_state;										///< Latest lifecycle state.
+					StormByte::Safe::Atomic<int> m_state;	///< Latest lifecycle state.
 
-					mutable std::mutex m_error_lock;								///< Protects failure text.
+					mutable StormByte::Safe::Mutex m_error_lock;	///< Protects failure text.
 
 					StormByte::Safe::Optional<StormByte::Safe::String> m_error;		///< Safe-owned failure text.
 
-					mutable std::mutex m_origin_lock;								///< Protects origin label.
+					mutable StormByte::Safe::Mutex m_origin_lock;	///< Protects origin label.
 
 					mutable StormByte::Safe::String m_origin;						///< Stage origin label.
 			};
@@ -441,17 +441,17 @@ namespace StormByte {
 					operator StormByte::Safe::String() const override;
 
 				private:
-					mutable std::mutex m_stages_lock;				///< Protects registered stage list.
+					mutable StormByte::Safe::Mutex m_stages_lock;	///< Protects registered stage list.
 
 					StormByte::Safe::Vector<Stage> m_stages;		///< Safe-owned registered stage snapshots.
 
-					std::atomic<std::uint64_t> m_memory_current;	///< Last resident-memory sample.
+					StormByte::Safe::Atomic<std::uint64_t> m_memory_current;	///< Last resident-memory sample.
 
-					std::atomic<std::uint64_t> m_memory_min;		///< Lowest resident-memory sample.
+					StormByte::Safe::Atomic<std::uint64_t> m_memory_min;	///< Lowest resident-memory sample.
 
-					std::atomic<std::uint64_t> m_memory_max;		///< Highest resident-memory sample.
+					StormByte::Safe::Atomic<std::uint64_t> m_memory_max;	///< Highest resident-memory sample.
 
-					std::atomic<std::uint64_t> m_memory_samples;	///< Successful sample count.
+					StormByte::Safe::Atomic<std::uint64_t> m_memory_samples;	///< Successful sample count.
 			};
 		}
 	}

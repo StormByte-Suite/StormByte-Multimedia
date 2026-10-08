@@ -49,11 +49,11 @@
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <string_view>
@@ -466,6 +466,14 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param reason Owned bare message retained in Safe storage.
 			 */
 			void Fail(StormByte::Safe::String reason) noexcept;
+
+			/**
+			 * @brief Copies a null-terminated failure literal into Safe storage.
+			 * @param reason Message literal; null becomes an empty message.
+			 */
+			void Fail(const char* reason) noexcept {
+				Fail(StormByte::Safe::String(reason));
+			}
 
 			/**
 			 * @brief Copies borrowed text into Safe storage and marks a hard error.
@@ -927,8 +935,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			void DrainMeasure() noexcept;
 
 			bool m_measuring = false;	///< First pass
-			std::atomic<bool> m_measureClosed{false};	///< Origin will not send more measure units
-			std::atomic<bool> m_measureDrained{false};	///< OnMeasureFilterDrained already ran
+			StormByte::Safe::Atomic<bool> m_measureClosed{false};	///< Origin will not send more measure units
+			StormByte::Safe::Atomic<bool> m_measureDrained{false};	///< OnMeasureFilterDrained already ran
 			StormByte::Multimedia::Pipeline::Filters* m_measureOwner = nullptr;	///< Facade for drain
 	};
 

@@ -56,7 +56,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class AVCodecParameters
 	 * @brief Deep-copying RAII wrapper for ::AVCodecParameters.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVCodecParameters: public AVPointer<::AVCodecParameters> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVCodecParameters: public AVPointer<::AVCodecParameters> {
 		friend class AVBSF;
 		friend class AVDecoder;
 		friend class AVEncoder;
@@ -308,11 +308,5 @@ namespace StormByte::Multimedia::FFmpeg {
 			using AVPointer<::AVCodecParameters>::Get;
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVCodecParameters>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVCodecParameters>;
 }
-
-/**
- * @brief Conditional provider contract: copies and release use FFmpeg out-of-line.
- * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
- */
-STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVCodecParameters);

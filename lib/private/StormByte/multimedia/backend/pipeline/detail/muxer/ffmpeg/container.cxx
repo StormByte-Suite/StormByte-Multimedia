@@ -225,7 +225,7 @@ namespace {
 		const auto view = UnreadSpan(fifo);
 		if (view.empty())
 			return StormByte::Buffer::FIFO{};
-		StormByte::BinaryData bytes{view};
+		StormByte::Safe::Binary bytes{view};
 		return StormByte::Buffer::FIFO{std::move(bytes)};
 	}
 }

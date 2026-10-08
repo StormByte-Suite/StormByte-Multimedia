@@ -45,16 +45,15 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/map.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/set.hxx>
 #include <StormByte/safe/string.hxx>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <set>
 
 /**
  * @namespace StormByte
@@ -381,16 +380,16 @@ namespace StormByte {
 					void ClockPass(std::int64_t ns) noexcept;
 
 					const Container* m_container;										///< Destination container (Plan)
-					std::unique_ptr<Backend::Pipeline::Muxer> m_backend;				///< Format backend
+					StormByte::Safe::Unique<Backend::Pipeline::Muxer> m_backend;	///< Format backend
 					Demuxer* m_origin;													///< Set only by demuxer >> muxer. Not owned
 					StormByte::Safe::Shared<class Progress> m_progress;				///< Shared tube clock retained through Base-heap ownership.
 					Attachments m_attachments;											///< Catalogue for header write
-					std::set<int> m_wired;												///< Output indices already reserved
+					StormByte::Safe::Set<int> m_wired;		///< Output indices already reserved
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;			///< Per-output language
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;				///< Per-output title
-					std::atomic<bool> m_closed;											///< Set by Finish / Fail
-					std::atomic<std::size_t> m_reserved;								///< Reserved Video/Audio/Subtitle hoppers
-					std::atomic<std::int64_t> m_positionNs;								///< Last written Pts, or -1
+					StormByte::Safe::Atomic<bool> m_closed;	///< Set by Finish / Fail
+					StormByte::Safe::Atomic<std::uint64_t> m_reserved;	///< Reserved Video/Audio/Subtitle hoppers
+					StormByte::Safe::Atomic<std::int64_t> m_positionNs;	///< Last written Pts, or -1
 					Join m_join{*this};													///< Halt before other members die
 			};
 		}

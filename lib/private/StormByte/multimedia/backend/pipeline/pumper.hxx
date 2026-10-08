@@ -41,13 +41,14 @@
 #include <StormByte/multimedia/backend/pipeline/host.hxx>
 #include <StormByte/multimedia/backend/pipeline/worker.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/safe/atomic.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/thread.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <atomic>
-#include <memory>
-#include <optional>
-#include <string>
-#include <thread>
+#include <string_view>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline
@@ -95,7 +96,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param worker Body. Must not be empty. No-op if a
 			 *        worker is already bound or the thread runs.
 			 */
-			void Bind(std::unique_ptr<Worker> worker) noexcept;
+			void Bind(StormByte::Safe::Unique<Worker> worker) noexcept;
 
 			/**
 			 * @brief Starts the thread: Setup, Ready, Pump.
@@ -129,13 +130,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Failure text.
 			 * @return Message, or empty.
 			 */
-			const std::optional<std::string>& Error() const noexcept;
+			const StormByte::Safe::Optional<StormByte::Safe::String>& Error() const noexcept;
 
 			/**
 			 * @brief Latches Failed. Does not close hoppers.
 			 * @param reason Message.
 			 */
-			void Fail(std::string reason) noexcept;
+			void Fail(std::string_view reason) noexcept;
 
 		protected:
 			/**
@@ -197,9 +198,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 		private:
 			Host& m_host;											///< Owner, via Host
-			std::unique_ptr<Worker> m_worker;						///< Body
-			std::atomic<Multimedia::Pipeline::State> m_state;		///< Lifecycle
-			std::optional<std::string> m_error;						///< Fail message
-			std::jthread m_thread;									///< Owned thread
+			StormByte::Safe::Unique<Worker> m_worker;		///< Body
+			StormByte::Safe::Atomic<int> m_state;			///< Lifecycle
+			StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< Fail message
+			StormByte::Safe::Thread m_thread;			///< Owned thread
 	};
 }

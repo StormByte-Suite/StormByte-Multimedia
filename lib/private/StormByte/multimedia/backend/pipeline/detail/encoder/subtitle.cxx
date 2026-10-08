@@ -180,7 +180,7 @@ namespace {
 		const auto n = pay.Available();
 		if (n == 0)
 			return {};
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		if (!pay.Peek(n, bytes) || bytes.empty())
 			return {};
 		const auto* raw = reinterpret_cast<const std::uint8_t*>(bytes.data());
@@ -203,7 +203,7 @@ namespace {
 		const auto n = pay.Available();
 		if (n < 12)
 			return std::nullopt;
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		if (!pay.Peek(n, bytes) || bytes.size() < 12)
 			return std::nullopt;
 		const auto* p = reinterpret_cast<const std::uint8_t*>(bytes.data());

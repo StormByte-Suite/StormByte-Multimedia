@@ -159,7 +159,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			Safe::Optional<double> m_ceilIn;	///< Caller dBTP, or empty
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Provider-owned graph
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }
 

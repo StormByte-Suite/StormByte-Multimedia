@@ -44,14 +44,15 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/AVStream.hxx>
+#include <StormByte/safe/binary.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/set.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
+#include <string_view>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -66,7 +67,7 @@ extern "C" {
 
 using namespace StormByte::Multimedia;
 using StormByte::Buffer::Consumer;
-using StormByte::BinaryData;
+using StormByte::Safe::Binary;
 using StormByte::Buffer::Position;
 
 namespace {
@@ -125,7 +126,7 @@ struct FFmpeg::AVFormatContext::ConsumerIO {
 		if (avail == 0)
 			return AVERROR_EOF;
 		const std::size_t want = std::min(avail, static_cast<std::size_t>(bufSize));
-		BinaryData chunk;
+		Binary chunk;
 		if (!io->consumer.Extract(want, chunk) || chunk.empty())
 			return AVERROR_EOF;
 		std::memcpy(buf, chunk.data(), chunk.size());
@@ -142,7 +143,7 @@ struct FFmpeg::AVFormatContext::ConsumerIO {
 	}
 };
 
-FFmpeg::AVFormatContext::AVFormatContext(::AVFormatContext* ctx, std::unique_ptr<ConsumerIO> io,
+FFmpeg::AVFormatContext::AVFormatContext(::AVFormatContext* ctx, Safe::Unique<ConsumerIO> io,
 	bool avioBorrowed) noexcept
 : AVPointer(ctx), m_io(std::move(io)), m_avioBorrowed(avioBorrowed) {}
 
@@ -203,7 +204,7 @@ FFmpeg::ExpectedAVFormatContext FFmpeg::AVFormatContext::Open(const std::filesys
 FFmpeg::ExpectedAVFormatContext FFmpeg::AVFormatContext::Open(Consumer consumer) {
 	av_log_set_level(AV_LOG_ERROR);
 
-	auto io = std::make_unique<ConsumerIO>(ConsumerIO{std::move(consumer), 0});
+	auto io = Safe::MakeUnique<ConsumerIO>(ConsumerIO{std::move(consumer), 0});
 	io->consumer.Clean();
 	io->position = 0;
 
@@ -267,7 +268,7 @@ void FFmpeg::AVFormatContext::HarvestSideData() noexcept {
 	constexpr int kMaxPackets = 128;
 	AVPacket packet;
 	AVFrame frame;
-	std::vector<std::unique_ptr<AVDecoder>> decoders(m_ptr->nb_streams);
+	StormByte::Safe::Vector<StormByte::Safe::Shared<AVDecoder>> decoders(m_ptr->nb_streams);
 
 	for (unsigned i = 0; i < m_ptr->nb_streams; ++i) {
 		::AVCodecParameters* par = m_ptr->streams[i]->codecpar;
@@ -279,7 +280,7 @@ void FFmpeg::AVFormatContext::HarvestSideData() noexcept {
 		auto opened = AVDecoder::Open(const_cast<AVCodec*>(codec),
 			AVCodecParameters(par), *this, static_cast<int>(i));
 		if (opened.has_value())
-			decoders[i] = std::make_unique<AVDecoder>(std::move(opened.value()));
+			decoders[i] = StormByte::Safe::Shared<AVDecoder>::MakePointer<AVDecoder>(std::move(opened.value()));
 	}
 
 	for (int n = 0; n < kMaxPackets; ++n) {
@@ -390,11 +391,8 @@ FFmpeg::Streams FFmpeg::AVFormatContext::Streams() const noexcept {
 	if (!m_ptr || m_ptr->nb_streams == 0)
 		return out;
 
-	std::set<AVStream> ordered;
 	for (unsigned i = 0; i < m_ptr->nb_streams; ++i)
-		ordered.emplace(m_ptr->streams[i]);
-	for (const auto& stream : ordered)
-		out.push_back(stream);
+		out.push_back(AVStream(m_ptr->streams[i]));
 
 	return out;
 }
@@ -403,7 +401,7 @@ StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int 
 	if (!m_ptr || !m_ptr->iformat || !m_ptr->iformat->name)
 		return {};
 
-	const std::string fmt_name = m_ptr->iformat->name;
+	const std::string_view fmt_name = m_ptr->iformat->name;
 
 	bool is_mp4_like =
 		fmt_name.find("mp4") != std::string::npos ||
@@ -413,7 +411,7 @@ StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int 
 	if (!is_mp4_like)
 		return {};
 
-	std::string bsf_name;
+	std::string_view bsf_name;
 	switch (codec_id) {
 		case AV_CODEC_ID_HEVC: bsf_name = "hevc_mp4toannexb"; break;
 		case AV_CODEC_ID_H264: bsf_name = "h264_mp4toannexb"; break;

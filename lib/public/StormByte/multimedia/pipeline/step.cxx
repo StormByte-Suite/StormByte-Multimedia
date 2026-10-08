@@ -97,7 +97,7 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 			return m_step.Stopping();
 		}
 
-		void Fail(std::string reason) noexcept override {
+		void Fail(std::string_view reason) noexcept override {
 			m_step.Fail(StormByte::Safe::String(reason));
 		}
 
@@ -169,7 +169,7 @@ Step::Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	m_receives(receives),
 	m_produces(produces),
 	m_state(new PrivateState(*this)),
-	m_telemetry(StormByte::Safe::Heap::MakeShared<StageTelemetry>()),
+	m_telemetry(StormByte::Safe::MakeShared<StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
 	m_workMin(std::numeric_limits<std::int64_t>::max()),
@@ -336,7 +336,7 @@ void Step::Mount(StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper,
 	if (m_state->pumper || !pumper || !worker)
 		return;
 	m_state->pumper = std::move(pumper);
-	m_state->pumper->Bind(std::make_unique<MountedWorker>(Face(), std::move(worker)));
+	m_state->pumper->Bind(StormByte::Safe::MakeUnique<MountedWorker>(Face(), std::move(worker)));
 }
 
 void Step::Launch() noexcept {

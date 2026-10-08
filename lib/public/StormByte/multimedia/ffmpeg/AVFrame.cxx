@@ -143,7 +143,7 @@ std::int64_t FFmpeg::AVFrame::DurationTicks() const noexcept {
 	return m_ptr ? m_ptr->duration : 0;
 }
 
-void FFmpeg::AVFrame::CopyPrimaryBuffer(StormByte::BinaryData& out) const noexcept {
+void FFmpeg::AVFrame::CopyPrimaryBuffer(StormByte::Safe::Binary& out) const noexcept {
 	out.clear();
 	if (!m_ptr)
 		return;
@@ -227,7 +227,7 @@ void FFmpeg::AVFrame::WriteSideData(
 		const auto size = item.Payload().Available();
 		if (size == 0)
 			continue;
-		StormByte::BinaryData bytes;
+		StormByte::Safe::Binary bytes;
 		if (!item.Payload().Peek(size, bytes) || bytes.empty())
 			continue;
 

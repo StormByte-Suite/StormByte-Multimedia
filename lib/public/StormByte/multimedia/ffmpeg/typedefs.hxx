@@ -40,9 +40,7 @@
 
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/ffmpeg/exception.hxx>
-#include <StormByte/multimedia/ffmpeg/AVStream.hxx>
 #include <StormByte/safe/string.hxx>
-#include <StormByte/safe/vector.hxx>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -59,21 +57,6 @@ namespace StormByte::Multimedia::FFmpeg {
 		Error,		///< Hard error
 		TryAgain	///< EAGAIN — need more input/output
 	};
-
-	class AVBSF;
-	class AVDecoder;
-	class AVEncoder;
-	class AVFormatContext;
-	class AVStream;
-
-	using ExpectedAVFormatContext = StormByte::Expected<AVFormatContext, FFmpeg::DecoderError>;	///< Open demuxer
-	using ExpectedAVDecoder = StormByte::Expected<AVDecoder, FFmpeg::DecoderError>;			///< Open decoder
-	using ExpectedAVEncoder = StormByte::Expected<AVEncoder, FFmpeg::EncoderError>;			///< Open encoder
-	using ExpectedAVBSF = StormByte::Expected<AVBSF, FFmpeg::BSFError>;				///< Create BSF
-	/**
-	 * @brief Ordered snapshots of borrowed stream views; the format context must outlive them.
-	 */
-	using Streams = Safe::Vector<AVStream>;
 
 	/**
 	 * @brief Converts an FFmpeg error code to a string.

@@ -39,106 +39,88 @@
 #pragma once
 
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
-#include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
-#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/multimedia/visibility.h>
+
+#include <string>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
  * @brief Private RAII wrappers over libav*.
  */
 namespace StormByte::Multimedia::FFmpeg {
-	class AVCodecParameters;
-	class AVPacket;
-
 	/**
-	 * @class AVBSF
-	 * @brief RAII bitstream filter context.
+	 * @class Dictionary
+	 * @brief RAII `AVDictionary` for muxer metadata / options.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVBSF: public AVPointer<::AVBSFContext> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE Dictionary: public AVPointer<::AVDictionary> {
+		friend class AVFormatContext;
 		public:
 			/**
-			 * @brief Copy constructor (deleted).
+			 * @brief Empty dictionary.
 			 */
-			AVBSF(const AVBSF&) = delete;
+			Dictionary() noexcept;
 
 			/**
-			 * @brief Move constructor.
-			 * @param other Source filter.
+			 * @brief Move constructor. Transfers the dictionary.
+			 * @param other Source dictionary; left empty.
 			 */
-			AVBSF(AVBSF&& other) noexcept = default;
+			Dictionary(Dictionary&& other) noexcept = default;
 
 			/**
-			 * @brief Destructor.
+			 * @brief Destructor. Frees the `AVDictionary`.
 			 */
-			~AVBSF() noexcept override;
+			~Dictionary() noexcept override;
 
 			/**
-			 * @brief Copy assignment (deleted).
+			 * @brief Move assignment. Frees *this, then takes @p other.
+			 * @param other Source dictionary; left empty.
 			 * @return *this.
 			 */
-			AVBSF& operator=(const AVBSF&) = delete;
+			Dictionary& operator=(Dictionary&& other) noexcept = default;
 
 			/**
-			 * @brief Move assignment.
-			 * @param other Source filter.
-			 * @return *this.
+			 * @brief Whether any entry is stored.
+			 * @return true if the dictionary is non-empty.
 			 */
-			AVBSF& operator=(AVBSF&& other) noexcept;
+			explicit operator bool() const noexcept;
 
 			/**
-			 * @brief Creates and initializes a named BSF.
-			 * @param name Filter name (e.g. "h264_mp4toannexb").
-			 * @param params Input codec parameters.
-			 * @param time_base Input time base.
-			 * @return AVBSF or BSFError.
+			 * @brief Sets @p key to @p value (`av_dict_set`).
+			 * @param key Entry key.
+			 * @param value Entry value. nullptr deletes the key.
+			 * @param flags `AV_DICT_*` flags.
+			 * @return false on failure.
 			 */
-			static ExpectedAVBSF Create(std::string_view name, const AVCodecParameters& params, AVRational time_base) noexcept;
+			bool Set(const char* key, const char* value, int flags = 0) noexcept;
 
 			/**
-			 * @brief Sends a packet into the filter.
-			 * @param pkt Packet to send.
-			 * @return Operation result.
+			 * @brief Looks up @p key.
+			 * @param key Entry key.
+			 * @return Value pointer, or nullptr.
 			 */
-			OperationResult SendPacket(AVPacket& pkt) noexcept;
+			const char* Value(const char* key) const noexcept;
 
 			/**
-			 * @brief Receives a filtered packet.
-			 * @param pkt Destination packet.
-			 * @return Operation result.
+			 * @brief Number of entries.
+			 * @return Count, or 0.
 			 */
-			OperationResult ReceivePacket(AVPacket& pkt) noexcept;
-
-			/**
-			 * @brief Flushes the filter.
-			 */
-			void Flush() noexcept;
-
-			/**
-			 * @brief Signals EOF (null packet).
-			 */
-			void SetEof() noexcept;
+			int Count() const noexcept;
 
 		private:
 			/**
-			 * @brief Adopts an allocated BSF context.
-			 * @param ctx Allocated BSF context.
-			 */
-			explicit AVBSF(AVBSFContext* ctx) noexcept;
-
-			/**
-			 * @brief Frees the BSF (av_bsf_free).
+			 * @brief Frees the dictionary (`av_dict_free`).
 			 */
 			void Free() noexcept override;
 
-			using AVPointer<::AVBSFContext>::Get;
+			using AVPointer<::AVDictionary>::Get;
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVBSFContext>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVDictionary>;
 }
 
 /**
- * @brief Conditional provider contract: FFmpeg resources are released out-of-line.
+ * @brief Conditional provider contract: dictionary storage is released through FFmpeg out-of-line.
  * @note Multimedia, Base and FFmpeg must remain loaded with compatible ABIs.
  */
-STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::AVBSF);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::FFmpeg::Dictionary);

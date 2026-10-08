@@ -44,10 +44,9 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/vector.hxx>
 
-#include <memory>
 #include <utility>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -64,7 +63,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * Advanced API. Construct origin and destination as
 	 * @c StormByte::Safe::Shared<Step>. Construct concrete stages with
-	 * @c StormByte::Safe::Heap::MakeShared so ownership stays on Base's heap.
+	* @c StormByte::Safe::MakeShared so ownership stays on Base's heap.
 	 *
 	 * Packet / BSF filters may sit between Demuxer and Remuxer.
 	 * Frame / Process filters on that stretch fail at Close.
@@ -174,7 +173,7 @@ namespace StormByte::Multimedia::Pipeline {
 			template<typename T, typename... Args>
 			Route& Add(Args&&... args) noexcept {
 				return Add(StormByte::Safe::Shared<Filter::FFmpeg>(
-					StormByte::Safe::Heap::MakeShared<T>(std::forward<Args>(args)...)));
+									StormByte::Safe::MakeShared<T>(std::forward<Args>(args)...)));
 			}
 
 			/**
@@ -193,7 +192,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * Call after @ref Idle.
 			 */
-			std::vector<Filter::Report> Reports() const noexcept;
+			StormByte::Safe::Vector<Filter::Report> Reports() const noexcept;
 
 		private:
 			/**
@@ -250,7 +249,7 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Wires an already-launched analytics leaf (global Add).
 			 */
-			void Observe(Filter::FFmpeg& analytics) noexcept;
+			void Observe(StormByte::Safe::Shared<Filter::FFmpeg> analytics) noexcept;
 
 			int m_track;													///< Origin stream index
 			StormByte::Safe::Shared<Step> m_origin;							///< Producer retained through Base-heap shared ownership.
@@ -258,8 +257,14 @@ namespace StormByte::Multimedia::Pipeline {
 			StormByte::Safe::Shared<Step> m_destination;					///< Consumer retained through Base-heap shared ownership.
 			Lane m_frames;													///< Frame process + analytics
 			Lane m_packets;													///< Packet process + analytics
-			std::vector<StormByte::Safe::Shared<Filter::FFmpeg>> m_filters;	///< Base-heap filter owners retained in insertion order.
-			std::vector<Filter::FFmpeg*> m_analytics;						///< Per-stretch and observed globals
-			std::vector<std::unique_ptr<Decoder>> m_looks;					///< Route-owned source and dest look decoders
+			StormByte::Safe::Vector<StormByte::Safe::Shared<Filter::FFmpeg>> m_filters;	///< Filter owners in insertion order.
+			StormByte::Safe::Vector<StormByte::Safe::Shared<Filter::FFmpeg>> m_analytics;	///< Per-stretch and observed globals.
+			StormByte::Safe::Vector<StormByte::Safe::Shared<Decoder>> m_looks;	///< Route-owned source and dest look decoders.
 	};
 }
+
+/**
+ * @brief Registers Route with Base-owned members and provider-local lifecycle.
+ * @note The private pipeline provider must remain loaded while routes or their handles exist.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Route);

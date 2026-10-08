@@ -271,6 +271,14 @@ namespace StormByte::Multimedia::Pipeline {
 			void Fail(StormByte::Safe::String reason) noexcept;
 
 			/**
+			 * @brief Copies a null-terminated failure literal into Safe storage.
+			 * @param reason Message literal; null becomes an empty message.
+			 */
+			STORMBYTE_FORCE_INLINE void Fail(const char* reason) noexcept {
+				Fail(StormByte::Safe::String(reason));
+			}
+
+			/**
 			 * @brief Copies borrowed failure text before calling the DLL-safe overload.
 			 * @param reason Borrowed message, used only during this call.
 			 */
@@ -428,7 +436,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param pumper Source, Through or Sink. Must not be empty.
 			 * @param worker Stage body. Must not be empty.
 			 *
-			 * Construct both owners with @c StormByte::Safe::Heap::MakeUnique.
+			 * Construct both owners with @c StormByte::Safe::MakeUnique.
 			 * Their storage is released on Base's heap after execution stops.
 			 * No-op if a pumper is already mounted. Does not Launch.
 			 * @endinternal

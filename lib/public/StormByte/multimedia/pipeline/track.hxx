@@ -42,7 +42,9 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/clonable.hxx>
+#include <StormByte/safe/iterable.hxx>
 #include <StormByte/safe/vector.hxx>
+#include <StormByte/size.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline
@@ -215,7 +217,13 @@ namespace StormByte::Multimedia::Pipeline {
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Tracks {
+	class STORMBYTE_MULTIMEDIA_PUBLIC Tracks:
+		private StormByte::Safe::Iterable<StormByte::Safe::Vector<StormByte::Safe::Shared<Track>>> {
+			/**
+			 * @brief Safe iterable base that owns the track sequence.
+			 */
+			using Iterable = StormByte::Safe::Iterable<StormByte::Safe::Vector<StormByte::Safe::Shared<Track>>>;
+
 		public:
 			/**
 			 * @brief Base-owned ordered track handles.
@@ -225,12 +233,12 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Count type.
 			 */
-			using size_type = ContainerType::size_type;
+			using size_type = StormByte::Size;
 
 			/**
 			 * @brief Read-only Safe iterator; dereference yields a shared track handle.
 			 */
-			using const_iterator = ContainerType::const_iterator;
+			using const_iterator = Iterable::const_iterator;
 
 			/**
 			 * @name Lifecycle
@@ -287,7 +295,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Iterator to the first shared track handle.
 			 */
 			inline const_iterator begin() const noexcept {
-				return m_tracks.begin();
+				return Iterable::begin();
 			}
 
 			/**
@@ -295,7 +303,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Past-the-last iterator.
 			 */
 			inline const_iterator end() const noexcept {
-				return m_tracks.end();
+				return Iterable::end();
 			}
 
 			/**
@@ -303,7 +311,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Iterator to the first element.
 			 */
 			inline const_iterator cbegin() const noexcept {
-				return m_tracks.cbegin();
+				return Iterable::cbegin();
 			}
 
 			/**
@@ -311,7 +319,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Past-the-last iterator.
 			 */
 			inline const_iterator cend() const noexcept {
-				return m_tracks.cend();
+				return Iterable::cend();
 			}
 
 			/**
@@ -326,7 +334,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return Number of tracks.
 			 */
 			inline size_type size() const noexcept {
-				return m_tracks.size();
+				return Iterable::size();
 			}
 
 			/**
@@ -334,7 +342,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return `true` if empty.
 			 */
 			inline bool empty() const noexcept {
-				return m_tracks.empty();
+				return Iterable::empty();
 			}
 
 			/**
@@ -353,9 +361,6 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @}
 			 */
 
-		private:
-			ContainerType m_tracks;	///< Base-owned collection; all allocating operations run in Multimedia.
-									///< @note Base and Multimedia must remain loaded with compatible C++ ABIs.
 	};
 }
 

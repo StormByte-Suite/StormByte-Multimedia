@@ -95,7 +95,7 @@ namespace {
 		return true;
 	}
 
-	std::string FlattenKey(std::string_view leaf, std::optional<int> track,
+	std::string FlattenKey(std::string_view leaf, StormByte::Safe::Optional<int> track,
 		std::map<std::string, int>& seen) noexcept {
 		std::string base(leaf);
 		base += "[";
@@ -153,11 +153,12 @@ Filters::Handle Filters::Between(StormByte::Safe::Shared<Step> origin,
 	stretch.Destination = std::move(destination);
 	if (stretch.Origin && stretch.Destination) {
 		stretch.Track = HopperKey(*stretch.Origin, *stretch.Destination);
-		stretch.Scope = stretch.Track >= 0 ? std::optional<int>(stretch.Track) : std::nullopt;
+		stretch.Scope = stretch.Track >= 0 ? StormByte::Safe::Optional<int>(stretch.Track) : std::nullopt;
 		if (stretch.Track < 0)
 			stretch.Destination->Fail("cannot infer hopper key for Between");
 		else
-			stretch.Lane = std::make_unique<Route>(stretch.Track, stretch.Origin, stretch.Destination);
+			stretch.Lane = StormByte::Safe::Shared<Route>::MakePointer<Route>(stretch.Track,
+				stretch.Origin, stretch.Destination);
 	}
 
 	m_stretches.push_back(std::move(stretch));
@@ -269,7 +270,7 @@ void Filters::Close() noexcept {
 		for (auto& global : m_globals) {
 			if (global.Filter && Matches(*global.Filter, *stretch.Origin,
 				stretch.Destination->m_name, stretch.Track))
-				stretch.Lane->Observe(*global.Filter);
+				stretch.Lane->Observe(global.Filter);
 		}
 
 		stretch.Lane->Close();
@@ -309,7 +310,7 @@ void Filters::Close() noexcept {
 		}
 	}
 
-	demuxer->Measure(m_measureTracks);
+	demuxer->Measure(StormByte::Safe::Vector<int>{m_measureTracks});
 	demuxer->m_filters = this;
 	m_measuring = true;
 	m_measureDrained.clear();

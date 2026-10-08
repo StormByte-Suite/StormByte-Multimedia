@@ -41,11 +41,11 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
+#include <StormByte/safe/string.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <cstdint>
 #include <chrono>
-#include <string>
 #include <string_view>
 
 /**
@@ -103,7 +103,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Does not join the thread. The implementer also
 			 * latches the Pumper.
 			 */
-			virtual void Fail(std::string reason) noexcept = 0;
+			virtual void Fail(std::string_view reason) noexcept = 0;
 
 			/**
 			 * @brief Writes one log line. No-op if the owner has no logger.

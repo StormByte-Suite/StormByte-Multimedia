@@ -106,7 +106,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_part = 0;
 		m_owner.m_inDts.reset();
 		Log(Level::Notice, std::format("open t={} impl={}",
-			m_owner.m_index, m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})));
+			m_owner.m_index, std::string_view{m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})}));
 	}
 
 	void Decode::Process(Item::PointerType item) noexcept {

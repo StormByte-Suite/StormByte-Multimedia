@@ -50,6 +50,11 @@
 #include <StormByte/multimedia/property/video.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/binary.hxx>
+#include <StormByte/safe/unordered_map.hxx>
+#include <StormByte/safe/unordered_set.hxx>
+#include <StormByte/safe/vector.hxx>
+#include <StormByte/size.hxx>
 
 #include <algorithm>
 #include <chrono>
@@ -57,10 +62,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
-#include <vector>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -128,8 +130,8 @@ namespace {
 		return std::chrono::nanoseconds{ns};
 	}
 
-	StormByte::BinaryData AttachmentBytes(const FFmpeg::AVStream& stream) noexcept {
-		StormByte::BinaryData bytes;
+	StormByte::Safe::Binary AttachmentBytes(const FFmpeg::AVStream& stream) noexcept {
+		StormByte::Safe::Binary bytes;
 		const ::AVStream* raw = stream.Raw();
 		if (raw && raw->attached_pic.size > 0 && raw->attached_pic.data) {
 			const auto* p = reinterpret_cast<const std::byte*>(raw->attached_pic.data);
@@ -153,7 +155,7 @@ namespace {
 	}
 
 	void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx,
-		StormByte::Safe::Vector<Attachment>& attachments, const std::vector<int>& coverIndex) noexcept {
+		StormByte::Safe::Vector<Attachment>& attachments, const StormByte::Safe::Vector<int>& coverIndex) noexcept {
 		bool missing = false;
 		for (const auto& item : std::as_const(attachments)) {
 			if (item.Payload().Available() == 0) {
@@ -182,7 +184,7 @@ namespace {
 				const Attachment attachment = std::as_const(attachments)[n];
 				if (attachment.Payload().Available() != 0)
 					break;
-				StormByte::BinaryData bytes;
+				StormByte::Safe::Binary bytes;
 				if (const auto* data = packet.Data(); data && packet.Size() > 0) {
 					const auto* raw = reinterpret_cast<const std::byte*>(data);
 					bytes.assign(raw, raw + packet.Size());
@@ -293,8 +295,8 @@ void File::MarkHdr10Plus(Stream& stream) noexcept {
 }
 
 void File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams) noexcept {
-	std::unordered_set<int> video;
-	std::unordered_set<int> found;
+	StormByte::Safe::UnorderedSet<int> video;
+	StormByte::Safe::UnorderedSet<int> found;
 	for (const auto& stream : std::as_const(streams)) {
 		if (stream.Type() == Multimedia::Type::Video)
 			video.insert(stream.Index());
@@ -343,9 +345,9 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 	auto published = std::chrono::steady_clock::now();
 	std::uint64_t payloadBytes = 0;
 	const bool hasPrimaryVideo = Detail::HasPrimaryVideo(ctx);
-	std::unordered_map<int, std::size_t> byIndex;
-	std::vector<Property::AVRational> timeBase;
-	std::vector<std::int64_t> endTick;
+	StormByte::Safe::UnorderedMap<int, StormByte::Size> byIndex;
+	StormByte::Safe::Vector<Property::AVRational> timeBase;
+	StormByte::Safe::Vector<std::int64_t> endTick;
 	std::size_t i = 0;
 	const auto sourceStreams = ctx.Streams();
 	for (const auto& stream : sourceStreams) {
@@ -396,7 +398,7 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 		const std::int64_t dur = packet.Duration();
 		if (dur > 0)
 			pts += dur;
-		std::int64_t& end = endTick[hit->second];
+		std::int64_t& end = endTick[static_cast<std::size_t>(hit->second)];
 		if (end == AV_NOPTS_VALUE || pts > end)
 			end = pts;
 	}
@@ -451,7 +453,7 @@ ExpectedFile File::Probe(BufferedLocationReader& reader,
 	const bool hasPrimaryVideo = Detail::HasPrimaryVideo(wrapped);
 	StormByte::Safe::Vector<Stream> streams;
 	StormByte::Safe::Vector<Attachment> attachments;
-	std::vector<int> coverIndex;
+	StormByte::Safe::Vector<int> coverIndex;
 	const auto sourceStreams = wrapped.Streams();
 	for (const auto& stream : sourceStreams) {
 		if (Detail::IsContainerAttachment(stream) || Detail::IsCoverStream(stream, hasPrimaryVideo)) {
@@ -492,8 +494,11 @@ ExpectedFile File::Probe(BufferedLocationReader& reader,
 	File snapshot(std::move(path), borrowed, container.value().get(),
 		std::move(streams), std::move(attachments), std::move(metadata),
 		std::move(duration), resolved);
-	for (const auto& stream : sourceStreams)
-		snapshot.m_codecParameters.emplace(stream.Index(), stream.CodecParameters());
+	for (const auto& stream : sourceStreams) {
+		auto stored = StormByte::Safe::Shared<FFmpeg::AVCodecParameters>::MakePointer<FFmpeg::AVCodecParameters>(nullptr);
+		*stored = stream.CodecParameters();
+		snapshot.m_codecParameters.emplace(stream.Index(), std::move(stored));
+	}
 	return snapshot;
 }
 

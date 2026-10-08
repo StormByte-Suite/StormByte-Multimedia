@@ -48,7 +48,12 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
+#include <StormByte/safe/condition_variable.hxx>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <atomic>
 #include <condition_variable>
@@ -265,7 +270,7 @@ namespace StormByte {
 					 *
 					 * Friend: @ref Filters::Close. Empty @p tracks is a no-op.
 					 */
-					void Measure(std::vector<int> tracks) noexcept;
+					void Measure(StormByte::Safe::Vector<int> tracks) noexcept;
 
 					/**
 					 * @brief Whether @ref Measure is active.
@@ -308,7 +313,7 @@ namespace StormByte {
 					 * @param decoder Destination decoder.
 					 * @return Backend, or empty after Fail.
 					 */
-					std::unique_ptr<Backend::Pipeline::Decoder> OpenDecoder(Decoder& decoder) noexcept;
+					StormByte::Safe::Unique<Backend::Pipeline::Decoder> OpenDecoder(Decoder& decoder) noexcept;
 
 					/**
 					 * @brief Builds a public packet. Called from the backend.
@@ -337,19 +342,19 @@ namespace StormByte {
 						int track,
 						Type type,
 						StormByte::Buffer::FIFO payload,
-						std::optional<Property::Duration> pts,
-						std::optional<Property::Duration> dts,
-						std::optional<Property::Duration> duration,
+						StormByte::Safe::Optional<Property::Duration> pts,
+						StormByte::Safe::Optional<Property::Duration> dts,
+						StormByte::Safe::Optional<Property::Duration> duration,
 						bool keyframe,
-						std::unique_ptr<Backend::Pipeline::Packet> backend) noexcept;
+						StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept;
 
-					std::unique_ptr<Backend::Pipeline::Demuxer> m_backend;				///< Format backend
+					StormByte::Safe::Unique<Backend::Pipeline::Demuxer> m_backend;		///< Format backend
 					bool m_eof;															///< End of Process-pass source
-					std::mutex m_planMutex;												///< Guards Plan wait
-					std::condition_variable m_planPresent;								///< Woken when a Plan arrives
-					std::atomic<std::int64_t> m_positionNs;								///< Last packet Pts, or -1
-					std::unordered_map<int, std::uint64_t> m_nextSerial;				///< Next lineage id per origin track
-					std::vector<int> m_measureTracks;									///< Tracks visible during measure
+					StormByte::Safe::Mutex m_planMutex;							///< Guards Plan wait
+					StormByte::Safe::ConditionVariable m_planPresent;		///< Woken when a Plan arrives
+					StormByte::Safe::Atomic<std::int64_t> m_positionNs;		///< Last packet Pts, or -1
+					StormByte::Safe::Map<int, std::uint64_t> m_nextSerial;	///< Next lineage id per origin track
+					StormByte::Safe::Vector<int> m_measureTracks;						///< Tracks visible during measure
 					bool m_measuring = false;											///< Measure pass active
 					Filters* m_filters = nullptr;										///< Facade that started measure
 					StormByte::Safe::Shared<class Progress> m_progress;				///< Shared tube clock retained through Base-heap ownership.

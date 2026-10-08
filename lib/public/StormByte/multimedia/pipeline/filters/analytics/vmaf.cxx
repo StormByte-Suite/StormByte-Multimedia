@@ -334,7 +334,7 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 
 	StormByte::Safe::Shared<Lane> lanePointer = m_lanes[frame.Track()];
 	if (!lanePointer) {
-		lanePointer = StormByte::Safe::Heap::MakeShared<Lane>();
+			lanePointer = StormByte::Safe::MakeShared<Lane>();
 		m_lanes[frame.Track()] = lanePointer;
 	}
 	Lane& lane = *lanePointer;

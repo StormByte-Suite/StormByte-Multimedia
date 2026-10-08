@@ -44,6 +44,7 @@
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/memory_order.hxx>
 
 #include <format>
 #include <string>
@@ -113,16 +114,16 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				if (const auto& dur = packet->Duration(); dur)
 					ns += dur->Nanoseconds().count();
 				if (type == Type::Video)
-					m_owner.m_positionNs.store(ns, std::memory_order_release);
+					m_owner.m_positionNs.store(ns, StormByte::Safe::MemoryOrder::Release);
 				else {
-					const std::int64_t current = m_owner.m_positionNs.load(std::memory_order_acquire);
+					const std::int64_t current = m_owner.m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
 					if (current < 0)
-						m_owner.m_positionNs.store(ns, std::memory_order_release);
+						m_owner.m_positionNs.store(ns, StormByte::Safe::MemoryOrder::Release);
 				}
 			}
 		}
 
-		const std::int64_t pos = m_owner.m_positionNs.load(std::memory_order_acquire);
+		const std::int64_t pos = m_owner.m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
 		if (pos >= 0)
 			m_owner.ClockPass(pos);
 
@@ -136,7 +137,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (m_owner.m_backend && !m_owner.Failed())
 			m_owner.m_backend->Flush(m_owner);
 		m_owner.FlushOctets();
-		m_owner.m_closed.store(true, std::memory_order_release);
+		m_owner.m_closed.store(true, StormByte::Safe::MemoryOrder::Release);
 		m_owner.ClockMuxDone();
 		Log(Level::Notice, "closed");
 	}

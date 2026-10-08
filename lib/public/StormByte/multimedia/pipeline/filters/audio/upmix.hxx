@@ -203,7 +203,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			Property::ChannelLayout m_target;	///< Destination layout
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 
 			Mode m_mode = Mode::None;	///< Active fallback step
 	};

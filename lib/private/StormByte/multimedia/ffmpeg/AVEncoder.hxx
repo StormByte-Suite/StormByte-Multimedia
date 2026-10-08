@@ -43,13 +43,12 @@
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
-#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/multimedia/ffmpeg/backend_typedefs.hxx>
+#include <StormByte/safe/binary.hxx>
 #include <StormByte/safe/map.hxx>
 
 #include <cstdint>
-#include <map>
-#include <string>
-#include <vector>
+#include <string_view>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -66,7 +65,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class AVEncoder
 	 * @brief RAII encoder context with optional BSF pipeline.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVEncoder: public AVPointer<::AVCodecContext> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVEncoder: public AVPointer<::AVCodecContext> {
 		public:
 			/**
 			 * @brief Copy constructor (deleted).
@@ -99,24 +98,24 @@ namespace StormByte::Multimedia::FFmpeg {
 
 			/**
 			 * @brief Opens an encoder; may attach BSF from @p fmt.
-			 * @param codec Encoder codec.
+			 * @param codec_name FFmpeg implementation name selected by the multimedia registry.
 			 * @param params Stream codec parameters.
 			 * @param fmt Format context (for BSF decision).
 			 * @param stream_index Stream index.
 			 * @return Encoder or EncoderError.
 			 */
-			static ExpectedAVEncoder Open(AVCodec* codec, const AVCodecParameters& params, const AVFormatContext& fmt, int stream_index) noexcept;
+			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, const AVFormatContext& fmt, int stream_index) noexcept;
 
 			/**
 			 * @brief Opens an encoder without a muxer (no BSF).
-			 * @param codec Encoder codec.
+			 * @param codec_name FFmpeg implementation name selected by the multimedia registry.
 			 * @param params Stream codec parameters.
 			 * @param stream_index Output track index.
 			 * @param options av_opt_set pairs applied before avcodec_open2.
 			 * @param time_base Encoder time base. Ignored if num/den are not positive.
 			 * @return Encoder or EncoderError.
 			 */
-			static ExpectedAVEncoder Open(AVCodec* codec, const AVCodecParameters& params, int stream_index,
+			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 				const Safe::Map<Safe::String, Safe::String>& options, AVRational time_base) noexcept;
 
 			/**
@@ -244,7 +243,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		private:
 			int m_stream_index = -1;										///< Output track
 			FFmpeg::AVBSFPipeline m_bsf_pipeline;							///< Optional annex-B filter
-			std::map<std::int64_t, std::vector<std::uint8_t>> m_hdrPlusT35;	///< PTS → ST 2094-40 T.35
+			Safe::Map<std::int64_t, Safe::Binary> m_hdrPlusT35;	///< PTS → ST 2094-40 T.35 bytes
 
 			/**
 			 * @brief Adopts an opened codec context.
@@ -260,7 +259,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			using AVPointer<::AVCodecContext>::Get;
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVCodecContext>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVCodecContext>;
 }
 
 /**

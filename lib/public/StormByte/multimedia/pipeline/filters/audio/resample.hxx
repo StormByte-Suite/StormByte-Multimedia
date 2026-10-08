@@ -160,7 +160,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			Safe::Optional<int> m_rateIn;	///< Caller rate, or empty
 
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }
 

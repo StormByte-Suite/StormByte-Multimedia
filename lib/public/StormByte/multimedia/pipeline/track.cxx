@@ -77,7 +77,7 @@ Track& Track::operator=(const Track& other) {
 Tracks::Tracks() noexcept = default;
 
 Tracks::Tracks(const Tracks& other)
-: m_tracks() {
+: Iterable() {
 	for (const auto& track : other)
 		add(*track);
 }
@@ -96,13 +96,13 @@ Tracks& Tracks::operator=(const Tracks& other) {
 Tracks& Tracks::operator=(Tracks&& other) noexcept = default;
 
 const Track& Tracks::operator[](size_type index) const {
-	return *m_tracks[index];
+	return *Iterable::Container()[index];
 }
 
 void Tracks::add(const Track& track) {
-	m_tracks.push_back(track.Clone());
+	Iterable::Container().push_back(track.Clone());
 }
 
 void Tracks::add(Track&& track) {
-	m_tracks.push_back(track.Move());
+	Iterable::Container().push_back(track.Move());
 }

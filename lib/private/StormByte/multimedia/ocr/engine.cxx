@@ -125,10 +125,10 @@ namespace StormByte::Multimedia::OCR {
 	};
 
 	Engine::Engine() noexcept
-	: m_impl(std::make_unique<Impl>()) {}
+	: m_impl(StormByte::Safe::MakeUnique<Impl>()) {}
 
 	Engine::Engine(std::string language) noexcept
-	: m_impl(std::make_unique<Impl>()), m_language(std::move(language)) {}
+	: m_impl(StormByte::Safe::MakeUnique<Impl>()), m_language(std::move(language)) {}
 
 	Engine::Engine(Engine&&) noexcept = default;
 	Engine::~Engine() noexcept = default;

@@ -284,7 +284,7 @@ void PSNR::Process(const Pipeline::Frame& frame) noexcept {
 	StormByte::Safe::Shared<Lane> owner = std::as_const(m_lanes).contains(frame.Track())
 		? std::as_const(m_lanes).at(frame.Track()) : StormByte::Safe::Shared<Lane>{};
 	if (!owner) {
-		owner = StormByte::Safe::Heap::MakeShared<Lane>();
+			owner = StormByte::Safe::MakeShared<Lane>();
 		m_lanes[frame.Track()] = owner;
 	}
 	Lane& lane = *owner;

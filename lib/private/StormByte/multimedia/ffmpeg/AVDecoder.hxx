@@ -43,7 +43,7 @@
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
-#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/multimedia/ffmpeg/backend_typedefs.hxx>
 
 /**
  * @namespace StormByte::Multimedia::FFmpeg
@@ -58,7 +58,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class AVDecoder
 	 * @brief RAII decoder context with optional BSF pipeline.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVDecoder: public AVPointer<::AVCodecContext> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE AVDecoder: public AVPointer<::AVCodecContext> {
 		public:
 			/**
 			 * @brief Copy constructor (deleted).
@@ -191,7 +191,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			using AVPointer<::AVCodecContext>::Get;
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVCodecContext>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVCodecContext>;
 }
 
 /**

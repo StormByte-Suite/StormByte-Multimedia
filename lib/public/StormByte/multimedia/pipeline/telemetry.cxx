@@ -37,6 +37,8 @@
  */
 
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
+#include <StormByte/safe/memory_order.hxx>
+#include <StormByte/safe/unique_lock.hxx>
 
 #include <algorithm>
 #include <charconv>
@@ -64,28 +66,28 @@ namespace {
 			std::chrono::steady_clock::now().time_since_epoch()).count();
 	}
 
-	void UpdateMaximum(std::atomic<std::int64_t>& target, std::int64_t value) noexcept {
-		std::int64_t current = target.load(std::memory_order_relaxed);
+	void UpdateMaximum(StormByte::Safe::Atomic<std::int64_t>& target, std::int64_t value) noexcept {
+		std::int64_t current = target.load(StormByte::Safe::MemoryOrder::Relaxed);
 		while (current < value && !target.compare_exchange_weak(current, value,
-				std::memory_order_relaxed, std::memory_order_relaxed)) {}
+				StormByte::Safe::MemoryOrder::Relaxed, StormByte::Safe::MemoryOrder::Relaxed)) {}
 	}
 
-	void UpdateMinimum(std::atomic<std::int64_t>& target, std::int64_t value) noexcept {
-		std::int64_t current = target.load(std::memory_order_relaxed);
+	void UpdateMinimum(StormByte::Safe::Atomic<std::int64_t>& target, std::int64_t value) noexcept {
+		std::int64_t current = target.load(StormByte::Safe::MemoryOrder::Relaxed);
 		while (current > value && !target.compare_exchange_weak(current, value,
-				std::memory_order_relaxed, std::memory_order_relaxed)) {}
+				StormByte::Safe::MemoryOrder::Relaxed, StormByte::Safe::MemoryOrder::Relaxed)) {}
 	}
 
-	void UpdateMaximum(std::atomic<std::uint64_t>& target, std::uint64_t value) noexcept {
-		std::uint64_t current = target.load(std::memory_order_relaxed);
+	void UpdateMaximum(StormByte::Safe::Atomic<std::uint64_t>& target, std::uint64_t value) noexcept {
+		std::uint64_t current = target.load(StormByte::Safe::MemoryOrder::Relaxed);
 		while (current < value && !target.compare_exchange_weak(current, value,
-				std::memory_order_relaxed, std::memory_order_relaxed)) {}
+				StormByte::Safe::MemoryOrder::Relaxed, StormByte::Safe::MemoryOrder::Relaxed)) {}
 	}
 
-	void UpdateMinimum(std::atomic<std::uint64_t>& target, std::uint64_t value) noexcept {
-		std::uint64_t current = target.load(std::memory_order_relaxed);
+	void UpdateMinimum(StormByte::Safe::Atomic<std::uint64_t>& target, std::uint64_t value) noexcept {
+		std::uint64_t current = target.load(StormByte::Safe::MemoryOrder::Relaxed);
 		while (current > value && !target.compare_exchange_weak(current, value,
-				std::memory_order_relaxed, std::memory_order_relaxed)) {}
+				StormByte::Safe::MemoryOrder::Relaxed, StormByte::Safe::MemoryOrder::Relaxed)) {}
 	}
 
 	std::optional<std::uint64_t> ResidentBytes() noexcept {
@@ -161,94 +163,94 @@ StageTelemetry::StageTelemetry() noexcept
 	m_setup_ns(0),
 	m_started_ns(0),
 	m_finished_ns(0),
-	m_state(State::Created) {}
+	m_state(static_cast<int>(State::Created)) {}
 
 StageTelemetry::~StageTelemetry() noexcept = default;
 
 void StageTelemetry::SetOrigin(std::string_view origin) const noexcept {
-	std::lock_guard lock(m_origin_lock);
+	StormByte::Safe::UniqueLock lock(m_origin_lock);
 	m_origin = StormByte::Safe::String{origin};
 }
 
 StormByte::Safe::String StageTelemetry::Origin() const noexcept {
-	std::lock_guard lock(m_origin_lock);
+	StormByte::Safe::UniqueLock lock(m_origin_lock);
 	return m_origin;
 }
 
 void StageTelemetry::RecordInput(Kind kind) noexcept {
 	if (kind == Kind::Frame)
-		m_input_frames.fetch_add(1, std::memory_order_relaxed);
+		m_input_frames.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
 	else if (kind == Kind::Packet)
-		m_input_packets.fetch_add(1, std::memory_order_relaxed);
+		m_input_packets.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 void StageTelemetry::RecordOutput(Kind kind) noexcept {
 	if (kind == Kind::Frame)
-		m_output_frames.fetch_add(1, std::memory_order_relaxed);
+		m_output_frames.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
 	else if (kind == Kind::Packet)
-		m_output_packets.fetch_add(1, std::memory_order_relaxed);
+		m_output_packets.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 void StageTelemetry::RecordProcess(std::chrono::nanoseconds duration) noexcept {
 	const std::int64_t ns = std::max<std::int64_t>(0, duration.count());
-	m_process_calls.fetch_add(1, std::memory_order_relaxed);
-	m_process_total_ns.fetch_add(ns, std::memory_order_relaxed);
+	m_process_calls.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
+	m_process_total_ns.fetch_add(ns, StormByte::Safe::MemoryOrder::Relaxed);
 	UpdateMinimum(m_process_min_ns, ns);
 	UpdateMaximum(m_process_max_ns, ns);
 }
 
 void StageTelemetry::RecordWait(std::chrono::nanoseconds duration) noexcept {
 	const std::int64_t ns = std::max<std::int64_t>(0, duration.count());
-	m_wait_count.fetch_add(1, std::memory_order_relaxed);
-	m_wait_total_ns.fetch_add(ns, std::memory_order_relaxed);
+	m_wait_count.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
+	m_wait_total_ns.fetch_add(ns, StormByte::Safe::MemoryOrder::Relaxed);
 	UpdateMaximum(m_wait_max_ns, ns);
 }
 
 void StageTelemetry::RecordSetup(std::chrono::nanoseconds duration) noexcept {
-	m_setup_ns.store(std::max<std::int64_t>(0, duration.count()), std::memory_order_relaxed);
+	m_setup_ns.store(std::max<std::int64_t>(0, duration.count()), StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 void StageTelemetry::SetState(State state) noexcept {
-	m_state.store(state, std::memory_order_release);
+	m_state.store(static_cast<int>(state), StormByte::Safe::MemoryOrder::Release);
 }
 
 void StageTelemetry::SetError(StormByte::Safe::String reason) noexcept {
-	std::lock_guard lock(m_error_lock);
+	StormByte::Safe::UniqueLock lock(m_error_lock);
 	m_error = std::move(reason);
 	SetState(State::Failed);
 }
 
 void StageTelemetry::Start() noexcept {
-	m_started_ns.store(NowNs(), std::memory_order_release);
-	m_finished_ns.store(0, std::memory_order_release);
+	m_started_ns.store(NowNs(), StormByte::Safe::MemoryOrder::Release);
+	m_finished_ns.store(0, StormByte::Safe::MemoryOrder::Release);
 }
 
 void StageTelemetry::Finish() noexcept {
-	m_finished_ns.store(NowNs(), std::memory_order_release);
+	m_finished_ns.store(NowNs(), StormByte::Safe::MemoryOrder::Release);
 }
 
 std::uint64_t StageTelemetry::ProcessCalls() const noexcept {
-	return m_process_calls.load(std::memory_order_relaxed);
+	return m_process_calls.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 std::uint64_t StageTelemetry::InputFrames() const noexcept {
-	return m_input_frames.load(std::memory_order_relaxed);
+	return m_input_frames.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 std::uint64_t StageTelemetry::InputPackets() const noexcept {
-	return m_input_packets.load(std::memory_order_relaxed);
+	return m_input_packets.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 std::uint64_t StageTelemetry::OutputFrames() const noexcept {
-	return m_output_frames.load(std::memory_order_relaxed);
+	return m_output_frames.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 std::uint64_t StageTelemetry::OutputPackets() const noexcept {
-	return m_output_packets.load(std::memory_order_relaxed);
+	return m_output_packets.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 std::chrono::nanoseconds StageTelemetry::ProcessTotal() const noexcept {
-	return std::chrono::nanoseconds(m_process_total_ns.load(std::memory_order_relaxed));
+	return std::chrono::nanoseconds(m_process_total_ns.load(StormByte::Safe::MemoryOrder::Relaxed));
 }
 
 std::chrono::nanoseconds StageTelemetry::ProcessMean() const noexcept {
@@ -259,46 +261,46 @@ std::chrono::nanoseconds StageTelemetry::ProcessMean() const noexcept {
 }
 
 std::chrono::nanoseconds StageTelemetry::ProcessMinimum() const noexcept {
-	const auto value = m_process_min_ns.load(std::memory_order_relaxed);
+	const auto value = m_process_min_ns.load(StormByte::Safe::MemoryOrder::Relaxed);
 	return value == std::numeric_limits<std::int64_t>::max()
 		? std::chrono::nanoseconds::zero() : std::chrono::nanoseconds(value);
 }
 
 std::chrono::nanoseconds StageTelemetry::ProcessMaximum() const noexcept {
-	return std::chrono::nanoseconds(m_process_max_ns.load(std::memory_order_relaxed));
+	return std::chrono::nanoseconds(m_process_max_ns.load(StormByte::Safe::MemoryOrder::Relaxed));
 }
 
 std::uint64_t StageTelemetry::WaitCount() const noexcept {
-	return m_wait_count.load(std::memory_order_relaxed);
+	return m_wait_count.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 std::chrono::nanoseconds StageTelemetry::WaitTotal() const noexcept {
-	return std::chrono::nanoseconds(m_wait_total_ns.load(std::memory_order_relaxed));
+	return std::chrono::nanoseconds(m_wait_total_ns.load(StormByte::Safe::MemoryOrder::Relaxed));
 }
 
 std::chrono::nanoseconds StageTelemetry::WaitMaximum() const noexcept {
-	return std::chrono::nanoseconds(m_wait_max_ns.load(std::memory_order_relaxed));
+	return std::chrono::nanoseconds(m_wait_max_ns.load(StormByte::Safe::MemoryOrder::Relaxed));
 }
 
 std::chrono::nanoseconds StageTelemetry::SetupTime() const noexcept {
-	return std::chrono::nanoseconds(m_setup_ns.load(std::memory_order_relaxed));
+	return std::chrono::nanoseconds(m_setup_ns.load(StormByte::Safe::MemoryOrder::Relaxed));
 }
 
 std::chrono::nanoseconds StageTelemetry::Elapsed() const noexcept {
-	const std::int64_t started = m_started_ns.load(std::memory_order_acquire);
+	const std::int64_t started = m_started_ns.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (started == 0)
 		return std::chrono::nanoseconds::zero();
-	const std::int64_t finished = m_finished_ns.load(std::memory_order_acquire);
+	const std::int64_t finished = m_finished_ns.load(StormByte::Safe::MemoryOrder::Acquire);
 	return std::chrono::nanoseconds(std::max<std::int64_t>(0,
 		(finished == 0 ? NowNs() : finished) - started));
 }
 
 State StageTelemetry::Status() const noexcept {
-	return m_state.load(std::memory_order_acquire);
+	return static_cast<State>(m_state.load(StormByte::Safe::MemoryOrder::Acquire));
 }
 
 StormByte::Safe::Optional<StormByte::Safe::String> StageTelemetry::Error() const noexcept {
-	std::lock_guard lock(m_error_lock);
+	StormByte::Safe::UniqueLock lock(m_error_lock);
 	return m_error;
 }
 
@@ -337,7 +339,7 @@ void JobTelemetry::RegisterStage(StormByte::Safe::String name,
 	StormByte::Safe::Shared<const StageTelemetry> metrics) noexcept {
 	if (!metrics)
 		return;
-	std::lock_guard lock(m_stages_lock);
+	StormByte::Safe::UniqueLock lock(m_stages_lock);
 	if (std::find_if(m_stages.begin(), m_stages.end(), [&metrics](const Stage& stage) {
 			return stage.Metrics.get() == metrics.get();
 		}) != m_stages.end())
@@ -347,7 +349,7 @@ void JobTelemetry::RegisterStage(StormByte::Safe::String name,
 }
 
 StormByte::Safe::Vector<JobTelemetry::Stage> JobTelemetry::Stages() const noexcept {
-	std::lock_guard lock(m_stages_lock);
+	StormByte::Safe::UniqueLock lock(m_stages_lock);
 	return m_stages;
 }
 
@@ -355,28 +357,28 @@ void JobTelemetry::SampleMemory() noexcept {
 	const auto resident = ResidentBytes();
 	if (!resident)
 		return;
-	m_memory_current.store(*resident, std::memory_order_relaxed);
+	m_memory_current.store(*resident, StormByte::Safe::MemoryOrder::Relaxed);
 	UpdateMinimum(m_memory_min, *resident);
 	UpdateMaximum(m_memory_max, *resident);
-	m_memory_samples.fetch_add(1, std::memory_order_relaxed);
+	m_memory_samples.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryCurrent() const noexcept {
 	if (MemorySamples() == 0)
 		return std::nullopt;
-	return m_memory_current.load(std::memory_order_relaxed);
+	return m_memory_current.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMinimum() const noexcept {
 	if (MemorySamples() == 0)
 		return std::nullopt;
-	return m_memory_min.load(std::memory_order_relaxed);
+	return m_memory_min.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMaximum() const noexcept {
 	if (MemorySamples() == 0)
 		return std::nullopt;
-	return m_memory_max.load(std::memory_order_relaxed);
+	return m_memory_max.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 StormByte::Safe::Optional<std::uint64_t> JobTelemetry::PeakMemory() const noexcept {
@@ -384,7 +386,7 @@ StormByte::Safe::Optional<std::uint64_t> JobTelemetry::PeakMemory() const noexce
 }
 
 std::uint64_t JobTelemetry::MemorySamples() const noexcept {
-	return m_memory_samples.load(std::memory_order_relaxed);
+	return m_memory_samples.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
 JobTelemetry::operator StormByte::Safe::String() const {

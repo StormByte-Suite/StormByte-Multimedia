@@ -337,7 +337,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Adopts a backend frame for lazy @ref Payload().
 			 * @param backend Backend holder.
 			 */
-			void Bind(std::unique_ptr<Backend::Pipeline::Frame> backend) noexcept;
+			void Bind(StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept;
 
 			/**
 			 * @brief Turns this unit into the empty sentinel.
@@ -389,10 +389,7 @@ namespace StormByte::Multimedia::Pipeline {
 
 			std::uint64_t m_part;						///< Sub-identifier within the lineage, zero on the sentinel.
 
-			std::unique_ptr<Backend::Pipeline::Frame> m_backend;		///< Multimedia-private holder, allocated and destroyed only by its provider.
-											///<
-											///< Never exposed to consumers. All operations affecting this STL owner are
-											///< exported out-of-line; compatible class layout is still required.
+			StormByte::Safe::Unique<Backend::Pipeline::Frame> m_backend;	///< Multimedia-private FFmpeg frame holder.
 	};
 }
 

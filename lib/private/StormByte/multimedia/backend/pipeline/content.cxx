@@ -47,19 +47,19 @@ using StormByte::Multimedia::Backend::Pipeline::Detail::Content::Passthrough;
 using StormByte::Multimedia::Backend::Pipeline::Detail::Content::Video;
 using StormByte::Multimedia::Type;
 
-std::unique_ptr<Content> Content::For(Type type) noexcept {
+StormByte::Safe::Unique<Content> Content::For(Type type) noexcept {
 	switch (type) {
 		case Type::Video:
-			return std::make_unique<Video>();
+			return StormByte::Safe::MakeUnique<Video>();
 		case Type::Audio:
-			return std::make_unique<Audio>();
+			return StormByte::Safe::MakeUnique<Audio>();
 		case Type::Subtitle:
 		case Type::Attachment:
 		case Type::Unknown:
-			return std::make_unique<Passthrough>();
+			return StormByte::Safe::MakeUnique<Passthrough>();
 	}
 
-	return std::make_unique<Passthrough>();
+	return StormByte::Safe::MakeUnique<Passthrough>();
 }
 
 const std::string& Content::Warning() const noexcept {

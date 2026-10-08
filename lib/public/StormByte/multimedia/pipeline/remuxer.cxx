@@ -58,8 +58,8 @@ using StormByte::Logger::Level;
 Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept
 :	Step(std::move(log), Producer::Remuxer, Kinds{Kind::Packet}, Kinds{Kind::Packet}),
 	m_index(in) {
-	Mount(StormByte::Safe::Heap::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::Heap::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Remux>(*this));
+	Mount(StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Remux>(*this));
 	Launch();
 }
 

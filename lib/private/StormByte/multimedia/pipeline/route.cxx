@@ -95,8 +95,9 @@ int Route::Track() const noexcept {
 	return m_track;
 }
 
-void Route::Observe(Filter::FFmpeg& analytics) noexcept {
-	m_analytics.push_back(&analytics);
+void Route::Observe(StormByte::Safe::Shared<Filter::FFmpeg> analytics) noexcept {
+	if (analytics)
+		m_analytics.push_back(std::move(analytics));
 }
 
 Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
@@ -117,7 +118,7 @@ Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	Filter::FFmpeg& node = *filter;
 	const bool analytics = dynamic_cast<Filter::Analytics*>(filter.get()) != nullptr;
 	if (analytics)
-		m_analytics.push_back(filter.get());
+		m_analytics.push_back(filter);
 	else {
 		if (packet)
 			Hook(m_packets, node);
@@ -180,7 +181,8 @@ void Route::Close() noexcept {
 
 	Cap(destination.pipe(), m_track, destination.InputCeiling());
 
-	for (Filter::FFmpeg* analytics : m_analytics) {
+	for (const auto& analyticsOwner : m_analytics) {
+		Filter::FFmpeg* analytics = analyticsOwner.get();
 		if (!analytics)
 			continue;
 		if (analytics->Leaf() != "frames")
@@ -205,8 +207,8 @@ bool Route::Idle() const noexcept {
 	return true;
 }
 
-std::vector<Filter::Report> Route::Reports() const noexcept {
-	std::vector<Filter::Report> reports;
+StormByte::Safe::Vector<Filter::Report> Route::Reports() const noexcept {
+	StormByte::Safe::Vector<Filter::Report> reports;
 	reports.reserve(m_filters.size());
 	for (const auto& filter : m_filters)
 		reports.push_back(filter->Report());
@@ -240,7 +242,8 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
 		return;
 	}
-	std::unique_ptr<Decoder> look(new Decoder(origin.m_log, m_track, Decoder::SourceLook{}));
+	StormByte::Safe::Shared<Decoder> look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
+		origin.m_log, m_track, Decoder::SourceLook{});
 	origin.pipe().CloneTo(m_track, look->pipe());
 	look->pipe().CloneTo(m_track, analytics.pipe());
 	look->pipe().Drain();
@@ -259,11 +262,13 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
 		return;
 	}
-	std::unique_ptr<Decoder> look;
+	StormByte::Safe::Shared<Decoder> look;
 	if (destination.m_name == Producer::Remuxer)
-		look.reset(new Decoder(destination.m_log, m_track, Decoder::RemuxLook{}));
+		look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
+			destination.m_log, m_track, Decoder::RemuxLook{});
 	else if (destination.m_name == Producer::Encoder)
-		look.reset(new Decoder(destination.m_log, m_track, Decoder::EncodeLook{}));
+		look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
+			destination.m_log, m_track, Decoder::EncodeLook{});
 	else
 		return;
 	look->pipe().Listen();

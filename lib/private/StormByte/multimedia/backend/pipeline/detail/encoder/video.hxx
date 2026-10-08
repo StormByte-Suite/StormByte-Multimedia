@@ -45,11 +45,10 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/deque.hxx>
+#include <StormByte/safe/optional.hxx>
 
 #include <cstdint>
-#include <deque>
-#include <memory>
-#include <optional>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder
@@ -167,9 +166,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 */
 			void StampOutgoing() noexcept;
 
-			std::optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;	///< Opened encoder
+			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;	///< Opened encoder.
 			StormByte::Multimedia::FFmpeg::AVPacket m_scratch;					///< Receive scratch
-			std::deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Packets waiting for Mux
+			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Base-owned packets waiting for Mux.
 			StormByte::Multimedia::Pipeline::Encoder* m_owner;							///< Owner for Take/Wrap
 			AVRational m_timeBase;														///< Encoder time base
 			int m_index;																///< Encoder::Index after Open

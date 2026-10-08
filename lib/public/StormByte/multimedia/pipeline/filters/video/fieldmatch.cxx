@@ -122,7 +122,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 			Fail("fieldmatch: AVFilterGraph::Open failed");
 			return;
 		}
-		m_graph = Safe::Heap::MakeUnique<FGraph>(std::move(opened));
+		m_graph = Safe::MakeUnique<FGraph>(std::move(opened));
 	} else if (!m_graph->Ensure(src, chain)) {
 		Fail("fieldmatch: AVFilterGraph::Ensure failed");
 		return;

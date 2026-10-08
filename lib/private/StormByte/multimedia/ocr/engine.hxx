@@ -40,9 +40,9 @@
 
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/ocr/exception.hxx>
+#include <StormByte/safe/pointers.hxx>
 
 #include <cstdint>
-#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
@@ -168,7 +168,7 @@ namespace StormByte::Multimedia::OCR {
 			 */
 			class Impl;
 
-			std::unique_ptr<Impl> m_impl;	///< Backend session.
+			StormByte::Safe::Unique<Impl> m_impl;	///< Base-owned backend session.
 			std::string m_language;			///< Caller language pin; empty uses `eng`.
 	};
 }

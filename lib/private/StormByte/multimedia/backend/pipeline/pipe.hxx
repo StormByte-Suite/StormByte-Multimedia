@@ -40,15 +40,17 @@
 
 #include <StormByte/buffer/sink.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
+#include <StormByte/safe/atomic.hxx>
+#include <StormByte/safe/condition_variable.hxx>
+#include <StormByte/safe/mutex.hxx>
+#include <StormByte/safe/pair.hxx>
+#include <StormByte/safe/unique_lock.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <cstddef>
-#include <deque>
-#include <mutex>
-#include <unordered_set>
+#include <StormByte/safe/deque.hxx>
+#include <StormByte/safe/unordered_set.hxx>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline
@@ -194,7 +196,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * After Bind, Out and In are the same hopper: this is
 			 * the only cap. There is no out ceiling.
 			 */
-			void Capacity(int track, std::size_t n) noexcept;
+			void Capacity(int track, StormByte::Size n) noexcept;
 
 			/**
 			 * @brief Registers the owned consumer CV on In (Launch and Bind).
@@ -327,22 +329,19 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			friend Pipe& operator>>(Item::PointerType&& item, Pipe& pipe) noexcept;
 
 		private:
-			std::condition_variable m_wake;				///< Provider-owned consumer CV
-			std::mutex m_wait;							///< Mutex held through wait completion
-			std::atomic<std::size_t> m_wakeGeneration{0};	///< Published explicit control notifications
+			StormByte::Safe::ConditionVariable m_wake;	///< Provider-owned consumer CV
+			StormByte::Safe::Mutex m_wait;				///< Mutex held through wait completion
+			StormByte::Safe::Atomic<std::size_t> m_wakeGeneration{0};	///< Published explicit control notifications
 			ItemSink m_in;						///< Input buckets
 			ItemSink m_out;						///< Output buckets
 
 			/**
 			 * @brief Track-specific clone destination.
 			 */
-			struct Fork {
-				int track;		///< Hopper key to clone
-				ItemSink hopper;	///< Bound clone output
-			};
+			using Fork = StormByte::Safe::Pair<int, StormByte::Safe::Shared<ItemSink>>;
 
-			std::deque<Fork> m_forks;			///< CloneTo dests
-			std::unordered_set<int> m_inTracks;	///< Keys already wired on In
+			StormByte::Safe::Deque<Fork> m_forks;	///< CloneTo destinations.
+			StormByte::Safe::UnorderedSet<int> m_inTracks;	///< Keys already wired on In
 	};
 
 	/**

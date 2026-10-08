@@ -45,7 +45,6 @@
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/type_traits/safe.hxx>
 
-#include <memory>
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -218,7 +217,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			int m_lumaW;		///< Cached source width
 			int m_lumaH;		///< Cached source height
 			int m_lumaFmt;		///< Cached source pixel format
-			std::unique_ptr<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Provider-owned luma cache
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Base-owned luma cache.
 	};
 }
 

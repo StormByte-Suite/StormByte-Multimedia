@@ -53,7 +53,7 @@ namespace StormByte::Multimedia::FFmpeg {
 	 * @class Sws
 	 * @brief RAII `SwsContext` for video scale / convert.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Sws: public AVPointer<::SwsContext> {
+	class STORMBYTE_MULTIMEDIA_PRIVATE Sws: public AVPointer<::SwsContext> {
 		friend class AVFrame;
 
 		public:
@@ -170,7 +170,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			int m_flags = 0;	///< Cached scaler flags
 	};
 
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::SwsContext>;
+	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::SwsContext>;
 }
 
 /**

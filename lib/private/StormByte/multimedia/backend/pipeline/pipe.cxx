@@ -66,7 +66,7 @@ Pipe::~Pipe() noexcept {
 	m_in.Unnotify();
 	m_out.Unnotify();
 	for (auto& fork : m_forks)
-		fork.hopper.Unnotify();
+		fork.second->Unnotify();
 }
 
 Pipe::ItemSink& Pipe::In() noexcept {
@@ -85,7 +85,7 @@ const Pipe::ItemSink& Pipe::Out() const noexcept {
 	return m_out;
 }
 
-void Pipe::Capacity(int track, std::size_t n) noexcept {
+void Pipe::Capacity(int track, StormByte::Size n) noexcept {
 	m_in.Capacity(track, n);
 }
 
@@ -94,23 +94,23 @@ void Pipe::Listen() noexcept {
 }
 
 void Pipe::Wake() noexcept {
-	m_wakeGeneration.fetch_add(1, std::memory_order_release);
+	m_wakeGeneration.fetch_add(std::size_t{1}, StormByte::Safe::MemoryOrder::Release);
 	m_wakeGeneration.notify_all();
 	m_wake.notify_all();
 }
 
 void Pipe::WaitWake(void* owner, bool (*ready)(void*) noexcept) noexcept {
 	for (;;) {
-		const auto generation = m_wakeGeneration.load(std::memory_order_acquire);
+		const auto generation = m_wakeGeneration.load(StormByte::Safe::MemoryOrder::Acquire);
 		if (ready(owner))
 			return;
-		m_wakeGeneration.wait(generation, std::memory_order_acquire);
+		m_wakeGeneration.wait(generation, StormByte::Safe::MemoryOrder::Acquire);
 	}
 }
 
 void Pipe::Wait(void* owner, bool (*ready)(void*) noexcept,
 	void (*completed)(void*, std::chrono::nanoseconds) noexcept) noexcept {
-	std::unique_lock lock(m_wait);
+	StormByte::Safe::UniqueLock lock(m_wait);
 	const auto started = std::chrono::steady_clock::now();
 	WaitWake(owner, ready);
 	completed(owner, std::chrono::steady_clock::now() - started);
@@ -120,17 +120,18 @@ void Pipe::Close() noexcept {
 	m_in.Eof();
 	m_out.Eof();
 	for (auto& fork : m_forks)
-		fork.hopper.Eof();
+		fork.second->Eof();
 }
 
 Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
 	dest.Listen();
-	m_forks.emplace_back();
-	m_forks.back().track = track;
+	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
+	m_forks.emplace_back(track, std::move(hopper));
+	auto& fork = m_forks.back();
 	if (dest.m_inTracks.contains(track))
-		dest.In().To(track) >> m_forks.back().hopper;
+		dest.In().To(track) >> *fork.second;
 	else
-		m_forks.back().hopper.To(track) >> dest.In();
+		fork.second->To(track) >> dest.In();
 	dest.m_inTracks.insert(track);
 	return dest;
 }
@@ -176,11 +177,11 @@ Pipe& Pipe::operator>>(Item::PointerType& item) noexcept {
 	const auto keys = m_in.Keys();
 	int chosen = 0;
 	bool found = false;
-	std::size_t best_size = 0;
+	StormByte::Size best_size = 0;
 	std::int64_t best_ts = std::numeric_limits<std::int64_t>::max();
 
 	for (const int key : keys) {
-		const std::size_t n = m_in.Size(key);
+		const StormByte::Size n = m_in.Size(key);
 		if (n == 0)
 			continue;
 		const auto ts = FrontTs(m_in.Front(key));
@@ -205,10 +206,10 @@ Pipe& Pipe::operator<<(Item::PointerType item) noexcept {
 		return *this;
 	const int key = item->Track();
 	for (auto& fork : m_forks) {
-		if (fork.track != key)
+		if (fork.first != key)
 			continue;
 		if (auto copy = item->Clone())
-			fork.hopper.Push(key, std::move(copy));
+			fork.second->Push(key, std::move(copy));
 	}
 	m_out.Push(key, std::move(item));
 	return *this;
