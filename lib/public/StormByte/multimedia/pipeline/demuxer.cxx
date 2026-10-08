@@ -235,6 +235,20 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 		decoder.Fail(demuxer.Error().value_or(StormByte::Safe::String("demuxer failed")));
 		return decoder;
 	}
+	if (const auto plan = decoder.Plan(); plan) {
+		try {
+			for (const auto stream : plan->Snapshot().Streams()) {
+				if (stream.Index() != decoder.Index())
+					continue;
+				decoder.Stamp(stream.Metadata().Language(), stream.Metadata().Title());
+				break;
+			}
+		}
+		catch (...) {
+			decoder.Fail("failed to copy source stream tags");
+			return decoder;
+		}
+	}
 
 	decoder.AttachOrigin(demuxer);
 	demuxer.pipe().To(decoder.Index()) >> decoder.pipe();
