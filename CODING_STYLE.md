@@ -1,83 +1,198 @@
-# StormByte-Multimedia Coding Style
+# StormByte coding style
 
-Multimedia follows the StormByte suite conventions. Match nearby code when a
-detail is not specified here, and keep changes focused on the requested behavior.
+This is how Base is written. Other suite modules follow it unless their own file says otherwise. If this file is silent, copy the nearest file that already does the thing you are doing.
 
-## Files and Formatting
+## Files
 
-- Use `.hxx` for headers, `.cxx` for sources, and `.txx` for template bodies.
-- Headers use `#pragma once`. Preserve the repository's existing license notices.
-- Indent with literal tabs, not spaces. Do not run clang-format on this project.
-- Use K&R braces, with access labels one indentation level inside the class.
-- Put `else` on its own line. Single-statement branches normally omit braces.
-- Bind pointers and references to the type: `Frame* frame`, `const Packet& packet`.
-- Use PascalCase for types and functions, and uppercase underscore-separated macros.
-- Keep one statement per line and end every file with a newline.
+C++ headers are `.hxx`. Sources are `.cxx`. Template bodies that would dirty the header go in a `.txx`, included at the bottom of the header. A private C helper is `.h` and `.c`, compiled as C, and is not installed.
 
-Include StormByte headers first, followed by a blank line and standard-library
-headers. Keep each group alphabetical. Never use `using namespace` in headers;
-namespace directives after the includes are appropriate in source files.
+Every C and C++ file starts with the license banner already used in the tree, unchanged, then `#pragma once` on a header. CMake and Markdown do not take the banner.
 
-Use nested namespace blocks in headers up to three levels deep. Deeper namespaces
-may use qualified namespace syntax. Document each namespace consistently.
+Includes are the project's own headers, alphabetical, a blank line, then the standard library, alphabetical. A header does not contain `using namespace`. A `.cxx` may say `using namespace StormByte;` after the includes, or name the few symbols it actually uses.
 
-## Language and Ownership
+## Layout
 
-Use C++26 and RAII. Prefer existing StormByte concepts, traits, buffers, safe
-pointers, strings, and `Expected`/`Unexpected` helpers when they fit the contract.
-Use domain exception types rather than introducing unrelated standard exceptions.
+Indent with tabs. A space used to indent is wrong. Do not pad with spaces to line columns up. A trailing `///<` on a member may be tabbed to the same column as its neighbours, and is dropped when the name is too long to keep that column.
 
-Prefer scoped enumerations and explicit converting constructors unless an implicit
-conversion is intentional and documented. Use `constexpr` where appropriate and
-`noexcept` only when the implementation honors that contract. Do not let exceptions
-escape FFmpeg callbacks or worker entry points.
+Braces are K&R. The `{` stays on the line of `class`, `struct`, `enum`, `namespace`, `if`, `for`, `while` and the function signature. `public:` and `private:` are one tab in. Members are one more. A `friend` sits with the members of the section that owns it, not before the first visibility label.
 
-Preserve the suite's platform and visibility macros. Changes must support Linux,
-Windows, and macOS, or document a deliberate best-effort capability on unsupported
-platforms. Avoid assumptions about the size of `long`, character encodings, or
-shared-library allocation ownership.
+A single-statement `if`, `else` or `else if` has no braces. `else` and `else if` go on their own line.
 
-## Public API and Library Boundaries
+```cpp
+if (unit == 0 || remainder == 0)
+	std::snprintf(...);
+else {
+	...
+}
+```
 
-Preserve existing public signatures unless an API change is explicitly intended.
-Use `STORMBYTE_MULTIMEDIA_PUBLIC` on exported classes and declarations and
-`STORMBYTE_MULTIMEDIA_PRIVATE` on implementation types. Visibility attributes on
-free functions precede the return type. Do not repeat a class export attribute on
-its members or on ordinary source definitions.
+`*` and `&` bind to the type: `const char* text`, `String& other`. Not `char *text`.
 
-Use the repository's established boundary-safe value types for new interfaces.
-Move heap-affecting operations out of headers when required for shared-library
-ownership. Ordinary `inline` is not a guarantee that allocation happens in the
-caller's runtime. Preserve the documented lifetime of references and shared handles.
+One statement per line. One empty line between members. No anonymous namespace in a public header.
 
-Keep third-party handles behind the established multimedia abstractions. Do not
-add implementation details to an interface merely to support one caller.
+## Names
 
-## Documentation
+Types, enumerations and functions are PascalCase: `Base64Encode`, `Length`, `Fault`. Macros are `SCREAMING_SNAKE`: `STORMBYTE_PUBLIC`, `WINDOWS`.
 
-Document declarations in headers, including constructor overloads, parameters,
-return values, ownership, failure behavior, and private implementation members.
-Use `@ref` only for actual documented symbols, with qualified names when ambiguous.
-Template examples belong in code spans or code blocks, not unescaped HTML tags.
+A data member is snake case and starts with `m_`: `m_thread_count`. A constant is PascalCase or full uppercase. Google `kConstant` is not used.
 
-Published API documentation describes what callers can use and observe. It must
-not explain private fields, queues, backend classes, or helper call sequences.
-Keep implementation documentation separate or inside Doxygen internal sections;
-private extraction and internal documentation remain disabled for publication.
+```cpp
+constexpr int Max = 5;
+constexpr int THRESHOLD = 5;
+```
 
-Resolve other suite modules through Doxygen tagfiles rather than adding their
-sources to the documentation inputs. Generated documentation must build without
-warnings. Update the README when public behavior, configuration, or usage changes.
+Snake case is reserved for a type that is deliberately std-like. `Safe::String::push_back` stays snake case because the point of that type is that a reader already knows the name. A helper that is not part of that emulated surface is PascalCase, including a private one. Do not mix the two on the same surface.
 
-## Validation and Commits
+A test function is snake case and starts with `test_`. Assert macros take the name from `__func__`. Do not pass the function name, and do not repeat it as a string literal.
 
-Add focused regression coverage for changed behavior, including relevant EOF,
-flush, cancellation, concurrency, and platform cases. Verify shared-library
-compatibility and preserve media metadata when changing processing paths.
+An accessor does not take a `Get` or `Set` prefix. The getter is the PascalCase name. The setter is the same name with an argument.
 
-Use separate build directories for different compilers and configurations. Check
-warnings with `-Wall -Wextra -Wpedantic -Werror` where supported. Report what was
-actually executed and any validation limitations.
+```cpp
+Foo::Data();
+Foo::Data(int value);
+```
 
-Use Conventional Commits in English, with a concise subject and a body explaining
-motivation, behavior, compatibility, and validation. Keep each commit on one topic.
+## Classes
+
+A class that owns or is copied is written in canonical order, and none of those six is omitted:
+
+1. constructor
+2. copy constructor
+3. move constructor
+4. destructor
+5. copy assignment
+6. move assignment
+
+`= default` and `= delete` are written out in that position. They are not left for the compiler to invent. Extra constructors go with the first constructor, not between the assignment operators.
+
+A converting constructor is `explicit` unless the type documents an implicit conversion. `Safe::String` to `std::string_view` is that case. A conversion to an STL container is explicit.
+
+Mark `noexcept` only when it is true. Prefer `constexpr` when there is no heap and no I/O. A function that builds a `Safe::String` inside the library is not `constexpr`.
+
+```cpp
+/**
+ * @class Foo
+ * @brief Sample owner used by the style guide. It does not cross a DLL.
+ */
+class STORMBYTE_PUBLIC Foo {
+	public:
+		/**
+		 * @brief Construct an invalid object with no workers.
+		 */
+		Foo();
+
+		/**
+		 * @brief Copy an object.
+		 * @param other Source.
+		 */
+		Foo(const Foo& other);
+
+		/**
+		 * @brief Take an object. @p other is left invalid.
+		 * @param other Source.
+		 */
+		Foo(Foo&& other) noexcept;
+
+		/**
+		 * @brief Destroy the object.
+		 */
+		virtual ~Foo();
+
+		/**
+		 * @brief Copy-assign an object.
+		 * @param other Source.
+		 * @return This object.
+		 */
+		Foo& operator=(const Foo& other);
+
+		/**
+		 * @brief Move-assign an object. @p other is left invalid.
+		 * @param other Source.
+		 * @return This object.
+		 */
+		Foo& operator=(Foo&& other) noexcept;
+
+		/**
+		 * @brief Report whether this object can be used.
+		 * @return Whether the object is valid.
+		 */
+		bool Valid() const { return m_valid; }
+
+		/**
+		 * @brief Set whether this object can be used.
+		 * @param valid New validity.
+		 */
+		void Valid(bool valid) { m_valid = valid; }
+
+		/**
+		 * @brief Return the worker count.
+		 * @return Worker count.
+		 */
+		int ThreadCount() const { return m_thread_count; }
+
+		/**
+		 * @brief Set the worker count.
+		 * @param threads Worker count. Not checked.
+		 */
+		void ThreadCount(int threads) { m_thread_count = threads; }
+
+	private:
+		bool m_valid;			///< Whether the object can be used.
+		int m_thread_count;		///< Worker count. Zero until set.
+};
+```
+
+## Namespaces
+
+Nest namespaces in the header when there are three or fewer. Each opened namespace gets the same `@namespace` and `@brief` block. Do not close with `// namespace Foo` or a similar tag.
+
+## Language
+
+The dialect is C++26. New code does not call bare `new` or `delete`. Owned memory goes through `Safe::Heap`, or through a Safe owner.
+
+`enum class` only. Platform tests are `#ifdef WINDOWS`, `#elifdef MACOS`, `#else`. Not `#if defined(WINDOWS)` and not raw `_WIN32`.
+
+A precondition failure, such as `operator[]` out of range, is undefined and `assert` when assertions are on. Do not throw for it. A checked access that is part of the type's contract throws a StormByte exception.
+
+## Concepts
+
+Constrain a public template with `StormByte::Type`. `Type::SameAs`, not `std::same_as`. Do not put `std::enable_if`, `void_t` or a raw `std::is_*` next to a concept that already says the same thing.
+
+## DLL boundary
+
+`STORMBYTE_PUBLIC` comes first on a function declaration. clang-cl rejects `__declspec` after a reference return type.
+
+```cpp
+STORMBYTE_PUBLIC Safe::String GenerateUUIDv4() noexcept;
+STORMBYTE_PUBLIC const Category<Code>& category() noexcept;
+```
+
+Do not write `Safe::String STORMBYTE_PUBLIC Foo();`. On a class the attribute stays on the type: `class STORMBYTE_PUBLIC Fault`. Do not repeat it on an ordinary `.cxx` definition.
+
+An exported template is split. The header has the `extern template` with `STORMBYTE_PUBLIC`. The `.cxx` has the body with `STORMBYTE_INSTANTIATE`. Never put `STORMBYTE_INSTANTIATE` on the `extern` line, and never write `STORMBYTE_PUBLIC extern template`.
+
+A value that leaves the shared library is a Safe type, or a borrowed `const char*` owned by this library. It is not a `std::string`, a `std::vector` or a `std::function`. A conversion to one of those is `STORMBYTE_FORCE_INLINE` in the header, so the STL object is born in the caller. A private C helper is not exported.
+
+## Doxygen
+
+Every declaration a reader can trip over is documented: types, functions, data members, template parameters. Each one gets its own block. Do not compress several functions into one block, and do not collapse a function block onto one line.
+
+A function gets `@brief`, and `@param`, `@return` or `@throws` when it has them. `@return` names the value, not the C++ type. `@ref` uses the qualified name. A comment says what the thing is for. It does not repeat the signature.
+
+`= delete` does not need a paragraph. A data member whose name already says what it is takes a trailing `///<`. Large classes may use `@name` groups. Wrap a list of `extern template` in `/// @cond` and `/// @endcond` so it does not become a page of instantiations.
+
+## Tests
+
+Sections are alphabetical. Functions inside a section are alphabetical. The banner is the same in the test body and in `main`, and `main` groups the calls under it:
+
+```cpp
+// -------------------
+// Construct
+// -------------------
+```
+
+The executable name in CMake is PascalCase. The source is `<component>_test.cxx`.
+
+## Commits
+
+Conventional Commits, in English: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`. A breaking change takes `!`. One topic per commit. The subject says what changed, not the file that changed.
