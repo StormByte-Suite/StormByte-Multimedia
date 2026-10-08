@@ -17,8 +17,8 @@
  *    (David C. Manuelda <StormByte@gmail.com>).
  *
  * Both licenses apply only to original StormByte-Multimedia source in this
- * file. Third-party components remain under their own licenses and are not
- * covered by the commercial grant.
+ * file. Third-party components — including FFmpeg and embedded trained data —
+ * remain under their own licenses and are not covered by the commercial grant.
  *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately

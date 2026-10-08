@@ -8,8 +8,8 @@
  * 1. GNU Lesser General Public License v3.0 (or later)
  *    You may redistribute and/or modify this file under the terms of the
  *    GNU Lesser General Public License as published by the Free Software
- *    Foundation, either version 3 of the License, or (at your option) any
- *    later version.
+ *    Foundation, either version 3 of the License, or (at your option)
+ *    any later version.
  *
  * 2. Commercial license
  *    Alternatively, this file may be used under the terms of a commercial
