@@ -9,7 +9,7 @@ Contributor guides: [Contributing](CONTRIBUTING.md) and [Coding Style](CODING_ST
 [![CI](https://github.com/StormBytePP/StormByte-Multimedia/actions/workflows/ci.yml/badge.svg)](https://github.com/StormBytePP/StormByte-Multimedia/actions/workflows/ci.yml)
 [![Sponsor](https://img.shields.io/badge/Sponsor-StormBytePP-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/StormBytePP)
 
-This repository is **StormByte Multimedia**: a C++26 pipeline for decoding, filtering, encoding and muxing media on top of FFmpeg (`libav`). It is **not** a thin wrapper around `AVFrame` / `AVPacket`. Those types never leave the private tree.
+This repository is **StormByte Multimedia**: a C++26 pipeline for decoding, filtering, encoding and muxing media on top of FFmpeg (`libav`). It is **not** a thin wrapper around raw FFmpeg contexts. Codec and format backends remain private; filter-facing frame, packet and graph adapters are part of the public surface where needed.
 
 It depends on [StormByte Base](https://github.com/StormBytePP/StormByte), [StormByte Buffer](https://github.com/StormBytePP/StormByte-Buffer) and [StormByte Logger](https://github.com/StormBytePP/StormByte-Logger). Public headers live under `StormByte/multimedia/` and cover the registry, containers, codecs, `File`, and the pipeline (`Plan`, `Step`, `Transcoder`, filters).
 
@@ -20,8 +20,8 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - **A closed job intention** — `Plan` owns the reader and writer through `Safe::Unique`, a consultation `File` snapshot and the **output** track list. The destination container is resolved from the writer path extension. `add` order is mux order. Omit a stream and it is dropped. `Check()` asks whether the intention is well formed, not whether FFmpeg will succeed.
 - **A tube of workers** — `Plan >> Demuxer >> (Decoder | Remuxer) [>> Filters] >> Encoder? >> Muxer`. Each `Step` is a worker with hoppers. Items are `Packet` (compressed AU) or `Frame` (decoded AU). Timing has no public setters. `Serial` is a monotone tube id, not `nb_frames`.
 - **Two ways in** — `Transcoder` is the File→File facade (inheritable, hookable, zero hacks). The same tube can be wired by hand with `operator>>`. Anything `Transcoder` can do, a hand-built tube can do. If a user-built tube fails, `Transcoder` fails the same way.
-- **Registry** — codecs and containers that actually exist in this build. Look up `"H.265"` / `"hevc"` or `"Matroska"` / `"matroska"`. Output supports Matroska/WebM and MP4 containers, plus audio-only MP3, Ogg and Opus destinations. MP3 and Opus require exactly one audio track; Ogg output is audio-only. Missing name is an error, not a silent fallback.
-- **Filters** — typed leaves on decoded frames or compressed packets (`Scale`, `Watermark`, analytics / VMAF, …). A bad filter is a Warning and the job continues. A broken tube frame is a Fail.
+- **Registry** — codec/container identities and operations available in this build. Look up `"H.265"` / `"hevc"` or `"Matroska"` / `"matroska"` and check access before selecting an encoder. Output supports Matroska/WebM and MP4 containers, plus audio-only MP3, Ogg, Opus, AC-3 and WAV destinations. MP3, Opus, AC-3 and WAV require exactly one audio track; Ogg output is audio-only. Registry presence alone does not guarantee that a destination accepts every codec or track combination.
+- **Filters** — typed leaves on decoded frames or compressed packets (`Scale`, `Watermark`, analytics / VMAF, …). Recoverable conditions follow each filter's contract: a missing Watermark logo can become passthrough, while invalid configuration or processing failures can fail a stage. Check job status and analytics reports rather than assuming every warning or filter failure is harmless.
 - **Logging** — every `Step` takes a `StormByte::Safe::Shared<StormByte::Logger::Log>` (prefer `ThreadedLog`). Lines use component `StormByte/Multimedia/<stage>` (`Demuxer`, `Transcoder`, `Watermark`, …) and format `[%L] %T %c`. The print floor belongs to the **application**. Module throttle: Window on LowLevel, Drop on Debug and Notice. Warning / Error / Fatal are not throttled.
 
 ## The rest of the suite
@@ -52,6 +52,7 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - [Logging](#logging)
 - [Build options and distribution](#build-options-and-distribution)
 - [Installation](#installation)
+- [Tests](#tests)
 - [Contributing](#contributing)
 - [License](#license)
 - [Supporting the project](#supporting-the-project)
@@ -104,7 +105,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	auto logger = StormByte::Safe::Heap::MakeShared<ThreadedLog>(std::cout, Level::Debug, "[%L] %T %c");
+	auto logger = StormByte::Safe::MakeShared<ThreadedLog>(std::cout, Level::Debug, "[%L] %T %c");
 	Transcoder job{std::filesystem::path{argv[1]}, std::filesystem::path{argv[2]}, logger};
 
 	auto& registry = Registry::Instance();
@@ -119,7 +120,7 @@ int main(int argc, char** argv) {
 	job.Video(0)
 		.Codec(hevc->get())
 		.Implementation(String{"libx265"})
-		.Filter<Watermark>(logger, std::filesystem::path("/var/lib/marks/logo.png"),
+		.Filter<Watermark>(logger, String{"/var/lib/marks/logo.png"},
 			Anchor::BottomRight, 25)
 		.Filter<Scale>(logger, 0u, 1080u);
 	job.Audio(1).Remux();          // compressed copy, adapted to the destination
@@ -161,7 +162,7 @@ What that mapping means:
 | `Ignore(n)` | Drop origin stream `n`. |
 | `Attachments()` / `Attachments("image/png")` | Keep all attachments, or only a MIME. Default without a call is drop. |
 | `Transcoder(source, destination, logger)` | Supplies locations before mapping; the writer path determines the container. |
-| `Filter<Analytics>(…)` on the **job** | Global analytics on matching encode lanes; `Track::Filter` also accepts track-scoped analytics. |
+| `Filter<Analytics>(…)` on the **job** | Global analytics on matching encode or remux lanes; `Track::Filter` also accepts track-scoped analytics. |
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
 
@@ -194,8 +195,10 @@ A short recode of one video track into Matroska:
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <thread>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -203,31 +206,39 @@ using StormByte::Logger::ThreadedLog;
 using StormByte::Multimedia::Registry;
 using namespace StormByte::Multimedia::Pipeline;
 
-auto logger = StormByte::Safe::Heap::MakeShared<ThreadedLog>(std::cout, Level::Notice, "[%L] %T %c");
-auto& registry = Registry::Instance();
-auto hevc = registry.FindCodec("H.265");
-auto mkv  = registry.FindContainer("Matroska");
-if (!hevc || !mkv)
-	return 1;
+int main() {
+	auto logger = StormByte::Safe::MakeShared<ThreadedLog>(std::cout, Level::Notice, "[%L] %T %c");
+	auto hevc = Registry::Instance().FindCodec("H.265");
+	if (!hevc || !hevc->get().HasAccess(StormByte::Multimedia::Access{
+			StormByte::Multimedia::Operation::Write}))
+		return 1;
 
-Plan plan{std::filesystem::path{"in.mkv"}, std::filesystem::path{"out.mkv"}};
-Config::Video video;
-video.Codec(hevc->get());
-Config::Implementation pins;
-pins.Encoder = StormByte::Safe::String{"libx265"};
-video.Implementation(std::move(pins));
-plan.add(Track{0, std::move(video)});
-if (auto check = plan.Check(); !check)
-	return 1;
+	Plan plan{std::filesystem::path{"in.mkv"}, std::filesystem::path{"out.mkv"}};
+	Config::Video video;
+	video.Codec(hevc->get());
+	plan.add(Track{0, std::move(video)});
+	if (auto check = plan.Check(); !check) {
+		std::cerr << check.error()->what() << '\n';
+		return 1;
+	}
 
-Demuxer demux(logger);
-Decoder decode(logger, /* origin track */ 0);
-Encoder encode(logger, /* output index */ 0, hevc->get());
-encode.Implementation(StormByte::Safe::String{"libx265"});
-Muxer   mux(logger, mkv->get());
+	Demuxer demux(logger);
+	Decoder decode(logger, 0);
+	Encoder encode(logger, 0, hevc->get());
+	Muxer mux(logger);
+	std::move(plan) >> demux;
+	demux >> mux;
+	demux >> decode >> encode >> mux;
 
-std::move(plan) >> demux;
-demux >> decode >> encode >> mux >> std::filesystem::path{"out.mkv"};
+	while (mux.Status() != State::Stopped && !mux.Failed()) {
+		if (demux.Failed() || decode.Failed() || encode.Failed()) {
+			mux.Stop();
+			return 1;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	return demux.Failed() || decode.Failed() || encode.Failed() || mux.Failed() ? 1 : 0;
+}
 ```
 
 `operator>>` shares the `Plan` and binds hoppers. `Demuxer` produces `Packet`s and receives nothing. `Decoder` turns those into `Frame`s. `Encoder` produces `Packet`s again. `Muxer` reserves the output slot — remux does not. Fan-out from one demuxer to several decoders / remuxers is the same operator.
@@ -239,8 +250,8 @@ demux >> decode >> encode >> mux >> std::filesystem::path{"out.mkv"};
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
 
-auto decode = StormByte::Safe::Heap::MakeShared<Decoder>(logger, 0);
-auto encode = StormByte::Safe::Heap::MakeShared<Encoder>(logger, 0, hevc->get());
+auto decode = StormByte::Safe::MakeShared<Decoder>(logger, 0);
+auto encode = StormByte::Safe::MakeShared<Encoder>(logger, 0, hevc->get());
 Filters graph;
 graph.Between(decode, encode).Add<Filter::Video::Scale>(logger, 1920u, 1080u);
 graph.Add<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"});	// one node, every matching stretch
@@ -253,12 +264,12 @@ graph.Close();
 - **`Packet`** is a compressed access unit. **`Frame`** is a decoded one. No public timing setters. Mutate pixels through `Decoder` / `Encoder` / a filter `Replace`, not a setter on `Frame`.
 - **`Serial`** is a monotone id assigned by the tube. Public getter, no setter. It is not a frame count.
 - **`Remuxer`** forwards compressed packets and adapts them to the destination. “Copy” as a stage does not exist.
-- **Caps** (`MaxCeiling`, hopper capacity) are real limits. Do not treat EOF as Fail. A filter that cannot overlay a logo disables the overlay (opacity 0, passthrough) and logs a Warning. Fail is reserved for a broken unit from the tube.
+- **Caps** (hopper capacity and stage ceilings) limit individual queues, not total job memory. Do not treat EOF as Fail. Recoverable logo failures can become Watermark passthrough; invalid plans, unsupported encoders and fatal processing errors remain failures.
 - **Content** behind `Frame` is virtual (passthrough / video / audio). After `Scale`, HDR10+ and friends are recalculated on `Replace`. Metadata is not dropped by `memcmp`.
 
 ## DLL boundaries
 
-The public API uses `StormByte::Safe` values (`String`, `Optional`), collections (`Vector`, `Map`, `Pair`) and owners (`Shared`, `Unique`) for owning data that crosses module boundaries. Owners retain provider-local release operations so the exact payload is destroyed by its creating provider. Construct shared owners with `Safe::Heap::MakeShared<T>(…)`; parameters typed as `Safe::String` require explicit `Safe::String{"text"}` construction. Fields holding references to external registry entries are borrowed, not owned: those registries must remain valid for the lifetime of the references.
+The public API uses `StormByte::Safe` values (`String`, `Optional`), collections (`Vector`, `Map`, `Pair`) and owners (`Shared`, `Unique`) for owning data that crosses module boundaries. Owners retain provider-local release operations so the exact payload is destroyed by its creating provider. Construct shared owners with `Safe::MakeShared<T>(…)`; parameters typed as `Safe::String` require explicit `Safe::String{"text"}` construction. Fields holding references to external registry entries are borrowed, not owned: those registries must remain valid for the lifetime of the references.
 
 `STORMBYTE_DECLARE_MAYBE_SAFE` is a provider's responsibility and promise, not an automatic audit: a declared type must keep its members, special members and heap-affecting operations boundary-safe. Consumers and providers still need a compatible C++/STL ABI. All providers supplying live values, owners or callbacks must remain loaded until those objects are released; this is neither arbitrary-ABI compatibility nor a safe-unload guarantee.
 
@@ -272,13 +283,17 @@ Filters are leaves, not a second pipeline language. `Scale` is resize (that is t
 
 Degrain blends the original and up to three bracketing filtered strengths using spatially smooth regional targets. It supports software planar integer YUV/gray at 8/10/12/16 bits in either byte order, preserving geometry, format, original PTS, metadata and alpha. Denoising uses the previous real input and current input, with current duplicated in place of a future picture; detected discontinuities use current alone. This asymmetric temporal baseline produces one output per input without delay, but is not motion compensation. Brightness cuts/flashes isolate temporal smoothing; equal-brightness cuts, fine texture and correlated/compressed grain remain heuristic limitations. Measurement holds at most eleven pictures plus compact per-frame target maps; repeated filtering is expensive. Do not stack it with another grain-denoising filter.
 
-Analytics do not change the encoded output. VMAF (when built) compares the source video with the decoded encoded result, scales the result to the reference geometry, and reports mean and minimum scores against model `vmaf_4k_v0.6.1`. Each video track is evaluated separately. The default thread count uses all cores; 4K 10-bit evaluation at 32 threads has been observed to use about 18.5 GiB for the job, with peaks around 20.5 GiB. Pass a smaller count as the third constructor argument to reduce memory demand.
+Analytics do not change the media output. VMAF compares decoded source pictures with decoded encoded or remuxed destination pictures, scales the destination look to the reference geometry, and reports mean/minimum scores and scored-frame counts for the selected model (for example `vmaf_4k_v0.6.1`). Pictures are paired in presentation order per track, not by serial or PTS. Report scores retain round-trip double precision; a score alone does not prove that all frames were compared. Inspect the frame count and report status after the job reaches `Done`.
+
+The default VMAF thread count uses all cores. Memory depends on resolution, thread count, simultaneous contexts and queued/unpaired pictures; there is no fixed total-job RAM guarantee. Pass a smaller count as the third constructor argument to reduce extractor memory demand and monitor job telemetry. Two-pass processing such as Degrain requires a rereadable source and is not supported on remux connections.
 
 Write a new filter the same way `Scale` and `Watermark` are written. Do not add public friends so a coordinator can peek.
 
 ## Logging
 
 First argument of every `Step` and filter leaf: `StormByte::Safe::Shared<StormByte::Logger::Log>`. Prefer `ThreadedLog` if more than one thread will write.
+
+An empty logger disables logging for manually constructed stages and filters. `Transcoder` requires a nonempty application logger. An ostream used to construct a logger must outlive every stage/job retaining it.
 
 The application logger is scoped at `StormByte/Multimedia/<stage>`. Format is `[%L] %T %c`. Do not put `STMM` or the level name in the payload.
 
@@ -303,12 +318,22 @@ Third-party trees live under `thirdparty/` and are wired through [StormByte Buil
 | --- | --- | --- |
 | `WITH_FFMPEG` | `BUNDLED` (default) / `SYSTEM` | Nested Meson FFmpeg, or `FindFFmpeg` against the host. |
 | `WITH_VMAF` | `BUNDLED` (default) / `SYSTEM` | Nested libvmaf, or `FindVmaf` (`libvmaf-dev` on Debian; Ubuntu archives do not ship it). |
+| `WITH_OCR` | `BUNDLED` (default) / `SYSTEM` | Tesseract/Leptonica; Windows forces bundled OCR. |
+| `WITH_TESSDATA` | `BUNDLED` / `SYSTEM` | OCR language models; selected languages must be installed and discoverable. |
+| `WITH_ZIMG` | `BUNDLED` / `SYSTEM` | zimg dependency used by image processing. |
+| `BUILD_SHARED_LIBS` | `ON` (default) / `OFF` | Shared or static Multimedia and StormByte libraries. |
+| `ENABLE_TEST` | `ON` / `OFF` (default) | Register and build this module's CTest suite. |
+| `ENABLE_ASAN` | `ON` / `OFF` (default) | Debug ASan/UBSan on supported non-Windows builds; disabled for Release. |
 | `WITH_GPL` | `ON` / `OFF` | GPL components inside bundled FFmpeg (`gpl=enabled`, `version3=enabled`). |
 | `WITH_NONFREE` | `ON` / `OFF` | Nonfree components inside bundled FFmpeg. |
 
 `WITH_GPL` and `WITH_NONFREE` change **what the bundled FFmpeg is allowed to compile**. They do not relicense StormByte-Multimedia. If you ship a binary linked against a GPL or nonfree FFmpeg, **that binary** follows FFmpeg’s license combination. Leave both `OFF` when you need a redistributable build that stays on the LGPL side of FFmpeg.
 
 `SYSTEM` FFmpeg is whatever the host already linked; you inherit that host’s license surface.
+
+Codec availability depends on the selected FFmpeg build and its external libraries, not just the registry name. A pinned implementation such as `libx265` must exist in that build. Keep system FFmpeg and system libvmaf ABI-compatible, including any FFmpeg codec dependencies that themselves link libvmaf. Bundled FFmpeg builds libraries with its programs and tests disabled; Multimedia tests do not require the `ffmpeg` or `ffprobe` executables.
+
+OCR converts bitmap subtitle frames to text when a text subtitle codec is selected. Source language metadata selects the Tesseract model; a missing model is an error, not a translation service. Bundled tessdata packages language models separately from the OCR engine. System tessdata requires an installation discoverable by the configured paths or Tesseract environment.
 
 Typical configure:
 
@@ -322,7 +347,7 @@ cmake -S . -B build \
 
 ## Installation
 
-Needs a C++26 compiler, CMake 3.12 or newer, and the StormByte modules listed above. Bundled FFmpeg also wants NASM/YASM (and Meson/Ninja via BuildMaster).
+Needs a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and the StormByte modules listed above. The root currently declares an older CMake minimum; that declaration does not remove the newer language-standard requirement. Bundled FFmpeg also needs its platform build tools, including an assembler on relevant x86 builds, and Meson/Ninja through BuildMaster.
 
 ```sh
 git clone --recursive https://github.com/StormBytePP/StormByte-Multimedia.git
@@ -331,7 +356,21 @@ cmake -S . -B build
 cmake --build build
 ```
 
-Link `StormByte-Multimedia` (and its StormByte + FFmpeg / libvmaf deps). Include path: the public install prefix, headers as `#include <StormByte/multimedia/….hxx>`.
+The in-tree CMake target is `StormByte::Multimedia`. The library is `StormByte-Multimedia`; its runtime dependencies must be deployed with a compatible ABI. Include path: the public install prefix, headers as `#include <StormByte/multimedia/file.hxx>`. Run `cmake --install build --prefix <prefix>` after building to install the configured library and headers.
+
+## Tests
+
+Configure with `-DENABLE_TEST=ON`, build, then run CTest from the test registration root:
+
+```sh
+cmake -S . -B build-tests -DENABLE_TEST=ON \
+	-DWITH_FFMPEG=BUNDLED -DWITH_VMAF=BUNDLED \
+	-DWITH_OCR=BUNDLED -DWITH_TESSDATA=BUNDLED
+cmake --build build-tests
+ctest --test-dir build-tests/test --output-on-failure
+```
+
+The initial suite has 49 cases covering registries, fixed `File` properties, facade/manual remux, attachment inclusion/omission, HDR encoding, Japanese PGS OCR, exact VMAF remux reports, audio conversions and invalid input/configuration. Encoder cases can skip when the configured registry has no write support; other missing prerequisites must not be treated as success. Each case has a 30-second timeout. Fixtures are short synthetic media; provenance and font redistribution notices are in [test/files/README.md](test/files/README.md). Passing these cases is not certification of every codec, long-running workload or target platform.
 
 ## Contributing
 

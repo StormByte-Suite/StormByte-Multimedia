@@ -4,9 +4,12 @@ set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" _sb_ver)
+string(STRIP "${_sb_ver}" _sb_ver)
+
 project("StormByte C++ Library: Multimedia module"
-	VERSION 0.0.9999
-	DESCRIPTION "StormByte-Multimedia is a StormByte library module for parsing configuration files"
+	VERSION ${_sb_ver}
+	DESCRIPTION "StormByte-Multimedia provides media inspection, decoding, filtering, encoding and muxing"
 	HOMEPAGE_URL "https://suite.stormbyte.org/StormByte-Multimedia"
 )
 
