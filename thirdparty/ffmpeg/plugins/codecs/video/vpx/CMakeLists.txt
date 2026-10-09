@@ -3,6 +3,7 @@ set(VPX_COMPONENT "VPX codec")
 set(VPX_PATCH_FILES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-Only-add-arm-asm-files-when-target-is-arm.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0002-fix-enable-VP9-high-bit-depth-in-the-libvpx-Meson-po.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0003-fix-drop-the-stale-highbd-NEON-convolve-source.patch"
 )
 
 set(VPX_OPTIONS

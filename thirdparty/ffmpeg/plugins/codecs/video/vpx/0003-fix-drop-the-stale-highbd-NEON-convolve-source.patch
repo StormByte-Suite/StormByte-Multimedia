@@ -1,0 +1,36 @@
+From db59e55a7f3d4522a9deb7b8aa6d3dcb0f49117d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Fri, 9 Oct 2026 08:45:45 +0200
+Subject: [PATCH] fix: drop the stale highbd NEON convolve source
+
+libvpx 1.16 renamed arm/highbd_vpx_convolve_neon.c to
+highbd_vpx_convolve8_neon.c, which is already listed. Enabling
+vp9_highbitdepth made Meson require the old name and the arm64 build
+failed. Removed the duplicated entries.
+---
+ vpx_dsp/meson.build | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/vpx_dsp/meson.build b/vpx_dsp/meson.build
+index 9e3d1635d..1d5d2c030 100644
+--- a/vpx_dsp/meson.build
++++ b/vpx_dsp/meson.build
+@@ -172,7 +172,6 @@ dsp_optional_sources = {
+ 		'arm/intrapred_neon.c',
+ 		# 'arm/highbd_vpx_convolve_copy_neon.c', # MANUAL
+ 		# 'arm/highbd_vpx_convolve_avg_neon.c', # MANUAL
+-		# 'arm/highbd_vpx_convolve_neon.c', # MANUAL
+ 		# 'arm/vpx_scaled_convolve8_neon.c', # MANUAL
+ 		# 'arm/loopfilter_neon.c', # MANUAL
+ 		# 'arm/highbd_loopfilter_neon.c', # MANUAL
+@@ -703,7 +702,6 @@ if features.get('vp9', false) # MANUAL
+ 					'arm/highbd_vpx_convolve_copy_neon.c',
+ 					'arm/highbd_vpx_convolve_avg_neon.c',
+ 					'arm/highbd_vpx_convolve8_neon.c',
+-					'arm/highbd_vpx_convolve_neon.c',
+ 					# loop filters
+ 					'arm/highbd_loopfilter_neon.c',
+ 				),
+-- 
+2.55.0
+
