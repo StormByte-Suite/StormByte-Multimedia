@@ -7,6 +7,11 @@ if(ENABLE_TEST)
 		"STORMBYTE_TEST_FILES_DIR=\"${PROJECT_SOURCE_DIR}/test/files\""
 		"STORMBYTE_TEST_OUTPUT_DIR=\"${PROJECT_BINARY_DIR}/test-output\"")
 
+	file(MAKE_DIRECTORY
+		"${PROJECT_BINARY_DIR}/test-output"
+		"${PROJECT_BINARY_DIR}/test-output/pipeline"
+	)
+
 	add_subdirectory(registry)
 	add_subdirectory(file)
 	add_subdirectory(pipeline)
