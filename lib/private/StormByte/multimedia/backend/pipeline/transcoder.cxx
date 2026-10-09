@@ -389,8 +389,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			remuxes.push_back(std::move(remux));
 		}
 		else {
-					auto decoder = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
-					auto encoder = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
+			auto decoder = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Decoder>(tube, slot.In);
+			auto encoder = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Encoder>(tube, muxIndex, *codec);
 			RegisterStage(*Metrics, *decoder);
 			RegisterStage(*Metrics, *encoder);
 			ConfigureEncoder(*encoder, *slot.Config);
@@ -454,6 +454,15 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			if (lane.Encoder && *lane.Encoder)
 				job.MarkSettled(lane.In, *lane.Encoder);
 		}
+		if (!dead) {
+			for (auto& remux : remuxes) {
+				if (remux && remux->Failed()) {
+					job.Fail(ErrorText(remux->Error(), "remux failed"));
+					dead = true;
+					break;
+				}
+			}
+		}
 		if (dead)
 			break;
 		TickHooks(job, graph);
@@ -476,8 +485,53 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	}
 
 	while (!Stopping(*this) && !graph.Idle()) {
+		if (demux->Failed()) {
+			job.Fail(ErrorText(demux->Error(), "demux failed"));
+			break;
+		}
+		if (mux->Failed()) {
+			job.Fail(ErrorText(mux->Error(), "mux failed"));
+			break;
+		}
+		bool dead = false;
+		for (auto& lane : lanes) {
+			if (lane.Decoder && lane.Decoder->Failed()) {
+				job.Fail(ErrorText(lane.Decoder->Error(), "decoder failed"));
+				dead = true;
+				break;
+			}
+			if (lane.Encoder && lane.Encoder->Failed()) {
+				job.Fail(ErrorText(lane.Encoder->Error(), "encoder failed"));
+				dead = true;
+				break;
+			}
+		}
+		if (!dead) {
+			for (auto& remux : remuxes) {
+				if (remux && remux->Failed()) {
+					job.Fail(ErrorText(remux->Error(), "remux failed"));
+					dead = true;
+					break;
+				}
+			}
+		}
+		if (dead)
+			break;
 		TickHooks(job, graph);
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	}
+
+	if (Stopping(*this)
+		&& Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
+		JobLog(job.Logger(), Level::Notice, "aborted");
+		job.OnAborted();
+		return;
+	}
+
+	if (job.Failed()) {
+		job.OnError(ErrorText(job.Error(), "transcode failed"));
+		return;
 	}
 
 	Reports = graph.Reports();
