@@ -1,0 +1,28 @@
+From f1375f302bc929aafe2a41ad3aa1381efa0ae107 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Fri, 9 Oct 2026 07:40:29 +0200
+Subject: [PATCH] fix: enable VP9 high bit depth in the libvpx Meson port
+
+vp9_highbitdepth=enabled reached Meson but was not in MESON_FEATURES, so
+the config loop skipped it and vpx_config.h kept CONFIG_VP9_HIGHBITDEPTH
+at 0. libvpx-vp9 then rejected yuv420p10le. Register the feature so the
+header follows the option.
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index 202e3743e..2e27fe042 100644
+--- a/meson.build
++++ b/meson.build
+@@ -343,6 +343,7 @@ MESON_FEATURES = [
+ 	'vp8_decoder',
+ 	'vp9_encoder',
+ 	'vp9_decoder',
++	'vp9_highbitdepth',
+ 	'postproc',
+ 	'vp9_postproc',
+ 	'multithread',
+-- 
+2.55.0
+

@@ -1,6 +1,9 @@
 set(VPX_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(VPX_COMPONENT "VPX codec")
-set(VPX_PATCH_FILE "${CMAKE_CURRENT_LIST_DIR}/0001-Only-add-arm-asm-files-when-target-is-arm.patch")
+set(VPX_PATCH_FILES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-Only-add-arm-asm-files-when-target-is-arm.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-fix-enable-VP9-high-bit-depth-in-the-libvpx-Meson-po.patch"
+)
 
 set(VPX_OPTIONS
 	"-Dlibs=enabled"
@@ -43,7 +46,7 @@ buildmaster_component(
 	"${VPX_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"vpx"
-	"GIT={RESET;PATCH=${VPX_PATCH_FILE};TITLE=VPX arm asm}"
+	"GIT={RESET;PATCH={${VPX_PATCH_FILES}};TITLE=VPX patches}"
 )
 buildmaster_group_add(ff-video vpx)
 register_plugin(vpx "libvpx=enabled libvpx_vp8_encoder=enabled libvpx_vp8_decoder=enabled libvpx_vp9_encoder=enabled libvpx_vp9_decoder=enabled")
