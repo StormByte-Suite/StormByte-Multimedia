@@ -131,23 +131,14 @@ else()
 	if(WIN32)
 		list(APPEND FFMPEG_BM_OPTS "TOOLCHAIN=msvc")
 	endif()
-	# Static bundled: merge the six Meson archives into one prefix .a
-	# (meta REPACK). Do not WHOLE the six — FFmpeg 9 ships framepool.c
-	# in both libswscale and libavfilter; --whole-archive pulls both
-	# and ld reports multiple definitions. One archive is rescanned by
-	# bfd, so av_md5_sum from avutil is found without WHOLE.
-	# System libs belong on ffmpeg-pack LINK= (REPACK does not copy
-	# LINK= from member `ffmpeg` onto the meta).
+	# Do not WHOLE the six archives. FFmpeg 9 ships framepool.c in both
+	# libswscale and libavfilter; --whole-archive pulls both. Static
+	# builds merge them below so bfd rescans one archive.
 	if(CMAKE_INTERPROCEDURAL_OPTIMIZATION
 			OR (CMAKE_BUILD_TYPE STREQUAL "Release"
 				AND CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE))
 		list(APPEND FFMPEG_BM_OPTS "IPO=fat")
 	endif()
-	# Patches are no longer needed since MRs were accepted upstream
-	#set(FFMPEG_PATCHES "")
-	#list(APPEND FFMPEG_BM_OPTS
-	#	"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=Meson configure probes}"
-	#)
 
 	list(JOIN FFMPEG_BM_OPTS ";" FFMPEG_BM_OPTSTR)
 
@@ -163,6 +154,9 @@ else()
 	buildmaster_group_add(ff-plugins ffmpeg)
 	buildmaster_link(ffmpeg ffmpeg-plugins)
 
+	# Static: one rescanned archive plus WHOLE plugins. Shared: the
+	# component INTERFACE already carries the plugins. LINK= stays on
+	# the pack because REPACK does not copy it from ffmpeg.
 	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
 		set(_FF_PACK_OPTS "REPACK")
 		if(WIN32)
@@ -174,9 +168,25 @@ else()
 		buildmaster_meta(ffmpeg-pack "FFmpeg static pack" "${_FF_PACK_OPTSTR}")
 		buildmaster_meta_add(ffmpeg-pack ffmpeg)
 		buildmaster_link(ffmpeg-pack ffmpeg-plugins)
-		buildmaster_link(StormByte-Multimedia ffmpeg-pack)
+		set(_FF_LINK ffmpeg-pack)
 	else()
-		buildmaster_link(StormByte-Multimedia ffmpeg)
+		set(_FF_LINK ffmpeg)
+	endif()
+
+	# Shared Multimedia absorbs the static pack (or NEEDs the shared
+	# FFmpeg). buildmaster_link is PUBLIC on a host target, so tests
+	# would inherit it. Depend orders the install; the hook attaches
+	# the already-filled INTERFACE as PRIVATE.
+	if(BUILD_SHARED_LIBS)
+		buildmaster_depend(StormByte-Multimedia "${_FF_LINK}")
+		function(_sb_mm_link_ffmpeg_private)
+			target_link_libraries(StormByte-Multimedia PRIVATE "${_FF_LINK}")
+		endfunction()
+		buildmaster_hook_graph(_sb_mm_link_ffmpeg_private zz-ffmpeg-private-link
+			CAPTURE _FF_LINK
+		)
+	else()
+		buildmaster_link(StormByte-Multimedia "${_FF_LINK}")
 	endif()
 
 	function(_stormbyte_ffmpeg_announce_build)
@@ -200,15 +210,11 @@ else()
 		CAPTURE FFMPEG_PLUGIN_OPTIONS
 	)
 
-	# Host DSO only. LINKFLAGS= on ffmpeg does not propagate (BM contract).
+	# Host DSO only. LINKFLAGS= on ffmpeg does not propagate.
 	# No gc-sections / -dead_strip / /OPT:REF — they can drop live objects.
 	# -Bsymbolic: ELF. Invalid on ld64 and link.exe.
-	# /FORCE:MULTIPLE: duplicate helpers (file_open, vorbis_encode_*) across
-	# static archives. Does not satisfy missing system libraries.
-	# Frameworks: VideoToolbox / AudioToolbox. CoreText was libass.
-	# find_library: AppleClang + raw "-framework Foo" was flattened to a
-	# bare token and the linker looked for a file named AudioToolbox.
-	# iconv / bcrypt / schannel: LINK= on ffmpeg-pack above.
+	# /FORCE:MULTIPLE: duplicate helpers across the static archives.
+	# Frameworks: find_library, already PRIVATE, so tests do not inherit them.
 	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
 		if(WIN32)
 			target_link_options(StormByte-Multimedia PRIVATE
