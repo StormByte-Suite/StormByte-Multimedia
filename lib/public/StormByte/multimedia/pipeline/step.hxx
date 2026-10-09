@@ -362,6 +362,27 @@ namespace StormByte::Multimedia::Pipeline {
 			virtual void AfterWait() noexcept;
 
 			/**
+			 * @brief Called after this stage publishes State::Ready.
+			 *
+			 * Default no-op. Leaves may wake peers that waited on Ready.
+			 */
+			virtual void OnBecameReady() noexcept {}
+
+			/**
+			 * @brief Called from @ref Fail before Wake.
+			 *
+			 * Default no-op. Leaves may wake peers that waited on terminal state.
+			 */
+			virtual void OnFailed() noexcept {}
+
+			/**
+			 * @brief Called from @ref Stop before Wake.
+			 *
+			 * Default no-op. Leaves may wake peers that waited on terminal state.
+			 */
+			virtual void OnStopping() noexcept {}
+
+			/**
 			 * @brief Starts stage initialization and processing.
 			 *
 			 * Idempotent. No-op without an execution handler, or if the
