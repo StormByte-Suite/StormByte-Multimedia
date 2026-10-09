@@ -175,8 +175,6 @@ jobs:
             -DWITH_VMAF=BUNDLED
             -DWITH_NONFREE=${{ matrix.extra }}
             -DWITH_GPL=${{ matrix.extra }}
-            "-DCMAKE_C_FLAGS=/W3 /wd4244 /wd4267 /wd4996 /wd4065 /D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0A00 /EHsc"
-            "-DCMAKE_CXX_FLAGS=/W3 /wd4244 /wd4267 /wd4996 /wd4065 /D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0A00 /EHsc"
           run-tests: true
           ctest-options: --output-on-failure --test-dir ${{ github.workspace }}/build/test
 
