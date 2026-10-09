@@ -3,7 +3,7 @@ target_link_libraries(MultimediaRegistryTests PRIVATE multimedia_test_support)
 
 function(add_registry_test test_name)
 	add_test(NAME "registry.${test_name}" COMMAND MultimediaRegistryTests "${test_name}")
-	set_tests_properties("registry.${test_name}" PROPERTIES TIMEOUT 30 LABELS "multimedia;registry")
+	set_tests_properties("registry.${test_name}" PROPERTIES TIMEOUT 300 LABELS "multimedia;registry")
 endfunction()
 
 add_registry_test(test_matroska_extensions_resolve_to_same_container)

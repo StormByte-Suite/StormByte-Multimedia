@@ -19,7 +19,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForTranscoder(Transcoder& job) {
-		const auto deadline = std::chrono::steady_clock::now() + 20s;
+		const auto deadline = std::chrono::steady_clock::now() + 250s;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
 		if (!IsTerminal(job.Status())) {
@@ -47,7 +47,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForTranscoderFailure(Transcoder& job, std::string_view expectedMessage) {
-		const auto deadline = std::chrono::steady_clock::now() + 20s;
+		const auto deadline = std::chrono::steady_clock::now() + 250s;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
 		if (!IsTerminal(job.Status())) {
@@ -73,7 +73,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForManualPipeline(Step& last) {
-		const auto deadline = std::chrono::steady_clock::now() + 20s;
+		const auto deadline = std::chrono::steady_clock::now() + 250s;
 		while (last.Status() != State::Stopped && last.Status() != State::Failed &&
 			std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);

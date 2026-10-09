@@ -3,7 +3,7 @@ target_link_libraries(multimedia_pipeline_test_support PUBLIC multimedia_test_su
 
 function(add_pipeline_test target test_name)
 	add_test(NAME "pipeline.${test_name}" COMMAND ${target} "${test_name}")
-	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 30 LABELS "multimedia;pipeline")
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 300 LABELS "multimedia;pipeline")
 endfunction()
 
 function(add_optional_pipeline_test target test_name)

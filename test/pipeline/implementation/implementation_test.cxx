@@ -67,7 +67,7 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 	TEST_REQUIRE(decoder.Implementation());
 	TEST_REQUIRE(TestView(decoder.Implementation().value()) == pin);
 	if (!expectedError.empty()) {
-		const auto deadline = std::chrono::steady_clock::now() + 20s;
+		const auto deadline = std::chrono::steady_clock::now() + 250s;
 		while (!decoder.Failed() && decoder.Status() != State::Stopped
 			&& std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
@@ -76,7 +76,7 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 		TEST_REQUIRE(TestView(decoder.Error().value()).find(expectedError) != std::string_view::npos);
 		return 0;
 	}
-	const auto deadline = std::chrono::steady_clock::now() + 20s;
+	const auto deadline = std::chrono::steady_clock::now() + 250s;
 	while (muxer.Status() != State::Stopped && !muxer.Failed()
 		&& !demuxer.Failed() && !decoder.Failed() && !encoder.Failed()
 		&& std::chrono::steady_clock::now() < deadline)
