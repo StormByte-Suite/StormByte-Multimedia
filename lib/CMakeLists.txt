@@ -45,7 +45,7 @@ set_target_properties(StormByte-Multimedia PROPERTIES
 if(MSVC)
 	target_compile_options(StormByte-Multimedia PRIVATE
 		/EHsc
-		$<$<CONFIG:Release>:/O2 /arch:AVX2 /fp:fast>
+		$<$<CONFIG:Release>:/O2 /arch:AVX2>
 		$<$<CONFIG:Debug>:/Od>
 	)
 	target_compile_definitions(StormByte-Multimedia PUBLIC UNICODE NOMINMAX)
