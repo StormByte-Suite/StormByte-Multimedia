@@ -252,17 +252,23 @@ Demuxer& StormByte::Multimedia::Pipeline::operator>>(Plan&& plan, Demuxer& demux
 }
 
 Demuxer& StormByte::Multimedia::Pipeline::operator>>(StormByte::Safe::Shared<Plan> plan, Demuxer& demuxer) noexcept {
-	if (demuxer.Plan()) {
-		demuxer.Fail(StormByte::Safe::String{"demuxer already has a plan"});
-		return demuxer;
-	}
 	if (!plan) {
 		demuxer.Fail(StormByte::Safe::String{"plan owner is empty"});
 		return demuxer;
 	}
 
-	Step& step = demuxer;
-	step.m_plan = std::move(plan);
+	bool alreadyBound = false;
+	{
+		StormByte::Safe::UniqueLock lock(demuxer.m_planMutex);
+		alreadyBound = static_cast<bool>(demuxer.m_plan);
+		if (!alreadyBound)
+			demuxer.m_plan = std::move(plan);
+	}
+	if (alreadyBound) {
+		demuxer.Fail(StormByte::Safe::String{"demuxer already has a plan"});
+		return demuxer;
+	}
+
 	demuxer.m_planPresent.notify_all();
 	demuxer.Wake();
 	return demuxer;

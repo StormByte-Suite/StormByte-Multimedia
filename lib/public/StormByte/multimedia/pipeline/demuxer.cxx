@@ -247,7 +247,7 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 					break;
 				}
 			}
-			for (const auto stream : plan->Snapshot().Streams()) {
+			for (const auto& stream : plan->Snapshot().Streams()) {
 				if (stream.Index() != decoder.Index())
 					continue;
 				decoder.Stamp(stream.Metadata().Language(), stream.Metadata().Title());

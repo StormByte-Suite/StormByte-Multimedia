@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Prevent Demuxer setup from missing an immediately bound Plan.
 - Create planned per-track hopper connections before generic stage transfer, avoiding blocked producers and consumers when stages are wired before their first item. Reserve manual encoder mux streams through a separate typed `Encoder >> Muxer` connection.
 - Format decoder implementation labels as text rather than character ranges.
 - Honor explicit decoder names and manual Plan decoder pins when opening origin decoders. Missing or codec-mismatched implementations fail instead of silently using the default decoder.

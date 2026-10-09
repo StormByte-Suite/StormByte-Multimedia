@@ -176,7 +176,7 @@ namespace {
 		if (packet.KeyFrame())
 			raw->flags |= AV_PKT_FLAG_KEY;
 
-		for (const StormByte::Multimedia::Pipeline::SideData side : packet.Attachments()) {
+		for (const StormByte::Multimedia::Pipeline::SideData& side : packet.Attachments()) {
 			const auto view = UnreadSpan(side.Payload());
 			if (view.empty())
 				continue;
@@ -371,7 +371,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		if (!track.language || !track.title) {
 			const auto plan = owner.Plan();
 			if (plan) {
-				for (const auto stream : plan->Snapshot().Streams()) {
+				for (const auto& stream : plan->Snapshot().Streams()) {
 					if (stream.Index() != inIndex)
 						continue;
 					if (!track.language)

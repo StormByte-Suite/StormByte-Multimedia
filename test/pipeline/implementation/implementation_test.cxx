@@ -93,6 +93,27 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 	TEST_REQUIRE(!demuxer.Failed() && !decoder.Failed() && !encoder.Failed());
 	return CheckSingleAudioOutput(output, "Matroska", "AC-3", 2, 48000);
 }
+
+static int CheckImmediatePlanBinding() {
+	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
+	const auto output = OutputPath("pipeline/immediate-plan-binding.mka");
+	for (int attempt = 0; attempt < 16; ++attempt) {
+		Plan plan{FixturePath("audio/noise_stereo.wav"), output, 2000000000LL};
+		Config::Audio audio;
+		plan.add(Track{0, std::move(audio)});
+		TEST_REQUIRE(plan.Check());
+
+		Demuxer demuxer{noLogger};
+		std::move(plan) >> demuxer;
+		const auto deadline = std::chrono::steady_clock::now() + 5s;
+		while (demuxer.Status() == State::Created && std::chrono::steady_clock::now() < deadline)
+			std::this_thread::sleep_for(1ms);
+		TEST_REQUIRE(demuxer.Status() != State::Created);
+		TEST_REQUIRE(!demuxer.Failed());
+		demuxer.Stop();
+	}
+	return 0;
+}
 }
 
 int test_transcoder_selects_decoder_implementation() {
@@ -113,6 +134,10 @@ int test_manual_selects_plan_decoder_implementation() {
 	return CheckManualDecoderPin("pcm_s16le", "pipeline/manual-pinned-decoder.mka");
 }
 
+int test_manual_demuxer_immediate_plan_binding() {
+	return CheckImmediatePlanBinding();
+}
+
 int test_manual_rejects_missing_decoder_implementation() {
 	return CheckManualDecoderPin("stormbyte_nonexistent_decoder", "pipeline/manual-missing-decoder.mka",
 		"decoder implementation is unavailable");
@@ -129,6 +154,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_rejects_missing_decoder_implementation", test_transcoder_rejects_missing_decoder_implementation},
 		TestEntry{"test_transcoder_rejects_mismatched_decoder_implementation", test_transcoder_rejects_mismatched_decoder_implementation},
 		TestEntry{"test_manual_selects_plan_decoder_implementation", test_manual_selects_plan_decoder_implementation},
+		TestEntry{"test_manual_demuxer_immediate_plan_binding", test_manual_demuxer_immediate_plan_binding},
 		TestEntry{"test_manual_rejects_missing_decoder_implementation", test_manual_rejects_missing_decoder_implementation},
 		TestEntry{"test_manual_rejects_mismatched_decoder_implementation", test_manual_rejects_mismatched_decoder_implementation},
 	};

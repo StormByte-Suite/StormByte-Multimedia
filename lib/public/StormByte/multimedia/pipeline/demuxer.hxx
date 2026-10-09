@@ -350,14 +350,14 @@ namespace StormByte {
 
 					StormByte::Safe::Unique<Backend::Pipeline::Demuxer> m_backend;		///< Format backend
 					bool m_eof;															///< End of Process-pass source
-					StormByte::Safe::Mutex m_planMutex;							///< Guards Plan wait
-					StormByte::Safe::ConditionVariable m_planPresent;		///< Woken when a Plan arrives
-					StormByte::Safe::Atomic<std::int64_t> m_positionNs;		///< Last packet Pts, or -1
-					StormByte::Safe::Map<int, std::uint64_t> m_nextSerial;	///< Next lineage id per origin track
+					StormByte::Safe::Mutex m_planMutex; 								///< Guards Plan wait
+					StormByte::Safe::ConditionVariable m_planPresent; 					///< Woken when a Plan arrives
+					StormByte::Safe::Atomic<std::int64_t> m_positionNs;					///< Last packet Pts, or -1
+					StormByte::Safe::Map<int, std::uint64_t> m_nextSerial;				///< Next lineage id per origin track
 					StormByte::Safe::Vector<int> m_measureTracks;						///< Tracks visible during measure
 					bool m_measuring = false;											///< Measure pass active
 					Filters* m_filters = nullptr;										///< Facade that started measure
-					StormByte::Safe::Shared<class Progress> m_progress;				///< Shared tube clock retained through Base-heap ownership.
+					StormByte::Safe::Shared<class Progress> m_progress;					///< Shared tube clock retained through Base-heap ownership.
 					Join m_join{*this};													///< Halt before other members die
 			};
 		}
