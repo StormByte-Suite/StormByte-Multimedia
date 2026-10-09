@@ -136,7 +136,12 @@ inline std::filesystem::path FixturePath(std::string_view relativePath) {
 /** @brief Resolves a generated result path and creates its parent directory. */
 inline std::filesystem::path OutputPath(std::string_view relativePath) {
 	auto path = std::filesystem::path{STORMBYTE_TEST_OUTPUT_DIR} / relativePath;
-	std::filesystem::create_directories(path.parent_path());
+	std::error_code error;
+	std::filesystem::create_directories(path.parent_path(), error);
+	if (error && !std::filesystem::is_directory(path.parent_path())) {
+		std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+		return {};
+	}
 	return path;
 }
 
