@@ -338,8 +338,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param track Origin stream index (same as Remuxer).
 			 * @param tag Remux-look tag.
 			 *
-			 * Not callable from user code. Same open path as
-			 * @ref EncodeLook. Produced frames are stamped
+			 * Not callable from user code. Same open path as the
+			 * encode-look constructor. Produced frames are stamped
 			 * @ref Producer::Remuxer. Label is Decoder(look remux).
 			 */
 			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -351,8 +351,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param track Origin stream index.
 			 * @param tag Source-look tag.
 			 *
-			 * Not callable from user code. Same open path as
-			 * @ref EncodeLook (codecpar on first Packet). Produced
+			 * Not callable from user code. Same open path as the
+			 * encode-look constructor (codecpar on first Packet). Produced
 			 * frames keep @ref Producer::Decoder.
 			 */
 			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,

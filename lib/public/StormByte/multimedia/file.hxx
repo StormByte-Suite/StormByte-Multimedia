@@ -133,7 +133,6 @@ namespace StormByte {
 
 				/**
 				 * @brief Copy construction is unavailable for source snapshots.
-				 * @param other Snapshot that cannot be copied.
 				 */
 				File(const File&) = delete;
 

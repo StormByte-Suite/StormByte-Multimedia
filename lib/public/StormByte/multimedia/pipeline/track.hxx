@@ -323,8 +323,8 @@ namespace StormByte::Multimedia::Pipeline {
 			}
 
 			/**
-			 * @brief Track at mux slot @p i.
-			 * @param i Zero-based index.
+			 * @brief Track at mux slot @p index.
+			 * @param index Zero-based index.
 			 * @return Borrowed track, valid while its owner remains in this list.
 			 */
 			const Track& operator[](size_type index) const;
