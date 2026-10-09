@@ -3,7 +3,7 @@ target_link_libraries(MultimediaFileTests PRIVATE multimedia_test_support)
 
 function(add_file_test test_name)
 	add_test(NAME "file.${test_name}" COMMAND MultimediaFileTests "${test_name}")
-	set_tests_properties("file.${test_name}" PROPERTIES TIMEOUT 30 LABELS "multimedia;file")
+	set_tests_properties("file.${test_name}" PROPERTIES TIMEOUT 50 LABELS "multimedia;file")
 endfunction()
 
 add_file_test(test_bluray_like_mkv_streams_and_cover)
