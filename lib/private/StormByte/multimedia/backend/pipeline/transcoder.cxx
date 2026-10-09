@@ -425,6 +425,34 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	for (auto stage : stages)
 		Metrics->RegisterStage(std::move(stage.Name), std::move(stage.Metrics));
 	TickHooks(job, graph);
+	auto captureStageFailure = [&]() noexcept {
+		if (job.Failed())
+			return;
+		if (demux->Failed()) {
+			job.Fail(ErrorText(demux->Error(), "demux failed"));
+			return;
+		}
+		if (mux->Failed()) {
+			job.Fail(ErrorText(mux->Error(), "mux failed"));
+			return;
+		}
+		for (auto& lane : lanes) {
+			if (lane.Decoder && lane.Decoder->Failed()) {
+				job.Fail(ErrorText(lane.Decoder->Error(), "decoder failed"));
+				return;
+			}
+			if (lane.Encoder && lane.Encoder->Failed()) {
+				job.Fail(ErrorText(lane.Encoder->Error(), "encoder failed"));
+				return;
+			}
+		}
+		for (auto& remux : remuxes) {
+			if (remux && remux->Failed()) {
+				job.Fail(ErrorText(remux->Error(), "remux failed"));
+				return;
+			}
+		}
+	};
 
 	while (!Stopping(*this)) {
 		WaitIfPaused();
@@ -471,6 +499,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
+	captureStageFailure();
 	if (Stopping(*this)
 		&& Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
 		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
@@ -521,6 +550,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
+	captureStageFailure();
 	if (Stopping(*this)
 		&& Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
 		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
