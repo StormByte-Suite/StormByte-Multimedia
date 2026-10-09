@@ -44,9 +44,11 @@
 #include <StormByte/multimedia/property/point.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/binary.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
 #include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
@@ -78,10 +80,19 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 	/**
 	 * @class Watermark
-	 * @brief Overlays a still image on decoded video. Real Hold example.
+	 * @brief Overlays a still image on decoded video from a path or encoded bytes.
 	 *
-	 * Attach with
-	 * @c job.Video(in, out).Filter<Watermark>(log, path, Anchor::BottomRight).
+	 * Supply either an owned UTF-8 file path or an owned @ref StormByte::Safe::Binary
+	 * containing an encoded PNG, JPEG, WebP or BMP image. File contents are read once
+	 * into the filter's provider-owned binary storage; binary input is copied there
+	 * when the filter is constructed. The stored source bytes survive @ref Clean so
+	 * the filter can be replayed without reopening or retaining the caller's buffer.
+	 *
+	 * Attach with a path or an encoded byte buffer:
+	 * @code
+	 * job.Video(in, out).Filter<Watermark>(log, path, Anchor::BottomRight);
+	 * job.Video(in, out).Filter<Watermark>(log, logoBytes, Anchor::BottomRight);
+	 * @endcode
 	 *
 	 * @par What it is for
 	 * Station / disc / review logo on the **finished**
@@ -115,12 +126,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Logo at an anchor on the active picture.
 			 * @param log Safe shared logger retained by the filter. Empty means no log.
-			 * @param logo Owned UTF-8 path to a still image (png, jpeg, webp, bmp).
+			 * @param logo UTF-8 path to a still image (png, jpeg, webp, bmp), read once during construction.
 			 * @param anchor Placement relative to measured bars.
 			 * @param opacity 0–100. 0 = no-op.
 			 * @param margin Pixels from the anchored active edge.
-			 * @note The path is copied into provider-owned native filesystem storage;
-			 * UTF-8 is converted to the native wide representation on Windows.
+			 * @note File bytes are copied into the filter's persistent @ref StormByte::Safe::Binary.
+			 * A missing or unreadable file logs a Warning and disables the overlay.
 			 * Allocation or path-conversion exceptions terminate because this is noexcept.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -128,17 +139,47 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				unsigned opacity = 100, int margin = 0) noexcept;
 
 			/**
+			 * @brief Logo bytes at an anchor on the active picture.
+			 * @param log Safe shared logger retained by the filter. Empty means no log.
+			 * @param logo Encoded PNG, JPEG, WebP or BMP bytes; copied into provider-owned storage.
+			 * @param anchor Placement relative to measured bars.
+			 * @param opacity 0–100. 0 = no-op.
+			 * @param margin Pixels from the anchored active edge.
+			 * @note The encoded source is copied into Watermark's persistent @ref StormByte::Safe::Binary
+			 * and remains there across @ref Clean and filter replays. Allocation failure terminates
+			 * because this constructor is noexcept.
+			 */
+			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				const StormByte::Safe::Binary& logo, Anchor anchor,
+				unsigned opacity = 100, int margin = 0) noexcept;
+
+			/**
 			 * @brief Logo at an absolute top-left. No Hold.
 			 * @param log Safe shared logger retained by the filter. Empty means no log.
-			 * @param logo Owned UTF-8 path to a still image (png, jpeg, webp, bmp).
+			 * @param logo UTF-8 path to a still image (png, jpeg, webp, bmp), read once during construction.
 			 * @param position Top-left of the logo in frame pixels.
 			 * @param opacity 0–100. 0 = no-op.
-			 * @note The path is copied into provider-owned native filesystem storage;
-			 * UTF-8 is converted to the native wide representation on Windows.
+			 * @note File bytes are copied into the filter's persistent @ref StormByte::Safe::Binary.
+			 * A missing or unreadable file logs a Warning and disables the overlay.
 			 * Allocation or path-conversion exceptions terminate because this is noexcept.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::String logo,
+				StormByte::Multimedia::Property::Point position,
+				unsigned opacity = 100) noexcept;
+
+			/**
+			 * @brief Logo bytes at an absolute top-left. No Hold.
+			 * @param log Safe shared logger retained by the filter. Empty means no log.
+			 * @param logo Encoded PNG, JPEG, WebP or BMP bytes; copied into provider-owned storage.
+			 * @param position Top-left of the logo in frame pixels.
+			 * @param opacity 0–100. 0 = no-op.
+			 * @note The encoded source is copied into Watermark's persistent @ref StormByte::Safe::Binary
+			 * and remains there across @ref Clean and filter replays. Allocation failure terminates
+			 * because this constructor is noexcept.
+			 */
+			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				const StormByte::Safe::Binary& logo,
 				StormByte::Multimedia::Property::Point position,
 				unsigned opacity = 100) noexcept;
 
@@ -204,14 +245,6 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Clean() noexcept override;
 
 			/**
-			 * @brief Reads the logo file for the coming run.
-			 *
-			 * A missing file logs a Warning and disables the overlay.
-			 * It does not Fail the step.
-			 */
-			void Setup() noexcept override;
-
-			/**
 			 * @brief Detects anchor placement, then overlays the logo on video frames.
 			 * @param frame Video unit. Borrow
 			 *        @ref Filter::FFmpeg::AVFrame for the live picture.
@@ -234,6 +267,23 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 
 		private:
+			/**
+			 * @brief Initializes source bytes and placement shared by public constructors.
+			 * @param log Safe shared logger retained by the filter.
+			 * @param path UTF-8 file path, or empty for direct binary input; consumed immediately.
+			 * @param logo Encoded bytes, or empty for file input.
+			 * @param anchor Optional bar-relative placement.
+			 * @param position Optional absolute frame position.
+			 * @param opacity Logo opacity from 0 to 100.
+			 * @param margin Anchor margin in pixels.
+			 * @param binaryInput Whether @p logo is the caller-provided source.
+			 */
+			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+				StormByte::Safe::String path, const StormByte::Safe::Binary& logo,
+				StormByte::Safe::Optional<Anchor> anchor,
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> position,
+				unsigned opacity, int margin, bool binaryInput) noexcept;
+
 			static constexpr std::uint8_t ProbeMax = 200;	///< Hold ceiling in units
 
 			/**
@@ -248,10 +298,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void DisableLogo(std::string_view why) noexcept;
 
 			/**
-			 * @brief Reads the provider-owned logo path into its byte buffer.
-			 * @return false if the logo was disabled.
+			 * @brief Reads a path into the persistent source buffer during construction.
+			 * @param path UTF-8 file path, consumed during this call.
+			 * @return false if the file could not be opened or read.
 			 */
-			bool LoadFile() noexcept;
+			bool LoadFile(const StormByte::Safe::String& path) noexcept;
 
 			/**
 			 * @brief Decodes the provider-owned bytes into RGBA on first use.
@@ -286,15 +337,15 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			void DropScale() noexcept;
 
-			struct STORMBYTE_MULTIMEDIA_PRIVATE Implementation;				///< Provider-owned path, buffers and scale owners; complete only in the source.
-			Implementation* m_implementation;								///< Created and deleted only by out-of-line provider methods.
+			StormByte::Safe::Binary m_logo;									///< Persistent encoded source; retained across Clean and replays.
+			StormByte::Safe::Vector<std::uint8_t> m_rgba;						///< Decoded RGBA8888 pixels.
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Cached GRAY8 view.
 			StormByte::Safe::Optional<Anchor> m_anchor;						///< Relative placement
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> m_point;	///< Absolute placement
 			unsigned m_opacity;												///< 0–100
 			int m_margin;													///< Anchor margin
 			int m_logoWidth;												///< Decoded logo width
 			int m_logoHeight;												///< Decoded logo height
-			bool m_loaded;													///< File read attempted
 			bool m_decoded;													///< Decode attempted
 			bool m_released;												///< Hold finished; replays may Paint
 			int m_barTop;													///< Letterbox top

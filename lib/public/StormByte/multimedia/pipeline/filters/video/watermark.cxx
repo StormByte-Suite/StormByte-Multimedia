@@ -36,8 +36,6 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
-#include <StormByte/safe/binary.hxx>
-#include <StormByte/multimedia/ffmpeg/Sws.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 
 #include <algorithm>
@@ -46,26 +44,32 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
-#include <memory>
 #include <utility>
 
 using namespace StormByte::Multimedia::Pipeline::Filter::Video;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using Level = StormByte::Logger::Level;
 
-/**
- * @brief Private storage allocated and destroyed only by the Multimedia provider.
- */
-struct Watermark::Implementation {
-	std::filesystem::path path;	///< Native logo file path converted from UTF-8.
-	StormByte::Safe::Binary bytes;	///< Encoded file bytes.
-	StormByte::Safe::Binary rgba;	///< Decoded RGBA8888 bytes.
-	std::unique_ptr<StormByte::Multimedia::FFmpeg::Sws> swsLuma;	///< Cached source-to-gray scale owner.
-	std::unique_ptr<FFrame> luma;	///< Cached GRAY8 view.
-};
-
 namespace {
 	constexpr int BarSlack = 16;
+
+	std::string_view ImageHint(const StormByte::Safe::Binary& bytes) noexcept {
+		const auto* data = reinterpret_cast<const std::uint8_t*>(bytes.data());
+		const auto size = static_cast<std::size_t>(bytes.size());
+		if (size >= 8 && data[0] == 0x89 && data[1] == 'P' && data[2] == 'N'
+			&& data[3] == 'G' && data[4] == 0x0d && data[5] == 0x0a
+			&& data[6] == 0x1a && data[7] == 0x0a)
+			return ".png";
+		if (size >= 3 && data[0] == 0xff && data[1] == 0xd8 && data[2] == 0xff)
+			return ".jpg";
+		if (size >= 12 && data[0] == 'R' && data[1] == 'I' && data[2] == 'F'
+			&& data[3] == 'F' && data[8] == 'W' && data[9] == 'E'
+			&& data[10] == 'B' && data[11] == 'P')
+			return ".webp";
+		if (size >= 2 && data[0] == 'B' && data[1] == 'M')
+			return ".bmp";
+		return {};
+	}
 
 	int SampleY8(const FFrame& src, int x, int y) noexcept {
 		if (!src.Data(0) || x < 0 || y < 0 || x >= src.Width() || y >= src.Height())
@@ -273,34 +277,45 @@ namespace {
 }
 
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::String logo, Anchor anchor,
-	unsigned opacity, int margin) noexcept
-: Filter::Process(std::move(log), "watermark"),
-	m_implementation(new Implementation {std::filesystem::path(std::u8string_view(
-		logo.empty() ? u8"" : reinterpret_cast<const char8_t*>(logo.data()),
-		static_cast<std::size_t>(logo.size()))), {}, {}, {}, {}}),
-	m_anchor(anchor),
-	m_opacity(std::min(opacity, 100u)), m_margin(margin),
-	m_logoWidth(0), m_logoHeight(0), m_loaded(false), m_decoded(false),
-	m_released(false), m_barTop(0), m_barBottom(0), m_barLeft(0), m_barRight(0),
-	m_stable(0), m_lumaW(0), m_lumaH(0), m_lumaFmt(FFrame::FormatNone()) {}
+	StormByte::Safe::String logo, Anchor anchor, unsigned opacity, int margin) noexcept
+: Watermark(std::move(log), std::move(logo), StormByte::Safe::Binary{},
+	StormByte::Safe::Optional<Anchor>{anchor}, {}, opacity, margin, false) {}
 
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::String logo,
-	StormByte::Multimedia::Property::Point position, unsigned opacity) noexcept
+	const StormByte::Safe::Binary& logo, Anchor anchor, unsigned opacity, int margin) noexcept
+: Watermark(std::move(log), StormByte::Safe::String{}, logo,
+	StormByte::Safe::Optional<Anchor>{anchor}, {}, opacity, margin, true) {}
+
+Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::String logo, StormByte::Multimedia::Property::Point position,
+	unsigned opacity) noexcept
+: Watermark(std::move(log), std::move(logo), StormByte::Safe::Binary{}, {},
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Point>{position}, opacity, 0, false) {}
+
+Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	const StormByte::Safe::Binary& logo, StormByte::Multimedia::Property::Point position,
+	unsigned opacity) noexcept
+: Watermark(std::move(log), StormByte::Safe::String{}, logo, {},
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Point>{position}, opacity, 0, true) {}
+
+Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+	StormByte::Safe::String path, const StormByte::Safe::Binary& logo,
+	StormByte::Safe::Optional<Anchor> anchor,
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> position,
+	unsigned opacity, int margin, bool binaryInput) noexcept
 : Filter::Process(std::move(log), "watermark"),
-	m_implementation(new Implementation {std::filesystem::path(std::u8string_view(
-		logo.empty() ? u8"" : reinterpret_cast<const char8_t*>(logo.data()),
-		static_cast<std::size_t>(logo.size()))), {}, {}, {}, {}}),
-	m_point(position),
-	m_opacity(std::min(opacity, 100u)), m_margin(0),
-	m_logoWidth(0), m_logoHeight(0), m_loaded(false), m_decoded(false),
+	m_logo(logo),
+	m_anchor(std::move(anchor)), m_point(std::move(position)),
+	m_opacity(std::min(opacity, 100u)), m_margin(margin),
+	m_logoWidth(0), m_logoHeight(0), m_decoded(false),
 	m_released(false), m_barTop(0), m_barBottom(0), m_barLeft(0), m_barRight(0),
-	m_stable(0), m_lumaW(0), m_lumaH(0), m_lumaFmt(FFrame::FormatNone()) {}
+	m_stable(0), m_lumaW(0), m_lumaH(0), m_lumaFmt(FFrame::FormatNone()) {
+	if (!binaryInput && m_opacity != 0)
+		static_cast<void>(LoadFile(path));
+}
 
 Watermark::~Watermark() noexcept {
 	DropScale();
-	delete m_implementation;
 }
 
 enum StormByte::Multimedia::Type Watermark::Media() const noexcept {
@@ -308,19 +323,16 @@ enum StormByte::Multimedia::Type Watermark::Media() const noexcept {
 }
 
 void Watermark::DropScale() noexcept {
-	m_implementation->swsLuma.reset();
-	m_implementation->luma.reset();
+	m_luma.reset();
 	m_lumaW = 0;
 	m_lumaH = 0;
 	m_lumaFmt = FFrame::FormatNone();
 }
 
 void Watermark::Clean() noexcept {
-	m_implementation->bytes.clear();
-	m_implementation->rgba.clear();
+	m_rgba.clear();
 	m_logoWidth = 0;
 	m_logoHeight = 0;
-	m_loaded = false;
 	m_decoded = false;
 	m_released = false;
 	m_barTop = 0;
@@ -334,26 +346,21 @@ void Watermark::Clean() noexcept {
 void Watermark::DisableLogo(std::string_view why) noexcept {
 	Log(Level::Warning, std::format("disabled: {}", why));
 	m_opacity = 0;
-	m_implementation->bytes.clear();
-	m_implementation->rgba.clear();
+	m_rgba.clear();
 	m_logoWidth = 0;
 	m_logoHeight = 0;
 }
 
-void Watermark::Setup() noexcept {
-	if (m_opacity == 0)
-		return;
-	(void)LoadFile();
-}
-
-bool Watermark::LoadFile() noexcept {
-	if (m_loaded)
-		return !m_implementation->bytes.empty();
-	m_loaded = true;
-
-	std::ifstream in(m_implementation->path, std::ios::binary);
+bool Watermark::LoadFile(const StormByte::Safe::String& path) noexcept {
+	if (path.empty()) {
+		DisableLogo("empty logo path");
+		return false;
+	}
+	const std::filesystem::path nativePath(std::u8string_view(
+		reinterpret_cast<const char8_t*>(path.data()), static_cast<std::size_t>(path.size())));
+	std::ifstream in(nativePath, std::ios::binary);
 	if (!in) {
-		DisableLogo("cannot open " + m_implementation->path.string());
+		DisableLogo("cannot open logo file");
 		return false;
 	}
 
@@ -365,11 +372,11 @@ bool Watermark::LoadFile() noexcept {
 	}
 
 	in.seekg(0, std::ios::beg);
-	m_implementation->bytes.resize(static_cast<std::size_t>(size));
-	in.read(reinterpret_cast<char*>(m_implementation->bytes.data()), size);
+	m_logo.resize(static_cast<std::size_t>(size));
+	in.read(reinterpret_cast<char*>(m_logo.data()), static_cast<std::streamsize>(size));
 	if (!in) {
-		m_implementation->bytes.clear();
-		DisableLogo("failed to read " + m_implementation->path.string());
+		m_logo.clear();
+		DisableLogo("failed to read logo file");
 		return false;
 	}
 
@@ -378,14 +385,16 @@ bool Watermark::LoadFile() noexcept {
 
 bool Watermark::DecodeLogo() noexcept {
 	if (m_decoded)
-		return !m_implementation->rgba.empty();
+		return !m_rgba.empty();
 	m_decoded = true;
-	if (!LoadFile())
+	if (m_logo.empty()) {
+		DisableLogo("empty logo");
 		return false;
-
+	}
+	const std::string hint{ImageHint(m_logo)};
 	FFrame decoded = FFrame::DecodeImage(
-		reinterpret_cast<const std::uint8_t*>(m_implementation->bytes.data()),
-		m_implementation->bytes.size(), m_implementation->path.string());
+		reinterpret_cast<const std::uint8_t*>(m_logo.data()),
+		static_cast<std::size_t>(m_logo.size()), hint);
 	if (!decoded || decoded.Width() <= 0 || decoded.Height() <= 0) {
 		DisableLogo("failed to decode logo");
 		return false;
@@ -401,10 +410,10 @@ bool Watermark::DecodeLogo() noexcept {
 
 	m_logoWidth = rgba.Width();
 	m_logoHeight = rgba.Height();
-	m_implementation->rgba.resize(static_cast<std::size_t>(m_logoWidth) * static_cast<std::size_t>(m_logoHeight) * 4);
+	m_rgba.resize(static_cast<std::size_t>(m_logoWidth) * static_cast<std::size_t>(m_logoHeight) * 4);
 	for (int row = 0; row < m_logoHeight; ++row) {
 		const uint8_t* src = rgba.Data(0) + row * rgba.Linesize(0);
-		uint8_t* dst = reinterpret_cast<uint8_t*>(m_implementation->rgba.data()) +
+		uint8_t* dst = m_rgba.data() +
 			static_cast<std::size_t>(row) * static_cast<std::size_t>(m_logoWidth) * 4;
 		std::copy(src, src + m_logoWidth * 4, dst);
 	}
@@ -420,11 +429,11 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 		return nullptr;
 	}
 
-	if (m_implementation->luma && (m_lumaW != src.Width() || m_lumaH != src.Height() || m_lumaFmt != src.Format()))
+	if (m_luma && (m_lumaW != src.Width() || m_lumaH != src.Height() || m_lumaFmt != src.Format()))
 		DropScale();
 
-	if (!m_implementation->luma) {
-		auto luma = std::make_unique<FFrame>();
+	if (!m_luma) {
+		auto luma = StormByte::Safe::MakeUnique<FFrame>();
 		luma->Format(FFrame::FormatGray8());
 		if (!src.ScaleTo(*luma, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
@@ -432,28 +441,28 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 			return nullptr;
 		}
 
-		m_implementation->luma = std::move(luma);
+		m_luma = std::move(luma);
 		m_lumaW = src.Width();
 		m_lumaH = src.Height();
 		m_lumaFmt = src.Format();
 	}
-	else if (!src.ScaleTo(*m_implementation->luma, src.Width(), src.Height(),
+	else if (!src.ScaleTo(*m_luma, src.Width(), src.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 		Fail("failed to convert frame to luma");
 		return nullptr;
 	}
 
-	return m_implementation->luma.get();
+	return m_luma.get();
 }
 
 bool Watermark::ProbeBars(const FFrame& src) noexcept {
-	if (!Luma(src) || m_implementation->luma->Width() < 16 || m_implementation->luma->Height() < 16) {
+	if (!Luma(src) || m_luma->Width() < 16 || m_luma->Height() < 16) {
 		Log(Level::Debug, std::format("probe skip luma={}x{}",
-			m_implementation->luma ? m_implementation->luma->Width() : 0,
-			m_implementation->luma ? m_implementation->luma->Height() : 0));
+			m_luma ? m_luma->Width() : 0,
+			m_luma ? m_luma->Height() : 0));
 		return false;
 	}
-	FFrame& gray = *m_implementation->luma;
+	FFrame& gray = *m_luma;
 
 	Probe found = Measure(gray);
 	const bool rawBoxed = Boxed(found);
@@ -622,7 +631,7 @@ void Watermark::Paint() noexcept {
 	}
 
 	Blend(out.Data(0), out.Linesize(0), out.Width(), out.Height(),
-		reinterpret_cast<const uint8_t*>(m_implementation->rgba.data()),
+		m_rgba.data(),
 		m_logoWidth, m_logoHeight, x, y, m_opacity);
 
 	if (src.Format() != FFrame::FormatRgba()) {
