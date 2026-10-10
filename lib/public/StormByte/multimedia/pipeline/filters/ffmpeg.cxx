@@ -294,14 +294,17 @@ void FFmpeg::Hold(std::uint8_t n) noexcept {
 
 	m_hold = n == 0 ? std::numeric_limits<std::uint8_t>::max() : n;
 	m_heldFor = 0;
-	Log(Level::Debug, std::format("hold n={}", static_cast<unsigned>(m_hold)));
+	Log(Level::LowLevel, std::format("hold n={} t={} {}:{} queue={}",
+		static_cast<unsigned>(m_hold), TrackOf(*m_current),
+		SerialOf(*m_current).value_or(0), PartOf(*m_current), m_state->queue.size()));
 	Park();
 }
 
 void FFmpeg::Release() noexcept {
 	if (!Held())
 		return;
-	Log(Level::Debug, std::format("release held={}", static_cast<unsigned>(m_heldFor)));
+	Log(Level::LowLevel, std::format("release held={} queue={}",
+		static_cast<unsigned>(m_heldFor), m_state->queue.size()));
 	m_hold = 0;
 	m_heldFor = 0;
 	auto parked = std::move(m_state->queue);
@@ -313,10 +316,15 @@ void FFmpeg::Release() noexcept {
 		else
 			m_current.reset();
 	}
+	std::size_t releaseIndex = 0;
 	for (auto& item : parked) {
 		m_current = std::move(item);
 		if (!m_current)
 			continue;
+		Log(Level::LowLevel, std::format("release-item index={} count={} t={} {}:{} kind={}",
+			releaseIndex++, parked.size(), TrackOf(*m_current),
+			SerialOf(*m_current).value_or(0), PartOf(*m_current),
+			static_cast<unsigned>(m_current->Kind())));
 		if (IsAnalytics(*this)) {
 			Work(std::move(m_current));
 			continue;
@@ -477,7 +485,7 @@ void FFmpeg::Park() noexcept {
 void FFmpeg::CallLastChance() noexcept {
 	if (!m_current)
 		return;
-	Log(Level::Debug, "last-chance");
+	Log(Level::LowLevel, "last-chance");
 	if (m_current->Kind() == Pipeline::Kind::Frame)
 		LastChance(static_cast<const Pipeline::Frame&>(*m_current));
 	else if (!IsAnalytics(*this))

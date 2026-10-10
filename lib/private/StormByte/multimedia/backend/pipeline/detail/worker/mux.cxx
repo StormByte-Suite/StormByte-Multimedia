@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/mux.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/muxer.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
@@ -60,6 +61,7 @@
 
 #include <format>
 #include <string>
+#include <string_view>
 
 namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
@@ -111,6 +113,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			Fail("muxer expected a packet");
 			return;
 		}
+		const auto payloadBytes = static_cast<std::size_t>(packet->Payload().Available());
+		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+		const auto payloadDigest = PacketDigest(packet->Payload());
 
 		while (!m_owner.m_backend->Push(m_owner, packet)) {
 			if (m_owner.Failed())
@@ -139,10 +144,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (pos >= 0)
 			m_owner.ClockPass(pos);
 
-		Log(Level::LowLevel, std::format("written t={} {}:{} pts={} dts={} pos={}",
+		Log(Level::LowLevel, std::format("written t={} {}:{} pts={} dts={} pos={} bytes={} raw={} fnv1a={:016x}",
 			track, packet->Serial().value_or(0), packet->Part(),
 			Ns(packet->Pts()), Ns(packet->Dts()),
-			pos));
+			pos, std::string_view{payloadLength}, payloadBytes, payloadDigest));
 	}
 
 	void Mux::Flush() noexcept {

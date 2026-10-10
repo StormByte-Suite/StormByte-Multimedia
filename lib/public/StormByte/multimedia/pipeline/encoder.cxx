@@ -57,6 +57,7 @@
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
@@ -64,6 +65,7 @@
 #include <StormByte/safe/pointers.hxx>
 
 #include <format>
+#include <string_view>
 #include <utility>
 
 extern "C" {
@@ -230,8 +232,11 @@ Packet::PointerType Encoder::Wrap(
 		return {};
 	}
 
-	Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={} key={}",
-		index, *m_serial, m_part, Ns(pts), Ns(dts), Ns(duration), keyFrame ? 1 : 0));
+	const auto payloadLength = static_cast<StormByte::Safe::String>(payload.Available());
+	Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={} key={} bytes={} raw={} fnv1a={:016x}",
+		index, *m_serial, m_part, Ns(pts), Ns(dts), Ns(duration), keyFrame ? 1 : 0,
+		std::string_view{payloadLength}, static_cast<std::size_t>(payload.Available()),
+		StormByte::Multimedia::Backend::Pipeline::Detail::PacketDigest(payload)));
 	auto packet = Packet::PointerType::MakePointer<Packet>(
 		index, type, Producer::Encoder,
 		std::move(payload),

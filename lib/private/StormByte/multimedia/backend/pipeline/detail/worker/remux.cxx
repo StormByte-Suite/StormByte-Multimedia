@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/remux.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
@@ -56,6 +57,7 @@
 
 #include <format>
 #include <string>
+#include <string_view>
 
 namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
@@ -106,9 +108,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		Log(Level::LowLevel, std::format("fwd t={} {}:{} pts={} dts={}",
+		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+		Log(Level::LowLevel, std::format("fwd t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
 			packet->Track(), *packet->Serial(), packet->Part(),
-			Ns(packet->Pts()), Ns(packet->Dts())));
+			Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
+			static_cast<std::size_t>(packet->Payload().Available()),
+			PacketDigest(packet->Payload())));
 		m_owner.Emit(std::move(packet));
 	}
 

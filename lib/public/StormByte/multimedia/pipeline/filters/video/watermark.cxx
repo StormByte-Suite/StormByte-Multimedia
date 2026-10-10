@@ -356,7 +356,7 @@ void Watermark::Clean() noexcept {
 }
 
 void Watermark::Setup() noexcept {
-	Log(Level::Debug, std::format("opacity {}%, margin {}", m_opacity, m_margin));
+	Log(Level::LowLevel, std::format("opacity {}%, margin {}", m_opacity, m_margin));
 }
 
 void Watermark::DisableLogo(std::string_view why) noexcept {
@@ -473,7 +473,7 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 
 bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	if (!Luma(src) || m_luma->Width() < 16 || m_luma->Height() < 16) {
-		Log(Level::Debug, std::format("probe skip luma={}x{}",
+			Log(Level::LowLevel, std::format("probe skip luma={}x{}",
 			m_luma ? m_luma->Width() : 0,
 			m_luma ? m_luma->Height() : 0));
 		return false;
@@ -496,7 +496,7 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 		if (core > edge) {
 			ApplyLut(gray, StretchLut(edge, core));
 			found = Measure(gray);
-			Log(Level::Debug, std::format(
+					Log(Level::LowLevel, std::format(
 				"probe stretch edge={} core={} found={},{};{},{}",
 				edge, core, found.top, found.bottom, found.left, found.right));
 		}
@@ -505,12 +505,12 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	if (!Boxed(found)) {
 		ApplyLut(gray, GammaLut(0.45));
 		found = Measure(gray);
-		Log(Level::Debug, std::format("probe gamma found={},{};{},{}",
+			Log(Level::LowLevel, std::format("probe gamma found={},{};{},{}",
 			found.top, found.bottom, found.left, found.right));
 	}
 
 	if (!Boxed(found)) {
-		Log(Level::Debug, std::format(
+			Log(Level::LowLevel, std::format(
 			"probe unboxed raw={} found={},{};{},{} bars={},{};{},{} stable={}",
 			static_cast<int>(rawBoxed), found.top, found.bottom, found.left, found.right,
 			m_barTop, m_barBottom, m_barLeft, m_barRight, m_stable));
@@ -552,7 +552,7 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	else
 		m_stable = 0;
 
-	Log(Level::Debug, std::format(
+	Log(Level::LowLevel, std::format(
 		"probe same={} stable={} found={},{};{},{} bars={},{};{},{}",
 		static_cast<int>(same), m_stable,
 		found.top, found.bottom, found.left, found.right,
@@ -560,9 +560,12 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	return true;
 }
 
-void Watermark::Process(const Pipeline::Frame&) noexcept {
+void Watermark::Process(const Pipeline::Frame& frame) noexcept {
 	if (m_opacity == 0)
 		return;
+	Log(Level::LowLevel, std::format("process t={} {}:{} opacity={} released={}",
+		frame.Track(), frame.Serial().value_or(0), frame.Part(), m_opacity,
+		static_cast<int>(m_released)));
 
 	const FFrame& src = AVFrame();
 
@@ -572,13 +575,15 @@ void Watermark::Process(const Pipeline::Frame&) noexcept {
 		const bool usable = ProbeBars(src);
 		const bool boxed = (m_barTop > 4 && m_barBottom > 4)
 			|| (m_barLeft > 4 && m_barRight > 4);
-		Log(Level::Debug, std::format(
-			"hold usable={} boxed={} stable={} held={} bars={},{};{},{}",
+		Log(Level::LowLevel, std::format(
+			"hold-state t={} {}:{} usable={} boxed={} stable={} held={} bars={},{};{},{}",
+			frame.Track(), frame.Serial().value_or(0), frame.Part(),
 			static_cast<int>(usable), static_cast<int>(boxed), m_stable,
 			static_cast<unsigned>(HeldFor()),
 			m_barTop, m_barBottom, m_barLeft, m_barRight));
 		if (usable && boxed && m_stable >= 8) {
-			Log(Level::Debug, "stable release");
+			Log(Level::LowLevel, std::format("stable-release t={} {}:{}",
+				frame.Track(), frame.Serial().value_or(0), frame.Part()));
 			m_released = true;
 			Release();
 			return;
@@ -592,9 +597,10 @@ void Watermark::Process(const Pipeline::Frame&) noexcept {
 	Paint();
 }
 
-void Watermark::LastChance(const Pipeline::Frame&) noexcept {
-	Log(Level::Debug, std::format(
-		"last-chance stable={} bars={},{};{},{}",
+void Watermark::LastChance(const Pipeline::Frame& frame) noexcept {
+	Log(Level::LowLevel, std::format(
+		"last-chance t={} {}:{} stable={} bars={},{};{},{}",
+		frame.Track(), frame.Serial().value_or(0), frame.Part(),
 		m_stable, m_barTop, m_barBottom, m_barLeft, m_barRight));
 	m_released = true;
 	Release();

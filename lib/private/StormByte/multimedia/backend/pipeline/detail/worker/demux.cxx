@@ -50,7 +50,7 @@
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
 #include <StormByte/safe/memory_order.hxx>
-#include <StormByte/safe/memory_order.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
@@ -60,6 +60,7 @@
 #include <format>
 #include <utility>
 #include <algorithm>
+#include <string_view>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	using StormByte::Multimedia::Pipeline::CheckResult;
@@ -198,6 +199,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 		if (const auto& pts = packet->Pts(); pts)
 			m_owner.m_positionNs.store(pts->Nanoseconds().count(), StormByte::Safe::MemoryOrder::Release);
+		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+		Log(Level::LowLevel, std::format("read t={} {}:{} bytes={} raw={} fnv1a={:016x}",
+			packet->Track(), packet->Serial().value_or(0), packet->Part(),
+			std::string_view{payloadLength},
+			static_cast<std::size_t>(packet->Payload().Available()),
+			PacketDigest(packet->Payload())));
 
 		const int track = packet->Track();
 		{

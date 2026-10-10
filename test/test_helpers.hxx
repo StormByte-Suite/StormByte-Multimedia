@@ -151,6 +151,7 @@ inline std::string_view TestView(const StormByte::Safe::String& value) {
 
 #define TEST_REQUIRE(expression) \
 	do { \
+		std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
 		if (!(expression)) { \
 			std::cerr << "[ASSERT] " << __func__ << ": " << #expression << std::endl; \
 			return 1; \

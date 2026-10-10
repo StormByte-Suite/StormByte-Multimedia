@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/decode.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
@@ -59,6 +60,7 @@
 #include <chrono>
 #include <format>
 #include <string>
+#include <string_view>
 
 namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
@@ -163,9 +165,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				m_owner.m_inDts.reset();
 		}
 
-		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={}",
+		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
 			packet->Track(), *packet->Serial(), packet->Part(),
-			Ns(packet->Pts()), Ns(packet->Dts())));
+			Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
+			static_cast<std::size_t>(packet->Payload().Available()),
+			PacketDigest(packet->Payload())));
 
 		const auto started = std::chrono::steady_clock::now();
 		unsigned emitted = 0;
