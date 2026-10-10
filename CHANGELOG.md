@@ -65,6 +65,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Normalize unspecified PCM input layouts consistently with libswresample using a temporary frame reference, without modifying the original samples or channel count.
 	- Normalize unspecified audio output layouts during sample conversion and drain; retry audio frame and EOF submission after a receive operation consumes buffered input without producing a packet.
 - Encoder configuration and diagnostics:
+	- Preserve HDR10 and Dolby Vision side data already carried by replacement frames; restore missing metadata only, retain recalculated HDR10+ instead of overwriting it, and avoid duplicate DOVI entries when encoding.
 	- Apply video-encoder parallelism per implementation: use explicit positive hardware-thread counts for x264, OpenH264, libaom and libvpx; cap x265 frame threads at 15 while keeping its worker pool sized to the available CPUs; enable row-mt for libaom and VP9; retain SVT-AV1 and Kvazaar automatic parallelism.
 	- Format decoder implementation labels, encoder-option errors and muxer error messages as text instead of character ranges.
 	- Explicitly disable empty construction of the private opened-encoder result, which requires an initialized FFmpeg encoder.

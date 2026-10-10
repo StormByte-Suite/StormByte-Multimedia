@@ -636,7 +636,7 @@ void Watermark::Paint() noexcept {
 	FFrame out;
 	out.Format(FFrame::FormatRgba());
 	if (!src.ScaleTo(out, src.Width(), src.Height(),
-			FFrame::Resample::Default, FFrame::Scaler::Sws) || !out.CopyProps(src)) {
+			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 		Fail("failed to convert frame to RGBA");
 		return;
 	}
@@ -654,7 +654,7 @@ void Watermark::Paint() noexcept {
 		FFrame restored;
 		restored.Format(src.Format());
 		if (!out.ScaleTo(restored, src.Width(), src.Height(),
-				FFrame::Resample::Default, FFrame::Scaler::Sws) || !restored.CopyProps(src)) {
+				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 			Fail("failed to convert frame back");
 			return;
 		}

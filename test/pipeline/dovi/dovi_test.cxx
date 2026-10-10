@@ -68,6 +68,7 @@
 
 extern "C" {
 	#include <libavutil/dovi_meta.h>
+	#include <libavutil/frame.h>
 }
 
 using namespace StormByte::Multimedia;
@@ -308,7 +309,20 @@ namespace {
 	struct FrameAudit {
 		StormByte::Safe::Vector<Property::Video> videos;
 		StormByte::Safe::Vector<int> side_data_counts;
+		StormByte::Safe::Vector<int> dovi_metadata_counts;
+		StormByte::Safe::Vector<int> dovi_rpu_counts;
 	};
+
+	int CountSideData(const StormByte::Multimedia::FFmpeg::AVFrame& frame,
+		AVFrameSideDataType type) noexcept {
+		int count = 0;
+		for (int index = 0; index < frame.SideDataCount(); ++index) {
+			const AVFrameSideData* side = frame.SideDataAt(index);
+			if (side && side->type == type)
+				++count;
+		}
+		return count;
+	}
 
 	struct EncodedAudit {
 		FrameAudit source;
@@ -336,11 +350,17 @@ namespace {
 				}
 				if (frame.Producer() == Producer::Decoder) {
 					m_audit->source.videos.push_back(frame.Video().value());
-					m_audit->source.side_data_counts.push_back(AVFrame().SideDataCount());
+					const auto& handle = AVFrame();
+					m_audit->source.side_data_counts.push_back(handle.SideDataCount());
+					m_audit->source.dovi_metadata_counts.push_back(CountSideData(handle, AV_FRAME_DATA_DOVI_METADATA));
+					m_audit->source.dovi_rpu_counts.push_back(CountSideData(handle, AV_FRAME_DATA_DOVI_RPU_BUFFER));
 				}
 				else if (frame.Producer() == Producer::Encoder || frame.Producer() == Producer::Remuxer) {
 					m_audit->destination.videos.push_back(frame.Video().value());
-					m_audit->destination.side_data_counts.push_back(AVFrame().SideDataCount());
+					const auto& handle = AVFrame();
+					m_audit->destination.side_data_counts.push_back(handle.SideDataCount());
+					m_audit->destination.dovi_metadata_counts.push_back(CountSideData(handle, AV_FRAME_DATA_DOVI_METADATA));
+					m_audit->destination.dovi_rpu_counts.push_back(CountSideData(handle, AV_FRAME_DATA_DOVI_RPU_BUFFER));
 				}
 			}
 
@@ -373,7 +393,10 @@ namespace {
 				Frame assigned;
 				assigned = std::move(copy);
 				m_audit->videos.push_back(assigned.Video().value());
-				m_audit->side_data_counts.push_back(AVFrame().SideDataCount());
+				const auto& handle = AVFrame();
+				m_audit->side_data_counts.push_back(handle.SideDataCount());
+				m_audit->dovi_metadata_counts.push_back(CountSideData(handle, AV_FRAME_DATA_DOVI_METADATA));
+				m_audit->dovi_rpu_counts.push_back(CountSideData(handle, AV_FRAME_DATA_DOVI_RPU_BUFFER));
 			}
 
 		private:
@@ -411,6 +434,10 @@ namespace {
 		TEST_REQUIRE(after.videos.size() == before.videos.size());
 		TEST_REQUIRE(before.side_data_counts.size() == before.videos.size());
 		TEST_REQUIRE(after.side_data_counts.size() == after.videos.size());
+		TEST_REQUIRE(before.dovi_metadata_counts.size() == before.videos.size());
+		TEST_REQUIRE(before.dovi_rpu_counts.size() == before.videos.size());
+		TEST_REQUIRE(after.dovi_metadata_counts.size() == after.videos.size());
+		TEST_REQUIRE(after.dovi_rpu_counts.size() == after.videos.size());
 		if (fixture.profile != 0)
 			TEST_REQUIRE(before.videos.size() == 48);
 		for (std::size_t index = 0; index < before.videos.size(); ++index) {
@@ -418,6 +445,11 @@ namespace {
 			const auto actual = after.videos[index];
 			TEST_REQUIRE(original.DOVI().has_value() == (fixture.profile != 0));
 			TEST_REQUIRE(original.HDR10().has_value() == fixture.hdr10);
+			const int expectedDoviSideData = fixture.profile != 0 ? 1 : 0;
+			TEST_REQUIRE(before.dovi_metadata_counts[index] == expectedDoviSideData);
+			TEST_REQUIRE(before.dovi_rpu_counts[index] == expectedDoviSideData);
+			TEST_REQUIRE(after.dovi_metadata_counts[index] == expectedDoviSideData);
+			TEST_REQUIRE(after.dovi_rpu_counts[index] == expectedDoviSideData);
 			if (original.DOVI()) {
 				const auto dovi = original.DOVI().value();
 				TEST_REQUIRE(check_dovi(dovi, fixture) == 0);

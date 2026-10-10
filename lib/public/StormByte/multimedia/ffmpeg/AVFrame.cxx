@@ -202,8 +202,7 @@ void FFmpeg::AVFrame::WriteHdr10(const StormByte::Multimedia::Property::HDR10& h
 	const auto& light = hdr10.LightLevel();
 	const bool hasLight = light.has_value() && (light->X() != 0 || light->Y() != 0);
 
-	if (hasMastering) {
-		av_frame_remove_side_data(m_ptr, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+	if (hasMastering && !av_frame_get_side_data(m_ptr, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA)) {
 		auto* mdm = av_mastering_display_metadata_create_side_data(m_ptr);
 		if (mdm) {
 			mdm->has_primaries = 1;
@@ -221,8 +220,7 @@ void FFmpeg::AVFrame::WriteHdr10(const StormByte::Multimedia::Property::HDR10& h
 		}
 	}
 
-	if (hasLight) {
-		av_frame_remove_side_data(m_ptr, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+	if (hasLight && !av_frame_get_side_data(m_ptr, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL)) {
 		auto* cll = av_content_light_metadata_create_side_data(m_ptr);
 		if (cll) {
 			cll->MaxCLL = static_cast<unsigned>(light->X());
@@ -249,7 +247,8 @@ void FFmpeg::AVFrame::WriteSideData(
 			continue;
 
 		if (item.Kind() == SideDataKind::HdrPlus) {
-			av_frame_remove_side_data(m_ptr, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+			if (av_frame_get_side_data(m_ptr, AV_FRAME_DATA_DYNAMIC_HDR_PLUS))
+				continue;
 			AVDynamicHDRPlus* plus = av_dynamic_hdr_plus_create_side_data(m_ptr);
 			if (!plus)
 				continue;
@@ -277,6 +276,10 @@ void FFmpeg::AVFrame::WriteSideData(
 				type = AV_FRAME_DATA_SEI_UNREGISTERED;
 				break;
 		}
+
+		if ((type == AV_FRAME_DATA_DOVI_METADATA || type == AV_FRAME_DATA_DOVI_RPU_BUFFER)
+			&& av_frame_get_side_data(m_ptr, type))
+			continue;
 
 		AVFrameSideData* side = av_frame_new_side_data(m_ptr, type, static_cast<int>(bytes.size()));
 		if (!side)
@@ -805,7 +808,8 @@ bool FFmpeg::AVFrame::ScaleTo(AVFrame& dst, int dst_w, int dst_h,
 		|| dst.Format() != fmt || !dst.Data(0)) {
 		if (!dst.AllocVideo(dst_w, dst_h, fmt))
 			return false;
-		(void)dst.CopyProps(*this);
+		if (!dst.CopyProps(*this))
+			return false;
 		dst.Width(dst_w);
 		dst.Height(dst_h);
 		dst.Format(fmt);
