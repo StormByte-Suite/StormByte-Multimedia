@@ -55,8 +55,6 @@
 #include <StormByte/multimedia/visibility.h>
 
 #include <cstdint>
-#include <optional>
-#include <variant>
 
 struct AVIOContext;
 
@@ -129,14 +127,8 @@ namespace StormByte::Multimedia::Backend {
 			AVIOContext* Context() const noexcept;
 
 		private:
-			/**
-			 * @brief Leaf bound to this AVIO.
-			 */
-			using Leaf = std::variant<
-				StormByte::Buffer::IO::BufferedLocationReader*,
-				StormByte::Buffer::IO::BufferedLocationWriter*>;
-
-			Leaf m_leaf;			///< Not owned
+			StormByte::Buffer::IO::BufferedLocationReader* m_reader;	///< Borrowed reader, or null
+			StormByte::Buffer::IO::BufferedLocationWriter* m_writer;	///< Borrowed writer, or null
 			AVIOContext* m_avio;	///< Custom I/O
 
 			/**
@@ -184,3 +176,5 @@ namespace StormByte::Multimedia::Backend {
 			StormByte::Safe::Optional<StormByte::ByteSize> LeafSize() const noexcept;
 	};
 }
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::FileAvio);

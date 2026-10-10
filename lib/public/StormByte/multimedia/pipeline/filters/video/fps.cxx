@@ -81,8 +81,8 @@ void Fps::Setup() noexcept {
 	Clean();
 }
 
-std::string Fps::Chain() const noexcept {
-	return std::format("fps=fps={}/{}:round=near", m_num, m_den);
+StormByte::Safe::String Fps::Chain() const noexcept {
+	return StormByte::Safe::String{std::format("fps=fps={}/{}:round=near", m_num, m_den)};
 }
 
 void Fps::Process(const Pipeline::Frame& frame) noexcept {
@@ -102,7 +102,7 @@ void Fps::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

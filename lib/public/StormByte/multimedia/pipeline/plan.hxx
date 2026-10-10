@@ -65,7 +65,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <filesystem>
 #include <utility>
 
 /**
@@ -128,8 +127,8 @@ namespace StormByte {
 					 * @param destination Output path.
 					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
-					Plan(const std::filesystem::path& source,
-						const std::filesystem::path& destination,
+					Plan(const StormByte::Safe::String& source,
+						const StormByte::Safe::String& destination,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 					/**
@@ -138,7 +137,7 @@ namespace StormByte {
 					 * @param writer Owned output location (moved).
 					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
-					Plan(const std::filesystem::path& source,
+					Plan(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
@@ -149,7 +148,7 @@ namespace StormByte {
 					 * @param duration Authoritative source nanoseconds; empty scans the full source.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-						const std::filesystem::path& destination,
+						const StormByte::Safe::String& destination,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 					/**

@@ -59,6 +59,8 @@ extern "C" {
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <format>
+#include <string>
 
 using StormByte::Multimedia::Backend::Pipeline::Detail::Content::Video;
 
@@ -144,11 +146,11 @@ namespace {
 		return av_d2q(v, 100000);
 	}
 
-	void DropPlus(::AVFrame* raw, std::string& warning, const char* why) noexcept {
+	void DropPlus(::AVFrame* raw, StormByte::Safe::String& warning, const char* why) noexcept {
 		if (!raw || !av_frame_get_side_data(raw, AV_FRAME_DATA_DYNAMIC_HDR_PLUS))
 			return;
 		av_frame_remove_side_data(raw, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
-		warning = why;
+		warning = std::string_view(why);
 	}
 
 	void ScaleEllipses(AVDynamicHDRPlus& plus, double sx, double sy) noexcept {
@@ -195,36 +197,76 @@ namespace {
 
 void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 	m_warning.clear();
+	m_diagnostic.clear();
 	if (before && after) {
 		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
 			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL}) {
 			const auto* source = av_frame_get_side_data(before, type);
-			if (!source || av_frame_get_side_data(after, type))
+			const auto* replacement = av_frame_get_side_data(after, type);
+			const char* name = "unknown";
+			switch (type) {
+				case AV_FRAME_DATA_DOVI_METADATA: name = "dovi-metadata"; break;
+				case AV_FRAME_DATA_DOVI_RPU_BUFFER: name = "dovi-rpu"; break;
+				case AV_FRAME_DATA_MASTERING_DISPLAY_METADATA: name = "hdr10-mastering"; break;
+				case AV_FRAME_DATA_CONTENT_LIGHT_LEVEL: name = "hdr10-content-light"; break;
+				default: break;
+			}
+			if (!source) {
+				m_diagnostic += std::format(" {}=source-absent", name);
 				continue;
-			if (av_frame_side_data_clone(&after->side_data, &after->nb_side_data, source, 0) < 0)
-				m_warning = "failed to preserve Dolby Vision/HDR10 frame side data";
+			}
+			if (replacement) {
+				m_diagnostic += std::format(" {}=already-present-kept:{}B", name, replacement->size);
+				continue;
+			}
+			if (av_frame_side_data_clone(&after->side_data, &after->nb_side_data, source, 0) < 0) {
+				m_diagnostic += std::format(" {}=copy-failed:{}B", name, source->size);
+				m_warning = std::string_view("failed to preserve Dolby Vision/HDR10 frame side data");
+			}
+			else {
+				m_diagnostic += std::format(" {}=copied:{}B", name, source->size);
+			}
 		}
 		if ((av_frame_get_side_data(before, AV_FRAME_DATA_DOVI_METADATA)
-			|| av_frame_get_side_data(before, AV_FRAME_DATA_DOVI_RPU_BUFFER)) && !Same(Read(before), Read(after)))
-			m_warning = "Dolby Vision metadata retained after geometry changes; RPU semantics may no longer match the image";
+			|| av_frame_get_side_data(before, AV_FRAME_DATA_DOVI_RPU_BUFFER)) && !Same(Read(before), Read(after))) {
+			m_diagnostic += std::format(" dovi-geometry={}x{}->{}x{} crop={},{},{},{}->{},{},{},{}",
+				before->width, before->height, after->width, after->height,
+				before->crop_top, before->crop_bottom, before->crop_left, before->crop_right,
+				after->crop_top, after->crop_bottom, after->crop_left, after->crop_right);
+			m_warning = std::string_view("Dolby Vision metadata retained after geometry changes; RPU semantics may no longer match the image");
+		}
+		const auto* sourcePlus = av_frame_get_side_data(before, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+		const auto* replacementPlus = av_frame_get_side_data(after, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+		if (!sourcePlus)
+			m_diagnostic += " hdr10plus=source-absent";
+		else if (!replacementPlus)
+			m_diagnostic += std::format(" hdr10plus=missing-on-replacement:{}B", sourcePlus->size);
+		else
+			m_diagnostic += std::format(" hdr10plus=already-present-kept:{}B", replacementPlus->size);
 	}
-	if (!after || !av_frame_get_side_data(after, AV_FRAME_DATA_DYNAMIC_HDR_PLUS))
+	if (!after)
+		return;
+	if (!av_frame_get_side_data(after, AV_FRAME_DATA_DYNAMIC_HDR_PLUS))
 		return;
 
 	const Card in = Read(before);
 	const Card out = Read(after);
 	const Kind kind = Classify(in, out);
 
-	if (kind == Kind::Identity)
+	if (kind == Kind::Identity) {
+		m_diagnostic += " hdr10plus=kept-identity";
 		return;
+	}
 
 	if (kind == Kind::Unknown) {
+		m_diagnostic += " hdr10plus=dropped-unsupported-geometry";
 		DropPlus(after, m_warning,
 			"dropped HDR10+ (geometry is not a single Scale/Crop/Pad)");
 		return;
 	}
 
 	if (kind == Kind::Pad) {
+		m_diagnostic += " hdr10plus=dropped-pad-offset";
 		DropPlus(after, m_warning,
 			"dropped HDR10+ (pad offset is not on the card)");
 		return;
@@ -239,6 +281,7 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 		const double sx = static_cast<double>(out.width) / static_cast<double>(in.width);
 		const double sy = static_cast<double>(out.height) / static_cast<double>(in.height);
 		ScaleEllipses(*plus, sx, sy);
+		m_diagnostic += std::format(" hdr10plus=remapped-scale:{:.6f}x{:.6f}", sx, sy);
 		return;
 	}
 
@@ -251,4 +294,6 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 	}
 
 	MapWindowsToOrigin(*plus, in.width, in.height, x0, y0, out.width, out.height);
+	m_diagnostic += std::format(" hdr10plus=remapped-crop:{}x{}@{},{}",
+		in.width, in.height, x0, y0);
 }

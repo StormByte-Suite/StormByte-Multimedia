@@ -187,7 +187,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `decimate=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
 			Safe::Optional<unsigned> m_cycleIn;	///< Caller cycle, or empty
 			Safe::Optional<double> m_dupIn;		///< Caller dupthresh, or empty

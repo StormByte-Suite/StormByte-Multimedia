@@ -349,10 +349,11 @@ void Degrain::PushFrame(const FFrame& source) noexcept {
 		ScoreCenter(m_state->ring.size() - 1 - RingSpan);
 }
 
-void Degrain::ScoreCenter(std::size_t index) noexcept {
-	if (index >= m_state->ring.size() || m_state->ring[index].scored)
+void Degrain::ScoreCenter(StormByte::Size index) noexcept {
+	const std::size_t center = static_cast<std::size_t>(index);
+	if (center >= m_state->ring.size() || m_state->ring[center].scored)
 		return;
-	auto& slot = m_state->ring[index];
+	auto& slot = m_state->ring[center];
 	slot.scored = true;
 	auto& row = m_state->row[slot.row];
 	if (!row.valid)
@@ -412,10 +413,10 @@ void Degrain::ScoreCenter(std::size_t index) noexcept {
 					std::array<double, 2 * RingSpan> differences{};
 					std::size_t accepted = 0;
 					std::size_t candidates = 0;
-					const std::size_t first = index > RingSpan ? index - RingSpan : 0;
-					const std::size_t last = std::min(m_state->ring.size() - 1, index + RingSpan);
+					const std::size_t first = center > RingSpan ? center - RingSpan : 0;
+					const std::size_t last = std::min(m_state->ring.size() - 1, center + RingSpan);
 					for (std::size_t neighbour = first; neighbour <= last; ++neighbour) {
-						if (neighbour == index || !m_state->row[m_state->ring[neighbour].row].valid)
+						if (neighbour == center || !m_state->row[m_state->ring[neighbour].row].valid)
 							continue;
 						++candidates;
 						const auto& other = *m_state->ring[neighbour].pic;
@@ -751,7 +752,8 @@ class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const no
 	data.emplace(StormByte::Safe::String("frames"), StormByte::Safe::String(std::to_string(m_frames)));
 	data.emplace(StormByte::Safe::String("ran"), StormByte::Safe::String(std::to_string(m_ran)));
 	data.emplace(StormByte::Safe::String("skipped"), StormByte::Safe::String(std::to_string(m_skipped)));
-	data.emplace(StormByte::Safe::String("groups"), StormByte::Safe::String(std::to_string(m_state->row.empty() ? 0 : m_group + 1)));
+	data.emplace(StormByte::Safe::String("groups"), StormByte::Safe::String(std::to_string(
+		m_state->row.empty() ? std::size_t{0} : static_cast<std::size_t>(m_group) + 1)));
 	data.emplace(StormByte::Safe::String("applied"), StormByte::Safe::String(std::to_string(m_applied)));
 	data.emplace(StormByte::Safe::String("unsupported"), StormByte::Safe::String(std::to_string(m_unsupported)));
 	data.emplace(StormByte::Safe::String("rejected"), StormByte::Safe::String(std::to_string(m_rejected)));

@@ -91,13 +91,13 @@ void Deflicker::Setup() noexcept {
 	Clean();
 }
 
-std::string Deflicker::Chain() const noexcept {
+StormByte::Safe::String Deflicker::Chain() const noexcept {
 	unsigned size = m_sizeIn.value_or(5u);
 	size = std::clamp(size, 2u, 129u);
 	std::string mode = std::string(m_modeIn.value_or(Safe::String("am")));
 	if (!ModeOk(mode))
 		mode = "am";
-	return std::format("deflicker=size={}:mode={}", size, mode);
+	return StormByte::Safe::String{std::format("deflicker=size={}:mode={}", size, mode)};
 }
 
 void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
@@ -113,7 +113,7 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

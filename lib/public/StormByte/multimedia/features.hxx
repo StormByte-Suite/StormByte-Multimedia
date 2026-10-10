@@ -124,14 +124,6 @@ namespace StormByte {
 				 */
 				operator Safe::String() const noexcept;
 
-				/**
-				 * @brief Enabled flags as caller-owned "A | B | C" text.
-				 * @return Standard string allocated in the calling module.
-				 * @note Allocation failure terminates, preserving the noexcept contract.
-				 */
-				STORMBYTE_FORCE_INLINE operator std::string() const noexcept {
-					return static_cast<std::string>(static_cast<Safe::String>(*this));
-				}
 		};
 	}
 }

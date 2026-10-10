@@ -99,7 +99,8 @@ namespace {
 			return TEST_SKIP;
 		const auto output = OutputPath(destination);
 		{
-			Plan plan{FixturePath(source), output, 2000000000LL};
+			Plan plan{StormByte::Safe::String{FixturePath(source).string()},
+				StormByte::Safe::String{output.string()}, 2000000000LL};
 			plan.add(Track{audioIndex, StormByte::Multimedia::Type::Audio});
 			Config::Subtitle config;
 			config.Codec(codec.value().get());
@@ -163,7 +164,7 @@ int test_subtitle_first_cue_after_one_hour() {
 	const auto output = OutputPath("pipeline/subtitle-header/late-first-cue.mkv");
 	{
 		auto logger = MakeLogger();
-		Transcoder job{FixturePath("subtitles/late_first_cue.srt"), output, logger, 3602000000000LL};
+			Transcoder job{TestLocation(FixturePath("subtitles/late_first_cue.srt")), TestLocation(output), logger, 3602000000000LL};
 		job.Subtitle(0).Codec(codec.value().get());
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 		job.Run();

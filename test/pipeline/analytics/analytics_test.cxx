@@ -65,7 +65,7 @@ namespace {
 static int CheckVmafRemux(std::string_view source, std::string_view destination) {
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath(source), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Filter<StormByte::Multimedia::Pipeline::Filter::Video::VMAF>(
 		logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"}, static_cast<unsigned short>(2));

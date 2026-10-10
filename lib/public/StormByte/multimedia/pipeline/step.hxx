@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/buffer/sink.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -317,7 +318,7 @@ namespace StormByte {
 					 *
 					 * Derived stages override this to specify their input limit.
 					 */
-					virtual std::size_t InputCeiling() const noexcept;
+					virtual StormByte::Size InputCeiling() const noexcept;
 
 					/**
 					 * @}

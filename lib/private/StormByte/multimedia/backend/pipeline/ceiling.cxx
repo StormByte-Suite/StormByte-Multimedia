@@ -211,15 +211,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		}
 	}
 
-	std::size_t Ceiling::Frames() const noexcept {
+	StormByte::Size Ceiling::Frames() const noexcept {
 		return m_frames;
 	}
 
-	std::size_t Ceiling::Packets() const noexcept {
+	StormByte::Size Ceiling::Packets() const noexcept {
 		return m_packets;
 	}
 
-	std::size_t Ceiling::Park() const noexcept {
+	StormByte::Size Ceiling::Park() const noexcept {
 		return m_park;
 	}
 }

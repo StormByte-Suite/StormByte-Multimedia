@@ -53,11 +53,11 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/deque.hxx>
 #include <StormByte/type_traits.hxx>
 
 #include <condition_variable>
 #include <cstdint>
-#include <deque>
 #include <mutex>
 #include <utility>
 
@@ -257,7 +257,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Detail {
 			}
 
 		private:
-			std::deque<Unit> m_units;					///< Parked units, oldest first
+			StormByte::Safe::Deque<Unit> m_units;		///< Parked units, oldest first
 			std::uint8_t m_cap = 0;						///< Set by @ref Reserve
 			std::condition_variable_any m_cv;			///< Wait / Notify
 	};

@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/buffer/sink.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/safe/atomic.hxx>

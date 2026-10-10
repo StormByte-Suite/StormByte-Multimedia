@@ -56,9 +56,9 @@
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/ffmpeg/backend_typedefs.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
-#include <filesystem>
 
 namespace StormByte::Multimedia {
 	class File;
@@ -123,7 +123,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param path Media path.
 			 * @return Context or DecoderError.
 			 */
-			static ExpectedAVFormatContext Open(const std::filesystem::path& path);
+			static ExpectedAVFormatContext Open(const Safe::String& path);
 
 			/**
 			 * @brief Opens a Consumer and finds stream info.

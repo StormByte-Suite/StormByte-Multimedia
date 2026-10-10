@@ -241,7 +241,7 @@ void Step::Stop() noexcept {
 	Wake();
 }
 
-std::size_t Step::InputCeiling() const noexcept {
+StormByte::Size Step::InputCeiling() const noexcept {
 	if (!m_plan || m_plan->Tracks().empty())
 		return 0;
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = m_plan;

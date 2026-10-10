@@ -122,7 +122,7 @@ bool Encoder::Opened() const noexcept {
 	return !Failed() && m_backend && m_backend->IsOpen();
 }
 
-std::size_t Encoder::InputCeiling() const noexcept {
+StormByte::Size Encoder::InputCeiling() const noexcept {
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
 	const auto* track = Backend::Pipeline::TrackByIn(plan, m_index);
 	if (!track && plan && m_index >= 0

@@ -53,16 +53,16 @@
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.hxx>
 #include <StormByte/multimedia/ocr/engine.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/multimedia/ocr/bitmap.hxx>
 
 #include <cctype>
 #include <cstdint>
 #include <cstdio>
-#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
-#include <vector>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -80,12 +80,7 @@ namespace {
 	constexpr std::size_t PackedAssFieldsBeforeText = 8;
 	constexpr std::int64_t FallbackCueNs = 2000000000;
 
-	struct GrayBitmap {
-		int width = 0;
-		int height = 0;
-		int stride = 0;
-		std::vector<std::uint8_t> pixels;
-	};
+	using GrayBitmap = StormByte::Multimedia::OCR::GrayBitmap;
 
 	std::string_view AfterCommas(std::string_view fields, std::size_t need) noexcept {
 		std::size_t commas = 0;
@@ -210,17 +205,17 @@ namespace {
 		return std::string(reinterpret_cast<const char*>(bytes.data() + begin), end - begin);
 	}
 
-	std::optional<GrayBitmap> ReadOcrBitmap(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	StormByte::Safe::Optional<GrayBitmap> ReadOcrBitmap(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
 		auto& pay = frame.Payload();
 		const auto n = pay.Available();
 		if (n < 12)
-			return std::nullopt;
+			return {};
 		StormByte::Safe::Binary bytes;
 		if (!pay.Peek(n, bytes) || bytes.size() < 12)
-			return std::nullopt;
+			return {};
 		const auto* p = reinterpret_cast<const std::uint8_t*>(bytes.data());
 		if (p[0] != 'O' || p[1] != 'C' || p[2] != 'R' || p[3] != '1')
-			return std::nullopt;
+			return {};
 		const auto get32 = [](const std::uint8_t* d) {
 			return static_cast<int>(d[0] | (d[1] << 8) | (d[2] << 16) | (d[3] << 24));
 		};
@@ -229,10 +224,10 @@ namespace {
 		out.height = get32(p + 8);
 		out.stride = out.width;
 		if (out.width <= 0 || out.height <= 0)
-			return std::nullopt;
+			return {};
 		const std::size_t need = static_cast<std::size_t>(out.width) * static_cast<std::size_t>(out.height);
 		if (bytes.size() < 12 + need)
-			return std::nullopt;
+			return {};
 		out.pixels.assign(p + 12, p + 12 + need);
 		return out;
 	}
@@ -331,7 +326,7 @@ bool Subtitle::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner)
 		return true;
 
 	StormByte::Multimedia::FFmpeg::AVCodecParameters params(nullptr);
-	auto opened = StormByte::Multimedia::Backend::Pipeline::Encoder::OpenCodec(
+	auto opened = StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		owner, std::move(params), FFmpeg::AVRational{1, AV_TIME_BASE}, owner.Require());
 	if (!opened)
 		return false;
@@ -358,7 +353,7 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 
 	const FFmpeg::AVRational tb = (m_timeBase.num > 0) ? m_timeBase : FFmpeg::AVRational{1, AV_TIME_BASE};
 	const StormByte::Safe::String impl = owner.Implementation().value_or(StormByte::Safe::String{});
-	std::string text = m_heldText;
+	std::string text{static_cast<std::string_view>(m_heldText)};
 
 	if (PlainTextDest(impl)) {
 		text = NewlinesFromAss(StripAssTags(text));
@@ -420,7 +415,7 @@ bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		if (!bitmap)
 			return true;
 		if (frame->Language())
-			m_ocr.Language(TessLanguage(*frame->Language()));
+			m_ocr.Language(StormByte::Safe::String{std::string_view{TessLanguage(*frame->Language())}});
 		else
 			m_ocr.Language({});
 		auto recognized = m_ocr.Recognize(
@@ -433,7 +428,7 @@ bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 			return false;
 		}
 
-		text = std::move(recognized.value());
+		text = static_cast<std::string>(recognized.value());
 		if (text.empty())
 			return true;
 	}
@@ -453,7 +448,7 @@ bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	if (owner.Failed())
 		return false;
 
-	m_heldText = std::move(text);
+	m_heldText = StormByte::Safe::String{std::string_view{text}};
 	m_heldStartNs = startNs;
 	m_heldPts = pts;
 	if (durationNs > 0)

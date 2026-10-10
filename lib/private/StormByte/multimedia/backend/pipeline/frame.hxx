@@ -52,6 +52,7 @@
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <string>
 #include <utility>
@@ -203,7 +204,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Why Content dropped extras on the last @ref Put.
 			 * @return Empty when extras were kept or remapped.
 			 */
-			const std::string& Warning() const noexcept;
+			const StormByte::Safe::String& Warning() const noexcept;
+
+			/**
+			 * @brief LowLevel details from the most recent payload replacement.
+			 * @return Empty when no replacement details were recorded.
+			 */
+			const StormByte::Safe::String& Diagnostic() const noexcept;
 
 			/**
 			 * @brief Reports whether required side data and properties survived replacement.
@@ -214,7 +221,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		private:
 			StormByte::Multimedia::FFmpeg::AVFrame m_handle;	///< FFmpeg frame
 			bool m_payloadReady = false;								///< true after Payload materialised planes
-			std::string m_warning;										///< Last Content drop reason
+			StormByte::Safe::String m_warning;									///< Last Content drop reason
+			StormByte::Safe::String m_diagnostic;								///< Last Content replacement details
 			bool m_contentValid = true;								///< Required metadata preservation status
 	};
 }

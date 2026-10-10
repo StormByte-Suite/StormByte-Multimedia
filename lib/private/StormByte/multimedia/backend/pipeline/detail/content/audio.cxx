@@ -71,15 +71,15 @@ namespace {
 		return card;
 	}
 
-	void DropSide(::AVFrame* raw, AVFrameSideDataType type, std::string& warning, const char* why) noexcept {
+	void DropSide(::AVFrame* raw, AVFrameSideDataType type, StormByte::Safe::String& warning, const char* why) noexcept {
 		if (!raw || !av_frame_get_side_data(raw, type))
 			return;
 		av_frame_remove_side_data(raw, type);
 		if (warning.empty())
-			warning = why;
+			warning = std::string_view(why);
 		else {
 			warning += "; ";
-			warning += why;
+			warning += std::string_view(why);
 		}
 	}
 }

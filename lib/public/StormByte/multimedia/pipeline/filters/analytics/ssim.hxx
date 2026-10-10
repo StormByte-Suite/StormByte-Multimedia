@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
@@ -176,7 +177,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Ceiling of the analytics input hopper.
 			 * @return Max items in the hopper. Never 0.
 			 */
-			std::size_t InputCeiling() const noexcept override {
+			StormByte::Size InputCeiling() const noexcept override {
 				return Ceiling;
 			}
 
@@ -248,7 +249,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Analytics hopper.
 			 */
-			static constexpr std::size_t Ceiling = 512;
+			static constexpr StormByte::Size Ceiling = 512;
 
 			/**
 			 * @brief SSIM window edge.

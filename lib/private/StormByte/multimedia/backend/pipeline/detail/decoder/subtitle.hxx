@@ -58,9 +58,8 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
 
-#include <memory>
-#include <optional>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder
@@ -158,7 +157,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 		private:
 			StormByte::Multimedia::FFmpeg::AVDecoder m_decoder;							///< Opened decoder
-			std::optional<StormByte::Multimedia::FFmpeg::AVSubtitle> m_pendingSub;		///< Pending AVSubtitle
+			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVSubtitle> m_pendingSub;	///< Pending AVSubtitle
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> m_heldSubtitle;		///< Held subtitle frame
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration> m_packetPts;		///< Last packet PTS
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration> m_packetDuration;	///< Last packet duration

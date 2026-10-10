@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/bitmask.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/features.hxx>
@@ -225,7 +226,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @brief Maximum number of queued input packets.
 			 * @return Packet limit, or `0` if no input queue exists.
 			 */
-			std::size_t InputCeiling() const noexcept override;
+			StormByte::Size InputCeiling() const noexcept override;
 
 			/**
 			 * @brief Flags.

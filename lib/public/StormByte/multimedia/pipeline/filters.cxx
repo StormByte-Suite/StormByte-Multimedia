@@ -125,7 +125,7 @@ namespace {
 
 Filters::Filters() noexcept = default;
 
-Filters::Handle::Handle(Filters& owner, std::size_t index) noexcept
+Filters::Handle::Handle(Filters& owner, StormByte::Size index) noexcept
 : m_owner(&owner), m_index(index) {}
 
 Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {

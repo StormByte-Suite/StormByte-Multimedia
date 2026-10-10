@@ -60,10 +60,13 @@
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/set.hxx>
 #include <StormByte/safe/vector.hxx>
+#include <StormByte/safe/wstring.hxx>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
+#include <string>
 #include <string_view>
 
 extern "C" {
@@ -192,14 +195,21 @@ FFmpeg::AVFormatContext& FFmpeg::AVFormatContext::operator=(AVFormatContext&& ot
 	return *this;
 }
 
-FFmpeg::ExpectedAVFormatContext FFmpeg::AVFormatContext::Open(const std::filesystem::path& path) {
+FFmpeg::ExpectedAVFormatContext FFmpeg::AVFormatContext::Open(const Safe::String& path) {
+#ifdef WINDOWS
+	const std::filesystem::path nativePath(static_cast<std::wstring_view>(Safe::WString{path}));
+#else
+	const std::filesystem::path nativePath(static_cast<std::string_view>(path));
+#endif
+	const auto encodedPath = nativePath.u8string();
+	const std::string filename(reinterpret_cast<const char*>(encodedPath.data()), encodedPath.size());
 	::AVFormatContext* raw_ctx = nullptr;
 	int ret;
 
 	av_log_set_level(AV_LOG_ERROR);
 
-	if ((ret = avformat_open_input(&raw_ctx, path.string().c_str(), nullptr, nullptr)) < 0)
-		return Unexpected<DecoderError>("Could not open file {}: {}", path.string(), ErrorToString(ret));
+	if ((ret = avformat_open_input(&raw_ctx, filename.c_str(), nullptr, nullptr)) < 0)
+		return Unexpected<DecoderError>("Could not open file {}: {}", filename, ErrorToString(ret));
 
 	::AVFormatContext* fmt_ctx = raw_ctx;
 

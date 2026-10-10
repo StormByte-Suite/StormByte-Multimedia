@@ -183,7 +183,7 @@ void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexce
 
 catch (...) {
 	m_contentValid = false;
-	m_warning = "failed to bind preserved frame metadata";
+	m_warning = std::string_view("failed to bind preserved frame metadata");
 }
 
 void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) noexcept {
@@ -193,6 +193,7 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 	auto content = Content::For(owner.Type());
 	content->Put(before, raw);
 	m_warning = content->Warning();
+	m_diagnostic = content->Diagnostic();
 	if (before && raw) {
 		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
 			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL}) {
@@ -205,8 +206,12 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 	BindProperties(owner);
 }
 
-const std::string& Frame::Warning() const noexcept {
+const StormByte::Safe::String& Frame::Warning() const noexcept {
 	return m_warning;
+}
+
+const StormByte::Safe::String& Frame::Diagnostic() const noexcept {
+	return m_diagnostic;
 }
 
 bool Frame::ContentValid() const noexcept {

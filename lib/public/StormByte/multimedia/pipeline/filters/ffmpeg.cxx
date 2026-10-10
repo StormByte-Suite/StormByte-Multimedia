@@ -249,7 +249,7 @@ const StormByte::Safe::Optional<StormByte::Safe::String>& FFmpeg::Error() const 
 	return m_error;
 }
 
-std::size_t FFmpeg::InputCeiling() const noexcept {
+StormByte::Size FFmpeg::InputCeiling() const noexcept {
 	if (Media() == StormByte::Multimedia::Type::Video && m_receives.Has(Kind::Frame))
 		return 27;
 	if (m_receives.Has(Kind::Frame) || m_receives.Has(Kind::Packet))
@@ -413,6 +413,8 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 	}
 	if (!frame->m_backend->Warning().empty())
 		Log(Level::Warning, frame->m_backend->Warning());
+	if (!frame->m_backend->Diagnostic().empty())
+		Log(Level::LowLevel, std::format("frame side-data{}", frame->m_backend->Diagnostic()));
 	Log(Level::LowLevel, std::format("save frame t={} {}:{}",
 		frame->Track(), frame->Serial().value_or(0), frame->Part()));
 }

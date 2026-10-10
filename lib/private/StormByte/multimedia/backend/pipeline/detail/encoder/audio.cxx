@@ -337,7 +337,7 @@ bool Audio::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	}
 
-	auto opened = StormByte::Multimedia::Backend::Pipeline::Encoder::OpenCodec(
+	auto opened = StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		owner, FillAudioParams(frame, owner.BitRate(), handle), AudioTimeBase(frame), owner.Require());
 	if (!opened)
 		return false;

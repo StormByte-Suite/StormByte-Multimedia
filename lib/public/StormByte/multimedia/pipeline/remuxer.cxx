@@ -77,7 +77,7 @@ Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) no
 
 Remuxer::~Remuxer() noexcept = default;
 
-std::size_t Remuxer::InputCeiling() const noexcept {
+StormByte::Size Remuxer::InputCeiling() const noexcept {
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
 	const auto* track = StormByte::Multimedia::Backend::Pipeline::TrackByIn(plan, m_index);
 	if (!track)

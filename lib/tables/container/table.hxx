@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <array>
@@ -74,8 +75,8 @@ namespace StormByte::Multimedia::Tables::Container {
 		std::array<const char*, 8> extensions;	///< Primary + aliases; unused slots nullptr
 		bool attachments = false;				///< Real AttachedFile (covers, fonts)
 
-		constexpr std::size_t FfmpegIdCount() const noexcept {
-			std::size_t n = 0;
+		constexpr StormByte::Size FfmpegIdCount() const noexcept {
+			StormByte::Size n = 0;
 			for (const char* id : ffmpegIds) {
 				if (!id)
 					break;
@@ -84,14 +85,14 @@ namespace StormByte::Multimedia::Tables::Container {
 			return n;
 		}
 
-		constexpr const char* FfmpegId(std::size_t index) const noexcept {
+		constexpr const char* FfmpegId(StormByte::Size index) const noexcept {
 			if (index >= FfmpegIdCount())
 				return nullptr;
 			return ffmpegIds[index];
 		}
 
-		constexpr std::size_t ExtensionCount() const noexcept {
-			std::size_t n = 0;
+		constexpr StormByte::Size ExtensionCount() const noexcept {
+			StormByte::Size n = 0;
 			for (const char* ext : extensions) {
 				if (!ext)
 					break;
@@ -100,7 +101,7 @@ namespace StormByte::Multimedia::Tables::Container {
 			return n;
 		}
 
-		constexpr const char* Extension(std::size_t index) const noexcept {
+		constexpr const char* Extension(StormByte::Size index) const noexcept {
 			if (index >= ExtensionCount())
 				return nullptr;
 			return extensions[index];

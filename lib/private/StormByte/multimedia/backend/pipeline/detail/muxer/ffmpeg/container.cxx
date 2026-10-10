@@ -575,7 +575,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			? (maxPts - minPts) / 1000 + InterleaveSlotUs : 0;
 		std::int64_t deltaUs = InterleaveDeltaUs(owner);
 		const auto capacity = owner.InputCeiling();
-		const auto depth = capacity == 0 ? 1 : capacity;
+		const StormByte::Size depth = capacity == StormByte::Size{0}
+			? StormByte::Size{1} : capacity;
 		deltaUs = std::max(deltaUs, InterleaveSlotUs * static_cast<std::int64_t>(depth));
 		deltaUs = std::max(deltaUs, spanUs);
 		m_ctx->max_interleave_delta = deltaUs;

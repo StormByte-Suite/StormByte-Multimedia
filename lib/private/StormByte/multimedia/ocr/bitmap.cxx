@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/ocr/bitmap.hxx>
+#include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -76,10 +77,10 @@ namespace StormByte::Multimedia::OCR {
 		return static_cast<std::uint8_t>(255u - y);
 	}
 
-	std::optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept {
+	StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept {
 		const auto* raw = sub.Get();
 		if (!raw)
-			return std::nullopt;
+			return {};
 
 		int width = 0;
 		int height = 0;
@@ -93,7 +94,7 @@ namespace StormByte::Multimedia::OCR {
 		}
 
 		if (width <= 0 || height <= 0)
-			return std::nullopt;
+			return {};
 
 		GrayBitmap out;
 		out.width = width;

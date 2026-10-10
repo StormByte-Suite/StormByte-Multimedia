@@ -53,10 +53,10 @@
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/ocr/exception.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
 #include <span>
-#include <string>
 #include <string_view>
 
 /**
@@ -67,7 +67,7 @@ namespace StormByte::Multimedia::OCR {
 	/**
 	 * @brief Recognized UTF-8 text, or an OCR / tessdata error.
 	 */
-	using ExpectedText = Expected<std::string, StormByte::Multimedia::Exception>;
+	using ExpectedText = Expected<StormByte::Safe::String, StormByte::Multimedia::Exception>;
 
 	/**
 	 * @class Engine
@@ -92,7 +92,7 @@ namespace StormByte::Multimedia::OCR {
 			 * @brief Constructs an engine pinned to @p language.
 			 * @param language Tesseract / tessdata key (`spa`, `eng`, …). Empty uses `eng`.
 			 */
-			explicit Engine(std::string language) noexcept;
+			explicit Engine(StormByte::Safe::String language) noexcept;
 
 			/**
 			 * @brief Move constructor.
@@ -138,13 +138,13 @@ namespace StormByte::Multimedia::OCR {
 			 * @brief Pinned language key.
 			 * @return Key as set by the caller. Empty means fallback `eng`.
 			 */
-			const std::string& Language() const noexcept;
+			const StormByte::Safe::String& Language() const noexcept;
 
 			/**
 			 * @brief Pins a language key. Reopens Tesseract on the next Recognize().
 			 * @param language Tesseract / tessdata key. Empty means fallback `eng`.
 			 */
-			void Language(std::string language) noexcept;
+			void Language(StormByte::Safe::String language) noexcept;
 
 			/**
 			 * @}
@@ -181,6 +181,6 @@ namespace StormByte::Multimedia::OCR {
 			class Impl;
 
 			StormByte::Safe::Unique<Impl> m_impl;	///< Base-owned backend session.
-			std::string m_language;			///< Caller language pin; empty uses `eng`.
+			StormByte::Safe::String m_language;	///< Caller language pin; empty uses `eng`.
 	};
 }

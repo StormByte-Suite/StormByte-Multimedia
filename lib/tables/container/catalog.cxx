@@ -49,6 +49,7 @@
  */
 
 #include <tables/container/catalog.hxx>
+#include <StormByte/safe/string.hxx>
 
 namespace StormByte::Multimedia::Tables::Container {
 	namespace {
@@ -346,12 +347,12 @@ namespace StormByte::Multimedia::Tables::Container {
 	void Catalog::Initialize() noexcept {
 		const auto identity = Identity();
 		m_byName.reserve(identity.size());
-		for (const auto& row : identity)
-			m_byName.emplace(row.name, &row);
+		for (std::size_t index = 0; index < identity.size(); ++index)
+			m_byName.emplace(StormByte::Safe::String{identity[index].name}, index);
 
 		m_compat.reserve(std::size(CompatDispatch));
-		for (const auto& item : CompatDispatch)
-			m_compat.emplace(item.name, item.rows());
+		for (std::size_t index = 0; index < std::size(CompatDispatch); ++index)
+			m_compat.emplace(StormByte::Safe::String{CompatDispatch[index].name}, index);
 	}
 
 	std::span<const ContainerDef> Catalog::All() const noexcept {
@@ -359,13 +360,16 @@ namespace StormByte::Multimedia::Tables::Container {
 	}
 
 	const ContainerDef* Catalog::Find(std::string_view name) const noexcept {
-		const auto it = m_byName.find(name);
-		return it == m_byName.end() ? nullptr : it->second;
+		const auto it = m_byName.find(StormByte::Safe::String{name});
+		const auto rows = Identity();
+		return it == m_byName.end() || it->second >= rows.size() ? nullptr : &rows[it->second];
 	}
 
 	std::span<const CompatDef> Catalog::Compat(std::string_view name) const noexcept {
-		const auto it = m_compat.find(name);
-		return it == m_compat.end() ? std::span<const CompatDef>{} : it->second;
+		const auto it = m_compat.find(StormByte::Safe::String{name});
+		return it == m_compat.end() || it->second >= std::size(CompatDispatch)
+			? std::span<const CompatDef>{}
+			: CompatDispatch[it->second].rows();
 	}
 
 	std::span<const CompatDef> Catalog::Compat(const ContainerDef& def) const noexcept {

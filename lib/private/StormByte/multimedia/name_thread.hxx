@@ -52,17 +52,15 @@
 
 #include <StormByte/system/this_thread.hxx>
 
-#include <string>
 #include <string_view>
 
 /**
  * @brief Sets the current thread name for debuggers and process tools.
- * @param name Host name. Linux keeps the first 15 bytes.
+ * @param view Host name. Linux keeps the first 15 bytes.
  */
-inline void NameThread(const std::string& name) noexcept {
-	if (name.empty())
+inline void NameThread(std::string_view view) noexcept {
+	if (view.empty())
 		return;
-	std::string_view view{name};
 #ifdef LINUX
 	view = view.substr(0, 15);
 #endif

@@ -414,7 +414,7 @@ FFmpeg::AVFrame::VideoLayout FFmpeg::AVFrame::Layout() const noexcept {
 	return VideoLayout::Unknown;
 }
 
-FFmpeg::AVFrame FFmpeg::AVFrame::DecodeImage(const std::uint8_t* data, std::size_t size,
+FFmpeg::AVFrame FFmpeg::AVFrame::DecodeImage(const std::uint8_t* data, StormByte::Size size,
 	std::string_view hint) noexcept {
 	AVFrame out;
 	out.Reset(nullptr);

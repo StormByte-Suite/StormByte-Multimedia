@@ -482,7 +482,7 @@ namespace {
 		auto encoded_frames = StormByte::Safe::MakeShared<EncodedAudit>();
 		{
 			auto logger = MakeLogger();
-			Transcoder job{FixturePath(fixture.path), output, logger, 2000000000LL};
+					Transcoder job{TestLocation(FixturePath(fixture.path)), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Video(0);
 			if (transform == Transform::Remux)
 				track.Remux();
@@ -541,7 +541,7 @@ namespace {
 			auto logger = MakeLogger();
 			const auto verification = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 				+ "-" + std::string{operation} + "-verified.mkv");
-			Transcoder job{output, verification, logger, 2000000000LL};
+					Transcoder job{TestLocation(output), TestLocation(verification), logger, 2000000000LL};
 			job.Video(0).Remux();
 			job.Filter<AuditEncodedFrames>(logger, reopened_frames);
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
@@ -562,7 +562,7 @@ namespace {
 		const auto output = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 			+ "-unsupported-" + std::string{implementation} + ".mkv");
 		auto logger = MakeLogger();
-		Transcoder job{FixturePath(fixture.path), output, logger, 2000000000LL};
+			Transcoder job{TestLocation(FixturePath(fixture.path)), TestLocation(output), logger, 2000000000LL};
 		job.Video(0).Codec(codec.value().get())
 			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{implementation});
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
@@ -731,10 +731,10 @@ int test_dovi_feature_string_conversion() {
 	const Features dovi{Feature::DOVI};
 	TEST_REQUIRE(dovi.Has(Feature::DOVI));
 	TEST_REQUIRE(!dovi.Has(Feature::HDR10));
-	TEST_REQUIRE(static_cast<std::string>(dovi) == "DOVI");
+	TEST_REQUIRE(TestView(static_cast<StormByte::Safe::String>(dovi)) == "DOVI");
 	TEST_REQUIRE(TestView(static_cast<StormByte::Safe::String>(dovi)) == "DOVI");
 	const Features combined = Feature::HDR10 | Feature::DOVI | Feature::SideData;
-	TEST_REQUIRE(static_cast<std::string>(combined) == "HDR10 | DOVI | SideData");
+	TEST_REQUIRE(TestView(static_cast<StormByte::Safe::String>(combined)) == "HDR10 | DOVI | SideData");
 	return 0;
 }
 

@@ -100,7 +100,7 @@ void Fieldmatch::Setup() noexcept {
 	Clean();
 }
 
-std::string Fieldmatch::Chain() const noexcept {
+StormByte::Safe::String Fieldmatch::Chain() const noexcept {
 	std::string order = std::string(m_orderIn.value_or(Safe::String("auto")));
 	if (!OrderOk(order))
 		order = "auto";
@@ -110,8 +110,8 @@ std::string Fieldmatch::Chain() const noexcept {
 	std::string comb = std::string(m_combIn.value_or(Safe::String("sc")));
 	if (!CombOk(comb))
 		comb = "sc";
-	return std::format("fieldmatch=order={}:mode={}:combmatch={}",
-		order, mode, comb);
+	return StormByte::Safe::String{std::format("fieldmatch=order={}:mode={}:combmatch={}",
+		order, mode, comb)};
 }
 
 void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
@@ -127,7 +127,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

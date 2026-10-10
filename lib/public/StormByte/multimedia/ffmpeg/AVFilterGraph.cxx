@@ -241,7 +241,7 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) noexcept {
 	const bool video = src.Width() > 0 && src.Height() > 0;
 	const bool same = m_ptr && m_src && m_sink && !m_closed
-		&& m_graph == graph
+		&& m_graph == StormByte::Safe::String{graph}
 		&& m_fmt == src.Format()
 		&& m_w == (video ? src.Width() : 0)
 		&& m_h == (video ? src.Height() : 0)

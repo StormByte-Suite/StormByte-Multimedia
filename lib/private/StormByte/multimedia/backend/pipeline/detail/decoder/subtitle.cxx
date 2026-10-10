@@ -59,10 +59,11 @@
 #include <StormByte/multimedia/pipeline/side_data.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/optional.hxx>
 
 #include <cstdint>
 #include <cstring>
-#include <memory>
+#include <optional>
 #include <vector>
 
 extern "C" {

@@ -75,7 +75,7 @@ namespace {
 			return TEST_SKIP;
 		{
 			auto logger = MakeLogger();
-			Transcoder job{FixturePath("video/bluray_like_hdr10.mp4"), output, logger, 2000000000LL};
+					Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mp4")), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Video(0);
 			track.Codec(codec.value().get())
 				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libvpx-vp9"})

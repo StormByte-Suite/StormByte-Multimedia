@@ -81,10 +81,11 @@ void Interpolate::Setup() noexcept {
 	Clean();
 }
 
-std::string Interpolate::Chain() const noexcept {
-	return std::format(
+
+StormByte::Safe::String Interpolate::Chain() const noexcept {
+	return StormByte::Safe::String{std::format(
 		"minterpolate=fps={}/{}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1",
-		m_num, m_den);
+		m_num, m_den)};
 }
 
 void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
@@ -104,7 +105,7 @@ void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

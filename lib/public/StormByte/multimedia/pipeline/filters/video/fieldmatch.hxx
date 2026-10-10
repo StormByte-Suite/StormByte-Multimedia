@@ -196,7 +196,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `fieldmatch=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
 			Safe::Optional<Safe::String> m_orderIn;	///< Caller order, or empty
 			Safe::Optional<Safe::String> m_modeIn;	///< Caller mode, or empty

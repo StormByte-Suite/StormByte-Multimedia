@@ -53,6 +53,7 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <string>
 
@@ -137,7 +138,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Why coupled extras were dropped, if they were.
 			 * @return Empty when extras were kept or remapped.
 			 */
-			const std::string& Warning() const noexcept;
+			const StormByte::Safe::String& Warning() const noexcept;
+
+			/**
+			 * @brief LowLevel details from the most recent payload replacement.
+			 * @return Empty when the strategy has no replacement diagnostics.
+			 */
+			const StormByte::Safe::String& Diagnostic() const noexcept;
 
 		protected:
 			/**
@@ -145,6 +152,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			Content() noexcept = default;
 
-			std::string m_warning;	///< Drop reason; empty if none
+			StormByte::Safe::String m_warning;	///< Drop reason; empty if none
+			StormByte::Safe::String m_diagnostic;	///< LowLevel replacement details
 	};
 }

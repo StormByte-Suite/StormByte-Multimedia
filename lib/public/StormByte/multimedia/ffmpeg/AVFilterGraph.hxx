@@ -53,9 +53,9 @@
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <string>
 #include <string_view>
 
 /**
@@ -209,7 +209,7 @@ namespace StormByte {
 					int m_rate = 0;				///< Cached audio sample rate.
 					int m_ch = 0;				///< Cached audio channel count.
 					std::uint64_t m_mask = 0;		///< Cached native channel mask.
-					std::string m_graph;			///< Cached filterchain.
+					StormByte::Safe::String m_graph;			///< Cached filterchain.
 					bool m_closed = false;			///< Source already closed.
 			};
 

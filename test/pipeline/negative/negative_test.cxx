@@ -73,7 +73,7 @@ template<typename Configure>
 static int CheckRejectedJob(std::string_view source, const std::filesystem::path& destination,
 	std::string_view expectedMessage, Configure configure, bool rejectDuringConfigure = false) {
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath(source), destination, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath(source)), TestLocation(destination), logger, 2000000000LL};
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	configure(job);
 	if (rejectDuringConfigure)
@@ -85,7 +85,8 @@ static int CheckRejectedJob(std::string_view source, const std::filesystem::path
 }
 
 static int CheckManualRejectsInvalidSource(std::string_view source, std::string_view destination) {
-	Plan plan{FixturePath(source), OutputPath(destination), 2000000000LL};
+	Plan plan{StormByte::Safe::String{FixturePath(source).string()},
+		StormByte::Safe::String{OutputPath(destination).string()}, 2000000000LL};
 	plan.add(Track{0, StormByte::Multimedia::Type::Video});
 	const auto check = plan.Check();
 	TEST_REQUIRE(!check);
@@ -113,7 +114,7 @@ static int CheckManualRejectsInvalidSource(std::string_view source, std::string_
 
 static int CheckTranscoderRejectsInvalidSource(std::string_view source, std::string_view destination) {
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath(source), OutputPath(destination), logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath(source)), TestLocation(OutputPath(destination)), logger, 2000000000LL};
 	TEST_REQUIRE(job.Failed());
 	const auto originalError = job.Error();
 	TEST_REQUIRE(originalError && !originalError->empty());
@@ -178,8 +179,8 @@ int test_transcoder_rejects_invalid_attachment_pattern() {
 
 int test_transcoder_rejects_missing_logger() {
 	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
-	Transcoder job{FixturePath("video/anime_like.mkv"),
-		OutputPath("pipeline/rejected-no-logger.mkv"), noLogger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath("pipeline/rejected-no-logger.mkv")), noLogger, 2000000000LL};
 	TEST_REQUIRE(job.Failed());
 	job.Run();
 	return WaitForTranscoderFailure(job, "logger is required");

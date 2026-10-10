@@ -81,7 +81,7 @@ namespace {
 		const auto output = OutputPath(destination);
 		{
 			auto logger = MakeLogger();
-			Transcoder job{FixturePath(source), output, logger, 2000000000LL};
+					Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger, 2000000000LL};
 			for (const auto& item : expected) {
 				auto track = item.Kind == StormByte::Multimedia::Type::Video ? job.Video(item.Input)
 					: item.Kind == StormByte::Multimedia::Type::Audio ? job.Audio(item.Input)
@@ -154,7 +154,7 @@ namespace {
 		}
 		TEST_REQUIRE(found);
 		auto logger = MakeLogger();
-		Transcoder job{FixturePath(source), OutputPath(destination), logger, 2000000000LL};
+			Transcoder job{TestLocation(FixturePath(source)), TestLocation(OutputPath(destination)), logger, 2000000000LL};
 		job.Video(0).Remux();
 		job.Attachments(pattern);
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
@@ -171,7 +171,7 @@ namespace {
 		const auto output = OutputPath(destination);
 		{
 			auto logger = MakeLogger();
-			Transcoder job{sourcePath, output, logger, 2000000000LL};
+					Transcoder job{TestLocation(sourcePath), TestLocation(output), logger, 2000000000LL};
 			if (audioOnly)
 				job.Audio(2).Remux();
 			else

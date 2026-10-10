@@ -50,11 +50,12 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/pointers.hxx>
 
 #include <array>
 #include <cstddef>
-#include <memory>
 
 struct AVBufferPool;
 struct AVCodecContext;
@@ -86,6 +87,13 @@ namespace StormByte::Multimedia::Backend::FFmpeg {
 			AVPool& operator=(const AVPool& other) = delete;
 
 			/**
+			 * @brief Creates the native per-plane pools for a validated layout.
+			 * @param key Layout identity.
+			 * @param sizes Per-plane sizes including decoder overread padding.
+			 */
+			AVPool(std::array<int, 8> key, const std::array<std::size_t, 4>& sizes) noexcept;
+
+			/**
 			 * @brief Releases cached buffers, deferring live-buffer release to FFmpeg.
 			 */
 			~AVPool() noexcept;
@@ -98,7 +106,7 @@ namespace StormByte::Multimedia::Backend::FFmpeg {
 			 * @note The synchronized registry holds weak references only. All participating
 			 * decoders and callback providers must remain in a loaded Multimedia module.
 			 */
-			static std::shared_ptr<AVPool> For(::AVCodecContext& context, const ::AVFrame& frame) noexcept;
+			static StormByte::Safe::Shared<AVPool> For(::AVCodecContext& context, const ::AVFrame& frame) noexcept;
 
 			/**
 			 * @brief Acquires independent native buffers for an empty video frame.
@@ -126,13 +134,6 @@ namespace StormByte::Multimedia::Backend::FFmpeg {
 			 * @brief Format, aligned width/height, four strides and allocation alignment.
 			 */
 			using Key = std::array<int, 8>;
-
-			/**
-			 * @brief Creates the native per-plane pools for a validated layout.
-			 * @param key Layout identity.
-			 * @param sizes Per-plane sizes including decoder overread padding.
-			 */
-			AVPool(Key key, const std::array<std::size_t, 4>& sizes) noexcept;
 
 			/**
 			 * @brief Thread-safe FFmpeg allocation callback.

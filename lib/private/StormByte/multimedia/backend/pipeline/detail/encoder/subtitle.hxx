@@ -61,9 +61,9 @@
 #include <StormByte/safe/deque.hxx>
 #include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder
@@ -192,7 +192,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			StormByte::Multimedia::OCR::Engine m_ocr;										///< Bitmap OCR
 			int m_index;																	///< Encoder::Index after Open
 			bool m_flushed;																	///< Flush already called
-			std::string m_heldText;															///< OCR/text of the open PGS show packet
+			StormByte::Safe::String m_heldText;											///< OCR/text of the open PGS show packet
 			std::int64_t m_heldStartNs;														///< Start of m_heldText in nanoseconds
 			std::int64_t m_heldPts;															///< PTS ticks of m_heldText in AV_TIME_BASE
 	};

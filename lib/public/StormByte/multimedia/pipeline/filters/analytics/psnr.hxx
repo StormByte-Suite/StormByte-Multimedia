@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
@@ -180,7 +181,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * Must exceed encoder delay or the first distorted
 			 * look cannot arrive. Does not cap the park FIFOs.
 			 */
-			std::size_t InputCeiling() const noexcept override {
+			StormByte::Size InputCeiling() const noexcept override {
 				return Ceiling;
 			}
 
@@ -259,7 +260,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Analytics input hopper ceiling.
 			 */
-			static constexpr std::size_t Ceiling = 512;
+			static constexpr StormByte::Size Ceiling = 512;
 
 			/**
 			 * @brief Finite PSNR when MSE is zero.

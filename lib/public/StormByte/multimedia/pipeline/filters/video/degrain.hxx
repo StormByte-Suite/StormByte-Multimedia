@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
@@ -286,7 +287,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Fill one measurement row from ring slot @p idx using up to five neighbours each side.
 			 * @param idx Index in the provider-owned ring. No-op if already scored or tiny.
 			 */
-			void ScoreCenter(std::size_t idx) noexcept;
+			void ScoreCenter(StormByte::Size idx) noexcept;
 
 			/**
 			 * @brief Score every remaining slot so the last 5 frames are not silent.
@@ -331,7 +332,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			Safe::Optional<double> m_capIn;		///< Caller ceiling, or empty for 4.0.
 			Safe::Unique<State> m_state;		///< Base-heap state constructed and destroyed only by the provider.
-			std::size_t m_group = 0;		///< Current continuity group.
+			StormByte::Size m_group = 0;		///< Current continuity group.
 			unsigned m_frames = 0;			///< Measurement inputs seen, including rejected inputs.
 			bool m_voted = false;			///< Measurement finalized.
 			double m_sigmaMin = 0.0;		///< Minimum nonzero regional target.

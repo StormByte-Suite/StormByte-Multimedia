@@ -289,7 +289,7 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	}
 
-	auto opened = StormByte::Multimedia::Backend::Pipeline::Encoder::OpenCodec(
+	auto opened = StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		owner, std::move(params), VideoTimeBase(frame), need, handle);
 	if (!opened)
 		return false;

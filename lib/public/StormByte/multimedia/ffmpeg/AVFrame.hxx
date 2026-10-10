@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/buffer/typedefs.hxx>
 #include <StormByte/multimedia/ffmpeg/AVChannelLayout.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
@@ -389,7 +390,7 @@ namespace StormByte {
 					 * @ref StormByte::Multimedia::FFmpeg::AVFrame::ScaleTo for RGBA / GRAY8.
 					 * @p data must remain valid for the duration of the call.
 					 */
-					static AVFrame DecodeImage(const std::uint8_t* data, std::size_t size,
+					static AVFrame DecodeImage(const std::uint8_t* data, StormByte::Size size,
 						std::string_view hint = {}) noexcept;
 
 					/**

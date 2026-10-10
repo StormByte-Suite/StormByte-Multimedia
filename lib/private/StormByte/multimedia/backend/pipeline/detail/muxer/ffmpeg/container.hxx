@@ -60,12 +60,12 @@
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/deque.hxx>
+#include <StormByte/safe/map.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <deque>
-#include <map>
-#include <optional>
-#include <string>
 
 /**
  * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg
@@ -75,6 +75,33 @@
  */
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	using StormByte::Multimedia::FFmpeg::AVRational;
+	/**
+	 * @class Track
+	 * @brief Reserved output slot for an encoder or a remux track.
+	 */
+	class Track {
+		public:
+			StormByte::Multimedia::Pipeline::Encoder* encoder = nullptr;	///< Live encoder. Null on remux
+			int inIndex = -1;										///< Source stream index if remux
+			::AVCodecParameters* params = nullptr;							///< Cloned remux codecpar
+			AVRational srcTb{0, 1};										///< Source time base if remux
+			int avIndex = -1;										///< Index in AVFormatContext
+			AVRational timeBase{0, 1};									///< Mux time base
+			std::int64_t lastDts = StormByte::Multimedia::FFmpeg::NoPts;	///< Last written DTS
+			StormByte::Safe::Optional<StormByte::Safe::String> language;	///< Header language
+			StormByte::Safe::Optional<StormByte::Safe::String> title;		///< Header title
+	};
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg::Track);
+
+/**
+ * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg
+ * @brief Generic libavformat output mux backend.
+ *
+ * @ingroup multimedia_pipeline
+ */
+namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 	/**
 	 * @class Container
@@ -192,22 +219,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			void Close() noexcept override;
 
 		private:
-			/**
-			 * @class Track
-			 * @brief Reserved output slot for an encoder or a remux track.
-			 */
-			class Track {
-				public:
-					StormByte::Multimedia::Pipeline::Encoder* encoder = nullptr;	///< Live encoder. Null on remux
-					int inIndex = -1;												///< Source stream index if remux
-					::AVCodecParameters* params = nullptr;							///< Cloned remux codecpar
-					AVRational srcTb{0, 1};											///< Source time base if remux
-					int avIndex = -1;												///< Index in AVFormatContext
-					AVRational timeBase{0, 1};										///< Mux time base
-					std::int64_t lastDts = StormByte::Multimedia::FFmpeg::NoPts;	///< Last written DTS
-					StormByte::Safe::Optional<StormByte::Safe::String> language;	///< Header language
-					StormByte::Safe::Optional<StormByte::Safe::String> title;		///< Header title
-			};
 
 			/**
 			 * @brief Maps a packet track onto an output slot.
@@ -239,10 +250,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 			const Policy* m_policy = nullptr;						///< Borrowed immutable format policy with process lifetime.
 			::AVFormatContext* m_ctx;									///< Output format context
-			std::optional<StormByte::Multimedia::Backend::FileAvio> m_avio;	///< Writer AVIO
-			std::map<int, Track> m_tracks;								///< Output index → track
-			std::map<int, int> m_inToOut;								///< Source index → output index
-			std::deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_queue;	///< Packets waiting for header
+			StormByte::Safe::Optional<StormByte::Multimedia::Backend::FileAvio> m_avio;	///< Writer AVIO
+			StormByte::Safe::Map<int, Track> m_tracks;								///< Output index → track
+			StormByte::Safe::Map<int, int> m_inToOut; 								///< Source stream index → reserved output slot
+			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_queue;	///< Packets waiting for header
 			StormByte::Multimedia::Attachments m_attachments;			///< Header catalogue
 			bool m_header;												///< avformat_write_header done
 			bool m_trailer;												///< av_write_trailer done

@@ -93,31 +93,33 @@ namespace {
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
 		auto logger = MakeLogger();
-		Transcoder job{input, output, logger, 2000000000LL};
-		auto track = job.Video(0);
-		track.Codec(codec.value().get())
-			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});
-		if (!decoder.empty())
-			track.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{decoder});
-		track.Filter<Filter::Video::Scale>(logger, 320u, 192u);
-		if (encoder == "libsvtav1")
-			track.Preset(StormByte::Safe::String{"12"}).CRF(40);
-		else if (encoder == "libx264" || encoder == "libx265")
-			track.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
-		else if (encoder == "libaom-av1" || encoder == "libvpx" || encoder == "libvpx-vp9") {
-			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
-			options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
-			if (encoder != "libaom-av1")
-				options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
-			track.FineTune(std::move(options)).BitRate(500000);
+		{
+					Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+			auto track = job.Video(0);
+			track.Codec(codec.value().get())
+				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});
+			if (!decoder.empty())
+				track.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{decoder});
+			track.Filter<Filter::Video::Scale>(logger, 320u, 192u);
+			if (encoder == "libsvtav1")
+				track.Preset(StormByte::Safe::String{"12"}).CRF(40);
+			else if (encoder == "libx264" || encoder == "libx265")
+				track.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
+			else if (encoder == "libaom-av1" || encoder == "libvpx" || encoder == "libvpx-vp9") {
+				StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+				options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+				if (encoder != "libaom-av1")
+					options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
+				track.FineTune(std::move(options)).BitRate(500000);
+			}
+			else
+				track.BitRate(500000);
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			const int result = WaitForOptionalCodec(job);
+			if (result != 0)
+				return result;
 		}
-		else
-			track.BitRate(500000);
-		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
-		job.Run();
-		const int result = WaitForOptionalCodec(job);
-		if (result != 0)
-			return result;
 		return CheckVideoOutput(output, containerName, codecName);
 	}
 

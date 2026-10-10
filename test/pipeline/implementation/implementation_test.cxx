@@ -78,7 +78,7 @@ static int CheckTranscoderDecoderPin(std::string_view pin, std::string_view dest
 	TEST_REQUIRE(codec && codec.value().get().HasAccess(Access{Operation::Write}));
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_stereo.wav"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(codec.value().get())
 		.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{pin})
 		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"ac3"});
@@ -95,7 +95,8 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 	auto codec = Registry::Instance().FindCodec("AC-3");
 	TEST_REQUIRE(codec && codec.value().get().HasAccess(Access{Operation::Write}));
 	const auto output = OutputPath(destination);
-	Plan plan{FixturePath("audio/noise_stereo.wav"), output, 2000000000LL};
+	Plan plan{StormByte::Safe::String{FixturePath("audio/noise_stereo.wav").string()},
+		StormByte::Safe::String{output.string()}, 2000000000LL};
 	Config::Audio audio;
 	audio.Codec(codec.value().get());
 	Config::Implementation implementation;
@@ -147,7 +148,8 @@ static int CheckImmediatePlanBinding() {
 	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
 	const auto output = OutputPath("pipeline/immediate-plan-binding.mka");
 	for (int attempt = 0; attempt < 16; ++attempt) {
-		Plan plan{FixturePath("audio/noise_stereo.wav"), output, 2000000000LL};
+		Plan plan{StormByte::Safe::String{FixturePath("audio/noise_stereo.wav").string()},
+			StormByte::Safe::String{output.string()}, 2000000000LL};
 		Config::Audio audio;
 		plan.add(Track{0, std::move(audio)});
 		TEST_REQUIRE(plan.Check());

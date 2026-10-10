@@ -50,10 +50,14 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <tables/container/table.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/unordered_map.hxx>
 
+#include <cstddef>
+#include <span>
 #include <string_view>
-#include <unordered_map>
 
 /**
  * @namespace StormByte::Multimedia::Tables::Container
@@ -106,21 +110,11 @@ namespace StormByte::Multimedia::Tables::Container {
 			std::span<const CompatDef> Compat(const ContainerDef& def) const noexcept;
 
 		private:
-			struct NameHash {
-				using is_transparent = void;
-				std::size_t operator()(std::string_view s) const noexcept {
-					return std::hash<std::string_view>{}(s);
-				}
-				std::size_t operator()(const char* s) const noexcept {
-					return std::hash<std::string_view>{}(s ? std::string_view{s} : std::string_view{});
-				}
-			};
-
 			Catalog() noexcept;
 
 			void Initialize() noexcept;
 
-			std::unordered_map<std::string_view, const ContainerDef*, NameHash, std::equal_to<>> m_byName;
-			std::unordered_map<std::string_view, std::span<const CompatDef>, NameHash, std::equal_to<>> m_compat;
+			StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_byName;	///< Name → identity row index.
+			StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_compat;	///< Name → compatibility dispatch index.
 	};
 }

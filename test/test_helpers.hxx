@@ -51,6 +51,7 @@
 #pragma once
 
 #include <StormByte/safe/string.hxx>
+#include <StormByte/safe/wstring.hxx>
 
 #include <filesystem>
 #include <iostream>
@@ -118,6 +119,21 @@ inline std::filesystem::path OutputPath(std::string_view relativePath) {
 		return {};
 	}
 	return path;
+}
+
+/**
+ * @brief Converts a native test path to the UTF-8 path type used by Multimedia APIs.
+ * @param path Native filesystem path.
+ * @return UTF-8 safe string.
+ */
+inline StormByte::Safe::String TestLocation(const std::filesystem::path& path) {
+#ifdef WINDOWS
+	return StormByte::Safe::String{StormByte::Safe::WString{std::wstring_view{path.native()}}};
+#else
+	const auto encoded = path.u8string();
+	return StormByte::Safe::String{std::string_view{
+		reinterpret_cast<const char*>(encoded.data()), encoded.size()}};
+#endif
 }
 
 /** @brief Returns a view of a Base-owned UTF-8 string for fixed-value assertions. */

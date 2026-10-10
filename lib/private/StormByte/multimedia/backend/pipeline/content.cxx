@@ -74,6 +74,10 @@ StormByte::Safe::Unique<Content> Content::For(Type type) noexcept {
 	return StormByte::Safe::MakeUnique<Passthrough>();
 }
 
-const std::string& Content::Warning() const noexcept {
+const StormByte::Safe::String& Content::Warning() const noexcept {
 	return m_warning;
+}
+
+const StormByte::Safe::String& Content::Diagnostic() const noexcept {
+	return m_diagnostic;
 }

@@ -96,10 +96,10 @@ void Bm3d::Latch(int width, int height) noexcept {
 		width, height, m_sigma, m_group, m_range, m_bstep, uhd));
 }
 
-std::string Bm3d::Chain() const noexcept {
-	return std::format(
+StormByte::Safe::String Bm3d::Chain() const noexcept {
+	return StormByte::Safe::String{std::format(
 		"bm3d=sigma={}:block=4:bstep={}:group={}:range={}:estim=basic",
-		m_sigma, m_bstep, m_group, m_range);
+		m_sigma, m_bstep, m_group, m_range)};
 }
 
 void Bm3d::Process(const Pipeline::Frame& frame) noexcept {
@@ -114,7 +114,7 @@ void Bm3d::Process(const Pipeline::Frame& frame) noexcept {
 	if (!m_latched)
 		Latch(src.Width(), src.Height());
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

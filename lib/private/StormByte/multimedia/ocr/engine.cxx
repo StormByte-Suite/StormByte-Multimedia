@@ -96,9 +96,9 @@ namespace StormByte::Multimedia::OCR {
 			 * fallback to another language when the requested model is missing.
 			 */
 			bool Open(std::string_view language) noexcept {
-				const std::string key = language.empty()
-					? std::string(FallbackLanguage)
-					: std::string(language);
+				const StormByte::Safe::String key = language.empty()
+					? StormByte::Safe::String{FallbackLanguage}
+					: StormByte::Safe::String{language};
 				if (m_open && m_openLanguage == key)
 					return true;
 
@@ -132,25 +132,25 @@ namespace StormByte::Multimedia::OCR {
 			}
 
 			tesseract::TessBaseAPI m_api;	///< Tesseract API.
-			std::string m_openLanguage;		///< Language passed to the last successful Init.
+			StormByte::Safe::String m_openLanguage;	///< Language passed to the last successful Init.
 			bool m_open = false;			///< true after a successful Init.
 	};
 
 	Engine::Engine() noexcept
 	: m_impl(StormByte::Safe::MakeUnique<Impl>()) {}
 
-	Engine::Engine(std::string language) noexcept
+	Engine::Engine(StormByte::Safe::String language) noexcept
 	: m_impl(StormByte::Safe::MakeUnique<Impl>()), m_language(std::move(language)) {}
 
 	Engine::Engine(Engine&&) noexcept = default;
 	Engine::~Engine() noexcept = default;
 	Engine& Engine::operator=(Engine&&) noexcept = default;
 
-	const std::string& Engine::Language() const noexcept {
+	const StormByte::Safe::String& Engine::Language() const noexcept {
 		return m_language;
 	}
 
-	void Engine::Language(std::string language) noexcept {
+	void Engine::Language(StormByte::Safe::String language) noexcept {
 		if (m_language == language)
 			return;
 		m_language = std::move(language);
@@ -169,15 +169,19 @@ namespace StormByte::Multimedia::OCR {
 			return Unexpected<OCRException>("invalid OCR image");
 		if (!m_impl->Open(m_language)) {
 			if (!m_language.empty())
-				return Unexpected<TessDataNotFoundException>(m_language);
-			return Unexpected<TessDataNotFoundException>(std::string(FallbackLanguage));
+				return std::unexpected<StormByte::Safe::Shared<StormByte::Multimedia::Exception>>(
+					StormByte::Safe::Shared<StormByte::Multimedia::Exception>::MakePointer<TessDataNotFoundException>(
+						static_cast<std::string_view>(m_language)));
+			return std::unexpected<StormByte::Safe::Shared<StormByte::Multimedia::Exception>>(
+				StormByte::Safe::Shared<StormByte::Multimedia::Exception>::MakePointer<TessDataNotFoundException>(
+					FallbackLanguage));
 		}
 
 		m_impl->m_api.SetImage(gray.data(), width, height, 1, stride);
 		char* raw = m_impl->m_api.GetUTF8Text();
 		if (!raw)
 			return Unexpected<OCRException>("tesseract returned no text");
-		std::string text(raw);
+		StormByte::Safe::String text(raw);
 		delete[] raw;
 		while (!text.empty() && (text.back() == '\n' || text.back() == '\r' || text.back() == ' '))
 			text.pop_back();

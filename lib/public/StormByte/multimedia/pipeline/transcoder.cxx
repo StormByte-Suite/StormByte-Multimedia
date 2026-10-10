@@ -66,7 +66,6 @@
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/unique_lock.hxx>
-#include <StormByte/safe/wstring.hxx>
 
 #include <algorithm>
 #include <limits>
@@ -84,19 +83,14 @@ using namespace StormByte::Multimedia::Pipeline;
 namespace {
 	constexpr std::size_t InvalidSlot = std::numeric_limits<std::size_t>::max();
 
-	StormByte::Safe::String LocationText(const std::filesystem::path& path) {
-		const auto native = path.wstring();
-		return StormByte::Safe::String{StormByte::Safe::WString{std::wstring_view{native}}};
-	}
-
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> LocalReader(
-		const std::filesystem::path& path) {
-		return StormByte::Multimedia::Backend::MakeLocalFileReader(LocationText(path));
+		const StormByte::Safe::String& path) {
+		return StormByte::Multimedia::Backend::MakeLocalFileReader(path);
 	}
 
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> LocalWriter(
-		const std::filesystem::path& path) {
-		return StormByte::Multimedia::Backend::MakeLocalFileWriter(LocationText(path));
+		const StormByte::Safe::String& path) {
+		return StormByte::Multimedia::Backend::MakeLocalFileWriter(path);
 	}
 
 	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
@@ -173,7 +167,7 @@ StormByte::Safe::String TrackSettled::ToString() const {
 	return StormByte::Safe::String{std::string_view{text}};
 }
 
-Transcoder::Track::Track(Transcoder& owner, std::size_t slot) noexcept
+Transcoder::Track::Track(Transcoder& owner, StormByte::Size slot) noexcept
 : m_owner(&owner), m_slot(slot) {}
 
 Transcoder::Track& Transcoder::Track::Remux() noexcept {
@@ -299,13 +293,13 @@ Transcoder::Track& Transcoder::Track::Title(StormByte::Safe::String title) {
 	return *this;
 }
 
-Transcoder::Transcoder(const std::filesystem::path& source,
-	const std::filesystem::path& destination,
+Transcoder::Transcoder(const StormByte::Safe::String& source,
+	const StormByte::Safe::String& destination,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
-Transcoder::Transcoder(const std::filesystem::path& source,
+Transcoder::Transcoder(const StormByte::Safe::String& source,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
@@ -313,7 +307,7 @@ Transcoder::Transcoder(const std::filesystem::path& source,
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-	const std::filesystem::path& destination,
+	const StormByte::Safe::String& destination,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 	: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger), std::move(duration)) {}
@@ -366,11 +360,11 @@ void Transcoder::Fail(std::string_view reason) noexcept {
 	JobLog(m_logger, Level::Error, m_backend->Error.value());
 }
 
-bool Transcoder::ValidSlot(std::size_t slot) const noexcept {
+bool Transcoder::ValidSlot(StormByte::Size slot) const noexcept {
 	return m_backend && slot < m_backend->Mapped.size();
 }
 
-void Transcoder::AttachFilter(std::size_t slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
+void Transcoder::AttachFilter(StormByte::Size slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!ValidSlot(slot) || !filter)
 		return;
 	m_backend->Mapped[slot].Filters.push_back(std::move(filter));

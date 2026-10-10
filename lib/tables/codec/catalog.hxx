@@ -52,9 +52,12 @@
 
 #include <tables/codec/table.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
+#include <StormByte/safe/unordered_map.hxx>
 
+#include <cstdint>
+#include <span>
 #include <string_view>
-#include <unordered_map>
 
 /**
  * @namespace StormByte::Multimedia::Tables::Codec
@@ -102,23 +105,6 @@ namespace StormByte::Multimedia::Tables::Codec {
 
 		private:
 			/**
-			 * @struct NameHash
-			 * @brief Transparent hasher for string_view keys.
-			 */
-			struct NameHash {
-				using is_transparent = void;	///< Heterogeneous lookup
-
-				/**
-				 * @brief Hashes a view.
-				 * @param view Key.
-				 * @return Hash.
-				 */
-				std::size_t operator()(std::string_view view) const noexcept {
-					return std::hash<std::string_view>{}(view);
-				}
-			};
-
-			/**
 			 * @brief Builds the name maps.
 			 */
 			Catalog() noexcept;
@@ -135,7 +121,7 @@ namespace StormByte::Multimedia::Tables::Codec {
 			 */
 			void Index(Type type, std::span<const CodecDef> table) noexcept;
 
-			std::unordered_map<std::string_view, const CodecDef*, NameHash, std::equal_to<>> m_byName;	///< Name / FFmpeg id → row
-			std::unordered_map<std::string_view, Type, NameHash, std::equal_to<>> m_kind;			///< StormByte name → kind
+			StormByte::Safe::UnorderedMap<StormByte::Safe::String, std::uint64_t> m_byName;	///< Name / FFmpeg id → packed type and row index
+			StormByte::Safe::UnorderedMap<StormByte::Safe::String, Type> m_kind;			///< StormByte name → kind
 	};
 }

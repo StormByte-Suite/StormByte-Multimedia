@@ -50,11 +50,11 @@
 
 #pragma once
 
-#include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
+#include <StormByte/multimedia/ffmpeg/fwd.hxx>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/vector.hxx>
 
 #include <cstdint>
-#include <optional>
-#include <vector>
 
 /**
  * @namespace StormByte::Multimedia::OCR
@@ -66,16 +66,25 @@ namespace StormByte::Multimedia::OCR {
 	 * @brief Packed 8-bit grayscale cue for Tesseract.
 	 */
 	struct GrayBitmap {
-		std::vector<std::uint8_t> pixels;	///< Row-major gray samples.
+		StormByte::Safe::Vector<std::uint8_t> pixels;	///< Row-major gray samples.
 		int width = 0;						///< Width in pixels.
 		int height = 0;						///< Height in pixels.
 		int stride = 0;						///< Bytes per row.
 	};
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::OCR::GrayBitmap);
+
+/**
+ * @namespace StormByte::Multimedia::OCR
+ * @brief Private Tesseract OCR helpers.
+ */
+namespace StormByte::Multimedia::OCR {
 
 	/**
 	 * @brief Renders paletted FFmpeg bitmap rects to dark-on-light gray.
 	 * @param sub Decoded AVSubtitle (PGS / DVD).
 	 * @return Image, or empty when there is no bitmap rect.
 	 */
-	std::optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept;
+	StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept;
 }

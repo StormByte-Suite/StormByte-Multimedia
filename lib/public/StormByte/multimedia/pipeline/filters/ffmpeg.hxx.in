@@ -38,6 +38,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
@@ -418,7 +419,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * The limit follows the job's configured buffering policy.
 			 * The filter must be attached to a job before use.
 			 */
-			virtual std::size_t InputCeiling() const noexcept;
+			virtual StormByte::Size InputCeiling() const noexcept;
 
 			/**
 			 * @}

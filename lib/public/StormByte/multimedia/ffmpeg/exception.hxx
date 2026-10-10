@@ -51,8 +51,8 @@
 #pragma once
 
 #include <StormByte/multimedia/exception.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <string>
 #include <string_view>
 #include <utility>
 
@@ -87,7 +87,11 @@ namespace StormByte {
 					template <typename... Args>
 					Exception(std::string_view component, std::format_string<Args...> fmt, Args&&... args):
 						Multimedia::Exception(
-							std::string{"AV."}.append(component), fmt, std::forward<Args>(args)...) {}
+							[component] {
+								StormByte::Safe::String path{"AV."};
+								path += component;
+								return path;
+							}(), fmt, std::forward<Args>(args)...) {}
 
 					/**
 					 * @brief Constructs from a preformatted message (`Unexpected<E>(fmt, …)`).

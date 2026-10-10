@@ -84,12 +84,12 @@ void Decimate::Setup() noexcept {
 	Clean();
 }
 
-std::string Decimate::Chain() const noexcept {
+StormByte::Safe::String Decimate::Chain() const noexcept {
 	unsigned cycle = std::clamp(m_cycleIn.value_or(5u), 2u, 25u);
 	const double dup = std::clamp(m_dupIn.value_or(1.1), 0.0, 100.0);
 	const double sc = std::clamp(m_scIn.value_or(15.0), 0.0, 100.0);
-	return std::format("decimate=cycle={}:dupthresh={}:scthresh={}",
-		cycle, dup, sc);
+	return StormByte::Safe::String{std::format("decimate=cycle={}:dupthresh={}:scthresh={}",
+		cycle, dup, sc)};
 }
 
 void Decimate::Process(const Pipeline::Frame& frame) noexcept {
@@ -105,7 +105,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const std::string chain = Chain();
+	const StormByte::Safe::String chain = Chain();
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain);
 		if (!opened) {

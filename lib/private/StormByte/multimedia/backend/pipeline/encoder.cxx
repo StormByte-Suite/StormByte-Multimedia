@@ -275,9 +275,11 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 		std::move(holder));
 }
 
-std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipeline::Encoder& owner,
+StormByte::Safe::Optional<StormByte::Multimedia::Backend::Pipeline::Encoder::Opened>
+StormByte::Multimedia::Backend::Pipeline::OpenCodec(
+	StormByte::Multimedia::Pipeline::Encoder& owner,
 	StormByte::Multimedia::FFmpeg::AVCodecParameters params,
-	AVRational timeBase,
+	StormByte::Multimedia::FFmpeg::AVRational timeBase,
 	Features need, const FFmpeg::AVFrame* firstFrame) noexcept {
 	if (!owner.Destination().HasAccess(Operation::Write)) {
 		owner.Fail("codec is not writable");
@@ -510,7 +512,7 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		return std::nullopt;
 	}
 
-	Opened out{std::move(opened.value()), timeBase, {}, {}};
+	Encoder::Opened out{std::move(opened.value()), timeBase, {}, {}};
 	auto tb = out.Handle().TimeBase();
 	if (tb.num <= 0 || tb.den <= 0)
 		tb = timeBase;

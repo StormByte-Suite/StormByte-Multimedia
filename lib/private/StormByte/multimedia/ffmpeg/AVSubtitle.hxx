@@ -51,20 +51,16 @@
 #pragma once
 
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
+#include <StormByte/multimedia/ocr/bitmap.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <optional>
 #include <string_view>
 
 namespace StormByte::Multimedia::FFmpeg {
 	class AVSubtitle;
-}
-
-namespace StormByte::Multimedia::OCR {
-	struct GrayBitmap;
-	std::optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept;
 }
 
 /**
@@ -162,7 +158,7 @@ namespace StormByte::Multimedia::FFmpeg {
 
 			friend class AVDecoder;
 			friend class AVEncoder;
-			friend std::optional<StormByte::Multimedia::OCR::GrayBitmap>
+			friend StormByte::Safe::Optional<StormByte::Multimedia::OCR::GrayBitmap>
 				StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
 	};
 }

@@ -318,14 +318,6 @@ namespace StormByte {
 					 */
 					operator StormByte::Safe::String() const;
 
-					/**
-					 * @brief Formats a snapshot as STL text in the caller's runtime.
-					 * @return Single line allocated on the caller's heap.
-					 */
-					STORMBYTE_FORCE_INLINE operator std::string() const {
-						return static_cast<std::string>(static_cast<StormByte::Safe::String>(*this));
-					}
-
 				private:
 					/**
 					 * @brief Allows the source stage to update progress.

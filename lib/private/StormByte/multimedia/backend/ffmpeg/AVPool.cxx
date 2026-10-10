@@ -70,7 +70,7 @@ using namespace StormByte::Multimedia::Backend::FFmpeg;
 namespace {
 	struct DecoderPool {
 		std::mutex mutex;
-		std::shared_ptr<AVPool> pool;
+		StormByte::Safe::Shared<AVPool> pool;
 	};
 }
 
@@ -90,7 +90,7 @@ AVPool::~AVPool() noexcept {
 		av_buffer_pool_uninit(&pool);
 }
 
-std::shared_ptr<AVPool> AVPool::For(::AVCodecContext& context, const ::AVFrame& frame) noexcept {
+StormByte::Safe::Shared<AVPool> AVPool::For(::AVCodecContext& context, const ::AVFrame& frame) noexcept {
 	if (frame.width <= 0 || frame.height <= 0
 		|| av_image_check_size(frame.width, frame.height, 0, &context) < 0)
 		return {};
@@ -137,7 +137,7 @@ std::shared_ptr<AVPool> AVPool::For(::AVCodecContext& context, const ::AVFrame& 
 	const Key key{frame.format, width, height, strides[0], strides[1], strides[2], strides[3], alignment};
 	try {
 		static std::mutex mutex;
-		static std::map<Key, std::weak_ptr<AVPool>> registry;
+		static std::map<Key, StormByte::Safe::Weak<AVPool>> registry;
 		std::lock_guard lock(mutex);
 		for (auto entry = registry.begin(); entry != registry.end();) {
 			if (entry->second.expired())
@@ -149,7 +149,7 @@ std::shared_ptr<AVPool> AVPool::For(::AVCodecContext& context, const ::AVFrame& 
 			if (auto pool = found->second.lock())
 				return pool;
 		}
-		std::shared_ptr<AVPool> pool(new AVPool(key, sizes));
+		auto pool = StormByte::Safe::Shared<AVPool>::MakePointer<AVPool>(key, sizes);
 		if (!pool->m_valid)
 			return {};
 		registry[key] = pool;

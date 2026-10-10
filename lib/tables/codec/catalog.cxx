@@ -49,6 +49,9 @@
  */
 
 #include <tables/codec/catalog.hxx>
+#include <StormByte/safe/string.hxx>
+
+#include <cstdint>
 
 namespace StormByte::Multimedia::Tables::Codec {
 	const Catalog& Catalog::Instance() noexcept {
@@ -61,11 +64,14 @@ namespace StormByte::Multimedia::Tables::Codec {
 	}
 
 	void Catalog::Index(Type type, std::span<const CodecDef> table) noexcept {
-		for (const auto& row : table) {
-			m_byName.emplace(row.name, &row);
-			m_kind.emplace(row.name, type);
+		for (std::size_t index = 0; index < table.size(); ++index) {
+			const auto& row = table[index];
+			const std::uint64_t reference = (static_cast<std::uint64_t>(static_cast<std::uint32_t>(type)) << 32)
+				| static_cast<std::uint32_t>(index);
+			m_byName.emplace(StormByte::Safe::String{row.name}, reference);
+			m_kind.emplace(StormByte::Safe::String{row.name}, type);
 			for (std::size_t i = 0; i < row.FfmpegIdCount(); ++i)
-				m_byName.emplace(row.FfmpegId(i), &row);
+				m_byName.emplace(StormByte::Safe::String{row.FfmpegId(i)}, reference);
 		}
 	}
 
@@ -87,12 +93,17 @@ namespace StormByte::Multimedia::Tables::Codec {
 	}
 
 	const CodecDef* Catalog::Find(std::string_view name) const noexcept {
-		const auto it = m_byName.find(name);
-		return it == m_byName.end() ? nullptr : it->second;
+		const auto it = m_byName.find(StormByte::Safe::String{name});
+		if (it == m_byName.end())
+			return nullptr;
+		const auto type = static_cast<Type>(static_cast<std::uint32_t>(it->second >> 32));
+		const auto index = static_cast<std::size_t>(it->second & 0xffffffffu);
+		const auto rows = Identity(type);
+		return index < rows.size() ? &rows[index] : nullptr;
 	}
 
 	Type Catalog::Kind(std::string_view name) const noexcept {
-		const auto it = m_kind.find(name);
+		const auto it = m_kind.find(StormByte::Safe::String{name});
 		return it == m_kind.end() ? Type::Unknown : it->second;
 	}
 }

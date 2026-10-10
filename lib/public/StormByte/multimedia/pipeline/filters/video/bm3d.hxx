@@ -56,6 +56,7 @@
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 #include <StormByte/type_traits/safe.hxx>
 
 /**
@@ -192,7 +193,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain from the latched values.
 			 * @return `bm3d=...` string for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
 			Safe::Optional<double> m_sigmaIn;	///< Caller sigma, or empty
 			Safe::Optional<unsigned> m_groupIn;	///< Caller group, or empty

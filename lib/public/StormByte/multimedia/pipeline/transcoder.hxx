@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/buffer/io/buffered_location_reader.hxx>
 #include <StormByte/buffer/io/buffered_location_writer.hxx>
 #include <StormByte/buffer/telemetry.hxx>
@@ -75,7 +76,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <filesystem>
 #include <string_view>
 #include <utility>
 
@@ -470,10 +470,10 @@ namespace StormByte {
 							 * @param owner Parent job.
 							 * @param slot Index into the job map.
 							 */
-							Track(Transcoder& owner, std::size_t slot) noexcept;
+							Track(Transcoder& owner, StormByte::Size slot) noexcept;
 
 							Transcoder* m_owner;	///< Borrowed parent job, which must outlive this handle
-							std::size_t m_slot;	///< Job map index
+							StormByte::Size m_slot;	///< Job map index
 					};
 
 					/**
@@ -491,8 +491,8 @@ namespace StormByte {
 					 * Stores @p logger as-is. @ref InstallLog runs at the end
 					 * of this constructor.
 					 */
-					Transcoder(const std::filesystem::path& source,
-						const std::filesystem::path& destination,
+					Transcoder(const StormByte::Safe::String& source,
+						const StormByte::Safe::String& destination,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
@@ -503,7 +503,7 @@ namespace StormByte {
 					 * @param logger Shared log for the job and the tube.
 					 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
 					 */
-					Transcoder(const std::filesystem::path& source,
+					Transcoder(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
@@ -516,7 +516,7 @@ namespace StormByte {
 					 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
 					 */
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-						const std::filesystem::path& destination,
+						const StormByte::Safe::String& destination,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
@@ -925,14 +925,14 @@ namespace StormByte {
 					 * @param slot Job map index.
 					 * @return true if the slot exists.
 					 */
-					bool ValidSlot(std::size_t slot) const noexcept;
+					bool ValidSlot(StormByte::Size slot) const noexcept;
 
 					/**
 					 * @brief Appends a track filter (Process, Packet or Analytics) to @p slot.
 					 * @param slot Job map index.
 					 * @param filter Filter instance.
 					 */
-					void AttachFilter(std::size_t slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
+					void AttachFilter(StormByte::Size slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
 
 					/**
 					 * @brief Appends a global analytics filter (one node).

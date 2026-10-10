@@ -172,7 +172,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `minterpolate=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			std::string Chain() const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
 			std::uint32_t m_num;	///< Rate numerator
 			std::uint32_t m_den;	///< Rate denominator

@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/multimedia/backend/pipeline/worker.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -197,7 +198,7 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			 */
 			bool ParkPending() const noexcept;
 
-			static constexpr std::size_t ParkCeiling = 2048;	///< Per-track compressed park
+			static constexpr StormByte::Size ParkCeiling = 2048;	///< Per-track compressed park
 
 			StormByte::Multimedia::Pipeline::Demuxer& m_owner;	///< Public demuxer
 			StormByte::Safe::Map<int, StormByte::Safe::List<StormByte::Multimedia::Pipeline::Packet::PointerType>> m_park;

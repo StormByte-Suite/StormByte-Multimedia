@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
@@ -329,10 +330,10 @@ namespace StormByte {
 							 * @param owner Facade that created this handle.
 							 * @param index Index into m_stretches.
 							 */
-							Handle(Filters& owner, std::size_t index) noexcept;
+							Handle(Filters& owner, StormByte::Size index) noexcept;
 
 							Filters* m_owner;	///< Borrowed facade; must outlive this handle.
-							std::size_t m_index;	///< Stretch index; owns no storage.
+							StormByte::Size m_index;	///< Stretch index; owns no storage.
 					};
 
 				private:
@@ -464,8 +465,8 @@ namespace StormByte {
 					StormByte::Safe::Vector<Attached> m_reports;		///< Leaves that may Report().
 					StormByte::Safe::Vector<int> m_measureTracks;		///< Tracks given to Demuxer::Measure.
 					StormByte::Safe::Vector<int> m_measureDrained;		///< Tracks that finished DrainMeasure
-					std::size_t m_measureFilterCount = 0;			///< ProcessTwoPasses leaves in this pass
-					std::size_t m_measureFiltersDrained = 0;			///< Those leaves that finished Measure
+					StormByte::Size m_measureFilterCount = 0;			///< ProcessTwoPasses leaves in this pass
+					StormByte::Size m_measureFiltersDrained = 0;			///< Those leaves that finished Measure
 					bool m_measuring = false;						///< After Close, before FinishMeasure
 					bool m_hasAnalytics = false;						///< At least one Analytics leaf
 					StormByte::Safe::Shared<class Progress> m_progress;	///< Shared tube clock

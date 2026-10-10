@@ -69,7 +69,7 @@ namespace {
 		const auto output = OutputPath(destination);
 		{
 			auto logger = MakeLogger();
-			Transcoder job{FixturePath("audio/noise_stereo.wav"), output, logger, 2000000000LL};
+					Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Audio(0);
 			track.Codec(codec.value().get());
 			if (codecName == "Vorbis")
@@ -113,8 +113,8 @@ int test_generic_muxer_writes_eac3() {
 
 int test_generic_flac_rejects_aac_remux() {
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_51.m4a"),
-		OutputPath("pipeline/mux-policy/rejected-aac.flac"), logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_51.m4a")),
+			TestLocation(OutputPath("pipeline/mux-policy/rejected-aac.flac")), logger, 2000000000LL};
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -127,8 +127,8 @@ int test_webm_policy_rejects_attachments() {
 	if (!codec.value().get().HasAccess(Access{Operation::Write}))
 		return TEST_SKIP;
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/anime_like.mkv"),
-		OutputPath("pipeline/mux-policy/rejected-attachment.webm"), logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath("pipeline/mux-policy/rejected-attachment.webm")), logger, 2000000000LL};
 	job.Video(0).Codec(codec.value().get());
 	job.Attachments();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);

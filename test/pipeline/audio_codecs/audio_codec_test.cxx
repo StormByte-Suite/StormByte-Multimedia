@@ -81,7 +81,7 @@ namespace {
 			return TEST_SKIP;
 		}
 		auto logger = MakeLogger();
-		Transcoder job{input, output, logger, 2000000000LL};
+			Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
 		auto track = job.Audio(0);
 		track.Codec(codec.value().get())
 			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});

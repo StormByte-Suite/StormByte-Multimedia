@@ -137,7 +137,7 @@ const Container& Muxer::Destination() const noexcept {
 	return *m_container;
 }
 
-std::size_t Muxer::ExpectedSlots() const noexcept {
+StormByte::Size Muxer::ExpectedSlots() const noexcept {
 	if (!m_plan)
 		return 0;
 	std::size_t n = 0;
@@ -165,7 +165,7 @@ bool Muxer::Ready() const noexcept {
 	return Step::Ready() && Armed();
 }
 
-std::size_t Muxer::InputCeiling() const noexcept {
+StormByte::Size Muxer::InputCeiling() const noexcept {
 	if (!m_plan || m_plan->Tracks().empty())
 		std::abort();
 	for (const auto& held : m_plan->Tracks()) {

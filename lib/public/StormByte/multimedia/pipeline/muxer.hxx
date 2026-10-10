@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
@@ -317,7 +318,7 @@ namespace StormByte {
 					 *
 					 * @return Max queued packets. Never 0 after a live Plan.
 					 */
-					std::size_t InputCeiling() const noexcept override;
+					StormByte::Size InputCeiling() const noexcept override;
 
 					/**
 					 * @name Stream tags
@@ -457,7 +458,7 @@ namespace StormByte {
 					 * @brief Video / Audio / Subtitle entries in the bound Plan.
 					 * @return 0 when there is no Plan.
 					 */
-					std::size_t ExpectedSlots() const noexcept;
+					StormByte::Size ExpectedSlots() const noexcept;
 
 					/**
 					 * @brief Marks the shared clock MuxDone. Friend: mux worker Flush.

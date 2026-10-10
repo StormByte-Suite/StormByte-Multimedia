@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/buffer/fifo.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/codec.hxx>
@@ -215,7 +216,7 @@ namespace StormByte {
 					 * @brief Maximum number of queued input frames.
 					 * @return Frame limit, or `0` if no input queue exists.
 					 */
-					std::size_t InputCeiling() const noexcept override;
+					StormByte::Size InputCeiling() const noexcept override;
 
 					/**
 					 * @brief Destination codec.

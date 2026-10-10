@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/size.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
@@ -155,23 +156,23 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Raw-frame hopper cap.
 			 * @return Items, or `0` if this instance has no frame hopper.
 			 */
-			std::size_t Frames() const noexcept;
+			StormByte::Size Frames() const noexcept;
 
 			/**
 			 * @brief Packet hopper cap.
 			 * @return Items, or `0` if this instance has no packet hopper.
 			 */
-			std::size_t Packets() const noexcept;
+			StormByte::Size Packets() const noexcept;
 
 			/**
 			 * @brief Demux park cap.
 			 * @return Packets, or `0` if this instance is not a Demuxer park.
 			 */
-			std::size_t Park() const noexcept;
+			StormByte::Size Park() const noexcept;
 
 		private:
-			std::size_t m_frames;	///< Frame hopper, or `0`
-			std::size_t m_packets;	///< Packet hopper, or `0`
-			std::size_t m_park;		///< Demux park, or `0`
+			StormByte::Size m_frames;	///< Frame hopper, or `0`
+			StormByte::Size m_packets;	///< Packet hopper, or `0`
+			StormByte::Size m_park;		///< Demux park, or `0`
 	};
 }

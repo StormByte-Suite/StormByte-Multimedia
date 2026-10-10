@@ -63,7 +63,6 @@
 #include <StormByte/multimedia/pipeline/exception.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
-#include <StormByte/safe/wstring.hxx>
 
 #include <cctype>
 #include <optional>
@@ -75,17 +74,12 @@ using StormByte::Buffer::IO::BufferedLocationWriter;
 using namespace StormByte::Multimedia::Pipeline;
 
 namespace {
-	StormByte::Safe::String LocationText(const std::filesystem::path& path) {
-		const auto native = path.wstring();
-		return StormByte::Safe::String{StormByte::Safe::WString{std::wstring_view{native}}};
+	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const StormByte::Safe::String& path) {
+		return StormByte::Multimedia::Backend::MakeLocalFileReader(path);
 	}
 
-	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const std::filesystem::path& path) {
-		return StormByte::Multimedia::Backend::MakeLocalFileReader(LocationText(path));
-	}
-
-	StormByte::Safe::Unique<BufferedLocationWriter> LocalWriter(const std::filesystem::path& path) {
-		return StormByte::Multimedia::Backend::MakeLocalFileWriter(LocationText(path));
+	StormByte::Safe::Unique<BufferedLocationWriter> LocalWriter(const StormByte::Safe::String& path) {
+		return StormByte::Multimedia::Backend::MakeLocalFileWriter(path);
 	}
 
 	std::string ExtensionOf(std::string_view location) noexcept {
@@ -125,18 +119,18 @@ namespace {
 	}
 }
 
-Plan::Plan(const std::filesystem::path& source,
-	const std::filesystem::path& destination,
+Plan::Plan(const StormByte::Safe::String& source,
+	const StormByte::Safe::String& destination,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Plan(LocalReader(source), LocalWriter(destination), std::move(duration)) {}
 
-Plan::Plan(const std::filesystem::path& source,
+Plan::Plan(const StormByte::Safe::String& source,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Plan(LocalReader(source), std::move(writer), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
-	const std::filesystem::path& destination,
+	const StormByte::Safe::String& destination,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
 : Plan(std::move(reader), LocalWriter(destination), std::move(duration)) {}
 

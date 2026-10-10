@@ -60,11 +60,10 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/optional.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
 #include <utility>
 
 extern "C" {
@@ -112,7 +111,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					 */
 					Opened(StormByte::Multimedia::FFmpeg::AVEncoder encoder,
 						AVRational timeBase,
-						std::string implementation,
+						StormByte::Safe::String implementation,
 						StormByte::Multimedia::Features capabilities) noexcept
 					: m_encoder(std::move(encoder)),
 					m_timeBase(timeBase),
@@ -155,7 +154,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					 * @brief Selected table row name.
 					 * @return Name.
 					 */
-					inline const std::string& Implementation() const noexcept {
+					inline const StormByte::Safe::String& Implementation() const noexcept {
 						return m_implementation;
 					}
 
@@ -163,7 +162,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					 * @brief Sets the selected table row name.
 					 * @param implementation Row name.
 					 */
-					inline void Implementation(std::string implementation) noexcept {
+					inline void Implementation(StormByte::Safe::String implementation) noexcept {
 						m_implementation = std::move(implementation);
 					}
 
@@ -186,7 +185,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				private:
 					StormByte::Multimedia::FFmpeg::AVEncoder m_encoder;	///< Opened encoder
 					AVRational m_timeBase{};										///< Encoder time base
-					std::string m_implementation;									///< Selected row name
+					StormByte::Safe::String m_implementation;									///< Selected row name
 					StormByte::Multimedia::Features m_capabilities;				///< Selected row features
 			};
 
@@ -271,21 +270,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			virtual AVRational TimeBase() const noexcept = 0;
 
 			/**
-			 * @brief Picks the table row, applies owner setters and opens FFmpeg.
-			 * @param owner Public encoder (Fail, CRF, FineTune, Destination).
-			 * @param params Codec parameters filled by the media leaf.
-			 * @param timeBase Encoder time base chosen by the media leaf.
-			 * @param need Extra feature bits the leaf derived from the frame.
-			 * @param firstFrame Optional decoded metadata used to configure native video encoding.
-			 * @return Opened backend, or empty after owner.Fail().
-			 */
-			static std::optional<Opened> OpenCodec(StormByte::Multimedia::Pipeline::Encoder& owner,
-				StormByte::Multimedia::FFmpeg::AVCodecParameters params,
-				AVRational timeBase,
-				StormByte::Multimedia::Features need,
-				const StormByte::Multimedia::FFmpeg::AVFrame* firstFrame = nullptr) noexcept;
-
-			/**
 			 * @brief Builds a pipeline Packet from an encoded AVPacket via owner.Wrap.
 			 * @param owner Public encoder.
 			 * @param type Kind of the encoded access unit (destination codec Type).
@@ -356,4 +340,31 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			static void CommitOpen(StormByte::Multimedia::Pipeline::Encoder& owner,
 				const Opened& opened) noexcept;
 	};
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Encoder::Opened);
+
+/**
+ * @namespace StormByte::Multimedia::Backend::Pipeline
+ * @brief Multimedia-owned pipeline stages and unit holders.
+ *
+ * @ingroup multimedia_pipeline
+ */
+namespace StormByte::Multimedia::Backend::Pipeline {
+
+	/**
+	 * @brief Picks the table row, applies owner setters and opens FFmpeg.
+	 * @param owner Public encoder (Fail, CRF, FineTune, Destination).
+	 * @param params Codec parameters filled by the media leaf.
+	 * @param timeBase Encoder time base chosen by the media leaf.
+	 * @param need Extra feature bits the leaf derived from the frame.
+	 * @param firstFrame Optional decoded metadata used to configure native video encoding.
+	 * @return Opened backend, or empty after owner.Fail().
+	 */
+	StormByte::Safe::Optional<StormByte::Multimedia::Backend::Pipeline::Encoder::Opened> OpenCodec(
+		StormByte::Multimedia::Pipeline::Encoder& owner,
+		StormByte::Multimedia::FFmpeg::AVCodecParameters params,
+		AVRational timeBase,
+		StormByte::Multimedia::Features need,
+		const StormByte::Multimedia::FFmpeg::AVFrame* firstFrame = nullptr) noexcept;
 }

@@ -106,7 +106,7 @@ namespace {
 int test_transcoder_remux_preserves_pgs_and_attachments() {
 	const auto output = OutputPath("pipeline/transcoder-remux.mkv");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/anime_like.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Audio(1).Remux();
 	job.Subtitle(2).Remux();
@@ -122,7 +122,7 @@ int test_transcoder_remux_preserves_pgs_and_attachments() {
 int test_transcoder_remux_omits_unselected_attachments() {
 	const auto output = OutputPath("pipeline/transcoder-remux-no-attachments.mkv");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/anime_like.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Audio(1).Remux();
 	job.Subtitle(2).Remux();
@@ -137,7 +137,7 @@ int test_transcoder_remux_omits_unselected_attachments() {
 int test_hand_built_pipe_remux_preserves_pgs_and_attachments() {
 	const auto input = FixturePath("video/anime_like.mkv");
 	const auto output = OutputPath("pipeline/manual-remux.mkv");
-	Plan plan{input, output, 2000000000LL};
+	Plan plan{StormByte::Safe::String{input.string()}, StormByte::Safe::String{output.string()}, 2000000000LL};
 	plan.add(Track{0, StormByte::Multimedia::Type::Video});
 	plan.add(Track{1, StormByte::Multimedia::Type::Audio});
 	plan.add(Track{2, Config::Subtitle{}});

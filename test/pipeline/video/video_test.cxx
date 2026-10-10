@@ -128,7 +128,7 @@ int test_transcoder_hevc_encode_output_file_properties() {
 
 	const auto output = OutputPath("pipeline/encoded-hevc.mkv");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/hdr10_metadata_source.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Codec(hevc.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -145,7 +145,7 @@ int test_transcoder_hevc_encode_preserves_hdr10_metadata() {
 
 	const auto output = OutputPath("pipeline/encoded-hevc-hdr10.mkv");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/hdr10_metadata_source.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Codec(hevc.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -162,7 +162,7 @@ int test_transcoder_vp9_encode_preserves_hdr10_metadata() {
 
 	const auto output = OutputPath("pipeline/encoded-vp9-hdr10.mkv");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/hdr10_metadata_source.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Codec(vp9.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();

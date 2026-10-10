@@ -123,7 +123,7 @@ Decoder::operator bool() const noexcept {
 	return !Failed() && Ready() && m_backend && m_backend->IsOpen();
 }
 
-std::size_t Decoder::InputCeiling() const noexcept {
+StormByte::Size Decoder::InputCeiling() const noexcept {
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
 	const auto* track = Backend::Pipeline::TrackByIn(plan, m_index);
 	if (!track)

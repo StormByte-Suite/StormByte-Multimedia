@@ -52,9 +52,9 @@
 
 #include <StormByte/exception.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <format>
-#include <string>
 #include <string_view>
 #include <utility>
 
@@ -93,7 +93,11 @@ namespace StormByte {
 				template <typename... Args>
 				Exception(std::string_view component, std::format_string<Args...> fmt, Args&&... args):
 					StormByte::Exception(
-						StormByte::Exception::Path{std::string{"Multimedia."}.append(component)},
+						StormByte::Exception::Path{[component] {
+							StormByte::Safe::String path{"Multimedia."};
+							path += component;
+							return path;
+						}()},
 						fmt, std::forward<Args>(args)...) {}
 
 				/**

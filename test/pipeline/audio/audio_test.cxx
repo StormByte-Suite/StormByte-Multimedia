@@ -83,7 +83,7 @@ static int CheckAutomaticSurroundConversion(std::string_view codecName, std::str
 
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
-	Transcoder job{input, output, logger, 2000000000LL};
+	Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
 	// AC-3/E-AC3 may automatically convert 7.1 to 5.1 without an explicit downmix filter.
 	job.Audio(0).Codec(codec.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
@@ -102,7 +102,7 @@ static int CheckAutomaticSurroundConversion(std::string_view codecName, std::str
 int test_transcoder_extracts_single_ac3_track_from_bluray_mkv() {
 	const auto output = OutputPath("pipeline/bluray-track-1.ac3");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/bluray_like_hdr10.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(1).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -113,7 +113,7 @@ int test_transcoder_extracts_single_ac3_track_from_bluray_mkv() {
 int test_transcoder_extracts_single_aac_track_from_bluray_mkv() {
 	const auto output = OutputPath("pipeline/bluray-track-2.m4a");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("video/bluray_like_hdr10.mkv"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(2).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -124,7 +124,7 @@ int test_transcoder_extracts_single_aac_track_from_bluray_mkv() {
 int test_transcoder_remuxes_single_opus_file_to_mka() {
 	const auto output = OutputPath("pipeline/opus-remux.mka");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_opus_source_51.opus"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_opus_source_51.opus")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -135,7 +135,7 @@ int test_transcoder_remuxes_single_opus_file_to_mka() {
 int test_transcoder_remuxes_wav_file_to_wav() {
 	const auto output = OutputPath("pipeline/wav-remux.wav");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_stereo.wav"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -152,7 +152,7 @@ int test_transcoder_opus_encode_output_file_properties() {
 
 	const auto output = OutputPath("pipeline/encoded-opus.mka");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_opus_source_51.opus"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_opus_source_51.opus")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(opus.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -181,7 +181,7 @@ int test_transcoder_aac_encode_from_stereo_wav() {
 
 	const auto output = OutputPath("pipeline/encoded-aac.m4a");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_51.opus"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_51.opus")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(aac.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -196,8 +196,8 @@ int test_transcoder_rejects_51_audio_to_mp3_without_downmix() {
 		return TEST_SKIP;
 
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_51.opus"),
-		OutputPath("pipeline/rejected-51.mp3"), logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_51.opus")),
+			TestLocation(OutputPath("pipeline/rejected-51.mp3")), logger, 2000000000LL};
 	job.Audio(0).Codec(mp3.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();
@@ -220,7 +220,7 @@ int test_transcoder_encodes_stereo_audio_to_mp3() {
 
 	const auto output = OutputPath("pipeline/encoded-stereo.mp3");
 	auto logger = MakeLogger();
-	Transcoder job{FixturePath("audio/noise_stereo.mp3"), output, logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.mp3")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(mp3.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	job.Run();

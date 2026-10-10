@@ -172,6 +172,11 @@ namespace StormByte {
 			 * @brief Forward declaration of the codec-parameter wrapper.
 			 */
 			class AVCodecParameters;
+
+			/**
+			 * @brief Forward declaration of FFmpeg subtitle box.
+			 */
+			class AVSubtitle;
 		}
 	}
 }
