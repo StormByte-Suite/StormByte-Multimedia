@@ -234,7 +234,7 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 	const FFrame* src = &raw;
 	FFrame scaled;
 	if (raw.Width() != tw || raw.Height() != th) {
-		if (!raw.ScaleTo(scaled, tw, th, FFrame::Resample::Bicubic, FFrame::Scaler::Sws) || !scaled) {
+		if (!raw.ScaleTo(ScalingContext(), scaled, tw, th, FFrame::Resample::Bicubic, FFrame::Scaler::Sws) || !scaled) {
 			vmaf_picture_unref(pic);
 			return false;
 		}

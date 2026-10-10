@@ -800,7 +800,26 @@ uint8_t* FFmpeg::AVFrame::NewSideData(int type, int size) noexcept {
 	return sd ? sd->data : nullptr;
 }
 
+class FFmpeg::AVFrame::ScaleContext::State {
+	public:
+		Backend::Zimg zimg;	///< Cached zimg graphs and persistent tile workers.
+		FFmpeg::Sws sws;		///< Cached libswscale context.
+};
+
+FFmpeg::AVFrame::ScaleContext::ScaleContext()
+:	m_state(new State) {}
+
+FFmpeg::AVFrame::ScaleContext::~ScaleContext() noexcept {
+	delete m_state;
+}
+
 bool FFmpeg::AVFrame::ScaleTo(AVFrame& dst, int dst_w, int dst_h,
+	Resample filter, Scaler scaler) const noexcept {
+	ScaleContext context;
+	return ScaleTo(context, dst, dst_w, dst_h, filter, scaler);
+}
+
+bool FFmpeg::AVFrame::ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, int dst_h,
 	Resample filter, Scaler scaler) const noexcept {
 	if (!m_ptr || dst_w <= 0 || dst_h <= 0 || Width() <= 0 || Height() <= 0)
 		return false;
@@ -816,12 +835,12 @@ bool FFmpeg::AVFrame::ScaleTo(AVFrame& dst, int dst_w, int dst_h,
 		dst.Format(fmt);
 	}
 	if (scaler == Scaler::Zimg) {
-		thread_local Backend::Zimg zimg;
+		auto& zimg = context.m_state->zimg;
 		if (!zimg.Ensure(*this, dst, filter))
 			return false;
 		return zimg.Scale(*this, dst);
 	}
-	thread_local Sws sws;
+	auto& sws = context.m_state->sws;
 	if (!sws.Ensure(Width(), Height(), Format(),
 		dst.Width(), dst.Height(), dst.Format(), ToSwsFlags(filter)))
 		return false;

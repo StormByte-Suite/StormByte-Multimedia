@@ -121,7 +121,7 @@ void Scale::Process(const Pipeline::Frame&) noexcept {
 	const auto scaler = m_scaler.value_or(FFrame::Scaler::Zimg);
 
 	FFrame out;
-	if (!src.ScaleTo(out, static_cast<int>(dstW), static_cast<int>(dstH), filter, scaler)) {
+	if (!src.ScaleTo(ScalingContext(), out, static_cast<int>(dstW), static_cast<int>(dstH), filter, scaler)) {
 		Fail("scale failed");
 		return;
 	}

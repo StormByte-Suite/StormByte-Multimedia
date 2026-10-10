@@ -27,6 +27,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Replace thread-local scaling owners with reusable per-filter `AVFrame::ScaleContext` caches on all platforms. Graphs and Zimg workers remain reusable across frames and are released through ordinary filter teardown rather than DLL thread detach; direct callers can retain an explicit context through the new `ScaleTo` overload.
 - Apply route input capacities after connecting their hoppers; configuring a missing hopper previously left first-filter or destination queues unbounded after audit wiring was reordered.
 - Install route audit consumers before their producers, synchronize clone destination registration with emission and EOF, and propagate EOF to clone destinations connected after output closes.
 - Retry video decoder EOF submission after draining pending frames when FFmpeg returns `EAGAIN`, rather than treating an unaccepted EOF as successfully signalled.

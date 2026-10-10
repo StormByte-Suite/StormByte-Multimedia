@@ -561,6 +561,12 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			const StormByte::Multimedia::FFmpeg::AVFrame& AVFrame() const noexcept;
 
 			/**
+			 * @brief Reusable scaling cache owned by this filter, not by TLS.
+			 * @return Cache for synchronous scaling on this filter's worker.
+			 */
+			StormByte::Multimedia::FFmpeg::AVFrame::ScaleContext& ScalingContext() const noexcept;
+
+			/**
 			 * @brief Borrowed RAII handle of the current packet.
 			 * @return @ref StormByte::Multimedia::FFmpeg::AVPacket of the
 			 *         unit in @ref Process, or an empty handle if there
