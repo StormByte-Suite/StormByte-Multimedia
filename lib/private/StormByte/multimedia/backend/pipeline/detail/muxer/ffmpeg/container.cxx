@@ -64,6 +64,7 @@
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/type.hxx>
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <format>
@@ -90,6 +91,51 @@ namespace {
 	const FFmpeg::AVRational NanoTimeBase{1, 1000000000};
 	constexpr const char WritingApp[] = "StormByte-Multimedia " STORMBYTE_MULTIMEDIA_VERSION;
 	constexpr std::int64_t InterleaveSlotUs = 40LL * 1000;
+	constexpr std::int64_t InterleaveFloorUs = 250000;
+	constexpr std::int64_t InterleaveMixedUs = 60LL * 1000 * 1000;
+
+	bool Encodes(const StormByte::Multimedia::Pipeline::Track& track) noexcept {
+		const auto* config = track.Config();
+		if (const auto* video = dynamic_cast<const Config::Video*>(config))
+			return video->Codec() != nullptr;
+		if (const auto* audio = dynamic_cast<const Config::Audio*>(config))
+			return audio->Codec() != nullptr;
+		if (const auto* subtitle = dynamic_cast<const Config::Subtitle*>(config))
+			return subtitle->Codec() != nullptr;
+		return false;
+	}
+
+	bool Muxable(StormByte::Multimedia::Type type) noexcept {
+		return type == StormByte::Multimedia::Type::Video
+			|| type == StormByte::Multimedia::Type::Audio
+			|| type == StormByte::Multimedia::Type::Subtitle;
+	}
+
+	std::int64_t InterleaveDeltaUs(const StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
+		std::size_t remux = 0;
+		std::size_t encodeVideo = 0;
+		std::size_t encodeOther = 0;
+		if (const auto& plan = owner.Plan(); plan) {
+			for (const auto& held : plan->Tracks()) {
+				if (!held || !Muxable(held->Type()))
+					continue;
+				if (!Encodes(*held))
+					++remux;
+				else if (held->Type() == StormByte::Multimedia::Type::Video)
+					++encodeVideo;
+				else
+					++encodeOther;
+			}
+		}
+		if (encodeVideo != 0 && remux != 0)
+			return InterleaveMixedUs;
+
+		return std::clamp<std::int64_t>(InterleaveFloorUs
+			+ static_cast<std::int64_t>(encodeVideo) * 500000
+			+ static_cast<std::int64_t>(remux) * 100000
+			+ static_cast<std::int64_t>(encodeOther) * 80000,
+			InterleaveFloorUs, InterleaveMixedUs);
+	}
 
 
 	std::int64_t NsToTicks(std::int64_t ns, FFmpeg::AVRational time_base) noexcept {
@@ -527,6 +573,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 		const std::int64_t spanUs = minPts >= 0 && maxPts > minPts
 			? (maxPts - minPts) / 1000 + InterleaveSlotUs : 0;
+		std::int64_t deltaUs = InterleaveDeltaUs(owner);
+		const auto capacity = owner.InputCeiling();
+		const auto depth = capacity == 0 ? 1 : capacity;
+		deltaUs = std::max(deltaUs, InterleaveSlotUs * static_cast<std::int64_t>(depth));
+		deltaUs = std::max(deltaUs, spanUs);
+		m_ctx->max_interleave_delta = deltaUs;
 
 		AVDictionary* opts = nullptr;
 		m_policy->ConfigureHeader(owner, *m_ctx, spanUs, &opts);

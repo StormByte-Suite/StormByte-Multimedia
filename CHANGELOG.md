@@ -60,6 +60,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Create planned per-track hopper connections before generic stage transfer, avoiding blocked producers and consumers when stages are wired before their first item. Reserve manual encoder mux streams through a separate typed `Encoder >> Muxer` connection.
 	- Propagate stage failures observed as the muxer closes, even when the filter graph is already idle.
 	- Honor explicit decoder names and manual Plan decoder pins when opening origin decoders. Missing or codec-mismatched implementations fail instead of silently using the default decoder.
+	- Apply the calculated FFmpeg interleave limit to every output policy, so MP4 and generic muxers retain the packet-buffering margin previously configured by the shared muxer.
 - Audio conversion and encoder submission:
 	- Normalize unspecified PCM input layouts consistently with libswresample using a temporary frame reference, without modifying the original samples or channel count.
 	- Normalize unspecified audio output layouts during sample conversion and drain; retry audio frame and EOF submission after a receive operation consumes buffered input without producing a packet.
