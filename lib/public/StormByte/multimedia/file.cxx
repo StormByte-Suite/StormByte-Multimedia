@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -41,6 +53,8 @@
 #include <StormByte/multimedia/backend/local_file_reader.hxx>
 #include <StormByte/multimedia/detail/probe.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
+#include <StormByte/multimedia/ffmpeg/AVDecoder.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFormatContext.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/AVStream.hxx>
@@ -295,7 +309,7 @@ void File::ScanWithReader(BufferedLocationReader& reader, StormByte::Safe::Vecto
 	ReportProgress(progress, complete && rewound ? 100.0 : percent);
 }
 
-void File::MarkHdr10Plus(Stream& stream) noexcept {
+void File::MarkHdr10Plus(Stream& stream) {
 	if (!stream.m_properties.first.has_value())
 		return;
 	const auto video = stream.m_properties.first.value();
@@ -303,10 +317,10 @@ void File::MarkHdr10Plus(Stream& stream) noexcept {
 	hdr10.HDR10Plus(true);
 	stream.m_properties.first = Property::Video(
 		video.Color(), video.Resolution(), std::move(hdr10),
-		video.FrameRate(), video.SampleAspectRatio());
+		video.FrameRate(), video.SampleAspectRatio(), video.DOVI());
 }
 
-void File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams) noexcept {
+bool File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams) noexcept try {
 	StormByte::Safe::UnorderedSet<int> video;
 	StormByte::Safe::UnorderedSet<int> found;
 	for (const auto& stream : std::as_const(streams)) {
@@ -314,13 +328,59 @@ void File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector
 			video.insert(stream.Index());
 	}
 	if (video.empty())
-		return;
+		return true;
+	const auto sourceStreams = ctx.Streams();
+	StormByte::Safe::Vector<StormByte::Safe::Shared<FFmpeg::AVDecoder>> decoders(sourceStreams.size());
+	for (const auto& source : sourceStreams) {
+		if (!video.contains(source.Index()))
+			continue;
+		const auto parameters = source.CodecParameters();
+		const auto codecId = static_cast<AVCodecID>(parameters.CodecId());
+		if (codecId != AV_CODEC_ID_HEVC && codecId != AV_CODEC_ID_AV1)
+			continue;
+		const auto* codec = avcodec_find_decoder(codecId);
+		if (!codec)
+			continue;
+		auto opened = FFmpeg::AVDecoder::Open(const_cast<AVCodec*>(codec), parameters, ctx, source.Index());
+		if (opened)
+			decoders[source.Index()] = StormByte::Safe::Shared<FFmpeg::AVDecoder>::MakePointer<FFmpeg::AVDecoder>(std::move(*opened));
+	}
+	int decodedFrames = 0;
+	const auto collect = [&streams, &decodedFrames](FFmpeg::AVDecoder& decoder) {
+		FFmpeg::AVFrame frame;
+		while (decodedFrames < Hdr10PlusVideoPackets && decoder.ReceiveFrame(frame) == FFmpeg::OperationResult::Success) {
+			++decodedFrames;
+			const auto* metadata = frame.SideData(AV_FRAME_DATA_DOVI_METADATA);
+			const auto* rpu = frame.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER);
+			if (metadata || rpu) {
+				for (std::size_t index = 0; index < streams.size(); ++index) {
+					auto stream = std::as_const(streams)[index];
+					if (stream.Index() != decoder.StreamIndex() || !stream.m_properties.first)
+						continue;
+					const auto properties = *stream.m_properties.first;
+					auto dovi = properties.DOVI().value_or(Property::DOVI{});
+					if (dovi.MetadataPresent() && !dovi.Rpu().empty())
+						break;
+					bool loaded = false;
+					if (metadata && metadata->data)
+						loaded = dovi.LoadMetadata(std::as_bytes(std::span{metadata->data, metadata->size}));
+					if (rpu && rpu->data)
+						loaded = dovi.LoadRpu(std::as_bytes(std::span{rpu->data, rpu->size})) || loaded;
+					if (loaded) {
+						stream.m_properties.first = Property::Video(properties.Color(), properties.Resolution(),
+							properties.HDR10(), properties.FrameRate(), properties.SampleAspectRatio(), std::move(dovi));
+						streams[index] = stream;
+					}
+					break;
+				}
+			}
+			frame.Unref();
+		}
+	};
 
 	FFmpeg::AVPacket packet;
 	int seenVideo = 0;
 	for (;;) {
-		if (found.size() == video.size())
-			break;
 		if (seenVideo >= Hdr10PlusVideoPackets)
 			break;
 		const auto result = ctx.ReadPacket(packet);
@@ -339,7 +399,20 @@ void File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector
 		++seenVideo;
 		if (PacketHasHdr10Plus(packet))
 			found.insert(index);
+		if (index >= 0 && static_cast<std::size_t>(index) < decoders.size() && decoders[index]) {
+			auto decoder = decoders[index];
+			collect(*decoder);
+			if (decoder->SendPacket(packet) == FFmpeg::OperationResult::Success)
+				collect(*decoder);
+		}
 		packet.Unref();
+	}
+	for (const auto& decoder : std::as_const(decoders)) {
+		if (!decoder)
+			continue;
+		collect(*decoder);
+		if (decoder->SetEof() == FFmpeg::OperationResult::Success)
+			collect(*decoder);
 	}
 
 	for (std::size_t index = 0; index < streams.size(); ++index) {
@@ -349,6 +422,10 @@ void File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector
 			streams[index] = stream;
 		}
 	}
+	return true;
+}
+catch (...) {
+	return false;
 }
 
 bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams,
@@ -488,7 +565,10 @@ ExpectedFile File::Probe(BufferedLocationReader& reader,
 	}
 
 	FillEmptyAttachmentPayloads(wrapped, attachments, coverIndex);
-	DetectHdr10Plus(wrapped, streams);
+	if (!DetectHdr10Plus(wrapped, streams)) {
+		static_cast<void>(reader.Rewind());
+		return FailOpen(label, "failed to retain decoded video metadata");
+	}
 	auto metadata = Detail::Probe::File(wrapped);
 	StormByte::Safe::Optional<Property::Duration> duration;
 	bool resolved = false;

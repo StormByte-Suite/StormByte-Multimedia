@@ -9,7 +9,9 @@ Contributor guides: [Contributing](CONTRIBUTING.md) and [Coding Style](CODING_ST
 [![CI](https://github.com/StormBytePP/StormByte-Multimedia/actions/workflows/ci.yml/badge.svg)](https://github.com/StormBytePP/StormByte-Multimedia/actions/workflows/ci.yml)
 [![Sponsor](https://img.shields.io/badge/Sponsor-StormBytePP-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/StormBytePP)
 
-This repository is **StormByte Multimedia**: a C++26 pipeline for decoding, filtering, encoding and muxing media on top of FFmpeg (`libav`). It is **not** a thin wrapper around raw FFmpeg contexts. Codec and format backends remain private; filter-facing frame, packet and graph adapters are part of the public surface where needed.
+**StormByte-Multimedia** is a high-level, extensible C++26 library for building media workflows: inspect files, select streams, remux or transcode them, apply filters, and collect progress and analytics. It uses libav as its media engine, transparently; routine use is expressed entirely through StormByte types such as `File`, `Plan`, `Transcoder`, `Step` and typed filters. You do not need to know libav APIs to build or run a job.
+
+The high-level API does not trade away control. Use `Transcoder` for the common File-to-File workflow, derive from it to add application-specific plans and lifecycle hooks, or wire the same `Step`s by hand when you need a custom graph. Custom filters use StormByte's RAII frame and packet types; only reach for the advanced libav-backed filter surface when those wrappers do not provide an operation your filter needs.
 
 It depends on [StormByte Base](https://github.com/StormBytePP/StormByte), [StormByte Buffer](https://github.com/StormBytePP/StormByte-Buffer) and [StormByte Logger](https://github.com/StormBytePP/StormByte-Logger). Public headers live under `StormByte/multimedia/` and cover the registry, containers, codecs, `File`, and the pipeline (`Plan`, `Step`, `Transcoder`, filters).
 
@@ -17,12 +19,11 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 
 ## What this module does
 
-- **A closed job intention** — `Plan` owns the reader and writer through `Safe::Unique`, a consultation `File` snapshot and the **output** track list. The destination container is resolved from the writer path extension. `add` order is mux order. Omit a stream and it is dropped. `Check()` asks whether the intention is well formed, not whether FFmpeg will succeed.
-- **A tube of workers** — `Plan >> Demuxer >> (Decoder | Remuxer) [>> Filters] >> Encoder? >> Muxer`. Each `Step` is a worker with hoppers. Items are `Packet` (compressed AU) or `Frame` (decoded AU). Timing has no public setters. `Serial` is a monotone tube id, not `nb_frames`.
-- **Two ways in** — `Transcoder` is the File→File facade (inheritable, hookable, zero hacks). The same tube can be wired by hand with `operator>>`. Anything `Transcoder` can do, a hand-built tube can do. If a user-built tube fails, `Transcoder` fails the same way.
-- **Registry** — codec/container identities and operations available in this build. Look up `"H.265"` / `"hevc"` or `"Matroska"` / `"matroska"` and check access before selecting an encoder. Output uses the actual writer filename to select the FFmpeg muxer. Registered single-file destinations use generic libavformat writing by default, including FLAC, CAF and E-AC3; codec and stream-count restrictions come from FFmpeg, not a Multimedia whitelist. Registry presence alone does not guarantee that a destination accepts every codec or track combination.
-- **Filters** — typed leaves on decoded frames or compressed packets (`Scale`, `Watermark`, analytics / VMAF, …). Recoverable conditions follow each filter's contract: a missing Watermark logo can become passthrough, while invalid configuration or processing failures can fail a stage. Check job status and analytics reports rather than assuming every warning or filter failure is harmless.
-- **Logging** — every `Step` takes a `StormByte::Safe::Shared<StormByte::Logger::Log>` (prefer `ThreadedLog`). Lines use component `StormByte/Multimedia/<stage>` (`Demuxer`, `Transcoder`, `Watermark`, …) and format `[%L] %T %c`. The print floor belongs to the **application**. Module throttle: Window on LowLevel, Drop on Debug and Notice. Warning / Error / Fatal are not throttled.
+- **Build complete media jobs** — map input streams to output tracks, choose which are copied or re-encoded, set codec options, and select a destination. Output-track order determines mux order; omitted streams are dropped. `Plan::Check()` validates the job description, while actual codec and container support is checked when the job is configured and run.
+- **Choose your level of control** — `Transcoder` gives applications a concise File-to-File API with asynchronous execution, progress, pause/resume/cancel, reports and lifecycle hooks. It is designed to be inherited: specialize its plan and hooks for a product workflow, batch runner or UI. For custom routing, connect `Plan`, `Demuxer`, `Decoder`, `Remuxer`, filters, `Encoder` and `Muxer` directly with `operator>>`.
+- **Compose filters and analysis** — use typed audio/video filters on decoded media, packet filters where appropriate, and analytics such as VMAF. Filter chains work with either entry point. A recoverable filter condition follows that filter's contract; invalid configuration or processing failures remain visible in job status.
+- **Discover available capabilities** — the registry reports the codecs, containers and operations available in the configured build. Use it to select implementations and check read/write access; availability depends on the chosen dependencies and build options, and a codec/container combination may still be rejected during job setup.
+- **Integrate with application logging** — pipeline stages accept a shared StormByte Logger instance (prefer `ThreadedLog` when several workers can write). `Transcoder` exposes hooks and status so the application can own its UI, scheduling and error handling.
 
 ## The rest of the suite
 
@@ -43,6 +44,7 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - [What this module does](#what-this-module-does)
 - [The rest of the suite](#the-rest-of-the-suite)
 - [Documentation](#documentation)
+- [Codec compatibility](#codec-compatibility)
 - [Two ways to work](#two-ways-to-work)
   - [1. Transcoder (File → File)](#1-transcoder-file--file)
   - [2. The tube by hand](#2-the-tube-by-hand)
@@ -59,9 +61,26 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 
 ## Documentation
 
-- This README: how to build, the two entry points, the tube contract, distribution flags.
+- This README: how to build, the two entry points, the tube contract, codec compatibility and distribution flags.
 - Doxygen class reference (headers under `StormByte/multimedia/`): [https://suite.stormbyte.org/StormByte-Multimedia/](https://suite.stormbyte.org/StormByte-Multimedia/).
 - Logger contract used by every `Step`: [https://suite.stormbyte.org/StormByte-Logger/](https://suite.stormbyte.org/StormByte-Logger/).
+
+## Codec compatibility
+
+`Feature::DOVI` indicates that a listed implementation supports Dolby Vision metadata handling for that direction. It is separate from HDR10, HDR10+ and hardware-acceleration support; it does not promise support for every Dolby Vision profile or certify the visual result.
+
+| Direction | Format | Implementations listed with DOVI support |
+| --- | --- | --- |
+| Decode | HEVC | `hevc` |
+| Decode | AV1 | `av1`, `libdav1d` |
+| Encode | HEVC | `libx265` (requires a GPL-enabled build and a compatible x265) |
+| Encode | AV1 | `libsvtav1`, `libaom-av1` (availability depends on the configured dependencies) |
+
+The registry reflects the capabilities compiled into the selected bundled or system libav build. Decoding remains available independently of GPL encoder components. Encoding requires compatible Dolby Vision input metadata and supported encoder settings; an encoder cannot create a Dolby Vision grade from ordinary HDR pixels alone. Other hardware implementations may decode or encode the picture format without providing the metadata support represented by `Feature::DOVI`.
+
+### Dolby Vision metadata and transforms
+
+Dolby Vision and HDR10 are separate properties: DOVI-only content must not acquire an invented HDR10 fallback. Preserving metadata does not prove that it still describes transformed pixels. Cropping, scaling, overlays, denoising, grading, gamut conversion and tone mapping can make it stale. Validate or regenerate it with an appropriate mastering workflow after such transformations. Neither a successful encode nor metadata preservation proves visual correctness, Dolby conformance or certification.
 
 ## Two ways to work
 
@@ -69,9 +88,9 @@ You either let `Transcoder` assemble a job from a fluent map of origin streams, 
 
 ### 1. Transcoder (File → File)
 
-`Transcoder` is the facade most applications want. Construct it with source and destination paths (or owned reader/writer locations), then name **output** tracks in mux order, attach filters and run the coordinator. The destination container is inferred from the writer path extension. The stock class is complete: you do not have to derive anything to remux, recode or filter.
+`Transcoder` is the recommended starting point for a File-to-File job. Construct it with source and destination paths, map **output** tracks in mux order, choose remux or encoding, attach filters, and run. The destination container is inferred from the writer path. The stock class is complete for remuxing, transcoding and filtering; inheritance is for adding application-specific behavior, not a prerequisite for ordinary use.
 
-It is also **designed to be inherited**. Override `EmptyPlan()` / `EmptySettled()` to carry your own fields, or the hooks (`OnConfigure`, `OnStart`, `OnPlan`, `OnSettled`, `OnProgress`, `OnDone`, `OnError`, `OnAborted`) to drive a UI or a batch runner. Override `InstallLog()` so this job’s own lines use another component path; tube stages stay under `StormByte/Multimedia/<stage>`. Hooks are not an escape hatch around the tube. If a hand-wired tube cannot do it, `Transcoder` will not sneak it in.
+It is also **designed to be inherited**. Override `EmptyPlan()` / `EmptySettled()` for application-specific state, or lifecycle hooks such as `OnProgress`, `OnDone` and `OnError` to connect a UI, scheduler or batch runner. You can extend the job description and orchestration while retaining the same pipeline stages and behavior.
 
 Open the source, map streams, run, poll:
 
@@ -167,7 +186,7 @@ What that mapping means:
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
 
-When source duration is not supplied, `Progress` first displays only `Calculating duration` with an animated activity indicator. During source preparation and FFmpeg stream analysis there is no percentage: this work can consume CPU without advancing through the file. Once packet scanning starts, the activity indicator freezes and the line adds a monotone estimate based on processed packet positions relative to source size, not on AVIO seeks or read-ahead; formats without packet positions use accumulated packet payload bytes as an approximation. The 100 percent value is reserved for EOF followed by a successful rewind. Processing and analytics remain inactive until the scan and rewind finish; this preliminary percentage is separate from `All()`. The reader's cache and read-ahead settings are unchanged. `Progress::Snapshot()` captures the exclusive phase, optional duration/measure/analytics percentages, combined processing score, and completion flags under one lock, so applications can render their own UI without parsing the status string. During preparation its phase is `CalculatingDuration` and its `Duration` value is empty. Getters and snapshots are safe to read concurrently. Custom `EmptyPlan` factories can pass `DurationProgress()` to the observing `Plan` constructor to publish scan updates.
+When source duration is not supplied, `Progress` first displays `Calculating duration` with an activity indicator. Duration analysis happens before processing begins; after it completes, progress reports the scan and processing phases separately. `Progress::Snapshot()` gives applications a consistent phase, duration/analytics percentages, processing score and completion flags, so a UI does not need to parse the status string. Getters and snapshots are safe to read concurrently. Custom `EmptyPlan` factories can pass `DurationProgress()` to the observing `Plan` constructor to publish scan updates.
 
 Capture `job.Telemetry()` before `Run()` if the final snapshot must outlive the job. It retains each stage's origin, lifecycle, frame/packet input and output counts, setup and elapsed time, Process-call total/mean/min/max, and blocked-wait total/count/max. The coordinator also logs the final multi-line report at `Info`; converting the retained handle to `std::string` produces the same report. A hand-built `Step` or filter exposes its own retained `Telemetry()` handle.
 
@@ -265,12 +284,12 @@ graph.Close();
 
 ## Plan, items and the tube contract
 
-- **`Plan`** is the whole job. Owned reader/writer locations, a consultation `File` snapshot, and a destination container resolved from the writer path. `Tracks` is the list of **outputs**. `Check()` is shape, not a rehearsal of FFmpeg.
+- **`Plan`** describes the job: input/output locations, a source-file snapshot and the **output** tracks. The destination container is inferred from the writer path. `Check()` validates the plan's structure; codec and format availability are confirmed when the job is configured.
 - **`Packet`** is a compressed access unit. **`Frame`** is a decoded one. No public timing setters. Mutate pixels through `Decoder` / `Encoder` / a filter `Replace`, not a setter on `Frame`.
 - **`Serial`** is a monotone id assigned by the tube. Public getter, no setter. It is not a frame count.
 - **`Remuxer`** forwards compressed packets and adapts them to the destination. “Copy” as a stage does not exist.
 - **Caps** (hopper capacity and stage ceilings) limit individual queues, not total job memory. Do not treat EOF as Fail. Recoverable logo failures can become Watermark passthrough; invalid plans, unsupported encoders and fatal processing errors remain failures.
-- **Content** behind `Frame` is virtual (passthrough / video / audio). After `Scale`, HDR10+ and friends are recalculated on `Replace`. Metadata is not dropped by `memcmp`.
+- **Frames and metadata** — filters can replace decoded content while the pipeline preserves the timing and properties it can safely retain. HDR and Dolby Vision metadata is not generally recalibrated to describe changed pixels; see [Dolby Vision metadata and transforms](#dolby-vision-metadata-and-transforms).
 
 ## DLL boundaries
 
@@ -282,7 +301,7 @@ For custom payloads, derived `Transcoder` providers must override `EmptyPlan()` 
 
 ## Filters and analytics
 
-Muxing shares one FFmpeg backend with private, separately maintained policies for Matroska, WebM and MOV/MP4. Matroska retains attachment streams, header metadata, default dispositions and interleaving adaptations; WebM shares its container machinery but rejects file attachments. MOV/MP4 retains default stream dispositions and adapts JPEG, PNG and BMP attachments to cover art using FFmpeg's attached-picture representation and `covr` metadata, not ordinary playable video tracks. Other attachment MIME types fail explicitly because this backend does not implement arbitrary ISO BMFF metadata items. Other muxers keep FFmpeg defaults. The `StormByte-Multimedia` writing-app tag is retained. Formats that manage their own files or require multiple outputs are not supported by the single buffered-writer contract.
+Container output is selected from the destination path and follows the format's supported stream and attachment rules. Matroska, WebM and MP4 support the common media workflows; image attachments can be written as cover art in MP4, while unsupported attachment types are reported rather than silently discarded. The library writes its application identity into supported container metadata. Formats that require multiple output files are outside the single-writer workflow.
 
 Filters are leaves, not a second pipeline language. `Scale` is resize (that is the name). `Watermark` is a still image on decoded video, with Hold so a black slate at the start does not pin the letterbox probe too early.
 
@@ -319,26 +338,26 @@ The application chooses the floor. `LowLevel` is a request for noise and the cos
 
 ## Build options and distribution
 
-Third-party trees live under `thirdparty/` and are wired through [StormByte BuildMaster](https://github.com/StormBytePP/StormByte-BuildMaster).
+Choose bundled or system dependencies and optional features with these CMake options.
 
 | Option | Values | Meaning |
 | --- | --- | --- |
-| `WITH_FFMPEG` | `BUNDLED` (default) / `SYSTEM` | Nested Meson FFmpeg, or `FindFFmpeg` against the host. |
-| `WITH_VMAF` | `BUNDLED` (default) / `SYSTEM` | Nested libvmaf, or `FindVmaf` (`libvmaf-dev` on Debian; Ubuntu archives do not ship it). |
+| `WITH_FFMPEG` | `BUNDLED` (default) / `SYSTEM` | Use the bundled libav media engine or a compatible system installation. |
+| `WITH_VMAF` | `BUNDLED` (default) / `SYSTEM` | Use bundled or system libvmaf for VMAF analytics. |
 | `WITH_OCR` | `BUNDLED` (default) / `SYSTEM` | Tesseract/Leptonica; Windows forces bundled OCR. |
 | `WITH_TESSDATA` | `BUNDLED` / `SYSTEM` | OCR language models; selected languages must be installed and discoverable. |
 | `WITH_ZIMG` | `BUNDLED` / `SYSTEM` | zimg dependency used by image processing. |
 | `BUILD_SHARED_LIBS` | `ON` (default) / `OFF` | Shared or static Multimedia and StormByte libraries. |
 | `ENABLE_TEST` | `ON` / `OFF` (default) | Register and build this module's CTest suite. |
 | `ENABLE_ASAN` | `ON` / `OFF` (default) | Debug ASan/UBSan on supported non-Windows builds; disabled for Release. |
-| `WITH_GPL` | `ON` / `OFF` | GPL components inside bundled FFmpeg (`gpl=enabled`, `version3=enabled`). |
-| `WITH_NONFREE` | `ON` / `OFF` | Nonfree components inside bundled FFmpeg. |
+| `WITH_GPL` | `ON` / `OFF` | Allow GPL-licensed components in the bundled media engine; this enables codecs such as x265 when available. It does not control decoding support. |
+| `WITH_NONFREE` | `ON` / `OFF` | Allow nonfree components in the bundled media engine, such as FDK-AAC. |
 
-`WITH_GPL` and `WITH_NONFREE` change **what the bundled FFmpeg is allowed to compile**. They do not relicense StormByte-Multimedia. If you ship a binary linked against a GPL or nonfree FFmpeg, **that binary** follows FFmpeg’s license combination. Leave both `OFF` when you need a redistributable build that stays on the LGPL side of FFmpeg.
+These options change which bundled codec implementations are available; they do not change the license of StormByte-Multimedia. libav is an implementation dependency, not an API you need to call. Review the licenses of the actual dependencies and enabled components when distributing an application.
 
-`SYSTEM` FFmpeg is whatever the host already linked; you inherit that host’s license surface.
+With `SYSTEM`, the system installation determines codec availability and its associated license terms.
 
-Codec availability depends on the selected FFmpeg build and its external libraries, not just the registry name. A pinned implementation such as `libx265` must exist in that build. Keep system FFmpeg and system libvmaf ABI-compatible, including any FFmpeg codec dependencies that themselves link libvmaf. Bundled FFmpeg builds libraries with its programs and tests disabled; Multimedia tests do not require the `ffmpeg` or `ffprobe` executables.
+Codec availability depends on the selected media-engine build and its installed dependencies, not just the registry name. A pinned implementation such as `libx265` must be present in that build. The library's tests exercise media through the StormByte API and do not require separate command-line media tools.
 
 OCR converts bitmap subtitle frames to text when a text subtitle codec is selected. Source language metadata selects the Tesseract model; a missing model is an error, not a translation service. Bundled tessdata packages language models separately from the OCR engine. System tessdata requires an installation discoverable by the configured paths or Tesseract environment.
 
@@ -354,7 +373,7 @@ cmake -S . -B build \
 
 ## Installation
 
-Needs a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and the StormByte modules listed above. The root currently declares an older CMake minimum; that declaration does not remove the newer language-standard requirement. Bundled FFmpeg also needs its platform build tools, including an assembler on relevant x86 builds, and Meson/Ninja through BuildMaster.
+Building from source requires a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and the StormByte modules listed above. The root currently declares an older CMake minimum; that declaration does not remove the newer language-standard requirement. A bundled build also builds its media dependencies, so the required platform toolchain may include additional tools.
 
 ```sh
 git clone --recursive https://github.com/StormBytePP/StormByte-Multimedia.git
@@ -369,7 +388,7 @@ The in-tree CMake target is `StormByte::Multimedia`. The library is `StormByte-M
 
 The mux-policy batch covers direct FLAC, FLAC in OGA, ALAC in CAF and direct E-AC3 output, plus incompatible FLAC input and WebM attachment rejection. Generated outputs are checked with `File`; no external media tools are invoked.
 
-Additional MP4 cases cover individual and mixed video/audio/timed-text tracks, languages and reordered tracks, `.m4a`/`.m4b` aliases, mixed remux/encode, image cover-art roundtrips and explicit rejection of unsupported font attachments. Cover tests compare exact payload bytes in MP4, audio-only M4A and Matroska, and ensure `File::Streams()` excludes the cover while `File::Attachments()` exposes it. The existing Matroska still-image classification workaround is retained. Subtitle-header cases check codec preparation without cues and a first cue timestamped at one hour. Matroska retains its empty subtitle stream; MP4 may omit entirely empty tracks from the final file according to libavformat behavior. Subtitle encoders are prepared at mux reservation, without waiting for a first decoded cue.
+Additional MP4 cases cover mixed video/audio/timed-text tracks, language and track ordering, `.m4a`/`.m4b` aliases, mixed remux/encode, image cover-art roundtrips and rejection of unsupported font attachments. Cover tests compare payloads and verify that `File::Streams()` and `File::Attachments()` report the expected items. Subtitle cases cover empty tracks and late first cues; container formats may differ in whether an entirely empty track appears in the final file.
 
 Pipeline cases are split into remux, analytics, video, audio, audio-codec, video-codec, watermark, mux-policy, OCR, negative-input/configuration and decoder-implementation executables under `test/pipeline`. Common helpers are compiled once in a static test support library; category-local edits rebuild only the affected executable. Individual CTest names remain `pipeline.test_*`.
 
@@ -383,9 +402,9 @@ cmake --build build-tests
 ctest --test-dir build-tests/test --output-on-failure
 ```
 
-The initial suite has 49 cases covering registries, fixed `File` properties, facade/manual remux, attachment inclusion/omission, HDR encoding, Japanese PGS OCR, exact VMAF remux reports, audio conversions and invalid input/configuration. New codec batches add 17 audio cases (FDK-AAC, Vorbis, Opus, LAME, FLAC, ALAC and AC-3/E-AC3), 11 video cases (SVT/libaom AV1, dav1d/libaom decoding, VP8/VP9, x264, OpenH264, Kvazaar and x265), and one dual-input watermark case. Outputs are reopened with `File` to check identity, dimensions or audio properties and positive duration; tests never invoke external FFmpeg or ffprobe programs. Decoder roundtrips create their own inputs and do not depend on another test's output.
+The suite covers registries, `File`, facade and manual pipelines, remux and transcode workflows, attachments, HDR metadata, OCR, analytics, audio/video codec combinations, filters and invalid input/configuration. Outputs are reopened with `File` to verify stream identity and media properties. Decoder roundtrips create their own inputs and do not depend on another test's output.
 
-Encoder cases can skip when the configured registry has no write support; pinned codec cases skip only unavailable implementations, not encoding failures. FDK-AAC is required when FFmpeg is bundled and nonfree is enabled. New codec and watermark cases have a 90-second CTest timeout to allow two successive jobs, each with a 30-second wait deadline. Fixtures are short synthetic media; provenance and font redistribution notices are in [test/files/README.md](test/files/README.md). Passing these cases is not certification of every codec, long-running workload or target platform.
+Encoder cases can skip when the configured registry has no write support; pinned codec cases skip only unavailable implementations, not encoding failures. FDK-AAC is required when the bundled build enables nonfree components. Fixtures are short synthetic media; provenance and font redistribution notices are in [test/files/README.md](test/files/README.md). Passing these cases is not certification of every codec, long-running workload or target platform.
 
 The watermark case creates `test-output/pipeline/watermark/watermark-logo-path.webm` and `watermark-logo-binary.webm`, using the same logo from a file path and from `#embed` bytes. It prints both paths for manual inspection; the automated checks validate video generation, not the overlay's appearance. Run the `MultimediaPipelineWatermarkTests` executable directly or use `ctest --test-dir build-tests/test -R watermark -V` to see the paths on success. Both outputs use VP9 and do not require GPL/nonfree codecs.
 
@@ -407,15 +426,17 @@ StormByte-Multimedia original source is **dual-licensed**:
    The same original source may be used under a commercial agreement with the copyright holder (David C. Manuelda <StormByte@gmail.com>).  
    That option requires a written agreement. Without it, the LGPL applies.
 
-Both licenses cover **original StormByte-Multimedia source only**. Third-party components — including FFmpeg, libvmaf and embedded trained data — keep their own licenses and are **not** covered by the commercial grant. See [NOTICE](NOTICE) and `thirdparty/`.
+Both licensing options cover **original StormByte-Multimedia source only**. Third-party components — including FFmpeg, libvmaf and embedded trained data — keep their own licenses and are **not** covered by the commercial grant. See [NOTICE](NOTICE) and `thirdparty/`.
 
-Neither license grants patent rights. SPDX: `LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial`.
+A written StormByte commercial agreement may license the original StormByte-Multimedia code on terms other than the LGPL, including specific use and linking arrangements such as static linking, as stated in that agreement. It does not grant rights to dependencies or waive their license conditions. In particular, enabling `WITH_GPL` or `WITH_NONFREE` can add separate obligations to a binary or other work that uses those components, including for modification, linking (static or dynamic) and redistribution. The packager and final user are responsible for determining and meeting all applicable license and distribution requirements and obtaining any needed patent permissions. A StormByte license does not provide those permissions for GPL or nonfree components and grants no patent rights.
+
+SPDX: `LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial`.
 
 The headers of the public and private trees repeat this grant. When in doubt, those headers and `LICENSE` win over this README.
 
 ## Supporting the project
 
-If this saved you from another pile of raw `AVCodecContext` and a private graph of `av_read_frame` loops, a star is the polite nod. A well-aimed issue beats a vague “it broke”. Pull requests that keep the public tube small — `Plan`, `Step`, `Transcoder`, filters as leaves — are the ones that land.
+If this saved you from building a separate media pipeline inside your application, a star is the polite nod. A well-aimed issue beats a vague “it broke”. Pull requests that keep the public API focused — `Plan`, `Step`, `Transcoder` and composable filters — are the ones that land.
 
 I wrote this because the alternative was another private transcoder in every product. Maintaining that difference takes evenings.
 

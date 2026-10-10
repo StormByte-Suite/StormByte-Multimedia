@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -62,86 +74,26 @@ namespace StormByte {
 			 * @brief Curated pixel formats. Unknown covers unlisted AVPixelFormat values.
 			 */
 			enum class STORMBYTE_MULTIMEDIA_PUBLIC PixelFormat {
-				/**
-				 * @brief Unlisted or missing
-				 */
-				Unknown,
-				/**
-				 * @brief Planar YUV 4:2:0 8-bit
-				 */
-				YUV420P,
-				/**
-				 * @brief Planar YUV 4:2:2 8-bit
-				 */
-				YUV422P,
-				/**
-				 * @brief Planar YUV 4:4:4 8-bit
-				 */
-				YUV444P,
-				/**
-				 * @brief Planar YUV 4:2:0 10-bit
-				 */
-				YUV420P10,
-				/**
-				 * @brief Planar YUV 4:2:2 10-bit
-				 */
-				YUV422P10,
-				/**
-				 * @brief Planar YUV 4:4:4 10-bit
-				 */
-				YUV444P10,
-				/**
-				 * @brief Planar YUV 4:2:0 12-bit
-				 */
-				YUV420P12,
-				/**
-				 * @brief Planar YUV 4:2:2 12-bit
-				 */
-				YUV422P12,
-				/**
-				 * @brief Planar YUV 4:4:4 12-bit
-				 */
-				YUV444P12,
-				/**
-				 * @brief Semi-planar YUV 4:2:0 8-bit
-				 */
-				NV12,
-				/**
-				 * @brief Semi-planar YUV 4:2:0 8-bit (VU)
-				 */
-				NV21,
-				/**
-				 * @brief Semi-planar YUV 4:2:0 10-bit
-				 */
-				P010,
-				/**
-				 * @brief Packed RGB 8-bit
-				 */
-				RGB24,
-				/**
-				 * @brief Packed BGR 8-bit
-				 */
-				BGR24,
-				/**
-				 * @brief Packed RGBA 8-bit
-				 */
-				RGBA,
-				/**
-				 * @brief Packed BGRA 8-bit
-				 */
-				BGRA,
-				/**
-				 * @brief Gray 8-bit
-				 */
-				GRAY8,
-				/**
-				 * @brief Gray 10-bit
-				 */
-				GRAY10,
-				/**
-				 * @brief Gray 16-bit
-				 */
-				GRAY16
+				Unknown,		///< Unlisted or missing
+				YUV420P,		///< Planar YUV 4:2:0 8-bit
+				YUV422P,		///< Planar YUV 4:2:2 8-bit
+				YUV444P,		///< Planar YUV 4:4:4 8-bit
+				YUV420P10,		///< Planar YUV 4:2:0 10-bit
+				YUV422P10,		///< Planar YUV 4:2:2 10-bit
+				YUV444P10,		///< Planar YUV 4:4:4 10-bit
+				YUV420P12,		///< Planar YUV 4:2:0 12-bit
+				YUV422P12,		///< Planar YUV 4:2:2 12-bit
+				YUV444P12,		///< Planar YUV 4:4:4 12-bit
+				NV12,			///< Semi-planar YUV 4:2:0 8-bit
+				NV21,			///< Semi-planar YUV 4:2:0 8-bit (VU)
+				P010,			///< Semi-planar YUV 4:2:0 10-bit
+				RGB24,			///< Packed RGB 8-bit
+				BGR24,			///< Packed BGR 8-bit
+				RGBA,			///< Packed RGBA 8-bit
+				BGRA,			///< Packed BGRA 8-bit
+				GRAY8,			///< Gray 8-bit
+				GRAY10,			///< Gray 10-bit
+				GRAY16			///< Gray 16-bit
 			};
 
 			/**
@@ -155,12 +107,12 @@ namespace StormByte {
 					case PixelFormat::YUV420P:		return "YUV420P";
 					case PixelFormat::YUV422P:		return "YUV422P";
 					case PixelFormat::YUV444P:		return "YUV444P";
-					case PixelFormat::YUV420P10:	return "YUV420P10";
-					case PixelFormat::YUV422P10:	return "YUV422P10";
-					case PixelFormat::YUV444P10:	return "YUV444P10";
-					case PixelFormat::YUV420P12:	return "YUV420P12";
-					case PixelFormat::YUV422P12:	return "YUV422P12";
-					case PixelFormat::YUV444P12:	return "YUV444P12";
+					case PixelFormat::YUV420P10:		return "YUV420P10";
+					case PixelFormat::YUV422P10:		return "YUV422P10";
+					case PixelFormat::YUV444P10:		return "YUV444P10";
+					case PixelFormat::YUV420P12:		return "YUV420P12";
+					case PixelFormat::YUV422P12:		return "YUV422P12";
+					case PixelFormat::YUV444P12:		return "YUV444P12";
 					case PixelFormat::NV12:			return "NV12";
 					case PixelFormat::NV21:			return "NV21";
 					case PixelFormat::P010:			return "P010";
@@ -171,7 +123,7 @@ namespace StormByte {
 					case PixelFormat::GRAY8:		return "GRAY8";
 					case PixelFormat::GRAY10:		return "GRAY10";
 					case PixelFormat::GRAY16:		return "GRAY16";
-					default:						return "Invalid";
+					default:				return "Invalid";
 				}
 			}
 

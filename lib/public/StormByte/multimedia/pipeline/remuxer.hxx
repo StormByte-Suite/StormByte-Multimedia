@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -47,138 +59,198 @@
 #include <cstddef>
 #include <memory>
 
+/**
+ * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker
+ * @brief Backend pipeline worker types.
+ *
+ * @ingroup multimedia_pipeline
+ */
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
+	/**
+	 * @brief Backend worker for remuxing compressed packets.
+	 */
 	class Remux;
 }
 
 /**
- * @namespace StormByte::Multimedia::Pipeline
- * @brief Demux / decode / filter / encode / mux types.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte suite.
  *
  * @ingroup multimedia_pipeline
  */
-namespace StormByte::Multimedia::Pipeline {
-	class Demuxer;
-	class Muxer;
-	class Remuxer;
-
+namespace StormByte {
 	/**
-	 * @brief Binds origin track remuxer.In() from @p demuxer onto @p remuxer.
-	 * @param demuxer Origin demuxer.
-	 * @param remuxer Destination remuxer.
-	 * @return @p remuxer.
-	 */
-	STORMBYTE_MULTIMEDIA_PUBLIC Remuxer& operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept;
-
-	/**
-	 * @class Remuxer
-	 * @brief Forwards compressed packets of one origin track to the muxer.
-	 *
-	 * Packets retain their source lineage and are forwarded without
-	 * re-encoding. @ref Filters can analyze decoded destination
-	 * pictures without changing the forwarded packets.
-	 *
-	 * Logging identifies the origin codec or track index; the supplied
-	 * logger controls throttling.
+	 * @namespace StormByte::Multimedia
+	 * @brief Audio and video processing types.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Remuxer final: public Step {
-		friend class Backend::Pipeline::Detail::Worker::Remux;
-		friend Remuxer& operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept;
-		friend Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
-		friend class Route;
-
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Pipeline
+		 * @brief Demux / decode / filter / encode / mux types.
+		 *
+		 * @ingroup multimedia_pipeline
+		 */
+		namespace Pipeline {
 			/**
-			 * @name Lifecycle
-			 * @{
+			 * @brief Demultiplexes input media streams.
 			 */
-
-			/**
-			 * @brief Remuxer for origin stream @p in.
-			 * @param log Shared logger. Empty pointer means no log.
-			 * @param in Origin stream index.
-			 */
-			explicit Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept;
+			class Demuxer;
 
 			/**
-			 * @brief Copy constructor.
-			 * @param other Source remuxer.
+			 * @brief Multiplexes output media streams.
 			 */
-			Remuxer(const Remuxer& other) = delete;
+			class Muxer;
 
 			/**
-			 * @brief Move constructor.
-			 * @param other Remuxer to take.
+			 * @brief Forwards compressed packets of an origin track.
 			 */
-			Remuxer(Remuxer&& other) noexcept = delete;
+			class Remuxer;
 
 			/**
-			 * @brief Destructor. @ref Step::Join Halt s before backends die.
+			 * @brief Binds origin track remuxer.In() from @p demuxer onto @p remuxer.
+			 * @param demuxer Origin demuxer.
+			 * @param remuxer Destination remuxer.
+			 * @return @p remuxer.
 			 */
-			~Remuxer() noexcept override;
+			STORMBYTE_MULTIMEDIA_PUBLIC Remuxer& operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept;
 
 			/**
-			 * @brief Copy assignment.
-			 * @param other Source remuxer.
-			 * @return *this.
+			 * @class Remuxer
+			 * @brief Forwards compressed packets of one origin track to the muxer.
+			 *
+			 * Packets retain their source lineage and are forwarded without
+			 * re-encoding. @ref Filters can analyze decoded destination
+			 * pictures without changing the forwarded packets.
+			 *
+			 * Logging identifies the origin codec or track index; the supplied
+			 * logger controls throttling.
+			 *
+			 * @ingroup multimedia_pipeline
 			 */
-			Remuxer& operator=(const Remuxer& other) = delete;
+			class STORMBYTE_MULTIMEDIA_PUBLIC Remuxer final: public Step {
+				public:
+					/**
+					 * @name Lifecycle
+					 * @{
+					 */
 
-			/**
-			 * @brief Move assignment.
-			 * @param other Remuxer to take.
-			 * @return *this.
-			 */
-			Remuxer& operator=(Remuxer&& other) noexcept = delete;
+					/**
+					 * @brief Remuxer for origin stream @p in.
+					 * @param log Shared logger. Empty pointer means no log.
+					 * @param in Origin stream index.
+					 */
+					explicit Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept;
 
-			/**
-			 * @}
-			 */
+					/**
+					 * @brief Copy constructor.
+					 * @param other Source remuxer.
+					 */
+					Remuxer(const Remuxer& other) = delete;
 
-			/**
-			 * @brief Origin stream index.
-			 * @return Index passed to the constructor.
-			 */
-			inline int In() const noexcept {
-				return m_index;
-			}
+					/**
+					 * @brief Move constructor.
+					 * @param other Remuxer to take.
+					 */
+					Remuxer(Remuxer&& other) noexcept = delete;
 
-			/**
-			 * @brief Maximum number of queued input packets.
-			 * @return Packet limit, or `0` if no input queue exists.
-			 */
-			std::size_t InputCeiling() const noexcept override;
+					/**
+					 * @brief Destroy the remuxer; @ref Step::Join halts before backends die.
+					 */
+					~Remuxer() noexcept override;
 
-		private:
-			/**
-			 * @name Logging
-			 * @{
-			 */
+					/**
+					 * @brief Copy assignment.
+					 * @param other Source remuxer.
+					 * @return *this.
+					 */
+					Remuxer& operator=(const Remuxer& other) = delete;
 
-			using Step::Log;
+					/**
+					 * @brief Move assignment.
+					 * @param other Remuxer to take.
+					 * @return *this.
+					 */
+					Remuxer& operator=(Remuxer&& other) noexcept = delete;
 
-			/**
-			 * @brief Token after `STMM ` for this remuxer.
-			 * @return `Remuxer(<origin codec name>)` when the Plan
-			 *         lists @ref In, otherwise `Remuxer(t=<index>)`.
-			 */
-			StormByte::Safe::String Label() const noexcept override;
+					/**
+					 * @}
+					 */
 
-			/**
-			 * @}
-			 */
+					/**
+					 * @brief Origin stream index.
+					 * @return Index passed to the constructor.
+					 */
+					inline int In() const noexcept {
+						return m_index;
+					}
 
-			/**
-			 * @brief @ref Step::Emit of the forwarded packet.
-			 * @param packet Forwarded unit. Empty pointers are ignored.
-			 */
-			void Emit(Packet::PointerType packet) noexcept;
+					/**
+					 * @brief Maximum number of queued input packets.
+					 * @return Packet limit, or `0` if no input queue exists.
+					 */
+					std::size_t InputCeiling() const noexcept override;
 
-			int m_index;								///< Origin stream index
-			Join m_join{*this};							///< Halt before other members die
-	};
+				private:
+					/**
+					 * @brief Allow the remux worker to access pipeline internals.
+					 */
+					friend class Backend::Pipeline::Detail::Worker::Remux;
+
+					/**
+					 * @brief Connect the origin demuxer to this remuxer.
+					 * @param demuxer Origin demuxer.
+					 * @param remuxer Destination remuxer.
+					 * @return Destination remuxer.
+					 */
+					friend Remuxer& operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept;
+
+					/**
+					 * @brief Connect this remuxer to the destination muxer.
+					 * @param remuxer Origin remuxer.
+					 * @param muxer Destination muxer.
+					 * @return Origin remuxer.
+					 */
+					friend Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
+
+					/**
+					 * @brief Allow routes to access remuxer internals.
+					 */
+					friend class Route;
+
+					/**
+					 * @name Logging
+					 * @{
+					 */
+
+					/**
+					 * @brief Make the base logging overloads available in this scope.
+					 */
+					using Step::Log;
+
+					/**
+					 * @brief Token after `STMM ` for this remuxer.
+					 * @return `Remuxer(<origin codec name>)` when the Plan
+					 *         lists @ref In, otherwise `Remuxer(t=<index>)`.
+					 */
+					StormByte::Safe::String Label() const noexcept override;
+
+					/**
+					 * @}
+					 */
+
+					/**
+					 * @brief @ref Step::Emit of the forwarded packet.
+					 * @param packet Forwarded unit. Empty pointers are ignored.
+					 */
+					void Emit(Packet::PointerType packet) noexcept;
+
+					int m_index;		///< Origin stream index
+					Join m_join{*this};	///< Halt before other members die
+			};
+		}
+	}
 }
 
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Remuxer);

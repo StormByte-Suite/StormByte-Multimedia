@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -46,109 +58,117 @@
 #include <cstdint>
 
 /**
- * @namespace StormByte::Multimedia::Property
- * @brief Media property value types.
+ * @namespace StormByte
+ * @brief StormByte library root namespace.
  */
-namespace StormByte::Multimedia::Property {
+namespace StormByte {
 	/**
-	 * @class Audio
-	 * @brief Per-stream audio properties.
-	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
-	 *       remain loaded while their values and provider callbacks are in use.
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia classes and helpers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Audio final {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Property
+		 * @brief Media property value types.
+		 */
+		namespace Property {
 			/**
-			 * @brief Constructs unknown audio properties with no codec profile.
-			 * @throws StormByte::Exception Safe storage initialization failed.
+			 * @class Audio
+			 * @brief Per-stream audio properties.
+			 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+			 *       remain loaded while their values and provider callbacks are in use.
 			 */
-			Audio();
+			class STORMBYTE_MULTIMEDIA_PUBLIC Audio final {
+				public:
+					/**
+					 * @brief Constructs unknown audio properties with no codec profile.
+					 * @throws StormByte::Exception Safe storage initialization failed.
+					 */
+					Audio();
 
-			/**
-			 * @brief Constructs audio properties.
-			 * @param layout Speaker layout.
-			 * @param sample_rate Sample rate in Hz.
-			 * @param channels Channel count.
-			 * @param bitrate Bitrate in bits per second (0 if unknown).
-			 * @param profile Optional codec profile name.
-			 */
-			Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
-				std::uint64_t bitrate = 0, StormByte::Safe::Optional<StormByte::Safe::String> profile = std::nullopt) noexcept;
+					/**
+					 * @brief Constructs audio properties.
+					 * @param layout Speaker layout.
+					 * @param sample_rate Sample rate in Hz.
+					 * @param channels Channel count.
+					 * @param bitrate Bitrate in bits per second (0 if unknown).
+					 * @param profile Optional codec profile name.
+					 */
+					Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+						std::uint64_t bitrate = 0, StormByte::Safe::Optional<StormByte::Safe::String> profile = std::nullopt) noexcept;
 
-			/**
-			 * @brief Copy constructor.
-			 * @param other Properties to copy.
-			 * @throws StormByte::Exception Safe storage copying failed.
-			 */
-			Audio(const Audio& other);
+					/**
+					 * @brief Copy constructor.
+					 * @param other Properties to copy.
+					 * @throws StormByte::Exception Safe storage copying failed.
+					 */
+					Audio(const Audio& other);
 
-			/**
-			 * @brief Move constructor.
-			 * @param other Properties to move.
-			 */
-			Audio(Audio&& other) noexcept;
+					/**
+					 * @brief Move constructor.
+					 * @param other Properties to move.
+					 */
+					Audio(Audio&& other) noexcept;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Audio() noexcept;
+					/**
+					 * @brief Destructor.
+					 */
+					~Audio() noexcept;
 
-			/**
-			 * @brief Copy assignment.
-			 * @param other Properties to copy.
-			 * @return *this.
-			 * @throws StormByte::Exception Safe storage copying failed.
-			 */
-			Audio& operator=(const Audio& other);
+					/**
+					 * @brief Copy assignment.
+					 * @param other Properties to copy.
+					 * @return *this.
+					 * @throws StormByte::Exception Safe storage copying failed.
+					 */
+					Audio& operator=(const Audio& other);
 
-			/**
-			 * @brief Move assignment.
-			 * @param other Properties to move.
-			 * @return *this.
-			 */
-			Audio& operator=(Audio&& other) noexcept;
+					/**
+					 * @brief Move assignment.
+					 * @param other Properties to move.
+					 * @return *this.
+					 */
+					Audio& operator=(Audio&& other) noexcept;
 
-			/**
-			 * @brief Speaker layout.
-			 * @return Layout.
-			 */
-			ChannelLayout Layout() const noexcept;
+					/**
+					 * @brief Speaker layout.
+					 * @return Layout.
+					 */
+					ChannelLayout Layout() const noexcept;
 
-			/**
-			 * @brief Sample rate in Hz.
-			 * @return Sample rate.
-			 */
-			std::uint32_t SampleRate() const noexcept;
+					/**
+					 * @brief Sample rate in Hz.
+					 * @return Sample rate.
+					 */
+					std::uint32_t SampleRate() const noexcept;
 
-			/**
-			 * @brief Channel count.
-			 * @return Channel count.
-			 */
-			std::uint8_t Channels() const noexcept;
+					/**
+					 * @brief Channel count.
+					 * @return Channel count.
+					 */
+					std::uint8_t Channels() const noexcept;
 
-			/**
-			 * @brief Bitrate in bits per second.
-			 * @return Bitrate, or 0 if unknown.
-			 */
-			std::uint64_t BitRate() const noexcept;
+					/**
+					 * @brief Bitrate in bits per second.
+					 * @return Bitrate, or 0 if unknown.
+					 */
+					std::uint64_t BitRate() const noexcept;
 
-			/**
-			 * @brief Codec profile name, if present.
-			 * @return Borrowed optional profile, valid while this object is alive.
-			 */
-			const StormByte::Safe::Optional<StormByte::Safe::String>& Profile() const noexcept;
+					/**
+					 * @brief Codec profile name, if present.
+					 * @return Borrowed optional profile, valid while this object is alive.
+					 */
+					const StormByte::Safe::Optional<StormByte::Safe::String>& Profile() const noexcept;
 
-		private:
-			ChannelLayout m_layout = ChannelLayout::Unknown;				///< Speaker layout, initialized to unknown.
-
-			std::uint32_t m_sample_rate = 0;								///< Sample rate in Hz, initialized to zero.
-
-			std::uint8_t m_channels = 0;									///< Channel count, initialized to zero.
-
-			std::uint64_t m_bitrate = 0;									///< Bitrate in bits per second, initialized to zero.
-
-			StormByte::Safe::Optional<StormByte::Safe::String> m_profile;	///< Optional Base-owned codec profile.
-	};
+				private:
+					ChannelLayout m_layout = ChannelLayout::Unknown;		///< Speaker layout, initialized to unknown.
+					std::uint32_t m_sample_rate = 0;				///< Sample rate in Hz, initialized to zero.
+					std::uint8_t m_channels = 0;					///< Channel count, initialized to zero.
+					std::uint64_t m_bitrate = 0;					///< Bitrate in bits per second, initialized to zero.
+					StormByte::Safe::Optional<StormByte::Safe::String> m_profile;	///< Optional Base-owned codec profile.
+			};
+		}
+	}
 }
 
 /**

@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -42,83 +54,94 @@
 #include <StormByte/type_traits/safe.hxx>
 
 /**
- * @namespace StormByte::Multimedia::Property
- * @brief Media property value types.
+ * @namespace StormByte
+ * @brief StormByte library root namespace.
  */
-namespace StormByte::Multimedia::Property {
+namespace StormByte {
 	/**
-	 * @class Point
-	 * @brief Integer 2D point (chromaticity / luminance pair).
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia classes and helpers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Point final {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Property
+		 * @brief Media property value types.
+		 */
+		namespace Property {
 			/**
-			 * @brief Constructs the zero point for Safe value storage.
+			 * @class Point
+			 * @brief Integer 2D point (chromaticity / luminance pair).
 			 */
-			Point() noexcept = default;
+			class STORMBYTE_MULTIMEDIA_PUBLIC Point final {
+				public:
+					/**
+					 * @brief Constructs the zero point for Safe value storage.
+					 */
+					Point() noexcept = default;
 
-			/**
-			 * @brief Constructs a point.
-			 * @param x X coordinate.
-			 * @param y Y coordinate.
-			 */
-			Point(int x, int y) noexcept;
+					/**
+					 * @brief Constructs a point.
+					 * @param x X coordinate.
+					 * @param y Y coordinate.
+					 */
+					Point(int x, int y) noexcept;
 
-			/**
-			 * @brief Copy constructor.
-			 */
-			Point(const Point&) = default;
+					/**
+					 * @brief Copy constructor.
+					 */
+					Point(const Point&) = default;
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Point(Point&&) noexcept = default;
+					/**
+					 * @brief Move constructor.
+					 */
+					Point(Point&&) noexcept = default;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Point() noexcept = default;
+					/**
+					 * @brief Destructor.
+					 */
+					~Point() noexcept = default;
 
-			/**
-			 * @brief Copy assignment.
-			 * @return *this.
-			 */
-			Point& operator=(const Point&) = default;
+					/**
+					 * @brief Copy assignment.
+					 * @return *this.
+					 */
+					Point& operator=(const Point&) = default;
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Point& operator=(Point&&) noexcept = default;
+					/**
+					 * @brief Move assignment.
+					 * @return *this.
+					 */
+					Point& operator=(Point&&) noexcept = default;
 
-			/**
-			 * @brief X coordinate.
-			 * @return X.
-			 */
-			int X() const noexcept;
+					/**
+					 * @brief X coordinate.
+					 * @return X.
+					 */
+					int X() const noexcept;
 
-			/**
-			 * @brief Y coordinate.
-			 * @return Y.
-			 */
-			int Y() const noexcept;
+					/**
+					 * @brief Y coordinate.
+					 * @return Y.
+					 */
+					int Y() const noexcept;
 
-			/**
-			 * @brief Builds a point scaled to a common denominator.
-			 * @param numerator_x X numerator.
-			 * @param denominator_x X denominator.
-			 * @param numerator_y Y numerator.
-			 * @param denominator_y Y denominator.
-			 * @param denominator Target scale denominator.
-			 * @return Normalized point.
-			 */
-			static Point Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept;
+					/**
+					 * @brief Builds a point scaled to a common denominator.
+					 * @param numerator_x X numerator.
+					 * @param denominator_x X denominator.
+					 * @param numerator_y Y numerator.
+					 * @param denominator_y Y denominator.
+					 * @param denominator Target scale denominator.
+					 * @return Normalized point.
+					 */
+					static Point Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept;
 
-		private:
-			int m_x = 0;	///< X coordinate, initialized to zero.
-
-			int m_y = 0;	///< Y coordinate, initialized to zero.
-	};
+				private:
+					int m_x = 0;	///< X coordinate, initialized to zero.
+					int m_y = 0;	///< Y coordinate, initialized to zero.
+			};
+		}
+	}
 }
 
 /**

@@ -213,9 +213,10 @@ else()
 		CAPTURE FFMPEG_PLUGIN_OPTIONS
 	)
 
-	# Host DSO only. LINKFLAGS= on ffmpeg does not propagate.
+	# Static media dependencies are absorbed into the host DSO. Hide symbols
+	# contributed by static archives so their PC-relative relocations resolve
+	# locally without binding Multimedia's own public RTTI or host symbols.
 	# No gc-sections / -dead_strip / /OPT:REF — they can drop live objects.
-	# -Bsymbolic: ELF. Invalid on ld64 and link.exe.
 	# /FORCE:MULTIPLE: duplicate helpers across the static archives.
 	# Frameworks: find_library, already PRIVATE, so tests do not inherit them.
 	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
@@ -238,7 +239,7 @@ else()
 			endforeach()
 		elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 			target_link_options(StormByte-Multimedia PRIVATE
-				"-Wl,-Bsymbolic"
+				"-Wl,--exclude-libs,ALL"
 				"-Wl,--no-undefined"
 			)
 		endif()

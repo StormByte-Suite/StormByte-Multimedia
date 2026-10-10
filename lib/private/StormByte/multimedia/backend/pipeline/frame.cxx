@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -102,17 +114,18 @@ namespace {
 }
 
 Frame::Frame(const Frame& other) noexcept
-: m_handle(other.m_handle), m_payloadReady(other.m_payloadReady) {}
+: m_handle(other.m_handle), m_payloadReady(other.m_payloadReady), m_contentValid(other.m_contentValid) {}
 
 Frame& Frame::operator=(const Frame& other) noexcept {
 	if (this == &other)
 		return *this;
 	m_handle = other.m_handle;
 	m_payloadReady = other.m_payloadReady;
+	m_contentValid = other.m_contentValid;
 	return *this;
 }
 
-void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexcept try {
 	if (!m_handle)
 		return;
 
@@ -123,6 +136,19 @@ void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexce
 			if (m_handle.Width() <= 0 || m_handle.Height() <= 0)
 				return;
 			const auto sar = m_handle.SampleAspectRatio();
+			auto dovi = frame.m_video->DOVI();
+			const auto* metadata = m_handle.SideData(AV_FRAME_DATA_DOVI_METADATA);
+			const auto* rpu = m_handle.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER);
+			if (metadata || rpu) {
+				auto merged = dovi.value_or(Property::DOVI{});
+				bool loaded = false;
+				if (metadata && metadata->data)
+					loaded = merged.LoadMetadata(std::as_bytes(std::span{metadata->data, metadata->size}));
+				if (rpu && rpu->data)
+					loaded = merged.LoadRpu(std::as_bytes(std::span{rpu->data, rpu->size})) || loaded;
+				if (loaded)
+					dovi = std::move(merged);
+			}
 			frame.m_video = Property::Video(
 				frame.m_video->Color(),
 				Property::Resolution{
@@ -131,7 +157,8 @@ void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexce
 				},
 				frame.m_video->HDR10(),
 				frame.m_video->FrameRate(),
-				sar.Valid() ? std::optional<Property::AVRational>{sar} : frame.m_video->SampleAspectRatio());
+				sar.Valid() ? std::optional<Property::AVRational>{sar} : frame.m_video->SampleAspectRatio(),
+				std::move(dovi));
 			break;
 		}
 
@@ -154,12 +181,25 @@ void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexce
 	}
 }
 
+catch (...) {
+	m_contentValid = false;
+	m_warning = "failed to bind preserved frame metadata";
+}
+
 void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) noexcept {
 	m_warning.clear();
+	m_contentValid = true;
 	const ::AVFrame* before = m_handle.Get();
 	auto content = Content::For(owner.Type());
 	content->Put(before, raw);
 	m_warning = content->Warning();
+	if (before && raw) {
+		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
+			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL}) {
+			if (av_frame_get_side_data(before, type) && !av_frame_get_side_data(raw, type))
+				m_contentValid = false;
+		}
+	}
 	m_handle.Reset(raw);
 	m_payloadReady = false;
 	BindProperties(owner);
@@ -167,4 +207,8 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 
 const std::string& Frame::Warning() const noexcept {
 	return m_warning;
+}
+
+bool Frame::ContentValid() const noexcept {
+	return m_contentValid;
 }

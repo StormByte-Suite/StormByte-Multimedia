@@ -1,0 +1,44 @@
+add_executable(MultimediaPipelineDoviTests dovi_test.cxx
+	"${PROJECT_SOURCE_DIR}/lib/tables/decoder/video.cxx"
+	"${PROJECT_SOURCE_DIR}/lib/tables/encoder/video.cxx")
+target_include_directories(MultimediaPipelineDoviTests PRIVATE "${PROJECT_SOURCE_DIR}/lib")
+target_link_libraries(MultimediaPipelineDoviTests PRIVATE multimedia_pipeline_test_support)
+
+foreach(test_name IN ITEMS
+	test_file_dovi_only_configuration_and_metadata
+	test_file_hdr10_only_without_dovi
+	test_file_dovi_hdr10_configuration_and_metadata
+	test_remux_dovi_only
+	test_remux_hdr10_only
+	test_remux_dovi_hdr10
+	test_video_and_frame_copy_move_preserve_dovi
+	test_dovi_owned_rpu_and_invalid_loads_preserve_configuration
+	test_dovi_metadata_rejects_invalid_extension_offsets
+	test_dovi_metadata_rejects_invalid_extension_strides
+	test_dovi_metadata_validates_extension_counts_and_extent
+	test_dovi_metadata_accepts_unaligned_storage_and_offsets
+	test_dovi_feature_string_conversion
+	test_dovi_decoder_table_capabilities
+	test_dovi_encoder_table_capabilities)
+	add_pipeline_test(MultimediaPipelineDoviTests ${test_name})
+endforeach()
+
+if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_GPL))
+	foreach(test_name IN ITEMS
+		test_reencode_dovi_only
+		test_reencode_hdr10_only
+		test_reencode_dovi_hdr10
+		test_watermark_dovi_only
+		test_watermark_hdr10_only
+		test_watermark_dovi_hdr10
+		test_replace_frame_dovi_only
+		test_replace_frame_hdr10_only
+		test_replace_frame_dovi_hdr10
+		test_unsupported_hevc_dovi_only
+		test_unsupported_hevc_dovi_hdr10)
+		add_optional_pipeline_test(MultimediaPipelineDoviTests ${test_name})
+	endforeach()
+endif()
+
+add_optional_pipeline_test(MultimediaPipelineDoviTests test_unsupported_vp9_dovi_only)
+add_optional_pipeline_test(MultimediaPipelineDoviTests test_unsupported_vp9_dovi_hdr10)

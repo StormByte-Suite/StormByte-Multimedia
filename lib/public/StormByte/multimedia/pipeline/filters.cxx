@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -123,7 +135,7 @@ Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> fi
 	if (!stretch.Lane)
 		return *this;
 
-	if (dynamic_cast<Filter::ProcessTwoPasses*>(filter.get())) {
+	if (StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(filter)) {
 		if (dynamic_cast<Remuxer*>(stretch.Destination.get())) {
 			stretch.Destination->Fail("ProcessTwoPasses cannot remux");
 			return *this;
@@ -135,7 +147,7 @@ Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> fi
 		}
 	}
 
-	if (dynamic_cast<Filter::Analytics*>(filter.get())) {
+	if (StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)) {
 		m_owner->m_hasAnalytics = true;
 		if (m_owner->m_progress)
 			m_owner->m_progress->HasAnalytics(true);
@@ -175,7 +187,7 @@ Filters::~Filters() noexcept {
 Filters& Filters::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!filter)
 		return *this;
-	if (dynamic_cast<Filter::Analytics*>(filter.get()) == nullptr) {
+	if (!StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)) {
 		filter->Fail("global Add is Analytics; Process/Packet go on Between");
 		return *this;
 	}
@@ -303,7 +315,7 @@ void Filters::Close() noexcept {
 	m_measureFilterCount = 0;
 	m_measureFiltersDrained = 0;
 	for (auto& item : m_reports) {
-		if (auto* two = dynamic_cast<Filter::ProcessTwoPasses*>(item.Filter.get())) {
+		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter)) {
 			two->EnterMeasure();
 			two->BindMeasure(this);
 			++m_measureFilterCount;
@@ -344,7 +356,7 @@ void Filters::CloseMeasureSource() noexcept {
 	}
 
 	for (auto& item : m_reports) {
-		if (auto* two = dynamic_cast<Filter::ProcessTwoPasses*>(item.Filter.get()))
+		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter))
 			two->MeasureSourceClosed();
 	}
 }
@@ -354,7 +366,7 @@ void Filters::OnMeasureDrained(int track) noexcept {
 			== m_measureDrained.end())
 		m_measureDrained.push_back(track);
 	for (auto& item : m_reports) {
-		if (auto* two = dynamic_cast<Filter::ProcessTwoPasses*>(item.Filter.get()))
+		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter))
 			two->Wake();
 	}
 }
@@ -377,7 +389,7 @@ void Filters::FinishMeasure() noexcept {
 		return;
 
 	for (auto& item : m_reports) {
-		if (auto* two = dynamic_cast<Filter::ProcessTwoPasses*>(item.Filter.get()))
+		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter))
 			two->LeaveMeasure();
 	}
 

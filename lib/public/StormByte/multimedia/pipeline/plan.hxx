@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -45,11 +57,11 @@
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/function.hxx>
 #include <StormByte/safe/optional.hxx>
-#include <StormByte/safe/string.hxx>
 #include <StormByte/safe/pointers.hxx>
-#include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
 #include <cstdint>
@@ -73,20 +85,23 @@ namespace StormByte {
 		 * @ingroup multimedia_pipeline
 		 */
 		namespace Pipeline {
+				/**
+				 * @brief Demux stage receiving the job intention.
+				 */
 			class Demuxer;
 
 			/**
 			 * @class Plan
-				 * @brief Closed job intention: owned location reader, writer and tracks.
+			 * @brief Closed job intention: owned location reader, writer and tracks.
 			 *
-				 * Octets are held as @ref StormByte::Safe::Unique of the location
-				 * bases. Paths build local BufferedFile leaves; supplied owners retain
-				 * their dynamic types without slicing. The constructor probes the
-				 * reader once into a consultation File snapshot
-				 * (streams, attachments, metadata). That File is not the
-				 * octet origin. The source duration is resolved here: an
-				 * explicit duration avoids scanning; otherwise the full source
-				 * is scanned before pipeline stages are created.
+			 * Octets are held as @ref StormByte::Safe::Unique of the location
+			 * bases. Paths build local BufferedFile leaves; supplied owners retain
+			 * their dynamic types without slicing. The constructor probes the
+			 * reader once into a consultation File snapshot
+			 * (streams, attachments, metadata). That File is not the
+			 * octet origin. The source duration is resolved here: an
+			 * explicit duration avoids scanning; otherwise the full source
+			 * is scanned before pipeline stages are created.
 			 *
 			 * Destination container is resolved from the writer path
 			 * extension. There is no Container argument.
@@ -166,13 +181,6 @@ namespace StormByte {
 					Plan(const Plan& other) = delete;
 
 					/**
-					 * @brief Copy assignment is not supported.
-					 * @param other Source plan.
-					 * @return This plan.
-					 */
-					Plan& operator=(const Plan& other) = delete;
-
-					/**
 					 * @brief Move constructor.
 					 * @param other Plan to take.
 					 */
@@ -182,6 +190,13 @@ namespace StormByte {
 					 * @brief Destructor.
 					 */
 					virtual ~Plan() noexcept;
+
+					/**
+					 * @brief Copy assignment is not supported.
+					 * @param other Source plan.
+					 * @return This plan.
+					 */
+					Plan& operator=(const Plan& other) = delete;
 
 					/**
 					 * @brief Move assignment.
@@ -196,6 +211,7 @@ namespace StormByte {
 
 					/**
 					 * @brief Deep copy is not supported.
+					 * @return Owning pointer to the copied plan.
 					 */
 					StormByte::Safe::Shared<Plan> Clone() const = delete;
 
@@ -333,18 +349,12 @@ namespace StormByte {
 						const StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
 
 					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;		///< Input counters retained independently of the reader.
-
 					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;		///< Output counters retained independently of the writer.
-
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets.
-
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned destination octets.
-
-					StormByte::Safe::Unique<StormByte::Multimedia::File> m_snapshot;					///< Provider-owned constructor probe.
-
-					const class Container* m_container;													///< Borrowed destination container from the registry.
-
-					class Tracks m_tracks;																///< Tube tracks indexed by mux slot.
+					StormByte::Safe::Unique<StormByte::Multimedia::File> m_snapshot;			///< Provider-owned constructor probe.
+					const class Container* m_container;						///< Borrowed destination container from the registry.
+					class Tracks m_tracks;								///< Tube tracks indexed by mux slot.
 			};
 
 			/**

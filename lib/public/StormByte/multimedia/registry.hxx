@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -75,6 +87,7 @@ namespace StormByte {
 				 */
 				struct CodecDef;
 			}
+
 			/**
 			 * @namespace StormByte::Multimedia::Tables::Container
 			 * @brief Container identity table declarations.
@@ -220,17 +233,12 @@ namespace StormByte {
 				 */
 				Access ProbeContainer(const Tables::Container::ContainerDef& def) const noexcept;
 
-				StormByte::Safe::Vector<StormByte::Safe::Shared<Codec>> m_codecs; ///< Stable, Base-owned codec instances.
-
-				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_by_name; ///< Owned codec key to index.
-
-				StormByte::Safe::UnorderedMap<Type, StormByte::Size> m_by_type_start; ///< First contiguous codec index per type.
-
-				StormByte::Safe::UnorderedMap<Type, StormByte::Size> m_by_type_count; ///< Codec count per type.
-
-				StormByte::Safe::Vector<StormByte::Safe::Shared<Container>> m_containers; ///< Stable, Base-owned container instances.
-
-				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_container_by_name; ///< Owned container key to index.
+				StormByte::Safe::Vector<StormByte::Safe::Shared<Codec>> m_codecs;					///< Stable, Base-owned codec instances.
+				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_by_name;	///< Owned codec key to index.
+				StormByte::Safe::UnorderedMap<Type, StormByte::Size> m_by_type_start;				///< First contiguous codec index per type.
+				StormByte::Safe::UnorderedMap<Type, StormByte::Size> m_by_type_count;				///< Codec count per type.
+				StormByte::Safe::Vector<StormByte::Safe::Shared<Container>> m_containers;			///< Stable, Base-owned container instances.
+				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_container_by_name;	///< Owned container key to index.
 		};
 	}
 }

@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -44,83 +56,94 @@
 #include <cstdint>
 
 /**
- * @namespace StormByte::Multimedia::Property
- * @brief Media property value types.
+ * @namespace StormByte
+ * @brief StormByte library root namespace.
  */
-namespace StormByte::Multimedia::Property {
+namespace StormByte {
 	/**
-	 * @class AVRational
-	 * @brief Pair `{num, den}` matching libavutil `AVRational`.
-	 *
-	 * Public fields so `fps.num`, `fps.den` and `AVRational{24000, 1001}`
-	 * read like the C API. This is not libav's header: plugins that
-	 * include `libavutil/rational.h` still use `::AVRational` for the
-	 * C struct. Convert with `{r.num, r.den}`.
-	 *
-	 * 23.976 fps is `{24000, 1001}`. 24 fps is `{24, 1}`. A time base
-	 * of 1 ms is `{1, 1000}`.
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia classes and helpers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVRational {
-		public:
-			int num = 0;	///< Numerator (`AVRational.num`), initialized to zero.
-
-			int den = 1;	///< Denominator (`AVRational.den`), initialized to one.
-
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Property
+		 * @brief Media property value types.
+		 */
+		namespace Property {
 			/**
-			 * @brief `{0, 1}` — unknown / unset.
+			 * @class AVRational
+			 * @brief Pair `{num, den}` matching libavutil `AVRational`.
+			 *
+			 * Public fields so `fps.num`, `fps.den` and `AVRational{24000, 1001}`
+			 * read like the C API. This is not libav's header: plugins that
+			 * include `libavutil/rational.h` still use `::AVRational` for the
+			 * C struct. Convert with `{r.num, r.den}`.
+			 *
+			 * 23.976 fps is `{24000, 1001}`. 24 fps is `{24, 1}`. A time base
+			 * of 1 ms is `{1, 1000}`.
 			 */
-			constexpr AVRational() noexcept = default;
+			class STORMBYTE_MULTIMEDIA_PUBLIC AVRational {
+				public:
+					int num = 0;	///< Numerator (`AVRational.num`), initialized to zero.
+					int den = 1;	///< Denominator (`AVRational.den`), initialized to one.
 
-			/**
-			 * @brief `{num, den}` like the C aggregate.
-			 * @param num Numerator.
-			 * @param den Denominator.
-			 */
-			constexpr AVRational(int num, int den) noexcept
-			: num(num), den(den) {}
+					/**
+					 * @brief `{0, 1}` — unknown / unset.
+					 */
+					constexpr AVRational() noexcept = default;
 
-			/**
-			 * @brief True when both sides are positive.
-			 * @return true if `num > 0 && den > 0`.
-			 */
-			constexpr bool Valid() const noexcept {
-				return num > 0 && den > 0;
-			}
+					/**
+					 * @brief `{num, den}` like the C aggregate.
+					 * @param num Numerator.
+					 * @param den Denominator.
+					 */
+					constexpr AVRational(int num, int den) noexcept
+						: num(num), den(den) {}
 
-			/**
-			 * @brief `av_q2d` — `num / den` as double.
-			 * @return Quotient, or 0 if `den == 0`.
-			 */
-			constexpr double ToDouble() const noexcept {
-				return den ? static_cast<double>(num) / static_cast<double>(den) : 0.0;
-			}
+					/**
+					 * @brief True when both sides are positive.
+					 * @return true if `num > 0 && den > 0`.
+					 */
+					constexpr bool Valid() const noexcept {
+						return num > 0 && den > 0;
+					}
 
-			/**
-			 * @brief `av_rescale_q(ticks, *this, dst)`.
-			 * @param ticks Source ticks.
-			 * @param dst Destination time base.
-			 * @return Scaled ticks, or `AV_NOPTS_VALUE` when either side is invalid.
-			 */
-			std::int64_t Rescale(std::int64_t ticks, const AVRational& dst) const noexcept;
+					/**
+					 * @brief `av_q2d` — `num / den` as double.
+					 * @return Quotient, or 0 if `den == 0`.
+					 */
+					constexpr double ToDouble() const noexcept {
+						return den ? static_cast<double>(num) / static_cast<double>(den) : 0.0;
+					}
 
-			/**
-			 * @brief Equality.
-			 * @param other Other rational.
-			 * @return true if num and den match.
-			 */
-			constexpr bool operator==(const AVRational& other) const noexcept {
-				return num == other.num && den == other.den;
-			}
+					/**
+					 * @brief `av_rescale_q(ticks, *this, dst)`.
+					 * @param ticks Source ticks.
+					 * @param dst Destination time base.
+					 * @return Scaled ticks, or `AV_NOPTS_VALUE` when either side is invalid.
+					 */
+					std::int64_t Rescale(std::int64_t ticks, const AVRational& dst) const noexcept;
 
-			/**
-			 * @brief Inequality.
-			 * @param other Other rational.
-			 * @return true if num or den differ.
-			 */
-			constexpr bool operator!=(const AVRational& other) const noexcept {
-				return !(*this == other);
-			}
-	};
+					/**
+					 * @brief Equality.
+					 * @param other Other rational.
+					 * @return true if num and den match.
+					 */
+					constexpr bool operator==(const AVRational& other) const noexcept {
+						return num == other.num && den == other.den;
+					}
+
+					/**
+					 * @brief Inequality.
+					 * @param other Other rational.
+					 * @return true if num or den differ.
+					 */
+					constexpr bool operator!=(const AVRational& other) const noexcept {
+						return !(*this == other);
+					}
+			};
+		}
+	}
 }
 
 /**

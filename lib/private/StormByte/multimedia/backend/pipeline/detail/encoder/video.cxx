@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -53,6 +65,7 @@
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavcodec/packet.h>
+	#include <libavutil/dovi_meta.h>
 	#include <libavutil/mastering_display_metadata.h>
 	#include <libavutil/pixfmt.h>
 	#include <libavutil/rational.h>
@@ -111,6 +124,7 @@ namespace {
 			case Property::Space::ChromaDerivedNCL:		return AVCOL_SPC_CHROMA_DERIVED_NCL;
 			case Property::Space::ChromaDerivedCL:		return AVCOL_SPC_CHROMA_DERIVED_CL;
 			case Property::Space::ICtCp:				return AVCOL_SPC_ICTCP;
+			case Property::Space::IPTC2:				return AVCOL_SPC_IPT_C2;
 			default:									return AVCOL_SPC_UNSPECIFIED;
 		}
 	}
@@ -264,9 +278,19 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	Features need = owner.Require();
 	if (frame.Video() && frame.Video()->HDR10())
 		need.Add(Feature::HDR10);
+	if ((frame.Video() && frame.Video()->DOVI() && frame.Video()->DOVI()->Present())
+		|| handle->SideData(AV_FRAME_DATA_DOVI_METADATA) || handle->SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER))
+		need.Add(Feature::DOVI);
+
+	auto params = FillVideoParams(frame, owner.BitRate(), handle);
+	if (need.Has(Feature::DOVI) && (!frame.Video() || !frame.Video()->DOVI()
+		|| !params.WriteDovi(*frame.Video()->DOVI()))) {
+		owner.Fail("Dolby Vision stream configuration is missing");
+		return false;
+	}
 
 	auto opened = StormByte::Multimedia::Backend::Pipeline::Encoder::OpenCodec(
-		owner, FillVideoParams(frame, owner.BitRate(), handle), VideoTimeBase(frame), need);
+		owner, std::move(params), VideoTimeBase(frame), need, handle);
 	if (!opened)
 		return false;
 
@@ -318,6 +342,15 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		&& frame->Video()->SampleAspectRatio()->Valid())
 		handle->SampleAspectRatio(*frame->Video()->SampleAspectRatio());
 	handle->WriteSideData(frame->Attachments());
+	const auto* doviConfiguration = ctx ? av_packet_side_data_get(ctx->coded_side_data,
+		ctx->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF) : nullptr;
+	const bool doviActive = doviConfiguration && doviConfiguration->data
+		&& doviConfiguration->size >= sizeof(AVDOVIDecoderConfigurationRecord)
+		&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(doviConfiguration->data)->rpu_present_flag;
+	if (doviActive && !handle->SideData(AV_FRAME_DATA_DOVI_METADATA)) {
+		owner.Fail("Dolby Vision frame lost parsed metadata before encoding");
+		return false;
+	}
 
 	if (frame->Pts())
 		handle->Pts(StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(

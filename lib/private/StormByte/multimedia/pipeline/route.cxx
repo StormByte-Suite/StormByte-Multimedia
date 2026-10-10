@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -104,9 +116,9 @@ Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (!filter)
 		return *this;
 
-	if (!dynamic_cast<Filter::Process*>(filter.get())
-		&& !dynamic_cast<Filter::Packet*>(filter.get())
-		&& !dynamic_cast<Filter::Analytics*>(filter.get())) {
+	if (!StormByte::Safe::DynamicPointerCast<Filter::Process>(filter)
+		&& !StormByte::Safe::DynamicPointerCast<Filter::Packet>(filter)
+		&& !StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)) {
 		filter->Fail("inherit Process, Packet or Analytics; FFmpeg is not a leaf");
 		return *this;
 	}
@@ -116,7 +128,7 @@ Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	const bool packet = receives.Has(Kind::Packet);
 
 	Filter::FFmpeg& node = *filter;
-	const bool analytics = dynamic_cast<Filter::Analytics*>(filter.get()) != nullptr;
+	const bool analytics = static_cast<bool>(StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter));
 	if (analytics)
 		m_analytics.push_back(filter);
 	else {
@@ -145,7 +157,7 @@ void Route::Close() noexcept {
 
 	const auto media = StreamMedia(origin, m_track);
 	for (const auto& filter : m_filters) {
-		if (dynamic_cast<Filter::Analytics*>(filter.get()) == nullptr
+		if (!StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)
 			&& !filter->Receives().Has(stretch)) {
 			destination.Fail(std::format("{} does not cover this stretch", filter->Name()));
 			return;
@@ -244,6 +256,7 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 	}
 	StormByte::Safe::Shared<Decoder> look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
 		origin.m_log, m_track, Decoder::SourceLook{});
+	look->m_plan = origin.Plan();
 	origin.pipe().CloneTo(m_track, look->pipe());
 	look->pipe().CloneTo(m_track, analytics.pipe());
 	look->pipe().Drain();
@@ -271,6 +284,7 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 			destination.m_log, m_track, Decoder::EncodeLook{});
 	else
 		return;
+	look->m_plan = destination.Plan();
 	look->pipe().Listen();
 	destination.pipe().CloneTo(m_track, look->pipe());
 	look->pipe().CloneTo(m_track, analytics.pipe());

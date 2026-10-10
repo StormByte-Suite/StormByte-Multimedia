@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -56,7 +68,6 @@
  * @brief Video process filters.
  */
 namespace StormByte::Multimedia::Pipeline::Filter::Video {
-
 	/**
 	 * @class Degrain
 	 * @brief Two-pass, regional film-grain reducer built on libavfilter
@@ -152,10 +163,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Boundary ownership
 	 * Requires a compatible C++ ABI, including compatible STL layouts, and the
 	 * Multimedia, Logger, Base and FFmpeg providers to remain loaded. Own the leaf
-		 * through Base-heap Safe pointers. A Base-heap Safe unique owner holds opaque
-		 * provider state. Private STL storage and frame owners never cross the
-		 * interface: all their allocation, mutation and destruction execute in
-		 * out-of-line Multimedia methods. The leaf cannot be copied or moved.
+	 * through Base-heap Safe pointers. A Base-heap Safe unique owner holds opaque
+	 * provider state. Private STL storage and frame owners never cross the
+	 * interface: all their allocation, mutation and destruction execute in
+	 * out-of-line Multimedia methods. The leaf cannot be copied or moved.
 	 * This is conditional provider ownership, not an ABI-independent STL guarantee.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Degrain: public Filter::ProcessTwoPasses {
@@ -244,6 +255,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @cond INTERNAL
 			 */
+
 			/**
 			 * @brief Horizontal region count.
 			 */
@@ -259,7 +271,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			using RegionMap = std::array<float, GridWidth * GridHeight>;
 
-			struct STORMBYTE_MULTIMEDIA_PRIVATE State;	///< Provider-only measurement storage and frame owners.
+			/**
+			 * @brief Provider-only measurement storage and frame owners.
+			 */
+			struct STORMBYTE_MULTIMEDIA_PRIVATE State;
 
 			/**
 			 * @brief Convert @p src to YUV420P, isolate boundaries and score the ring centre.
@@ -314,19 +329,20 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			static double RegionTarget(const RegionMap& regions, double horizontal,
 				double vertical) noexcept;
 
-			Safe::Optional<double> m_capIn;			///< Caller ceiling, or empty for 4.0.
-			Safe::Unique<State> m_state;				///< Base-heap state constructed and destroyed only by the provider.
-			std::size_t m_group = 0;					///< Current continuity group.
-			unsigned m_frames = 0;					///< Measurement inputs seen, including rejected inputs.
-			bool m_voted = false;					///< Measurement finalized.
-			double m_sigmaMin = 0.0;					///< Minimum nonzero regional target.
-			double m_sigmaP50 = 0.0;					///< Median nonzero regional target.
-			double m_sigmaMax = 0.0;					///< Maximum regional target.
-			unsigned m_ran = 0;						///< Frames with positive measured targets.
-			unsigned m_skipped = 0;					///< Measured frames with zero/invalid targets.
-			unsigned m_applied = 0;					///< Successfully blended encode frames.
-			unsigned m_unsupported = 0;				///< Unsupported encode formats passed through.
-			unsigned m_rejected = 0;					///< Missing/duplicate/unconvertible measurement inputs.
+			Safe::Optional<double> m_capIn;		///< Caller ceiling, or empty for 4.0.
+			Safe::Unique<State> m_state;		///< Base-heap state constructed and destroyed only by the provider.
+			std::size_t m_group = 0;		///< Current continuity group.
+			unsigned m_frames = 0;			///< Measurement inputs seen, including rejected inputs.
+			bool m_voted = false;			///< Measurement finalized.
+			double m_sigmaMin = 0.0;		///< Minimum nonzero regional target.
+			double m_sigmaP50 = 0.0;		///< Median nonzero regional target.
+			double m_sigmaMax = 0.0;		///< Maximum regional target.
+			unsigned m_ran = 0;			///< Frames with positive measured targets.
+			unsigned m_skipped = 0;			///< Measured frames with zero/invalid targets.
+			unsigned m_applied = 0;			///< Successfully blended encode frames.
+			unsigned m_unsupported = 0;		///< Unsupported encode formats passed through.
+			unsigned m_rejected = 0;		///< Missing/duplicate/unconvertible measurement inputs.
+
 			/**
 			 * @endcond
 			 */

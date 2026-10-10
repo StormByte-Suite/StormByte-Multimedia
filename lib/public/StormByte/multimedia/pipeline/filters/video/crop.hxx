@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -44,7 +56,6 @@
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/type_traits/safe.hxx>
-
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Video
@@ -169,7 +180,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void LastChance(const Pipeline::Frame& frame) noexcept override;
 
 		private:
-			static constexpr std::uint8_t ProbeMax = 200;	///< Maximum probe count
+			/**
+			 * @brief Maximum probe count.
+			 */
+			static constexpr std::uint8_t ProbeMax = 200;
 
 			/**
 			 * @brief GRAY8 view of @p src via ScaleTo (Sws).
@@ -205,13 +219,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			bool m_auto;		///< Detect mode
 			bool m_released;	///< Hold finished
 			bool m_skip;		///< Auto gave up: passthrough
-			int m_x;			///< Explicit origin x
-			int m_y;			///< Explicit origin y
-			int m_w;			///< Explicit width
-			int m_h;			///< Explicit height
-			int m_left;			///< Detected left bar
+			int m_x;		///< Explicit origin x
+			int m_y;		///< Explicit origin y
+			int m_w;		///< Explicit width
+			int m_h;		///< Explicit height
+			int m_left;		///< Detected left bar
 			int m_right;		///< Detected right bar
-			int m_top;			///< Detected top bar
+			int m_top;		///< Detected top bar
 			int m_bottom;		///< Detected bottom bar
 			int m_stable;		///< Consecutive matching probes
 			int m_lumaW;		///< Cached source width

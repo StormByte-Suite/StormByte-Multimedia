@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -72,12 +84,12 @@ namespace StormByte {
 		 */
 		constexpr const char* ToString(Type type) noexcept {
 			switch (type) {
-				case Type::Audio:		return "Audio";			///< Audio
-				case Type::Video:		return "Video";			///< Video
-				case Type::Subtitle:	return "Subtitle";		///< Subtitle
-				case Type::Attachment:	return "Attachment";	///< Attachment
-				case Type::Unknown:		return "Unknown";		///< Unknown
-				default:				return "Invalid";		///< Out of range
+				case Type::Audio:		return "Audio";			// Audio
+				case Type::Video:		return "Video";			// Video
+				case Type::Subtitle:	return "Subtitle";		// Subtitle
+				case Type::Attachment:	return "Attachment";	// Attachment
+				case Type::Unknown:		return "Unknown";		// Unknown
+				default:				return "Invalid";		// Out of range
 			}
 		}
 
@@ -86,10 +98,10 @@ namespace StormByte {
 		 * @brief Read / write capability flags for a codec.
 		 */
 		enum class STORMBYTE_MULTIMEDIA_PUBLIC Operation: std::uint8_t {
-			None	= 0,		///< No access
-			Read	= 1 << 0,	///< Decode / demux is available
-			Write	= 1 << 1,	///< At least one encoder / muxer exists
-			Attach	= 1 << 2	///< Container can hold real attachments (covers, fonts)
+			None	= 0,			///< No access
+			Read	= 1 << 0,		///< Decode / demux is available
+			Write	= 1 << 1,		///< At least one encoder / muxer exists
+			Attach	= 1 << 2		///< Container can hold real attachments (covers, fonts)
 		};
 
 		/**
@@ -104,15 +116,15 @@ namespace StormByte {
 				/**
 				 * @brief Empty mask.
 				 */
-				constexpr Access() noexcept
-				: StormByte::Bitmask<Access, Operation>() {}
+				constexpr Access() noexcept:
+					StormByte::Bitmask<Access, Operation>() {}
 
 				/**
 				 * @brief Mask from a single operation.
 				 * @param op Initial flag.
 				 */
-				constexpr Access(Operation op) noexcept
-				: StormByte::Bitmask<Access, Operation>(op) {}
+				constexpr Access(Operation op) noexcept:
+					StormByte::Bitmask<Access, Operation>(op) {}
 
 				/**
 				 * @brief Copy constructor.
@@ -148,8 +160,4 @@ namespace StormByte {
 	}
 }
 
-/**
- * @brief Declare the allocation-free access mask conditionally DLL-safe.
- * @note Its Bitmask vtable and inline operations require a compatible provider ABI.
- */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Access);

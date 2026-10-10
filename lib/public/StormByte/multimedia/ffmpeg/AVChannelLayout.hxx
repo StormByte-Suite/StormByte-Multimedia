@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -45,150 +57,209 @@
 #include <cstdint>
 
 /**
- * @namespace StormByte::Multimedia::FFmpeg
- * @brief Private RAII wrappers over libav*.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia::FFmpeg {
-	struct Convert;
-	class AVCodecParameters;
-	class AVDecoder;
-	class AVEncoder;
-	class AVFrame;
-	class Swr;
-
+namespace StormByte {
 	/**
-	 * @class AVChannelLayout
-	 * @brief RAII `::AVChannelLayout` (`av_channel_layout_copy` / `uninit`).
-	 *
-	 * Named like the C struct so `AVChannelLayout stereo(2)` reads as
-	 * `av_channel_layout_default(&stereo, 2)`. The C type is `::AVChannelLayout`.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVChannelLayout {
-		friend struct Convert;
-		friend class AVCodecParameters;
-		friend class AVDecoder;
-		friend class AVEncoder;
-		friend class AVFrame;
-		friend class Swr;
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::FFmpeg
+		 * @brief Private RAII wrappers over libav*.
+		 */
+		namespace FFmpeg {
 			/**
-			 * @brief Empty layout.
+			 * @brief Forward declaration of the C value conversion bridge.
 			 */
-			AVChannelLayout() noexcept;
+			struct Convert;
 
 			/**
-			 * @brief Default layout for @p channels (`av_channel_layout_default`).
-			 * @param channels Channel count.
+			 * @brief Forward declaration of the codec-parameter wrapper.
 			 */
-			explicit AVChannelLayout(int channels) noexcept;
+			class AVCodecParameters;
 
 			/**
-			 * @brief Deep copy (`av_channel_layout_copy`).
-			 * @param other Source layout.
+			 * @brief Forward declaration of the decoder wrapper.
 			 */
-			AVChannelLayout(const AVChannelLayout& other) noexcept;
+			class AVDecoder;
 
 			/**
-			 * @brief Move constructor. @p other is left empty.
-			 * @param other Source layout.
+			 * @brief Forward declaration of the encoder wrapper.
 			 */
-			AVChannelLayout(AVChannelLayout&& other) noexcept;
+			class AVEncoder;
 
 			/**
-			 * @brief Destructor. `av_channel_layout_uninit` + free.
+			 * @brief Forward declaration of the frame wrapper.
 			 */
-			~AVChannelLayout() noexcept;
+			class AVFrame;
 
 			/**
-			 * @brief Deep copy assignment.
-			 * @param other Source layout.
-			 * @return *this.
+			 * @brief Forward declaration of the audio resampler wrapper.
 			 */
-			AVChannelLayout& operator=(const AVChannelLayout& other) noexcept;
+			class Swr;
 
 			/**
-			 * @brief Move assignment. @p other is left empty.
-			 * @param other Source layout.
-			 * @return *this.
+			 * @class AVChannelLayout
+			 * @brief RAII `::AVChannelLayout` (`av_channel_layout_copy` / `uninit`).
+			 *
+			 * Named like the C struct so `AVChannelLayout stereo(2)` reads as
+			 * `av_channel_layout_default(&stereo, 2)`. The C type is `::AVChannelLayout`.
 			 */
-			AVChannelLayout& operator=(AVChannelLayout&& other) noexcept;
+			class STORMBYTE_MULTIMEDIA_PUBLIC AVChannelLayout {
+				public:
+					/**
+					 * @brief Empty layout.
+					 */
+					AVChannelLayout() noexcept;
 
-			/**
-			 * @brief Default layout for @p channels.
-			 * @param channels Channel count.
-			 * @return Layout, or empty on failure.
-			 */
-			static AVChannelLayout Default(int channels) noexcept;
+					/**
+					 * @brief Default layout for @p channels (`av_channel_layout_default`).
+					 * @param channels Channel count.
+					 */
+					explicit AVChannelLayout(int channels) noexcept;
 
-			/**
-			 * @brief Whether a layout is stored.
-			 * @return true after a successful Default / copy.
-			 */
-			explicit operator bool() const noexcept;
+					/**
+					 * @brief Deep copy (`av_channel_layout_copy`).
+					 * @param other Source layout.
+					 */
+					AVChannelLayout(const AVChannelLayout& other) noexcept;
 
-			/**
-			 * @brief Channel count (`nb_channels`).
-			 * @return Count, or 0.
-			 */
-			int NbChannels() const noexcept;
+					/**
+					 * @brief Move constructor. @p other is left empty.
+					 * @param other Source layout.
+					 */
+					AVChannelLayout(AVChannelLayout&& other) noexcept;
 
-			/**
-			 * @brief Native bitmask (`u.mask`) when `order` is native.
-			 * @return Mask, or 0.
-			 */
-			std::uint64_t Mask() const noexcept;
+					/**
+					 * @brief Destructor. `av_channel_layout_uninit` + free.
+					 */
+					~AVChannelLayout() noexcept;
 
-			/**
-			 * @brief `AVChannelOrder` as int.
-			 * @return Order, or 0.
-			 */
-			int Order() const noexcept;
+					/**
+					 * @brief Deep copy assignment.
+					 * @param other Source layout.
+					 * @return *this.
+					 */
+					AVChannelLayout& operator=(const AVChannelLayout& other) noexcept;
 
-			/**
-			 * @brief FFmpeg layout name (`av_channel_layout_describe`).
-			 * @return Name such as @c "stereo", or empty if there is no layout.
-			 */
-			Safe::String Describe() const noexcept;
+					/**
+					 * @brief Move assignment. @p other is left empty.
+					 * @param other Source layout.
+					 * @return *this.
+					 */
+					AVChannelLayout& operator=(AVChannelLayout&& other) noexcept;
 
-			/**
-			 * @brief `av_channel_layout_compare` == 0.
-			 * @param other Other layout.
-			 * @return true if equal.
-			 */
-			bool operator==(const AVChannelLayout& other) const noexcept;
+					/**
+					 * @brief Default layout for @p channels.
+					 * @param channels Channel count.
+					 * @return Layout, or empty on failure.
+					 */
+					static AVChannelLayout Default(int channels) noexcept;
 
-			/**
-			 * @brief Inequality.
-			 * @param other Other layout.
-			 * @return true if not equal.
-			 */
-			bool operator!=(const AVChannelLayout& other) const noexcept;
+					/**
+					 * @brief Whether a layout is stored.
+					 * @return true after a successful Default / copy.
+					 */
+					explicit operator bool() const noexcept;
 
-		private:
-			::AVChannelLayout* m_raw = nullptr;	///< Owned C layout
+					/**
+					 * @brief Channel count (`nb_channels`).
+					 * @return Count, or 0.
+					 */
+					int NbChannels() const noexcept;
 
-			/**
-			 * @brief Allocates a zeroed C layout if needed.
-			 */
-			void Ensure() noexcept;
+					/**
+					 * @brief Native bitmask (`u.mask`) when `order` is native.
+					 * @return Mask, or 0.
+					 */
+					std::uint64_t Mask() const noexcept;
 
-			/**
-			 * @brief Releases the C layout.
-			 */
-			void Free() noexcept;
+					/**
+					 * @brief `AVChannelOrder` as int.
+					 * @return Order, or 0.
+					 */
+					int Order() const noexcept;
 
-			/**
-			 * @brief Const C layout.
-			 * @return Pointer, or nullptr.
-			 */
-			const ::AVChannelLayout* Get() const noexcept;
+					/**
+					 * @brief FFmpeg layout name (`av_channel_layout_describe`).
+					 * @return Name such as @c "stereo", or empty if there is no layout.
+					 */
+					Safe::String Describe() const noexcept;
 
-			/**
-			 * @brief Mutable C layout.
-			 * @return Pointer, or nullptr.
-			 */
-			::AVChannelLayout* Get() noexcept;
-	};
+					/**
+					 * @brief `av_channel_layout_compare` == 0.
+					 * @param other Other layout.
+					 * @return true if equal.
+					 */
+					bool operator==(const AVChannelLayout& other) const noexcept;
+
+					/**
+					 * @brief Inequality.
+					 * @param other Other layout.
+					 * @return true if not equal.
+					 */
+					bool operator!=(const AVChannelLayout& other) const noexcept;
+
+				private:
+					/**
+					 * @brief Allows the conversion bridge to access the C layout.
+					 */
+					friend struct Convert;
+
+					/**
+					 * @brief Allows codec parameters to access the C layout.
+					 */
+					friend class AVCodecParameters;
+
+					/**
+					 * @brief Allows the decoder to access the C layout.
+					 */
+					friend class AVDecoder;
+
+					/**
+					 * @brief Allows the encoder to access the C layout.
+					 */
+					friend class AVEncoder;
+
+					/**
+					 * @brief Allows frames to access the C layout.
+					 */
+					friend class AVFrame;
+
+					/**
+					 * @brief Allows the audio resampler to access the C layout.
+					 */
+					friend class Swr;
+
+					::AVChannelLayout* m_raw = nullptr;	///< Owned C layout.
+
+					/**
+					 * @brief Allocates a zeroed C layout if needed.
+					 */
+					void Ensure() noexcept;
+
+					/**
+					 * @brief Releases the C layout.
+					 */
+					void Free() noexcept;
+
+					/**
+					 * @brief Const C layout.
+					 * @return Pointer, or nullptr.
+					 */
+					const ::AVChannelLayout* Get() const noexcept;
+
+					/**
+					 * @brief Mutable C layout.
+					 * @return Pointer, or nullptr.
+					 */
+					::AVChannelLayout* Get() noexcept;
+			};
+		}
+	}
 }
 
 /**

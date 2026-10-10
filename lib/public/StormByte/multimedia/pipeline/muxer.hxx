@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -75,15 +87,40 @@ namespace StormByte {
 			 * @brief Multimedia-owned pipeline stages and unit holders.
 			 */
 			namespace Pipeline {
+				/**
+				 * @brief Backend mux stage.
+				 */
 				class Muxer;
 
+				/**
+				 * @namespace StormByte::Multimedia::Backend::Pipeline::Detail
+				 * @brief Private pipeline implementation details.
+				 */
 				namespace Detail {
+					/**
+					 * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker
+					 * @brief Pipeline execution workers.
+					 */
 					namespace Worker {
+						/**
+						 * @brief Mux execution worker.
+						 */
 						class Mux;
 					}
 
+					/**
+					 * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer
+					 * @brief Muxer implementation details.
+					 */
 					namespace Muxer {
+						/**
+						 * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg
+						 * @brief FFmpeg muxer implementation details.
+						 */
 						namespace FFmpeg {
+							/**
+							 * @brief FFmpeg output container backend.
+							 */
 							class Container;
 						}
 					}
@@ -98,9 +135,24 @@ namespace StormByte {
 		 * @ingroup multimedia_pipeline
 		 */
 		namespace Pipeline {
+				/**
+				 * @brief Demux stage supplying the remux origin.
+				 */
 			class Demuxer;
+
+				/**
+				 * @brief Encode stage supplying output packets.
+				 */
 			class Encoder;
+
+				/**
+				 * @brief Mux stage writing output packets.
+				 */
 			class Muxer;
+
+				/**
+				 * @brief Remux stage forwarding source packets.
+				 */
 			class Remuxer;
 
 			/**
@@ -160,13 +212,6 @@ namespace StormByte {
 			 * @ingroup multimedia_pipeline
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Muxer final: public Step {
-				friend class Backend::Pipeline::Detail::Muxer::FFmpeg::Container;
-				friend class Backend::Pipeline::Muxer;
-				friend class Backend::Pipeline::Detail::Worker::Mux;
-				friend Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
-				friend Muxer& operator>>(Demuxer& demuxer, Muxer& muxer) noexcept;
-				friend Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
-
 				public:
 					/**
 					 * @name Lifecycle
@@ -184,11 +229,13 @@ namespace StormByte {
 
 					/**
 					 * @brief Copy constructor (deleted).
+					 * @param other Source muxer.
 					 */
 					Muxer(const Muxer& other) = delete;
 
 					/**
 					 * @brief Move constructor (deleted).
+					 * @param other Source muxer.
 					 */
 					Muxer(Muxer&& other) noexcept = delete;
 
@@ -199,12 +246,14 @@ namespace StormByte {
 
 					/**
 					 * @brief Copy assignment (deleted).
+					 * @param other Source muxer.
 					 * @return *this.
 					 */
 					Muxer& operator=(const Muxer& other) = delete;
 
 					/**
 					 * @brief Move assignment (deleted).
+					 * @param other Source muxer.
 					 * @return *this.
 					 */
 					Muxer& operator=(Muxer&& other) noexcept = delete;
@@ -308,6 +357,48 @@ namespace StormByte {
 					 */
 
 				private:
+					/**
+					 * @brief Allows the FFmpeg container backend to access mux state.
+					 */
+					friend class Backend::Pipeline::Detail::Muxer::FFmpeg::Container;
+
+					/**
+					 * @brief Allows the mux backend to access its owning stage.
+					 */
+					friend class Backend::Pipeline::Muxer;
+
+					/**
+					 * @brief Allows the mux worker to drive output and progress.
+					 */
+					friend class Backend::Pipeline::Detail::Worker::Mux;
+
+					/**
+					 * @brief Allows encoder connections to reserve output tracks.
+					 * @param encoder Live encoder.
+					 * @param muxer Destination.
+					 * @return Connected encoder.
+					 */
+					friend Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
+
+					/**
+					 * @brief Allows demuxer connections to bind the remux origin.
+					 * @param demuxer Origin demuxer.
+					 * @param muxer Destination.
+					 * @return Destination muxer.
+					 */
+					friend Muxer& operator>>(Demuxer& demuxer, Muxer& muxer) noexcept;
+
+					/**
+					 * @brief Allows remuxer connections to reserve output tracks.
+					 * @param remuxer Live remuxer.
+					 * @param muxer Destination.
+					 * @return Connected remuxer.
+					 */
+					friend Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
+
+					/**
+					 * @brief Keeps the inherited logger accessor private.
+					 */
 					using Step::Log;
 
 					/**
@@ -379,18 +470,18 @@ namespace StormByte {
 					 */
 					void ClockPass(std::int64_t ns) noexcept;
 
-					const Container* m_container;										///< Destination container (Plan)
+					const Container* m_container;					///< Destination container (Plan)
 					StormByte::Safe::Unique<Backend::Pipeline::Muxer> m_backend;	///< Format backend
-					Demuxer* m_origin;													///< Set only by demuxer >> muxer. Not owned
-					StormByte::Safe::Shared<class Progress> m_progress;				///< Shared tube clock retained through Base-heap ownership.
-					Attachments m_attachments;											///< Catalogue for header write
-					StormByte::Safe::Set<int> m_wired;		///< Remux input indices already reserved; encoder output indices are checked by the backend.
-					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;			///< Per-output language
-					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;				///< Per-output title
-					StormByte::Safe::Atomic<bool> m_closed;	///< Set by Finish / Fail
-					StormByte::Safe::Atomic<std::uint64_t> m_reserved;	///< Reserved Video/Audio/Subtitle hoppers
-					StormByte::Safe::Atomic<std::int64_t> m_positionNs;	///< Last written Pts, or -1
-					Join m_join{*this};													///< Halt before other members die
+					Demuxer* m_origin;						///< Set only by demuxer >> muxer. Not owned
+					StormByte::Safe::Shared<class Progress> m_progress;		///< Shared tube clock retained through Base-heap ownership.
+					Attachments m_attachments;					///< Catalogue for header write
+					StormByte::Safe::Set<int> m_wired;					///< Remux input indices already reserved; encoder output indices are checked by the backend.
+					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;	///< Per-output language
+					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;		///< Per-output title
+					StormByte::Safe::Atomic<bool> m_closed;				///< Set by Finish / Fail
+					StormByte::Safe::Atomic<std::uint64_t> m_reserved;			///< Reserved Video/Audio/Subtitle hoppers
+					StormByte::Safe::Atomic<std::int64_t> m_positionNs;			///< Last written Pts, or -1
+					Join m_join{*this};						///< Halt before other members die
 			};
 		}
 	}

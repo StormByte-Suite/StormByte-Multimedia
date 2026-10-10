@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -43,25 +55,52 @@
 #include <StormByte/safe/string.hxx>
 
 /**
- * @namespace StormByte::Multimedia::FFmpeg
- * @brief Private RAII wrappers over libav*.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia::FFmpeg {
+namespace StormByte {
 	/**
-	 * @enum OperationResult
-	 * @brief Result of send/receive style FFmpeg calls.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	enum STORMBYTE_MULTIMEDIA_PUBLIC OperationResult {
-		Success,	///< Completed successfully
-		EndOfFile,	///< EOF reached
-		Error,		///< Hard error
-		TryAgain	///< EAGAIN — need more input/output
-	};
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::FFmpeg
+		 * @brief Private RAII wrappers over libav*.
+		 */
+		namespace FFmpeg {
+			/**
+			 * @enum OperationResult
+			 * @brief Result of send/receive style FFmpeg calls.
+			 */
+			enum STORMBYTE_MULTIMEDIA_PUBLIC OperationResult {
+				/**
+				 * @brief Completed successfully.
+				 */
+				Success,
 
-	/**
-	 * @brief Converts an FFmpeg error code to a string.
-	 * @param errnum Code from av_strerror.
-	 * @return Human-readable message.
-	 */
-	STORMBYTE_MULTIMEDIA_PUBLIC Safe::String ErrorToString(int errnum);
+				/**
+				 * @brief EOF reached.
+				 */
+				EndOfFile,
+
+				/**
+				 * @brief Hard error.
+				 */
+				Error,
+
+				/**
+				 * @brief EAGAIN: need more input/output.
+				 */
+				TryAgain
+			};
+
+			/**
+			 * @brief Converts an FFmpeg error code to a string.
+			 * @param errnum Code from av_strerror.
+			 * @return Human-readable message.
+			 */
+			STORMBYTE_MULTIMEDIA_PUBLIC Safe::String ErrorToString(int errnum);
+		}
+	}
 }

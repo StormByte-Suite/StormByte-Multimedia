@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -43,8 +55,8 @@
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
-#include <StormByte/type_traits/safe.hxx>
 #include <StormByte/thread_lock.hxx>
+#include <StormByte/type_traits/safe.hxx>
 
 #include <cstdint>
 #include <string>
@@ -81,14 +93,17 @@ namespace StormByte {
 			 * @brief Source pipeline stage sharing the progress clock.
 			 */
 			class Demuxer;
+
 			/**
 			 * @brief Filter coordinator sharing the progress clock.
 			 */
 			class Filters;
+
 			/**
 			 * @brief Destination pipeline stage sharing the progress clock.
 			 */
 			class Muxer;
+
 			/**
 			 * @brief Public job coordinator sharing the progress clock.
 			 */
@@ -133,12 +148,6 @@ namespace StormByte {
 			 * @ingroup multimedia_pipeline
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Progress {
-				friend class Demuxer;
-				friend class Filters;
-				friend class Muxer;
-				friend class Transcoder;
-				friend class StormByte::Multimedia::Backend::Pipeline::Transcoder;
-
 				public:
 					/**
 					 * @brief Exclusive phase currently presented to the user.
@@ -160,12 +169,12 @@ namespace StormByte {
 						StormByte::Safe::Optional<double> Duration;			///< Duration scan percent; empty during CPU-only preparation.
 						StormByte::Safe::Optional<double> Measure;			///< Mounted measure percent, hidden during duration.
 						StormByte::Safe::Optional<double> Analytics;			///< Mounted analytics percent, hidden during duration.
-						double Processing;										///< Ordinary processing percent; zero during duration calculation.
-						double All;												///< Processing percent; zero during duration calculation.
-						bool MeasureComplete;									///< Whether the optional measure axis is closed.
-						bool AnalyticsComplete;									///< Whether the optional analytics axis is closed.
+						double Processing;									///< Ordinary processing percent; zero during duration calculation.
+						double All;											///< Processing percent; zero during duration calculation.
+						bool MeasureComplete;								///< Whether the optional measure axis is closed.
+						bool AnalyticsComplete;								///< Whether the optional analytics axis is closed.
 						bool ProcessingComplete;								///< Whether the source processing pass has reached EOF.
-						bool MuxComplete;										///< Whether the destination trailer has been written.
+						bool MuxComplete;									///< Whether the destination trailer has been written.
 					};
 
 					/**
@@ -319,6 +328,31 @@ namespace StormByte {
 
 				private:
 					/**
+					 * @brief Allows the source stage to update progress.
+					 */
+					friend class Demuxer;
+
+					/**
+					 * @brief Allows the filter coordinator to update progress.
+					 */
+					friend class Filters;
+
+					/**
+					 * @brief Allows the destination stage to update progress.
+					 */
+					friend class Muxer;
+
+					/**
+					 * @brief Allows the public job coordinator to update progress.
+					 */
+					friend class Transcoder;
+
+					/**
+					 * @brief Allows the internal job coordinator to update progress.
+					 */
+					friend class StormByte::Multimedia::Backend::Pipeline::Transcoder;
+
+					/**
 					 * @brief Begin duration preparation before measurable packet scanning starts.
 					 */
 					void BeginDurationCalculation() noexcept;
@@ -329,11 +363,9 @@ namespace StormByte {
 					 */
 					void SetDurationCalculation(StormByte::Safe::Optional<double> percent) noexcept;
 
-					mutable StormByte::ThreadLock m_reentrantLock;	///< Serializes callers and tracks the owning thread.
-
-					mutable StormByte::Safe::Mutex m_lock;	///< Protects all clock values at the outermost lock level.
-
-					mutable std::uint32_t m_lockDepth = 0;	///< Reentrant levels owned under m_reentrantLock.
+					mutable StormByte::ThreadLock m_reentrantLock;			///< Serializes callers and tracks the owning thread.
+					mutable StormByte::Safe::Mutex m_lock;						///< Protects all clock values at the outermost lock level.
+					mutable std::uint32_t m_lockDepth = 0;					///< Reentrant levels owned under m_reentrantLock.
 					bool m_calculatingDuration = false;						///< Duration preparation or byte scanning is active.
 					mutable char m_durationIndicator = '|';					///< Last preparation symbol, frozen while scanning.
 					StormByte::Safe::Optional<double> m_durationCalculation;	///< Active monotone duration scan estimate.
@@ -407,7 +439,7 @@ namespace StormByte {
 					bool m_measureDone = false;					///< Measure pass closed.
 					bool m_passDone = false;						///< Ordinary Process pass at source EoF.
 					bool m_muxDone = false;						///< Muxer wrote trailer.
-					bool m_analyticsDone = false;					///< Analytics taps idle.
+					bool m_analyticsDone = false;				///< Analytics taps idle.
 					std::int64_t m_durationNs = 0;				///< Origin duration in nanoseconds.
 					std::int64_t m_measureNs = 0;					///< Measure position in nanoseconds.
 					std::int64_t m_passNs = 0;					///< Ordinary Process position in nanoseconds.

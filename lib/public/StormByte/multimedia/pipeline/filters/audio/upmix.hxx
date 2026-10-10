@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -66,20 +78,20 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * `surround` extracts a low band when the target has
 	 * LFE; it is **not** a studio 5.1 that was mixed that
 	 * way. Same count = no-op. More source channels than
-	 * wanted = Fail (that is @ref Downmix).
+	 * wanted = Fail (that is @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix).
 	 *
 	 * @par Do not stack
-	 * Not with @ref Downmix on the same stretch. Before
-	 * @ref Loudnorm. After @ref Resample is fine.
+	 * Not with @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix on the same stretch. Before
+	 * @ref StormByte::Multimedia::Pipeline::Filter::Audio::Loudnorm. After @ref StormByte::Multimedia::Pipeline::Filter::Audio::Resample is fine.
 	 *
 	 * @par Algorithm
 	 * Try `surround` (chl_in from
-	 * @ref FFmpeg::AVChannelLayout::Describe, LFE band
+	 * @ref StormByte::Multimedia::FFmpeg::AVChannelLayout::Describe, LFE band
 	 * when the target has LFE), then `aformat`, then
 	 * `pan` with a folded LFE. Hardware N/A.
 	 *
 	 * @par Mutation
-	 * Save + BindProperties. EAGAIN = wait. @ref Eof flushes.
+	 * Save + BindProperties. EAGAIN = wait. @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::Eof flushes.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Upmix: public Filter::Process {
 		public:
@@ -89,7 +101,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param target Destination speaker layout (not a fixed 5.1).
 			 */
 			Upmix(Safe::Shared<StormByte::Logger::Log> log,
-				Property::ChannelLayout target) noexcept;
+					Property::ChannelLayout target) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -154,21 +166,21 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief How the current graph was built.
 			 */
 			enum class Mode: std::uint8_t {
-				None,		///< No graph yet
-				Surround,	///< `surround` with LFE band
-				Aformat,	///< `aformat=channel_layouts=`
-				Pan			///< `pan` fronts + summed LFE
+				None,			///< No graph yet.
+				Surround,		///< `surround` with LFE band.
+				Aformat,		///< `aformat=channel_layouts=`.
+				Pan			///< `pan` fronts + summed LFE.
 			};
 
 			/**
-			 * @brief FFmpeg layout token for @ref m_target.
+			 * @brief FFmpeg layout token for @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::m_target.
 			 * @return Token, or empty when the layout is unknown.
 			 * @note Borrows a string literal valid while Multimedia remains loaded.
 			 */
 			std::string_view LayoutName() const noexcept;
 
 			/**
-			 * @brief Whether @ref m_target includes an LFE speaker.
+			 * @brief Whether @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::m_target includes an LFE speaker.
 			 * @return true for 2.1 / 5.1 / 6.1 / 7.1 / 7.1(wide) / 22.2.
 			 */
 			bool TargetHasLfe() const noexcept;
@@ -176,36 +188,34 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			/**
 			 * @brief Preferred chain: `surround=chl_in=…:chl_out=…:lfe=…`.
 			 * @param src Model frame (Describe for chl_in).
-			 * @return Filterchain, or empty if @ref LayoutName is empty.
+			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::LayoutName is empty.
 			 */
 			Safe::String SurroundChain(const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
 
 			/**
 			 * @brief Second chain: `aformat=channel_layouts=…`.
-			 * @return Filterchain, or empty if @ref LayoutName is empty.
+			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::LayoutName is empty.
 			 */
 			Safe::String AformatChain() const noexcept;
 
 			/**
 			 * @brief Last chain: keep FL/FR, synthesize LFE from the sum.
-			 * @return Filterchain, or empty if @ref LayoutName is empty.
+			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::LayoutName is empty.
 			 */
 			Safe::String PanChain() const noexcept;
 
 			/**
-			 * @brief Opens or reuses @ref m_graph for @p src and @p chain.
+			 * @brief Opens or reuses @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix::m_graph for @p src and @p chain.
 			 * @param src Model audio frame.
 			 * @param chain Borrowed avfilter chain, valid throughout this call; not retained.
 			 * @return false if the graph could not be (re)opened.
 			 */
 			bool EnsureGraph(const StormByte::Multimedia::FFmpeg::AVFrame& src,
-				std::string_view chain) noexcept;
+					std::string_view chain) noexcept;
 
 			Property::ChannelLayout m_target;	///< Destination layout
-
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
-
-			Mode m_mode = Mode::None;	///< Active fallback step
+			Mode m_mode = Mode::None;		///< Active fallback step
 	};
 }
 

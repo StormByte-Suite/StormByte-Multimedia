@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -60,62 +72,20 @@ namespace StormByte {
 			 * @brief Curated speaker layouts. Unknown covers unlisted AVChannelLayout values.
 			 */
 			enum class STORMBYTE_MULTIMEDIA_PUBLIC ChannelLayout {
-				/**
-				 * @brief Unlisted or missing
-				 */
-				Unknown,
-				/**
-				 * @brief 1.0
-				 */
-				Mono,
-				/**
-				 * @brief 2.0
-				 */
-				Stereo,
-				/**
-				 * @brief 2.1
-				 */
-				TwoPointOne,
-				/**
-				 * @brief 3.0
-				 */
-				ThreePointZero,
-				/**
-				 * @brief 4.0
-				 */
-				FourPointZero,
-				/**
-				 * @brief Quad
-				 */
-				Quad,
-				/**
-				 * @brief 5.0
-				 */
-				FivePointZero,
-				/**
-				 * @brief 5.1
-				 */
-				FivePointOne,
-				/**
-				 * @brief 6.1
-				 */
-				SixPointOne,
-				/**
-				 * @brief 7.1
-				 */
-				SevenPointOne,
-				/**
-				 * @brief 7.1 wide
-				 */
-				SevenPointOneW,
-				/**
-				 * @brief 8.0 octagonal
-				 */
-				Octagonal,
-				/**
-				 * @brief 22.2
-				 */
-				TwentyTwoPointTwo
+				Unknown,			///< Unlisted or missing
+				Mono,				///< 1.0
+				Stereo,				///< 2.0
+				TwoPointOne,			///< 2.1
+				ThreePointZero,			///< 3.0
+				FourPointZero,			///< 4.0
+				Quad,				///< Quad
+				FivePointZero,			///< 5.0
+				FivePointOne,			///< 5.1
+				SixPointOne,			///< 6.1
+				SevenPointOne,			///< 7.1
+				SevenPointOneW,			///< 7.1 wide
+				Octagonal,			///< 8.0 octagonal
+				TwentyTwoPointTwo		///< 22.2
 			};
 
 			/**
@@ -126,20 +96,20 @@ namespace StormByte {
 			constexpr const char* ToString(ChannelLayout layout) noexcept {
 				switch (layout) {
 					case ChannelLayout::Unknown:			return "Unknown";
-					case ChannelLayout::Mono:				return "Mono";
-					case ChannelLayout::Stereo:				return "Stereo";
+					case ChannelLayout::Mono:			return "Mono";
+					case ChannelLayout::Stereo:			return "Stereo";
 					case ChannelLayout::TwoPointOne:		return "2.1";
 					case ChannelLayout::ThreePointZero:		return "3.0";
 					case ChannelLayout::FourPointZero:		return "4.0";
-					case ChannelLayout::Quad:				return "Quad";
+					case ChannelLayout::Quad:			return "Quad";
 					case ChannelLayout::FivePointZero:		return "5.0";
 					case ChannelLayout::FivePointOne:		return "5.1";
 					case ChannelLayout::SixPointOne:		return "6.1";
 					case ChannelLayout::SevenPointOne:		return "7.1";
 					case ChannelLayout::SevenPointOneW:		return "7.1W";
 					case ChannelLayout::Octagonal:			return "Octagonal";
-					case ChannelLayout::TwentyTwoPointTwo:	return "22.2";
-					default:								return "Invalid";
+					case ChannelLayout::TwentyTwoPointTwo:		return "22.2";
+					default:					return "Invalid";
 				}
 			}
 
@@ -150,20 +120,20 @@ namespace StormByte {
 			 */
 			constexpr unsigned ChannelCount(ChannelLayout layout) noexcept {
 				switch (layout) {
-					case ChannelLayout::Mono:				return 1;
-					case ChannelLayout::Stereo:				return 2;
+					case ChannelLayout::Mono:			return 1;
+					case ChannelLayout::Stereo:			return 2;
 					case ChannelLayout::TwoPointOne:		return 3;
 					case ChannelLayout::ThreePointZero:		return 3;
 					case ChannelLayout::FourPointZero:		return 4;
-					case ChannelLayout::Quad:				return 4;
+					case ChannelLayout::Quad:			return 4;
 					case ChannelLayout::FivePointZero:		return 5;
 					case ChannelLayout::FivePointOne:		return 6;
 					case ChannelLayout::SixPointOne:		return 7;
 					case ChannelLayout::SevenPointOne:		return 8;
 					case ChannelLayout::SevenPointOneW:		return 8;
 					case ChannelLayout::Octagonal:			return 8;
-					case ChannelLayout::TwentyTwoPointTwo:	return 24;
-					default:								return 0;
+					case ChannelLayout::TwentyTwoPointTwo:		return 24;
+					default:					return 0;
 				}
 			}
 		}

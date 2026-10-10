@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -43,6 +55,7 @@
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/property/hdr10.hxx>
+#include <StormByte/multimedia/property/dovi.hxx>
 #include <StormByte/multimedia/visibility.h>
 
 #include <cstdint>
@@ -286,6 +299,13 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param hdr10 High-level HDR10 bag.
 			 */
 			void WriteHdr10(const StormByte::Multimedia::Property::HDR10& hdr10) noexcept;
+
+			/**
+			 * @brief Writes the Dolby Vision coded configuration for native encoder setup.
+			 * @param dovi Owned stream configuration snapshot.
+			 * @return True when the configuration was allocated and copied.
+			 */
+			bool WriteDovi(const StormByte::Multimedia::Property::DOVI& dovi) noexcept;
 
 			/**
 			 * @brief Media type.

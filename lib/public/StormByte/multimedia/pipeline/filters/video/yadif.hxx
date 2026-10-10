@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -73,6 +85,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * the remaining delayed output. Field-rate doubling is out of scope.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Video::Bwdif
+	 * @note Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Yadif: public Filter::Process {
 		public:
@@ -89,6 +102,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param other Filter that cannot be copied.
 			 */
 			Yadif(const Yadif& other) = delete;
+
 			/**
 			 * @brief Move construction is unavailable.
 			 * @param other Filter that cannot be moved.
@@ -106,6 +120,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @return No value; this operation is deleted.
 			 */
 			Yadif& operator=(const Yadif& other) = delete;
+
 			/**
 			 * @brief Move assignment is unavailable.
 			 * @param other Filter that cannot be moved.
@@ -114,26 +129,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Yadif& operator=(Yadif&& other) noexcept = delete;
 
 			/**
-			 * @brief Media this filter handles.
-			 * @return Video.
-			 */
-			enum StormByte::Multimedia::Type Media() const noexcept override;
-
-			/**
 			 * @brief Discards delayed frames and resets deinterlacing history.
 			 */
 			void Clean() noexcept override;
-
-			/**
-			 * @brief Calls @ref Clean. No Hold.
-			 */
-			void Setup() noexcept override;
-
-			/**
-			 * @brief Produces a progressive frame when enough input is available.
-			 * @param frame Video unit.
-			 */
-			void Process(const Pipeline::Frame& frame) noexcept override;
 
 			/**
 			 * @brief Weaves the delayed tail and drops it.
@@ -145,6 +143,23 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param frame Ignored.
 			 */
 			void LastChance(const Pipeline::Frame& frame) noexcept override;
+
+			/**
+			 * @brief Media this filter handles.
+			 * @return Video.
+			 */
+			enum StormByte::Multimedia::Type Media() const noexcept override;
+
+			/**
+			 * @brief Produces a progressive frame when enough input is available.
+			 * @param frame Video unit.
+			 */
+			void Process(const Pipeline::Frame& frame) noexcept override;
+
+			/**
+			 * @brief Calls @ref Clean. No Hold.
+			 */
+			void Setup() noexcept override;
 
 		private:
 			/**
@@ -161,13 +176,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				const StormByte::Multimedia::FFmpeg::AVFrame& cur,
 				const StormByte::Multimedia::FFmpeg::AVFrame& next) noexcept;
 
-			bool m_onlyInterlaced;	///< Skip progressive input
+			bool m_onlyInterlaced;				///< Skip progressive input
 			StormByte::Multimedia::FFmpeg::AVFrame m_prev;	///< Look t-1
 			StormByte::Multimedia::FFmpeg::AVFrame m_cur;	///< Look t
 	};
 }
 
-/**
- * @brief Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
- */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Yadif);

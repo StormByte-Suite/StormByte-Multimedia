@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -67,15 +79,15 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * letterbox / pillarbox rectangle, not of the full frame.
 	 */
 	enum class STORMBYTE_MULTIMEDIA_PUBLIC Anchor {
-	    TopLeft,
-	    TopCenter,
-	    TopRight,
-	    CenterLeft,
-	    Center,
-	    CenterRight,
-	    BottomLeft,
-	    BottomCenter,
-	    BottomRight
+		TopLeft,		///< Top-left placement.
+		TopCenter,		///< Top-centre placement.
+		TopRight,		///< Top-right placement.
+		CenterLeft,		///< Centre-left placement.
+		Center,			///< Centre placement.
+		CenterRight,		///< Centre-right placement.
+		BottomLeft,		///< Bottom-left placement.
+		BottomCenter,		///< Bottom-centre placement.
+		BottomRight		///< Bottom-right placement.
 	};
 
 	/**
@@ -115,6 +127,17 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * the limit or at end-of-input. The source pixel format is preserved.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::FFmpeg::Hold
+	 * @par Conditional boundary safety
+	 * Declares Watermark conditionally safe, not universally ABI-compatible.
+	 *
+	 * Consumers must use the same compatible C++ class, enum and virtual-dispatch ABI
+	 * and keep the Multimedia, Logger and Base creators loaded through destruction.
+	 * Private storage is created and destroyed out-of-line by Multimedia; Safe owners
+	 * retain their creator's allocation and destruction callbacks. Copy and move are deleted.
+	 * Owning handles must preserve creator-side destruction and deallocation of the
+	 * Watermark object itself; foreign-runtime deletion of provider allocations is invalid.
+	 * The Process parent and its inherited Step state and APIs must first satisfy their
+	 * Safe ownership contracts; this declaration does not certify or repair those parents.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Watermark: public Process {
 		public:
@@ -245,9 +268,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Clean() noexcept override;
 
 			/**
-			 * @brief Logs overlay configuration before processing video frames.
+			 * @brief Hold ceiling: keep measured bars or zero them, then Release.
+			 * @param frame Last unit that would overflow the Hold queue.
+			 *
+			 * Called by FFmpeg when HeldFor() would exceed Hold() and
+			 * again on Hold+EOF. Must Release() or the job Fails.
 			 */
-			void Setup() noexcept override;
+			void LastChance(const Pipeline::Frame& frame) noexcept override;
 
 			/**
 			 * @brief Detects anchor placement, then overlays the logo on video frames.
@@ -259,13 +286,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Process(const Pipeline::Frame& frame) noexcept override;
 
 			/**
-			 * @brief Hold ceiling: keep measured bars or zero them, then Release.
-			 * @param frame Last unit that would overflow the Hold queue.
-			 *
-			 * Called by FFmpeg when HeldFor() would exceed Hold() and
-			 * again on Hold+EOF. Must Release() or the job Fails.
+			 * @brief Logs overlay configuration before processing video frames.
 			 */
-			void LastChance(const Pipeline::Frame& frame) noexcept override;
+			void Setup() noexcept override;
 
 			/**
 			 * @}
@@ -289,7 +312,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> position,
 				unsigned opacity, int margin, bool binaryInput) noexcept;
 
-			static constexpr std::uint8_t ProbeMax = 200;	///< Hold ceiling in units
+			/**
+			 * @brief Hold ceiling in units.
+			 */
+			static constexpr std::uint8_t ProbeMax = 200;
+
+			/**
+			 * @brief Decodes the provider-owned bytes into RGBA on first use.
+			 * @return false if the logo was disabled.
+			 */
+			bool DecodeLogo() noexcept;
 
 			/**
 			 * @brief Turns the overlay off without failing the tube.
@@ -303,17 +335,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void DisableLogo(std::string_view why) noexcept;
 
 			/**
+			 * @brief Frees cached scale context and luma buffer.
+			 */
+			void DropScale() noexcept;
+
+			/**
 			 * @brief Reads a path into the persistent source buffer during construction.
 			 * @param path UTF-8 file path, consumed during this call.
 			 * @return false if the file could not be opened or read.
 			 */
 			bool LoadFile(const StormByte::Safe::String& path) noexcept;
-
-			/**
-			 * @brief Decodes the provider-owned bytes into RGBA on first use.
-			 * @return false if the logo was disabled.
-			 */
-			bool DecodeLogo() noexcept;
 
 			/**
 			 * @brief Builds an 8-bit luma view of @p src for bar sampling.
@@ -324,13 +355,6 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
 
 			/**
-			 * @brief Samples letterbox / pillarbox on the luma view of @p src.
-			 * @param src Live RAII frame.
-			 * @return true if this frame updated or confirmed the rectangle.
-			 */
-			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
-
-			/**
 			 * @brief Paints the logo and @ref FFmpeg::Save.
 			 *
 			 * An oversized logo calls @ref DisableLogo, not Fail.
@@ -338,42 +362,32 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Paint() noexcept;
 
 			/**
-			 * @brief Frees cached scale context and luma buffer.
+			 * @brief Samples letterbox / pillarbox on the luma view of @p src.
+			 * @param src Live RAII frame.
+			 * @return true if this frame updated or confirmed the rectangle.
 			 */
-			void DropScale() noexcept;
+			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
 
-			StormByte::Safe::Binary m_logo;									///< Persistent encoded source; retained across Clean and replays.
-			StormByte::Safe::Vector<std::uint8_t> m_rgba;						///< Decoded RGBA8888 pixels.
+			StormByte::Safe::Binary m_logo;			///< Persistent encoded source; retained across Clean and replays.
+			StormByte::Safe::Vector<std::uint8_t> m_rgba;	///< Decoded RGBA8888 pixels.
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Cached GRAY8 view.
-			StormByte::Safe::Optional<Anchor> m_anchor;						///< Relative placement
+			StormByte::Safe::Optional<Anchor> m_anchor;	///< Relative placement
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> m_point;	///< Absolute placement
-			unsigned m_opacity;												///< 0–100
-			int m_margin;													///< Anchor margin
-			int m_logoWidth;												///< Decoded logo width
-			int m_logoHeight;												///< Decoded logo height
-			bool m_decoded;													///< Decode attempted
-			bool m_released;												///< Hold finished; replays may Paint
-			int m_barTop;													///< Letterbox top
-			int m_barBottom;												///< Letterbox bottom
-			int m_barLeft;													///< Pillarbox left
-			int m_barRight;													///< Pillarbox right
-			int m_stable;													///< Consecutive unchanged letterbox probes
-			int m_lumaW;													///< Cached luma width
-			int m_lumaH;													///< Cached luma height
-			int m_lumaFmt;													///< Cached source pixel format
+			unsigned m_opacity;				///< 0–100
+			int m_margin;					///< Anchor margin
+			int m_logoWidth;				///< Decoded logo width
+			int m_logoHeight;				///< Decoded logo height
+			bool m_decoded;					///< Decode attempted
+			bool m_released;				///< Hold finished; replays may Paint
+			int m_barTop;					///< Letterbox top
+			int m_barBottom;				///< Letterbox bottom
+			int m_barLeft;					///< Pillarbox left
+			int m_barRight;					///< Pillarbox right
+			int m_stable;					///< Consecutive unchanged letterbox probes
+			int m_lumaW;					///< Cached luma width
+			int m_lumaH;					///< Cached luma height
+			int m_lumaFmt;					///< Cached source pixel format
 	};
 }
 
-/**
- * @brief Declares Watermark conditionally safe, not universally ABI-compatible.
- *
- * Consumers must use the same compatible C++ class, enum and virtual-dispatch ABI
- * and keep the Multimedia, Logger and Base creators loaded through destruction.
- * Private storage is created and destroyed out-of-line by Multimedia; Safe owners
- * retain their creator's allocation and destruction callbacks. Copy and move are deleted.
- * Owning handles must preserve creator-side destruction and deallocation of the
- * Watermark object itself; foreign-runtime deletion of provider allocations is invalid.
- * The Process parent and its inherited Step state and APIs must first satisfy their
- * Safe ownership contracts; this declaration does not certify or repair those parents.
- */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Watermark);

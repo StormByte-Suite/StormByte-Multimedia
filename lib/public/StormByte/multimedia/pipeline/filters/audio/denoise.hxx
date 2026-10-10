@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -59,10 +71,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio::Detail {
 	 * @brief Room-tone signature used by the Denoise vote.
 	 */
 	struct DenoiseCandidate {
-		double rmsDb = 0.0;	///< Window RMS in dB.
-		double crest = 0.0;	///< Peak-to-RMS ratio.
-		double zcr = 0.0;	///< Zero-crossing ratio.
-		double hp = 0.0;	///< High-pass energy ratio.
+		public:
+			double rmsDb = 0.0;	///< Window RMS in dB.
+			double crest = 0.0;	///< Peak-to-RMS ratio.
+			double zcr = 0.0;	///< Zero-crossing ratio.
+			double hp = 0.0;	///< High-pass energy ratio.
 	};
 }
 
@@ -82,8 +95,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * @par What it is for
 	 * Phone / cheap-mic recordings: the constant floor (preamp
 	 * hiss, A/C, room tone). Not a neighbour, a slammed door
-	 * or a click — those are events. Clicks are @ref Adeclick.
-	 * Generic one-pass hiss without a profile is @ref Afftdn.
+	 * or a click — those are events. Clicks are @ref StormByte::Multimedia::Pipeline::Filter::Audio::Adeclick.
+	 * Generic one-pass hiss without a profile is @ref StormByte::Multimedia::Pipeline::Filter::Audio::Afftdn.
 	 *
 	 * @par Measure
 	 * Mix-down windows (~350 ms). Keep candidates that look
@@ -116,7 +129,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param nr Reduction in dB. Empty → 12. Clamped 1–30.
 			 */
 			Denoise(Safe::Shared<StormByte::Logger::Log> log,
-				Safe::Optional<double> nr = {}) noexcept;
+					Safe::Optional<double> nr = {}) noexcept;
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -217,18 +230,17 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 */
 			Safe::String Chain() const noexcept;
 
-			Safe::Optional<double> m_nrIn;	///< Caller noise reduction, or empty
-			StormByte::Safe::Vector<float> m_acc;	///< Base-owned measurement samples.
+			Safe::Optional<double> m_nrIn;			///< Caller noise reduction, or empty
+			StormByte::Safe::Vector<float> m_acc;		///< Base-owned measurement samples.
 			StormByte::Safe::Vector<Candidate> m_cand;	///< Base-owned candidate signatures.
-			int m_rate;						///< Latched sample rate
-			int m_win;						///< Measurement window size
+			int m_rate;					///< Latched sample rate
+			int m_win;					///< Measurement window size
 			unsigned m_frames;				///< Measured audio frame count
 			bool m_voted;					///< Vote has completed
-			bool m_skip;						///< Uncertain floor leaves audio unchanged
-			double m_nf;						///< Voted noise floor in dB
-			double m_nr;						///< Resolved noise reduction in dB
+			bool m_skip;					///< Uncertain floor leaves audio unchanged
+			double m_nf;					///< Voted noise floor in dB
+			double m_nr;					///< Resolved noise reduction in dB
 			int m_matches;					///< Matching room-tone signatures
-
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }

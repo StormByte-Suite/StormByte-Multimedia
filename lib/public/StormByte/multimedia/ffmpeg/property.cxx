@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -96,12 +108,14 @@ namespace {
 		return r;
 	}
 
-	bool LooksLikeHDR10(Transfer transfer, Primaries primaries) noexcept {
-		return transfer == Transfer::SMPTE2084 && primaries == Primaries::BT2020;
+	bool LooksLikeHDR10(Space space, Transfer transfer, Primaries primaries) noexcept {
+		return transfer == Transfer::SMPTE2084 && primaries == Primaries::BT2020
+			&& (space == Space::BT2020NCL || space == Space::BT2020CL);
 	}
 
-	StormByte::Safe::Optional<HDR10> MapHDR10(const ::AVStream* raw, Transfer transfer, Primaries primaries) noexcept {
-		if (!LooksLikeHDR10(transfer, primaries))
+	StormByte::Safe::Optional<HDR10> MapHDR10(
+		const ::AVStream* raw, Space space, Transfer transfer, Primaries primaries) noexcept {
+		if (!LooksLikeHDR10(space, transfer, primaries))
 			return std::nullopt;
 
 		size_t mdmSize = 0;
@@ -150,6 +164,17 @@ namespace {
 		HDR10 out = HDR10::DEFAULT;
 		out.HDR10Plus(hdr10plus);
 		return out;
+	}
+
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::DOVI> MapDOVI(const ::AVStream* raw) noexcept {
+		size_t size = 0;
+		const auto* data = CodecSideData(raw, AV_PKT_DATA_DOVI_CONF, size);
+		if (!data)
+			return std::nullopt;
+		StormByte::Multimedia::Property::DOVI dovi;
+		if (!dovi.LoadConfiguration(std::as_bytes(std::span{data, size})))
+			return std::nullopt;
+		return dovi;
 	}
 
 	PixelFormat MapPixelFormat(int format) noexcept {
@@ -250,6 +275,8 @@ namespace {
 				return Space::ChromaDerivedCL;
 			case AVCOL_SPC_ICTCP:
 				return Space::ICtCp;
+			case AVCOL_SPC_IPT_C2:
+				return Space::IPTC2;
 			case AVCOL_SPC_UNSPECIFIED:
 				return Space::Unspecified;
 			default:
@@ -386,9 +413,10 @@ StormByte::Multimedia::Stream::Properties FFmpeg::MapProperties(const AVStream& 
 					static_cast<std::uint32_t>(params.Width()),
 					static_cast<std::uint32_t>(params.Height())
 				},
-				MapHDR10(stream.Raw(), transfer, primaries),
+				MapHDR10(stream.Raw(), space, transfer, primaries),
 				IfValid(stream.FrameRateRational()),
-				IfValid(stream.SampleAspectRatio())
+				IfValid(stream.SampleAspectRatio()),
+				MapDOVI(stream.Raw())
 			}, std::nullopt};
 		}
 

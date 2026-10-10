@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -44,87 +56,98 @@
 #include <cstdint>
 
 /**
- * @namespace StormByte::Multimedia::Property
- * @brief Media property value types.
+ * @namespace StormByte
+ * @brief StormByte library root namespace.
  */
-namespace StormByte::Multimedia::Property {
+namespace StormByte {
 	/**
-	 * @class Resolution
-	 * @brief Frame width and height.
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia classes and helpers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Resolution final {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Property
+		 * @brief Media property value types.
+		 */
+		namespace Property {
 			/**
-			 * @brief Constructs a zero-sized resolution for Safe value storage.
+			 * @class Resolution
+			 * @brief Frame width and height.
 			 */
-			Resolution() noexcept = default;
+			class STORMBYTE_MULTIMEDIA_PUBLIC Resolution final {
+				public:
+					/**
+					 * @brief Constructs a zero-sized resolution for Safe value storage.
+					 */
+					Resolution() noexcept = default;
 
-			/**
-			 * @brief Constructs a resolution.
-			 * @param width Width in pixels.
-			 * @param height Height in pixels.
-			 */
-			Resolution(std::uint32_t width, std::uint32_t height) noexcept;
+					/**
+					 * @brief Constructs a resolution.
+					 * @param width Width in pixels.
+					 * @param height Height in pixels.
+					 */
+					Resolution(std::uint32_t width, std::uint32_t height) noexcept;
 
-			/**
-			 * @brief Copy constructor.
-			 */
-			Resolution(const Resolution&) = default;
+					/**
+					 * @brief Copy constructor.
+					 */
+					Resolution(const Resolution&) = default;
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Resolution(Resolution&&) noexcept = default;
+					/**
+					 * @brief Move constructor.
+					 */
+					Resolution(Resolution&&) noexcept = default;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Resolution() noexcept = default;
+					/**
+					 * @brief Destructor.
+					 */
+					~Resolution() noexcept = default;
 
-			/**
-			 * @brief Copy assignment.
-			 * @return *this.
-			 */
-			Resolution& operator=(const Resolution&) = default;
+					/**
+					 * @brief Copy assignment.
+					 * @return *this.
+					 */
+					Resolution& operator=(const Resolution&) = default;
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Resolution& operator=(Resolution&&) noexcept = default;
+					/**
+					 * @brief Move assignment.
+					 * @return *this.
+					 */
+					Resolution& operator=(Resolution&&) noexcept = default;
 
-			/**
-			 * @brief Width in pixels.
-			 * @return Width.
-			 */
-			std::uint32_t Width() const noexcept;
+					/**
+					 * @brief Width in pixels.
+					 * @return Width.
+					 */
+					std::uint32_t Width() const noexcept;
 
-			/**
-			 * @brief Height in pixels.
-			 * @return Height.
-			 */
-			std::uint32_t Height() const noexcept;
+					/**
+					 * @brief Height in pixels.
+					 * @return Height.
+					 */
+					std::uint32_t Height() const noexcept;
 
-			/**
-			 * @brief "WIDTHxHEIGHT" string.
-			 * @return Size string.
-			 * @throws StormByte::Exception If Base-owned text cannot be allocated.
-			 * @throws std::bad_alloc If temporary formatting storage cannot be allocated.
-			 */
-			StormByte::Safe::String Name() const;
+					/**
+					 * @brief "WIDTHxHEIGHT" string.
+					 * @return Size string.
+					 * @throws StormByte::Exception If Base-owned text cannot be allocated.
+					 * @throws std::bad_alloc If temporary formatting storage cannot be allocated.
+					 */
+					StormByte::Safe::String Name() const;
 
-			/**
-			 * @brief Coarse label (e.g. "1080p", "4K").
-			 * @return Standard name.
-			 * @throws StormByte::Exception If Base-owned text cannot be allocated.
-			 */
-			StormByte::Safe::String StandardName() const;
+					/**
+					 * @brief Coarse label (e.g. "1080p", "4K").
+					 * @return Standard name.
+					 * @throws StormByte::Exception If Base-owned text cannot be allocated.
+					 */
+					StormByte::Safe::String StandardName() const;
 
-		private:
-			std::uint32_t m_width = 0;	///< Width in pixels, initialized to zero.
-
-			std::uint32_t m_height = 0;	///< Height in pixels, initialized to zero.
-	};
+				private:
+					std::uint32_t m_width = 0;	///< Width in pixels, initialized to zero.
+					std::uint32_t m_height = 0;	///< Height in pixels, initialized to zero.
+			};
+		}
+	}
 }
 
 /**

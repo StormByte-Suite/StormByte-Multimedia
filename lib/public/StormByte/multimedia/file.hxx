@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -121,8 +133,12 @@ namespace StormByte {
 		 * @see StormByte::Buffer::IO::BufferedLocationReader
 		 */
 		class STORMBYTE_MULTIMEDIA_PUBLIC File {
-			friend class StormByte::Multimedia::Backend::Pipeline::Demuxer;
 			public:
+				/**
+				 * @brief Demuxer restoring codec metadata from the consultation snapshot.
+				 */
+				friend class StormByte::Multimedia::Backend::Pipeline::Demuxer;
+
 				/**
 				 * @brief Provider-owned observer receiving monotone scan percentages.
 				 * @note Supply context, invoke, clone and release callbacks from the
@@ -231,14 +247,14 @@ namespace StormByte {
 					StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
 			private:
-				StormByte::Safe::String m_path;						///< Stored local path
-				StormByte::Buffer::IO::BufferedLocationReader* m_reader;	///< Borrowed reader, or nullptr for a local path
-				const class Container& m_container;						///< Registry container
-				mutable StormByte::Safe::Vector<Stream> m_streams;			///< Probed streams
-				StormByte::Safe::Vector<Attachment> m_attachments;			///< Covers / attached files
-				Metadata::File m_metadata;								///< Container tags
+				StormByte::Safe::String m_path;									///< Stored local path
+				StormByte::Buffer::IO::BufferedLocationReader* m_reader;			///< Borrowed reader, or nullptr for a local path
+				const class Container& m_container;								///< Registry container
+				mutable StormByte::Safe::Vector<Stream> m_streams;					///< Probed streams
+				StormByte::Safe::Vector<Attachment> m_attachments;					///< Covers / attached files
+				Metadata::File m_metadata;										///< Container tags
 				mutable StormByte::Safe::Optional<Property::Duration> m_duration;	///< Container duration
-				mutable bool m_durationResolved;						///< Caller-supplied or scan done
+				mutable bool m_durationResolved;									///< Caller-supplied or scan done
 				StormByte::Safe::UnorderedMap<int, StormByte::Safe::Shared<FFmpeg::AVCodecParameters>> m_codecParameters;	///< Probed codec parameters, including harvested HDR metadata.
 
 				/**
@@ -292,14 +308,15 @@ namespace StormByte {
 				 * @brief Sets HDR10+ on a video stream.
 				 * @param stream Stream to update.
 				 */
-				static void MarkHdr10Plus(Stream& stream) noexcept;
+				static void MarkHdr10Plus(Stream& stream);
 
 				/**
-				 * @brief Peeks video packets for HDR10+ side data.
+				 * @brief Peeks bounded video packets for HDR10+ and decoded Dolby Vision metadata.
 				 * @param ctx Open probe context.
-				 * @param streams Streams to mark.
+				 * @param streams Streams whose configuration and first available metadata are merged.
+				 * @return False if owned metadata storage could not be allocated.
 				 */
-				static void DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams) noexcept;
+				static bool DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams) noexcept;
 
 				/**
 				 * @brief Fills missing durations from packet timestamps.

@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -43,175 +55,176 @@
 #include <StormByte/safe/optional.hxx>
 
 /**
- * @namespace StormByte::Multimedia::Property
- * @brief Media property value types.
+ * @namespace StormByte
+ * @brief StormByte library root namespace.
  */
-namespace StormByte::Multimedia::Property {
+namespace StormByte {
 	/**
-	 * @class HDR10
-	 * @brief Mastering display and content light level metadata.
-	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
-	 *       remain loaded while their values and provider callbacks are in use.
+	 * @namespace Multimedia
+	 * @brief Multimedia classes and helpers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC HDR10 final {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace Property
+		 * @brief Media property value types.
+		 */
+		namespace Property {
 			/**
-			 * @enum Source
-			 * @brief Origin of the mastering-display numbers.
+			 * @class HDR10
+			 * @brief Mastering display and content light level metadata.
+			 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+			 *       remain loaded while their values and provider callbacks are in use.
 			 */
-			enum class Source {
-				/**
-				 * @brief Side data from the container or bitstream.
-				 */
-				Metadata,
+			class STORMBYTE_MULTIMEDIA_PUBLIC HDR10 final {
+				public:
+					/**
+					 * @enum Source
+					 * @brief Origin of the mastering-display numbers.
+					 */
+					enum class Source {
+						Metadata,		///< Side data from the container or bitstream.
+						Heuristics		///< Default values when HDR10 is signaled without mastering metadata.
+					};
 
-				/**
-				 * @brief Default values when HDR10 is signaled without mastering metadata.
-				 */
-				Heuristics
+					/**
+					 * @brief DEFAULT primaries / luminance, Source::Heuristics.
+					 * @throws StormByte::Exception Safe storage initialization failed.
+					 */
+					HDR10();
+
+					/**
+					 * @brief Full mastering-display description.
+					 * @param red Red primary.
+					 * @param green Green primary.
+					 * @param blue Blue primary.
+					 * @param white White point.
+					 * @param luminance Min/max luminance pair.
+					 * @param light_level Optional MaxCLL/MaxFALL.
+					 * @param source Metadata or Heuristics.
+					 * @throws StormByte::Exception Safe storage copying failed.
+					 */
+					HDR10(const Point& red, const Point& green, const Point& blue, const Point& white,
+						const Point& luminance, const StormByte::Safe::Optional<Point>& light_level = std::nullopt,
+						Source source = Source::Metadata);
+
+					/**
+					 * @brief Move overload of the full constructor.
+					 * @param red Red primary.
+					 * @param green Green primary.
+					 * @param blue Blue primary.
+					 * @param white White point.
+					 * @param luminance Min/max luminance pair.
+					 * @param light_level Optional MaxCLL/MaxFALL.
+					 * @param source Metadata or Heuristics.
+					 */
+					HDR10(Point&& red, Point&& green, Point&& blue, Point&& white,
+						Point&& luminance, StormByte::Safe::Optional<Point>&& light_level = std::nullopt,
+						Source source = Source::Metadata) noexcept;
+
+					/**
+					 * @brief Copy constructor.
+					 * @param other Metadata to copy.
+					 * @throws StormByte::Exception Safe storage copying failed.
+					 */
+					HDR10(const HDR10& other);
+
+					/**
+					 * @brief Move constructor.
+					 * @param other Metadata to move.
+					 */
+					HDR10(HDR10&& other) noexcept;
+
+					/**
+					 * @brief Destructor.
+					 */
+					~HDR10() noexcept;
+
+					/**
+					 * @brief Copy assignment.
+					 * @param other Metadata to copy.
+					 * @return *this.
+					 * @throws StormByte::Exception Safe storage copying failed.
+					 */
+					HDR10& operator=(const HDR10& other);
+
+					/**
+					 * @brief Move assignment.
+					 * @param other Metadata to move.
+					 * @return *this.
+					 */
+					HDR10& operator=(HDR10&& other) noexcept;
+
+					/**
+					 * @brief Red primary.
+					 * @return Red.
+					 */
+					const Point& Red() const noexcept;
+
+					/**
+					 * @brief Green primary.
+					 * @return Green.
+					 */
+					const Point& Green() const noexcept;
+
+					/**
+					 * @brief Blue primary.
+					 * @return Blue.
+					 */
+					const Point& Blue() const noexcept;
+
+					/**
+					 * @brief White point.
+					 * @return White.
+					 */
+					const Point& White() const noexcept;
+
+					/**
+					 * @brief Luminance (min, max).
+					 * @return Luminance.
+					 */
+					const Point& Luminance() const noexcept;
+
+					/**
+					 * @brief Optional content light level (MaxCLL, MaxFALL).
+					 * @return Borrowed optional light level, valid while this object is alive.
+					 */
+					const StormByte::Safe::Optional<Point>& LightLevel() const noexcept;
+
+					/**
+					 * @brief Origin of the numbers.
+					 * @return Metadata or Heuristics.
+					 */
+					Source Origin() const noexcept;
+
+					/**
+					 * @brief HDR10+ dynamic metadata flag.
+					 * @return true if HDR10+ was detected.
+					 */
+					bool IsHDR10Plus() const noexcept;
+
+					/**
+					 * @brief Sets the HDR10+ flag.
+					 * @param hdrplus New value.
+					 */
+					void HDR10Plus(bool hdrplus) noexcept;
+
+					/**
+					 * @brief Fallback mastering display with heuristic origin.
+					 */
+					static const HDR10 DEFAULT;
+
+				private:
+					Point m_red;					///< Red primary.
+					Point m_green;					///< Green primary.
+					Point m_blue;					///< Blue primary.
+					Point m_white;					///< White point.
+					Point m_luminance;				///< Minimum and maximum luminance.
+					StormByte::Safe::Optional<Point> m_light_level;	///< Optional MaxCLL and MaxFALL values.
+					Source m_source;				///< Origin of the mastering display values.
+					bool m_hdr10plus;				///< Whether HDR10+ metadata is present.
 			};
-
-			/**
-			 * @brief DEFAULT primaries / luminance, Source::Heuristics.
-			 * @throws StormByte::Exception Safe storage initialization failed.
-			 */
-			HDR10();
-
-			/**
-			 * @brief Full mastering-display description.
-			 * @param red Red primary.
-			 * @param green Green primary.
-			 * @param blue Blue primary.
-			 * @param white White point.
-			 * @param luminance Min/max luminance pair.
-			 * @param light_level Optional MaxCLL/MaxFALL.
-			 * @param source Metadata or Heuristics.
-			 * @throws StormByte::Exception Safe storage copying failed.
-			 */
-			HDR10(const Point& red, const Point& green, const Point& blue, const Point& white,
-				const Point& luminance, const StormByte::Safe::Optional<Point>& light_level = std::nullopt,
-				Source source = Source::Metadata);
-
-			/**
-			 * @brief Move overload of the full constructor.
-			 * @param red Red primary.
-			 * @param green Green primary.
-			 * @param blue Blue primary.
-			 * @param white White point.
-			 * @param luminance Min/max luminance pair.
-			 * @param light_level Optional MaxCLL/MaxFALL.
-			 * @param source Metadata or Heuristics.
-			 */
-			HDR10(Point&& red, Point&& green, Point&& blue, Point&& white,
-				Point&& luminance, StormByte::Safe::Optional<Point>&& light_level = std::nullopt,
-				Source source = Source::Metadata) noexcept;
-
-			/**
-			 * @brief Copy constructor.
-			 * @param other Metadata to copy.
-			 * @throws StormByte::Exception Safe storage copying failed.
-			 */
-			HDR10(const HDR10& other);
-
-			/**
-			 * @brief Move constructor.
-			 * @param other Metadata to move.
-			 */
-			HDR10(HDR10&& other) noexcept;
-
-			/**
-			 * @brief Destructor.
-			 */
-			~HDR10() noexcept;
-
-			/**
-			 * @brief Copy assignment.
-			 * @param other Metadata to copy.
-			 * @return *this.
-			 * @throws StormByte::Exception Safe storage copying failed.
-			 */
-			HDR10& operator=(const HDR10& other);
-
-			/**
-			 * @brief Move assignment.
-			 * @param other Metadata to move.
-			 * @return *this.
-			 */
-			HDR10& operator=(HDR10&& other) noexcept;
-
-			/**
-			 * @brief Red primary.
-			 * @return Red.
-			 */
-			const Point& Red() const noexcept;
-
-			/**
-			 * @brief Green primary.
-			 * @return Green.
-			 */
-			const Point& Green() const noexcept;
-
-			/**
-			 * @brief Blue primary.
-			 * @return Blue.
-			 */
-			const Point& Blue() const noexcept;
-
-			/**
-			 * @brief White point.
-			 * @return White.
-			 */
-			const Point& White() const noexcept;
-
-			/**
-			 * @brief Luminance (min, max).
-			 * @return Luminance.
-			 */
-			const Point& Luminance() const noexcept;
-
-			/**
-			 * @brief Optional content light level (MaxCLL, MaxFALL).
-			 * @return Borrowed optional light level, valid while this object is alive.
-			 */
-			const StormByte::Safe::Optional<Point>& LightLevel() const noexcept;
-
-			/**
-			 * @brief Origin of the numbers.
-			 * @return Metadata or Heuristics.
-			 */
-			Source Origin() const noexcept;
-
-			/**
-			 * @brief HDR10+ dynamic metadata flag.
-			 * @return true if HDR10+ was detected.
-			 */
-			bool IsHDR10Plus() const noexcept;
-
-			/**
-			 * @brief Sets the HDR10+ flag.
-			 * @param hdrplus New value.
-			 */
-			void HDR10Plus(bool hdrplus) noexcept;
-
-			static const HDR10 DEFAULT;	///< Fallback mastering display with heuristic origin.
-
-		private:
-			Point m_red;									///< Red primary.
-
-			Point m_green;									///< Green primary.
-
-			Point m_blue;									///< Blue primary.
-
-			Point m_white;									///< White point.
-
-			Point m_luminance;								///< Minimum and maximum luminance.
-
-			StormByte::Safe::Optional<Point> m_light_level;	///< Optional MaxCLL and MaxFALL values.
-
-			Source m_source;								///< Origin of the mastering display values.
-
-			bool m_hdr10plus;								///< Whether HDR10+ metadata is present.
-	};
+		}
+	}
 }
 
 /**

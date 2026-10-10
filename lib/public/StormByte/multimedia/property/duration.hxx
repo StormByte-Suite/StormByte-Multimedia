@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -44,78 +56,91 @@
 #include <chrono>
 
 /**
- * @namespace StormByte::Multimedia::Property
- * @brief Media property value types.
+ * @namespace StormByte
+ * @brief StormByte library root namespace.
  */
-namespace StormByte::Multimedia::Property {
+namespace StormByte {
 	/**
-	 * @class Duration
-	 * @brief Media duration stored as nanoseconds.
-	 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
-	 *       remain loaded while their values and provider callbacks are in use.
+	 * @namespace StormByte::Multimedia
+	 * @brief Multimedia classes and helpers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Duration final {
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::Property
+		 * @brief Media property value types.
+		 */
+		namespace Property {
 			/**
-			 * @brief Constructs a zero duration for Safe value storage.
+			 * @class Duration
+			 * @brief Media duration stored as nanoseconds.
+			 * @note DLL exchange requires compatible C++ ABIs. Base and Multimedia must
+			 *       remain loaded while their values and provider callbacks are in use.
 			 */
-			Duration() noexcept = default;
+			class STORMBYTE_MULTIMEDIA_PUBLIC Duration final {
+				public:
+					/**
+					 * @brief Constructs a zero duration for Safe value storage.
+					 */
+					Duration() noexcept = default;
 
-			/**
-			 * @brief Constructs from nanoseconds.
-			 * @param value Duration.
-			 */
-			explicit Duration(std::chrono::nanoseconds value) noexcept;
+					/**
+					 * @brief Constructs from nanoseconds.
+					 * @param value Duration.
+					 */
+					explicit Duration(std::chrono::nanoseconds value) noexcept;
 
-			/**
-			 * @brief Copy constructor.
-			 */
-			Duration(const Duration&) = default;
+					/**
+					 * @brief Copy constructor.
+					 */
+					Duration(const Duration&) = default;
 
-			/**
-			 * @brief Move constructor.
-			 */
-			Duration(Duration&&) noexcept = default;
+					/**
+					 * @brief Move constructor.
+					 */
+					Duration(Duration&&) noexcept = default;
 
-			/**
-			 * @brief Destructor.
-			 */
-			~Duration() noexcept = default;
+					/**
+					 * @brief Destructor.
+					 */
+					~Duration() noexcept = default;
 
-			/**
-			 * @brief Copy assignment.
-			 * @return *this.
-			 */
-			Duration& operator=(const Duration&) = default;
+					/**
+					 * @brief Copy assignment.
+					 * @return *this.
+					 */
+					Duration& operator=(const Duration&) = default;
 
-			/**
-			 * @brief Move assignment.
-			 * @return *this.
-			 */
-			Duration& operator=(Duration&&) noexcept = default;
+					/**
+					 * @brief Move assignment.
+					 * @return *this.
+					 */
+					Duration& operator=(Duration&&) noexcept = default;
 
-			/**
-			 * @brief Three-way compare.
-			 */
-			auto operator<=>(const Duration&) const noexcept = default;
+					/**
+					 * @brief Three-way compare.
+					 * @return Ordering of the stored nanosecond values.
+					 */
+					auto operator<=>(const Duration&) const noexcept = default;
 
-			/**
-			 * @brief Duration in nanoseconds.
-			 * @return Stored value.
-			 */
-			std::chrono::nanoseconds Nanoseconds() const noexcept;
+					/**
+					 * @brief Duration in nanoseconds.
+					 * @return Stored value.
+					 */
+					std::chrono::nanoseconds Nanoseconds() const noexcept;
 
-			/**
-			 * @brief `[HH:][MM:]SS.mmm` (hours/minutes omitted when zero).
-			 * @return Human-readable text.
-			 * @throws StormByte::Exception If Base-owned text cannot be allocated.
-			 * @throws std::bad_alloc If temporary formatting storage cannot be allocated.
-			 */
-			StormByte::Safe::String ToString() const;
+					/**
+					 * @brief `[HH:][MM:]SS.mmm` (hours/minutes omitted when zero).
+					 * @return Human-readable text.
+					 * @throws StormByte::Exception If Base-owned text cannot be allocated.
+					 * @throws std::bad_alloc If temporary formatting storage cannot be allocated.
+					 */
+					StormByte::Safe::String ToString() const;
 
-		private:
-			std::chrono::nanoseconds m_value{};	///< Duration value, initialized to zero.
-	};
+				private:
+					std::chrono::nanoseconds m_value{};	///< Duration value, initialized to zero.
+			};
+		}
+	}
 }
 
 /**

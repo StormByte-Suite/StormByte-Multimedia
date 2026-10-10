@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -63,14 +75,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * @par What it is for
 	 * Delivery that has fewer speakers than the source
 	 * (7.1→5.1, 5.1→stereo). Target is any
-	 * @ref Property::ChannelLayout, not a fixed stereo.
+	 * @ref StormByte::Multimedia::Property::ChannelLayout, not a fixed stereo.
 	 * Same channel **count** is a no-op (layout rename is
 	 * not this leaf). Fewer source channels than wanted
-	 * is @ref Filter::FFmpeg::Fail — use @ref Upmix.
+	 * is @ref StormByte::Multimedia::Pipeline::Filter::FFmpeg::Fail — use @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix.
 	 *
 	 * @par Do not stack
-	 * Not with @ref Upmix on the same stretch. After
-	 * @ref Resample is fine; before @ref Loudnorm so the
+	 * Not with @ref StormByte::Multimedia::Pipeline::Filter::Audio::Upmix on the same stretch. After
+	 * @ref StormByte::Multimedia::Pipeline::Filter::Audio::Resample is fine; before @ref StormByte::Multimedia::Pipeline::Filter::Audio::Loudnorm so the
 	 * meter sees the delivered layout.
 	 *
 	 * @par LFE
@@ -82,11 +94,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * @par Names
 	 * mono, stereo, 2.1, 3.0, 4.0, quad, 5.0, 5.1, 6.1,
 	 * 7.1, 7.1(wide), octagonal, 22.2.
-	 * @ref Property::ChannelLayout::Unknown Fails.
+	 * @ref StormByte::Multimedia::Property::ChannelLayout::Unknown Fails.
 	 *
 	 * @par Mutation
-	 * @ref Filter::FFmpeg::Save; BindProperties rewrites
-	 * Frame::Audio. EAGAIN = wait. @ref Eof flushes.
+	 * @ref StormByte::Multimedia::Pipeline::Filter::FFmpeg::Save; BindProperties rewrites
+	 * Frame::Audio. EAGAIN = wait. @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::Eof flushes.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Downmix: public Filter::Process {
 		public:
@@ -96,7 +108,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param target Destination speaker layout (not a fixed stereo).
 			 */
 			Downmix(Safe::Shared<StormByte::Logger::Log> log,
-				Property::ChannelLayout target) noexcept;
+					Property::ChannelLayout target) noexcept;
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -158,7 +170,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 		private:
 			/**
-			 * @brief FFmpeg `aformat` / `pan` layout token for @ref m_target.
+			 * @brief FFmpeg `aformat` / `pan` layout token for @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::m_target.
 			 * @return Token, or empty when the layout is unknown.
 			 * @note Borrows a string literal valid while Multimedia remains loaded.
 			 */
@@ -166,30 +178,28 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			/**
 			 * @brief Preferred chain: `aformat=channel_layouts=…`.
-			 * @return Filterchain, or empty if @ref LayoutName is empty.
+			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::LayoutName is empty.
 			 */
 			Safe::String AformatChain() const noexcept;
 
 			/**
 			 * @brief Fallback chain: fold LFE into FL/FR via `pan`.
-			 * @return Filterchain, or empty if @ref LayoutName is empty.
+			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::LayoutName is empty.
 			 */
 			Safe::String PanChain() const noexcept;
 
 			/**
-			 * @brief Opens or reuses @ref m_graph for @p src and @p chain.
+			 * @brief Opens or reuses @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::m_graph for @p src and @p chain.
 			 * @param src Model audio frame.
 			 * @param chain Borrowed avfilter chain, valid throughout this call; not retained.
 			 * @return false if the graph could not be (re)opened.
 			 */
 			bool EnsureGraph(const StormByte::Multimedia::FFmpeg::AVFrame& src,
-				std::string_view chain) noexcept;
+					std::string_view chain) noexcept;
 
 			Property::ChannelLayout m_target;	///< Destination layout
-
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
-
-			bool m_pan = false;	///< true after LFE pan fallback
+			bool m_pan = false;			///< true after LFE pan fallback
 	};
 }
 

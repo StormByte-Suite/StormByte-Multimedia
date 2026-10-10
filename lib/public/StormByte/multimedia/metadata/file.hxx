@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -39,7 +51,6 @@
 #pragma once
 
 #include <StormByte/multimedia/visibility.h>
-
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -53,246 +64,242 @@ namespace StormByte {
 	 * @brief Multimedia processing and metadata.
 	 */
 	namespace Multimedia {
-	/**
-	 * @class File
-	 * @brief Public media file snapshot.
-	 */
-	class File;
+		/**
+		 * @class File
+		 * @brief Public media file snapshot.
+		 */
+		class File;
 
-	/**
-	 * @namespace StormByte::Multimedia::Detail
-	 * @brief Private multimedia implementation helpers.
-	 */
-	namespace Detail {
-	/**
-	 * @class Probe
-	 * @brief Private metadata probe.
-	 */
-	class Probe;
-	}
-
-/**
- * @namespace StormByte::Multimedia::Metadata
- * @brief Snapshot metadata for files and streams.
- */
-	namespace Metadata {
-	/**
-	 * @class File
-	 * @brief Container-level tags and header fields captured at Open.
-	 *
-	 * Duration that requires a demux scan lives on Multimedia::File, not here.
-	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC File {
-		public:
+		/**
+		 * @namespace StormByte::Multimedia::Detail
+		 * @brief Private multimedia implementation helpers.
+		 */
+		namespace Detail {
 			/**
-			 * @brief Copy constructor.
-			 * @param other Metadata to copy.
+			 * @class Probe
+			 * @brief Private metadata probe.
 			 */
-			File(const File& other);
+			class Probe;
+		}
 
+		/**
+		 * @namespace StormByte::Multimedia::Metadata
+		 * @brief Snapshot metadata for files and streams.
+		 */
+		namespace Metadata {
 			/**
-			 * @brief Move constructor.
-			 * @param other Metadata to transfer.
+			 * @class File
+			 * @brief Container-level tags and header fields captured at Open.
+			 *
+			 * Duration that requires a demux scan lives on Multimedia::File, not here.
 			 */
-			File(File&& other) noexcept;
+			class STORMBYTE_MULTIMEDIA_PUBLIC File {
+				public:
+					/**
+					 * @brief Copy constructor.
+					 * @param other Metadata to copy.
+					 */
+					File(const File& other);
 
-			/**
-			 * @brief Destructor.
-			 */
-			~File() noexcept;
+					/**
+					 * @brief Move constructor.
+					 * @param other Metadata to transfer.
+					 */
+					File(File&& other) noexcept;
 
-			/**
-			 * @brief Copy assignment.
-			 * @param other Metadata to copy.
-			 * @return *this.
-			 */
-			File& operator=(const File& other);
+					/**
+					 * @brief Destructor.
+					 */
+					~File() noexcept;
 
-			/**
-			 * @brief Move assignment.
-			 * @param other Metadata to transfer.
-			 * @return *this.
-			 */
-			File& operator=(File&& other) noexcept;
+					/**
+					 * @brief Copy assignment.
+					 * @param other Metadata to copy.
+					 * @return *this.
+					 */
+					File& operator=(const File& other);
 
-			/**
-			 * @brief Work title.
-			 * @return Title, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Title() const noexcept;
+					/**
+					 * @brief Move assignment.
+					 * @param other Metadata to transfer.
+					 * @return *this.
+					 */
+					File& operator=(File&& other) noexcept;
 
-			/**
-			 * @brief Main artist.
-			 * @return Artist, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Artist() const noexcept;
+					/**
+					 * @brief Work title.
+					 * @return Title, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Title() const noexcept;
 
-			/**
-			 * @brief Album / set name.
-			 * @return Album, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Album() const noexcept;
+					/**
+					 * @brief Main artist.
+					 * @return Artist, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Artist() const noexcept;
 
-			/**
-			 * @brief Album artist if different from Artist.
-			 * @return Album artist, or empty.
-			 */
-			const Safe::Optional<Safe::String>& AlbumArtist() const noexcept;
+					/**
+					 * @brief Album / set name.
+					 * @return Album, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Album() const noexcept;
 
-			/**
-			 * @brief Composer.
-			 * @return Composer, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Composer() const noexcept;
+					/**
+					 * @brief Album artist if different from Artist.
+					 * @return Album artist, or empty.
+					 */
+					const Safe::Optional<Safe::String>& AlbumArtist() const noexcept;
 
-			/**
-			 * @brief Genre.
-			 * @return Genre, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Genre() const noexcept;
+					/**
+					 * @brief Composer.
+					 * @return Composer, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Composer() const noexcept;
 
-			/**
-			 * @brief Comment.
-			 * @return Comment, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Comment() const noexcept;
+					/**
+					 * @brief Genre.
+					 * @return Genre, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Genre() const noexcept;
 
-			/**
-			 * @brief Copyright notice.
-			 * @return Copyright, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Copyright() const noexcept;
+					/**
+					 * @brief Comment.
+					 * @return Comment, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Comment() const noexcept;
 
-			/**
-			 * @brief Encoder identification.
-			 * @return Encoder, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Encoder() const noexcept;
+					/**
+					 * @brief Copyright notice.
+					 * @return Copyright, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Copyright() const noexcept;
 
-			/**
-			 * @brief Date / year tag.
-			 * @return Date, or empty.
-			 */
-			const Safe::Optional<Safe::String>& Date() const noexcept;
+					/**
+					 * @brief Encoder identification.
+					 * @return Encoder, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Encoder() const noexcept;
 
-			/**
-			 * @brief Track number.
-			 * @return Track, or empty.
-			 */
-			Safe::Optional<unsigned> Track() const;
+					/**
+					 * @brief Date / year tag.
+					 * @return Date, or empty.
+					 */
+					const Safe::Optional<Safe::String>& Date() const noexcept;
 
-			/**
-			 * @brief Disc number.
-			 * @return Disc, or empty.
-			 */
-			Safe::Optional<unsigned> Disc() const;
+					/**
+					 * @brief Track number.
+					 * @return Track, or empty.
+					 */
+					Safe::Optional<unsigned> Track() const;
 
-		private:
-			friend class StormByte::Multimedia::File;
-			friend class StormByte::Multimedia::Detail::Probe;
+					/**
+					 * @brief Disc number.
+					 * @return Disc, or empty.
+					 */
+					Safe::Optional<unsigned> Disc() const;
 
-			Safe::Optional<Safe::String> m_title;		///< Work title.
+				private:
+					/**
+					 * @brief Public media file snapshot.
+					 */
+					friend class StormByte::Multimedia::File;
 
-			Safe::Optional<Safe::String> m_artist;		///< Main artist.
+					/**
+					 * @brief Private metadata probe.
+					 */
+					friend class StormByte::Multimedia::Detail::Probe;
 
-			Safe::Optional<Safe::String> m_album;		///< Album or set name.
+					Safe::Optional<Safe::String> m_title;			///< Work title.
+					Safe::Optional<Safe::String> m_artist;		///< Main artist.
+					Safe::Optional<Safe::String> m_album;			///< Album or set name.
+					Safe::Optional<Safe::String> m_albumArtist;	///< Album artist.
+					Safe::Optional<Safe::String> m_composer;		///< Composer.
+					Safe::Optional<Safe::String> m_genre;			///< Genre.
+					Safe::Optional<Safe::String> m_comment;		///< Comment.
+					Safe::Optional<Safe::String> m_copyright;		///< Copyright notice.
+					Safe::Optional<Safe::String> m_encoder;		///< Encoder identification.
+					Safe::Optional<Safe::String> m_date;			///< Date or year tag.
+					Safe::Optional<unsigned> m_track;				///< Track number.
+					Safe::Optional<unsigned> m_disc;				///< Disc number.
 
-			Safe::Optional<Safe::String> m_albumArtist;	///< Album artist.
+					/**
+					 * @brief Empty metadata.
+					 */
+					File();
 
-			Safe::Optional<Safe::String> m_composer;	///< Composer.
+					/**
+					 * @brief Sets the title.
+					 * @param title Title tag.
+					 */
+					void Title(Safe::String title);
 
-			Safe::Optional<Safe::String> m_genre;		///< Genre.
+					/**
+					 * @brief Sets the artist.
+					 * @param artist Artist tag.
+					 */
+					void Artist(Safe::String artist);
 
-			Safe::Optional<Safe::String> m_comment;		///< Comment.
+					/**
+					 * @brief Sets the album.
+					 * @param album Album tag.
+					 */
+					void Album(Safe::String album);
 
-			Safe::Optional<Safe::String> m_copyright;	///< Copyright notice.
+					/**
+					 * @brief Sets the album artist.
+					 * @param albumArtist Album artist tag.
+					 */
+					void AlbumArtist(Safe::String albumArtist);
 
-			Safe::Optional<Safe::String> m_encoder;		///< Encoder identification.
+					/**
+					 * @brief Sets the composer.
+					 * @param composer Composer tag.
+					 */
+					void Composer(Safe::String composer);
 
-			Safe::Optional<Safe::String> m_date;		///< Date or year tag.
+					/**
+					 * @brief Sets the genre.
+					 * @param genre Genre tag.
+					 */
+					void Genre(Safe::String genre);
 
-			Safe::Optional<unsigned> m_track;			///< Track number.
+					/**
+					 * @brief Sets the comment.
+					 * @param comment Comment tag.
+					 */
+					void Comment(Safe::String comment);
 
-			Safe::Optional<unsigned> m_disc;			///< Disc number.
+					/**
+					 * @brief Sets the copyright.
+					 * @param copyright Copyright tag.
+					 */
+					void Copyright(Safe::String copyright);
 
-			/**
-			 * @brief Empty metadata.
-			 */
-			File();
+					/**
+					 * @brief Sets the encoder.
+					 * @param encoder Encoder tag.
+					 */
+					void Encoder(Safe::String encoder);
 
-			/**
-			 * @brief Sets the title.
-			 * @param title Title tag.
-			 */
-			void Title(Safe::String title);
+					/**
+					 * @brief Sets the date.
+					 * @param date Date tag.
+					 */
+					void Date(Safe::String date);
 
-			/**
-			 * @brief Sets the artist.
-			 * @param artist Artist tag.
-			 */
-			void Artist(Safe::String artist);
+					/**
+					 * @brief Sets the track number.
+					 * @param track Track number.
+					 */
+					void Track(unsigned track);
 
-			/**
-			 * @brief Sets the album.
-			 * @param album Album tag.
-			 */
-			void Album(Safe::String album);
-
-			/**
-			 * @brief Sets the album artist.
-			 * @param albumArtist Album artist tag.
-			 */
-			void AlbumArtist(Safe::String albumArtist);
-
-			/**
-			 * @brief Sets the composer.
-			 * @param composer Composer tag.
-			 */
-			void Composer(Safe::String composer);
-
-			/**
-			 * @brief Sets the genre.
-			 * @param genre Genre tag.
-			 */
-			void Genre(Safe::String genre);
-
-			/**
-			 * @brief Sets the comment.
-			 * @param comment Comment tag.
-			 */
-			void Comment(Safe::String comment);
-
-			/**
-			 * @brief Sets the copyright.
-			 * @param copyright Copyright tag.
-			 */
-			void Copyright(Safe::String copyright);
-
-			/**
-			 * @brief Sets the encoder.
-			 * @param encoder Encoder tag.
-			 */
-			void Encoder(Safe::String encoder);
-
-			/**
-			 * @brief Sets the date.
-			 * @param date Date tag.
-			 */
-			void Date(Safe::String date);
-
-			/**
-			 * @brief Sets the track number.
-			 * @param track Track number.
-			 */
-			void Track(unsigned track);
-
-			/**
-			 * @brief Sets the disc number.
-			 * @param disc Disc number.
-			 */
-			void Disc(unsigned disc);
-	};
-	}
+					/**
+					 * @brief Sets the disc number.
+					 * @param disc Disc number.
+					 */
+					void Disc(unsigned disc);
+			};
+		}
 	}
 }
 

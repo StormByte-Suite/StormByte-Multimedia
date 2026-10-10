@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -43,6 +55,7 @@
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/multimedia/property/dovi.hxx>
 
 #include <cstring>
 #include <string>
@@ -51,6 +64,7 @@
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavutil/error.h>
+	#include <libavutil/dovi_meta.h>
 	#include <libavutil/frame.h>
 	#include <libavutil/hdr_dynamic_metadata.h>
 	#include <libavutil/mem.h>
@@ -60,6 +74,23 @@ extern "C" {
 using namespace StormByte::Multimedia;
 
 namespace {
+	bool ValidDoviMetadata(const AVFrameSideData* side) noexcept {
+		Property::DOVI validated;
+		if (!side || !side->data || !validated.LoadMetadata(std::as_bytes(std::span{side->data, side->size})))
+			return false;
+		AVDOVIMetadata metadata;
+		std::memcpy(&metadata, side->data, sizeof(metadata));
+		const auto aligned = [side](std::size_t offset, std::size_t alignment) noexcept {
+			return (reinterpret_cast<std::uintptr_t>(side->data) + offset) % alignment == 0;
+		};
+		return aligned(0, alignof(AVDOVIMetadata))
+			&& aligned(metadata.header_offset, alignof(AVDOVIRpuDataHeader))
+			&& aligned(metadata.mapping_offset, alignof(AVDOVIDataMapping))
+			&& aligned(metadata.color_offset, alignof(AVDOVIColorMetadata))
+			&& (metadata.num_ext_blocks == 0 || (aligned(metadata.ext_block_offset, alignof(AVDOVIDmData))
+				&& metadata.ext_block_size % alignof(AVDOVIDmData) == 0));
+	}
+
 	constexpr const char DefaultAssHeader[] =
 		"[Script Info]\n"
 		"ScriptType: v4.00+\n"
@@ -224,7 +255,8 @@ FFmpeg::AVEncoder::~AVEncoder() noexcept {
 }
 
 FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
-	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base) noexcept {
+	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base,
+	const AVFrame* firstFrame) noexcept {
 	const std::string codec_name_copy{codec_name};
 	const AVCodec* codec = avcodec_find_encoder_by_name(codec_name_copy.c_str());
 	if (!codec || !params.Get())
@@ -240,6 +272,29 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	}
 
 	PromoteCodedSideData(ctx);
+	const auto* dovi = av_packet_side_data_get(ctx->coded_side_data,
+		ctx->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF);
+	const bool needsDovi = dovi && dovi->data && dovi->size >= sizeof(AVDOVIDecoderConfigurationRecord)
+		&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(dovi->data)->rpu_present_flag;
+	if (needsDovi) {
+		const auto* metadata = firstFrame ? firstFrame->SideData(AV_FRAME_DATA_DOVI_METADATA) : nullptr;
+		if (!ValidDoviMetadata(metadata)) {
+			avcodec_free_context(&ctx);
+			return Unexpected<FFmpeg::EncoderError>("native Dolby Vision encoding requires parsed frame metadata");
+		}
+		if (av_frame_side_data_clone(&ctx->decoded_side_data, &ctx->nb_decoded_side_data, metadata, 0) < 0) {
+			avcodec_free_context(&ctx);
+			return Unexpected<FFmpeg::EncoderError>("failed to preserve parsed Dolby Vision encoder metadata");
+		}
+		if (!ctx->priv_data || !av_opt_find(ctx->priv_data, "dolbyvision", nullptr, 0, 0)) {
+			avcodec_free_context(&ctx);
+			return Unexpected<FFmpeg::EncoderError>("encoder '{}' does not support native Dolby Vision", codec_name);
+		}
+		if (reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(dovi->data)->el_present_flag) {
+			avcodec_free_context(&ctx);
+			return Unexpected<FFmpeg::EncoderError>("Dolby Vision enhancement-layer encoding is unsupported");
+		}
+	}
 
 	ctx->thread_count = 0;
 	ctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
@@ -273,6 +328,11 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 			avcodec_free_context(&ctx);
 			return Unexpected<FFmpeg::EncoderError>("failed to set encoder option '{}'", static_cast<std::string_view>(key));
 		}
+	}
+
+	if (needsDovi && av_opt_set(ctx, "dolbyvision", "1", AV_OPT_SEARCH_CHILDREN) < 0) {
+		avcodec_free_context(&ctx);
+		return Unexpected<FFmpeg::EncoderError>("failed to enable native Dolby Vision encoding");
 	}
 
 	const int opened = avcodec_open2(ctx, codec, nullptr);
@@ -314,6 +374,19 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
+	if (m_ptr && frame.Get()) {
+		const auto* configuration = av_packet_side_data_get(m_ptr->coded_side_data,
+			m_ptr->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF);
+		const bool configured = configuration && configuration->data
+			&& configuration->size >= sizeof(AVDOVIDecoderConfigurationRecord)
+			&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(configuration->data)->rpu_present_flag;
+		const auto* parsed = frame.SideData(AV_FRAME_DATA_DOVI_METADATA);
+		if (parsed && !ValidDoviMetadata(parsed))
+			return OperationResult::Error;
+		const bool metadata = parsed != nullptr;
+		if ((configured && !metadata) || (!configured && (metadata || frame.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER))))
+			return OperationResult::Error;
+	}
 	if (m_ptr && m_ptr->codec_id == AV_CODEC_ID_HEVC) {
 		auto t35 = T35FromFrame(frame);
 		if (!t35.empty()) {

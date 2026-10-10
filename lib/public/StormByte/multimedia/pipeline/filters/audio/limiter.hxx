@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -61,7 +73,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 *
 	 * @par What it is for
 	 * Stop inter-sample / digital overs before the encode.
-	 * A ceiling, not a loudness match — that is @ref Loudnorm.
+	 * A ceiling, not a loudness match — that is @ref StormByte::Multimedia::Pipeline::Filter::Audio::Loudnorm.
 	 * Put it last on the audio stretch, or after Loudnorm if
 	 * a second safety rail is wanted. It does not compress
 	 * LRA and does not change layout or rate.
@@ -77,8 +89,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * delay is compensated (`latency=1`). Hardware N/A.
 	 *
 	 * @par Mutation
-	 * @ref Filter::FFmpeg::Save of the abuffersink frame.
-	 * EAGAIN = wait. @ref Eof flushes the lookahead.
+	 * @ref StormByte::Multimedia::Pipeline::Filter::FFmpeg::Save of the abuffersink frame.
+	 * EAGAIN = wait. @ref StormByte::Multimedia::Pipeline::Filter::Audio::Limiter::Eof flushes the lookahead.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::Audio::Loudnorm
 	 */
@@ -90,7 +102,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param ceiling True-peak ceiling in dBTP. Empty → −1.5.
 			 */
 			Limiter(Safe::Shared<StormByte::Logger::Log> log,
-				Safe::Optional<double> ceiling = {}) noexcept;
+					Safe::Optional<double> ceiling = {}) noexcept;
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -153,12 +165,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 		private:
 			/**
 			 * @brief Builds the avfilter chain.
-			 * @return `alimiter=…` for @ref FFmpeg::AVFilterGraph::Ensure.
+			 * @return `alimiter=…` for @ref StormByte::Multimedia::FFmpeg::AVFilterGraph::Ensure.
 			 */
 			Safe::String Chain() const noexcept;
 
 			Safe::Optional<double> m_ceilIn;	///< Caller dBTP, or empty
-
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.
 	};
 }

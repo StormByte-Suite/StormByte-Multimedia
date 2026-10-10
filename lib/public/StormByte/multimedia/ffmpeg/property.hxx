@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -41,14 +53,33 @@
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-namespace StormByte::Multimedia::FFmpeg {
-	class AVStream;
-
+/**
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
+ */
+namespace StormByte {
 	/**
-	 * @brief Builds the public property bag from a stream view.
-	 * @param stream Stream view.
-	 * @return Video, audio or monostate.
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	STORMBYTE_MULTIMEDIA_PUBLIC Multimedia::Stream::Properties
-	MapProperties(const AVStream& stream) noexcept;
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::FFmpeg
+		 * @brief Private RAII wrappers over libav*.
+		 */
+		namespace FFmpeg {
+			/**
+			 * @brief Forward declaration of the FFmpeg stream view.
+			 */
+			class AVStream;
+
+			/**
+			 * @brief Builds the public property bag from a stream view.
+			 * @param stream Stream view.
+			 * @return Video, audio or monostate.
+			 */
+			STORMBYTE_MULTIMEDIA_PUBLIC Multimedia::Stream::Properties
+			MapProperties(const AVStream& stream) noexcept;
+		}
+	}
 }

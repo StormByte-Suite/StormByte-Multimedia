@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -82,6 +94,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Colour tags on the sink are set to BT.709 / TV.
 	 *
 	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @note Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Tonemap: public Filter::Process {
 		public:
@@ -99,21 +112,25 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param other Filter that cannot be copied.
 			 */
 			Tonemap(const Tonemap& other) = delete;
+
 			/**
 			 * @brief Move construction is unavailable.
 			 * @param other Filter that cannot be moved.
 			 */
 			Tonemap(Tonemap&& other) noexcept = delete;
+
 			/**
 			 * @brief Releases owned options and the cached graph in the provider module.
 			 */
 			~Tonemap() noexcept override;
+
 			/**
 			 * @brief Copy assignment is unavailable.
 			 * @param other Filter that cannot be copied.
 			 * @return No value; this operation is deleted.
 			 */
 			Tonemap& operator=(const Tonemap& other) = delete;
+
 			/**
 			 * @brief Move assignment is unavailable.
 			 * @param other Filter that cannot be moved.
@@ -174,7 +191,4 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	};
 }
 
-/**
- * @brief Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
- */
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Filter::Video::Tonemap);

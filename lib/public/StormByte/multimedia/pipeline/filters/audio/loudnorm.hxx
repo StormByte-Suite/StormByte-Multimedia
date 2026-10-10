@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -48,7 +60,6 @@
 #include <StormByte/safe/vector.hxx>
 
 #include <ebur128.h>
-
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
@@ -82,14 +93,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * every channel. If that gain would push any channel over
 	 * @p truePeak, a linked ceiling at @p truePeak runs on the
 	 * gained samples. The program gain is not reduced. Same
-	 * @ref Process as a one-pass leaf after measure has closed.
+	 * @ref StormByte::Multimedia::Pipeline::Filter::Audio::Loudnorm::Process as a one-pass leaf after measure has closed.
 	 *
 	 * @par Defaults
 	 * - I = −23 LUFS (EBU R128)
 	 * - TP = −1.5 dBTP
 	 *
 	 * @par Mutation
-	 * @ref Filter::FFmpeg::Save of a new
+	 * @ref StormByte::Multimedia::Pipeline::Filter::FFmpeg::Save of a new
 	 * @ref StormByte::Multimedia::FFmpeg::AVFrame.
 	 *
 	 * @see StormByte::Multimedia::Pipeline::Filter::ProcessTwoPasses
@@ -103,8 +114,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param truePeak True-peak ceiling in dBTP. Empty → −1.5.
 			 */
 			Loudnorm(Safe::Shared<StormByte::Logger::Log> log,
-				Safe::Optional<double> integrated = {},
-				Safe::Optional<double> truePeak = {}) noexcept;
+					Safe::Optional<double> integrated = {},
+					Safe::Optional<double> truePeak = {}) noexcept;
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -211,21 +222,21 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @return New frame, or empty on failure.
 			 */
 			StormByte::Multimedia::FFmpeg::AVFrame Gain(
-				const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
+					const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
 
-			double m_targetI;					///< Target integrated LUFS
-			double m_targetTp;					///< Target true-peak dBTP
-			ebur128_state* m_st;					///< Provider-owned meter, or nullptr
-			int m_channels;						///< Latched channel count
-			int m_rate;							///< Latched sample rate
-			double m_measuredI;					///< Program integrated LUFS
-			double m_measuredLra;				///< Program LRA (LU)
+			double m_targetI;			///< Target integrated LUFS
+			double m_targetTp;			///< Target true-peak dBTP
+			ebur128_state* m_st;			///< Provider-owned meter, or nullptr
+			int m_channels;				///< Latched channel count
+			int m_rate;				///< Latched sample rate
+			double m_measuredI;			///< Program integrated LUFS
+			double m_measuredLra;			///< Program LRA (LU)
 			StormByte::Safe::Vector<double> m_tp;	///< Base-owned true peak per channel (linear).
-			double m_gain;						///< Linear amplitude gain (I only)
-			double m_ceiling;					///< Linear TP ceiling
-			bool m_limit;						///< Gain would exceed TP without ceiling
-			bool m_ready;						///< Measure closed successfully
-			unsigned m_frames;					///< Audio frames seen in Measure
+			double m_gain;				///< Linear amplitude gain (I only)
+			double m_ceiling;			///< Linear TP ceiling
+			bool m_limit;				///< Gain would exceed TP without ceiling
+			bool m_ready;				///< Measure closed successfully
+			unsigned m_frames;			///< Audio frames seen in Measure
 	};
 }
 

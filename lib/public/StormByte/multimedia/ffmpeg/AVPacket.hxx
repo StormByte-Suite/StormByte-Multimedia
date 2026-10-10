@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -45,9 +57,12 @@
 
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter
- * @brief Forward so this RAII type can friend the filter base.
+ * @brief Frame and packet steps attached to a job or a raw pipeline.
  */
 namespace StormByte::Multimedia::Pipeline::Filter {
+	/**
+	 * @brief Forward declaration of the FFmpeg filter base.
+	 */
 	class FFmpeg;
 }
 
@@ -56,205 +71,271 @@ namespace StormByte::Multimedia::Pipeline::Filter {
  * @brief Multimedia-owned pipeline stages and unit holders.
  */
 namespace StormByte::Multimedia::Backend::Pipeline {
+	/**
+	 * @brief Forward declaration of the backend packet holder.
+	 */
 	class Packet;
 }
 
 /**
- * @namespace StormByte::Multimedia::FFmpeg
- * @brief Private RAII wrappers over libav*.
+ * @namespace StormByte
+ * @brief Root namespace of the StormByte C++ suite.
  */
-namespace StormByte::Multimedia::FFmpeg {
-	class AVBSF;
-	class AVDecoder;
-	class AVEncoder;
-	class AVFormatContext;
-
+namespace StormByte {
 	/**
-	 * @class AVPacket
-	 * @brief RAII owner of a libav AVPacket.
-	 *
-	 * Copy and @ref Ref share compressed buffers (`av_packet_ref`).
-	 * They are not a deep copy of payload. Each wrapper still owns
-	 * its own @c AVPacket struct. @c Get() and @c Detach() are not
-	 * public.
-	 *
-	 * @ingroup multimedia_pipeline
+	 * @namespace StormByte::Multimedia
+	 * @brief Public Multimedia module.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC AVPacket: public AVPointer<::AVPacket> {
-		friend class AVBSF;
-		friend class AVDecoder;
-		friend class AVEncoder;
-		friend class AVFormatContext;
-		friend class StormByte::Multimedia::Backend::Pipeline::Packet;
-		friend class StormByte::Multimedia::Pipeline::Filter::FFmpeg;
-		public:
+	namespace Multimedia {
+		/**
+		 * @namespace StormByte::Multimedia::FFmpeg
+		 * @brief Private RAII wrappers over libav*.
+		 */
+		namespace FFmpeg {
 			/**
-			 * @brief Allocates an empty packet.
+			 * @brief Forward declaration of the bitstream-filter wrapper.
 			 */
-			AVPacket() noexcept;
+			class AVBSF;
 
 			/**
-			 * @brief Copy. New struct; payload buffers are referenced (`av_packet_ref`).
-			 * @param other Source packet.
+			 * @brief Forward declaration of the decoder wrapper.
+			 */
+			class AVDecoder;
+
+			/**
+			 * @brief Forward declaration of the encoder wrapper.
+			 */
+			class AVEncoder;
+
+			/**
+			 * @brief Forward declaration of the format-context wrapper.
+			 */
+			class AVFormatContext;
+
+			/**
+			 * @class AVPacket
+			 * @brief RAII owner of a libav AVPacket.
 			 *
-			 * Not a deep copy of compressed bytes.
-			 */
-			AVPacket(const AVPacket& other) noexcept;
-
-			/**
-			 * @brief Move constructor. Transfers the libav pointer.
-			 * @param other Source packet; left empty.
-			 */
-			AVPacket(AVPacket&& other) noexcept = default;
-
-			/**
-			 * @brief Destructor. Unreferences buffers and frees the struct.
-			 */
-			~AVPacket() noexcept override;
-
-			/**
-			 * @brief Copy assignment. Same as the copy constructor.
-			 * @param other Source packet.
-			 * @return *this.
-			 */
-			AVPacket& operator=(const AVPacket& other) noexcept;
-
-			/**
-			 * @brief Move assignment. Frees *this, then takes @p other.
-			 * @param other Source packet; left empty.
-			 * @return *this.
-			 */
-			AVPacket& operator=(AVPacket&& other) noexcept = default;
-
-			/**
-			 * @brief New packet referencing the same data (`av_packet_ref`).
-			 * @return Referenced packet.
+			 * Copy and @ref StormByte::Multimedia::FFmpeg::AVPacket::Ref share
+			 * compressed buffers (`av_packet_ref`). They are not a deep copy of
+			 * payload. Each wrapper still owns its own @c AVPacket struct.
+			 * @c Get() and @c Detach() are not public.
 			 *
-			 * Same as the copy constructor.
+			 * @ingroup multimedia_pipeline
 			 */
-			FFmpeg::AVPacket Ref() const noexcept;
+			class STORMBYTE_MULTIMEDIA_PUBLIC AVPacket: public AVPointer<::AVPacket> {
+				public:
+					/**
+					 * @brief Allocates an empty packet.
+					 */
+					AVPacket() noexcept;
 
+					/**
+					 * @brief Copy. New struct; payload buffers are referenced (`av_packet_ref`).
+					 * @param other Source packet.
+					 *
+					 * Not a deep copy of compressed bytes.
+					 */
+					AVPacket(const AVPacket& other) noexcept;
+
+					/**
+					 * @brief Move constructor. Transfers the libav pointer.
+					 * @param other Source packet; left empty.
+					 */
+					AVPacket(AVPacket&& other) noexcept = default;
+
+					/**
+					 * @brief Destructor. Unreferences buffers and frees the struct.
+					 */
+					~AVPacket() noexcept override;
+
+					/**
+					 * @brief Copy assignment. Same as the copy constructor.
+					 * @param other Source packet.
+					 * @return *this.
+					 */
+					AVPacket& operator=(const AVPacket& other) noexcept;
+
+					/**
+					 * @brief Move assignment. Frees *this, then takes @p other.
+					 * @param other Source packet; left empty.
+					 * @return *this.
+					 */
+					AVPacket& operator=(AVPacket&& other) noexcept = default;
+
+					/**
+					 * @brief New packet referencing the same data (`av_packet_ref`).
+					 * @return Referenced packet.
+					 *
+					 * Same as the copy constructor.
+					 */
+					FFmpeg::AVPacket Ref() const noexcept;
+
+					/**
+					 * @brief Unreferences packet data (`av_packet_unref`).
+					 */
+					void Unref() noexcept;
+
+					/**
+					 * @brief Replaces payload for avcodec_send_packet.
+					 * @param data Compressed bytes.
+					 * @param size Byte count.
+					 * @param stream_index Stream index.
+					 * @param key_frame Sets AV_PKT_FLAG_KEY when true.
+					 * @return false if allocation failed.
+					 */
+					bool Load(const std::uint8_t* data, int size, int stream_index, bool key_frame) noexcept;
+
+					/**
+					 * @brief Sets timestamps in stream time base.
+					 * @param pts Presentation timestamp, or AV_NOPTS_VALUE.
+					 * @param dts Decode timestamp, or AV_NOPTS_VALUE.
+					 * @param duration Duration ticks, or 0.
+					 */
+					void Timestamps(std::int64_t pts, std::int64_t dts, std::int64_t duration) noexcept;
+
+					/**
+					 * @brief Packet stream index.
+					 * @return stream_index, or -1 if empty.
+					 */
+					int StreamIndex() const noexcept;
+
+					/**
+					 * @brief Presentation timestamp in stream time base.
+					 * @return PTS, or AV_NOPTS_VALUE.
+					 */
+					std::int64_t Pts() const noexcept;
+
+					/**
+					 * @brief Decode timestamp in stream time base.
+					 * @return DTS, or AV_NOPTS_VALUE.
+					 */
+					std::int64_t Dts() const noexcept;
+
+					/**
+					 * @brief Packet duration in stream time base.
+					 * @return Duration ticks, or 0.
+					 */
+					std::int64_t Duration() const noexcept;
+
+					/**
+					 * @brief Packet flags (AV_PKT_FLAG_*).
+					 * @return Flags, or 0 if empty.
+					 */
+					int Flags() const noexcept;
+
+					/**
+					 * @brief Compressed payload pointer.
+					 * @return data, or nullptr if empty.
+					 */
+					const std::uint8_t* Data() const noexcept;
+
+					/**
+					 * @brief Compressed payload size in bytes.
+					 * @return size, or 0 if empty.
+					 */
+					int Size() const noexcept;
+
+					/**
+					 * @brief Byte position of this packet in its input source.
+					 * @return Source offset, or -1 when unavailable.
+					 */
+					std::int64_t Position() const noexcept;
+
+					/**
+					 * @brief Whether a packet struct is owned.
+					 * @return true if the wrapper holds a packet.
+					 */
+					explicit operator bool() const noexcept;
+
+					/**
+					 * @brief Number of side-data entries.
+					 * @return Count, or 0.
+					 */
+					int SideDataCount() const noexcept;
+
+					/**
+					 * @brief Side-data type at @p index.
+					 * @param index Entry index.
+					 * @return `AVPacketSideDataType` as int, or -1.
+					 */
+					int SideDataType(int index) const noexcept;
+
+					/**
+					 * @brief Side-data payload at @p index.
+					 * @param index Entry index.
+					 * @param size Set to payload size on success.
+					 * @return Pointer, or nullptr.
+					 */
+					const std::uint8_t* SideData(int index, int& size) const noexcept;
+
+					/**
+					 * @brief Adopts @p raw. Previous packet is freed.
+					 * @param raw libav packet, or nullptr.
+					 */
+					void Reset(::AVPacket* raw) noexcept;
+
+				private:
+					/**
+					 * @brief Allows bitstream filters to access the raw packet.
+					 */
+					friend class AVBSF;
+
+					/**
+					 * @brief Allows the decoder to access the raw packet.
+					 */
+					friend class AVDecoder;
+
+					/**
+					 * @brief Allows the encoder to access the raw packet.
+					 */
+					friend class AVEncoder;
+
+					/**
+					 * @brief Allows the format context to access the raw packet.
+					 */
+					friend class AVFormatContext;
+
+					/**
+					 * @brief Allows the backend packet holder to access the raw packet.
+					 */
+					friend class StormByte::Multimedia::Backend::Pipeline::Packet;
+
+					/**
+					 * @brief Allows the filter base to access the raw packet.
+					 */
+					friend class StormByte::Multimedia::Pipeline::Filter::FFmpeg;
+
+					/**
+					 * @brief Yields the raw pointer and leaves this wrapper empty.
+					 * @return Previous libav packet, or nullptr. Does not free.
+					 */
+					::AVPacket* Detach() noexcept;
+
+					/**
+					 * @brief Frees the packet (`av_packet_free`).
+					 */
+					void Free() noexcept override;
+
+					/**
+					 * @brief Keeps raw packet access private.
+					 */
+					using AVPointer<::AVPacket>::Get;
+
+					/**
+					 * @brief Keeps the base pointer-detachment operation private.
+					 */
+					using AVPointer<::AVPacket>::Detach;
+			};
+
+			/// @cond
 			/**
-			 * @brief Unreferences packet data (`av_packet_unref`).
+			 * @brief Uses the provider's packet pointer-base instantiation.
 			 */
-			void Unref() noexcept;
-
-			/**
-			 * @brief Replaces payload for avcodec_send_packet.
-			 * @param data Compressed bytes.
-			 * @param size Byte count.
-			 * @param stream_index Stream index.
-			 * @param key_frame Sets AV_PKT_FLAG_KEY when true.
-			 * @return false if allocation failed.
-			 */
-			bool Load(const std::uint8_t* data, int size, int stream_index, bool key_frame) noexcept;
-
-			/**
-			 * @brief Sets timestamps in stream time base.
-			 * @param pts Presentation timestamp, or AV_NOPTS_VALUE.
-			 * @param dts Decode timestamp, or AV_NOPTS_VALUE.
-			 * @param duration Duration ticks, or 0.
-			 */
-			void Timestamps(std::int64_t pts, std::int64_t dts, std::int64_t duration) noexcept;
-
-			/**
-			 * @brief Packet stream index.
-			 * @return stream_index, or -1 if empty.
-			 */
-			int StreamIndex() const noexcept;
-
-			/**
-			 * @brief Presentation timestamp in stream time base.
-			 * @return PTS, or AV_NOPTS_VALUE.
-			 */
-			std::int64_t Pts() const noexcept;
-
-			/**
-			 * @brief Decode timestamp in stream time base.
-			 * @return DTS, or AV_NOPTS_VALUE.
-			 */
-			std::int64_t Dts() const noexcept;
-
-			/**
-			 * @brief Packet duration in stream time base.
-			 * @return Duration ticks, or 0.
-			 */
-			std::int64_t Duration() const noexcept;
-
-			/**
-			 * @brief Packet flags (AV_PKT_FLAG_*).
-			 * @return Flags, or 0 if empty.
-			 */
-			int Flags() const noexcept;
-
-			/**
-			 * @brief Compressed payload pointer.
-			 * @return data, or nullptr if empty.
-			 */
-			const std::uint8_t* Data() const noexcept;
-
-			/**
-			 * @brief Compressed payload size in bytes.
-			 * @return size, or 0 if empty.
-			 */
-			int Size() const noexcept;
-
-			/**
-			 * @brief Byte position of this packet in its input source.
-			 * @return Source offset, or -1 when unavailable.
-			 */
-			std::int64_t Position() const noexcept;
-
-			/**
-			 * @brief Whether a packet struct is owned.
-			 * @return true if the wrapper holds a packet.
-			 */
-			explicit operator bool() const noexcept;
-
-			/**
-			 * @brief Number of side-data entries.
-			 * @return Count, or 0.
-			 */
-			int SideDataCount() const noexcept;
-
-			/**
-			 * @brief Side-data type at @p index.
-			 * @param index Entry index.
-			 * @return `AVPacketSideDataType` as int, or -1.
-			 */
-			int SideDataType(int index) const noexcept;
-
-			/**
-			 * @brief Side-data payload at @p index.
-			 * @param index Entry index.
-			 * @param size Set to payload size on success.
-			 * @return Pointer, or nullptr.
-			 */
-			const std::uint8_t* SideData(int index, int& size) const noexcept;
-
-			/**
-			 * @brief Adopts @p raw. Previous packet is freed.
-			 * @param raw libav packet, or nullptr.
-			 */
-			void Reset(::AVPacket* raw) noexcept;
-
-		private:
-			/**
-			 * @brief Yields the raw pointer and leaves this wrapper empty.
-			 * @return Previous libav packet, or nullptr. Does not free.
-			 */
-			::AVPacket* Detach() noexcept;
-
-			/**
-			 * @brief Frees the packet (`av_packet_free`).
-			 */
-			void Free() noexcept override;
-
-			using AVPointer<::AVPacket>::Get;
-			using AVPointer<::AVPacket>::Detach;
-	};
-
-	extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVPacket>;
+			extern template class STORMBYTE_MULTIMEDIA_PUBLIC AVPointer<::AVPacket>;
+			/// @endcond
+		}
+	}
 }
 
 /**

@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -265,7 +277,7 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipeline::Encoder& owner,
 	StormByte::Multimedia::FFmpeg::AVCodecParameters params,
 	AVRational timeBase,
-	Features need) noexcept {
+	Features need, const FFmpeg::AVFrame* firstFrame) noexcept {
 	if (!owner.Destination().HasAccess(Operation::Write)) {
 		owner.Fail("codec is not writable");
 		return std::nullopt;
@@ -284,7 +296,8 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 
 		const auto* listed = FindRow(stormName, pin);
 		if (!listed || !listed->features.Has(need)) {
-			owner.Fail("encoder implementation lacks required features");
+			owner.Fail(need.Has(Feature::DOVI) ? "encoder implementation lacks required Dolby Vision support"
+				: "encoder implementation lacks required features");
 			return std::nullopt;
 		}
 	}
@@ -294,7 +307,8 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	if (row)
 		codec = avcodec_find_encoder_by_name(row->name);
 	if (!codec) {
-		owner.Fail("no encoder for destination codec");
+		owner.Fail(need.Has(Feature::DOVI) ? "no native Dolby Vision encoder for destination codec"
+			: "no encoder for destination codec");
 		return std::nullopt;
 	}
 
@@ -352,6 +366,15 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		opts.emplace(row->maxrate_key, std::to_string(*owner.MaxBitRate()));
 	if (row && HasKey(row->bufsize_key) && (owner.BitRate() || owner.MaxBitRate()))
 		opts.emplace(row->bufsize_key, std::to_string(BufSizeBits(owner)));
+	if (need.Has(Feature::DOVI) && row && std::string_view(row->name) == "libx265") {
+		if ((owner.MaxBitRate() && *owner.MaxBitRate() <= 0) || (owner.BitRate() && *owner.BitRate() <= 0)) {
+			owner.Fail("Dolby Vision requires positive VBV bitrate settings");
+			return std::nullopt;
+		}
+		const auto maxRate = owner.MaxBitRate().value_or(owner.BitRate().value_or(20000000));
+		opts.try_emplace(row->maxrate_key, std::to_string(maxRate));
+		opts.try_emplace(row->bufsize_key, std::to_string(maxRate));
+	}
 	if (owner.Preset() && row && HasKey(row->preset_key))
 		opts.emplace(row->preset_key, std::string{*owner.Preset()});
 	if (owner.Tune() && row && HasKey(row->style_key))
@@ -378,6 +401,11 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	for (const auto& [key, value] : fine) {
 		if (key.empty())
 			continue;
+		if (need.Has(Feature::DOVI) && (key == "dolbyvision" || key == "dolby-vision-profile" || key == "dolby-vision-rpu"
+			|| key == "vbv-maxrate" || key == "x265-params" || key == "svtav1-params")) {
+			owner.Fail("FineTune cannot override native Dolby Vision preservation");
+			return std::nullopt;
+		}
 		if (blob.contains(key) && blob[key] != value) {
 			owner.Fail("FineTune conflicts with HDR signaling key '" + key + "'");
 			return std::nullopt;
@@ -462,7 +490,7 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	for (const auto& [key, value] : opts)
 		options.emplace(StormByte::Safe::String{key}, StormByte::Safe::String{value});
 	auto opened = StormByte::Multimedia::FFmpeg::AVEncoder::Open(
-		row->name, params, owner.Index(), options, timeBase);
+		row->name, params, owner.Index(), options, timeBase, firstFrame);
 	if (!opened.has_value()) {
 		owner.Fail(opened.error() ? opened.error()->what() : "Failed to open encoder");
 		return std::nullopt;

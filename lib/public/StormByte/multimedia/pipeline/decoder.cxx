@@ -20,6 +20,18 @@
  * file. Third-party components — including FFmpeg and embedded trained data —
  * remain under their own licenses and are not covered by the commercial grant.
  *
+ * A written StormByte commercial agreement may license this original source
+ * on terms other than the LGPL, including specific use, distribution or
+ * linking arrangements such as static linking, as stated in that agreement.
+ * It does not grant rights to dependencies or waive their license conditions.
+ * Enabling WITH_GPL or WITH_NONFREE may include components with separate
+ * obligations for modification, linking (static or dynamic), redistribution
+ * or works that incorporate them. The person modifying, linking, packaging or
+ * distributing the resulting work is responsible for determining and meeting
+ * all applicable requirements, including any needed patent permissions.
+ * A StormByte commercial agreement does not provide those rights for GPL or
+ * nonfree components.
+ *
  * Neither license grants any patent rights. Any patent licenses required
  * to use this software or third-party components must be obtained separately
  * from the patent holders.
@@ -271,8 +283,17 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 
 	const StormByte::Multimedia::FFmpeg::AVRational timeBase{1, 1000000000};
 	if (packet.Type() == Type::Video) {
+		StormByte::Safe::Optional<Property::Video> video;
+		if (const auto& plan = Plan(); plan && static_cast<bool>(*plan)) {
+			for (const auto& stream : plan->Snapshot().Streams()) {
+				if (stream.Index() == m_index) {
+					video = stream.Video();
+					break;
+				}
+			}
+		}
 		Bind(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Decoder::Video>(
-			std::move(*opened), timeBase, std::nullopt));
+			std::move(*opened), timeBase, std::move(video)));
 	}
 
 	else if (packet.Type() == Type::Audio) {
