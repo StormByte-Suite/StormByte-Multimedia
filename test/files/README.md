@@ -54,7 +54,9 @@ The Japanese PGS was rendered with `IPAMonaGothic` at a larger size for OCR cove
 
 ## Test-generated outputs
 
-Generated media is written under the configured `STORMBYTE_TEST_OUTPUT_DIR`, normally `<build>/test-output`. These outputs are not additional redistributed fixtures. Every case uses its own output filename; codec roundtrips generate their intermediate inputs within the same case and do not depend on execution order.
+Generated media is written under the configured `STORMBYTE_TEST_OUTPUT_DIR`, normally `<build>/test-output`, under
+`<executable>/<test-case>/`. These outputs are not additional redistributed fixtures. Codec roundtrips generate their
+intermediate inputs within the same case and do not depend on execution order.
 
 - `pipeline/audio-codecs/`: stereo PCM, surround AAC and Opus fixtures exercise FDK-AAC, Vorbis, Opus, LAME, FLAC, ALAC and AC-3/E-AC3. The cases inspect container and codec identities, channel count, 48 kHz sample rate and positive duration. FDK-AAC is required when FFmpeg is bundled with nonfree enabled.
 - `pipeline/video-codecs/`: the H.264 SDR MP4 fixture is scaled to 320x192 for SVT/libaom AV1, VP8/VP9, x264, OpenH264, Kvazaar and x265. AV1 decoder cases generate their own input before selecting dav1d or libaom. The scaled dimensions are multiples of eight for Kvazaar compatibility.

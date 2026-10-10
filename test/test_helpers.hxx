@@ -56,7 +56,9 @@
 #include <filesystem>
 #include <iostream>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
 
 /** @brief CTest return code for an unavailable optional encoder case. */
 inline constexpr int TEST_SKIP = 77;
@@ -77,8 +79,32 @@ struct TestEntry {
 	TestFunction function; ///< Function body for the test case.
 };
 
+/** @brief Active per-test output namespace, set by the selected test runner. */
+inline thread_local std::filesystem::path ActiveTestOutputScope;
+
+/** @brief Restores the previous output namespace when a test case finishes. */
+class TestOutputScope final {
+	public:
+		/** @brief Selects a unique output directory for one test case. */
+		explicit TestOutputScope(std::filesystem::path scope)
+		: m_previous(std::move(ActiveTestOutputScope)) {
+			ActiveTestOutputScope = std::move(scope);
+		}
+
+		/** @brief Restores the previous output directory. */
+		~TestOutputScope() {
+			ActiveTestOutputScope = std::move(m_previous);
+		}
+
+	private:
+		std::filesystem::path m_previous; ///< Namespace active before this test.
+};
+
 /** @brief Logs lifecycle around one function so a timeout identifies the active case. */
-inline int RunOneTest(const TestEntry& test) {
+inline int RunOneTest(const TestEntry& test, std::string_view executable) {
+	auto outputScope = std::filesystem::path(executable).stem();
+	outputScope /= std::string{test.name};
+	const TestOutputScope outputScopeGuard(std::move(outputScope));
 	std::cout << "[Test] Starting " << test.name << std::endl;
 	const int result = test.function();
 	if (result == TEST_SKIP) {
@@ -94,7 +120,7 @@ inline int RunSelectedTest(int argc, char** argv, std::span<const TestEntry> tes
 	if (argc == 1) {
 		int failures = 0;
 		for (const auto& test : tests) {
-			const int result = RunOneTest(test);
+			const int result = RunOneTest(test, argv[0]);
 			if (result != 0 && result != TEST_SKIP)
 				++failures;
 		}
@@ -104,7 +130,7 @@ inline int RunSelectedTest(int argc, char** argv, std::span<const TestEntry> tes
 	const std::string_view selected{argv[1]};
 	for (const auto& test : tests) {
 		if (test.name == selected)
-			return RunOneTest(test);
+			return RunOneTest(test, argv[0]);
 	}
 
 	std::cerr << "Unknown test function: " << selected << std::endl;
@@ -118,7 +144,10 @@ inline std::filesystem::path FixturePath(std::string_view relativePath) {
 
 /** @brief Resolves a generated result path and creates its parent directory. */
 inline std::filesystem::path OutputPath(std::string_view relativePath) {
-	auto path = std::filesystem::path{STORMBYTE_TEST_OUTPUT_DIR} / relativePath;
+	auto path = std::filesystem::path{STORMBYTE_TEST_OUTPUT_DIR};
+	if (!ActiveTestOutputScope.empty())
+		path /= ActiveTestOutputScope;
+	path /= relativePath;
 	std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
 	std::error_code error;
 	std::filesystem::create_directories(path.parent_path(), error);
