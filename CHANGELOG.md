@@ -24,6 +24,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Fixed
 
 - Declare SVT-AV1 encoder support for HDR10 signaling so HDR10 AV1 jobs can select `libsvtav1`.
+- Synchronize decoded side data across all bundled FFmpeg frame workers; system FFmpeg must be 9.0.2 or newer to avoid incomplete HEVC/Dolby Vision worker state.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 

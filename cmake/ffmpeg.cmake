@@ -56,6 +56,11 @@ function(export_ffmpeg_version)
 	if(_ff_maj STREQUAL "")
 		message(FATAL_ERROR "FFmpeg version '${_ver}' is not MAJOR.MINOR[.PATCH]")
 	endif()
+	if(WITH_FFMPEG STREQUAL "SYSTEM" AND _ver VERSION_LESS "9.0.2")
+		message(FATAL_ERROR
+			"WITH_FFMPEG=SYSTEM uses FFmpeg ${_ver}. Multimedia requires FFmpeg 9.0.2 or newer; "
+			"9.0.2 fixes decoded side-data synchronization across frame workers. Upgrade system FFmpeg or use WITH_FFMPEG=BUNDLED.")
+	endif()
 
 	set(STORMBYTE_FFMPEG_VERSION "${_ver}" PARENT_SCOPE)
 	set(STORMBYTE_FFMPEG_VERSION_MAJOR "${_ff_maj}" PARENT_SCOPE)
