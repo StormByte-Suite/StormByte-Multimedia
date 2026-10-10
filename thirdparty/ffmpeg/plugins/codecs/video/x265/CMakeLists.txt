@@ -78,9 +78,13 @@ if(MSVC)
 	set(X265_TC "TOOLCHAIN=msvc")
 endif()
 
-set(X265_12_OPTSTR "SOURCE=source;NOINSTALL;GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-json11-cstdint.patch;TITLE=json11 cstdint}")
-set(X265_10_OPTSTR "SOURCE=source;NOINSTALL")
-set(X265_8_OPTSTR "SOURCE=source")
+# The multilib variants define x265_analysis_distortion_data differently
+# (notably sse_t* ctuDistortion). Combining their IR violates the ODR, as
+# diagnosed by GCC LTO. Keep all bit depths outside IPO on every compiler;
+# native optimization and assembly remain enabled.
+set(X265_12_OPTSTR "SOURCE=source;NOINSTALL;IPO=off;GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-json11-cstdint.patch;TITLE=json11 cstdint}")
+set(X265_10_OPTSTR "SOURCE=source;NOINSTALL;IPO=off")
+set(X265_8_OPTSTR "SOURCE=source;IPO=off")
 if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
 	set(X265_8_OPTSTR "${X265_8_OPTSTR};REPACK")
 endif()
