@@ -27,6 +27,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Encoder table entries for bundled Kvazaar and OpenH264, preserving x265/x264 as preferred implementations.
 - Category-specific pipeline test executables with shared compiled helpers to reduce recompilation while preserving individual CTest cases.
 
+### Changed
+
+- Replace the mux output whitelist and artificial stream-shape restrictions with generic libavformat writing for registered single-file destinations. Resolve the actual writer filename and select separately maintained Matroska, WebM and MOV/MP4 policies; preserve writing-app branding and Matroska-specific adaptations. Add six mux-policy regression cases and retain incompatible-output failure checks through FFmpeg.
+
 ### Fixed
 
 - Implement the Watermark setup hook so path and binary overlays can be instantiated through the pipeline's filter API.

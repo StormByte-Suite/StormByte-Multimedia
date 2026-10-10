@@ -40,6 +40,7 @@
 
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/backend/file_avio.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/policy.hxx>
 #include <StormByte/multimedia/backend/pipeline/muxer.hxx>
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
@@ -70,8 +71,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	 * Owns the output AVFormatContext, reserved tracks and the
 	 * header-delay queue. Bytes leave through @ref Backend::FileAvio
 	 * on @ref Plan::Writer. Format is guessed from the registry container
-	 * extension. Matroska attachments and header options remain conditional
-	 * on destination capabilities.
+	 * filename. Exceptional format adaptations live in separate policies;
+	 * unrecognized policy names retain the unrestricted libavformat default.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -126,7 +127,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @param owner Public muxer.
 			 * @return false if owner.Fail() was called.
 			 *
-			 * Format comes from @c owner.Destination().Extension().
+			 * Format comes from the actual @c Plan::Writer().Path() filename.
 			 * Bytes go to @ref Plan::Writer via FileAvio. No path.
 			 */
 			bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept override;
@@ -224,6 +225,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 */
 			void FreeParams() noexcept;
 
+			const Policy* m_policy = nullptr;						///< Borrowed immutable format policy with process lifetime.
 			::AVFormatContext* m_ctx;									///< Output format context
 			std::optional<StormByte::Multimedia::Backend::FileAvio> m_avio;	///< Writer AVIO
 			std::map<int, Track> m_tracks;								///< Output index → track

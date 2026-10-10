@@ -36,7 +36,6 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
-#include <StormByte/multimedia/backend/pipeline/detail/muxer/matroska/attachment.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
@@ -77,61 +76,7 @@ namespace {
 	const FFmpeg::AVRational NanoTimeBase{1, 1000000000};
 	constexpr const char WritingApp[] = "StormByte-Multimedia " STORMBYTE_MULTIMEDIA_VERSION;
 	constexpr std::int64_t InterleaveSlotUs = 40LL * 1000;
-	constexpr std::int64_t InterleaveFloorUs = 250000;
-	constexpr std::int64_t InterleaveMixedUs = 60LL * 1000 * 1000;
 
-	bool Encodes(const StormByte::Multimedia::Pipeline::Track& track) noexcept {
-		const auto* cfg = track.Config();
-		if (!cfg)
-			return false;
-		if (const auto* video = dynamic_cast<const Config::Video*>(cfg))
-			return video->Codec() != nullptr;
-		if (const auto* audio = dynamic_cast<const Config::Audio*>(cfg))
-			return audio->Codec() != nullptr;
-		if (const auto* sub = dynamic_cast<const Config::Subtitle*>(cfg))
-			return sub->Codec() != nullptr;
-		return false;
-	}
-
-	bool Muxable(StormByte::Multimedia::Type type) noexcept {
-		return type == StormByte::Multimedia::Type::Video
-			|| type == StormByte::Multimedia::Type::Audio
-			|| type == StormByte::Multimedia::Type::Subtitle;
-	}
-
-	std::int64_t InterleaveDeltaUs(const StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
-		std::size_t remux = 0;
-		std::size_t encodeVideo = 0;
-		std::size_t encodeOther = 0;
-		const auto& plan = owner.Plan();
-		if (plan) {
-			for (const auto& held : plan->Tracks()) {
-				if (!held)
-					continue;
-				const auto& track = *held;
-				if (!Muxable(track.Type()))
-					continue;
-				if (!Encodes(track))
-					++remux;
-				else if (track.Type() == StormByte::Multimedia::Type::Video)
-					++encodeVideo;
-				else
-					++encodeOther;
-			}
-		}
-		if (encodeVideo != 0 && remux != 0)
-			return InterleaveMixedUs;
-
-		std::int64_t us = InterleaveFloorUs;
-		us += static_cast<std::int64_t>(encodeVideo) * 500000;
-		us += static_cast<std::int64_t>(remux) * 100000;
-		us += static_cast<std::int64_t>(encodeOther) * 80000;
-		if (us < InterleaveFloorUs)
-			us = InterleaveFloorUs;
-		if (us > InterleaveMixedUs)
-			us = InterleaveMixedUs;
-		return us;
-	}
 
 	std::int64_t NsToTicks(std::int64_t ns, FFmpeg::AVRational time_base) noexcept {
 		if (time_base.num <= 0 || time_base.den <= 0)
@@ -232,10 +177,6 @@ namespace {
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	namespace {
-		bool MatroskaFamily(const StormByte::Multimedia::Container& container) noexcept {
-			const auto name = container.Name();
-			return name == "Matroska" || name == "WebM";
-		}
 	}
 
 	Container::Container() noexcept
@@ -283,18 +224,22 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			return false;
 		}
 
-		const auto ext = owner.Destination().Extension();
-		if (ext.empty()) {
-			owner.Fail("destination container has no extension");
+		const std::string filename{owner.Plan()->Writer().Path()};
+		if (filename.empty()) {
+			owner.Fail("destination filename is empty");
 			return false;
 		}
 
-		const std::string dummy = "out." + std::string(ext);
-		const AVOutputFormat* oformat = av_guess_format(nullptr, dummy.c_str(), nullptr);
+		const AVOutputFormat* oformat = av_guess_format(nullptr, filename.c_str(), nullptr);
 		if (!oformat) {
 			owner.Fail("could not guess output format from container");
 			return false;
 		}
+		if (oformat->flags & AVFMT_NOFILE) {
+			owner.Fail("destination muxer does not support a single buffered writer");
+			return false;
+		}
+		m_policy = &SelectPolicy(oformat->name);
 
 		AVFormatContext* ctx = nullptr;
 		if (avformat_alloc_output_context2(&ctx, const_cast<AVOutputFormat*>(oformat),
@@ -312,6 +257,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		m_ctx = ctx;
+		av_dict_set(&m_ctx->metadata, "ENCODER", WritingApp, 0);
 		if (!(ctx->oformat->flags & AVFMT_NOFILE)) {
 			ctx->pb = m_avio->Context();
 			ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
@@ -398,17 +344,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			m_attachments.clear();
 			return true;
 		}
-		if (!owner.Destination().HasAccess(StormByte::Multimedia::Access{
-				StormByte::Multimedia::Operation::Attach})) {
-			owner.Fail("destination container does not support attachments");
-			return false;
-		}
-
-		if (!owner.Destination().HasAccess(Access{Operation::Attach})) {
-			owner.Fail("destination container does not support attachments");
-			return false;
-		}
-
 		m_attachments.clear();
 		m_attachments.reserve(attachments.size());
 		for (const auto& item : attachments) {
@@ -544,40 +479,16 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			if (track.title)
 				av_dict_set(&stream->metadata, "title", track.title->data(), 0);
 
-			if (stream->codecpar) {
-				if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && !haveDefaultVideo) {
-					stream->disposition |= AV_DISPOSITION_DEFAULT;
-					haveDefaultVideo = true;
-				}
-
-				if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && !haveDefaultAudio) {
-					stream->disposition |= AV_DISPOSITION_DEFAULT;
-					haveDefaultAudio = true;
-				}
-			}
+			m_policy->PrepareStream(*stream, haveDefaultVideo, haveDefaultAudio);
 
 			track.avIndex = stream->index;
 			track.timeBase = FFmpeg::AVRational{stream->time_base.num, stream->time_base.den};
 		}
 
 		if (!m_attachments.empty()) {
-			if (!MatroskaFamily(owner.Destination())) {
-				owner.Fail("file attachments are only supported in Matroska/WebM output");
-				return false;
-			}
-			if (!Matroska::Attachment::Write(owner, m_ctx, m_attachments))
+			if (!m_policy->WriteAttachments(owner, *m_ctx, m_attachments))
 				return false;
 		}
-
-		if (MatroskaFamily(owner.Destination()))
-			av_dict_set(&m_ctx->metadata, "encoding_tool", WritingApp, 0);
-
-		std::int64_t deltaUs = InterleaveDeltaUs(owner);
-		const auto cap = owner.InputCeiling();
-		const auto depth = cap == 0 ? 1 : cap;
-		const std::int64_t byDepth = InterleaveSlotUs * static_cast<std::int64_t>(depth);
-		if (byDepth > deltaUs)
-			deltaUs = byDepth;
 
 		std::int64_t minPts = -1;
 		std::int64_t maxPts = -1;
@@ -590,16 +501,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			if (ns > maxPts)
 				maxPts = ns;
 		}
-		if (minPts >= 0 && maxPts > minPts) {
-			const std::int64_t spanUs = (maxPts - minPts) / 1000 + InterleaveSlotUs;
-			if (spanUs > deltaUs)
-				deltaUs = spanUs;
-		}
-		m_ctx->max_interleave_delta = deltaUs;
+		const std::int64_t spanUs = minPts >= 0 && maxPts > minPts
+			? (maxPts - minPts) / 1000 + InterleaveSlotUs : 0;
 
 		AVDictionary* opts = nullptr;
-		if (MatroskaFamily(owner.Destination()))
-			av_dict_set(&opts, "default_mode", "passthrough", 0);
+		m_policy->ConfigureHeader(owner, *m_ctx, spanUs, &opts);
 		const int rc = avformat_write_header(m_ctx, &opts);
 		av_dict_free(&opts);
 		if (rc < 0) {

@@ -36,7 +36,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
-#include <StormByte/multimedia/backend/pipeline/detail/muxer/matroska/attachment.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
@@ -84,18 +84,13 @@ namespace {
 	}
 }
 
-namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
+namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	bool Attachment::Write(StormByte::Multimedia::Pipeline::Muxer& owner,
 		AVFormatContext* ctx, const StormByte::Multimedia::Attachments& attachments) noexcept {
 		if (!ctx)
 			return true;
 		if (!PlanWantsAttachments(owner) || attachments.empty())
 			return true;
-		if (!owner.Destination().HasAccess(Access{Operation::Attach})) {
-			owner.Fail("destination container does not support attachments");
-			return false;
-		}
-
 		for (const auto& attachment : attachments) {
 			AVStream* stream = avformat_new_stream(ctx, nullptr);
 			if (!stream) {

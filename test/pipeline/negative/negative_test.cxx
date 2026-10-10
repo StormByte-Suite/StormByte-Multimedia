@@ -149,12 +149,12 @@ int test_transcoder_rejects_unknown_destination_container() {
 
 int test_transcoder_rejects_video_in_wav() {
 	return CheckRejectedJob("video/anime_like.mkv", OutputPath("pipeline/rejected-video.wav"),
-		"requires exactly one audio track", [](Transcoder& job) { job.Video(0).Remux(); });
+		{}, [](Transcoder& job) { job.Video(0).Remux(); });
 }
 
 int test_transcoder_rejects_multiple_audio_tracks_in_wav() {
 	return CheckRejectedJob("video/bluray_like_hdr10.mkv", OutputPath("pipeline/rejected-multiple-audio.wav"),
-		"requires exactly one audio track", [](Transcoder& job) {
+		{}, [](Transcoder& job) {
 			job.Audio(1).Remux();
 			job.Audio(2).Remux();
 		});
@@ -172,7 +172,7 @@ int test_transcoder_rejects_pgs_remux_in_mp4() {
 
 int test_transcoder_rejects_attachments_in_mp4() {
 	return CheckRejectedJob("video/anime_like.mkv", OutputPath("pipeline/rejected-attachments.mp4"),
-		"does not support file attachments", [](Transcoder& job) {
+		{}, [](Transcoder& job) {
 			job.Video(0).Remux();
 			job.Attachments();
 		});

@@ -47,17 +47,17 @@ extern "C" {
 }
 
 /**
- * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska
- * @brief Matroska / WebM mux backend.
+ * @namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg
+ * @brief Generic libavformat output mux backend.
  *
  * @ingroup multimedia_pipeline
  */
-namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::Matroska {
+namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	/**
 	 * @class Attachment
-	 * @brief Writes catalogue attachments as Matroska attachment streams.
+	 * @brief Writes catalogue attachments as FFmpeg attachment streams.
 	 *
-	 * extradata + filename/mimetype. Not a generic mux helper.
+	 * Supplies extradata and filename/mimetype; the selected muxer decides compatibility.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */

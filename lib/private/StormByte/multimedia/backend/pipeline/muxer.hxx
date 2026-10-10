@@ -58,7 +58,7 @@ namespace StormByte {
 				 * @class Muxer
 				 * @brief Mux backend behind one public Muxer.
 				 *
-				 * One leaf per destination container family. BindSink allocates
+					 * A shared libavformat leaf selects separate format policies. BindSink allocates
 				 * the format context and a write @ref FileAvio on
 				 * @ref Plan::Writer. Libav must not open a path.
 				 * ReserveEncoder, ReserveRemux and BindAttachments stay
@@ -101,7 +101,7 @@ namespace StormByte {
 						 * @param owner Public muxer (Fail, Destination, Plan writer).
 						 * @return false if owner.Fail() was called.
 						 *
-						 * Format is guessed from the Plan container extension.
+						 * Format is guessed from the actual Plan writer filename.
 						 * Bytes go to @ref Plan::Writer through FileAvio.
 						 */
 						virtual bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept = 0;

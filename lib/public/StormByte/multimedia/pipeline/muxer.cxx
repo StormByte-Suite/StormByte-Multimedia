@@ -57,7 +57,6 @@
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/pointers.hxx>
 
-#include <cctype>
 #include <chrono>
 #include <cstdlib>
 #include <format>
@@ -75,73 +74,6 @@ using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
 namespace {
-	using MediaType = StormByte::Multimedia::Type;
-
-	bool EqualsIgnoreCase(std::string_view a, std::string_view b) noexcept {
-		if (a.size() != b.size())
-			return false;
-		for (std::size_t i = 0; i < a.size(); ++i) {
-			const auto left = static_cast<unsigned char>(a[i]);
-			const auto right = static_cast<unsigned char>(b[i]);
-			if (std::tolower(left) != std::tolower(right))
-				return false;
-		}
-
-		return true;
-	}
-
-	bool IsSupportedOutput(std::string_view name) noexcept {
-		return EqualsIgnoreCase(name, "matroska") || EqualsIgnoreCase(name, "webm")
-			|| EqualsIgnoreCase(name, "mp4") || EqualsIgnoreCase(name, "mp3")
-			|| EqualsIgnoreCase(name, "ogg") || EqualsIgnoreCase(name, "opus")
-			|| EqualsIgnoreCase(name, "AC-3") || EqualsIgnoreCase(name, "WAV");
-	}
-
-	bool ValidateOutputShape(const Plan& plan, const Container& container, std::string& reason) {
-		std::size_t muxable = 0;
-		std::size_t audio = 0;
-		bool nonAudio = false;
-		bool attachments = false;
-		for (const auto& held : plan.Tracks()) {
-			if (!held)
-				continue;
-			switch (held->Type()) {
-				case MediaType::Video:
-				case MediaType::Subtitle:
-					++muxable;
-					nonAudio = true;
-					break;
-				case MediaType::Audio:
-					++muxable;
-					++audio;
-					break;
-				case MediaType::Attachment:
-					attachments = true;
-					break;
-				default:
-					reason = "destination track type is not muxable";
-					return false;
-			}
-		}
-
-		const auto name = container.Name();
-		if ((EqualsIgnoreCase(name, "mp3") || EqualsIgnoreCase(name, "opus")
-				|| EqualsIgnoreCase(name, "AC-3") || EqualsIgnoreCase(name, "WAV"))
-			&& (audio != 1 || nonAudio || muxable != 1)) {
-			reason = std::string(name) + " output requires exactly one audio track";
-			return false;
-		}
-		if (EqualsIgnoreCase(name, "ogg") && (audio == 0 || nonAudio)) {
-			reason = "Ogg output currently supports audio tracks only";
-			return false;
-		}
-		if (attachments && !container.HasAccess(Access{Operation::Attach})) {
-			reason = std::string(name) + " output does not support file attachments";
-			return false;
-		}
-		return true;
-	}
-
 	bool Muxable(enum StormByte::Multimedia::Type type) noexcept {
 		return type == StormByte::Multimedia::Type::Video
 			|| type == StormByte::Multimedia::Type::Audio
@@ -289,16 +221,6 @@ bool Muxer::SpawnBackend() noexcept {
 		return false;
 	}
 
-	const std::string_view name{m_container->Name()};
-	if (!IsSupportedOutput(name)) {
-		Fail("no muxer backend for destination container " + std::string(name));
-		return false;
-	}
-	std::string reason;
-	if (!ValidateOutputShape(*m_plan, *m_container, reason)) {
-		Fail(std::move(reason));
-		return false;
-	}
 	m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Muxer::FFmpeg::Container>();
 	return true;
 }
