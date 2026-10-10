@@ -129,6 +129,20 @@ namespace StormByte::Multimedia::Backend::FFmpeg {
 			 */
 			static void Release(::AVCodecContext*& context) noexcept;
 
+			/**
+			 * @brief Installs diagnostics on the calling destruction thread only.
+			 * @param owner Borrowed callback context, or null to clear.
+			 * @param trace Synchronous LowLevel callback, or null to clear.
+			 */
+			static void SetShutdownTrace(void* owner, void (*trace)(void*, const char*) noexcept) noexcept;
+
+			/**
+			 * @brief Reports a destruction phase through the calling thread's callback.
+			 * @param phase Name of the operation and its begin/end boundary.
+			 * @param object Identity of the object undergoing destruction.
+			 */
+			static void ShutdownTrace(const char* phase, const void* object) noexcept;
+
 		private:
 			/**
 			 * @brief Format, aligned width/height, four strides and allocation alignment.

@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/zimg/zimg.hxx>
+#include <StormByte/multimedia/backend/ffmpeg/AVPool.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/Sws.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
@@ -828,10 +829,12 @@ bool FFmpeg::AVFrame::ScaleTo(AVFrame& dst, int dst_w, int dst_h,
 }
 
 void FFmpeg::AVFrame::Free() noexcept {
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVFrame native free begin", m_ptr);
 	if (m_ptr) {
 		av_frame_free(&m_ptr);
 		m_ptr = nullptr;
 	}
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVFrame native free end", this);
 }
 
 template class StormByte::Multimedia::FFmpeg::AVPointer<::AVFrame>;

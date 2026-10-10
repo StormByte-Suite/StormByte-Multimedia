@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/ffmpeg/AVBSF.hxx>
+#include <StormByte/multimedia/backend/ffmpeg/AVPool.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
@@ -65,7 +66,9 @@ FFmpeg::AVBSF::AVBSF(AVBSFContext* ctx) noexcept
 :AVPointer(ctx) {}
 
 FFmpeg::AVBSF::~AVBSF() noexcept {
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVBSF destructor begin", this);
 	Free();
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVBSF destructor end", this);
 }
 
 FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(std::string_view name, const AVCodecParameters& params, FFmpeg::AVRational time_base) noexcept {

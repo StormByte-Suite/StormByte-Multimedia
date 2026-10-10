@@ -1,0 +1,362 @@
+diff --git a/libavcodec/avcodec.c b/libavcodec/avcodec.c
+index 5320dfc06c..08586d79ea 100644
+--- a/libavcodec/avcodec.c
++++ b/libavcodec/avcodec.c
+@@ -449,13 +449,18 @@ av_cold void ff_codec_close(AVCodecContext *avctx)
+ 
+ #if CONFIG_FRAME_THREAD_ENCODER
+         if (avci->frame_thread_encoder && avctx->thread_count > 1) {
++            av_stormbyte_shutdown_trace("ffmpeg encoder thread free begin ctx=%p", (void *)avctx);
+             ff_frame_thread_encoder_free(avctx);
++            av_stormbyte_shutdown_trace("ffmpeg encoder thread free end ctx=%p", (void *)avctx);
+         }
+ #endif
++        av_stormbyte_shutdown_trace("ffmpeg thread free begin ctx=%p threads=%d active=%d", (void *)avctx, avctx->thread_count, avctx->active_thread_type);
+         if (HAVE_THREADS && avci->thread_ctx)
+             ff_thread_free(avctx);
++        av_stormbyte_shutdown_trace("ffmpeg thread free end; codec close begin ctx=%p", (void *)avctx);
+         if (avci->needs_close && ffcodec(avctx->codec)->close)
+             ffcodec(avctx->codec)->close(avctx);
++        av_stormbyte_shutdown_trace("ffmpeg codec close end; buffered frames free begin ctx=%p", (void *)avctx);
+         avci->byte_buffer_size = 0;
+         av_freep(&avci->byte_buffer);
+         av_frame_free(&avci->buffer_frame);
+@@ -466,22 +471,30 @@ av_cold void ff_codec_close(AVCodecContext *avctx)
+         av_frame_free(&avci->in_frame);
+         av_frame_free(&avci->recon_frame);
+ 
++        av_stormbyte_shutdown_trace("ffmpeg buffered frames free end; frame pool unref begin ctx=%p", (void *)avctx);
+         av_refstruct_unref(&avci->pool);
++        av_stormbyte_shutdown_trace("ffmpeg frame pool unref end; progress pool uninit begin ctx=%p", (void *)avctx);
+         av_refstruct_pool_uninit(&avci->progress_frame_pool);
++        av_stormbyte_shutdown_trace("ffmpeg progress pool uninit end; decode internal uninit begin ctx=%p", (void *)avctx);
+         if (av_codec_is_decoder(avctx->codec))
+             ff_decode_internal_uninit(avctx);
+ 
++        av_stormbyte_shutdown_trace("ffmpeg decode internal uninit end; hwaccel uninit begin ctx=%p", (void *)avctx);
+         ff_hwaccel_uninit(avctx);
+ 
++        av_stormbyte_shutdown_trace("ffmpeg hwaccel uninit end; BSF free begin ctx=%p", (void *)avctx);
+         av_bsf_free(&avci->bsf);
++        av_stormbyte_shutdown_trace("ffmpeg BSF free end; ICC/internal free begin ctx=%p", (void *)avctx);
+ 
+ #if CONFIG_LCMS2
+         ff_icc_context_uninit(&avci->icc);
+ #endif
+ 
+         av_freep(&avctx->internal);
++        av_stormbyte_shutdown_trace("ffmpeg internal free end ctx=%p", (void *)avctx);
+     }
+ 
++    av_stormbyte_shutdown_trace("ffmpeg side data and hw references free begin ctx=%p", (void *)avctx);
+     for (i = 0; i < avctx->nb_coded_side_data; i++)
+         av_freep(&avctx->coded_side_data[i].data);
+     av_freep(&avctx->coded_side_data);
+@@ -492,6 +505,7 @@ av_cold void ff_codec_close(AVCodecContext *avctx)
+     av_buffer_unref(&avctx->hw_frames_ctx);
+     av_buffer_unref(&avctx->hw_device_ctx);
+ 
++    av_stormbyte_shutdown_trace("ffmpeg side data and hw references free end; options free begin ctx=%p", (void *)avctx);
+     if (avctx->priv_data && avctx->codec && avctx->codec->priv_class)
+         av_opt_free(avctx->priv_data);
+     av_opt_free(avctx);
+@@ -504,6 +518,7 @@ av_cold void ff_codec_close(AVCodecContext *avctx)
+ 
+     avctx->codec = NULL;
+     avctx->active_thread_type = 0;
++    av_stormbyte_shutdown_trace("ffmpeg codec shutdown complete ctx=%p", (void *)avctx);
+ }
+ 
+ static const char *unknown_if_null(const char *str)
+diff --git a/libavcodec/options.c b/libavcodec/options.c
+index 834beb5757..509e94e754 100644
+--- a/libavcodec/options.c
++++ b/libavcodec/options.c
+@@ -170,6 +170,7 @@ void avcodec_free_context(AVCodecContext **pavctx)
+ 
+     ff_codec_close(avctx);
+ 
++    av_stormbyte_shutdown_trace("ffmpeg codec close returned; context fields free begin ctx=%p", (void *)avctx);
+     av_freep(&avctx->extradata);
+     av_freep(&avctx->subtitle_header);
+     av_freep(&avctx->intra_matrix);
+@@ -179,6 +180,7 @@ void avcodec_free_context(AVCodecContext **pavctx)
+     av_channel_layout_uninit(&avctx->ch_layout);
+ 
+     av_freep(pavctx);
++    av_stormbyte_shutdown_trace("ffmpeg context fields free end");
+ }
+ 
+ const AVClass *avcodec_get_class(void)
+diff --git a/libavcodec/pthread_frame.c b/libavcodec/pthread_frame.c
+index e6dcc23c15..f71d897c08 100644
+--- a/libavcodec/pthread_frame.c
++++ b/libavcodec/pthread_frame.c
+@@ -158,20 +158,27 @@ static int hwaccel_serial(const AVCodecContext *avctx)
+ 
+ static void async_lock(FrameThreadContext *fctx)
+ {
++    av_stormbyte_shutdown_trace("ffmpeg async lock begin fctx=%p", (void *)fctx);
+     pthread_mutex_lock(&fctx->async_mutex);
+-    while (fctx->async_lock)
++    while (fctx->async_lock) {
++        av_stormbyte_shutdown_trace("ffmpeg async condition wait begin fctx=%p", (void *)fctx);
+         pthread_cond_wait(&fctx->async_cond, &fctx->async_mutex);
++        av_stormbyte_shutdown_trace("ffmpeg async condition wait end fctx=%p", (void *)fctx);
++    }
+     fctx->async_lock = 1;
+     pthread_mutex_unlock(&fctx->async_mutex);
++    av_stormbyte_shutdown_trace("ffmpeg async lock end fctx=%p", (void *)fctx);
+ }
+ 
+ static void async_unlock(FrameThreadContext *fctx)
+ {
++    av_stormbyte_shutdown_trace("ffmpeg async unlock begin fctx=%p", (void *)fctx);
+     pthread_mutex_lock(&fctx->async_mutex);
+     av_assert0(fctx->async_lock);
+     fctx->async_lock = 0;
+     pthread_cond_broadcast(&fctx->async_cond);
+     pthread_mutex_unlock(&fctx->async_mutex);
++    av_stormbyte_shutdown_trace("ffmpeg async unlock end fctx=%p", (void *)fctx);
+ }
+ 
+ static void thread_set_name(PerThreadContext *p)
+@@ -224,8 +231,11 @@ static void decoded_frames_flush(DecodedFrames *df)
+ 
+ static void decoded_frames_free(DecodedFrames *df)
+ {
+-    for (size_t i = 0; i < df->nb_f_allocated; i++)
++    for (size_t i = 0; i < df->nb_f_allocated; i++) {
++        av_stormbyte_shutdown_trace("ffmpeg retained frame free begin frames=%p index=%zu frame=%p", (void *)df, i, (void *)df->f[i]);
+         av_frame_free(&df->f[i]);
++        av_stormbyte_shutdown_trace("ffmpeg retained frame free end frames=%p index=%zu", (void *)df, i);
++    }
+     av_freep(&df->f);
+     df->nb_f           = 0;
+     df->nb_f_allocated = 0;
+@@ -717,12 +727,18 @@ static av_cold void park_frame_worker_threads(FrameThreadContext *fctx, int thre
+     for (i = 0; i < thread_count; i++) {
+         PerThreadContext *p = &fctx->threads[i];
+ 
++        av_stormbyte_shutdown_trace("ffmpeg park worker begin worker=%d ctx=%p state=%d", i, (void *)p->avctx, atomic_load(&p->state));
+         if (atomic_load(&p->state) != STATE_INPUT_READY) {
++            av_stormbyte_shutdown_trace("ffmpeg park progress lock begin worker=%d ctx=%p", i, (void *)p->avctx);
+             pthread_mutex_lock(&p->progress_mutex);
+-            while (atomic_load(&p->state) != STATE_INPUT_READY)
++            while (atomic_load(&p->state) != STATE_INPUT_READY) {
++                av_stormbyte_shutdown_trace("ffmpeg park worker wait begin worker=%d ctx=%p state=%d", i, (void *)p->avctx, atomic_load(&p->state));
+                 pthread_cond_wait(&p->output_cond, &p->progress_mutex);
++                av_stormbyte_shutdown_trace("ffmpeg park worker wait end worker=%d ctx=%p state=%d", i, (void *)p->avctx, atomic_load(&p->state));
++            }
+             pthread_mutex_unlock(&p->progress_mutex);
+         }
++        av_stormbyte_shutdown_trace("ffmpeg park worker end worker=%d ctx=%p", i, (void *)p->avctx);
+     }
+ 
+     async_lock(fctx);
+@@ -746,7 +762,9 @@ av_cold void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
+     const FFCodec *codec = ffcodec(avctx->codec);
+     int i;
+ 
++    av_stormbyte_shutdown_trace("ffmpeg park workers begin ctx=%p fctx=%p threads=%d", (void *)avctx, (void *)fctx, thread_count);
+     park_frame_worker_threads(fctx, thread_count);
++    av_stormbyte_shutdown_trace("ffmpeg park workers end ctx=%p", (void *)avctx);
+ 
+     for (i = 0; i < thread_count; i++) {
+         PerThreadContext *p = &fctx->threads[i];
+@@ -754,20 +772,26 @@ av_cold void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
+ 
+         if (ctx->internal) {
+             if (p->thread_init == INITIALIZED) {
++                av_stormbyte_shutdown_trace("ffmpeg worker shutdown lock begin worker=%d ctx=%p", i, (void *)ctx);
+                 pthread_mutex_lock(&p->mutex);
+                 p->die = 1;
+                 pthread_cond_signal(&p->input_cond);
+                 pthread_mutex_unlock(&p->mutex);
+ 
++                av_stormbyte_shutdown_trace("ffmpeg worker shutdown lock released; join begin worker=%d ctx=%p", i, (void *)ctx);
+                 pthread_join(p->thread, NULL);
++                av_stormbyte_shutdown_trace("ffmpeg worker join end worker=%d ctx=%p", i, (void *)ctx);
+             }
++            av_stormbyte_shutdown_trace("ffmpeg worker codec close begin worker=%d ctx=%p", i, (void *)ctx);
+             if (codec->close && p->thread_init != UNINITIALIZED)
+                 codec->close(ctx);
++            av_stormbyte_shutdown_trace("ffmpeg worker codec close end; hwaccel free begin worker=%d ctx=%p", i, (void *)ctx);
+ 
+             /* When using a threadsafe hwaccel, this is where
+              * each thread's context is uninit'd and freed. */
+             ff_hwaccel_uninit(ctx);
+ 
++            av_stormbyte_shutdown_trace("ffmpeg worker hwaccel free end; options free begin worker=%d ctx=%p", i, (void *)ctx);
+             if (ctx->priv_data) {
+                 if (codec->p.priv_class)
+                     av_opt_free(ctx->priv_data);
+@@ -775,9 +799,12 @@ av_cold void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
+             }
+ 
+             av_refstruct_unref(&ctx->internal->pool);
++            av_stormbyte_shutdown_trace("ffmpeg worker frame pool unref end; packets free begin worker=%d ctx=%p", i, (void *)ctx);
+             av_packet_free(&ctx->internal->in_pkt);
+             av_packet_free(&ctx->internal->last_pkt_props);
++            av_stormbyte_shutdown_trace("ffmpeg worker packets free end; decode internal free begin worker=%d ctx=%p", i, (void *)ctx);
+             ff_decode_internal_uninit(ctx);
++            av_stormbyte_shutdown_trace("ffmpeg worker decode internal free end worker=%d ctx=%p", i, (void *)ctx);
+             av_freep(&ctx->internal);
+             av_buffer_unref(&ctx->hw_frames_ctx);
+             av_frame_side_data_free(&ctx->decoded_side_data,
+@@ -786,13 +813,16 @@ av_cold void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
+ 
+         decoded_frames_free(&p->df);
+ 
++        av_stormbyte_shutdown_trace("ffmpeg worker decoded frames free end; synchronization free begin worker=%d ctx=%p", i, (void *)ctx);
+         ff_pthread_free(p, per_thread_offsets);
+         av_packet_free(&p->avpkt);
+ 
+         av_freep(&p->avctx);
++        av_stormbyte_shutdown_trace("ffmpeg worker resources free end worker=%d", i);
+     }
+ 
+     decoded_frames_free(&fctx->df);
++    av_stormbyte_shutdown_trace("ffmpeg parent decoded frames free end; final resources free begin fctx=%p", (void *)fctx);
+     av_packet_free(&fctx->next_pkt);
+ 
+     av_freep(&fctx->threads);
+@@ -806,6 +836,7 @@ av_cold void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
+     FFSWAP(void*,            avctx->internal->hwaccel_priv_data, fctx->stash_hwaccel_priv);
+ 
+     av_freep(&avctx->internal->thread_ctx);
++    av_stormbyte_shutdown_trace("ffmpeg frame thread free complete ctx=%p", (void *)avctx);
+ }
+ 
+ static av_cold int init_thread(PerThreadContext *p, int *threads_to_free,
+diff --git a/libavutil/buffer.c b/libavutil/buffer.c
+index a8101d83f0..b2afe429d5 100644
+--- a/libavutil/buffer.c
++++ b/libavutil/buffer.c
+@@ -24,6 +24,7 @@
+ #include "buffer_internal.h"
+ #include "common.h"
+ #include "mem.h"
++#include "log.h"
+ #include "thread.h"
+ 
+ static AVBufferRef *buffer_create(AVBuffer *buf, uint8_t *data, size_t size,
+@@ -305,7 +306,9 @@ static void buffer_pool_flush(AVBufferPool *pool)
+         BufferPoolEntry *buf = pool->pool;
+         pool->pool = buf->next;
+ 
++        av_stormbyte_shutdown_trace("ffmpeg cached buffer free begin pool=%p entry=%p", (void *)pool, (void *)buf);
+         buf->free(buf->opaque, buf->data);
++        av_stormbyte_shutdown_trace("ffmpeg cached buffer free end pool=%p entry=%p", (void *)pool, (void *)buf);
+         av_freep(&buf);
+     }
+ }
+@@ -316,13 +319,18 @@ static void buffer_pool_flush(AVBufferPool *pool)
+  */
+ static void buffer_pool_free(AVBufferPool *pool)
+ {
++    av_stormbyte_shutdown_trace("ffmpeg pool final flush begin pool=%p", (void *)pool);
+     buffer_pool_flush(pool);
++    av_stormbyte_shutdown_trace("ffmpeg pool final flush end; mutex destroy begin pool=%p", (void *)pool);
+     ff_mutex_destroy(&pool->mutex);
+ 
++    av_stormbyte_shutdown_trace("ffmpeg pool mutex destroy end; free callback begin pool=%p", (void *)pool);
+     if (pool->pool_free)
+         pool->pool_free(pool->opaque);
+ 
++    av_stormbyte_shutdown_trace("ffmpeg pool free callback end pool=%p", (void *)pool);
+     av_freep(&pool);
++    av_stormbyte_shutdown_trace("ffmpeg pool final free complete");
+ }
+ 
+ void av_buffer_pool_uninit(AVBufferPool **ppool)
+@@ -334,12 +342,17 @@ void av_buffer_pool_uninit(AVBufferPool **ppool)
+     pool   = *ppool;
+     *ppool = NULL;
+ 
++    av_stormbyte_shutdown_trace("ffmpeg pool uninit lock begin pool=%p refs=%u", (void *)pool, atomic_load(&pool->refcount));
+     ff_mutex_lock(&pool->mutex);
++    av_stormbyte_shutdown_trace("ffmpeg pool uninit lock acquired; flush begin pool=%p", (void *)pool);
+     buffer_pool_flush(pool);
++    av_stormbyte_shutdown_trace("ffmpeg pool uninit flush end; unlock begin pool=%p", (void *)pool);
+     ff_mutex_unlock(&pool->mutex);
+ 
++    av_stormbyte_shutdown_trace("ffmpeg pool uninit unlocked; ref decrement begin pool=%p refs=%u", (void *)pool, atomic_load(&pool->refcount));
+     if (atomic_fetch_sub_explicit(&pool->refcount, 1, memory_order_acq_rel) == 1)
+         buffer_pool_free(pool);
++    av_stormbyte_shutdown_trace("ffmpeg pool uninit complete");
+ }
+ 
+ static void pool_release_buffer(void *opaque, uint8_t *data)
+@@ -347,13 +360,17 @@ static void pool_release_buffer(void *opaque, uint8_t *data)
+     BufferPoolEntry *buf = opaque;
+     AVBufferPool *pool = buf->pool;
+ 
++    av_stormbyte_shutdown_trace("ffmpeg pool buffer return lock begin pool=%p refs=%u", (void *)pool, atomic_load(&pool->refcount));
+     ff_mutex_lock(&pool->mutex);
++    av_stormbyte_shutdown_trace("ffmpeg pool buffer return lock acquired pool=%p", (void *)pool);
+     buf->next = pool->pool;
+     pool->pool = buf;
+     ff_mutex_unlock(&pool->mutex);
+ 
++    av_stormbyte_shutdown_trace("ffmpeg pool buffer return unlocked; ref decrement begin pool=%p", (void *)pool);
+     if (atomic_fetch_sub_explicit(&pool->refcount, 1, memory_order_acq_rel) == 1)
+         buffer_pool_free(pool);
++    av_stormbyte_shutdown_trace("ffmpeg pool buffer return complete");
+ }
+ 
+ /* allocate a new buffer and override its free() callback so that
+diff --git a/libavutil/log.c b/libavutil/log.c
+index b5d3e46d6c..468fd8b423 100644
+--- a/libavutil/log.c
++++ b/libavutil/log.c
+@@ -48,6 +48,32 @@
+ 
+ static AVMutex mutex = AV_MUTEX_INITIALIZER;
+ 
++#if defined(_MSC_VER)
++#define STORMBYTE_THREAD_LOCAL __declspec(thread)
++#else
++#define STORMBYTE_THREAD_LOCAL _Thread_local
++#endif
++static STORMBYTE_THREAD_LOCAL void (*shutdown_trace_callback)(void *, const char *);
++static STORMBYTE_THREAD_LOCAL void *shutdown_trace_opaque;
++
++void av_stormbyte_set_shutdown_trace(void (*callback)(void *, const char *), void *opaque)
++{
++    shutdown_trace_callback = callback;
++    shutdown_trace_opaque = opaque;
++}
++
++void av_stormbyte_shutdown_trace(const char *fmt, ...)
++{
++    char message[1024];
++    va_list args;
++    if (!shutdown_trace_callback)
++        return;
++    va_start(args, fmt);
++    vsnprintf(message, sizeof(message), fmt, args);
++    va_end(args);
++    shutdown_trace_callback(shutdown_trace_opaque, message);
++}
++
+ #define LINE_SZ 1024
+ 
+ #if HAVE_VALGRIND_VALGRIND_H && CONFIG_VALGRIND_BACKTRACE
+diff --git a/libavutil/log.h b/libavutil/log.h
+index 4a111ca9a5..56ad6f8b78 100644
+--- a/libavutil/log.h
++++ b/libavutil/log.h
+@@ -336,6 +336,12 @@ void av_log_set_level(int level);
+  */
+ void av_log_set_callback(void (*callback)(void*, int, const char*, va_list));
+ 
++#define AV_STORMBYTE_SHUTDOWN_TRACE 1
++/** Set synchronous shutdown diagnostics on the calling thread only. */
++void av_stormbyte_set_shutdown_trace(void (*callback)(void *, const char *), void *opaque);
++/** Report a shutdown boundary without changing the global logging callback. */
++void av_stormbyte_shutdown_trace(const char *fmt, ...) av_printf_format(1, 2);
++
+ /**
+  * Default logging callback
+  *

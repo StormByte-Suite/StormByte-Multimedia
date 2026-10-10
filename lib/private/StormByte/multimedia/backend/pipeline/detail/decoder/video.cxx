@@ -53,6 +53,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/video.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
+#include <StormByte/multimedia/backend/ffmpeg/AVPool.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/side_data.hxx>
@@ -226,7 +227,14 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
-	Video::~Video() noexcept = default;
+	namespace FFmpeg = StormByte::Multimedia::FFmpeg;
+
+	Video::~Video() noexcept {
+		using StormByte::Multimedia::Backend::FFmpeg::AVPool;
+		AVPool::ShutdownTrace("Video properties reset begin", this);
+		m_video.reset();
+		AVPool::ShutdownTrace("Video properties reset end; scratch member destructor next", this);
+	}
 
 	Video::Video(Video&& other) noexcept = default;
 

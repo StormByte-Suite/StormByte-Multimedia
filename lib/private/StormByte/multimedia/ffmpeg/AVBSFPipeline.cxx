@@ -50,12 +50,17 @@
 
 #include <StormByte/multimedia/ffmpeg/AVBSFPipeline.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
+#include <StormByte/multimedia/backend/ffmpeg/AVPool.hxx>
 
 using namespace StormByte::Multimedia::FFmpeg;
 
 AVBSFPipeline::AVBSFPipeline() noexcept = default;
 
-AVBSFPipeline::~AVBSFPipeline() noexcept = default;
+AVBSFPipeline::~AVBSFPipeline() noexcept {
+	StormByte::Multimedia::Backend::FFmpeg::AVPool::ShutdownTrace("AVBSFPipeline filters clear begin", this);
+	m_filters.clear();
+	StormByte::Multimedia::Backend::FFmpeg::AVPool::ShutdownTrace("AVBSFPipeline filters clear end", this);
+}
 
 AVBSFPipeline::AVBSFPipeline(AVBSFPipeline&& other) noexcept:
 m_filters(std::move(other.m_filters)) {

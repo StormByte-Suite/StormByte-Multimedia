@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Changed
+
+- Extend `LowLevel` shutdown diagnostics through decoder properties, native frames, BSF cleanup, shared pool references and bundled FFmpeg worker parking, joins, codec cleanup and buffer-pool locks. Internal FFmpeg traces use a synchronous thread-local callback without replacing global codec logging.
+
 ### Fixed
 
 - Apply route input capacities after connecting their hoppers; configuring a missing hopper previously left first-filter or destination queues unbounded after audit wiring was reordered.

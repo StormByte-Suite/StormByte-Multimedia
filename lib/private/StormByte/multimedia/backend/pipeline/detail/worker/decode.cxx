@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/decode.hxx>
+#include <StormByte/multimedia/backend/ffmpeg/AVPool.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
@@ -249,7 +250,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 		Log(Level::LowLevel, std::format("decoder drain complete; backend release begin t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
+		StormByte::Multimedia::Backend::FFmpeg::AVPool::SetShutdownTrace(this, [](void* owner, const char* message) noexcept {
+			static_cast<Decode*>(owner)->Log(Level::LowLevel, message);
+		});
 		m_owner.m_backend.reset();
+		StormByte::Multimedia::Backend::FFmpeg::AVPool::SetShutdownTrace(nullptr, nullptr);
 		Log(Level::LowLevel, std::format("decoder backend release end t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
 	}

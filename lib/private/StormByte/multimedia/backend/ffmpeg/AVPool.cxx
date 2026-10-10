@@ -52,6 +52,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <format>
 #include <limits>
 #include <map>
 #include <mutex>
@@ -62,12 +63,16 @@ extern "C" {
 	#include <libavutil/cpu.h>
 	#include <libavutil/frame.h>
 	#include <libavutil/imgutils.h>
+	#include <libavutil/log.h>
 	#include <libavutil/pixdesc.h>
 }
 
 using namespace StormByte::Multimedia::Backend::FFmpeg;
 
 namespace {
+	thread_local void* shutdownOwner = nullptr;
+	thread_local void (*shutdownCallback)(void*, const char*) noexcept = nullptr;
+
 	struct DecoderPool {
 		std::mutex mutex;
 		StormByte::Safe::Shared<AVPool> pool;
@@ -86,8 +91,13 @@ AVPool::AVPool(Key key, const std::array<std::size_t, 4>& sizes) noexcept
 }
 
 AVPool::~AVPool() noexcept {
-	for (auto& pool : m_pools)
+	ShutdownTrace("shared AVPool destructor begin", this);
+	for (auto& pool : m_pools) {
+		ShutdownTrace("native plane pool uninit begin", pool);
 		av_buffer_pool_uninit(&pool);
+		ShutdownTrace("native plane pool uninit end", this);
+	}
+	ShutdownTrace("shared AVPool destructor end", this);
 }
 
 StormByte::Safe::Shared<AVPool> AVPool::For(::AVCodecContext& context, const ::AVFrame& frame) noexcept {
@@ -218,8 +228,32 @@ int AVPool::GetBuffer(::AVCodecContext* context, ::AVFrame* frame, int flags) no
 void AVPool::Release(::AVCodecContext*& context) noexcept {
 	if (!context)
 		return;
+	const auto* identity = context;
 	DecoderPool* owner = context->get_buffer2 == GetBuffer
 		? static_cast<DecoderPool*>(context->opaque) : nullptr;
+	ShutdownTrace("avcodec_free_context begin", identity);
 	avcodec_free_context(&context);
+	ShutdownTrace("avcodec_free_context end", identity);
+	ShutdownTrace("DecoderPool shared reference reset begin", owner);
+	if (owner)
+		owner->pool.reset();
+	ShutdownTrace("DecoderPool shared reference reset end", owner);
+	ShutdownTrace("DecoderPool delete begin", owner);
 	delete owner;
+	ShutdownTrace("DecoderPool delete end", identity);
+}
+
+void AVPool::SetShutdownTrace(void* owner, void (*trace)(void*, const char*) noexcept) noexcept {
+	shutdownOwner = owner;
+	shutdownCallback = trace;
+#ifdef AV_STORMBYTE_SHUTDOWN_TRACE
+	av_stormbyte_set_shutdown_trace(trace, owner);
+#endif
+}
+
+void AVPool::ShutdownTrace(const char* phase, const void* object) noexcept {
+	if (shutdownCallback) {
+		const auto message = std::format("shutdown {} object={}", phase, object);
+		shutdownCallback(shutdownOwner, message.c_str());
+	}
 }

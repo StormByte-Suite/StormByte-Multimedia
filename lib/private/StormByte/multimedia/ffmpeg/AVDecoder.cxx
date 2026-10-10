@@ -68,7 +68,9 @@ FFmpeg::AVDecoder::AVDecoder(::AVCodecContext* ctx) noexcept:
 AVPointer(ctx) {}
 
 FFmpeg::AVDecoder::~AVDecoder() noexcept {
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVDecoder destructor begin", this);
 	Free();
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVDecoder Free end; BSF member destruction next", this);
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCodecParameters& params, int stream_index) noexcept {
@@ -202,10 +204,12 @@ FFmpeg::OperationResult FFmpeg::AVDecoder::DecodeSubtitle(AVPacket& pkt, FFmpeg:
 }
 
 void FFmpeg::AVDecoder::Free() noexcept {
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVDecoder Free begin", this);
 	if (m_ptr) {
 		Backend::FFmpeg::AVPool::Release(m_ptr);
 		m_ptr = nullptr;
 	}
+	Backend::FFmpeg::AVPool::ShutdownTrace("AVDecoder Free end", this);
 }
 
 template class StormByte::Multimedia::FFmpeg::AVPointer<::AVCodecContext>;
