@@ -12,6 +12,12 @@ set(X264_OPTIONS
 set(X264_OPTSTR "")
 if(MSVC)
 	set(X264_OPTSTR "TOOLCHAIN=msvc")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	# x264 uses -mpreferred-stack-boundary=6 (64 bytes). GCC LTO can apply
+	# that assumption to other dependencies and omit required AVX2 stack
+	# realignment, causing crashes in VMAF, libvpx and Tesseract. Keep x264
+	# outside GCC LTO; this does not disable its native SIMD optimizations.
+	set(X264_OPTSTR "IPO=off")
 endif()
 
 buildmaster_component(

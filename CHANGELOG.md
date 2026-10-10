@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Keep bundled x264 outside GCC LTO so its 64-byte stack preference does not suppress required stack realignment in other SIMD dependencies, avoiding AVX2 crashes in VMAF, VP9 encoding and OCR when GPL codecs are enabled.
 - Prevent Demuxer setup from missing an immediately bound Plan.
 - Propagate stage failures observed as the muxer closes, even when the filter graph is already idle.
 - Create planned per-track hopper connections before generic stage transfer, avoiding blocked producers and consumers when stages are wired before their first item. Reserve manual encoder mux streams through a separate typed `Encoder >> Muxer` connection.
