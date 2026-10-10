@@ -64,6 +64,7 @@ namespace {
 	int CheckAudioCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
 		std::uint8_t channels, std::string_view decoder = {}) {
+		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
 		TEST_REQUIRE(source.value().Streams().size() == 1);
@@ -81,6 +82,7 @@ namespace {
 			return TEST_SKIP;
 		}
 		auto logger = MakeLogger();
+			TEST_PHASE("creating transcoder");
 			Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
 		auto track = job.Audio(0);
 		track.Codec(codec.value().get())
@@ -91,6 +93,7 @@ namespace {
 			|| codecName == "MP3" || codecName == "AC-3" || codecName == "E-AC3")
 			track.BitRate(channels == 2 ? 192000 : 384000);
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		TEST_PHASE("starting transcoder run");
 		job.Run();
 		const int result = WaitForOptionalCodec(job);
 #ifdef STORMBYTE_TEST_REQUIRE_FDK_AAC
@@ -100,6 +103,7 @@ namespace {
 		if (result != 0)
 			return result;
 		TEST_REQUIRE(CheckSingleAudioOutput(output, containerName, codecName, channels, 48000) == 0);
+		TEST_PHASE("opening media file for inspection");
 		auto encoded = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(encoded);
 		const auto& duration = encoded.value().Duration();

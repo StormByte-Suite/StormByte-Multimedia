@@ -63,6 +63,7 @@ using namespace std::string_view_literals;
 
 namespace {
 	int CheckEncodedVideoOutput(const std::filesystem::path& output, std::string_view expectedCodec) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		const auto& result = opened.value();
@@ -84,6 +85,7 @@ namespace {
 
 	int CheckHdr10EncodeOutput(const std::filesystem::path& output, std::string_view expectedCodec) {
 	const auto sourcePath = FixturePath("video/hdr10_metadata_source.mkv");
+	TEST_PHASE("opening media file for inspection");
 	auto source = File::Open(StormByte::Safe::String{sourcePath.string()});
 	TEST_REQUIRE(source);
 	TEST_REQUIRE(source.value().Streams().size() == 1);
@@ -91,6 +93,7 @@ namespace {
 	TEST_REQUIRE(sourceVideo && sourceVideo.value().HDR10());
 	TEST_REQUIRE(sourceVideo.value().HDR10()->Origin() == StormByte::Multimedia::Property::HDR10::Source::Metadata);
 
+	TEST_PHASE("opening media file for inspection");
 	auto encoded = File::Open(StormByte::Safe::String{output.string()});
 	TEST_REQUIRE(encoded);
 	TEST_REQUIRE(encoded.value().Streams().size() == 1);
@@ -128,9 +131,11 @@ int test_transcoder_hevc_encode_output_file_properties() {
 
 	const auto output = OutputPath("pipeline/encoded-hevc.mkv");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Codec(hevc.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckEncodedVideoOutput(output, "H.265");
@@ -145,9 +150,11 @@ int test_transcoder_hevc_encode_preserves_hdr10_metadata() {
 
 	const auto output = OutputPath("pipeline/encoded-hevc-hdr10.mkv");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Codec(hevc.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckHdr10EncodeOutput(output, "H.265");
@@ -162,9 +169,11 @@ int test_transcoder_vp9_encode_preserves_hdr10_metadata() {
 
 	const auto output = OutputPath("pipeline/encoded-vp9-hdr10.mkv");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Codec(vp9.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckHdr10EncodeOutput(output, "VP9");

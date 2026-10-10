@@ -78,11 +78,13 @@ static int CheckTranscoderDecoderPin(std::string_view pin, std::string_view dest
 	TEST_REQUIRE(codec && codec.value().get().HasAccess(Access{Operation::Write}));
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(codec.value().get())
 		.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{pin})
 		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"ac3"});
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	if (!expectedError.empty())
 		return WaitForTranscoderFailure(job, expectedError);

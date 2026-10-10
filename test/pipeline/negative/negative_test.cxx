@@ -73,6 +73,7 @@ template<typename Configure>
 static int CheckRejectedJob(std::string_view source, const std::filesystem::path& destination,
 	std::string_view expectedMessage, Configure configure, bool rejectDuringConfigure = false) {
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath(source)), TestLocation(destination), logger, 2000000000LL};
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	configure(job);
@@ -80,6 +81,7 @@ static int CheckRejectedJob(std::string_view source, const std::filesystem::path
 		TEST_REQUIRE(job.Failed());
 	else
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	return WaitForTranscoderFailure(job, expectedMessage);
 }
@@ -114,11 +116,13 @@ static int CheckManualRejectsInvalidSource(std::string_view source, std::string_
 
 static int CheckTranscoderRejectsInvalidSource(std::string_view source, std::string_view destination) {
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath(source)), TestLocation(OutputPath(destination)), logger, 2000000000LL};
 	TEST_REQUIRE(job.Failed());
 	const auto originalError = job.Error();
 	TEST_REQUIRE(originalError && !originalError->empty());
 	job.Video(0).Remux();
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoderFailure(job) == 0);
 	TEST_REQUIRE(job.Error().value() == originalError.value());
@@ -179,9 +183,11 @@ int test_transcoder_rejects_invalid_attachment_pattern() {
 
 int test_transcoder_rejects_missing_logger() {
 	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
 			TestLocation(OutputPath("pipeline/rejected-no-logger.mkv")), noLogger, 2000000000LL};
 	TEST_REQUIRE(job.Failed());
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	return WaitForTranscoderFailure(job, "logger is required");
 }

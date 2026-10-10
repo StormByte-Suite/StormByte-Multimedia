@@ -126,6 +126,7 @@ namespace {
 			TEST_REQUIRE(!cueDrain->Failed());
 			TEST_REQUIRE(!demuxer.Failed() && !audio.Failed() && !subtitle->Failed() && !muxer.Failed());
 		}
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		TEST_REQUIRE(opened.value().Container().Name() == containerName);
@@ -164,12 +165,15 @@ int test_subtitle_first_cue_after_one_hour() {
 	const auto output = OutputPath("pipeline/subtitle-header/late-first-cue.mkv");
 	{
 		auto logger = MakeLogger();
+			TEST_PHASE("creating transcoder");
 			Transcoder job{TestLocation(FixturePath("subtitles/late_first_cue.srt")), TestLocation(output), logger, 3602000000000LL};
 		job.Subtitle(0).Codec(codec.value().get());
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		TEST_PHASE("starting transcoder run");
 		job.Run();
 		TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	}
+	TEST_PHASE("opening media file for inspection");
 	auto opened = File::Open(StormByte::Safe::String{output.string()});
 	TEST_REQUIRE(opened);
 	TEST_REQUIRE(opened.value().Streams().size() == 1);

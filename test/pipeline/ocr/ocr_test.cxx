@@ -88,12 +88,15 @@ int test_transcoder_ocr_japanese_pgs_to_subrip() {
 
 	const auto output = OutputPath("pipeline/ocr-japanese.mkv");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Subtitle(4).Codec(subrip.value().get()).Language(StormByte::Safe::String{"jpn"});
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 
+	TEST_PHASE("opening media file for inspection");
 	auto opened = File::Open(StormByte::Safe::String{output.string()});
 	TEST_REQUIRE(opened);
 	TEST_REQUIRE(opened.value().Streams().size() == 1);

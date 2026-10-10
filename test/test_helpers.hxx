@@ -64,6 +64,13 @@ inline constexpr int TEST_SKIP = 77;
 /** @brief Named test function accepted by the per-function CTest runner. */
 using TestFunction = int (*)();
 
+/** @brief Writes a flushed phase marker identifying the current test function. */
+inline void LogTestPhase(std::string_view function, std::string_view phase) {
+	std::cout << "[Test] " << function << ": " << phase << std::endl;
+}
+
+#define TEST_PHASE(phase) LogTestPhase(__func__, phase)
+
 /** @brief One independently invocable test case. */
 struct TestEntry {
 	std::string_view name; ///< Stable test-function identifier passed by CTest.
@@ -72,13 +79,13 @@ struct TestEntry {
 
 /** @brief Logs lifecycle around one function so a timeout identifies the active case. */
 inline int RunOneTest(const TestEntry& test) {
-	std::cout << "[BEGIN] " << test.name << std::endl;
+	std::cout << "[Test] Starting " << test.name << std::endl;
 	const int result = test.function();
 	if (result == TEST_SKIP) {
-		std::cout << "[END] " << test.name << " SKIP" << std::endl;
+		std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
 		return TEST_SKIP;
 	}
-	std::cout << "[END] " << test.name << (result == 0 ? " PASS" : " FAIL") << std::endl;
+	std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
 	return result;
 }
 
@@ -112,6 +119,7 @@ inline std::filesystem::path FixturePath(std::string_view relativePath) {
 /** @brief Resolves a generated result path and creates its parent directory. */
 inline std::filesystem::path OutputPath(std::string_view relativePath) {
 	auto path = std::filesystem::path{STORMBYTE_TEST_OUTPUT_DIR} / relativePath;
+	std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
 	std::error_code error;
 	std::filesystem::create_directories(path.parent_path(), error);
 	if (error && !std::filesystem::is_directory(path.parent_path())) {

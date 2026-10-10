@@ -64,6 +64,7 @@ using namespace StormByte::Multimedia::Pipeline;
 namespace {
 	int CheckVideoOutput(const std::filesystem::path& output, std::string_view containerName,
 		std::string_view codecName) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		TEST_REQUIRE(opened.value().Container().Name() == containerName);
@@ -84,6 +85,7 @@ namespace {
 	int CheckVideoCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
 		std::string_view decoder = {}) {
+		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
 		TEST_REQUIRE(!source.value().Streams().empty());
@@ -94,6 +96,7 @@ namespace {
 			return TEST_SKIP;
 		auto logger = MakeLogger();
 		{
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Video(0);
 			track.Codec(codec.value().get())
@@ -115,6 +118,7 @@ namespace {
 			else
 				track.BitRate(500000);
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			const int result = WaitForOptionalCodec(job);
 			if (result != 0)

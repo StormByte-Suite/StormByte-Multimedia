@@ -69,6 +69,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForTranscoder(Transcoder& job) {
+		TEST_PHASE("waiting for transcoder completion");
 		const auto deadline = std::chrono::steady_clock::now() + 30s;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
@@ -88,6 +89,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForOptionalCodec(Transcoder& job) {
+		TEST_PHASE("waiting for optional codec result");
 		const int result = WaitForTranscoder(job);
 		if (result == 0)
 			return 0;
@@ -104,6 +106,7 @@ using namespace std::string_view_literals;
 	}
 
 	int CheckTranscoderConfigured(Transcoder& job) {
+		TEST_PHASE("checking transcoder configuration");
 		if (!job.Failed())
 			return 0;
 		const auto error = job.Error();
@@ -113,6 +116,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForTranscoderFailure(Transcoder& job, std::string_view expectedMessage) {
+		TEST_PHASE("waiting for expected transcoder failure");
 		const auto deadline = std::chrono::steady_clock::now() + 30s;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
@@ -139,6 +143,7 @@ using namespace std::string_view_literals;
 	}
 
 	int WaitForManualPipeline(Step& last) {
+		TEST_PHASE("waiting for manual pipeline completion");
 		const auto deadline = std::chrono::steady_clock::now() + 30s;
 		while (last.Status() != State::Stopped && last.Status() != State::Failed &&
 			std::chrono::steady_clock::now() < deadline)
@@ -151,6 +156,8 @@ using namespace std::string_view_literals;
 	int CheckSingleAudioOutput(const std::filesystem::path& output, std::string_view container,
 		std::string_view codec, std::uint8_t channels, std::uint32_t sampleRate,
 		std::string_view language) {
+		TEST_PHASE("opening and checking audio output");
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		TEST_REQUIRE(opened.value().Container().Name() == container);

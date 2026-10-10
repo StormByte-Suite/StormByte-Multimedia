@@ -61,6 +61,7 @@ using MediaType = StormByte::Multimedia::Type;
 
 namespace {
 	auto OpenFixture(std::string_view path) {
+		TEST_PHASE("opening fixture");
 		return File::Open(StormByte::Safe::String{FixturePath(path).string()});
 	}
 

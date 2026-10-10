@@ -81,6 +81,7 @@ namespace {
 		const auto output = OutputPath(destination);
 		{
 			auto logger = MakeLogger();
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger, 2000000000LL};
 			for (const auto& item : expected) {
 				auto track = item.Kind == StormByte::Multimedia::Type::Video ? job.Video(item.Input)
@@ -103,10 +104,12 @@ namespace {
 					track.Language(StormByte::Safe::String{item.Language});
 			}
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			TEST_REQUIRE(WaitForTranscoder(job) == 0);
 		}
 
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		if (!opened)
 			std::cerr << "[DETAIL] MP4 output " << output.string() << ": " << opened.error()->what() << std::endl;
@@ -145,6 +148,7 @@ namespace {
 
 	int CheckRejectedAttachment(std::string_view source, std::string_view destination,
 		std::string_view pattern, std::string_view expectedMime) {
+		TEST_PHASE("opening media file for inspection");
 		auto input = File::Open(StormByte::Safe::String{FixturePath(source).string()});
 		TEST_REQUIRE(input);
 		bool found = false;
@@ -154,16 +158,19 @@ namespace {
 		}
 		TEST_REQUIRE(found);
 		auto logger = MakeLogger();
+			TEST_PHASE("creating transcoder");
 			Transcoder job{TestLocation(FixturePath(source)), TestLocation(OutputPath(destination)), logger, 2000000000LL};
 		job.Video(0).Remux();
 		job.Attachments(pattern);
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		TEST_PHASE("starting transcoder run");
 		job.Run();
 		return WaitForTranscoderFailure(job, "MP4 attachment cannot be represented as cover art");
 	}
 
 	int CheckCoverRoundtrip(std::string_view destination, std::string_view containerName, bool audioOnly = false) {
 		const auto sourcePath = FixturePath("video/bluray_like_hdr10.mkv");
+		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{sourcePath.string()});
 		TEST_REQUIRE(source);
 		TEST_REQUIRE(source.value().Attachments().size() == 1);
@@ -171,6 +178,7 @@ namespace {
 		const auto output = OutputPath(destination);
 		{
 			auto logger = MakeLogger();
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(sourcePath), TestLocation(output), logger, 2000000000LL};
 			if (audioOnly)
 				job.Audio(2).Remux();
@@ -178,9 +186,11 @@ namespace {
 				job.Video(0).Remux();
 			job.Attachments("image/*");
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			TEST_REQUIRE(WaitForTranscoder(job) == 0);
 		}
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		TEST_REQUIRE(opened.value().Container().Name() == containerName);

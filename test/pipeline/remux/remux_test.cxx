@@ -70,6 +70,7 @@ using namespace std::string_view_literals;
 
 namespace {
 	int CheckRemuxOutput(const std::filesystem::path& output, std::size_t expectedAttachments = 1) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		const auto& result = opened.value();
@@ -106,6 +107,7 @@ namespace {
 int test_transcoder_remux_preserves_pgs_and_attachments() {
 	const auto output = OutputPath("pipeline/transcoder-remux.mkv");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Audio(1).Remux();
@@ -114,6 +116,7 @@ int test_transcoder_remux_preserves_pgs_and_attachments() {
 	job.Subtitle(4).Remux();
 	job.Attachments();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckRemuxOutput(output);
@@ -122,6 +125,7 @@ int test_transcoder_remux_preserves_pgs_and_attachments() {
 int test_transcoder_remux_omits_unselected_attachments() {
 	const auto output = OutputPath("pipeline/transcoder-remux-no-attachments.mkv");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Audio(1).Remux();
@@ -129,6 +133,7 @@ int test_transcoder_remux_omits_unselected_attachments() {
 	job.Subtitle(3).Remux();
 	job.Subtitle(4).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckRemuxOutput(output, 0);

@@ -64,6 +64,7 @@ using namespace std::string_view_literals;
 namespace {
 static int CheckAutomaticSurroundConversion(std::string_view codecName, std::string_view destination) {
 	const auto input = FixturePath("audio/noise_71.wav");
+	TEST_PHASE("opening media file for inspection");
 	auto source = File::Open(StormByte::Safe::String{input.string()});
 	TEST_REQUIRE(source);
 	TEST_REQUIRE(source.value().Streams().size() == 1);
@@ -83,13 +84,16 @@ static int CheckAutomaticSurroundConversion(std::string_view codecName, std::str
 
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
 	// AC-3/E-AC3 may automatically convert 7.1 to 5.1 without an explicit downmix filter.
 	job.Audio(0).Codec(codec.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	TEST_REQUIRE(CheckSingleAudioOutput(output, "Matroska", codecName, 6, 48000) == 0);
+	TEST_PHASE("opening media file for inspection");
 	auto encoded = File::Open(StormByte::Safe::String{output.string()});
 	TEST_REQUIRE(encoded);
 	const auto outputAudio = encoded.value().Streams()[0].Audio();
@@ -102,9 +106,11 @@ static int CheckAutomaticSurroundConversion(std::string_view codecName, std::str
 int test_transcoder_extracts_single_ac3_track_from_bluray_mkv() {
 	const auto output = OutputPath("pipeline/bluray-track-1.ac3");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(1).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckSingleAudioOutput(output, "AC-3", "AC-3", 6, 48000);
@@ -113,9 +119,11 @@ int test_transcoder_extracts_single_ac3_track_from_bluray_mkv() {
 int test_transcoder_extracts_single_aac_track_from_bluray_mkv() {
 	const auto output = OutputPath("pipeline/bluray-track-2.m4a");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mkv")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(2).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckSingleAudioOutput(output, "MP4", "AAC", 6, 48000);
@@ -124,9 +132,11 @@ int test_transcoder_extracts_single_aac_track_from_bluray_mkv() {
 int test_transcoder_remuxes_single_opus_file_to_mka() {
 	const auto output = OutputPath("pipeline/opus-remux.mka");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_opus_source_51.opus")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckSingleAudioOutput(output, "Matroska", "Opus", 6, 48000);
@@ -135,9 +145,11 @@ int test_transcoder_remuxes_single_opus_file_to_mka() {
 int test_transcoder_remuxes_wav_file_to_wav() {
 	const auto output = OutputPath("pipeline/wav-remux.wav");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckSingleAudioOutput(output, "WAV", "PCM S16 LE", 2, 48000);
@@ -152,12 +164,15 @@ int test_transcoder_opus_encode_output_file_properties() {
 
 	const auto output = OutputPath("pipeline/encoded-opus.mka");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_opus_source_51.opus")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(opus.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 
+	TEST_PHASE("opening media file for inspection");
 	auto opened = File::Open(StormByte::Safe::String{output.string()});
 	TEST_REQUIRE(opened);
 	TEST_REQUIRE(opened.value().Container().Name() == "Matroska");
@@ -181,9 +196,11 @@ int test_transcoder_aac_encode_from_stereo_wav() {
 
 	const auto output = OutputPath("pipeline/encoded-aac.m4a");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_51.opus")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(aac.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckSingleAudioOutput(output, "MP4", "AAC", 6, 48000);
@@ -196,10 +213,12 @@ int test_transcoder_rejects_51_audio_to_mp3_without_downmix() {
 		return TEST_SKIP;
 
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_51.opus")),
 			TestLocation(OutputPath("pipeline/rejected-51.mp3")), logger, 2000000000LL};
 	job.Audio(0).Codec(mp3.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	return WaitForTranscoderFailure(job, "unsupported channel layout");
 }
@@ -220,9 +239,11 @@ int test_transcoder_encodes_stereo_audio_to_mp3() {
 
 	const auto output = OutputPath("pipeline/encoded-stereo.mp3");
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.mp3")), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(mp3.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
 	return CheckSingleAudioOutput(output, "MP3", "MP3", 2, 48000);

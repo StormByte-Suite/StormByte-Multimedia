@@ -182,6 +182,7 @@ namespace {
 	}
 
 	int check_invalid_metadata(const NativeMetadata& native, std::size_t size = sizeof(NativeMetadata)) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{FixturePath(dovi_only.path).string()});
 		TEST_REQUIRE(opened);
 		const auto video = opened.value().Streams()[0].Video();
@@ -196,6 +197,7 @@ namespace {
 	}
 
 	int check_valid_metadata(std::span<const std::byte> bytes) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{FixturePath(dovi_only.path).string()});
 		TEST_REQUIRE(opened);
 		const auto video = opened.value().Streams()[0].Video();
@@ -256,6 +258,7 @@ namespace {
 	}
 
 	int check_fixture(const Fixture& fixture) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{FixturePath(fixture.path).string()});
 		TEST_REQUIRE(opened);
 		TEST_REQUIRE(opened.value().Container().Name() == "Matroska");
@@ -430,6 +433,7 @@ namespace {
 
 	int check_decoded_frames(const FrameAudit& before, const FrameAudit& after, const Fixture& fixture,
 		DoviComparison comparison = DoviComparison::Exact) {
+		TEST_PHASE("checking decoded frame counts and HDR/DOVI side data");
 		TEST_REQUIRE(!before.videos.empty());
 		TEST_REQUIRE(after.videos.size() == before.videos.size());
 		TEST_REQUIRE(before.side_data_counts.size() == before.videos.size());
@@ -473,6 +477,7 @@ namespace {
 	enum class Transform { Remux, Encode, Watermark, Replace };
 
 	int check_pipeline(const Fixture& fixture, Transform transform, std::string_view operation) {
+		TEST_PHASE("preparing DOVI pipeline outputs");
 		const auto comparison = transform == Transform::Remux
 			? DoviComparison::Exact : DoviComparison::Regenerated;
 		const auto output = OutputPath("pipeline/dovi/" + std::string{fixture.name}
@@ -482,6 +487,7 @@ namespace {
 		auto encoded_frames = StormByte::Safe::MakeShared<EncodedAudit>();
 		{
 			auto logger = MakeLogger();
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(FixturePath(fixture.path)), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Video(0);
 			if (transform == Transform::Remux)
@@ -505,15 +511,22 @@ namespace {
 			}
 			job.Filter<AuditEncodedFrames>(logger, encoded_frames);
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			const int result = transform == Transform::Remux ? WaitForTranscoder(job) : WaitForOptionalCodec(job);
 			if (result != 0)
 				return result;
 		}
-		if (transform != Transform::Remux)
+		if (transform != Transform::Remux) {
+			TEST_PHASE("checking frames around the transform");
 			TEST_REQUIRE(check_decoded_frames(*before, *after, fixture) == 0);
+		}
+		TEST_PHASE("checking encoder output audit");
 		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, encoded_frames->destination, fixture, comparison) == 0);
+		TEST_PHASE("opening encoded output for stream inspection");
+		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{FixturePath(fixture.path).string()});
+		TEST_PHASE("opening media file for inspection");
 		auto encoded = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(source && encoded);
 		TEST_REQUIRE(encoded.value().Container().Name() == "Matroska");
@@ -541,13 +554,18 @@ namespace {
 			auto logger = MakeLogger();
 			const auto verification = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 				+ "-" + std::string{operation} + "-verified.mkv");
+			TEST_PHASE("creating verification remux from encoded output");
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(output), TestLocation(verification), logger, 2000000000LL};
 			job.Video(0).Remux();
 			job.Filter<AuditEncodedFrames>(logger, reopened_frames);
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("running verification remux");
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			TEST_REQUIRE(WaitForTranscoder(job) == 0);
 		}
+		TEST_PHASE("checking reopened encoded frames");
 		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, reopened_frames->source, fixture, comparison) == 0);
 		TEST_REQUIRE(check_decoded_frames(reopened_frames->source, reopened_frames->destination, fixture) == 0);
 		return 0;
@@ -562,10 +580,12 @@ namespace {
 		const auto output = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 			+ "-unsupported-" + std::string{implementation} + ".mkv");
 		auto logger = MakeLogger();
+			TEST_PHASE("creating transcoder");
 			Transcoder job{TestLocation(FixturePath(fixture.path)), TestLocation(output), logger, 2000000000LL};
 		job.Video(0).Codec(codec.value().get())
 			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{implementation});
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		TEST_PHASE("starting transcoder run");
 		job.Run();
 		TEST_REQUIRE(WaitForTranscoderFailure(job) == 0);
 		const auto error = job.Error();
@@ -610,6 +630,7 @@ int test_unsupported_hevc_dovi_hdr10() { return check_unsupported_encoder(dovi_h
 
 int test_video_and_frame_copy_move_preserve_dovi() {
 	for (const auto& fixture : {dovi_only, hdr10_only, dovi_hdr10}) {
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{FixturePath(fixture.path).string()});
 		TEST_REQUIRE(opened);
 		const auto video = opened.value().Streams()[0].Video();
@@ -637,6 +658,7 @@ int test_video_and_frame_copy_move_preserve_dovi() {
 }
 
 int test_dovi_owned_rpu_and_invalid_loads_preserve_configuration() {
+	TEST_PHASE("opening media file for inspection");
 	auto opened = File::Open(StormByte::Safe::String{FixturePath(dovi_only.path).string()});
 	TEST_REQUIRE(opened);
 	const auto video = opened.value().Streams()[0].Video();

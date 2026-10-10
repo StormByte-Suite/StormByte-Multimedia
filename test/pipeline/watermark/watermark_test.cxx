@@ -75,6 +75,7 @@ namespace {
 			return TEST_SKIP;
 		{
 			auto logger = MakeLogger();
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mp4")), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Video(0);
 			track.Codec(codec.value().get())
@@ -97,11 +98,13 @@ namespace {
 					Filter::Video::Anchor::TopRight, 30u, 16);
 			}
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			const int result = WaitForOptionalCodec(job);
 			if (result != 0)
 				return result;
 		}
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		TEST_REQUIRE(opened.value().Container().Name() == "WebM");

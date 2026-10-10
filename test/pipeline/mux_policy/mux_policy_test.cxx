@@ -69,16 +69,19 @@ namespace {
 		const auto output = OutputPath(destination);
 		{
 			auto logger = MakeLogger();
+					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
 			auto track = job.Audio(0);
 			track.Codec(codec.value().get());
 			if (codecName == "Vorbis")
 				track.BitRate(192000);
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
 			job.Run();
 			TEST_REQUIRE(WaitForTranscoder(job) == 0);
 		}
 		TEST_REQUIRE(CheckSingleAudioOutput(output, containerName, codecName, 2, 48000) == 0);
+		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
 		const auto& duration = opened.value().Duration();
@@ -113,10 +116,12 @@ int test_generic_muxer_writes_eac3() {
 
 int test_generic_flac_rejects_aac_remux() {
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("audio/noise_51.m4a")),
 			TestLocation(OutputPath("pipeline/mux-policy/rejected-aac.flac")), logger, 2000000000LL};
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	return WaitForTranscoderFailure(job);
 }
@@ -127,11 +132,13 @@ int test_webm_policy_rejects_attachments() {
 	if (!codec.value().get().HasAccess(Access{Operation::Write}))
 		return TEST_SKIP;
 	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
 			TestLocation(OutputPath("pipeline/mux-policy/rejected-attachment.webm")), logger, 2000000000LL};
 	job.Video(0).Codec(codec.value().get());
 	job.Attachments();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
 	job.Run();
 	return WaitForTranscoderFailure(job, "WebM output does not support file attachments");
 }
