@@ -49,6 +49,13 @@ namespace StormByte {
 int WaitForTranscoder(StormByte::Multimedia::Pipeline::Transcoder& job);
 
 /**
+ * @brief Waits for a pinned codec job, skipping only unavailable implementations.
+ * @param job Transcoder with explicit encoder or decoder selection.
+ * @return Zero on success, TEST_SKIP for an unavailable implementation, one otherwise.
+ */
+int WaitForOptionalCodec(StormByte::Multimedia::Pipeline::Transcoder& job);
+
+/**
  * @brief Reports a failed transcoder configuration.
  * @param job Transcoder whose configuration is checked.
  * @return Zero for a valid configuration, one on failure.

@@ -282,32 +282,41 @@ Subtitle::Subtitle(Subtitle&& other) noexcept = default;
 Subtitle& Subtitle::operator=(Subtitle&& other) noexcept = default;
 
 Subtitle::Subtitle() noexcept
-: m_timeBase{1, AV_TIME_BASE},
+: m_openMutex(StormByte::Safe::MakeUnique<StormByte::Safe::Mutex>()),
+	m_timeBase{1, AV_TIME_BASE},
 	m_index(0),
 	m_flushed(false),
 	m_heldStartNs(0),
 	m_heldPts(AV_NOPTS_VALUE) {}
 
 bool Subtitle::IsOpen() const noexcept {
+	StormByte::Safe::UniqueLock lock(*m_openMutex);
 	return m_encoder.has_value();
 }
 
 const AVCodecContext* Subtitle::Context() const noexcept {
+	StormByte::Safe::UniqueLock lock(*m_openMutex);
 	return m_encoder ? m_encoder->Context() : nullptr;
 }
 
 FFmpeg::AVRational Subtitle::TimeBase() const noexcept {
+	StormByte::Safe::UniqueLock lock(*m_openMutex);
 	return m_timeBase;
 }
 
 bool Subtitle::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
-	if (m_encoder)
-		return true;
 	if (frame.Type() != Type::Subtitle) {
 		owner.Fail("encoder destination is subtitle but frame is not");
 		return false;
 	}
+	return PrepareForHeader(owner);
+}
+
+bool Subtitle::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+	StormByte::Safe::UniqueLock lock(*m_openMutex);
+	if (m_encoder)
+		return true;
 
 	StormByte::Multimedia::FFmpeg::AVCodecParameters params(nullptr);
 	auto opened = StormByte::Multimedia::Backend::Pipeline::Encoder::OpenCodec(
@@ -360,8 +369,10 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 	else {
 		if (WantsAssRect(impl))
 			text = WrapAss(std::move(text), m_heldStartNs, m_heldStartNs + durationNs);
+		else if (impl == "mov_text")
+			text = "0,0,Default,,0,0,0,," + NewlinesToAss(std::move(text));
 		StormByte::Multimedia::FFmpeg::AVSubtitle sub;
-		sub.FillText(StormByte::Safe::String(text), m_heldPts, durationMs, WantsAssRect(impl));
+		sub.FillText(StormByte::Safe::String(text), m_heldPts, durationMs, WantsAssRect(impl) || impl == "mov_text");
 		if (!m_encoder || m_encoder->EncodeSubtitle(sub, m_scratch)
 			!= StormByte::Multimedia::FFmpeg::OperationResult::Success) {
 			owner.Fail("failed to encode subtitle");
@@ -386,7 +397,7 @@ bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	}
 
-	if (!m_encoder && !Open(owner, *frame))
+	if (!Open(owner, *frame))
 		return false;
 	if (!m_encoder)
 		return false;

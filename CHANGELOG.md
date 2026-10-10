@@ -23,6 +23,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Added
 
+- Eighteen MP4 policy cases covering stream combinations, ordering and languages, audio filename aliases, mixed remux/encode, byte-exact image roundtrips in MP4/M4A/Matroska and unsupported font attachment rejection, plus three subtitle-header cases for preparation without cues and a first cue at one hour.
+- Codec test batches with 17 audio and 11 video cases selecting concrete software implementations, including bundled nonfree FDK-AAC, SVT/libaom AV1 encoding and dav1d decoding. Independent decoder roundtrips and generated outputs are checked through `File`, without external media tools.
+- A dual-input watermark test using the same synthetic colored-noise logo from a path and `#embed` binary bytes. Both VP9 outputs are checked through `File` and their paths are printed for manual overlay inspection.
 - `Transcoder::Track::Implementation(ImplementationSide, name)` for independent decoder/encoder selection, retaining the one-argument encoder shorthand, and six facade/manual decoder-pin regression cases covering successful selection, missing implementations and codec mismatches.
 - Encoder table entries for bundled Kvazaar and OpenH264, preserving x265/x264 as preferred implementations.
 - Category-specific pipeline test executables with shared compiled helpers to reduce recompilation while preserving individual CTest cases.
@@ -33,7 +36,17 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Allow remux codec parameters to be cloned after a short source reaches EOF, so subtitle-only outputs can write their headers instead of finishing with an empty file.
+- Allow decoder initialization after a short source has reached EOF while its format context and queued packets remain available, avoiding endless setup waits. Connect a cue-consuming filter in the empty-subtitle-header regression pipelines instead of leaving decoder output without a consumer.
+- Supply MOV timed-text encoders with ASS rectangles using FFmpeg's internal dialogue format while retaining cue timestamps and durations.
+- Patch bundled FFmpeg to read MOV/MP4 track `name` metadata as raw UTF-8, matching its writer and avoiding the spurious UDTA length-parsing fallback warning. System FFmpeg remains unchanged.
+- Adapt JPEG, PNG and BMP attachments to MOV/MP4 cover-art packets instead of silently dropping image payloads; retain Matroska attachment serialization and File's existing cover-classification workaround. Reject resources that this MP4 backend cannot represent explicitly.
+- Keep remux input indices separate from encoder output indices during mux reservation and packet routing, avoiding false duplicate connections and misdirected packets in selected or reordered multitrack outputs. Respect encoder reservation failures before publishing a connection.
+- Prepare configured subtitle encoders during mux reservation so their real codec parameters and extradata are available before the first cue. Remove the flush-time substitution of unopened encoders with SubRip, preserving audio/video decoder errors and allowing delayed subtitle tracks to be declared without waiting for content.
 - Preserve original FFmpeg packet properties and side data when rebuilding mux packets, including late AV1 extradata from libaom and audio skip-sample metadata.
+- Normalize unspecified audio output layouts during sample conversion and drain; retry audio frame and EOF submission after a receive operation consumes buffered input without producing a packet.
+- Apply libvpx row-based multithreading only to VP9, not VP8, and format encoder-option and muxer error messages as text instead of character ranges.
+- Explicitly disable empty construction of the private opened-encoder result, which requires an initialized FFmpeg encoder.
 - Implement the Watermark setup hook so path and binary overlays can be instantiated through the pipeline's filter API.
 - Disable IPO for all bundled x265 bit-depth variants on every compiler to prevent cross-variant LTO from combining incompatible definitions of `x265_analysis_distortion_data`.
 - Keep bundled x264 outside GCC LTO so its 64-byte stack preference does not suppress required stack realignment in other SIMD dependencies, avoiding AVX2 crashes in VMAF, VP9 encoding and OCR when GPL codecs are enabled.

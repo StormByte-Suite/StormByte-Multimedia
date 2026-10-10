@@ -271,7 +271,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 			continue;
 		if (av_opt_set(ctx, key.data(), value.empty() ? "" : value.data(), AV_OPT_SEARCH_CHILDREN) < 0) {
 			avcodec_free_context(&ctx);
-			return Unexpected<FFmpeg::EncoderError>("failed to set encoder option '{}'", key);
+			return Unexpected<FFmpeg::EncoderError>("failed to set encoder option '{}'", static_cast<std::string_view>(key));
 		}
 	}
 

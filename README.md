@@ -282,7 +282,7 @@ For custom payloads, derived `Transcoder` providers must override `EmptyPlan()` 
 
 ## Filters and analytics
 
-Muxing shares one FFmpeg backend with private, separately maintained policies for Matroska, WebM and MOV/MP4. Matroska retains attachment streams, header metadata, default dispositions and interleaving adaptations; WebM shares its container machinery but rejects file attachments. MOV/MP4 retains default stream dispositions. Other muxers keep FFmpeg defaults. The `StormByte-Multimedia` writing-app tag is retained. Formats that manage their own files or require multiple outputs are not supported by the single buffered-writer contract.
+Muxing shares one FFmpeg backend with private, separately maintained policies for Matroska, WebM and MOV/MP4. Matroska retains attachment streams, header metadata, default dispositions and interleaving adaptations; WebM shares its container machinery but rejects file attachments. MOV/MP4 retains default stream dispositions and adapts JPEG, PNG and BMP attachments to cover art using FFmpeg's attached-picture representation and `covr` metadata, not ordinary playable video tracks. Other attachment MIME types fail explicitly because this backend does not implement arbitrary ISO BMFF metadata items. Other muxers keep FFmpeg defaults. The `StormByte-Multimedia` writing-app tag is retained. Formats that manage their own files or require multiple outputs are not supported by the single buffered-writer contract.
 
 Filters are leaves, not a second pipeline language. `Scale` is resize (that is the name). `Watermark` is a still image on decoded video, with Hold so a black slate at the start does not pin the letterbox probe too early.
 
@@ -369,7 +369,9 @@ The in-tree CMake target is `StormByte::Multimedia`. The library is `StormByte-M
 
 The mux-policy batch covers direct FLAC, FLAC in OGA, ALAC in CAF and direct E-AC3 output, plus incompatible FLAC input and WebM attachment rejection. Generated outputs are checked with `File`; no external media tools are invoked.
 
-Pipeline cases are split into remux, analytics, video, audio, OCR, negative-input/configuration and decoder-implementation executables under `test/pipeline`. Common helpers are compiled once in a static test support library; category-local edits rebuild only the affected executable. Individual CTest names remain `pipeline.test_*`.
+Additional MP4 cases cover individual and mixed video/audio/timed-text tracks, languages and reordered tracks, `.m4a`/`.m4b` aliases, mixed remux/encode, image cover-art roundtrips and explicit rejection of unsupported font attachments. Cover tests compare exact payload bytes in MP4, audio-only M4A and Matroska, and ensure `File::Streams()` excludes the cover while `File::Attachments()` exposes it. The existing Matroska still-image classification workaround is retained. Subtitle-header cases check codec preparation without cues and a first cue timestamped at one hour. Matroska retains its empty subtitle stream; MP4 may omit entirely empty tracks from the final file according to libavformat behavior. Subtitle encoders are prepared at mux reservation, without waiting for a first decoded cue.
+
+Pipeline cases are split into remux, analytics, video, audio, audio-codec, video-codec, watermark, mux-policy, OCR, negative-input/configuration and decoder-implementation executables under `test/pipeline`. Common helpers are compiled once in a static test support library; category-local edits rebuild only the affected executable. Individual CTest names remain `pipeline.test_*`.
 
 Configure with `-DENABLE_TEST=ON`, build, then run CTest from the test registration root:
 
@@ -381,7 +383,11 @@ cmake --build build-tests
 ctest --test-dir build-tests/test --output-on-failure
 ```
 
-The initial suite has 49 cases covering registries, fixed `File` properties, facade/manual remux, attachment inclusion/omission, HDR encoding, Japanese PGS OCR, exact VMAF remux reports, audio conversions and invalid input/configuration. Encoder cases can skip when the configured registry has no write support; other missing prerequisites must not be treated as success. Each case has a 30-second timeout. Fixtures are short synthetic media; provenance and font redistribution notices are in [test/files/README.md](test/files/README.md). Passing these cases is not certification of every codec, long-running workload or target platform.
+The initial suite has 49 cases covering registries, fixed `File` properties, facade/manual remux, attachment inclusion/omission, HDR encoding, Japanese PGS OCR, exact VMAF remux reports, audio conversions and invalid input/configuration. New codec batches add 17 audio cases (FDK-AAC, Vorbis, Opus, LAME, FLAC, ALAC and AC-3/E-AC3), 11 video cases (SVT/libaom AV1, dav1d/libaom decoding, VP8/VP9, x264, OpenH264, Kvazaar and x265), and one dual-input watermark case. Outputs are reopened with `File` to check identity, dimensions or audio properties and positive duration; tests never invoke external FFmpeg or ffprobe programs. Decoder roundtrips create their own inputs and do not depend on another test's output.
+
+Encoder cases can skip when the configured registry has no write support; pinned codec cases skip only unavailable implementations, not encoding failures. FDK-AAC is required when FFmpeg is bundled and nonfree is enabled. New codec and watermark cases have a 90-second CTest timeout to allow two successive jobs, each with a 30-second wait deadline. Fixtures are short synthetic media; provenance and font redistribution notices are in [test/files/README.md](test/files/README.md). Passing these cases is not certification of every codec, long-running workload or target platform.
+
+The watermark case creates `test-output/pipeline/watermark/watermark-logo-path.webm` and `watermark-logo-binary.webm`, using the same logo from a file path and from `#embed` bytes. It prints both paths for manual inspection; the automated checks validate video generation, not the overlay's appearance. Run the `MultimediaPipelineWatermarkTests` executable directly or use `ctest --test-dir build-tests/test -R watermark -V` to see the paths on success. Both outputs use VP9 and do not require GPL/nonfree codecs.
 
 ## Contributing
 

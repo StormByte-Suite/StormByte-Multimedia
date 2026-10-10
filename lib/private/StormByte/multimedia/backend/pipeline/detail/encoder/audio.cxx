@@ -291,14 +291,14 @@ bool Audio::Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) noe
 
 		auto result = m_encoder->SendFrame(m_converted);
 		while (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain) {
-			if (!DrainOne(owner)) {
-				if (owner.Failed())
-					return false;
+			const bool produced = DrainOne(owner);
+			if (owner.Failed())
+				return false;
+			result = m_encoder->SendFrame(m_converted);
+			if (!produced && result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain) {
 				owner.Fail("encoder stalled");
 				return false;
 			}
-
-			result = m_encoder->SendFrame(m_converted);
 		}
 
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Error) {
@@ -427,8 +427,16 @@ void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 			|| sent == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 			break;
 		if (sent == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain) {
-			if (!DrainOne(owner))
-				break;
+			if (!DrainOne(owner)) {
+				if (owner.Failed())
+					return;
+				const auto retried = m_encoder->SetEof();
+				if (retried == StormByte::Multimedia::FFmpeg::OperationResult::Success
+					|| retried == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
+					break;
+				owner.Fail("failed to signal encoder EOF after draining");
+				return;
+			}
 			continue;
 		}
 

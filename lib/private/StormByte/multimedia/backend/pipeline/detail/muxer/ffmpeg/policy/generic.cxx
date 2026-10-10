@@ -18,6 +18,10 @@ bool Policy::WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
 	return Attachment::Write(owner, &context, attachments);
 }
 
+bool Policy::WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer&, ::AVFormatContext&) const noexcept {
+	return true;
+}
+
 void Policy::ConfigureHeader(const StormByte::Multimedia::Pipeline::Muxer&,
 	::AVFormatContext&, std::int64_t, ::AVDictionary**) const noexcept {}
 

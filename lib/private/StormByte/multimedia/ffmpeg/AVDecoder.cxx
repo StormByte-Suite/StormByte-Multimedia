@@ -90,14 +90,8 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCod
 	return dec;
 }
 
-FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params, const AVFormatContext& fmt, int stream_index) noexcept {
-	auto opened = OpenRaw(codec, params, stream_index);
-	if (!opened)
-		return opened;
-	auto bsf = fmt.Mp4ToAnnexB(params.CodecId(), stream_index, params);
-	if (bsf)
-		opened->m_bsf_pipeline.Add(std::move(*bsf));
-	return opened;
+FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params, const AVFormatContext&, int stream_index) noexcept {
+	return OpenRaw(codec, params, stream_index);
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params, int stream_index) noexcept {

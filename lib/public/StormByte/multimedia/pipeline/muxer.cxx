@@ -282,7 +282,8 @@ bool Muxer::BindEncoderStream(Encoder& encoder, void* avStream) noexcept {
 
 bool Muxer::RemuxCodec(int inIndex, void*& params, void* timeBase) noexcept {
 	params = nullptr;
-	if (!timeBase || !m_origin || !m_origin->Ready() || !m_origin->m_backend)
+	if (!timeBase || !m_origin || m_origin->Failed() || !m_origin->m_backend
+		|| (!m_origin->Ready() && !m_origin->Eof()))
 		return false;
 	return m_origin->m_backend->CloneStream(
 		inIndex,
@@ -310,15 +311,11 @@ Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& mu
 		return encoder;
 	if (!muxer.SpawnBackend())
 		return encoder;
-	if (muxer.m_wired.contains(encoder.Index())) {
-		muxer.Fail("track already wired to muxer");
-		return encoder;
-	}
-	muxer.m_wired.insert(encoder.Index());
 	if (!muxer.ArmOctets())
 		return encoder;
 
-	muxer.m_backend->ReserveEncoder(muxer, encoder);
+	if (!muxer.m_backend->ReserveEncoder(muxer, encoder))
+		return encoder;
 	encoder.pipe().To(encoder.Index()) >> muxer.pipe();
 	if (const std::size_t cap = muxer.InputCeiling(); cap > 0)
 		muxer.pipe().Capacity(encoder.Index(), cap);
@@ -343,12 +340,12 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& mu
 		muxer.Fail("track already wired to muxer");
 		return remuxer;
 	}
-	muxer.m_wired.insert(remuxer.In());
 	if (!muxer.ArmOctets())
 		return remuxer;
 
 	if (!muxer.m_backend->ReserveRemux(muxer, remuxer.In()))
 		return remuxer;
+	muxer.m_wired.insert(remuxer.In());
 	remuxer.pipe().To(remuxer.In()) >> muxer.pipe();
 	if (const std::size_t cap = muxer.InputCeiling(); cap > 0)
 		muxer.pipe().Capacity(remuxer.In(), cap);

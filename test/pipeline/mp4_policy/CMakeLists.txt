@@ -1,0 +1,26 @@
+add_executable(MultimediaPipelineMp4PolicyTests mp4_policy_test.cxx)
+target_link_libraries(MultimediaPipelineMp4PolicyTests PRIVATE multimedia_pipeline_test_support)
+
+foreach(test_name IN ITEMS
+	test_mp4_video_only
+	test_mp4_audio_only_m4a
+	test_mp4_audio_only_m4b
+	test_mp4_two_audio_tracks
+	test_mp4_reordered_audio_tracks
+	test_mp4_video_and_audio
+	test_mp4_video_and_subtitle
+	test_mp4_video_and_two_audio_tracks
+	test_mp4_video_and_two_subtitle_tracks
+	test_mp4_all_five_tracks
+	test_mp4_subtitles_only
+	test_mp4_remux_video_and_encode_audio
+	test_mp4_audio_and_encode_timed_text
+	test_mp4_hevc_aac_without_attachments
+	test_mp4_preserves_image_as_cover
+	test_m4a_preserves_image_as_cover
+	test_matroska_preserves_image_as_attachment
+	test_mp4_rejects_font_attachment
+)
+	add_optional_pipeline_test(MultimediaPipelineMp4PolicyTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES LABELS "multimedia;pipeline;mp4-policy")
+endforeach()

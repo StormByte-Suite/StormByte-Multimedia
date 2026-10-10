@@ -88,11 +88,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		while (!Stopping() && !m_owner.m_origin->Failed() && !m_owner.m_origin->Ready())
+		while (!Stopping() && !m_owner.m_origin->Failed()
+			&& !m_owner.m_origin->Ready() && !m_owner.m_origin->Eof())
 			Wait();
 		if (Stopping())
 			return;
-		if (m_owner.m_origin->Failed() || !m_owner.m_origin->Ready()) {
+		if (m_owner.m_origin->Failed() || (!m_owner.m_origin->Ready() && !m_owner.m_origin->Eof())) {
 			const auto reason = m_owner.m_origin->Error().value_or(StormByte::Safe::String("demuxer failed"));
 			Fail(static_cast<std::string>(reason));
 			return;

@@ -87,9 +87,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			class STORMBYTE_MULTIMEDIA_PRIVATE Opened {
 				public:
 					/**
-					 * @brief Empty result.
+					 * @brief Empty construction is disabled; an opened encoder is required.
 					 */
-					Opened() noexcept = default;
+					Opened() noexcept = delete;
 
 					/**
 					 * @brief Takes ownership of an opened encoder.
@@ -201,6 +201,20 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return true after a successful Open().
 			 */
 			virtual bool IsOpen() const noexcept = 0;
+
+			/**
+			 * @brief Prepares codecs whose headers do not require a first frame.
+			 * @param owner Public encoder with completed output configuration.
+			 * @return True when ready or when opening must remain frame-driven.
+			 */
+			virtual bool PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
+
+			/**
+			 * @brief Requests header preparation through the public encoder's private backend.
+			 * @param owner Public encoder being reserved by the muxer.
+			 * @return False if preparation failed or the backend is absent.
+			 */
+			static bool PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
 
 			/**
 			 * @brief Picks the table row and opens the FFmpeg encoder from leaf parameters.

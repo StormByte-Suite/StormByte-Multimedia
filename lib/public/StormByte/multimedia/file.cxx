@@ -159,10 +159,9 @@ namespace {
 	}
 
 	Attachment MakeAttachment(const FFmpeg::AVStream& stream) noexcept {
-		StormByte::Safe::Optional<StormByte::Safe::String> name;
-		StormByte::Safe::Optional<StormByte::Safe::String> mime;
-		name = stream.Tag("filename");
-		mime = stream.Tag("mimetype");
+		const auto described = Detail::MakeAttachment(stream);
+		auto name = described.FileName();
+		auto mime = described.MimeType();
 		return Attachment(std::move(name), std::move(mime),
 			StormByte::Buffer::FIFO{AttachmentBytes(stream)});
 	}

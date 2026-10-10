@@ -37,6 +37,22 @@ using namespace std::string_view_literals;
 		return 0;
 	}
 
+	int WaitForOptionalCodec(Transcoder& job) {
+		const int result = WaitForTranscoder(job);
+		if (result == 0)
+			return 0;
+		const auto error = job.Error();
+		if (job.Status() == Status::Error && error) {
+			const auto message = TestView(error.value());
+			if (message.find("encoder implementation is unavailable") != std::string_view::npos
+				|| message.find("decoder implementation is unavailable") != std::string_view::npos) {
+				std::cerr << "[SKIP] " << error.value() << std::endl;
+				return TEST_SKIP;
+			}
+		}
+		return result;
+	}
+
 	int CheckTranscoderConfigured(Transcoder& job) {
 		if (!job.Failed())
 			return 0;

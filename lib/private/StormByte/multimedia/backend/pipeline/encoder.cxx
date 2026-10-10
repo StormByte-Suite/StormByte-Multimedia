@@ -178,6 +178,14 @@ namespace {
 	}
 }
 
+bool Encoder::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder&) noexcept {
+	return true;
+}
+
+bool Encoder::PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+	return owner.m_backend && owner.m_backend->PrepareForHeader(owner);
+}
+
 std::int64_t Encoder::NsToTicks(std::int64_t ns, FFmpeg::AVRational timeBase) noexcept {
 	if (ns < 0 || !timeBase.Valid())
 		return FFmpeg::NoPts;
@@ -362,7 +370,7 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		}
 	}
 
-	if (row && (std::string_view(row->name) == "libvpx" || std::string_view(row->name) == "libvpx-vp9")) {
+	if (row && std::string_view(row->name) == "libvpx-vp9") {
 		if (!opts.contains("row-mt") && !fine.contains("row-mt"))
 			opts.emplace("row-mt", "1");
 	}

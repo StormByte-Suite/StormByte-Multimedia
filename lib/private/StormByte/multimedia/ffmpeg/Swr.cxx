@@ -80,6 +80,11 @@ FFmpeg::Swr FFmpeg::Swr::Open(const FFmpeg::AVChannelLayout& out_layout, int out
 bool FFmpeg::Swr::Convert(const AVFrame& src, AVFrame& dst) const noexcept {
 	if (!m_ptr || !src.Get() || !dst.Get())
 		return false;
+	if (dst.Get()->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
+		const int channels = dst.Get()->ch_layout.nb_channels;
+		av_channel_layout_uninit(&dst.Get()->ch_layout);
+		av_channel_layout_default(&dst.Get()->ch_layout, channels);
+	}
 	if (src.Get()->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
 		AVFrame normalized;
 		if (!normalized.Ref(src))
@@ -95,6 +100,11 @@ bool FFmpeg::Swr::Convert(const AVFrame& src, AVFrame& dst) const noexcept {
 bool FFmpeg::Swr::Drain(AVFrame& dst) const noexcept {
 	if (!m_ptr || !dst.Get())
 		return false;
+	if (dst.Get()->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
+		const int channels = dst.Get()->ch_layout.nb_channels;
+		av_channel_layout_uninit(&dst.Get()->ch_layout);
+		av_channel_layout_default(&dst.Get()->ch_layout, channels);
+	}
 	return swr_convert_frame(m_ptr, dst.Get(), nullptr) >= 0;
 }
 

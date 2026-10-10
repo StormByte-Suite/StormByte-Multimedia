@@ -133,8 +133,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			return false;
 		}
 
-		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
-			return false;
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Success)
 			m_pendingSub = std::move(sub);
 		return true;

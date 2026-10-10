@@ -47,6 +47,7 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/deque.hxx>
+#include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/optional.hxx>
 
 #include <cstdint>
@@ -114,7 +115,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			bool IsOpen() const noexcept override;
 
 			/**
-			 * @brief Opens the subtitle encoder from the first frame.
+			 * @brief Opens the configured subtitle codec without waiting for a cue.
+			 * @param owner Public encoder with completed output configuration.
+			 * @return False if codec selection or opening failed.
+			 */
+			bool PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept override;
+
+			/**
+			 * @brief Validates a subtitle frame and ensures header preparation has completed.
 			 * @param owner Public encoder.
 			 * @param frame First subtitle frame.
 			 * @return false if owner.Fail() was called.
@@ -123,7 +131,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 				const StormByte::Multimedia::Pipeline::Frame& frame) noexcept override;
 
 			/**
-			 * @brief Encodes one subtitle cue. Opens lazily on first call.
+			 * @brief Encodes one subtitle cue using the codec prepared for the mux header.
 			 * @param owner Public encoder.
 			 * @param frame Decoded subtitle frame.
 			 * @return true if the cue was accepted (or skipped empty).
@@ -164,6 +172,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			void EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 				std::int64_t endNs) noexcept;
 
+			mutable StormByte::Safe::Unique<StormByte::Safe::Mutex> m_openMutex;	///< Serializes mux preparation and first-cue opening.
 			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;	///< Opened encoder.
 			StormByte::Multimedia::FFmpeg::AVPacket m_scratch;						///< Encode scratch
 			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Base-owned packets waiting for Mux.

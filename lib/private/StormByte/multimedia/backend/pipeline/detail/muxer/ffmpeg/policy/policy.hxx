@@ -95,6 +95,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept;
 
 			/**
+			 * @brief Emits static resources once after libavformat writes the header.
+			 * @param owner Public muxer receiving failures.
+			 * @param context Output context with initialized stream time bases.
+			 * @return True on success, false if a resource packet could not be written.
+			 */
+			virtual bool WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
+				::AVFormatContext& context) const noexcept;
+
+			/**
 			 * @brief Applies header adaptations; the default preserves FFmpeg settings.
 			 * @param owner Public muxer with the bound plan.
 			 * @param context Output context to configure.

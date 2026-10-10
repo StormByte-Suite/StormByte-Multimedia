@@ -1,0 +1,28 @@
+add_executable(MultimediaPipelineAudioCodecTests audio_codec_test.cxx)
+target_link_libraries(MultimediaPipelineAudioCodecTests PRIVATE multimedia_pipeline_test_support)
+if(WITH_FFMPEG STREQUAL "BUNDLED" AND WITH_NONFREE)
+	target_compile_definitions(MultimediaPipelineAudioCodecTests PRIVATE STORMBYTE_TEST_REQUIRE_FDK_AAC)
+endif()
+
+foreach(test_name IN ITEMS
+	test_fdk_aac_encodes_stereo_mp4
+	test_fdk_aac_encodes_surround_mp4
+	test_fdk_aac_decodes_surround_to_flac
+	test_libvorbis_encodes_stereo_ogg
+	test_libvorbis_encodes_surround_matroska
+	test_libvorbis_decode_roundtrip
+	test_libopus_encodes_stereo_opus
+	test_libopus_decodes_surround_to_flac
+	test_lame_encodes_stereo_mp3
+	test_flac_encodes_stereo_matroska
+	test_flac_encodes_surround_matroska
+	test_flac_decode_roundtrip
+	test_alac_encodes_stereo_mp4
+	test_alac_encodes_surround_mp4
+	test_alac_decode_roundtrip
+	test_ac3_fixed_encodes_stereo_matroska
+	test_eac3_encodes_stereo_matroska
+)
+	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+endforeach()

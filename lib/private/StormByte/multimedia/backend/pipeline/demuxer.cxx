@@ -204,7 +204,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 	m_ctx->wanted.clear();
 	if (const auto& plan = owner.Plan(); plan) {
 		for (const auto& slot : plan->Tracks()) {
-			if (slot)
+			if (slot && slot->Type() != StormByte::Multimedia::Type::Attachment)
 				m_ctx->wanted.insert(slot->In());
 		}
 	}

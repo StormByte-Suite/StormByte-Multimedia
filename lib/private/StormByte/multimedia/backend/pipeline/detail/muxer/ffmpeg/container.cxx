@@ -37,6 +37,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
+#include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
@@ -211,9 +212,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		return m_header;
 	}
 
-	int Container::Resolve(int track) const noexcept {
-		if (m_tracks.contains(track))
-			return track;
+	int Container::Resolve(const StormByte::Multimedia::Pipeline::Packet& packet) const noexcept {
+		const int track = packet.Track();
+		if (packet.Producer() == StormByte::Multimedia::Pipeline::Producer::Encoder)
+			return m_tracks.contains(track) ? track : -1;
 		const auto it = m_inToOut.find(track);
 		if (it != m_inToOut.end())
 			return it->second;
@@ -249,7 +251,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 		AVFormatContext* ctx = nullptr;
 		if (avformat_alloc_output_context2(&ctx, const_cast<AVOutputFormat*>(oformat),
-				nullptr, nullptr) < 0 || !ctx) {
+				nullptr, filename.c_str()) < 0 || !ctx) {
 			owner.Fail("avformat_alloc_output_context2 failed");
 			return false;
 		}
@@ -291,6 +293,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		Track track;
+		if (!StormByte::Multimedia::Backend::Pipeline::Encoder::PrepareForMux(encoder)) {
+			owner.Fail(encoder.Error().value_or(StormByte::Safe::String{"encoder header preparation failed"}));
+			return false;
+		}
 		track.encoder = &encoder;
 		track.language = owner.Language(encoder.Index());
 		track.title = owner.Title(encoder.Index());
@@ -368,7 +374,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			return false;
 		}
 
-		if (Resolve(packet->Track()) < 0) {
+		if (Resolve(*packet) < 0) {
 			owner.Fail("packet stream index is not a mux track");
 			return false;
 		}
@@ -516,7 +522,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		av_dict_free(&opts);
 		if (rc < 0) {
 			owner.Fail(std::format("avformat_write_header failed: {}",
-				StormByte::Multimedia::FFmpeg::ErrorToString(rc)));
+				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(rc))));
 			return false;
 		}
 
@@ -534,6 +540,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		m_header = true;
+		if (!m_policy->WriteHeaderPackets(owner, *m_ctx))
+			return false;
 		while (!m_queue.empty()) {
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> queued = std::move(m_queue.front());
 			m_queue.pop_front();
@@ -548,7 +556,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		StormByte::Multimedia::Pipeline::Packet& packet) noexcept {
 		if (owner.Failed() || !m_header)
 			return false;
-		const int out = Resolve(packet.Track());
+		const int out = Resolve(packet);
 		const auto it = m_tracks.find(out);
 		if (it == m_tracks.end() || it->second.avIndex < 0) {
 			owner.Fail("packet stream index is not a mux track");
@@ -604,7 +612,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		av_packet_free(&raw);
 		if (rc < 0) {
 			owner.Fail(std::format("av_interleaved_write_frame failed: {}",
-				StormByte::Multimedia::FFmpeg::ErrorToString(rc)));
+				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(rc))));
 			return false;
 		}
 
@@ -619,22 +627,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				owner.Fail(track.encoder->Error().value_or(StormByte::Safe::String{"encoder failed"}));
 				return;
 			}
-		}
-
-		for (auto& [index, track] : m_tracks) {
-			if (!track.encoder || *track.encoder)
-				continue;
-			AVCodecParameters* params = avcodec_parameters_alloc();
-			if (!params) {
-				owner.Fail("avcodec_parameters_alloc failed");
-				return;
-			}
-
-			params->codec_type = AVMEDIA_TYPE_SUBTITLE;
-			params->codec_id = AV_CODEC_ID_SUBRIP;
-			track.params = params;
-			track.srcTb = FFmpeg::AVRational{1, 1000};
-			track.encoder = nullptr;
 		}
 
 		if (!WriteHeaderIfReady(owner))

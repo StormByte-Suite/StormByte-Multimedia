@@ -199,10 +199,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 			/**
 			 * @brief Maps a packet track onto an output slot.
-			 * @param track Packet::Track().
+			 * @param packet Packet whose producer determines the input or output index space.
 			 * @return Output key, or -1.
 			 */
-			int Resolve(int track) const noexcept;
+			int Resolve(const StormByte::Multimedia::Pipeline::Packet& packet) const noexcept;
 
 			/**
 			 * @brief Writes the header when Armed and every reserved encoder is open.
