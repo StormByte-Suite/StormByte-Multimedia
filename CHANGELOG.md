@@ -23,6 +23,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Apply route input capacities after connecting their hoppers; configuring a missing hopper previously left first-filter or destination queues unbounded after audit wiring was reordered.
 - Install route audit consumers before their producers, synchronize clone destination registration with emission and EOF, and propagate EOF to clone destinations connected after output closes.
 - Retry video decoder EOF submission after draining pending frames when FFmpeg returns `EAGAIN`, rather than treating an unaccepted EOF as successfully signalled.
 - Declare SVT-AV1 encoder support for HDR10 signaling so HDR10 AV1 jobs can select `libsvtav1`.

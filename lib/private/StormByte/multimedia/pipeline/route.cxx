@@ -182,8 +182,6 @@ void Route::Close() noexcept {
 	Filter::FFmpeg* first = packetFirst != nullptr ? packetFirst : frameFirst;
 	Filter::FFmpeg* last = frameLast != nullptr ? frameLast : packetLast;
 
-	Cap(destination.pipe(), m_track, destination.InputCeiling());
-
 	for (const auto& analyticsOwner : m_analytics) {
 		Filter::FFmpeg* analytics = analyticsOwner.get();
 		if (!analytics)
@@ -197,11 +195,13 @@ void Route::Close() noexcept {
 
 	if (first == nullptr) {
 		origin.pipe().To(m_track) >> destination.pipe();
+		Cap(destination.pipe(), m_track, destination.InputCeiling());
 	}
 	else {
-		Cap(first->pipe(), m_track, first->InputCeiling());
 		last->pipe().To(m_track) >> destination.pipe();
+		Cap(destination.pipe(), m_track, destination.InputCeiling());
 		origin.pipe().To(m_track) >> first->pipe();
+		Cap(first->pipe(), m_track, first->InputCeiling());
 	}
 }
 
