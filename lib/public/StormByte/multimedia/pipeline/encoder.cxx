@@ -114,7 +114,15 @@ Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	Launch();
 }
 
-Encoder::~Encoder() noexcept = default;
+Encoder::~Encoder() noexcept {
+	Halt();
+	const auto implementation = m_implementation.value_or(StormByte::Safe::String{"auto"});
+	Log(Level::LowLevel, std::format("backend release begin stage=Encoder t={} impl={} instance={}",
+		m_index, std::string_view{implementation}, static_cast<const void*>(this)));
+	m_backend.reset();
+	Log(Level::LowLevel, std::format("backend release end stage=Encoder t={} impl={} instance={}",
+		m_index, std::string_view{implementation}, static_cast<const void*>(this)));
+}
 
 Encoder::operator bool() const noexcept {
 	return !Failed() && Ready() && m_backend && m_backend->IsOpen();
@@ -299,6 +307,6 @@ const void* Encoder::FrameHandle(const Frame& frame) noexcept {
 
 StormByte::Safe::String Encoder::Label() const noexcept {
 	if (m_implementation && !m_implementation->empty())
-		return StormByte::Safe::String(std::format("Encoder({})", *m_implementation));
+		return StormByte::Safe::String(std::format("Encoder({})", std::string_view{*m_implementation}));
 	return StormByte::Safe::String("Encoder(" + std::string(m_codec->Name()) + ")");
 }

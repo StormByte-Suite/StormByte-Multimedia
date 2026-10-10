@@ -340,7 +340,11 @@ Transcoder::~Transcoder() noexcept {
 	const auto status = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (status == Status::Running || status == Status::Paused)
 		Cancel();
+	JobLog(m_logger, Level::LowLevel, std::format("coordinator join begin component=Transcoder instance={}",
+		static_cast<const void*>(this)));
 	m_backend->Join();
+	JobLog(m_logger, Level::LowLevel, std::format("coordinator join end component=Transcoder instance={}",
+		static_cast<const void*>(this)));
 }
 
 void Transcoder::InstallLog() noexcept {

@@ -131,6 +131,8 @@ void Pipe::Wait(void* owner, bool (*ready)(void*) noexcept,
 void Pipe::Close() noexcept {
 	m_in.Eof();
 	m_out.Eof();
+	StormByte::Safe::UniqueLock lock(m_forkMutex);
+	m_closed = true;
 	for (auto& fork : m_forks)
 		fork.second->Eof();
 }
@@ -138,6 +140,7 @@ void Pipe::Close() noexcept {
 Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
 	dest.Listen();
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
+	StormByte::Safe::UniqueLock lock(m_forkMutex);
 	m_forks.emplace_back(track, std::move(hopper));
 	auto& fork = m_forks.back();
 	if (dest.m_inTracks.contains(track))
@@ -145,6 +148,8 @@ Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
 	else
 		fork.second->To(track) >> dest.In();
 	dest.m_inTracks.insert(track);
+	if (m_closed)
+		fork.second->Eof();
 	return dest;
 }
 
@@ -217,7 +222,12 @@ Pipe& Pipe::operator<<(Item::PointerType item) noexcept {
 	if (!item)
 		return *this;
 	const int key = item->Track();
-	for (auto& fork : m_forks) {
+	StormByte::Safe::Deque<Fork> forks;
+	{
+		StormByte::Safe::UniqueLock lock(m_forkMutex);
+		forks = m_forks;
+	}
+	for (auto& fork : forks) {
 		if (fork.first != key)
 			continue;
 		if (auto copy = item->Clone())

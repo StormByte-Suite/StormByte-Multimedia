@@ -148,7 +148,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
 
 			/**
-			 * @brief Signals EOF and keeps delayed frames available to Receive.
+			 * @brief Requests EOF and keeps delayed frames available to Receive.
+			 * Receive retries EOF after draining pending output if submission needs a retry.
 			 * @param owner Public decoder.
 			 */
 			void Flush(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
@@ -165,6 +166,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			StormByte::Multimedia::FFmpeg::AVFrame m_scratch;				///< Receive scratch
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Video> m_video;	///< Stream video properties.
 			AVRational m_timeBase;											///< Stream time base
+			bool m_draining;												///< EOF requested
 			bool m_flushed;													///< EOF already signalled
 	};
 }

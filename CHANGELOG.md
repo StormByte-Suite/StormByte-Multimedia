@@ -23,6 +23,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Install route audit consumers before their producers, synchronize clone destination registration with emission and EOF, and propagate EOF to clone destinations connected after output closes.
+- Retry video decoder EOF submission after draining pending frames when FFmpeg returns `EAGAIN`, rather than treating an unaccepted EOF as successfully signalled.
 - Declare SVT-AV1 encoder support for HDR10 signaling so HDR10 AV1 jobs can select `libsvtav1`.
 - Synchronize decoded side data across all bundled FFmpeg frame workers; system FFmpeg must be 9.0.2 or newer to avoid incomplete HEVC/Dolby Vision worker state.
 - Drop remaining HEVC slices when the first slice of a picture is skipped, avoiding stale-context reference-list errors in frame-threaded decode.

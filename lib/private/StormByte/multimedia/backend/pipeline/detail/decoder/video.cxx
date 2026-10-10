@@ -234,7 +234,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 	Video::Video(StormByte::Multimedia::FFmpeg::AVDecoder decoder, FFmpeg::AVRational timeBase,
 		StormByte::Safe::Optional<StormByte::Multimedia::Property::Video> video) noexcept
-	: m_decoder(std::move(decoder)), m_video(std::move(video)), m_timeBase(timeBase), m_flushed(false) {}
+	: m_decoder(std::move(decoder)), m_video(std::move(video)), m_timeBase(timeBase), m_draining(false), m_flushed(false) {}
 
 	bool Video::IsOpen() const noexcept {
 		return true;
@@ -284,7 +284,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Video::Receive(
 		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
 		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Frame>();
-		const auto result = m_decoder.ReceiveFrame(holder->Handle());
+		auto result = m_decoder.ReceiveFrame(holder->Handle());
+		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain && m_draining && !m_flushed) {
+			Flush(owner);
+			if (owner.Failed())
+				return {};
+			if (!m_flushed) {
+				owner.Fail("decoder EOF submission made no progress after draining output");
+				return {};
+			}
+			result = m_decoder.ReceiveFrame(holder->Handle());
+		}
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain
 			|| result == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 			return {};
@@ -325,20 +335,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	void Video::Flush(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
 		if (owner.Failed() || m_flushed)
 			return;
-		for (;;) {
-			const auto sent = m_decoder.SetEof();
-			if (sent == StormByte::Multimedia::FFmpeg::OperationResult::Success
-				|| sent == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
-				break;
-			if (sent == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
-				break;
-			if (sent == StormByte::Multimedia::FFmpeg::OperationResult::Error) {
-				owner.Fail("failed to flush decoder");
-				return;
-			}
+		m_draining = true;
+		const auto sent = m_decoder.SetEof();
+		if (sent == StormByte::Multimedia::FFmpeg::OperationResult::Success
+			|| sent == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile) {
+			m_flushed = true;
 		}
-
-		m_flushed = true;
+		else if (sent == StormByte::Multimedia::FFmpeg::OperationResult::Error)
+			owner.Fail("failed to flush decoder");
 	}
 
 	bool Video::Reset(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
@@ -346,6 +350,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			return false;
 		m_decoder.Flush();
 		m_scratch.Unref();
+		m_draining = false;
 		m_flushed = false;
 		return true;
 	}

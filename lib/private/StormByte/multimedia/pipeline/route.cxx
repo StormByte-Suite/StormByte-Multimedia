@@ -182,15 +182,6 @@ void Route::Close() noexcept {
 	Filter::FFmpeg* first = packetFirst != nullptr ? packetFirst : frameFirst;
 	Filter::FFmpeg* last = frameLast != nullptr ? frameLast : packetLast;
 
-	if (first == nullptr) {
-		origin.pipe().To(m_track) >> destination.pipe();
-	}
-	else {
-		origin.pipe().To(m_track) >> first->pipe();
-		Cap(first->pipe(), m_track, first->InputCeiling());
-		last->pipe().To(m_track) >> destination.pipe();
-	}
-
 	Cap(destination.pipe(), m_track, destination.InputCeiling());
 
 	for (const auto& analyticsOwner : m_analytics) {
@@ -202,6 +193,15 @@ void Route::Close() noexcept {
 		TapEncode(destination, *analytics);
 		Cap(analytics->pipe(), m_track, analytics->InputCeiling());
 		analytics->pipe().Drain();
+	}
+
+	if (first == nullptr) {
+		origin.pipe().To(m_track) >> destination.pipe();
+	}
+	else {
+		Cap(first->pipe(), m_track, first->InputCeiling());
+		last->pipe().To(m_track) >> destination.pipe();
+		origin.pipe().To(m_track) >> first->pipe();
 	}
 }
 
@@ -257,11 +257,11 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 	StormByte::Safe::Shared<Decoder> look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
 		origin.m_log, m_track, Decoder::SourceLook{});
 	look->m_plan = origin.Plan();
-	origin.pipe().CloneTo(m_track, look->pipe());
 	look->pipe().CloneTo(m_track, analytics.pipe());
 	look->pipe().Drain();
 	Cap(look->pipe(), m_track, look->InputCeiling());
 	Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+	origin.pipe().CloneTo(m_track, look->pipe());
 	m_looks.push_back(std::move(look));
 }
 
@@ -286,10 +286,10 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 		return;
 	look->m_plan = destination.Plan();
 	look->pipe().Listen();
-	destination.pipe().CloneTo(m_track, look->pipe());
 	look->pipe().CloneTo(m_track, analytics.pipe());
 	look->pipe().Drain();
 	Cap(look->pipe(), m_track, look->InputCeiling());
 	Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+	destination.pipe().CloneTo(m_track, look->pipe());
 	m_looks.push_back(std::move(look));
 }

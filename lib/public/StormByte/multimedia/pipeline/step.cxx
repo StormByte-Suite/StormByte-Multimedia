@@ -360,9 +360,14 @@ void Step::Launch() noexcept {
 }
 
 void Step::Halt() noexcept {
+	const auto label = Label();
+	Log(Level::LowLevel, std::format("halt/join begin stage={} instance={}",
+		std::string_view{label}, static_cast<const void*>(this)));
 	Stop();
 	if (m_state->pumper)
 		m_state->pumper->Halt();
+	Log(Level::LowLevel, std::format("halt/join end stage={} instance={}",
+		std::string_view{label}, static_cast<const void*>(this)));
 }
 
 Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept {

@@ -354,6 +354,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			using Fork = StormByte::Safe::Pair<int, StormByte::Safe::Shared<ItemSink>>;
 
 			StormByte::Safe::Deque<Fork> m_forks;	///< CloneTo destinations.
+			StormByte::Safe::Mutex m_forkMutex;	///< Guards clone registration and snapshots.
+			bool m_closed = false;			///< Output and clone destinations have reached EOF.
 			StormByte::Safe::UnorderedSet<int> m_inTracks;	///< Keys already wired on In
 	};
 
