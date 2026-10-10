@@ -769,6 +769,8 @@ int test_dovi_decoder_table_capabilities() {
 		});
 		TEST_REQUIRE(found != table.end());
 		TEST_REQUIRE(found->features.Has(Feature::DOVI));
+		if (name == "libdav1d")
+			TEST_REQUIRE(found->features.Has(Feature::HDR10));
 	}
 	for (const auto& row : table) {
 		const bool expected = std::ranges::find(enabled, std::string_view{row.name}) != enabled.end();

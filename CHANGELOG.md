@@ -20,6 +20,11 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
 ## [Unreleased]
+
+### Fixed
+
+- Declare SVT-AV1 encoder support for HDR10 signaling so HDR10 AV1 jobs can select `libsvtav1`.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-10
