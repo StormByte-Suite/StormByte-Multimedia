@@ -223,7 +223,7 @@ void PSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 	const FFrame* d = &dist;
 	FFrame scaled;
 	if (dist.Width() != lane.width || dist.Height() != lane.height) {
-		if (!dist.ScaleTo(scaled, lane.width, lane.height, FFrame::Resample::Bicubic, FFrame::Scaler::Sws) || !scaled) {
+		if (!dist.ScaleTo(ScalingContext(), scaled, lane.width, lane.height, FFrame::Resample::Bicubic, FFrame::Scaler::Sws) || !scaled) {
 			Log(Level::Warning, "ScaleTo failed, skip pair");
 			return;
 		}

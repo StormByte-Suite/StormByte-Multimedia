@@ -790,6 +790,64 @@ namespace StormByte {
 						Scaler scaler = Scaler::Zimg) const noexcept;
 
 					/**
+					 * @brief Reusable scaler graphs and workers with explicit owner lifetime.
+					 * @note Use on one processing thread at a time. Destruction joins workers
+					 * before returning; never store this owner in thread-local storage.
+					 */
+					class STORMBYTE_MULTIMEDIA_PUBLIC ScaleContext final {
+						public:
+							/**
+							 * @brief Creates an empty reusable scaler cache.
+							 */
+							ScaleContext();
+
+							/**
+							 * @brief Joins scaling workers and frees cached graphs.
+							 */
+							~ScaleContext() noexcept;
+
+							/**
+							 * @brief Copy construction is not allowed.
+							 * @param other Source context.
+							 */
+							ScaleContext(const ScaleContext& other) = delete;
+
+							/**
+							 * @brief Copy assignment is not allowed.
+							 * @param other Source context.
+							 * @return This context.
+							 */
+							ScaleContext& operator=(const ScaleContext& other) = delete;
+
+						private:
+							/**
+							 * @brief Grants frame scaling access to the cached backends.
+							 */
+							friend class AVFrame;
+
+							/**
+							 * @brief Provider-owned scaler implementation.
+							 */
+							class State;
+
+							State* m_state;	///< Provider-owned graphs and persistent scaling workers.
+					};
+
+					/**
+					 * @brief Scales using an explicitly owned reusable cache.
+					 * @param context Cache retained across calls by the processing owner.
+					 * @param dst Destination frame, with optional pixel format selected.
+					 * @param dst_w Destination width.
+					 * @param dst_h Destination height.
+					 * @param filter Resample kernel.
+					 * @param scaler Resampling backend.
+					 * @return false on allocation or scaling failure.
+					 */
+					bool ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, int dst_h,
+						Resample filter = Resample::Default,
+						Scaler scaler = Scaler::Zimg) const noexcept;
+
+					/**
 					 * @brief Adopts @p raw. Previous frame is freed.
 					 * @param raw libav frame, or nullptr.
 					 */

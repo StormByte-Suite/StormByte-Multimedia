@@ -103,7 +103,7 @@ void Format::Process(const Pipeline::Frame& frame) noexcept {
 
 	FFrame out;
 	out.Format(m_pixFmt);
-	if (!src.ScaleTo(out, src.Width(), src.Height(),
+	if (!src.ScaleTo(ScalingContext(), out, src.Width(), src.Height(),
 			FFrame::Resample::Default, scaler)) {
 		Fail("format: ScaleTo failed");
 		return;

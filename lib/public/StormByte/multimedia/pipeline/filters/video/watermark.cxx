@@ -418,7 +418,7 @@ bool Watermark::DecodeLogo() noexcept {
 
 	FFrame rgba;
 	rgba.Format(FFrame::FormatRgba());
-	if (!decoded.ScaleTo(rgba, decoded.Width(), decoded.Height(),
+	if (!decoded.ScaleTo(ScalingContext(), rgba, decoded.Width(), decoded.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 		DisableLogo("failed to convert logo to RGBA");
 		return false;
@@ -451,7 +451,7 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 	if (!m_luma) {
 		auto luma = StormByte::Safe::MakeUnique<FFrame>();
 		luma->Format(FFrame::FormatGray8());
-		if (!src.ScaleTo(*luma, src.Width(), src.Height(),
+			if (!src.ScaleTo(ScalingContext(), *luma, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 			Fail("failed to allocate luma probe");
 			return nullptr;
@@ -462,7 +462,7 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 		m_lumaH = src.Height();
 		m_lumaFmt = src.Format();
 	}
-	else if (!src.ScaleTo(*m_luma, src.Width(), src.Height(),
+	else if (!src.ScaleTo(ScalingContext(), *m_luma, src.Width(), src.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 		Fail("failed to convert frame to luma");
 		return nullptr;
@@ -641,7 +641,7 @@ void Watermark::Paint() noexcept {
 
 	FFrame out;
 	out.Format(FFrame::FormatRgba());
-	if (!src.ScaleTo(out, src.Width(), src.Height(),
+	if (!src.ScaleTo(ScalingContext(), out, src.Width(), src.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 		Fail("failed to convert frame to RGBA");
 		return;
@@ -659,7 +659,7 @@ void Watermark::Paint() noexcept {
 	if (src.Format() != FFrame::FormatRgba()) {
 		FFrame restored;
 		restored.Format(src.Format());
-		if (!out.ScaleTo(restored, src.Width(), src.Height(),
+		if (!out.ScaleTo(ScalingContext(), restored, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 			Fail("failed to convert frame back");
 			return;

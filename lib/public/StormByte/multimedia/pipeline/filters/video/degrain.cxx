@@ -287,7 +287,7 @@ void Degrain::PushFrame(const FFrame& source) noexcept {
 	slot.pic = std::make_unique<FFrame>();
 	slot.pic->Format(FFrame::FormatYUV420P());
 	if (source.Hardware() || source.Width() < 16 || source.Height() < 16
-		|| !source.ScaleTo(*slot.pic, source.Width(), source.Height(),
+		|| !source.ScaleTo(ScalingContext(), *slot.pic, source.Width(), source.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws) || !slot.pic->Data(0)) {
 		++m_rejected;
 		FlushRing();

@@ -190,6 +190,7 @@ class FFmpeg::PrivateState {
 		Surface surface;														///< Host adapter borrowing the owning filter
 		std::unique_ptr<StormByte::Multimedia::Backend::Pipeline::Pumper> pumper;	///< Worker driver allocated and destroyed in Multimedia
 		std::deque<Item::PointerType> queue;										///< Held input items awaiting delayed filter output
+		StormByte::Multimedia::FFmpeg::AVFrame::ScaleContext scaling;			///< Reusable scaler graphs and workers owned by this filter.
 };
 
 FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -375,6 +376,10 @@ const StormByte::Multimedia::FFmpeg::AVFrame& FFmpeg::AVFrame() const noexcept {
 	if (!frame || !frame->m_backend)
 		return empty;
 	return frame->m_backend->Handle();
+}
+
+StormByte::Multimedia::FFmpeg::AVFrame::ScaleContext& FFmpeg::ScalingContext() const noexcept {
+	return m_state->scaling;
 }
 
 const StormByte::Multimedia::FFmpeg::AVPacket& FFmpeg::AVPacket() const noexcept {

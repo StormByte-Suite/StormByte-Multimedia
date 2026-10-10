@@ -274,7 +274,7 @@ const FFrame* Crop::Luma(const FFrame& src) noexcept {
 	if (!m_luma) {
 		auto luma = StormByte::Safe::MakeUnique<FFrame>();
 		luma->Format(FFrame::FormatGray8());
-		if (!src.ScaleTo(*luma, src.Width(), src.Height(),
+			if (!src.ScaleTo(ScalingContext(), *luma, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 			Fail("crop: failed to allocate luma probe");
 			return nullptr;
@@ -283,7 +283,7 @@ const FFrame* Crop::Luma(const FFrame& src) noexcept {
 		m_lumaW = src.Width();
 		m_lumaH = src.Height();
 		m_lumaFmt = src.Format();
-	} else if (!src.ScaleTo(*m_luma, src.Width(), src.Height(),
+	} else if (!src.ScaleTo(ScalingContext(), *m_luma, src.Width(), src.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
 		Fail("crop: failed to convert frame to luma");
 		return nullptr;
