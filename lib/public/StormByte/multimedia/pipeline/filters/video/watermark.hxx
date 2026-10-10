@@ -245,6 +245,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Clean() noexcept override;
 
 			/**
+			 * @brief Logs overlay configuration before processing video frames.
+			 */
+			void Setup() noexcept override;
+
+			/**
 			 * @brief Detects anchor placement, then overlays the logo on video frames.
 			 * @param frame Video unit. Borrow
 			 *        @ref Filter::FFmpeg::AVFrame for the live picture.

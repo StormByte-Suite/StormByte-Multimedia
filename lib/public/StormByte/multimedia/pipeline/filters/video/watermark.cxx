@@ -343,6 +343,10 @@ void Watermark::Clean() noexcept {
 	DropScale();
 }
 
+void Watermark::Setup() noexcept {
+	Log(Level::Debug, std::format("opacity {}%, margin {}", m_opacity, m_margin));
+}
+
 void Watermark::DisableLogo(std::string_view why) noexcept {
 	Log(Level::Warning, std::format("disabled: {}", why));
 	m_opacity = 0;
