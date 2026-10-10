@@ -380,8 +380,21 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 	if (owner.Tune() && row && HasKey(row->style_key))
 		opts.emplace(row->style_key, std::string{*owner.Tune()});
 
+	const std::string_view implementationName = row ? std::string_view{row->name} : std::string_view{};
+	const bool explicitThreadCount = implementationName == "libx264" || implementationName == "libx265"
+		|| implementationName == "libopenh264" || implementationName == "libaom-av1"
+		|| implementationName == "libvpx" || implementationName == "libvpx-vp9";
+	if (explicitThreadCount && !fine.contains("threads")) {
+		unsigned workers = std::thread::hardware_concurrency();
+		if (workers < 1)
+			workers = 1;
+		if (implementationName == "libx265" && workers >= 16)
+			workers = 15;
+		opts.emplace("threads", std::to_string(workers));
+	}
+
 	const bool pack = row && HasKey(row->tune_key);
-	if (pack) {
+	if (implementationName == "libx265") {
 		if (!blob.contains("wpp") && !fine.contains("wpp"))
 			blob.emplace("wpp", "1");
 		if (!blob.contains("pools") && !blob.contains("numa-pools")
@@ -393,7 +406,7 @@ std::optional<Encoder::Opened> Encoder::OpenCodec(StormByte::Multimedia::Pipelin
 		}
 	}
 
-	if (row && std::string_view(row->name) == "libvpx-vp9") {
+	if (implementationName == "libaom-av1" || implementationName == "libvpx-vp9") {
 		if (!opts.contains("row-mt") && !fine.contains("row-mt"))
 			opts.emplace("row-mt", "1");
 	}
