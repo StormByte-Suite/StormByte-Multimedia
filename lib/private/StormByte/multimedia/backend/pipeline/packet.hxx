@@ -185,6 +185,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			void BindProperties(StormByte::Multimedia::Pipeline::Packet& packet) noexcept;
 
+			/**
+			 * @brief Copies original FFmpeg packet metadata without replacing the facade payload.
+			 * @param packet Public unit that owns the original packet holder.
+			 * @param destination FFmpeg packet receiving properties and side data.
+			 * @return True when copied or no original holder exists, false on allocation failure.
+			 */
+			static bool CopyProperties(const StormByte::Multimedia::Pipeline::Packet& packet,
+				::AVPacket* destination) noexcept;
+
 		private:
 			StormByte::Multimedia::FFmpeg::AVPacket m_handle;	///< FFmpeg packet
 			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> m_params;	///< Producer codecpar.

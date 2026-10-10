@@ -37,6 +37,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
+#include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
@@ -116,6 +117,11 @@ namespace {
 				av_packet_free(&raw);
 				return nullptr;
 			}
+		}
+
+		if (!StormByte::Multimedia::Backend::Pipeline::Packet::CopyProperties(packet, raw)) {
+			av_packet_free(&raw);
+			return nullptr;
 		}
 
 		if (packet.KeyFrame())

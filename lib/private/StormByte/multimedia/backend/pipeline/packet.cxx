@@ -41,6 +41,10 @@
 
 #include <utility>
 
+extern "C" {
+	#include <libavcodec/packet.h>
+}
+
 using namespace StormByte::Multimedia::Backend::Pipeline;
 
 Packet::Packet(const Packet& other) noexcept
@@ -60,4 +64,11 @@ void Packet::Parameters(StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg:
 
 void Packet::BindProperties(StormByte::Multimedia::Pipeline::Packet& packet) noexcept {
 	(void)packet;
+}
+
+bool Packet::CopyProperties(const StormByte::Multimedia::Pipeline::Packet& packet,
+	::AVPacket* destination) noexcept {
+	if (!packet.m_backend || !packet.m_backend->m_handle)
+		return true;
+	return av_packet_copy_props(destination, packet.m_backend->m_handle.Get()) >= 0;
 }
