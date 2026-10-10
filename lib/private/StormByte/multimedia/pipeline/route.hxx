@@ -135,10 +135,16 @@ namespace StormByte::Multimedia::Pipeline {
 			Route(Route&& other) noexcept = delete;
 
 			/**
-			 * @brief Destructor. Halts owned filters and look Decoders
-			 *        while those objects are still complete.
+			 * @brief Requests endpoint cancellation, then halts owned filters and looks.
+			 * All objects remain complete while their workers are joined.
 			 */
 			~Route() noexcept;
+
+			/**
+			 * @brief Requests cancellation of endpoints, filters and looks without joining.
+			 * @note All graph routes must be stopped before any route is destroyed.
+			 */
+			void Stop() noexcept;
 
 			/**
 			 * @brief Copy assignment.

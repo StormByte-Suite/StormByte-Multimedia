@@ -210,7 +210,7 @@ StormByte::Safe::Shared<const StageTelemetry> Step::Telemetry() const noexcept {
 }
 
 void Step::CloseHoppers() noexcept {
-	m_state->pipe.Close();
+	m_state->pipe.Abort();
 }
 
 void Step::Fail(StormByte::Safe::String reason) noexcept {

@@ -317,6 +317,8 @@ The default VMAF thread count uses all cores. Memory depends on resolution, thre
 
 Write a new filter the same way `Scale` and `Watermark` are written. Do not add public friends so a coordinator can peek.
 
+Destroying a filter graph requests cancellation of its connected endpoints, filters and look decoders before joining workers. Explicit stage stop or failure aborts shared hoppers to wake blocked producers; normal producer EOF still drains queued media and respects the remaining writers.
+
 ## Logging
 
 First argument of every `Step` and filter leaf: `StormByte::Safe::Shared<StormByte::Logger::Log>`. Prefer `ThreadedLog` if more than one thread will write.

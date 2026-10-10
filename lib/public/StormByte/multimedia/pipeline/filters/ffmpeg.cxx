@@ -647,7 +647,7 @@ const StormByte::Multimedia::Backend::Pipeline::Pipe& FFmpeg::pipe() const noexc
 }
 
 void FFmpeg::CloseHoppers() noexcept {
-	m_state->pipe.Close();
+	m_state->pipe.Abort();
 }
 
 void FFmpeg::RecordWork(std::int64_t microseconds) noexcept {
