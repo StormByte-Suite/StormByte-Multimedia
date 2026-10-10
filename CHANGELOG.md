@@ -20,6 +20,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
 ## [Unreleased]
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-10
 
@@ -87,5 +88,4 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - VP9 and HEVC remux analytics require VMAF mean and minimum exactly 100 and all 48 fixture frames. Dedicated cases preserve automatic 7.1-to-5.1 AC-3/E-AC3 conversion and reject implicit 5.1-to-MP3 conversion.
 - Tests use Multimedia APIs and `File` in process, without invoking external FFmpeg programs. Generated outputs are checked for codec/container identity, stream properties and duration; watermark appearance remains a manual check. Synthetic fixtures and redistributed font notices are documented separately. Optional codec cases skip only unavailable implementations or missing registry write support, not actual encoding failures; FDK-AAC is required in bundled nonfree builds.
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 [1.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.0
