@@ -485,7 +485,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				continue;
 			if (!owner.RemuxCodec(track.inIndex,
 					reinterpret_cast<void*&>(track.params),
-					&track.srcTb))
+					&track.srcTb, &track.srcAverageFrameRate))
 				return true;
 		}
 
@@ -532,6 +532,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 				if (track.srcTb.num > 0 && track.srcTb.den > 0)
 					stream->time_base = ::AVRational{track.srcTb.num, track.srcTb.den};
+				if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO
+					&& track.srcAverageFrameRate.num > 0 && track.srcAverageFrameRate.den > 0)
+					stream->avg_frame_rate = ::AVRational{
+						track.srcAverageFrameRate.num, track.srcAverageFrameRate.den};
 			}
 
 			if (stream->codecpar) {

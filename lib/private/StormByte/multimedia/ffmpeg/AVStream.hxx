@@ -169,6 +169,12 @@ namespace StormByte::Multimedia::FFmpeg {
 			AVRational FrameRateRational() const noexcept;
 
 			/**
+			 * @brief Average frame rate declared or estimated for the stream.
+			 * @return `avg_frame_rate`, or `{0, 1}` if unavailable.
+			 */
+			AVRational AverageFrameRateRational() const noexcept;
+
+			/**
 			 * @brief Pixel aspect ratio (`codecpar`, else stream `sample_aspect_ratio`).
 			 * @return `{num, den}` with den > 0. `{0, 1}` if unknown.
 			 */

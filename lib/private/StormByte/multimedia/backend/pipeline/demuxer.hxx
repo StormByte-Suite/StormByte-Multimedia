@@ -135,13 +135,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				StormByte::Multimedia::Pipeline::Decoder& decoder) noexcept;
 
 			/**
-			 * @brief Clones codecpar and time base of origin stream @p index.
+			 * @brief Clones codec parameters and timing metadata of origin stream @p index.
 			 * @param index Source stream index.
 			 * @param params Owned AVCodecParameters on success.
 			 * @param timeBase Source time base.
+			 * @param averageFrameRate Source average frame rate, or `{0, 1}` if unknown.
 			 * @return false if closed or @p index is missing.
 			 */
-			bool CloneStream(int index, ::AVCodecParameters*& params, AVRational& timeBase) noexcept;
+			bool CloneStream(int index, ::AVCodecParameters*& params, AVRational& timeBase,
+				AVRational& averageFrameRate) noexcept;
 
 			/**
 			 * @brief Closes the format context.

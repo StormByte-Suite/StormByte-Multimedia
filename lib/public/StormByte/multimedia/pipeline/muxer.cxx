@@ -292,15 +292,16 @@ bool Muxer::BindEncoderStream(Encoder& encoder, void* avStream) noexcept {
 	return encoder.MuxBindStream(avStream);
 }
 
-bool Muxer::RemuxCodec(int inIndex, void*& params, void* timeBase) noexcept {
+bool Muxer::RemuxCodec(int inIndex, void*& params, void* timeBase, void* averageFrameRate) noexcept {
 	params = nullptr;
-	if (!timeBase || !m_origin || m_origin->Failed() || !m_origin->m_backend
+	if (!timeBase || !averageFrameRate || !m_origin || m_origin->Failed() || !m_origin->m_backend
 		|| (!m_origin->Ready() && !m_origin->Eof()))
 		return false;
 	return m_origin->m_backend->CloneStream(
 		inIndex,
 		*reinterpret_cast<::AVCodecParameters**>(&params),
-		*static_cast<StormByte::Multimedia::FFmpeg::AVRational*>(timeBase));
+		*static_cast<StormByte::Multimedia::FFmpeg::AVRational*>(timeBase),
+		*static_cast<StormByte::Multimedia::FFmpeg::AVRational*>(averageFrameRate));
 }
 
 void Muxer::ClockMuxDone() noexcept {

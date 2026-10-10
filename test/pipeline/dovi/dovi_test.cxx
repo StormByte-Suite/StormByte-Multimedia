@@ -523,6 +523,8 @@ namespace {
 		}
 		TEST_PHASE("checking encoder output audit");
 		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, encoded_frames->destination, fixture, comparison) == 0);
+		const auto verification = OutputPath("pipeline/dovi/" + std::string{fixture.name}
+			+ "-" + std::string{operation} + "-verified.mkv");
 		TEST_PHASE("opening encoded output for stream inspection");
 		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{FixturePath(fixture.path).string()});
@@ -552,8 +554,6 @@ namespace {
 		auto reopened_frames = StormByte::Safe::MakeShared<EncodedAudit>();
 		{
 			auto logger = MakeLogger();
-			const auto verification = OutputPath("pipeline/dovi/" + std::string{fixture.name}
-				+ "-" + std::string{operation} + "-verified.mkv");
 			TEST_PHASE("creating verification remux from encoded output");
 					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(output), TestLocation(verification), logger, 2000000000LL};
@@ -564,6 +564,18 @@ namespace {
 			TEST_PHASE("starting transcoder run");
 			job.Run();
 			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		TEST_PHASE("checking remuxed average frame rate");
+		auto verified = File::Open(StormByte::Safe::String{verification.string()});
+		TEST_REQUIRE(verified && verified.value().Streams().size() == 1);
+		const auto verifiedVideo = verified.value().Streams()[0].Video();
+		TEST_REQUIRE(verifiedVideo && original);
+		const auto sourceFrameRate = original->FrameRate();
+		const auto verifiedFrameRate = verifiedVideo->FrameRate();
+		if (sourceFrameRate) {
+			TEST_REQUIRE(verifiedFrameRate);
+			TEST_REQUIRE(sourceFrameRate->num * verifiedFrameRate->den
+				== verifiedFrameRate->num * sourceFrameRate->den);
 		}
 		TEST_PHASE("checking reopened encoded frames");
 		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, reopened_frames->source, fixture, comparison) == 0);

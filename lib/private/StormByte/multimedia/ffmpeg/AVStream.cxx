@@ -111,6 +111,12 @@ FFmpeg::AVRational FFmpeg::AVStream::FrameRateRational() const noexcept {
 	return FFmpeg::AVRational{0, 1};
 }
 
+FFmpeg::AVRational FFmpeg::AVStream::AverageFrameRateRational() const noexcept {
+	if (!m_stream || m_stream->avg_frame_rate.num <= 0 || m_stream->avg_frame_rate.den <= 0)
+		return FFmpeg::AVRational{0, 1};
+	return FFmpeg::FromRaw(m_stream->avg_frame_rate);
+}
+
 FFmpeg::AVRational FFmpeg::AVStream::SampleAspectRatio() const noexcept {
 	if (!m_stream)
 		return FFmpeg::AVRational{0, 1};

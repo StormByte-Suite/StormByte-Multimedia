@@ -384,9 +384,11 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 }
 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::CloneStream(
-	int index, ::AVCodecParameters*& params, FFmpeg::AVRational& timeBase) noexcept {
+	int index, ::AVCodecParameters*& params, FFmpeg::AVRational& timeBase,
+	FFmpeg::AVRational& averageFrameRate) noexcept {
 	params = nullptr;
 	timeBase = FFmpeg::AVRational{0, 1};
+	averageFrameRate = FFmpeg::AVRational{0, 1};
 	if (!m_ctx || !m_ctx->format)
 		return false;
 	const auto streams = m_ctx->format->Streams();
@@ -405,6 +407,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::CloneStream(
 		}
 
 		timeBase = stream.TimeBase();
+		averageFrameRate = stream.AverageFrameRateRational();
 		return true;
 	}
 

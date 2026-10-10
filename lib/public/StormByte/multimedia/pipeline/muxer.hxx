@@ -446,13 +446,15 @@ namespace StormByte {
 					bool BindEncoderStream(Encoder& encoder, void* avStream) noexcept;
 
 					/**
-					 * @brief Clones remux codecpar from the bound demuxer.
+					 * @brief Clones remux codec parameters and timing from the bound demuxer.
 					 * @param inIndex Origin stream index.
 					 * @param params Owned AVCodecParameters* on success.
 					 * @param timeBase AVRational*.
+					 * @param averageFrameRate AVRational* for source `avg_frame_rate`.
 					 * @return false if the origin is not ready.
 					 */
-					bool RemuxCodec(int inIndex, void*& params, void* timeBase) noexcept;
+					bool RemuxCodec(int inIndex, void*& params, void* timeBase,
+						void* averageFrameRate) noexcept;
 
 					/**
 					 * @brief Video / Audio / Subtitle entries in the bound Plan.

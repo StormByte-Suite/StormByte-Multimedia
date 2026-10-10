@@ -85,6 +85,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			int inIndex = -1;										///< Source stream index if remux
 			::AVCodecParameters* params = nullptr;							///< Cloned remux codecpar
 			AVRational srcTb{0, 1};										///< Source time base if remux
+			AVRational srcAverageFrameRate{0, 1};						///< Source average video frame rate
 			int avIndex = -1;										///< Index in AVFormatContext
 			AVRational timeBase{0, 1};									///< Mux time base
 			std::int64_t lastDts = StormByte::Multimedia::FFmpeg::NoPts;	///< Last written DTS
