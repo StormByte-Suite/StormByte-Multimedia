@@ -122,10 +122,10 @@ int WaitForTranscoderFailure(StormByte::Multimedia::Pipeline::Transcoder& job,
 	std::string_view expectedMessage = {});
 
 /**
- * @brief Creates the logger used with the tests' scoped output suppression.
- * @return Shared threaded logger writing debug messages to standard output.
+ * @brief Creates the logger used by pipeline tests.
+ * @return Shared threaded logger writing LowLevel messages to standard output.
  */
-StormByte::Safe::Shared<StormByte::Logger::Log> MakeSilentLogger();
+StormByte::Safe::Shared<StormByte::Logger::Log> MakeLogger();
 
 /**
  * @brief Waits for the final manual pipeline stage to stop successfully.

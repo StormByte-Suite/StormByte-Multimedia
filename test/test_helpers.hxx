@@ -55,7 +55,6 @@
 #include <filesystem>
 #include <iostream>
 #include <span>
-#include <streambuf>
 #include <string_view>
 
 /** @brief CTest return code for an unavailable optional encoder case. */
@@ -68,42 +67,6 @@ using TestFunction = int (*)();
 struct TestEntry {
 	std::string_view name; ///< Stable test-function identifier passed by CTest.
 	TestFunction function; ///< Function body for the test case.
-};
-
-/** @brief Output buffer that reports every write as consumed without storing bytes. */
-class DiscardStreamBuffer final: public std::streambuf {
-	public:
-		/** @brief Accept one character without forwarding it. */
-		int_type overflow(int_type character) override {
-			return traits_type::not_eof(character);
-		}
-
-		/** @brief Accept a character range without forwarding it. */
-		std::streamsize xsputn(const char*, std::streamsize count) override {
-			return count;
-		}
-};
-
-/** @brief Temporarily diverts std::cout to a discard buffer and restores it on scope exit. */
-class QuietCout final {
-	public:
-		/** @brief Installs the discard buffer and remembers the original stream buffer. */
-		QuietCout() noexcept: m_original(std::cout.rdbuf(&m_discard)) {}
-
-		/** @brief Restores the stream buffer saved at construction. */
-		~QuietCout() noexcept {
-			std::cout.rdbuf(m_original);
-		}
-
-		/** @brief Copying would make stream-buffer restoration ambiguous. */
-		QuietCout(const QuietCout&) = delete;
-
-		/** @brief Copy assignment is disabled. */
-		QuietCout& operator=(const QuietCout&) = delete;
-
-	private:
-		DiscardStreamBuffer m_discard; ///< Sink installed while the guard is alive.
-		std::streambuf* m_original; ///< Stream buffer restored at destruction.
 };
 
 /** @brief Logs lifecycle around one function so a timeout identifies the active case. */

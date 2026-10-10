@@ -87,8 +87,7 @@ int test_transcoder_ocr_japanese_pgs_to_subrip() {
 		return TEST_SKIP;
 
 	const auto output = OutputPath("pipeline/ocr-japanese.mkv");
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath("video/anime_like.mkv"), output, logger, 2000000000LL};
 	job.Subtitle(4).Codec(subrip.value().get()).Language(StormByte::Safe::String{"jpn"});
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);

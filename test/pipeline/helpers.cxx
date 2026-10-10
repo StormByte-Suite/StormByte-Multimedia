@@ -133,9 +133,9 @@ using namespace std::string_view_literals;
 		return 0;
 	}
 
-	StormByte::Safe::Shared<StormByte::Logger::Log> MakeSilentLogger() {
+	StormByte::Safe::Shared<StormByte::Logger::Log> MakeLogger() {
 		return StormByte::Safe::MakeShared<StormByte::Logger::ThreadedLog>(
-			std::cout, StormByte::Logger::Level::Debug, "[%L]");
+			std::cout, StormByte::Logger::Level::LowLevel, "[%L]");
 	}
 
 	int WaitForManualPipeline(Step& last) {

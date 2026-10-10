@@ -105,8 +105,7 @@ namespace {
 
 int test_transcoder_remux_preserves_pgs_and_attachments() {
 	const auto output = OutputPath("pipeline/transcoder-remux.mkv");
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath("video/anime_like.mkv"), output, logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Audio(1).Remux();
@@ -122,8 +121,7 @@ int test_transcoder_remux_preserves_pgs_and_attachments() {
 
 int test_transcoder_remux_omits_unselected_attachments() {
 	const auto output = OutputPath("pipeline/transcoder-remux-no-attachments.mkv");
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath("video/anime_like.mkv"), output, logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Audio(1).Remux();

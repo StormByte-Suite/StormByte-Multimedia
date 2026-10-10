@@ -92,8 +92,7 @@ namespace {
 		TEST_REQUIRE(codec);
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
-		QuietCout quietCout;
-		auto logger = MakeSilentLogger();
+		auto logger = MakeLogger();
 		Transcoder job{input, output, logger, 2000000000LL};
 		auto track = job.Video(0);
 		track.Codec(codec.value().get())

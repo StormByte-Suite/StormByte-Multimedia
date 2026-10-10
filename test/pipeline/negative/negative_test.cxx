@@ -72,8 +72,7 @@ namespace {
 template<typename Configure>
 static int CheckRejectedJob(std::string_view source, const std::filesystem::path& destination,
 	std::string_view expectedMessage, Configure configure, bool rejectDuringConfigure = false) {
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath(source), destination, logger, 2000000000LL};
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	configure(job);
@@ -113,8 +112,7 @@ static int CheckManualRejectsInvalidSource(std::string_view source, std::string_
 }
 
 static int CheckTranscoderRejectsInvalidSource(std::string_view source, std::string_view destination) {
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath(source), OutputPath(destination), logger, 2000000000LL};
 	TEST_REQUIRE(job.Failed());
 	const auto originalError = job.Error();

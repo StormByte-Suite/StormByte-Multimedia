@@ -232,7 +232,8 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 		StormByte::Safe::Binary blob;
 		blob.assign(
 			reinterpret_cast<const std::byte*>(data),
-			reinterpret_cast<const std::byte*>(data) + size);
+			reinterpret_cast<const std::byte*>(data) + size
+		);
 		switch (type) {
 			case AV_PKT_DATA_DYNAMIC_HDR10_PLUS:
 				attachments.emplace_back(SideDataKind::HdrPlus,

@@ -74,8 +74,7 @@ namespace {
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
 		{
-			QuietCout quietCout;
-			auto logger = MakeSilentLogger();
+			auto logger = MakeLogger();
 			Transcoder job{FixturePath("video/bluray_like_hdr10.mp4"), output, logger, 2000000000LL};
 			auto track = job.Video(0);
 			track.Codec(codec.value().get())

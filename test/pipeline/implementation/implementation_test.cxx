@@ -77,8 +77,7 @@ static int CheckTranscoderDecoderPin(std::string_view pin, std::string_view dest
 	auto codec = Registry::Instance().FindCodec("AC-3");
 	TEST_REQUIRE(codec && codec.value().get().HasAccess(Access{Operation::Write}));
 	const auto output = OutputPath(destination);
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath("audio/noise_stereo.wav"), output, logger, 2000000000LL};
 	job.Audio(0).Codec(codec.value().get())
 		.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{pin})

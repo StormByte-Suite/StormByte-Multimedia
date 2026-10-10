@@ -4,6 +4,8 @@ target_link_libraries(MultimediaPipelineMuxPolicyTests PRIVATE multimedia_pipeli
 foreach(test_name IN ITEMS
 	test_generic_muxer_writes_flac
 	test_generic_muxer_writes_flac_in_oga
+	test_generic_muxer_writes_vorbis_in_ogg
+	test_generic_muxer_writes_vorbis_in_ogv
 	test_generic_muxer_writes_alac_in_caf
 	test_generic_muxer_writes_eac3
 	test_generic_flac_rejects_aac_remux

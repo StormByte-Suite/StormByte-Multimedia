@@ -162,8 +162,7 @@ int test_subtitle_first_cue_after_one_hour() {
 		return TEST_SKIP;
 	const auto output = OutputPath("pipeline/subtitle-header/late-first-cue.mkv");
 	{
-		QuietCout quietCout;
-		auto logger = MakeSilentLogger();
+		auto logger = MakeLogger();
 		Transcoder job{FixturePath("subtitles/late_first_cue.srt"), output, logger, 3602000000000LL};
 		job.Subtitle(0).Codec(codec.value().get());
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);

@@ -80,8 +80,7 @@ namespace {
 		std::string_view source = "video/bluray_like_hdr10.mp4") {
 		const auto output = OutputPath(destination);
 		{
-			QuietCout quietCout;
-			auto logger = MakeSilentLogger();
+			auto logger = MakeLogger();
 			Transcoder job{FixturePath(source), output, logger, 2000000000LL};
 			for (const auto& item : expected) {
 				auto track = item.Kind == StormByte::Multimedia::Type::Video ? job.Video(item.Input)
@@ -154,8 +153,7 @@ namespace {
 			found = found || (mime && TestView(mime.value()) == expectedMime);
 		}
 		TEST_REQUIRE(found);
-		QuietCout quietCout;
-		auto logger = MakeSilentLogger();
+		auto logger = MakeLogger();
 		Transcoder job{FixturePath(source), OutputPath(destination), logger, 2000000000LL};
 		job.Video(0).Remux();
 		job.Attachments(pattern);
@@ -172,8 +170,7 @@ namespace {
 		const auto original = source.value().Attachments()[0];
 		const auto output = OutputPath(destination);
 		{
-			QuietCout quietCout;
-			auto logger = MakeSilentLogger();
+			auto logger = MakeLogger();
 			Transcoder job{sourcePath, output, logger, 2000000000LL};
 			if (audioOnly)
 				job.Audio(2).Remux();

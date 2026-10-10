@@ -64,8 +64,7 @@ using namespace std::string_view_literals;
 namespace {
 static int CheckVmafRemux(std::string_view source, std::string_view destination) {
 	const auto output = OutputPath(destination);
-	QuietCout quietCout;
-	auto logger = MakeSilentLogger();
+	auto logger = MakeLogger();
 	Transcoder job{FixturePath(source), output, logger, 2000000000LL};
 	job.Video(0).Remux();
 	job.Filter<StormByte::Multimedia::Pipeline::Filter::Video::VMAF>(

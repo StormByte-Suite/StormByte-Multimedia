@@ -481,8 +481,7 @@ namespace {
 		auto after = StormByte::Safe::MakeShared<FrameAudit>();
 		auto encoded_frames = StormByte::Safe::MakeShared<EncodedAudit>();
 		{
-			QuietCout quiet_cout;
-			auto logger = MakeSilentLogger();
+			auto logger = MakeLogger();
 			Transcoder job{FixturePath(fixture.path), output, logger, 2000000000LL};
 			auto track = job.Video(0);
 			if (transform == Transform::Remux)
@@ -539,8 +538,7 @@ namespace {
 		TEST_REQUIRE(duration && duration.value().Nanoseconds().count() > 0);
 		auto reopened_frames = StormByte::Safe::MakeShared<EncodedAudit>();
 		{
-			QuietCout quiet_cout;
-			auto logger = MakeSilentLogger();
+			auto logger = MakeLogger();
 			const auto verification = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 				+ "-" + std::string{operation} + "-verified.mkv");
 			Transcoder job{output, verification, logger, 2000000000LL};
@@ -563,8 +561,7 @@ namespace {
 			return TEST_SKIP;
 		const auto output = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 			+ "-unsupported-" + std::string{implementation} + ".mkv");
-		QuietCout quiet_cout;
-		auto logger = MakeSilentLogger();
+		auto logger = MakeLogger();
 		Transcoder job{FixturePath(fixture.path), output, logger, 2000000000LL};
 		job.Video(0).Codec(codec.value().get())
 			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{implementation});
