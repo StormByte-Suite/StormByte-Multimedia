@@ -1,0 +1,23 @@
+diff --git a/src/threadqueue.c b/src/threadqueue.c
+index 29065101..64141e25 100644
+--- a/src/threadqueue.c
++++ b/src/threadqueue.c
+@@ -406,14 +406,16 @@ threadqueue_queue_t * kvz_threadqueue_init(int thread_count)
+       goto failed;
+     }
+   }
+-#else
+-  pthread_attr_t attr;
+ #endif
+ 
+   // Lock the queue before creating threads, to ensure they all have correct information.
+   PTHREAD_LOCK(&threadqueue->lock);
+   for (int i = 0; i < thread_count; i++) {
++#ifdef _MSC_VER
++    if (pthread_create(&threadqueue->threads[i], NULL, threadqueue_worker, threadqueue) != 0) {
++#else
+     if (pthread_create(&threadqueue->threads[i], &attr, threadqueue_worker, threadqueue) != 0) {
++#endif
+         fprintf(stderr, "pthread_create failed!\n");
+         goto failed;
+     }

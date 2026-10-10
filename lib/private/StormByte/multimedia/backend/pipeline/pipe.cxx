@@ -154,6 +154,26 @@ void Pipe::Close(void* owner, void (*trace)(void*, std::string_view) noexcept) n
 	log("complete");
 }
 
+void Pipe::Abort() noexcept {
+	ItemSink closed;
+	closed.Eof();
+	for (const int key : m_in.Keys())
+		m_in.To(key) >> closed;
+	for (const int key : m_out.Keys())
+		m_out.To(key) >> closed;
+	{
+		StormByte::Safe::UniqueLock lock(m_forkMutex);
+		for (auto& fork : m_forks) {
+			for (const int key : fork.second->Keys())
+				fork.second->To(key) >> closed;
+		}
+	}
+	Close();
+	while (m_in.Pop())
+		;
+	Wake();
+}
+
 Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
 	dest.Listen();
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();

@@ -92,6 +92,7 @@ Route::Route(int track,
 	m_destination(std::move(destination)) {}
 
 Route::~Route() noexcept {
+	Stop();
 	for (auto& filter : m_filters) {
 		if (filter)
 			filter->Halt();
@@ -100,6 +101,21 @@ Route::~Route() noexcept {
 	for (auto& look : m_looks) {
 		if (look)
 			look->Halt();
+	}
+}
+
+void Route::Stop() noexcept {
+	if (m_origin)
+		m_origin->Stop();
+	if (m_destination)
+		m_destination->Stop();
+	for (auto& filter : m_filters) {
+		if (filter)
+			filter->Stop();
+	}
+	for (auto& look : m_looks) {
+		if (look)
+			look->Stop();
 	}
 }
 

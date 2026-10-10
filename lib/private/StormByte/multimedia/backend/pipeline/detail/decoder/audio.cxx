@@ -125,8 +125,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		const auto n = packet->Payload().Available();
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
-			if (!packet->Payload().Extract(n, bytes) || bytes.size() != n) {
-				owner.Fail("failed to extract packet payload");
+			if (!packet->Payload().Peek(n, bytes) || bytes.size() != n) {
+				owner.Fail("failed to read packet payload");
 				return false;
 			}
 

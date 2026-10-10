@@ -229,6 +229,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				void (*trace)(void*, std::string_view) noexcept = nullptr) noexcept;
 
 			/**
+			 * @brief Aborts connected hoppers and wakes capacity-blocked producers.
+			 * @note Unlike normal EOF, cancellation closes shared hoppers regardless
+			 * of remaining writers. Pending input is discarded.
+			 */
+			void Abort() noexcept;
+
+			/**
 			 * @brief Fork each write: clone onto @p dest In, original to Out.
 			 * @param track Hopper key.
 			 * @param dest Analytics (or look) consumer.
