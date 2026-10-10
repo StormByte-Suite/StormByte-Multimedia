@@ -62,6 +62,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <string_view>
 #include <StormByte/safe/deque.hxx>
 #include <StormByte/safe/unordered_set.hxx>
 
@@ -218,11 +219,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 			/**
 			 * @brief Eof on In, Out and every CloneTo hopper.
+			 * @param owner Optional borrowed diagnostic context.
+			 * @param trace Optional synchronous callback for EOF phase diagnostics.
 			 *
 			 * CloseOutput uses this so analytics looks see Eof
 			 * when the producer finishes (not only on Halt).
 			 */
-			void Close() noexcept;
+			void Close(void* owner = nullptr,
+				void (*trace)(void*, std::string_view) noexcept = nullptr) noexcept;
 
 			/**
 			 * @brief Fork each write: clone onto @p dest In, original to Out.

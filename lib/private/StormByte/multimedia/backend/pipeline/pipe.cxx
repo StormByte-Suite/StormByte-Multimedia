@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
 #include <cstdint>
+#include <format>
 #include <limits>
 #include <optional>
 #include <utility>
@@ -128,13 +129,29 @@ void Pipe::Wait(void* owner, bool (*ready)(void*) noexcept,
 	completed(owner, std::chrono::steady_clock::now() - started);
 }
 
-void Pipe::Close() noexcept {
+void Pipe::Close(void* owner, void (*trace)(void*, std::string_view) noexcept) noexcept {
+	auto log = [this, owner, trace](std::string_view phase) {
+		if (trace)
+			trace(owner, std::format("pipe EOF {} pipe={}", phase, static_cast<const void*>(this)));
+	};
+	log("input begin");
 	m_in.Eof();
+	log("input end; output begin");
 	m_out.Eof();
+	log("output end; fork lock begin");
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
+	log("fork lock acquired");
 	m_closed = true;
-	for (auto& fork : m_forks)
+	for (auto& fork : m_forks) {
+		if (trace)
+			trace(owner, std::format("pipe EOF fork begin pipe={} track={} sink={}",
+				static_cast<const void*>(this), fork.first, static_cast<const void*>(fork.second.get())));
 		fork.second->Eof();
+		if (trace)
+			trace(owner, std::format("pipe EOF fork end pipe={} track={} sink={}",
+				static_cast<const void*>(this), fork.first, static_cast<const void*>(fork.second.get())));
+	}
+	log("complete");
 }
 
 Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {

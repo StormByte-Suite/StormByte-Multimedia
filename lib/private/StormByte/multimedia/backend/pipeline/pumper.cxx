@@ -53,6 +53,7 @@
 #include <StormByte/safe/memory_order.hxx>
 
 #include <chrono>
+#include <format>
 #include <utility>
 
 using namespace StormByte::Multimedia::Backend::Pipeline;
@@ -108,7 +109,11 @@ void Pumper::Launch() noexcept {
 		telemetry.SetState(State::Ready);
 		m_host.BecameReady();
 		Pump();
+		m_host.Log(Level::LowLevel, std::format("worker pump returned; close output begin host={}",
+			static_cast<const void*>(&m_host)));
 		m_host.CloseOutput();
+		m_host.Log(Level::LowLevel, std::format("worker close output end host={}",
+			static_cast<const void*>(&m_host)));
 		expected = static_cast<int>(State::Stopping);
 		if (!m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),
 				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire)) {
@@ -210,9 +215,17 @@ void Pumper::PumpPop() noexcept {
 
 			if (!Stopping()) {
 				const auto started = std::chrono::steady_clock::now();
+				m_host.Log(Level::LowLevel, std::format("worker EOF process begin host={}",
+					static_cast<const void*>(&m_host)));
 				m_worker->Process({});
+				m_host.Log(Level::LowLevel, std::format("worker EOF process end; record work begin host={}",
+					static_cast<const void*>(&m_host)));
 				m_host.RecordWork(Elapsed(started));
+				m_host.Log(Level::LowLevel, std::format("worker EOF record work end; dump work begin host={}",
+					static_cast<const void*>(&m_host)));
 				m_host.DumpWork();
+				m_host.Log(Level::LowLevel, std::format("worker EOF dump work end host={}",
+					static_cast<const void*>(&m_host)));
 			}
 
 			break;

@@ -138,7 +138,9 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		}
 
 		void CloseOutput() noexcept override {
-			m_step.pipe().Close();
+			m_step.pipe().Close(&m_step, [](void* owner, std::string_view message) noexcept {
+				static_cast<Step*>(owner)->Log(Level::LowLevel, message);
+			});
 		}
 
 		void BecameReady() noexcept override {

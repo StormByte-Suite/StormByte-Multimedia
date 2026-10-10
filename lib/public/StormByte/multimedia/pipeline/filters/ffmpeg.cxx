@@ -154,7 +154,9 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 		}
 
 		void CloseOutput() noexcept override {
-			m_owner.pipe().Close();
+			m_owner.pipe().Close(&m_owner, [](void* owner, std::string_view message) noexcept {
+				static_cast<FFmpeg*>(owner)->Log(Level::LowLevel, message);
+			});
 		}
 
 		void BecameReady() noexcept override {
