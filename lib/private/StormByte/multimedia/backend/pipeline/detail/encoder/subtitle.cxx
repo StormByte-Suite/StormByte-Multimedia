@@ -175,7 +175,7 @@ namespace {
 	}
 
 	bool WantsAssRect(std::string_view impl) noexcept {
-		return impl == "ass" || impl == "ssa";
+		return impl == "ass" || impl == "ssa" || impl == "ttml";
 	}
 
 	bool PlainTextDest(std::string_view impl) noexcept {

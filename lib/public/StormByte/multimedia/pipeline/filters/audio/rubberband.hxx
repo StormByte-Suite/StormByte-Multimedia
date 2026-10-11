@@ -161,6 +161,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 */
 			void Process(const Pipeline::Frame& frame) noexcept override;
 
+			/**
+			 * @brief Drains samples still held by the stretcher.
+			 */
+			void Eof() noexcept override;
+
 		private:
 			/**
 			 * @brief Builds the avfilter chain.

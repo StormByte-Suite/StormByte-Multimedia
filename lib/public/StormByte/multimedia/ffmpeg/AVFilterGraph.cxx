@@ -55,6 +55,7 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <string>
 #include <utility>
 
 extern "C" {
@@ -171,13 +172,14 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 			avfilter_graph_free(&raw);
 			return AVFilterGraph(nullptr);
 		}
-		char layout[128];
-		const std::uint64_t mask = src.ChannelLayout().Mask();
-		if (mask != 0)
-			std::snprintf(layout, sizeof(layout), "0x%llx",
-				static_cast<unsigned long long>(mask));
-		else
-			std::snprintf(layout, sizeof(layout), "%d", src.Channels());
+		char layout[128] = {};
+		std::string described{static_cast<std::string_view>(src.ChannelLayout().Describe())};
+		if (described.empty())
+			described = static_cast<std::string_view>(
+				FFmpeg::AVChannelLayout::Default(src.Channels()).Describe());
+		if (described.empty())
+			described = std::to_string(src.Channels());
+		std::snprintf(layout, sizeof(layout), "%s", described.c_str());
 		std::snprintf(args, sizeof(args),
 			"time_base=1/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
 			src.SampleRate(), src.SampleRate(), fmt, layout);

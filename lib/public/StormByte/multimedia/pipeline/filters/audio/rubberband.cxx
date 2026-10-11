@@ -115,7 +115,7 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 		Fail("rubberband: AVFilterGraph::Filter failed");
 		return;
 	}
-	if (!out) {
+	if (out.NbSamples() <= 0 || out.SampleRate() <= 0) {
 		Log(Level::LowLevel, std::format(
 			"rubberband wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
@@ -126,4 +126,23 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 		"rubberband ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	Save(std::move(out));
+}
+
+void Rubberband::Eof() noexcept {
+	if (!m_graph)
+		return;
+	for (;;) {
+		FFrame out;
+		if (!m_graph->Flush(out)) {
+			Fail("rubberband: flush failed");
+			break;
+		}
+		if (out.NbSamples() <= 0 || out.SampleRate() <= 0)
+			break;
+		Log(Level::LowLevel, std::format(
+			"rubberband flush ch={} rate={} samples={} pts={}",
+			out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
+		Save(std::move(out));
+	}
+	m_graph.reset();
 }

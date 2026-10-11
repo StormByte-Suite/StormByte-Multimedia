@@ -94,6 +94,19 @@ namespace {
 		"[Events]\n"
 		"Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n";
 
+	constexpr const char TtmlAssHeader[] =
+		"[Script Info]\n"
+		"ScriptType: v4.00+\n"
+		"PlayResX: 384\n"
+		"PlayResY: 288\n"
+		"\n"
+		"[V4+ Styles]\n"
+		"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+		"Style: Default,Arial,16,&Hffffff,&Hffffff,&H0,&H0,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,0\n"
+		"\n"
+		"[Events]\n"
+		"Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n";
+
 	std::string AvError(int err) noexcept {
 		char buf[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(err, buf, sizeof(buf));
@@ -301,16 +314,17 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		}
 	}
 
-	if (ctx->codec_type == AVMEDIA_TYPE_SUBTITLE && !ctx->subtitle_header
-		&& (!codec->name || std::string_view{codec->name} != "ttml")) {
-		const auto n = std::strlen(DefaultAssHeader);
+	if (ctx->codec_type == AVMEDIA_TYPE_SUBTITLE && !ctx->subtitle_header) {
+		const bool ttml = codec->name && std::string_view{codec->name} == "ttml";
+		const char* header = ttml ? TtmlAssHeader : DefaultAssHeader;
+		const auto n = std::strlen(header);
 		ctx->subtitle_header = static_cast<std::uint8_t*>(av_malloc(n + 1));
 		if (!ctx->subtitle_header) {
 			avcodec_free_context(&ctx);
 			return Unexpected<FFmpeg::EncoderError>("Out of memory allocating subtitle header");
 		}
 
-		std::memcpy(ctx->subtitle_header, DefaultAssHeader, n + 1);
+		std::memcpy(ctx->subtitle_header, header, n + 1);
 		ctx->subtitle_header_size = static_cast<int>(n);
 	}
 

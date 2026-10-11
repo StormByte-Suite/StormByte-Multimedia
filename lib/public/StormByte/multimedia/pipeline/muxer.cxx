@@ -272,8 +272,10 @@ bool Muxer::SetupPlan() noexcept {
 			});
 			if (Stopping())
 				return false;
-			if (Plan()->State() != Plan::State::Running || !encoder->second->Ready()) {
-				Fail(encoder->second->Error().value_or(StormByte::Safe::String("encoder is not ready")));
+			const auto& opened = *encoder->second;
+			const bool usable = !opened.Failed() && (opened.Ready() || opened.Opened());
+			if (Plan()->State() != Plan::State::Running || !usable) {
+				Fail(opened.Error().value_or(StormByte::Safe::String("encoder is not ready")));
 				return false;
 			}
 			if (!m_backend->ReserveEncoder(*this, *encoder->second))
