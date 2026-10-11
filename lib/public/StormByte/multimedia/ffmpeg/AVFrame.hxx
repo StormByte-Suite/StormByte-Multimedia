@@ -776,6 +776,21 @@ namespace StormByte {
 					void WriteSideData(const Safe::Vector<StormByte::Multimedia::Pipeline::SideData>& attachments) noexcept;
 
 					/**
+					 * @brief Output colorspace for the cached zimg scaler.
+					 *
+					 * Values are libavutil color enums (`AVCOL_*`). A negative
+					 * field is left unchanged. @c peak is the nominal peak in
+					 * cd/m²; 0 keeps the scaler default (100).
+					 */
+					struct ColorTarget {
+						int transfer = -1;	///< `AVColorTransferCharacteristic`
+						int primaries = -1;	///< `AVColorPrimaries`
+						int matrix = -1;	///< `AVColorSpace`
+						int range = -1;		///< `AVColorRange`
+						double peak = 0;	///< Nominal peak luminance, cd/m²
+					};
+
+					/**
 					 * @brief Scales this frame into @p dst (allocates @p dst if empty).
 					 * @param dst Destination. Pixel format is taken from @p dst if set,
 					 * otherwise from this frame.
@@ -846,6 +861,20 @@ namespace StormByte {
 					bool ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, int dst_h,
 						Resample filter = Resample::Default,
 						Scaler scaler = Scaler::Zimg) const noexcept;
+
+					/**
+					 * @brief Scales and converts colorspace through the same cache.
+					 * @param context Cache retained by the caller.
+					 * @param dst Destination frame. Pixel format is taken from @p dst if set.
+					 * @param dst_w Destination width.
+					 * @param dst_h Destination height.
+					 * @param filter Resample kernel.
+					 * @param scaler Must be @c Zimg. @c Sws cannot convert colorspace.
+					 * @param color Output transfer, primaries, matrix, range and peak.
+					 * @return false on allocation or conversion failure.
+					 */
+					bool ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, int dst_h,
+						Resample filter, Scaler scaler, ColorTarget color) const noexcept;
 
 					/**
 					 * @brief Adopts @p raw. Previous frame is freed.

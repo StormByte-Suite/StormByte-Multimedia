@@ -55,6 +55,10 @@
 #include <cstdint>
 #include <utility>
 
+extern "C" {
+	#include <libavutil/pixdesc.h>
+}
+
 namespace StormByte::Multimedia::Backend {
 	namespace {
 		constexpr unsigned kAlign = 64;
@@ -91,16 +95,44 @@ namespace StormByte::Multimedia::Backend {
 			params.resample_filter_uv = kernel;
 		}
 
+		const AVPixFmtDescriptor* Descriptor(const FFmpeg::AVFrame& frame) noexcept {
+			return av_pix_fmt_desc_get(static_cast<AVPixelFormat>(frame.Format()));
+		}
+
+		bool IsRgb(const AVPixFmtDescriptor* desc) noexcept {
+			return desc && (desc->flags & AV_PIX_FMT_FLAG_RGB) != 0 && desc->nb_components >= 3;
+		}
+
+		int ZimgPlane(const AVPixFmtDescriptor* desc, int plane) noexcept {
+			if (!IsRgb(desc) || plane >= 3)
+				return plane;
+			// FFmpeg GBR is G, B, R. zimg RGB is R, G, B.
+			static constexpr int map[3] = { 2, 0, 1 };
+			return map[plane];
+		}
+
 		bool FillFormat(const FFmpeg::AVFrame& frame, zimg_image_format& fmt) noexcept {
 			if (!frame || frame.Width() <= 0 || frame.Height() <= 0)
+				return false;
+			const AVPixFmtDescriptor* desc = Descriptor(frame);
+			if (!desc || (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) != 0)
 				return false;
 			zimg_image_format_default(&fmt, ZIMG_API_VERSION);
 			fmt.width = static_cast<unsigned>(frame.Width());
 			fmt.height = static_cast<unsigned>(frame.Height());
-			const int depth = Depth(frame);
-			fmt.depth = static_cast<unsigned>(depth);
-			fmt.pixel_type = (depth > 8) ? ZIMG_PIXEL_WORD : ZIMG_PIXEL_BYTE;
-			switch (frame.Layout()) {
+			if ((desc->flags & AV_PIX_FMT_FLAG_FLOAT) != 0) {
+				fmt.depth = 32;
+				fmt.pixel_type = ZIMG_PIXEL_FLOAT;
+			} else {
+				const int depth = Depth(frame);
+				fmt.depth = static_cast<unsigned>(depth);
+				fmt.pixel_type = (depth > 8) ? ZIMG_PIXEL_WORD : ZIMG_PIXEL_BYTE;
+			}
+			if (IsRgb(desc)) {
+				fmt.color_family = ZIMG_COLOR_RGB;
+				fmt.subsample_w = 0;
+				fmt.subsample_h = 0;
+			} else switch (frame.Layout()) {
 				case FFmpeg::AVFrame::VideoLayout::Gray:
 					fmt.color_family = ZIMG_COLOR_GREY;
 					fmt.subsample_w = 0;
@@ -131,12 +163,16 @@ namespace StormByte::Multimedia::Backend {
 
 		void CopyColor(const FFmpeg::AVFrame& src, zimg_image_format& in,
 			zimg_image_format& out) noexcept {
+			const bool rgb = IsRgb(Descriptor(src));
 			in.pixel_range = (src.ColorRange() == 2)
 				? ZIMG_RANGE_FULL : ZIMG_RANGE_LIMITED;
 			const int matrix = src.ColorSpace();
-			in.matrix_coefficients = (matrix > 0)
-				? static_cast<zimg_matrix_coefficients_e>(matrix)
-				: ZIMG_MATRIX_UNSPECIFIED;
+			if (rgb)
+				in.matrix_coefficients = ZIMG_MATRIX_RGB;
+			else
+				in.matrix_coefficients = (matrix > 0)
+					? static_cast<zimg_matrix_coefficients_e>(matrix)
+					: ZIMG_MATRIX_UNSPECIFIED;
 			const int transfer = src.ColorTransfer();
 			in.transfer_characteristics = (transfer > 0)
 				? static_cast<zimg_transfer_characteristics_e>(transfer)
@@ -159,10 +195,12 @@ namespace StormByte::Multimedia::Backend {
 		void FillConstBuffer(const FFmpeg::AVFrame& frame, zimg_image_buffer_const& buf) noexcept {
 			buf = {};
 			buf.version = ZIMG_API_VERSION;
+			const AVPixFmtDescriptor* desc = Descriptor(frame);
 			const int planes = frame.PlaneCount();
 			for (int i = 0; i < planes && i < 4; ++i) {
-				buf.plane[i].data = frame.Data(i);
-				buf.plane[i].stride = frame.Linesize(i);
+				const int src = ZimgPlane(desc, i);
+				buf.plane[i].data = frame.Data(src);
+				buf.plane[i].stride = frame.Linesize(src);
 				buf.plane[i].mask = ZIMG_BUFFER_MAX;
 			}
 		}
@@ -170,10 +208,12 @@ namespace StormByte::Multimedia::Backend {
 		void FillBuffer(FFmpeg::AVFrame& frame, zimg_image_buffer& buf) noexcept {
 			buf = {};
 			buf.version = ZIMG_API_VERSION;
+			const AVPixFmtDescriptor* desc = Descriptor(frame);
 			const int planes = frame.PlaneCount();
 			for (int i = 0; i < planes && i < 4; ++i) {
-				buf.plane[i].data = frame.Data(i);
-				buf.plane[i].stride = frame.Linesize(i);
+				const int src = ZimgPlane(desc, i);
+				buf.plane[i].data = frame.Data(src);
+				buf.plane[i].stride = frame.Linesize(src);
 				buf.plane[i].mask = ZIMG_BUFFER_MAX;
 			}
 		}
@@ -292,7 +332,8 @@ namespace StormByte::Multimedia::Backend {
 
 	bool Zimg::BuildStrip(Strip& strip, const FFmpeg::AVFrame& src,
 		const FFmpeg::AVFrame& dst, zimg_image_format in, zimg_image_format out,
-		FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height) noexcept {
+		FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height,
+		double peak) noexcept {
 		const double srcH = static_cast<double>(src.Height());
 		const double dstH = static_cast<double>(dst.Height());
 		in.active_region.left = 0;
@@ -307,6 +348,8 @@ namespace StormByte::Multimedia::Backend {
 		ApplyFilter(params, filter);
 		params.cpu_type = ZIMG_CPU_AUTO_64B;
 		params.allow_approximate_gamma = 1;
+		if (peak > 0.0)
+			params.nominal_peak_luminance = peak;
 
 		strip.graph = zimg_filter_graph_build(&in, &out, &params);
 		if (!strip.graph)
@@ -324,12 +367,21 @@ namespace StormByte::Multimedia::Backend {
 	}
 
 	bool Zimg::BuildSlot(Slot& slot, const FFmpeg::AVFrame& src,
-		const FFmpeg::AVFrame& dst, FFmpeg::AVFrame::Resample filter) noexcept {
+		const FFmpeg::AVFrame& dst, FFmpeg::AVFrame::Resample filter,
+		const Recolor* color) noexcept {
 		zimg_image_format in{};
 		zimg_image_format out{};
 		if (!FillFormat(src, in) || !FillFormat(dst, out))
 			return false;
 		CopyColor(src, in, out);
+		double peak = 0;
+		if (color) {
+			out.transfer_characteristics = static_cast<zimg_transfer_characteristics_e>(color->transfer);
+			out.color_primaries = static_cast<zimg_color_primaries_e>(color->primaries);
+			out.matrix_coefficients = static_cast<zimg_matrix_coefficients_e>(color->matrix);
+			out.pixel_range = static_cast<zimg_pixel_range_e>(color->range);
+			peak = color->peak;
+		}
 
 		FreeSlot(slot);
 		const unsigned jobs = StripCount(dst.Height());
@@ -346,7 +398,7 @@ namespace StormByte::Multimedia::Backend {
 				FreeSlot(slot);
 				return false;
 			}
-			if (!BuildStrip(slot.strips[i], src, dst, in, out, filter, top, end - top)) {
+			if (!BuildStrip(slot.strips[i], src, dst, in, out, filter, top, end - top, peak)) {
 				FreeSlot(slot);
 				return false;
 			}
@@ -360,6 +412,11 @@ namespace StormByte::Multimedia::Backend {
 		slot.dstH = dst.Height();
 		slot.dstFmt = dst.Format();
 		slot.filter = static_cast<int>(filter);
+		slot.outTransfer = color ? color->transfer : -1;
+		slot.outPrimaries = color ? color->primaries : -1;
+		slot.outMatrix = color ? color->matrix : -1;
+		slot.outRange = color ? color->range : -1;
+		slot.outPeak = peak;
 		return true;
 	}
 
@@ -399,6 +456,12 @@ namespace StormByte::Multimedia::Backend {
 
 	bool Zimg::Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
 		FFmpeg::AVFrame::Resample filter) noexcept {
+		return Ensure(src, dst, filter, Recolor{});
+	}
+
+	bool Zimg::Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
+		FFmpeg::AVFrame::Resample filter, Recolor color) noexcept {
+		const bool recolor = color.transfer >= 0;
 		const int srcW = src.Width();
 		const int srcH = src.Height();
 		const int srcFmt = src.Format();
@@ -406,12 +469,20 @@ namespace StormByte::Multimedia::Backend {
 		const int dstH = dst.Height();
 		const int dstFmt = dst.Format();
 		const int key = static_cast<int>(filter);
+		const int transfer = recolor ? color.transfer : -1;
+		const int primaries = recolor ? color.primaries : -1;
+		const int matrix = recolor ? color.matrix : -1;
+		const int range = recolor ? color.range : -1;
+		const double peak = recolor ? color.peak : 0;
 
 		for (auto& slot : m_slots) {
 			if (!slot.strips.empty()
 				&& slot.srcW == srcW && slot.srcH == srcH && slot.srcFmt == srcFmt
 				&& slot.dstW == dstW && slot.dstH == dstH && slot.dstFmt == dstFmt
-				&& slot.filter == key) {
+				&& slot.filter == key
+				&& slot.outTransfer == transfer && slot.outPrimaries == primaries
+				&& slot.outMatrix == matrix && slot.outRange == range
+				&& slot.outPeak == peak) {
 				m_current = &slot;
 				EnsureWorkers(static_cast<unsigned>(slot.strips.size()));
 				return true;
@@ -419,7 +490,7 @@ namespace StormByte::Multimedia::Backend {
 		}
 
 		m_slots.emplace_back();
-		if (!BuildSlot(m_slots.back(), src, dst, filter)) {
+		if (!BuildSlot(m_slots.back(), src, dst, filter, recolor ? &color : nullptr)) {
 			m_slots.pop_back();
 			m_current = nullptr;
 			return false;

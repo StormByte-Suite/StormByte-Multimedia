@@ -66,7 +66,7 @@
 namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	/**
 	 * @class Tonemap
-	 * @brief HDR (PQ / HLG) to BT.709 SDR via zscale + `tonemap`. Process leaf.
+	 * @brief HDR (PQ / HLG) to BT.709 SDR. Process leaf.
 	 *
 	 * Attach with @c job.Video(in).Filter<Tonemap>(log).
 	 *
@@ -84,16 +84,18 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * separately.
 	 *
 	 * @par Algorithm
-	 * @c zscale=t=linear:npl=100[:tin=arib-std-b67],format=gbrpf32le,
-	 * @c zscale=p=bt709,tonemap=tonemap=&lt;op&gt;:desat=0,
-	 * @c zscale=t=bt709:m=bt709:r=tv,format=yuv420p.
-	 * Empty operator is @c hable. Hardware frames Fail.
+	 * @ref FFmpeg::AVFrame::ScaleTo on the filter @ref FFmpeg::ScalingContext
+	 * converts PQ/HLG to scene-linear BT.709 RGB (nominal peak 100 cd/m²).
+	 * libavfilter `tonemap` applies the curve. Empty operator is @c hable.
+	 * A second @ref FFmpeg::AVFrame::ScaleTo converts that linear RGB to
+	 * limited yuv420p BT.709. FFmpeg's `zscale` filter is not used.
+	 * Hardware frames Fail.
 	 *
 	 * @par Mutation
-	 * @ref Filter::FFmpeg::Save of the buffersink frame.
-	 * Colour tags on the sink are set to BT.709 / TV.
+	 * @ref Filter::FFmpeg::Save of the yuv420p frame.
+	 * Colour tags are BT.709 / TV.
 	 *
-	 * @see StormByte::Multimedia::FFmpeg::AVFilterGraph
+	 * @note Colorspace conversion uses @ref FFmpeg::AVFrame::ScaleTo, not FFmpeg's `zscale`.
 	 * @note Conditional boundary safety requires compatible ABI and provider-managed FFmpeg lifetimes.
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Tonemap: public Filter::Process {
@@ -174,11 +176,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			static bool NeedsMap(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
 
 			/**
-			 * @brief Builds the avfilter chain for @p src.
-			 * @param src Model frame (HLG adds @c tin=arib-std-b67).
-			 * @return Filterchain for @ref FFmpeg::AVFilterGraph::Ensure.
+			 * @brief libavfilter curve, without a colorspace filter.
+			 * @return `tonemap=tonemap=<op>:desat=0`.
 			 */
-			StormByte::Safe::String Chain(const StormByte::Multimedia::FFmpeg::AVFrame& src) const noexcept;
+			StormByte::Safe::String Chain() const noexcept;
 
 			/**
 			 * @brief Resolved operator name.
@@ -187,7 +188,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			StormByte::Safe::String Operator() const noexcept;
 
 			StormByte::Safe::Optional<StormByte::Safe::String> m_opIn;	///< Caller operator, or empty
-			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Cached graph with provider-managed FFmpeg resources
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Curve filter only
 	};
 }
 

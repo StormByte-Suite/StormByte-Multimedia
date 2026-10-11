@@ -205,7 +205,7 @@ int test_libwebp_decodes_animated_webp() {
 	if (result != 0)
 		return result;
 	return CheckVideoCodec(encoded, OutputPath("pipeline/video-codecs/webp-decoded.webm"),
-		"WebM", "VP9", "libvpx-vp9", "libwebp");
+		"WebM", "VP9", "libvpx-vp9", "webp");
 }
 
 int main(int argc, char** argv) {

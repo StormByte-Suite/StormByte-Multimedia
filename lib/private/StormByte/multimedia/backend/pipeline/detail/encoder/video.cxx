@@ -377,6 +377,9 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		handle->ColorSpace(AVCOL_SPC_UNSPECIFIED);
 		handle->ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
 		handle->ColorTransfer(AVCOL_TRC_UNSPECIFIED);
+		handle->RemoveSideData(AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+		handle->RemoveSideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+		handle->RemoveSideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
 	}
 	if (frame->Video() && frame->Video()->SampleAspectRatio()
 		&& frame->Video()->SampleAspectRatio()->Valid())

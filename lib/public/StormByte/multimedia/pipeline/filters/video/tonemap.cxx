@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/tonemap.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -56,6 +57,10 @@
 #include <format>
 #include <utility>
 
+extern "C" {
+	#include <libavutil/pixfmt.h>
+}
+
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Filter::Video::Tonemap;
@@ -63,13 +68,32 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 namespace {
-	// libavutil AVColorTransferCharacteristic
-	constexpr int TrcPq  = 16;	// AVCOL_TRC_SMPTE2084
-	constexpr int TrcHlg = 18;	// AVCOL_TRC_ARIB_STD_B67
-	constexpr int TrcBt709 = 1;	// AVCOL_TRC_BT709
-	constexpr int PriBt709 = 1;	// AVCOL_PRI_BT709
-	constexpr int SpcBt709 = 1;	// AVCOL_SPC_BT709
-	constexpr int RangeTv  = 1;	// AVCOL_RANGE_MPEG
+	constexpr int TrcPq = AVCOL_TRC_SMPTE2084;
+	constexpr int TrcHlg = AVCOL_TRC_ARIB_STD_B67;
+
+	FFrame::ColorTarget LinearTarget() noexcept {
+		FFrame::ColorTarget color;
+		color.transfer = AVCOL_TRC_LINEAR;
+		color.primaries = AVCOL_PRI_BT709;
+		color.matrix = AVCOL_SPC_RGB;
+		color.range = AVCOL_RANGE_JPEG;
+		color.peak = 100.0;
+		return color;
+	}
+
+	FFrame::ColorTarget SdrTarget() noexcept {
+		FFrame::ColorTarget color;
+		color.transfer = AVCOL_TRC_BT709;
+		color.primaries = AVCOL_PRI_BT709;
+		color.matrix = AVCOL_SPC_BT709;
+		color.range = AVCOL_RANGE_MPEG;
+		color.peak = 0;
+		return color;
+	}
+
+	bool HasPicture(const FFrame& frame) noexcept {
+		return frame.Width() > 0 && frame.Height() > 0;
+	}
 }
 
 Tonemap::Tonemap(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -106,20 +130,16 @@ StormByte::Safe::String Tonemap::Operator() const noexcept {
 	return StormByte::Safe::String("hable");
 }
 
-StormByte::Safe::String Tonemap::Chain(const FFrame& src) const noexcept {
-	const char* tin = src.ColorTransfer() == TrcHlg ? ":tin=arib-std-b67" : "";
+StormByte::Safe::String Tonemap::Chain() const noexcept {
 	return StormByte::Safe::String(std::format(
-		"zscale=t=linear:npl=100{},format=gbrpf32le,"
-		"zscale=p=bt709,tonemap=tonemap={}:desat=0,"
-		"zscale=t=bt709:m=bt709:r=tv,format=yuv420p",
-		tin, static_cast<std::string_view>(Operator())));
+		"tonemap=tonemap={}:desat=0", static_cast<std::string_view>(Operator())));
 }
 
 void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
-	if (!src || src.Width() <= 0 || src.Height() <= 0) {
+	if (!src || !HasPicture(src)) {
 		Log(Level::Warning, "tonemap: frame has no picture");
 		return;
 	}
@@ -133,36 +153,53 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	const StormByte::Safe::String chain = Chain(src);
-	if (!m_graph) {
-		FGraph opened = FGraph::Open(src, chain);
-		if (!opened) {
-			Fail("tonemap: AVFilterGraph::Open failed");
-			return;
-		}
-		m_graph = StormByte::Safe::MakeUnique<FGraph>(std::move(opened));
-	} else if (!m_graph->Ensure(src, chain)) {
-		Fail("tonemap: AVFilterGraph::Ensure failed");
+	FFrame linear;
+	linear.Format(AV_PIX_FMT_GBRPF32LE);
+	if (!src.ScaleTo(ScalingContext(), linear, src.Width(), src.Height(),
+			FFrame::Resample::Default, FFrame::Scaler::Zimg, LinearTarget())) {
+		Fail("tonemap: linear conversion failed");
 		return;
 	}
 
-	FFrame out;
-	if (!m_graph->Filter(src, out)) {
-		Fail("tonemap: AVFilterGraph::Filter failed");
+	const StormByte::Safe::String chain = Chain();
+	if (!m_graph) {
+		FGraph opened = FGraph::Open(linear, chain);
+		if (!opened) {
+			Fail("tonemap: curve filter is unavailable");
+			return;
+		}
+		m_graph = StormByte::Safe::MakeUnique<FGraph>(std::move(opened));
+	} else if (!m_graph->Ensure(linear, chain)) {
+		Fail("tonemap: curve filter reset failed");
 		return;
 	}
-	if (!out) {
+
+	FFrame curved;
+	if (!m_graph->Filter(linear, curved)) {
+		Fail("tonemap: curve filter failed");
+		return;
+	}
+	if (!HasPicture(curved)) {
 		Log(Level::LowLevel, std::format(
 			"tonemap wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
 	}
+	curved.ColorTransfer(AVCOL_TRC_LINEAR);
+	curved.ColorPrimaries(AVCOL_PRI_BT709);
+	curved.ColorSpace(AVCOL_SPC_RGB);
+	curved.ColorRange(AVCOL_RANGE_JPEG);
 
-	out.ColorRange(RangeTv);
-	out.ColorSpace(SpcBt709);
-	out.ColorPrimaries(PriBt709);
-	out.ColorTransfer(TrcBt709);
+	FFrame out;
+	out.Format(AV_PIX_FMT_YUV420P);
+	if (!curved.ScaleTo(ScalingContext(), out, src.Width(), src.Height(),
+			FFrame::Resample::Default, FFrame::Scaler::Zimg, SdrTarget())) {
+		Fail("tonemap: BT.709 conversion failed");
+		return;
+	}
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
+	out.Pts(src.Pts());
+	out.DurationTicks(src.DurationTicks());
 
 	Log(Level::LowLevel, std::format(
 		"tonemap {} {}x{} pts={}",
@@ -174,17 +211,26 @@ void Tonemap::Eof() noexcept {
 	if (!m_graph)
 		return;
 	for (;;) {
-		FFrame out;
-		if (!m_graph->Flush(out)) {
-			Fail("tonemap: AVFilterGraph::Flush failed");
+		FFrame curved;
+		if (!m_graph->Flush(curved)) {
+			Fail("tonemap: curve flush failed");
 			break;
 		}
-		if (!out)
+		if (!HasPicture(curved))
 			break;
-		out.ColorRange(RangeTv);
-		out.ColorSpace(SpcBt709);
-		out.ColorPrimaries(PriBt709);
-		out.ColorTransfer(TrcBt709);
+		curved.ColorTransfer(AVCOL_TRC_LINEAR);
+		curved.ColorPrimaries(AVCOL_PRI_BT709);
+		curved.ColorSpace(AVCOL_SPC_RGB);
+		curved.ColorRange(AVCOL_RANGE_JPEG);
+		FFrame out;
+		out.Format(AV_PIX_FMT_YUV420P);
+		if (!curved.ScaleTo(ScalingContext(), out, curved.Width(), curved.Height(),
+				FFrame::Resample::Default, FFrame::Scaler::Zimg, SdrTarget())) {
+			Fail("tonemap: BT.709 conversion failed");
+			break;
+		}
+		out.Pts(curved.Pts());
+		out.DurationTicks(curved.DurationTicks());
 		Log(Level::LowLevel, std::format(
 			"tonemap flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
 		Save(std::move(out));

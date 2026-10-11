@@ -846,6 +846,45 @@ bool FFmpeg::AVFrame::ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, in
 	return sws.Scale(*this, dst);
 }
 
+bool FFmpeg::AVFrame::ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, int dst_h,
+	Resample filter, Scaler scaler, ColorTarget color) const noexcept {
+	if (scaler != Scaler::Zimg)
+		return false;
+	if (!m_ptr || !context.m_state || dst_w <= 0 || dst_h <= 0 || Width() <= 0 || Height() <= 0)
+		return false;
+	const int fmt = (dst.Format() == AV_PIX_FMT_NONE) ? Format() : dst.Format();
+	if (!dst.m_ptr || dst.Width() != dst_w || dst.Height() != dst_h
+		|| dst.Format() != fmt || !dst.Data(0)) {
+		if (!dst.AllocVideo(dst_w, dst_h, fmt))
+			return false;
+		if (!dst.CopyProps(*this))
+			return false;
+		dst.Width(dst_w);
+		dst.Height(dst_h);
+		dst.Format(fmt);
+	}
+
+	Backend::Zimg::Recolor rec;
+	rec.transfer = color.transfer;
+	rec.primaries = color.primaries;
+	rec.matrix = color.matrix;
+	rec.range = (color.range == static_cast<int>(AVCOL_RANGE_JPEG))
+		? static_cast<int>(ZIMG_RANGE_FULL) : static_cast<int>(ZIMG_RANGE_LIMITED);
+	rec.peak = color.peak;
+	auto& zimg = context.m_state->zimg;
+	if (!zimg.Ensure(*this, dst, filter, rec) || !zimg.Scale(*this, dst))
+		return false;
+	if (color.range >= 0)
+		dst.ColorRange(color.range);
+	if (color.matrix >= 0)
+		dst.ColorSpace(color.matrix);
+	if (color.primaries >= 0)
+		dst.ColorPrimaries(color.primaries);
+	if (color.transfer >= 0)
+		dst.ColorTransfer(color.transfer);
+	return true;
+}
+
 void FFmpeg::AVFrame::Free() noexcept {
 	if (m_ptr) {
 		av_frame_free(&m_ptr);

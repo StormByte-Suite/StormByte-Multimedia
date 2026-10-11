@@ -51,11 +51,9 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
-#include <StormByte/multimedia/pipeline/filters/video/format.hxx>
+#include <StormByte/multimedia/pipeline/filters/video/tonemap.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
-
-#include <libavutil/pixfmt.h>
 
 #include <array>
 #include <utility>
@@ -249,7 +247,7 @@ int test_transcoder_without_enforce_features_drops_hdr10() {
 	job.Video(0).Codec(h264.value().get())
 		.Implementation(StormByte::Safe::String{"libx264"})
 		.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30)
-		.Filter<Filter::Video::Format>(logger, AV_PIX_FMT_YUV420P);
+		.Filter<Filter::Video::Tonemap>(logger);
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	TEST_PHASE("starting transcoder run");
 	job.Run();

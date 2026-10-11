@@ -104,6 +104,24 @@ namespace StormByte::Multimedia::Backend {
 			Zimg& operator=(const Zimg&) = delete;
 
 			/**
+			 * @brief Empty scaler. Graphs are built by @ref Ensure.
+			 */
+			Zimg() noexcept;
+
+			/**
+			 * @brief Output colorspace for the recoloring @ref Ensure.
+			 *
+			 * @ref Scale still only resamples when the other @ref Ensure is used.
+			 */
+			struct Recolor {
+				int transfer = -1;	///< zimg transfer
+				int primaries = -1;	///< zimg primaries
+				int matrix = -1;	///< zimg matrix
+				int range = -1;		///< zimg range (limited or full)
+				double peak = 0;	///< Nominal peak in cd/m². 0 keeps the zimg default.
+			};
+
+			/**
 			 * @brief Whether a graph is selected for @ref Scale.
 			 * @return true if @ref Scale can run.
 			 */
@@ -128,6 +146,17 @@ namespace StormByte::Multimedia::Backend {
 			 */
 			bool Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
 				FFmpeg::AVFrame::Resample filter) noexcept;
+
+			/**
+			 * @brief Same as @ref Ensure, then the output colorspace is @p color.
+			 * @param src Source frame.
+			 * @param dst Destination frame.
+			 * @param filter Resample kernel.
+			 * @param color Output transfer, primaries, matrix, range and peak.
+			 * @return false if the graph could not be (re)opened.
+			 */
+			bool Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
+				FFmpeg::AVFrame::Resample filter, Recolor color) noexcept;
 
 			/**
 			 * @brief Scales @p src into @p dst. Both must already have buffers.
@@ -160,14 +189,13 @@ namespace StormByte::Multimedia::Backend {
 				int dstH = 0;						///< Cached destination height
 				int dstFmt = 0;						///< Cached destination format
 				int filter = 0;						///< Cached kernel
+				int outTransfer = -1;				///< Output transfer, or -1 when copied
+				int outPrimaries = -1;				///< Output primaries, or -1 when copied
+				int outMatrix = -1;					///< Output matrix, or -1 when copied
+				int outRange = -1;					///< Output range, or -1 when copied
+				double outPeak = 0;					///< Nominal peak passed to the graph
 				unsigned subH = 0;					///< Destination chroma log2
 			};
-
-			/**
-			 * @brief Empty scaler. Used by @ref Open and the per-thread
-			 *        slot in @ref FFmpeg::AVFrame::ScaleTo.
-			 */
-			Zimg() noexcept;
 
 			void Free() noexcept;
 			void StopWorkers() noexcept;
@@ -193,7 +221,8 @@ namespace StormByte::Multimedia::Backend {
 			 */
 			static bool BuildStrip(Strip& strip, const FFmpeg::AVFrame& src,
 				const FFmpeg::AVFrame& dst, zimg_image_format in, zimg_image_format out,
-				FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height) noexcept;
+				FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height,
+				double peak) noexcept;
 
 			/**
 			 * @brief Builds strip graphs into @p slot.
@@ -201,10 +230,12 @@ namespace StormByte::Multimedia::Backend {
 			 * @param src Source frame.
 			 * @param dst Destination frame.
 			 * @param filter Resample kernel.
+			 * @param color Output colorspace, or nullptr to copy the source tags.
 			 * @return false on failure.
 			 */
 			static bool BuildSlot(Slot& slot, const FFmpeg::AVFrame& src,
-				const FFmpeg::AVFrame& dst, FFmpeg::AVFrame::Resample filter) noexcept;
+				const FFmpeg::AVFrame& dst, FFmpeg::AVFrame::Resample filter,
+				const Recolor* color) noexcept;
 
 			/**
 			 * @brief Runs one strip. Destination pointers are offset.
