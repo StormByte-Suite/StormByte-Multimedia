@@ -26,6 +26,7 @@ endforeach()
 if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_GPL))
 	foreach(test_name IN ITEMS
 		test_reencode_dovi_only
+		test_reencoded_dovi_audit_and_vmaf_frame_counts
 		test_reencode_hdr10_only
 		test_reencode_dovi_hdr10
 		test_watermark_dovi_only

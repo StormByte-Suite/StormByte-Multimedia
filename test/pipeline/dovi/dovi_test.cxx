@@ -53,6 +53,7 @@
 #include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
+#include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
@@ -63,6 +64,7 @@
 #include <array>
 #include <cstddef>
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <utility>
 
@@ -627,6 +629,92 @@ int test_remux_dovi_only() { return check_pipeline(dovi_only, Transform::Remux, 
 int test_remux_hdr10_only() { return check_pipeline(hdr10_only, Transform::Remux, "remux"); }
 int test_remux_dovi_hdr10() { return check_pipeline(dovi_hdr10, Transform::Remux, "remux"); }
 int test_reencode_dovi_only() { return check_pipeline(dovi_only, Transform::Encode, "reencode"); }
+
+int test_reencoded_dovi_audit_and_vmaf_frame_counts() {
+	const auto output = OutputPath("pipeline/dovi/audit-vmaf-source.mkv");
+	auto before = StormByte::Safe::MakeShared<FrameAudit>();
+	auto after = StormByte::Safe::MakeShared<FrameAudit>();
+	auto encoded_frames = StormByte::Safe::MakeShared<EncodedAudit>();
+	{
+		TEST_PHASE("comparison: generating recoded DOVI source");
+		auto logger = MakeLogger();
+		Transcoder job{TestLocation(FixturePath(dovi_only.path)), TestLocation(output), logger, 2000000000LL};
+		auto codec = Registry::Instance().FindCodec("H.265");
+		TEST_REQUIRE(codec);
+		if (!codec->get().HasAccess(Access{Operation::Write}))
+			return TEST_SKIP;
+		auto track = job.Video(0);
+		track.Codec(codec->get())
+			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libx265"})
+			.Preset(StormByte::Safe::String{"ultrafast"});
+		track.Filter<AuditFrames>(logger, before);
+		track.Filter<AuditFrames>(logger, after);
+		job.Filter<AuditEncodedFrames>(logger, encoded_frames);
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		const int result = WaitForOptionalCodec(job);
+		if (result != 0)
+			return result;
+	}
+	TEST_REQUIRE(check_decoded_frames(*before, *after, dovi_only) == 0);
+	TEST_REQUIRE(check_decoded_frames(encoded_frames->source, encoded_frames->destination,
+		dovi_only, DoviComparison::Regenerated) == 0);
+
+	auto reopened_frames = StormByte::Safe::MakeShared<EncodedAudit>();
+	{
+		TEST_PHASE("comparison: remuxing recoded source with AuditEncodedFrames");
+		auto logger = MakeLogger();
+		Transcoder job{TestLocation(output), TestLocation(OutputPath("pipeline/dovi/audit-vmaf-audit.mkv")),
+			logger, 2000000000LL};
+		job.Video(0).Remux();
+		job.Filter<AuditEncodedFrames>(logger, reopened_frames);
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	}
+	std::cout << "[Comparison] AuditEncodedFrames source=" << reopened_frames->source.videos.size()
+		<< " destination=" << reopened_frames->destination.videos.size() << " expected=48" << std::endl;
+
+	unsigned long vmaf_frames = 0;
+	double vmaf_mean = 0;
+	double vmaf_minimum = 0;
+	bool vmaf_ok = false;
+	{
+		TEST_PHASE("comparison: remuxing the same recoded source with VMAF");
+		auto logger = MakeLogger();
+		Transcoder job{TestLocation(output), TestLocation(OutputPath("pipeline/dovi/audit-vmaf-vmaf.mkv")),
+			logger, 2000000000LL};
+		job.Video(0).Remux();
+		job.Filter<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"},
+			static_cast<unsigned short>(2));
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		const auto reports = job.Reports();
+		TEST_REQUIRE(reports.size() == 1);
+		const auto report = reports[0].second;
+		vmaf_ok = report.Kind() == Filter::Report::Status::Ok;
+		std::cout << "[Comparison] VMAF report_ok=" << vmaf_ok << std::endl;
+		const auto& data = report.Data();
+		TEST_REQUIRE(data.contains(StormByte::Safe::String{"frames"}));
+		TEST_REQUIRE(data.contains(StormByte::Safe::String{"vmaf_mean"}));
+		TEST_REQUIRE(data.contains(StormByte::Safe::String{"vmaf_min"}));
+		vmaf_frames = std::stoul(std::string{TestView(data.at(StormByte::Safe::String{"frames"}))});
+		vmaf_mean = std::stod(std::string{TestView(data.at(StormByte::Safe::String{"vmaf_mean"}))});
+		vmaf_minimum = std::stod(std::string{TestView(data.at(StormByte::Safe::String{"vmaf_min"}))});
+	}
+	std::cout << "[Comparison] VMAF pairs=" << vmaf_frames << " mean=" << vmaf_mean
+		<< " minimum=" << vmaf_minimum << " expected=48" << std::endl;
+	TEST_REQUIRE(vmaf_ok);
+	TEST_REQUIRE(vmaf_frames == 48);
+	TEST_REQUIRE(vmaf_mean == 100.0);
+	TEST_REQUIRE(vmaf_minimum == 100.0);
+	TEST_REQUIRE(check_decoded_frames(encoded_frames->source, reopened_frames->source,
+		dovi_only, DoviComparison::Regenerated) == 0);
+	TEST_REQUIRE(check_decoded_frames(reopened_frames->source, reopened_frames->destination, dovi_only) == 0);
+	return 0;
+}
+
 int test_reencode_hdr10_only() { return check_pipeline(hdr10_only, Transform::Encode, "reencode"); }
 int test_reencode_dovi_hdr10() { return check_pipeline(dovi_hdr10, Transform::Encode, "reencode"); }
 int test_watermark_dovi_only() { return check_pipeline(dovi_only, Transform::Watermark, "watermark"); }
@@ -821,6 +909,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_remux_hdr10_only", test_remux_hdr10_only},
 		TestEntry{"test_remux_dovi_hdr10", test_remux_dovi_hdr10},
 		TestEntry{"test_reencode_dovi_only", test_reencode_dovi_only},
+		TestEntry{"test_reencoded_dovi_audit_and_vmaf_frame_counts", test_reencoded_dovi_audit_and_vmaf_frame_counts},
 		TestEntry{"test_reencode_hdr10_only", test_reencode_hdr10_only},
 		TestEntry{"test_reencode_dovi_hdr10", test_reencode_dovi_hdr10},
 		TestEntry{"test_watermark_dovi_only", test_watermark_dovi_only},
