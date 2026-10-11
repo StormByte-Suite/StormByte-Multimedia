@@ -81,7 +81,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 *
 	 * @par Algorithm
 	 * librubberband through @ref StormByte::Multimedia::FFmpeg::AVFilterGraph
-	 * (`abuffer → rubberband → abuffersink`). Tempo scales
+	 * (`abuffer → aformat=fltp → rubberband → abuffersink`). Tempo scales
 	 * duration. Pitch scales frequency. Both default to 1
 	 * (identity). The graph owns the look-ahead; this leaf
 	 * does not Hold.

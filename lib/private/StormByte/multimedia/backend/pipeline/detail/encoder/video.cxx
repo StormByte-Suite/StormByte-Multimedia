@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/video.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/features.hxx>
+#include <tables/encoder/table.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/property/color.hxx>
 #include <StormByte/multimedia/property/hdr10.hxx>
@@ -60,6 +61,7 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 extern "C" {
@@ -180,7 +182,8 @@ namespace {
 	StormByte::Multimedia::FFmpeg::AVCodecParameters FillVideoParams(
 		const StormByte::Multimedia::Pipeline::Frame& frame,
 		const StormByte::Safe::Optional<std::int64_t>& bitRate,
-		const StormByte::Multimedia::FFmpeg::AVFrame* handle) noexcept {
+		const StormByte::Multimedia::FFmpeg::AVFrame* handle,
+		bool writeHdr10, bool keepHdrSignal) noexcept {
 		StormByte::Multimedia::FFmpeg::AVCodecParameters params(nullptr);
 		if (bitRate)
 			params.BitRate(*bitRate);
@@ -193,8 +196,13 @@ namespace {
 			params.ColorSpace(ToAVSpace(video.Color().Space()));
 			params.ColorPrimaries(ToAVPrimaries(video.Color().Primaries()));
 			params.ColorTransfer(ToAVTransfer(video.Color().Transfer()));
-			if (video.HDR10())
+			if (writeHdr10 && video.HDR10())
 				params.WriteHdr10(*video.HDR10());
+			if (!keepHdrSignal) {
+				params.ColorSpace(AVCOL_SPC_UNSPECIFIED);
+				params.ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
+				params.ColorTransfer(AVCOL_TRC_UNSPECIFIED);
+			}
 			if (video.SampleAspectRatio() && video.SampleAspectRatio()->Valid())
 				params.SampleAspectRatio(*video.SampleAspectRatio());
 		}
@@ -209,9 +217,34 @@ namespace {
 			const auto sar = handle->SampleAspectRatio();
 			if (sar.Valid())
 				params.SampleAspectRatio(sar);
+			if (keepHdrSignal && !writeHdr10) {
+				if (handle->ColorRange() != AVCOL_RANGE_UNSPECIFIED)
+					params.ColorRange(handle->ColorRange());
+				if (handle->ColorSpace() != AVCOL_SPC_UNSPECIFIED)
+					params.ColorSpace(handle->ColorSpace());
+				if (handle->ColorPrimaries() != AVCOL_PRI_UNSPECIFIED)
+					params.ColorPrimaries(handle->ColorPrimaries());
+				if (handle->ColorTransfer() != AVCOL_TRC_UNSPECIFIED)
+					params.ColorTransfer(handle->ColorTransfer());
+			}
 		}
 
 		return params;
+	}
+
+	bool RowKeeps(const StormByte::Multimedia::Pipeline::Encoder& owner, Feature feature) noexcept {
+		const auto codec = owner.Destination().Name();
+		const auto& pin = owner.Implementation();
+		const std::string_view wanted = pin ? std::string_view{*pin} : std::string_view{};
+		for (const auto& row : StormByte::Multimedia::Tables::Encoder::Video()) {
+			if (!row.codec || codec != row.codec)
+				continue;
+			if (!wanted.empty() && wanted != row.name)
+				continue;
+			if (row.features.Has(feature))
+				return true;
+		}
+		return false;
 	}
 }
 
@@ -276,13 +309,15 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	}
 
 	Features need = owner.Require();
-	if (frame.Video() && frame.Video()->HDR10())
+	const bool keepsHdr = RowKeeps(owner, Feature::HDR10);
+	const bool keepsDovi = RowKeeps(owner, Feature::DOVI);
+	if (keepsHdr && frame.Video() && frame.Video()->HDR10())
 		need.Add(Feature::HDR10);
-	if ((frame.Video() && frame.Video()->DOVI() && frame.Video()->DOVI()->Present())
-		|| handle->SideData(AV_FRAME_DATA_DOVI_METADATA) || handle->SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER))
+	if (keepsDovi && ((frame.Video() && frame.Video()->DOVI() && frame.Video()->DOVI()->Present())
+		|| handle->SideData(AV_FRAME_DATA_DOVI_METADATA) || handle->SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER)))
 		need.Add(Feature::DOVI);
 
-	auto params = FillVideoParams(frame, owner.BitRate(), handle);
+	auto params = FillVideoParams(frame, owner.BitRate(), handle, need.Has(Feature::HDR10), keepsHdr);
 	if (need.Has(Feature::DOVI) && (!frame.Video() || !frame.Video()->DOVI()
 		|| !params.WriteDovi(*frame.Video()->DOVI()))) {
 		owner.Fail("Dolby Vision stream configuration is missing");
@@ -336,8 +371,13 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	}
 
-	if (frame->Video() && frame->Video()->HDR10())
+	if (frame->Video() && frame->Video()->HDR10() && owner.Capabilities().Has(Feature::HDR10))
 		handle->WriteHdr10(*frame->Video()->HDR10());
+	else if (!owner.Capabilities().Has(Feature::HDR10)) {
+		handle->ColorSpace(AVCOL_SPC_UNSPECIFIED);
+		handle->ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
+		handle->ColorTransfer(AVCOL_TRC_UNSPECIFIED);
+	}
 	if (frame->Video() && frame->Video()->SampleAspectRatio()
 		&& frame->Video()->SampleAspectRatio()->Valid())
 		handle->SampleAspectRatio(*frame->Video()->SampleAspectRatio());

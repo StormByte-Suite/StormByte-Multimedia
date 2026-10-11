@@ -51,6 +51,7 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/filters/audio/rubberband.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
@@ -216,6 +217,44 @@ int test_eac3_encodes_stereo_matroska() {
 		"Matroska", "E-AC3", "eac3", 2);
 }
 
+int test_rubberband_stretches_stereo_wav() {
+	auto flac = Registry::Instance().FindCodec("FLAC");
+	TEST_REQUIRE(flac);
+	if (!flac.value().get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+
+	const auto sourcePath = FixturePath("audio/noise_stereo.wav");
+	const auto output = OutputPath("pipeline/audio-codecs/rubberband-fast.mka");
+	auto source = File::Open(StormByte::Safe::String{sourcePath.string()});
+	TEST_REQUIRE(source);
+	const auto& sourceDuration = source.value().Duration();
+	TEST_REQUIRE(sourceDuration && sourceDuration.value().Nanoseconds().count() > 0);
+
+	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
+	Transcoder job{TestLocation(sourcePath), TestLocation(output), logger, 2000000000LL};
+	job.Audio(0).Codec(flac.value().get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"flac"})
+		.Filter<Filter::Audio::Rubberband>(logger, StormByte::Safe::Optional<double>{2.0});
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
+	job.Run();
+	const int result = WaitForOptionalCodec(job);
+	if (result != 0)
+		return result;
+	TEST_REQUIRE(CheckSingleAudioOutput(output, "Matroska", "FLAC", 2, 48000) == 0);
+
+	auto encoded = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(encoded);
+	const auto& encodedDuration = encoded.value().Duration();
+	TEST_REQUIRE(encodedDuration && encodedDuration.value().Nanoseconds().count() > 0);
+	const auto before = sourceDuration.value().Nanoseconds().count();
+	const auto after = encodedDuration.value().Nanoseconds().count();
+	TEST_REQUIRE(after * 10 < before * 8);
+	TEST_REQUIRE(after * 10 > before * 3);
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_fdk_aac_encodes_stereo_mp4", test_fdk_aac_encodes_stereo_mp4},
@@ -235,6 +274,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_alac_decode_roundtrip", test_alac_decode_roundtrip},
 		TestEntry{"test_ac3_fixed_encodes_stereo_matroska", test_ac3_fixed_encodes_stereo_matroska},
 		TestEntry{"test_eac3_encodes_stereo_matroska", test_eac3_encodes_stereo_matroska},
+		TestEntry{"test_rubberband_stretches_stereo_wav", test_rubberband_stretches_stereo_wav},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

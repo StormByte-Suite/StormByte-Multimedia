@@ -51,9 +51,12 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/filters/video/format.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
+
+#include <libavutil/pixfmt.h>
 
 #include <array>
 #include <utility>
@@ -104,7 +107,9 @@ namespace {
 			if (!decoder.empty())
 				track.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{decoder});
 			track.Filter<Filter::Video::Scale>(logger, 320u, 192u);
-			if (encoder == "libsvtav1")
+			if (encoder == "libwebp" || encoder == "libwebp_anim")
+				track.Filter<Filter::Video::Format>(logger, AV_PIX_FMT_YUV420P);
+			else if (encoder == "libsvtav1")
 				track.Preset(StormByte::Safe::String{"12"}).CRF(40);
 			else if (encoder == "libx264" || encoder == "libx265")
 				track.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
@@ -189,6 +194,20 @@ int test_x265_encodes_hevc_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/x265.mkv", "Matroska", "H.265", "libx265");
 }
 
+int test_libwebp_anim_encodes_webp() {
+	return CheckVideoEncode("pipeline/video-codecs/webp-anim.webp", "WebP", "WebP", "libwebp_anim");
+}
+
+int test_libwebp_decodes_animated_webp() {
+	const auto encoded = OutputPath("pipeline/video-codecs/webp-decode-source.webp");
+	const int result = CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"), encoded,
+		"WebP", "WebP", "libwebp_anim");
+	if (result != 0)
+		return result;
+	return CheckVideoCodec(encoded, OutputPath("pipeline/video-codecs/webp-decoded.webm"),
+		"WebM", "VP9", "libvpx-vp9", "libwebp");
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_svt_av1_encodes_matroska", test_svt_av1_encodes_matroska},
@@ -202,6 +221,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_openh264_encodes_h264_matroska", test_openh264_encodes_h264_matroska},
 		TestEntry{"test_kvazaar_encodes_hevc_matroska", test_kvazaar_encodes_hevc_matroska},
 		TestEntry{"test_x265_encodes_hevc_matroska", test_x265_encodes_hevc_matroska},
+		TestEntry{"test_libwebp_anim_encodes_webp", test_libwebp_anim_encodes_webp},
+		TestEntry{"test_libwebp_decodes_animated_webp", test_libwebp_decodes_animated_webp},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

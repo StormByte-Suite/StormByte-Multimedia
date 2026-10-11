@@ -608,7 +608,8 @@ namespace {
 		if (message.find("encoder implementation is unavailable") != std::string_view::npos)
 			return TEST_SKIP;
 		TEST_REQUIRE(message.find("Dolby Vision") != std::string_view::npos
-			|| message.find("DOVI") != std::string_view::npos);
+			|| message.find("DOVI") != std::string_view::npos
+			|| message.find("drops source features") != std::string_view::npos);
 		return 0;
 	}
 }

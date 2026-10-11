@@ -5,9 +5,6 @@ if(WITH_FFMPEG STREQUAL "BUNDLED" AND WITH_NONFREE)
 endif()
 
 foreach(test_name IN ITEMS
-	test_fdk_aac_encodes_stereo_mp4
-	test_fdk_aac_encodes_surround_mp4
-	test_fdk_aac_decodes_surround_to_flac
 	test_libvorbis_encodes_stereo_ogg
 	test_libvorbis_encodes_surround_matroska
 	test_libvorbis_decode_roundtrip
@@ -26,3 +23,19 @@ foreach(test_name IN ITEMS
 	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
 endforeach()
+
+if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_NONFREE))
+	foreach(test_name IN ITEMS
+		test_fdk_aac_encodes_stereo_mp4
+		test_fdk_aac_encodes_surround_mp4
+		test_fdk_aac_decodes_surround_to_flac
+	)
+		add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
+		set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+	endforeach()
+endif()
+
+if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_GPL))
+	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests test_rubberband_stretches_stereo_wav)
+	set_tests_properties("pipeline.test_rubberband_stretches_stereo_wav" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+endif()

@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/bitmask.hxx>
 #include <StormByte/buffer/io/buffered_location_reader.hxx>
 #include <StormByte/buffer/io/buffered_location_writer.hxx>
 #include <StormByte/buffer/telemetry.hxx>
@@ -187,7 +188,11 @@ namespace StormByte {
 			 *
 			 * @ref Check tests formation of this intention only. Success
 			 * does not mean the tube will run. Boolean conversion reports
-			 * whether @ref Check succeeds.
+			 * whether @ref Check succeeds. @ref Policy::EnforceFeatures,
+			 * set on construction, makes @ref Check reject an encode that
+			 * would drop source features. @ref Policies(Policy) adds a
+			 * flag. @ref Policies with `~flag` clears that flag. Neither
+			 * call replaces the rest of the mask.
 			 *
 			 * @ingroup multimedia_pipeline
 			 */
@@ -202,6 +207,95 @@ namespace StormByte {
 						Running,	///< Pipeline execution has started.
 						Finished,	///< Pipeline execution completed successfully.
 						Failed		///< Pipeline formation or execution failed.
+					};
+
+					/**
+					 * @enum Policy
+					 * @brief Job-intention flags. Bits must be disjoint; Has() is a bitmask test.
+					 *
+					 * None is zero and is not a policy. EnforceFeatures is the
+					 * first flag. Further policies take the next free bit.
+					 */
+					enum class Policy: std::uint32_t {
+						None				= 0,		///< No flags.
+						EnforceFeatures		= 1u << 0	///< Check rejects an encode that drops source features.
+					};
+
+					/**
+					 * @brief Bitwise complement of one flag, for @ref Policies(Policy).
+					 * @param policy Flag to negate.
+					 * @return Policy whose defined bits are inverted.
+					 *
+					 * `Policies(~Policy::EnforceFeatures)` clears that flag
+					 * and leaves every other flag as it was.
+					 */
+					friend constexpr enum Policy operator~(enum Policy policy) noexcept {
+						return static_cast<enum Policy>(~static_cast<std::uint32_t>(policy));
+					}
+
+					/**
+					 * @brief Converts a Policy to a stable token.
+					 * @param policy Policy value.
+					 * @return Literal. Unknown bits return "UnknownPolicy".
+					 */
+					static constexpr const char* ToString(enum Policy policy) noexcept {
+						switch (policy) {
+							case Policy::None:				return "None";
+							case Policy::EnforceFeatures:	return "EnforceFeatures";
+						}
+						return "UnknownPolicy";
+					}
+
+					/**
+					 * @class Policies
+					 * @brief Bitmask of @ref Policy flags.
+					 * @note Stores only enum flags and a Bitmask vtable, with no owning heap state.
+					 * Conditional DLL safety requires a compatible compiler, standard-library ABI
+					 * and provider layout, with the multimedia provider loaded during use.
+					 */
+					class STORMBYTE_MULTIMEDIA_PUBLIC Policies: public StormByte::Bitmask<Policies, Policy> {
+						public:
+							/**
+							 * @brief Empty mask.
+							 */
+							constexpr Policies() noexcept: Bitmask() {}
+
+							/**
+							 * @brief Mask from one flag.
+							 * @param policy Initial flag.
+							 */
+							constexpr Policies(enum Policy policy) noexcept: Bitmask(policy) {}
+
+							/**
+							 * @brief Copy constructor.
+							 * @param other Source mask.
+							 */
+							constexpr Policies(const Policies& other) noexcept = default;
+
+							/**
+							 * @brief Move constructor.
+							 * @param other Source mask.
+							 */
+							constexpr Policies(Policies&& other) noexcept = default;
+
+							/**
+							 * @brief Destructor.
+							 */
+							constexpr ~Policies() noexcept override = default;
+
+							/**
+							 * @brief Copy assignment.
+							 * @param other Source mask.
+							 * @return *this.
+							 */
+							constexpr Policies& operator=(const Policies& other) noexcept = default;
+
+							/**
+							 * @brief Move assignment.
+							 * @param other Source mask.
+							 * @return *this.
+							 */
+							constexpr Policies& operator=(Policies&& other) noexcept = default;
 					};
 
 					/**
@@ -418,6 +512,36 @@ namespace StormByte {
 					}
 
 					/**
+					 * @brief Active intention flags.
+					 * @return Mask. EnforceFeatures is set at construction.
+					 */
+					inline const class Policies& Policies() const noexcept {
+						return m_policies;
+					}
+
+					/**
+					 * @brief Adds @p policy, or clears it when passed as `~policy`.
+					 * @param policy Flag to add, or the complement from @ref operator~(Policy).
+					 *
+					 * A value that only has defined bits is added. Other flags
+					 * stay set. `~Policy::EnforceFeatures` clears only that
+					 * flag. This does not replace the mask and does not take
+					 * @ref Policies.
+					 */
+					inline void Policies(enum Policy policy) noexcept {
+						constexpr auto defined = static_cast<std::uint32_t>(Policy::EnforceFeatures);
+						const auto bits = static_cast<std::uint32_t>(policy);
+						if ((bits & ~defined) == 0) {
+							if (bits != 0)
+								m_policies.Add(policy);
+							return;
+						}
+						const auto clear = defined & ~bits;
+						if (clear != 0)
+							m_policies.Remove(static_cast<enum Policy>(clear));
+					}
+
+					/**
 					 * @}
 					 */
 
@@ -434,6 +558,10 @@ namespace StormByte {
 					 * category, or star-star (all).
 					 * Duplicate @ref Track::In is allowed. Encode knobs on a
 					 * remux track (`Codec() == nullptr`) are ignored.
+					 * With @ref Policy::EnforceFeatures, an encode whose
+					 * destination codec has no implementation that keeps the
+					 * source HDR10, HDR10+ or Dolby Vision features also fails.
+					 * Other checks run either way.
 					 *
 					 * @return Empty value, or @ref PlanException.
 					 */
@@ -620,6 +748,15 @@ namespace StormByte {
 					mutable StormByte::Safe::Atomic<enum State> m_state{State::Created};	///< Published execution state.
 					mutable StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< First supplied failure reason.
 					StormByte::Safe::Unique<Observers> m_observers;	///< Provider-owned notification registry.
+
+				protected:
+					/**
+					 * @brief Intention flags. Constructed with @ref Policy::EnforceFeatures.
+					 *
+					 * The public setter adds a flag, or clears it with `~flag`.
+					 * Derived plans may also @ref StormByte::Bitmask::Remove.
+					 */
+					class Policies m_policies{Policy::EnforceFeatures};
 			};
 
 			/**
@@ -637,4 +774,12 @@ namespace StormByte {
  * @brief Registers the completed provider-owned plan.
  * @note Derived factories must construct the exact payload type in its provider module.
  */
+/**
+ * @brief Declare the allocation-free policy mask conditionally DLL-safe.
+ * @note `class` selects the nested type; the same name is also a member function.
+ * The mask stores only enum bits plus the Bitmask vtable. Default construction,
+ * copy, move, assignment and destruction allocate nothing. Its inline operations
+ * require a compatible provider ABI, with the multimedia provider loaded during use.
+ */
+STORMBYTE_DECLARE_MAYBE_SAFE(class StormByte::Multimedia::Pipeline::Plan::Policies);
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::Plan);

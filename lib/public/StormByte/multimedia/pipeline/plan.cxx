@@ -48,7 +48,12 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
+#include <StormByte/multimedia/property/dovi.hxx>
+#include <StormByte/multimedia/property/video.hxx>
+#include <StormByte/multimedia/stream.hxx>
+#include <tables/encoder/table.hxx>
 
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/backend/local_file_reader.hxx>
@@ -69,7 +74,9 @@
 #include <algorithm>
 #include <cctype>
 #include <optional>
+#include <span>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -80,6 +87,8 @@ extern "C" {
 using StormByte::Buffer::IO::BufferedLocationReader;
 using StormByte::Buffer::IO::BufferedLocationWriter;
 using namespace StormByte::Multimedia::Pipeline;
+using StormByte::Multimedia::Feature;
+using StormByte::Multimedia::Features;
 
 /**
  * @class Plan::Observers
@@ -226,6 +235,44 @@ namespace {
 		if (const auto* att = dynamic_cast<const Config::Attachment*>(config))
 			return att->MimeType();
 		return std::nullopt;
+	}
+
+	Features SourceFeatures(const StormByte::Multimedia::Stream& stream) noexcept {
+		Features need;
+		const auto video = stream.Video();
+		if (!video)
+			return need;
+		if (video->HDR10()) {
+			need.Add(Feature::HDR10);
+			if (video->HDR10()->IsHDR10Plus())
+				need.Add(Feature::HDR10Plus);
+		}
+		if (video->DOVI() && video->DOVI()->Present())
+			need.Add(Feature::DOVI);
+		return need;
+	}
+
+	bool CodecKeeps(std::string_view codec, std::string_view pin, const Features& need) noexcept {
+		const auto keeps = [&](std::span<const StormByte::Multimedia::Tables::Encoder::EncoderDef> rows) noexcept {
+			for (const auto& row : rows) {
+				if (!row.codec || codec != row.codec)
+					continue;
+				if (!pin.empty() && pin != row.name)
+					continue;
+				if (row.features.Has(need))
+					return true;
+			}
+			return false;
+		};
+		return keeps(StormByte::Multimedia::Tables::Encoder::Video())
+			|| keeps(StormByte::Multimedia::Tables::Encoder::Audio())
+			|| keeps(StormByte::Multimedia::Tables::Encoder::Subtitle());
+	}
+
+	std::string EncoderPin(const Config::Base* config) {
+		if (!config || !config->Implementation().Encoder)
+			return {};
+		return std::string{std::string_view{*config->Implementation().Encoder}};
 	}
 }
 
@@ -474,6 +521,19 @@ CheckResult Plan::Validate(bool tracks) const {
 		const auto* dest = DestinationCodec(track.Config());
 		if (dest && dest->Type() != track.Type())
 			return fail("destination codec type does not match the track");
+		if (!dest || !m_policies.Has(Policy::EnforceFeatures))
+			continue;
+		const auto& streams = m_snapshot->Streams();
+		for (std::size_t index = 0; index < streams.size(); ++index) {
+			if (streams[index].Index() != track.In())
+				continue;
+			const Features need = SourceFeatures(streams[index]);
+			if (!need.Has(Feature::HDR10) && !need.Has(Feature::HDR10Plus) && !need.Has(Feature::DOVI))
+				break;
+			if (!CodecKeeps(dest->Name(), EncoderPin(track.Config()), need))
+				return fail("destination codec drops source features");
+			break;
+		}
 	}
 
 	return CheckResult{};

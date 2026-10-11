@@ -78,6 +78,8 @@ namespace {
 		{ "VP9", "vp9_cuvid", "NVIDIA CUVID VP9", 50, Feature::HardwareAcceleration | Feature::LowDelay | Feature::RealTime | Feature::TenBit | Feature::HDR10 | Feature::WideGamut | Feature::ZeroCopy },
 		{ "VP9", "vp9_qsv", "Intel QSV VP9", 52, Feature::HardwareAcceleration | Feature::LowDelay | Feature::RealTime | Feature::TenBit | Feature::HDR10 },
 		{ "VP9", "vp9_vaapi", "VAAPI VP9", 53, Feature::HardwareAcceleration | Feature::LowDelay | Feature::RealTime | Feature::TenBit | Feature::HDR10 | Feature::WideGamut },
+		{ "WebP", "libwebp", "libwebp decoder", 0, Features{} },
+		{ "WebP Animated", "libwebp", "libwebp decoder", 0, Features{} },
 	};
 }
 

@@ -59,6 +59,7 @@
 
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <vector>
 
 extern "C" {
@@ -300,7 +301,8 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		}
 	}
 
-	if (ctx->codec_type == AVMEDIA_TYPE_SUBTITLE && !ctx->subtitle_header) {
+	if (ctx->codec_type == AVMEDIA_TYPE_SUBTITLE && !ctx->subtitle_header
+		&& (!codec->name || std::string_view{codec->name} != "ttml")) {
 		const auto n = std::strlen(DefaultAssHeader);
 		ctx->subtitle_header = static_cast<std::uint8_t*>(av_malloc(n + 1));
 		if (!ctx->subtitle_header) {

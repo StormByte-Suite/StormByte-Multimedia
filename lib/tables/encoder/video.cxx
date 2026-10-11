@@ -74,6 +74,9 @@ namespace {
 		{ "AV1", "av1_vaapi", "VAAPI AV1", 12, Feature::HardwareAcceleration | Feature::LowDelay | Feature::RealTime | Feature::TenBit | Feature::WideGamut, "", "", "", "qp", "b", "maxrate", "bufsize", "", "" },
 		{ "VP8", "libvpx", "libvpx VP8 encoder", 0, Feature::LowDelay | Feature::RealTime | Feature::Slices, "", "", "", "crf", "b", "maxrate", "bufsize", "", "" },
 		{ "VP9", "libvpx-vp9", "libvpx VP9 encoder", 0, Feature::LowDelay | Feature::RealTime | Feature::Slices | Feature::TenBit | Feature::TwelveBit | Feature::HDR10 | Feature::WideGamut, "", "", "", "crf", "b", "maxrate", "bufsize", "", "" },
+		{ "WebP", "libwebp_anim", "libwebp animated encoder", 0, Features{}, "", "", "", "", "", "", "", "", "" },
+		{ "WebP", "libwebp", "libwebp still encoder", 1, Features{}, "", "", "", "", "", "", "", "", "" },
+		{ "WebP Animated", "libwebp_anim", "libwebp animated encoder", 0, Features{}, "", "", "", "", "", "", "", "", "" },
 	};
 }
 

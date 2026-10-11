@@ -1,0 +1,14 @@
+add_executable(MultimediaPipelineSubtitleCodecTests subtitle_codec_test.cxx)
+target_link_libraries(MultimediaPipelineSubtitleCodecTests PRIVATE multimedia_pipeline_test_support)
+
+foreach(test_name IN ITEMS
+	test_srt_encodes_srt
+	test_ass_encodes_matroska
+	test_webvtt_encodes_vtt
+	test_mov_text_encodes_mp4
+	test_ttml_encodes_matroska
+	test_pgssub_remuxes_sup
+)
+	add_optional_pipeline_test(MultimediaPipelineSubtitleCodecTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;subtitle-codecs")
+endforeach()

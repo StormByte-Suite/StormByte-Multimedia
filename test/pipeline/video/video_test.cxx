@@ -51,10 +51,14 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/filters/video/format.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
+#include <libavutil/pixfmt.h>
+
 #include <array>
+#include <utility>
 
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
@@ -120,6 +124,44 @@ namespace {
 		TEST_REQUIRE(SamePoint(after.LightLevel().value(), before.LightLevel().value()));
 	return 0;
 }
+
+	class UnenforcedPlan final: public Plan {
+		public:
+			UnenforcedPlan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const StormByte::Safe::Function<void(double)>* progress) noexcept
+			: Plan(std::move(reader), std::move(writer), std::move(duration), progress) {
+				Policies(~Policy::EnforceFeatures);
+			}
+
+			UnenforcedPlan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				const class Container& container,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const StormByte::Safe::Function<void(double)>* progress) noexcept
+			: Plan(std::move(reader), std::move(writer), container, std::move(duration), progress) {
+				Policies(~Policy::EnforceFeatures);
+			}
+	};
+
+	class UnenforcedJob final: public Transcoder {
+		public:
+			using Transcoder::Transcoder;
+
+			StormByte::Safe::Shared<class Plan> EmptyPlan(
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const class Container* container) const noexcept override {
+				const auto progress = DurationProgress();
+				if (container)
+					return StormByte::Safe::Shared<class Plan>::MakePointer<UnenforcedPlan>(
+						std::move(reader), std::move(writer), *container, std::move(duration), &progress);
+				return StormByte::Safe::Shared<class Plan>::MakePointer<UnenforcedPlan>(
+					std::move(reader), std::move(writer), std::move(duration), &progress);
+			}
+	};
 }
 
 int test_transcoder_hevc_encode_output_file_properties() {
@@ -179,11 +221,68 @@ int test_transcoder_vp9_encode_preserves_hdr10_metadata() {
 	return CheckHdr10EncodeOutput(output, "VP9");
 }
 
+int test_transcoder_enforce_features_rejects_hdr10_loss() {
+	auto h264 = Registry::Instance().FindCodec("H.264");
+	TEST_REQUIRE(h264);
+	const auto output = OutputPath("pipeline/enforce-features-reject-hdr10.mkv");
+	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
+	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
+	job.Video(0).Codec(h264.value().get());
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
+	job.Run();
+	return WaitForTranscoderFailure(job, "drops source features");
+}
+
+int test_transcoder_without_enforce_features_drops_hdr10() {
+	auto h264 = Registry::Instance().FindCodec("H.264");
+	TEST_REQUIRE(h264);
+	if (!h264.value().get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+
+	const auto sourcePath = FixturePath("video/hdr10_metadata_source.mkv");
+	const auto output = OutputPath("pipeline/hdr10-dropped-h264.mkv");
+	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
+	UnenforcedJob job{TestLocation(sourcePath), TestLocation(output), logger, 2000000000LL};
+	job.Video(0).Codec(h264.value().get())
+		.Implementation(StormByte::Safe::String{"libx264"})
+		.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30)
+		.Filter<Filter::Video::Format>(logger, AV_PIX_FMT_YUV420P);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
+	job.Run();
+	if (const int waited = WaitForOptionalCodec(job); waited != 0)
+		return waited;
+	TEST_REQUIRE(job.Plan());
+	TEST_REQUIRE(!job.Plan()->Policies().Has(Plan::Policy::EnforceFeatures));
+
+	TEST_PHASE("opening media file for inspection");
+	auto source = File::Open(StormByte::Safe::String{sourcePath.string()});
+	TEST_REQUIRE(source);
+	const auto sourceVideo = source.value().Streams()[0].Video();
+	TEST_REQUIRE(sourceVideo && sourceVideo.value().HDR10());
+	TEST_REQUIRE(sourceVideo.value().HDR10()->Origin() == StormByte::Multimedia::Property::HDR10::Source::Metadata);
+
+	auto encoded = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(encoded);
+	TEST_REQUIRE(encoded.value().Streams().size() == 1);
+	const auto stream = encoded.value().Streams()[0];
+	TEST_REQUIRE(stream.Codec().Name() == "H.264");
+	const auto encodedVideo = stream.Video();
+	TEST_REQUIRE(encodedVideo);
+	TEST_REQUIRE(!encodedVideo.value().HDR10());
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_transcoder_hevc_encode_output_file_properties", test_transcoder_hevc_encode_output_file_properties},
 		TestEntry{"test_transcoder_hevc_encode_preserves_hdr10_metadata", test_transcoder_hevc_encode_preserves_hdr10_metadata},
 		TestEntry{"test_transcoder_vp9_encode_preserves_hdr10_metadata", test_transcoder_vp9_encode_preserves_hdr10_metadata},
+		TestEntry{"test_transcoder_enforce_features_rejects_hdr10_loss", test_transcoder_enforce_features_rejects_hdr10_loss},
+		TestEntry{"test_transcoder_without_enforce_features_drops_hdr10", test_transcoder_without_enforce_features_drops_hdr10},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

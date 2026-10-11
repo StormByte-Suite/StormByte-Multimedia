@@ -62,6 +62,7 @@ namespace {
 		{ "WebVTT", "webvtt", "WebVTT encoder", 0, Features{}, "", "", "", "", "", "", "", "", "" },
 		{ "UTF-8 Text", "text", "Raw UTF-8 text encoder", 1, Features{}, "", "", "", "", "", "", "", "", "" },
 		{ "3GPP Timed Text", "mov_text", "3GPP / MP4 timed text encoder", 0, Features{}, "", "", "", "", "", "", "", "", "" },
+		{ "TTML", "ttml", "TTML encoder", 0, Features{}, "", "", "", "", "", "", "", "", "" },
 	};
 }
 
