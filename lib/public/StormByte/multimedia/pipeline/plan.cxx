@@ -126,17 +126,56 @@ namespace {
 	}
 
 	const StormByte::Multimedia::Container* FormatIdentity(const AVOutputFormat& format) noexcept {
-		std::string_view names{format.name};
+		const std::string_view all{format.name ? format.name : ""};
+		const StormByte::Multimedia::Container* best = nullptr;
+		int bestScore = -1;
+		std::string_view names = all;
 		while (!names.empty()) {
 			const auto separator = names.find(',');
-			const auto found = StormByte::Multimedia::Registry::Instance().FindContainer(names.substr(0, separator));
-			if (found)
-				return &found.value().get();
+			const auto token = names.substr(0, separator);
+			const auto found = StormByte::Multimedia::Registry::Instance().FindContainer(token);
+			if (found) {
+				const auto& container = found.value().get();
+				int score = token == container.Extension() ? 10 : 0;
+				std::string_view rest = all;
+				while (!rest.empty()) {
+					const auto next = rest.find(',');
+					const auto piece = rest.substr(0, next);
+					const auto same = StormByte::Multimedia::Registry::Instance().FindContainer(piece);
+					if (same && same.value().get().Name() == container.Name())
+						++score;
+					if (next == std::string_view::npos)
+						break;
+					rest.remove_prefix(next + 1);
+				}
+				if (score > bestScore) {
+					best = &container;
+					bestScore = score;
+				}
+			}
 			if (separator == std::string_view::npos)
 				break;
 			names.remove_prefix(separator + 1);
 		}
-		return nullptr;
+		return best;
+	}
+
+	bool FormatServes(const AVOutputFormat& format,
+		const StormByte::Multimedia::Container& container) noexcept {
+		std::string_view names{format.name ? format.name : ""};
+		while (!names.empty()) {
+			const auto separator = names.find(',');
+			const auto token = names.substr(0, separator);
+			if (token == container.Extension())
+				return true;
+			const auto found = StormByte::Multimedia::Registry::Instance().FindContainer(token);
+			if (found && found.value().get().Name() == container.Name())
+				return true;
+			if (separator == std::string_view::npos)
+				break;
+			names.remove_prefix(separator + 1);
+		}
+		return false;
 	}
 
 	const AVOutputFormat* IdentityFormat(const StormByte::Multimedia::Container& container) noexcept {
@@ -144,13 +183,27 @@ namespace {
 		if (!registered || registered.value().get().Name() != container.Name()
 			|| !container.HasAccess(StormByte::Multimedia::Operation::Write))
 			return nullptr;
+
+		// extensions[0] / the first FFmpeg id is the muxer we mean to open.
+		if (!container.Extension().empty()) {
+			const std::string intended{container.Extension()};
+			if (const auto* format = av_guess_format(intended.c_str(), nullptr, nullptr)) {
+				if (!(format->flags & AVFMT_NOFILE) && FormatServes(*format, container))
+					return format;
+			}
+		}
+
+		const AVOutputFormat* fallback = nullptr;
 		void* cursor = nullptr;
 		while (const auto* format = av_muxer_iterate(&cursor)) {
-			const auto* identity = FormatIdentity(*format);
-			if (identity && identity->Name() == container.Name())
-				return av_guess_format(format->name, nullptr, nullptr);
+			if (!format->name || (format->flags & AVFMT_NOFILE) || !FormatServes(*format, container))
+				continue;
+			if (std::string_view{format->name}.find(',') == std::string_view::npos)
+				return format;
+			if (!fallback)
+				fallback = format;
 		}
-		return nullptr;
+		return fallback;
 	}
 
 	const StormByte::Multimedia::Codec* DestinationCodec(
@@ -246,7 +299,13 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 		format = IdentityFormat(*container);
 	if (container && format && !(format->flags & AVFMT_NOFILE)) {
 		m_container = container;
-		m_format = format->name;
+		// Keep the intended id, not FFmpeg's first alias in a comma-separated name.
+		if (format->name && std::string_view{format->name}.find(',') == std::string_view::npos)
+			m_format = format->name;
+		else if (!container->Extension().empty())
+			m_format = container->Extension().data();
+		else
+			m_format = format->name;
 	}
 	else if (container)
 		m_container = container;
