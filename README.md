@@ -88,7 +88,7 @@ You either let `Transcoder` assemble a job from a fluent map of origin streams, 
 
 ### 1. Transcoder (File → File)
 
-`Transcoder` is the recommended starting point for a File-to-File job. Construct it with source and destination paths, map **output** tracks in mux order, choose remux or encoding, attach filters, and run. The destination container is inferred from the writer path. The stock class is complete for remuxing, transcoding and filtering; inheritance is for adding application-specific behavior, not a prerequisite for ordinary use.
+`Transcoder` is the recommended starting point for a File-to-File job. Construct it with source and destination paths, map **output** tracks in mux order, choose remux or encoding, attach filters, and run. The destination container is inferred from the writer path unless an explicit registered `const Container&` override is supplied. The stock class is complete for remuxing, transcoding and filtering; inheritance is for adding application-specific behavior, not a prerequisite for ordinary use.
 
 It is also **designed to be inherited**. Override `EmptyPlan()` / `EmptySettled()` for application-specific state, or lifecycle hooks such as `OnProgress`, `OnDone` and `OnError` to connect a UI, scheduler or batch runner. You can extend the job description and orchestration while retaining the same pipeline stages and behavior.
 
@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 	}
 
 	auto logger = StormByte::Safe::MakeShared<ThreadedLog>(std::cout, Level::Debug, "[%L] %T %c");
-	Transcoder job{std::filesystem::path{argv[1]}, std::filesystem::path{argv[2]}, logger};
+	Transcoder job{String{argv[1]}, String{argv[2]}, logger};
 
 	auto& registry = Registry::Instance();
 	auto hevc = registry.FindCodec("H.265");
@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
 	for (;;) {
 		const auto status = job.Status();
 		if (auto progress = job.Progress())
-			std::cout << '\r' << static_cast<std::string>(*progress) << std::flush;
+			std::cout << '\r' << static_cast<String>(*progress) << std::flush;
 		if (status == Status::Done)
 			break;
 		if (status == Status::Error || status == Status::Aborted) {
@@ -182,6 +182,7 @@ What that mapping means:
 | `Ignore(n)` | Drop origin stream `n`. |
 | `Attachments()` / `Attachments("image/png")` | Keep all attachments, or only a MIME. Default without a call is drop. |
 | `Transcoder(source, destination, logger)` | Supplies locations before mapping; the writer path determines the container. |
+| `Transcoder(source, destination, container, logger)` | Uses the borrowed registered container identity regardless of the writer suffix. |
 | `Filter<Analytics>(…)` on the **job** | Global analytics on matching encode or remux lanes; `Track::Filter` also accepts track-scoped analytics. |
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
@@ -217,8 +218,9 @@ A short recode of one video track into Matroska:
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <algorithm>
+#include <array>
 #include <chrono>
-#include <filesystem>
 #include <iostream>
 #include <thread>
 #include <utility>
@@ -235,11 +237,12 @@ int main() {
 			StormByte::Multimedia::Operation::Write}))
 		return 1;
 
-	Plan plan{std::filesystem::path{"in.mkv"}, std::filesystem::path{"out.mkv"}};
+	auto plan = StormByte::Safe::MakeShared<Plan>(
+		StormByte::Safe::String{"in.mkv"}, StormByte::Safe::String{"out.mkv"});
 	Config::Video video;
 	video.Codec(hevc->get());
-	plan.add(Track{0, std::move(video)});
-	if (auto check = plan.Check(); !check) {
+	plan->add(Track{0, std::move(video)});
+	if (auto check = plan->Check(); !check) {
 		std::cerr << check.error()->what() << '\n';
 		return 1;
 	}
@@ -248,24 +251,43 @@ int main() {
 	Decoder decode(logger, 0);
 	Encoder encode(logger, 0, hevc->get());
 	Muxer mux(logger);
-	std::move(plan) >> demux;
+	const std::array<Step*, 4> stages{&demux, &decode, &encode, &mux};
+	struct StopPeers {
+		const std::array<Step*, 4>& stages;
+		~StopPeers() {
+			for (Step* stage : stages)
+				stage->Stop();
+		}
+	} teardown{stages};
 	demux >> mux;
 	demux >> decode;
 	decode >> encode;
 	encode >> mux;
+	plan >> demux;
+	if (plan->State() == Plan::State::Failed)
+		return 1;
 
-	while (mux.Status() != State::Stopped && !mux.Failed()) {
-		if (demux.Failed() || decode.Failed() || encode.Failed()) {
-			mux.Stop();
+	const auto stopped = [&] {
+		return std::all_of(stages.begin(), stages.end(), [](const Step* stage) {
+			return stage->Status() == State::Stopped;
+		});
+	};
+	const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+	while (!stopped()) {
+		if (plan->State() == Plan::State::Failed
+			|| std::chrono::steady_clock::now() >= deadline)
 			return 1;
-		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
-	return demux.Failed() || decode.Failed() || encode.Failed() || mux.Failed() ? 1 : 0;
+	return plan->State() == Plan::State::Finished ? 0 : 1;
 }
 ```
 
-`operator>>` shares the `Plan` and binds hoppers. `Demuxer` produces `Packet`s and receives nothing. `Decoder` turns those into `Frame`s. `Encoder` produces `Packet`s again. `Muxer` reserves the output slot — remux does not. Fan-out from one demuxer to several decoders / remuxers is the same operator.
+`Plan` is noncopyable and nonmovable. Construct a `Safe::Shared<Plan>` and bind that handle with `plan >> demux`; there is no value binding or `Plan::Move()`. Stage constructors still launch their workers immediately, but setup waits for the shared Plan to become `Running`. Finish all configuration and typed connections before binding the Plan. Binding publishes `Running`. `Demuxer` produces `Packet`s and receives nothing. `Decoder` turns those into `Frame`s. `Encoder` produces `Packet`s again. `Muxer` reserves the output slot, not the remuxer. Fan-out from one demuxer to several decoders or remuxers uses the same operator.
+
+Keep every stage alive through execution, failure propagation and Plan notifications. Request Stop on all peers before destroying any of them; stage destruction stops and joins its own worker. `Stop()` alone is nonblocking and a terminal status is not an all-worker join barrier. Externally serialize Plan state publication and teardown: no thread may publish a state or notify a borrowed stage while that stage is being destroyed. The example requests cancellation on all peers on every exit; applications with concurrent controllers must additionally quiesce those controllers before leaving the stage scope.
+
+The library publishes `Finished` when every participating stage has completed successfully. Muxer completion alone is insufficient while filters or analytics are still active; keep the graph and its endpoints alive until `Idle`. On failure, preserve `Plan::Error()` and tear down the whole graph. Applications observe `plan->State()`; they do not publish it.
 
 `Filters` sits between two `StormByte::Safe::Shared<Step>` ends when you need a filter chain or analytics. `Transcoder` builds that graph for you. By hand:
 
@@ -277,14 +299,22 @@ int main() {
 auto decode = StormByte::Safe::MakeShared<Decoder>(logger, 0);
 auto encode = StormByte::Safe::MakeShared<Encoder>(logger, 0, hevc->get());
 Filters graph;
+demux >> mux;
+demux >> *decode;
+*encode >> mux;
 graph.Between(decode, encode).Add<Filter::Video::Scale>(logger, 1920u, 1080u);
 graph.Add<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"});	// one node, every matching stretch
 graph.Close();
+plan >> demux;
 ```
+
+This is an alternative assembly sequence, not a graph to attach after starting the preceding example. Connect its source and mux destination first, register all filters, analytics consumers and forks, and call `graph.Close()` **before** `plan >> demux`. Binding publishes `Running`. Keep the graph and its endpoints alive until execution and notifications finish, and wait for `graph.Idle()` as well as every stage. Observe `Finished`; do not publish it.
 
 ## Plan, items and the tube contract
 
-- **`Plan`** describes the job: input/output locations, a source-file snapshot and the **output** tracks. The destination container is inferred from the writer path. `Check()` validates the plan's structure; codec and format availability are confirmed when the job is configured.
+- **`Plan`** describes the job: owned input/output locations, a private source-file snapshot and the **output** tracks. Use public configuration operations, including `add`, before binding; `Check()` and `Tracks()` are public. `Snapshot()`, `Container()`, `Reader()`, `Writer()` and `Path()` are private implementation accessors, not an application inspection surface. Inspect source media through `File` and retain `InputTelemetry()` / `OutputTelemetry()` for I/O counters.
+- **Plan lifecycle** uses public `enum class Plan::State` with `Created`, `Running`, `Finished` and `Failed`. Applications only read `plan->State()`. Binding the shared plan to the demuxer publishes `Running`; the first formation or execution failure publishes `Failed` and is preserved; every participating stage completing successfully publishes `Finished`. Failed cannot restart, and Finished does not acquire a later error. `Check()` failure also publishes Failed. There is no public state setter. State, Error and telemetry are the public observation APIs; configure the intention before binding.
+- **Container override**: `Plan(source, destination, const Container&, duration)` and the corresponding owned-reader/writer overloads override filename inference, even for an unknown or conflicting suffix. Supply a writable identity from `Registry::FindContainer`; the Plan borrows it rather than copying it. The registry entry must remain valid through Plan destruction. Without an override, the writer path still selects the registered buffered muxer. `Transcoder` also accepts the identity before its logger argument.
 - **`Packet`** is a compressed access unit. **`Frame`** is a decoded one. No public timing setters. Mutate pixels through `Decoder` / `Encoder` / a filter `Replace`, not a setter on `Frame`.
 - **`Serial`** is a monotone id assigned by the tube. Public getter, no setter. It is not a frame count.
 - **`Remuxer`** forwards compressed packets and adapts them to the destination. “Copy” as a stage does not exist.
@@ -297,11 +327,11 @@ The public API uses `StormByte::Safe` values (`String`, `Optional`), collections
 
 `STORMBYTE_DECLARE_MAYBE_SAFE` is a provider's responsibility and promise, not an automatic audit: a declared type must keep its members, special members and heap-affecting operations boundary-safe. Consumers and providers still need a compatible C++/STL ABI. All providers supplying live values, owners or callbacks must remain loaded until those objects are released; this is neither arbitrary-ABI compatibility nor a safe-unload guarantee.
 
-For custom payloads, derived `Transcoder` providers must override `EmptyPlan()` / `EmptySettled()` in their own module and create the exact derived payload with `Safe::Shared<Plan>::MakePointer<DerivedPlan>(…)` / `Safe::Unique<TrackSettled>::MakePointer<DerivedSettled>(…)`. Derived `Plan` types must override `Move()` there; derived `TrackSettled` types must override both `Clone()` and `Move()` there. Preserve the dynamic type and its provider-local release operations rather than slicing to the base. `Plan::Clone()` is not supported.
+For custom payloads, derived `Transcoder` providers must override `EmptyPlan()` / `EmptySettled()` in their own module and create the exact derived payload with `Safe::Shared<Plan>::MakePointer<DerivedPlan>(…)` / `Safe::Unique<TrackSettled>::MakePointer<DerivedSettled>(…)`. Derived Plans retain shared ownership and do not implement `Clone()` or `Move()`; derived `TrackSettled` types must override both there. Preserve the dynamic type and its provider-local release operations rather than slicing to the base.
 
 ## Filters and analytics
 
-Container output is selected from the destination path and follows the format's supported stream and attachment rules. Matroska, WebM and MP4 support the common media workflows; image attachments can be written as cover art in MP4, while unsupported attachment types are reported rather than silently discarded. The library writes its application identity into supported container metadata. Formats that require multiple output files are outside the single-writer workflow.
+Container output is selected from the destination path unless an explicit registered identity overrides it, and follows the format's supported stream and attachment rules. Matroska, WebM and MP4 support the common media workflows; image attachments can be written as cover art in MP4, while unsupported attachment types are reported rather than silently discarded. The library writes its application identity into supported container metadata. Formats that require multiple output files are outside the single-writer workflow.
 
 Filters are leaves, not a second pipeline language. `Scale` is resize (that is the name). `Watermark` is a still image on decoded video, with Hold so a black slate at the start does not pin the letterbox probe too early.
 

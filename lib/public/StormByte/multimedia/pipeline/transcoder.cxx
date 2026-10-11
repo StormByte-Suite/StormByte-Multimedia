@@ -317,11 +317,44 @@ Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Transcoder(std::move(reader), std::move(writer), std::move(logger), std::move(duration), nullptr) {}
+
+Transcoder::Transcoder(const StormByte::Safe::String& source,
+	const StormByte::Safe::String& destination, const class Container& container,
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger), std::move(duration), &container) {}
+
+Transcoder::Transcoder(const StormByte::Safe::String& source,
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+	const class Container& container, StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Transcoder(LocalReader(source), std::move(writer), std::move(logger), std::move(duration), &container) {}
+
+Transcoder::Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+	const StormByte::Safe::String& destination, const class Container& container,
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger), std::move(duration), &container) {}
+
+Transcoder::Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+	const class Container& container, StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Transcoder(std::move(reader), std::move(writer), std::move(logger), std::move(duration), &container) {}
+
+Transcoder::Transcoder(
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+	StormByte::Safe::Optional<std::int64_t> duration,
+	const class Container* container) noexcept
 : m_app_log(logger), m_logger(std::move(logger)),
 	m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)), m_writer(std::move(writer)),
 	m_duration(duration && duration.value() > 0 ? std::move(duration) : StormByte::Safe::Optional<std::int64_t>{}),
+	m_container(container),
 	m_backend(StormByte::Safe::Unique<Backend::Pipeline::Transcoder>::MakePointer<Backend::Pipeline::Transcoder>()),
 	m_armed(false) {
 	InstallLog();
@@ -356,6 +389,8 @@ void Transcoder::Fail(std::string_view reason) noexcept {
 	if (!m_backend)
 		return;
 	StormByte::Safe::UniqueLock lock(m_backend->Lock);
+	if (m_plan)
+		m_plan->State(Plan::State::Failed, StormByte::Safe::String{reason});
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Relaxed) == Status::Error)
 		return;
 	m_backend->Error = StormByte::Safe::String{reason};
@@ -535,8 +570,16 @@ void Transcoder::Run() noexcept {
 }
 
 void Transcoder::Cancel() noexcept {
-	if (m_backend)
-		m_backend->RequestCancel();
+	if (!m_backend)
+		return;
+	StormByte::Safe::Shared<class Plan> intention;
+	{
+		StormByte::Safe::UniqueLock lock(m_backend->Lock);
+		intention = m_plan;
+	}
+	m_backend->RequestCancel();
+	if (intention)
+		intention->State(Plan::State::Failed, StormByte::Safe::String{"transcode cancelled"});
 }
 
 void Transcoder::Pause() noexcept {
@@ -612,8 +655,12 @@ Transcoder::operator bool() const noexcept {
 StormByte::Safe::Shared<class Plan> Transcoder::EmptyPlan(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-	StormByte::Safe::Optional<std::int64_t> duration) const noexcept {
+	StormByte::Safe::Optional<std::int64_t> duration,
+	const class Container* container) const noexcept {
 	const auto progress = DurationProgress();
+	if (container)
+		return StormByte::Safe::Shared<class Plan>::MakePointer<class Plan>(std::move(reader), std::move(writer),
+			*container, std::move(duration), &progress);
 	return StormByte::Safe::Shared<class Plan>::MakePointer<class Plan>(std::move(reader), std::move(writer), std::move(duration),
 		&progress);
 }

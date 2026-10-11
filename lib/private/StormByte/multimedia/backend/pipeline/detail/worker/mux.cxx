@@ -84,11 +84,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Mux::Setup() noexcept {
-		m_owner.WaitArmed();
-		if (m_owner.Stopping())
-			return;
-		if (!m_owner.m_backend)
-			Fail("muxer has no backend");
+		static_cast<void>(m_owner.SetupPlan());
 	}
 
 	void Mux::Process(Item::PointerType item) noexcept {
@@ -118,7 +114,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		const auto payloadDigest = PacketDigest(packet->Payload());
 
 		while (!m_owner.m_backend->Push(m_owner, packet)) {
-			if (m_owner.Failed())
+			if (Stopping())
 				return;
 			Wait();
 		}

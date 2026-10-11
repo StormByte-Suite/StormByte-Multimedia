@@ -131,6 +131,17 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline {
+	const Multimedia::Pipeline::Track* Ceiling::TrackByIn(
+		const StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept {
+		if (!plan)
+			return nullptr;
+		for (const auto& held : plan->Tracks()) {
+			if (held && held->In() == origin)
+				return held.get();
+		}
+		return nullptr;
+	}
+
 	unsigned Ceiling::MaxThreads() noexcept {
 		static const unsigned cached = [] {
 			unsigned n = std::thread::hardware_concurrency();

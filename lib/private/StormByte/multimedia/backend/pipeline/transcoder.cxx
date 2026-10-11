@@ -293,12 +293,31 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		Clock->BeginDurationCalculation();
 		job.OnProgress();
 	}
-	auto built = job.EmptyPlan(std::move(job.m_reader), std::move(job.m_writer), job.m_duration);
+	auto built = job.EmptyPlan(std::move(job.m_reader), std::move(job.m_writer), job.m_duration,
+		job.m_container);
 	if (!built) {
 		job.Fail("EmptyPlan returned an empty owner");
 		job.OnError(job.Error().value());
 		return;
 	}
+	{
+		StormByte::Safe::UniqueLock lock(Lock);
+		job.m_plan = built;
+		if (Status.load(StormByte::Safe::MemoryOrder::Acquire) == StormByte::Multimedia::Pipeline::Status::Error)
+			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed, Error);
+	}
+	auto failUnlessFinished = [built]() noexcept {
+		if (built->State() != StormByte::Multimedia::Pipeline::Plan::State::Finished)
+			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed,
+				StormByte::Safe::String{"transcode did not finish"});
+	};
+	struct PlanCompletion {
+		decltype(failUnlessFinished)* action;
+
+		~PlanCompletion() noexcept {
+			(*action)();
+		}
+	} completion{&failUnlessFinished};
 	Clock->SetDurationCalculation(std::nullopt);
 	job.OnProgress();
 	if (Stopping(*this)) {
@@ -347,8 +366,6 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	auto mux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Muxer>(tube);
 	RegisterStage(*Metrics, *demux);
 	RegisterStage(*Metrics, *mux);
-	std::move(built) >> *demux;
-	job.m_plan = demux->Plan();
 	*demux >> *mux;
 
 	if (demux->Failed()) {
@@ -428,11 +445,16 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		++muxIndex;
 	}
 
-	if (!mux->Armed())
-		mux->Fail(StormByte::Safe::String{"muxer is not armed; missing encoder or remuxer >> muxer"});
 	for (const auto& filter : Analytics)
 		graph.Add(filter);
 	graph.Close();
+	built >> *demux;
+	if (built->State(StormByte::Multimedia::Pipeline::Plan::State::Running)
+		!= StormByte::Multimedia::Pipeline::Plan::State::Running) {
+		job.Fail(ErrorText(built->Error(), "plan could not start"));
+		job.OnError(ErrorText(job.Error(), "plan could not start"));
+		return;
+	}
 	const auto stages = graph.StageTelemetries();
 	for (auto stage : stages)
 		Metrics->RegisterStage(std::move(stage.Name), std::move(stage.Metrics));
@@ -440,6 +462,10 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	auto captureStageFailure = [&]() noexcept {
 		if (job.Failed())
 			return;
+		if (built->State() == StormByte::Multimedia::Pipeline::Plan::State::Failed) {
+			job.Fail(ErrorText(built->Error(), "plan failed"));
+			return;
+		}
 		if (demux->Failed()) {
 			job.Fail(ErrorText(demux->Error(), "demux failed"));
 			return;
@@ -464,11 +490,42 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 				return;
 			}
 		}
+		for (const auto& slot : Mapped) {
+			for (const auto& filter : slot.Filters) {
+				if (filter && filter->Failed()) {
+					job.Fail(ErrorText(filter->Error(), "track filter failed"));
+					return;
+				}
+			}
+		}
+		for (const auto& filter : Analytics) {
+			if (filter && filter->Failed()) {
+				job.Fail(ErrorText(filter->Error(), "analytics filter failed"));
+				return;
+			}
+		}
+	};
+	auto stagesStopped = [&]() noexcept {
+		using StormByte::Multimedia::Pipeline::State;
+		if (demux->Status() != State::Stopped || mux->Status() != State::Stopped)
+			return false;
+		for (const auto& lane : lanes) {
+			if (lane.Decoder->Status() != State::Stopped || lane.Encoder->Status() != State::Stopped)
+				return false;
+		}
+		for (const auto& remux : remuxes) {
+			if (remux->Status() != State::Stopped)
+				return false;
+		}
+		return true;
 	};
 
 	while (!Stopping(*this)) {
 		WaitIfPaused();
 		if (Stopping(*this))
+			break;
+		captureStageFailure();
+		if (job.Failed())
 			break;
 		if (demux->Failed()) {
 				job.Fail(ErrorText(demux->Error(), "demux failed"));
@@ -525,7 +582,11 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		return;
 	}
 
-	while (!Stopping(*this) && !graph.Idle()) {
+	while (!Stopping(*this) && (!graph.Idle() || !stagesStopped()
+		|| (Clock && Clock->HasAnalytics() && !Clock->AnalyticsComplete()))) {
+		captureStageFailure();
+		if (job.Failed())
+			break;
 		if (demux->Failed()) {
 			job.Fail(ErrorText(demux->Error(), "demux failed"));
 			break;
@@ -578,6 +639,22 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 
 	Reports = graph.Reports();
 	TickHooks(job, graph);
+	captureStageFailure();
+	if (job.Failed()) {
+		job.OnError(ErrorText(job.Error(), "transcode failed"));
+		return;
+	}
+	if (Stopping(*this)) {
+		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
+		job.OnAborted();
+		return;
+	}
+	if (built->State(StormByte::Multimedia::Pipeline::Plan::State::Finished)
+		!= StormByte::Multimedia::Pipeline::Plan::State::Finished) {
+		job.Fail(ErrorText(built->Error(), "plan could not finish"));
+		job.OnError(ErrorText(job.Error(), "plan could not finish"));
+		return;
+	}
 
 	Status.store(StormByte::Multimedia::Pipeline::Status::Done, StormByte::Safe::MemoryOrder::Release);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(

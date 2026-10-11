@@ -527,6 +527,18 @@ namespace StormByte {
 					 */
 					void Emit(Packet::PointerType packet) noexcept;
 
+					/**
+					 * @brief Waits for a running plan or execution termination.
+					 * @return true only while the plan is running.
+					 */
+					bool WaitForPlan() noexcept;
+
+					/**
+					 * @brief Selects the backend and prepares codec headers on the worker.
+					 * @return false after failure.
+					 */
+					bool SetupPlan() noexcept;
+
 					int m_index;								///< Mux destination order key
 					const Codec* m_codec;							///< Destination codec
 					StormByte::Safe::String m_encoderTag;					///< ENCODER metadata

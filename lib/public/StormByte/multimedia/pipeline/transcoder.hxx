@@ -284,6 +284,11 @@ namespace StormByte {
 			 * the opened Encoder. One instance is one Run. Another job is
 			 * another instance.
 			 *
+			 * Assembly uses the same connections as a manual pipeline. Filters
+			 * close before the shared Plan is sent to Demuxer, then the Plan
+			 * enters Running. Finished is published only after every stage and
+			 * analytics complete. Failures and cancellation publish Failed.
+			 *
 			 * Mux order is the order of Video / Audio / Subtitle / Attachments
 			 * calls. There is no output-index argument and no Destination
 			 * setter: the container is the writer extension.
@@ -529,6 +534,62 @@ namespace StormByte {
 					 */
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Builds local locations with an authoritative borrowed container.
+					 * @param source Input path.
+					 * @param destination Output path; its suffix does not select the muxer.
+					 * @param container Registered identity, borrowed through job and Plan destruction.
+					 * @param logger Shared application log.
+					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 */
+					Transcoder(const StormByte::Safe::String& source,
+						const StormByte::Safe::String& destination,
+						const class Container& container,
+						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Builds a local reader and takes the writer with an explicit container.
+					 * @param source Input path.
+					 * @param writer Owned output location.
+					 * @param container Registered identity, borrowed through job and Plan destruction.
+					 * @param logger Shared application log.
+					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 */
+					Transcoder(const StormByte::Safe::String& source,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						const class Container& container,
+						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Takes the reader and builds a writer with an explicit container.
+					 * @param reader Owned input location.
+					 * @param destination Output path; its suffix does not select the muxer.
+					 * @param container Registered identity, borrowed through job and Plan destruction.
+					 * @param logger Shared application log.
+					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 */
+					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						const StormByte::Safe::String& destination,
+						const class Container& container,
+						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Takes both locations with an authoritative borrowed container.
+					 * @param reader Owned input location.
+					 * @param writer Owned output location.
+					 * @param container Registered identity; its registry must outlive the job and Plan.
+					 * @param logger Shared application log.
+					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 */
+					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						const class Container& container,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
 
@@ -793,6 +854,7 @@ namespace StormByte {
 					 * @param reader Owned origin location, transferred from this Transcoder.
 					 * @param writer Owned destination location, transferred from this Transcoder.
 					 * @param duration Authoritative source nanoseconds; absent or non-positive scans the source.
+					 * @param container Borrowed authoritative registry identity; null guesses from the writer path.
 					 * @return Plan of the desired dynamic type, with no tracks yet.
 					 *
 					 * Override to return a type derived from Plan. Tracks are
@@ -805,7 +867,8 @@ namespace StormByte {
 					virtual StormByte::Safe::Shared<class Plan> EmptyPlan(
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) const noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {},
+						const class Container* container = nullptr) const noexcept;
 
 					/**
 					 * @brief Observer for duration resolution in custom EmptyPlan implementations.
@@ -894,6 +957,20 @@ namespace StormByte {
 					friend class Track;
 
 					/**
+					 * @brief Common constructor retaining an optional borrowed destination identity.
+					 * @param reader Owned input location.
+					 * @param writer Owned output location.
+					 * @param logger Shared application log.
+					 * @param duration Authoritative source nanoseconds.
+					 * @param container Borrowed registry identity, or null for automatic selection.
+					 */
+					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
+						StormByte::Safe::Optional<std::int64_t> duration,
+						const class Container* container) noexcept;
+
+					/**
 					 * @brief Marks a hard error and cancels the coordinator.
 					 * @param reason Message stored in Error().
 					 */
@@ -947,6 +1024,7 @@ namespace StormByte {
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;		///< Origin owner until EmptyPlan consumes it
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;		///< Destination owner until EmptyPlan consumes it
 					StormByte::Safe::Optional<std::int64_t> m_duration;						///< Authoritative source nanoseconds, when supplied
+					const class Container* m_container = nullptr;						///< Borrowed registry identity; registry outlives the job and retained Plan.
 					StormByte::Safe::Unique<File> m_consult;								///< Provider-owned consultation snapshot discarded after analysis
 					StormByte::Safe::Shared<class Plan> m_plan;								///< Intention shared with the pipeline after Run
 					StormByte::Safe::Unique<Backend::Pipeline::Transcoder> m_backend;				///< Provider-owned coordinator constructed and destroyed out of line

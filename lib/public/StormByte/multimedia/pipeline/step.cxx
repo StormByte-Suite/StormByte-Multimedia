@@ -54,16 +54,21 @@
 #include <StormByte/multimedia/backend/pipeline/pumper.hxx>
 #include <StormByte/multimedia/backend/pipeline/worker.hxx>
 #include <StormByte/multimedia/log.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
+#include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/unique_lock.hxx>
 
 #include <chrono>
+#include <algorithm>
 #include <format>
 #include <limits>
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace StormByte::Multimedia::Pipeline;
 namespace Backend = StormByte::Multimedia::Backend;
@@ -143,6 +148,10 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 			});
 		}
 
+		void Completed(bool success) noexcept override {
+			m_step.NotifyComplete(success);
+		}
+
 		void BecameReady() noexcept override {
 			m_step.Log(Level::Debug, "ready");
 			m_step.Wake();
@@ -173,6 +182,9 @@ class Step::PrivateState {
 		Backend::Pipeline::Pipe pipe;							///< Input/output queues and wait synchronization
 		Surface surface;										///< Host adapter borrowing the owning step
 		StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper;	///< Worker driver owned through Base heap callbacks
+		StormByte::Safe::Mutex mutex;							///< Plan identity and local failure synchronization
+		std::vector<Step*> downstream;						///< Borrowed graph links; graph owners serialize assembly and teardown
+		std::vector<Step*> pendingWire;						///< Links waiting for a plan before track hoppers exist
 };
 
 Step::Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -194,7 +206,106 @@ Step::Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 
 Step::~Step() noexcept {
 	Halt();
+	if (const auto plan = Plan())
+		plan->Unobserve(*this);
 	delete m_state;
+}
+
+StormByte::Safe::Shared<class Plan> Step::Plan() const noexcept {
+	StormByte::Safe::UniqueLock lock(m_state->mutex);
+	return m_plan;
+}
+
+void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept {
+	if (!plan) {
+		Fail("plan owner is empty");
+		return;
+	}
+	std::vector<Step*> downstream;
+	StormByte::Safe::Optional<StormByte::Safe::String> error;
+	bool conflict = false;
+	{
+		StormByte::Safe::UniqueLock lock(m_state->mutex);
+		if (m_plan == plan)
+			return;
+		conflict = static_cast<bool>(m_plan);
+		if (!conflict) {
+			m_plan = plan;
+			error = m_error;
+			downstream = m_state->downstream;
+		}
+	}
+	if (conflict) {
+		plan->State(Plan::State::Failed, StormByte::Safe::String{"connected stages have conflicting plans"});
+		Fail("connected stages have conflicting plans");
+		return;
+	}
+	plan->Observe(*this);
+	if (error)
+		plan->State(Plan::State::Failed, error);
+	for (auto* stage : downstream)
+		stage->Plan(plan);
+	std::vector<Step*> pending;
+	{
+		StormByte::Safe::UniqueLock lock(m_state->mutex);
+		pending.swap(m_state->pendingWire);
+	}
+	for (auto* stage : pending)
+		if (stage)
+			Wire(*stage);
+	if (m_name == Producer::Demuxer)
+		plan->State(Plan::State::Running);
+	Wake();
+}
+
+void Step::Wire(Step& downstream) noexcept {
+	const auto plan = Plan() ? Plan() : downstream.Plan();
+	if (!plan)
+		return;
+	for (const auto& track : plan->Tracks()) {
+		if (!track || track->Type() == StormByte::Multimedia::Type::Attachment)
+			continue;
+		pipe().To(track->In()) >> downstream.pipe();
+		if (const std::size_t cap = downstream.InputCeiling(); cap > 0)
+			downstream.pipe().Capacity(track->In(), cap);
+	}
+}
+
+void Step::NotifyComplete(bool success) noexcept {
+	if (const auto plan = Plan())
+		plan->Complete(*this, success);
+}
+
+bool Step::Connect(Step& downstream) noexcept {
+	{
+		StormByte::Safe::UniqueLock lock(m_state->mutex);
+		auto& links = m_state->downstream;
+		if (std::find(links.begin(), links.end(), &downstream) == links.end())
+			links.push_back(&downstream);
+	}
+	const auto sourcePlan = Plan();
+	const auto targetPlan = downstream.Plan();
+	if (sourcePlan)
+		downstream.Plan(sourcePlan);
+	else if (targetPlan)
+		Plan(targetPlan);
+	return !Failed() && !downstream.Failed();
+}
+
+bool Step::WaitPlan() noexcept {
+	m_state->pipe.WaitWake(this, [](void* owner) noexcept {
+		auto& step = *static_cast<Step*>(owner);
+		const auto plan = step.Plan();
+		return step.Stopping() || (plan && plan->State() != Plan::State::Created);
+	});
+	const auto plan = Plan();
+	if (Stopping() || !plan)
+		return false;
+	if (plan->State() != Plan::State::Running) {
+		Fail(plan->Error().value_or(StormByte::Safe::String{"plan is not running"}));
+		return false;
+	}
+	return true;
 }
 
 State Step::Status() const noexcept {
@@ -214,9 +325,18 @@ void Step::CloseHoppers() noexcept {
 }
 
 void Step::Fail(StormByte::Safe::String reason) noexcept {
-	m_telemetry->SetError(reason);
-	m_error = std::move(reason);
-	const StormByte::Safe::String message = *m_error;
+	StormByte::Safe::Shared<class Plan> plan;
+	StormByte::Safe::String message;
+	{
+		StormByte::Safe::UniqueLock lock(m_state->mutex);
+		if (!m_error)
+			m_error = std::move(reason);
+		message = *m_error;
+		plan = m_plan;
+	}
+	m_telemetry->SetError(message);
+	if (plan)
+		plan->State(Plan::State::Failed, message);
 	Log(Level::Error, message);
 	if (m_state->pumper)
 		m_state->pumper->Fail(static_cast<std::string>(message));
@@ -260,7 +380,8 @@ bool Step::Stopping() const noexcept {
 	return state == State::Stopping || state == State::Stopped || state == State::Failed;
 }
 
-const StormByte::Safe::Optional<StormByte::Safe::String>& Step::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Step::Error() const noexcept {
+	StormByte::Safe::UniqueLock lock(m_state->mutex);
 	return m_error;
 }
 
@@ -373,22 +494,13 @@ void Step::Halt() noexcept {
 }
 
 Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept {
-	if (!to.m_plan)
-		to.m_plan = from.m_plan;
-	if (to.m_plan) {
-		for (const auto& track : to.m_plan->Tracks()) {
-			if (track && track->Type() != Type::Attachment)
-				from.pipe().To(track->In()) >> to.pipe();
-		}
-	}
-	else
-		from.pipe() >> to.pipe();
-	if (const std::size_t cap = to.InputCeiling(); cap > 0 && to.m_plan) {
-		const auto& tracks = to.m_plan->Tracks();
-		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
-			if (*it)
-				to.pipe().Capacity((*it)->In(), cap);
-		}
+	if (!from.Connect(to))
+		return to;
+	if (from.Plan() || to.Plan())
+		from.Wire(to);
+	else {
+		StormByte::Safe::UniqueLock lock(from.m_state->mutex);
+		from.m_state->pendingWire.push_back(&to);
 	}
 	from.Log(Level::Debug, "bound to " + std::string(ToString(to.m_name)));
 	return to;

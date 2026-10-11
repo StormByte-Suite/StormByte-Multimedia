@@ -110,8 +110,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	 *
 	 * Owns the output AVFormatContext, reserved tracks and the
 	 * header-delay queue. Bytes leave through @ref Backend::FileAvio
-	 * on @ref Plan::Writer. Format is guessed from the registry container
-	 * filename. Exceptional format adaptations live in separate policies;
+	 * on @ref Plan::Writer. Format uses the plan's resolved FFmpeg identity,
+	 * independent of the destination filename. Exceptional adaptations live in separate policies;
 	 * unrecognized policy names retain the unrestricted libavformat default.
 	 *
 	 * @ingroup multimedia_pipeline
@@ -167,8 +167,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @param owner Public muxer.
 			 * @return false if owner.Fail() was called.
 			 *
-			 * Format comes from the actual @c Plan::Writer().Path() filename.
-			 * Bytes go to @ref Plan::Writer via FileAvio. No path.
+			 * Format comes from the identity resolved by Plan construction.
+			 * Bytes go to @ref Plan::Writer via FileAvio; the path is only a label.
 			 */
 			bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept override;
 

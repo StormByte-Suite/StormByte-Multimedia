@@ -80,8 +80,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Encode::Setup() noexcept {
-		if (!m_owner.m_backend)
-			Fail("encoder has no backend");
+		if (!m_owner.WaitForPlan())
+			return;
+		static_cast<void>(m_owner.SetupPlan());
 	}
 
 	void Encode::Process(Item::PointerType item) noexcept {

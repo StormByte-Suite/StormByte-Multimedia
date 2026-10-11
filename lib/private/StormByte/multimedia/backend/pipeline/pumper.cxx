@@ -97,6 +97,7 @@ void Pumper::Launch() noexcept {
 		if (Stopping()) {
 			telemetry.SetState(Status());
 			telemetry.Finish();
+			m_host.Completed(false);
 			return;
 		}
 		int expected = static_cast<int>(State::Created);
@@ -104,11 +105,13 @@ void Pumper::Launch() noexcept {
 				StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire)) {
 			telemetry.SetState(Status());
 			telemetry.Finish();
+			m_host.Completed(false);
 			return;
 		}
 		telemetry.SetState(State::Ready);
 		m_host.BecameReady();
 		Pump();
+		const bool success = !Stopping();
 		m_host.Log(Level::LowLevel, std::format("worker pump returned; close output begin host={}",
 			static_cast<const void*>(&m_host)));
 		m_host.CloseOutput();
@@ -125,6 +128,7 @@ void Pumper::Launch() noexcept {
 		m_host.Log(Level::LowLevel, "stopped");
 		telemetry.SetState(Status());
 		telemetry.Finish();
+		m_host.Completed(success);
 	});
 }
 

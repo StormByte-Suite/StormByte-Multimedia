@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/worker/decode.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
+#include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
@@ -88,25 +89,29 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 	void Decode::Setup() noexcept {
 		NameThread("STMM:Decode:" + std::to_string(m_owner.m_index));
+		if (!m_owner.WaitForPlan() || !m_owner.SetupPlan())
+			return;
 		if (m_owner.m_look) {
 			Log(Level::Notice, std::format("look t={}", m_owner.m_index));
 			return;
 		}
 
-		while (!Stopping() && m_owner.m_origin == nullptr)
-			Wait();
+		m_owner.pipe().WaitWake(this, [](void* context) noexcept {
+			const auto& worker = *static_cast<Decode*>(context);
+			const auto& owner = worker.m_owner;
+			return owner.Stopping() || owner.Plan()->State()
+				!= StormByte::Multimedia::Pipeline::Plan::State::Running
+				|| (owner.m_origin && (owner.m_origin->Failed()
+					|| owner.m_origin->Ready() || owner.m_origin->Eof()
+					|| owner.m_origin->Status() == StormByte::Multimedia::Pipeline::State::Stopping
+					|| owner.m_origin->Status() == StormByte::Multimedia::Pipeline::State::Stopped));
+		});
 		if (Stopping())
 			return;
-		if (!m_owner.m_origin) {
-			Fail("decoder has no demuxer");
+		if (m_owner.Plan()->State() != StormByte::Multimedia::Pipeline::Plan::State::Running) {
+			m_owner.Fail(m_owner.Plan()->Error().value_or(StormByte::Safe::String("plan is not running")));
 			return;
 		}
-
-		while (!Stopping() && !m_owner.m_origin->Failed()
-			&& !m_owner.m_origin->Ready() && !m_owner.m_origin->Eof())
-			Wait();
-		if (Stopping())
-			return;
 		if (m_owner.m_origin->Failed() || (!m_owner.m_origin->Ready() && !m_owner.m_origin->Eof())) {
 			const auto reason = m_owner.m_origin->Error().value_or(StormByte::Safe::String("demuxer failed"));
 			Fail(static_cast<std::string>(reason));

@@ -87,21 +87,25 @@ static int CheckRejectedJob(std::string_view source, const std::filesystem::path
 }
 
 static int CheckManualRejectsInvalidSource(std::string_view source, std::string_view destination) {
-	Plan plan{StormByte::Safe::String{FixturePath(source).string()},
-		StormByte::Safe::String{OutputPath(destination).string()}, 2000000000LL};
-	plan.add(Track{0, StormByte::Multimedia::Type::Video});
-	const auto check = plan.Check();
+	auto plan = StormByte::Safe::MakeShared<Plan>(StormByte::Safe::String{FixturePath(source).string()},
+		StormByte::Safe::String{OutputPath(destination).string()}, 2000000000LL);
+	plan->add(Track{0, StormByte::Multimedia::Type::Video});
+	const auto check = plan->Check();
 	TEST_REQUIRE(!check);
 	TEST_REQUIRE(check.error());
 	TEST_REQUIRE(std::string_view{check.error()->what()}.find("source snapshot failed") != std::string_view::npos);
+	TEST_REQUIRE(plan->State() == Plan::State::Failed);
+	const auto originalError = plan->Error();
+	TEST_REQUIRE(originalError && !originalError->empty());
 
 	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
 	Demuxer demuxer{noLogger};
 	Remuxer video{noLogger, 0};
 	Muxer muxer{noLogger};
-	std::move(plan) >> demuxer;
+	ManualPipelineStop teardown{&demuxer, &video, &muxer};
 	demuxer >> muxer;
 	demuxer >> video >> muxer;
+	plan >> demuxer;
 	const auto deadline = std::chrono::steady_clock::now() + 30s;
 	while (demuxer.Status() != State::Failed && demuxer.Status() != State::Stopped &&
 		std::chrono::steady_clock::now() < deadline)
@@ -111,6 +115,8 @@ static int CheckManualRejectsInvalidSource(std::string_view source, std::string_
 	TEST_REQUIRE(error && !error->empty());
 	TEST_REQUIRE(TestView(error.value()).find("source snapshot failed") != std::string_view::npos);
 	TEST_REQUIRE(muxer.Failed());
+	TEST_REQUIRE(plan->State() == Plan::State::Failed);
+	TEST_REQUIRE(plan->Error().value() == originalError.value());
 	return 0;
 }
 

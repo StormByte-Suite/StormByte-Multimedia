@@ -78,6 +78,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Remux::Setup() noexcept {
+		if (!m_owner.WaitForPlan())
+			return;
+		m_owner.SetupPlan();
+		if (Stopping() || m_owner.Failed())
+			return;
 		if (m_owner.m_index < 0) {
 			Fail("remuxer origin is negative");
 			return;

@@ -67,17 +67,6 @@ namespace {
 		return state == State::Stopped || state == State::Failed;
 	}
 
-	enum StormByte::Multimedia::Type StreamMedia(const Step& origin, int track) noexcept {
-		const auto& plan = origin.Plan();
-		if (!plan || !*plan)
-			return StormByte::Multimedia::Type::Unknown;
-		for (const auto& stream : plan->Snapshot().Streams()) {
-			if (stream.Index() == track)
-				return stream.Type();
-		}
-		return StormByte::Multimedia::Type::Unknown;
-	}
-
 	void Cap(StormByte::Multimedia::Backend::Pipeline::Pipe& pipe, int track, std::size_t n) noexcept {
 		if (n > 0)
 			pipe.Capacity(track, n);
@@ -159,6 +148,19 @@ Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	return *this;
 }
 
+enum StormByte::Multimedia::Type Route::SourceMedia() const noexcept {
+	if (!m_origin)
+		return StormByte::Multimedia::Type::Unknown;
+	const auto& plan = m_origin->Plan();
+	if (!plan || !*plan)
+		return StormByte::Multimedia::Type::Unknown;
+	for (const auto& stream : plan->Snapshot().Streams()) {
+		if (stream.Index() == m_track)
+			return stream.Type();
+	}
+	return StormByte::Multimedia::Type::Unknown;
+}
+
 void Route::Close() noexcept {
 	if (!m_origin || !m_destination)
 		return;
@@ -171,7 +173,7 @@ void Route::Close() noexcept {
 		return;
 	}
 
-	const auto media = StreamMedia(origin, m_track);
+	const auto media = SourceMedia();
 	for (const auto& filter : m_filters) {
 		if (!StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)
 			&& !filter->Receives().Has(stretch)) {
@@ -184,6 +186,9 @@ void Route::Close() noexcept {
 			return;
 		}
 	}
+
+	if (!origin.Connect(destination))
+		return;
 
 	Filter::FFmpeg* const packetFirst = m_packets.First();
 	Filter::FFmpeg* const packetLast = m_packets.Last();
@@ -272,7 +277,8 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 	}
 	StormByte::Safe::Shared<Decoder> look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
 		origin.m_log, m_track, Decoder::SourceLook{});
-	look->m_plan = origin.Plan();
+	if (!origin.Connect(*look))
+		return;
 	look->pipe().CloneTo(m_track, analytics.pipe());
 	look->pipe().Drain();
 	Cap(look->pipe(), m_track, look->InputCeiling());
@@ -300,7 +306,8 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 			destination.m_log, m_track, Decoder::EncodeLook{});
 	else
 		return;
-	look->m_plan = destination.Plan();
+	if (!destination.Connect(*look))
+		return;
 	look->pipe().Listen();
 	look->pipe().CloneTo(m_track, analytics.pipe());
 	look->pipe().Drain();

@@ -253,9 +253,7 @@ namespace StormByte {
 					 * @brief Bound job intention, if any.
 					 * @return Shared Plan, or empty.
 					 */
-					inline const StormByte::Safe::Shared<class Plan>& Plan() const noexcept {
-						return m_plan;
-					}
+					StormByte::Safe::Shared<class Plan> Plan() const noexcept;
 
 					/**
 					 * @}
@@ -339,7 +337,7 @@ namespace StormByte {
 					 * @brief Failure text.
 					 * @return Message, or empty.
 					 */
-					const StormByte::Safe::Optional<StormByte::Safe::String>& Error() const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
 
 					/**
 					 * @brief Marks the stage as failed and notifies connected stages.
@@ -372,6 +370,19 @@ namespace StormByte {
 					 */
 
 				protected:
+					/**
+					 * @brief Registers a borrowed downstream stage and shares any bound plan.
+					 * @param downstream Stage retained by the graph owner until assembly and execution end.
+					 * @return true when both stages share a compatible plan.
+					 */
+					bool Connect(Step& downstream) noexcept;
+
+					/**
+					 * @brief Waits interruptibly for the shared plan to enter Running.
+					 * @return false when the stage or shared plan stops or fails.
+					 */
+					bool WaitPlan() noexcept;
+
 					/**
 					 * @name Construction
 					 * @{
@@ -589,6 +600,11 @@ namespace StormByte {
 
 				private:
 					/**
+					 * @brief Allows the shared plan to wake registered stages.
+					 */
+					friend class Plan;
+
+					/**
 					 * @brief Allows the demultiplexing stage to access step internals.
 					 */
 					friend class Demuxer;
@@ -627,7 +643,6 @@ namespace StormByte {
 					 * @param demuxer Stage receiving the plan.
 					 * @return The demultiplexing stage.
 					 */
-					friend Demuxer& operator>>(class Plan&& plan, Demuxer& demuxer) noexcept;
 
 					/**
 					 * @brief Binds a shared plan to a demultiplexing stage.
@@ -711,6 +726,24 @@ namespace StormByte {
 					 * @brief Eof on the Pipe (In, Out, clone hopper).
 					 */
 					void CloseHoppers() noexcept;
+
+					/**
+					 * @brief Binds one shared intention and propagates it through registered links.
+					 * @param plan Shared job intention; conflicting identities fail the job.
+					 */
+					void Plan(StormByte::Safe::Shared<class Plan> plan) noexcept;
+
+					/**
+					 * @brief Forwards worker completion to the bound plan.
+					 * @param success Whether this stage completed successfully.
+					 */
+					void NotifyComplete(bool success) noexcept;
+
+					/**
+					 * @brief Binds downstream hoppers for the current plan's tracks.
+					 * @param downstream Stage already registered with @ref Connect.
+					 */
+					void Wire(Step& downstream) noexcept;
 
 					StormByte::Safe::Shared<class Plan> m_plan;			///< Current plan retained through Base-heap shared ownership
 					StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< Fail message

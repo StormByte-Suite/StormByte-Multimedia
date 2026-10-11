@@ -57,7 +57,11 @@
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
+#include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
+#include <StormByte/multimedia/pipeline/config/audio.hxx>
+#include <StormByte/multimedia/pipeline/config/subtitle.hxx>
+#include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
@@ -87,6 +91,18 @@ namespace {
 			return "-";
 		return std::format("{}", value->Nanoseconds().count());
 	}
+
+	const Codec* DestinationCodec(const Config::Base* config) noexcept {
+		if (!config)
+			return nullptr;
+		if (const auto* video = dynamic_cast<const Config::Video*>(config))
+			return video->Codec();
+		if (const auto* audio = dynamic_cast<const Config::Audio*>(config))
+			return audio->Codec();
+		if (const auto* subtitle = dynamic_cast<const Config::Subtitle*>(config))
+			return subtitle->Codec();
+		return nullptr;
+	}
 }
 
 Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -94,7 +110,29 @@ Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 : Step(std::move(log), Producer::Encoder, Kinds{Kind::Frame}, Kinds{Kind::Packet}),
 	m_index(output_index), m_codec(&codec),
 	m_encoderTag("StormByte-Multimedia " STORMBYTE_MULTIMEDIA_VERSION), m_part(0) {
-	switch (codec.Type()) {
+	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
+		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Encode>(*this));
+	Launch();
+}
+
+bool Encoder::WaitForPlan() noexcept {
+	return WaitPlan();
+}
+
+bool Encoder::SetupPlan() noexcept {
+	if (m_index < 0 || static_cast<std::size_t>(m_index) >= Plan()->Tracks().size()) {
+		Fail("encoder destination index is not in the plan");
+		return false;
+	}
+	const auto& track = Plan()->Tracks()[static_cast<std::size_t>(m_index)];
+	const auto* codec = DestinationCodec(track.Config());
+	if (!codec || codec != m_codec) {
+		Fail("encoder destination codec does not match the plan");
+		return false;
+	}
+	if (!m_implementation && track.Config()->Implementation().Encoder)
+		Implementation(*track.Config()->Implementation().Encoder);
+	switch (m_codec->Type()) {
 		case Type::Video:
 			m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Encoder::Video>();
 			break;
@@ -106,12 +144,12 @@ Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 			break;
 		default:
 			Fail("encoder destination type is not video, audio or subtitle");
-			return;
+			return false;
 	}
 
-	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
-		StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Worker::Encode>(*this));
-	Launch();
+	if (const std::size_t capacity = InputCeiling(); capacity > 0)
+		pipe().Capacity(m_index, capacity);
+	return Backend::Pipeline::Encoder::PrepareForMux(*this);
 }
 
 Encoder::~Encoder() noexcept {
@@ -134,13 +172,10 @@ bool Encoder::Opened() const noexcept {
 
 StormByte::Size Encoder::InputCeiling() const noexcept {
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
-	const auto* track = Backend::Pipeline::TrackByIn(plan, m_index);
-	if (!track && plan && m_index >= 0
-		&& static_cast<std::size_t>(m_index) < plan->Tracks().size())
-		track = &plan->Tracks()[static_cast<std::size_t>(m_index)];
-	if (!track)
+	if (!plan || m_index < 0 || static_cast<std::size_t>(m_index) >= plan->Tracks().size())
 		return 0;
-	const Backend::Pipeline::Ceiling cap{plan, Producer::Encoder, *track};
+	const auto& track = plan->Tracks()[static_cast<std::size_t>(m_index)];
+	const Backend::Pipeline::Ceiling cap{plan, Producer::Encoder, track};
 	return cap.Frames() != 0 ? cap.Frames() : cap.Packets();
 }
 

@@ -111,12 +111,12 @@ namespace {
 			|| type == StormByte::Multimedia::Type::Subtitle;
 	}
 
-	std::int64_t InterleaveDeltaUs(const StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
+	std::int64_t InterleaveDeltaUs(const StormByte::Multimedia::Pipeline::Tracks* tracks) noexcept {
 		std::size_t remux = 0;
 		std::size_t encodeVideo = 0;
 		std::size_t encodeOther = 0;
-		if (const auto& plan = owner.Plan(); plan) {
-			for (const auto& held : plan->Tracks()) {
+		if (tracks) {
+			for (const auto& held : *tracks) {
 				if (!held || !Muxable(held->Type()))
 					continue;
 				if (!Encodes(*held))
@@ -219,11 +219,10 @@ namespace {
 		return raw;
 	}
 
-	bool PlanWantsAttachments(const StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
-		const auto& plan = owner.Plan();
-		if (!plan)
+	bool PlanWantsAttachments(const StormByte::Multimedia::Pipeline::Tracks* tracks) noexcept {
+		if (!tracks)
 			return false;
-		for (const auto& track : plan->Tracks()) {
+		for (const auto& track : *tracks) {
 			if (track && track->Type() == StormByte::Multimedia::Type::Attachment)
 				return true;
 		}
@@ -291,14 +290,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		const std::string filename{owner.Plan()->Writer().Path()};
-		if (filename.empty()) {
-			owner.Fail("destination filename is empty");
-			return false;
-		}
-
-		const AVOutputFormat* oformat = av_guess_format(nullptr, filename.c_str(), nullptr);
+		const char* format = owner.Plan()->m_format;
+		const AVOutputFormat* oformat = format ? av_guess_format(format, nullptr, nullptr) : nullptr;
 		if (!oformat) {
-			owner.Fail("could not guess output format from container");
+			owner.Fail("plan has no resolved FFmpeg output format");
 			return false;
 		}
 		if (oformat->flags & AVFMT_NOFILE) {
@@ -308,8 +303,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		m_policy = &SelectPolicy(oformat->name);
 
 		AVFormatContext* ctx = nullptr;
-		if (avformat_alloc_output_context2(&ctx, const_cast<AVOutputFormat*>(oformat),
-				nullptr, filename.c_str()) < 0 || !ctx) {
+		if (avformat_alloc_output_context2(&ctx, oformat,
+				nullptr, filename.empty() ? nullptr : filename.c_str()) < 0 || !ctx) {
 			owner.Fail("avformat_alloc_output_context2 failed");
 			return false;
 		}
@@ -410,7 +405,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			return false;
 		}
 
-		if (!PlanWantsAttachments(owner)) {
+		if (!PlanWantsAttachments(owner.Plan() ? &owner.Plan()->Tracks() : nullptr)) {
 			m_attachments.clear();
 			return true;
 		}
@@ -577,7 +572,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 		const std::int64_t spanUs = minPts >= 0 && maxPts > minPts
 			? (maxPts - minPts) / 1000 + InterleaveSlotUs : 0;
-		std::int64_t deltaUs = InterleaveDeltaUs(owner);
+		std::int64_t deltaUs = InterleaveDeltaUs(owner.Plan() ? &owner.Plan()->Tracks() : nullptr);
 		const auto capacity = owner.InputCeiling();
 		const StormByte::Size depth = capacity == StormByte::Size{0}
 			? StormByte::Size{1} : capacity;

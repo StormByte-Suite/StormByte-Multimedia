@@ -21,6 +21,14 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Changed
+
+- Breaking manual pipeline Plan API and lifecycle:
+	- Make Plan noncopyable and nonmovable, retain it through `Safe::Shared<Plan>`, and remove value binding and `Clone`/`Move` requirements for derived Plans. Keep public configuration, `Check` and `Tracks()`; make snapshot, container, location and path getters private while retaining State, Error and I/O telemetry observation. There is no public state setter.
+	- Introduce shared `Created -> Running -> Finished` execution state with terminal Failed, first-failure preservation and rejection of failure after Finished. Constructors still launch stage workers, but setup waits for Running; complete wiring and `Filters::Close` before Plan binding, which publishes Running. The library publishes Finished when participating stages complete, and Failed on the first formation or execution error. Successful completion requires all stages and analytics, not just muxer EOF.
+	- Require stages to outlive execution, propagation and notifications, with peer cancellation before worker joins and externally serialized state publication and teardown. Migrate manual tests to shared Plans and add privacy, transition, failure-preservation and cancellation checks in existing sources.
+	- Accept explicit registered `const Container&` overrides for Plan and Transcoder destinations, independent of filename suffix. Retain borrowed registry identity rather than copying it; the entry must outlive its Plan. Existing manual and facade tests cover unknown and conflicting suffixes.
+
 ### Fixed
 
 - Peek compressed audio/video packet payloads during decoder submission without extracting bytes or advancing the FIFO cursor, so an `EAGAIN` retry resubmits the original data rather than an empty packet.

@@ -64,23 +64,6 @@
  */
 namespace StormByte::Multimedia::Backend::Pipeline {
 	/**
-	 * @brief Track of @p plan whose @ref Multimedia::Pipeline::Track::In equals @p origin.
-	 * @param plan Shared plan. May be empty.
-	 * @param origin Origin stream index.
-	 * @return Track, or `nullptr`.
-	 */
-	inline const Multimedia::Pipeline::Track* TrackByIn(
-		const StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept {
-		if (!plan)
-			return nullptr;
-		for (const auto& held : plan->Tracks()) {
-			if (held && held->In() == origin)
-				return held.get();
-		}
-		return nullptr;
-	}
-
-	/**
 	 * @class Ceiling
 	 * @brief Hopper caps for one Step × one Plan track.
 	 *
@@ -153,6 +136,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			static unsigned MaxThreads() noexcept;
 
 			/**
+			 * @brief Finds a track in the plan's published track list.
+			 * @param plan Shared plan. May be empty.
+			 * @param origin Origin stream index.
+			 * @return Borrowed track, or nullptr. The plan must outlive its use.
+			 */
+			static const Multimedia::Pipeline::Track* TrackByIn(
+				const StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept;
+
+			/**
 			 * @brief Raw-frame hopper cap.
 			 * @return Items, or `0` if this instance has no frame hopper.
 			 */
@@ -175,4 +167,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Size m_packets;	///< Packet hopper, or `0`
 			StormByte::Size m_park;		///< Demux park, or `0`
 	};
+
+	/**
+	 * @brief Forwards origin lookup to the plan's friend-owned capacity helper.
+	 * @param plan Shared plan. May be empty.
+	 * @param origin Origin stream index.
+	 * @return Borrowed track, or nullptr. The plan must outlive its use.
+	 */
+	inline const Multimedia::Pipeline::Track* TrackByIn(
+		const StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept {
+		return Ceiling::TrackByIn(plan, origin);
+	}
 }

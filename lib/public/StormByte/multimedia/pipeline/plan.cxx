@@ -61,17 +61,35 @@
 #include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/exception.hxx>
+#include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/unique_lock.hxx>
 
+#include <algorithm>
 #include <cctype>
 #include <optional>
 #include <string>
 #include <utility>
+#include <vector>
+
+extern "C" {
+	#include <libavformat/avformat.h>
+}
 
 using StormByte::Buffer::IO::BufferedLocationReader;
 using StormByte::Buffer::IO::BufferedLocationWriter;
 using namespace StormByte::Multimedia::Pipeline;
+
+/**
+ * @class Plan::Observers
+ * @brief Borrowed stage registrations copied under the state mutex before notification.
+ */
+class Plan::Observers {
+	public:
+		std::vector<Step*> Stages;	///< Stages whose owners serialize teardown with notification.
+		std::vector<Step*> Completed;
+};
 
 namespace {
 	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const StormByte::Safe::String& path) {
@@ -94,6 +112,45 @@ namespace {
 		for (char& ch : ext)
 			ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 		return ext;
+	}
+
+	const StormByte::Multimedia::Container* ContainerFromWriter(
+		const BufferedLocationWriter& writer) noexcept {
+		const auto ext = ExtensionOf(std::string_view{writer.Path()});
+		if (ext.empty())
+			return nullptr;
+		auto found = StormByte::Multimedia::Registry::Instance().FindContainer(ext);
+		if (!found)
+			return nullptr;
+		return &found.value().get();
+	}
+
+	const StormByte::Multimedia::Container* FormatIdentity(const AVOutputFormat& format) noexcept {
+		std::string_view names{format.name};
+		while (!names.empty()) {
+			const auto separator = names.find(',');
+			const auto found = StormByte::Multimedia::Registry::Instance().FindContainer(names.substr(0, separator));
+			if (found)
+				return &found.value().get();
+			if (separator == std::string_view::npos)
+				break;
+			names.remove_prefix(separator + 1);
+		}
+		return nullptr;
+	}
+
+	const AVOutputFormat* IdentityFormat(const StormByte::Multimedia::Container& container) noexcept {
+		const auto registered = StormByte::Multimedia::Registry::Instance().FindContainer(container.Name());
+		if (!registered || registered.value().get().Name() != container.Name()
+			|| !container.HasAccess(StormByte::Multimedia::Operation::Write))
+			return nullptr;
+		void* cursor = nullptr;
+		while (const auto* format = av_muxer_iterate(&cursor)) {
+			const auto* identity = FormatIdentity(*format);
+			if (identity && identity->Name() == container.Name())
+				return av_guess_format(format->name, nullptr, nullptr);
+		}
+		return nullptr;
 	}
 
 	const StormByte::Multimedia::Codec* DestinationCodec(
@@ -143,13 +200,60 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
 	StormByte::Safe::Optional<std::int64_t> duration,
 	const StormByte::Safe::Function<void(double)>* progress) noexcept
+: Plan(std::move(reader), std::move(writer), static_cast<const class Container*>(nullptr),
+	std::move(duration), progress) {}
+
+Plan::Plan(const StormByte::Safe::String& source,
+	const StormByte::Safe::String& destination, const class Container& container,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Plan(LocalReader(source), LocalWriter(destination), container, std::move(duration)) {}
+
+Plan::Plan(const StormByte::Safe::String& source,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container& container,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Plan(LocalReader(source), std::move(writer), container, std::move(duration)) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	const StormByte::Safe::String& destination, const class Container& container,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Plan(std::move(reader), LocalWriter(destination), container, std::move(duration)) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container& container,
+	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+: Plan(std::move(reader), std::move(writer), container, std::move(duration), nullptr) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container& container,
+	StormByte::Safe::Optional<std::int64_t> duration,
+	const StormByte::Safe::Function<void(double)>* progress) noexcept
+: Plan(std::move(reader), std::move(writer), &container, std::move(duration), progress) {}
+
+Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
+	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container* container,
+	StormByte::Safe::Optional<std::int64_t> duration,
+	const StormByte::Safe::Function<void(double)>* progress) noexcept
 : m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)),
-	m_writer(std::move(writer)),
-	m_container(m_writer ? ContainerFromWriter(*m_writer) : nullptr) {
-	if (!m_reader)
+	m_writer(std::move(writer)) {
+	const AVOutputFormat* format = nullptr;
+	if (container)
+		format = IdentityFormat(*container);
+	else if (m_writer)
+		container = ContainerFromWriter(*m_writer);
+	if (container && !format)
+		format = IdentityFormat(*container);
+	if (container && format && !(format->flags & AVFMT_NOFILE)) {
+		m_container = container;
+		m_format = format->name;
+	}
+	else if (container)
+		m_container = container;
+	if (!m_reader || !m_writer || !m_container || !m_format) {
+		static_cast<void>(Validate(false));
 		return;
+	}
 	if (duration && duration.value() <= 0)
 		duration.reset();
 	auto opened = StormByte::Multimedia::File::Open(*m_reader, duration);
@@ -162,25 +266,75 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 				static_cast<void>(m_snapshot->Duration());
 		}
 	}
+	static_cast<void>(Validate(false));
 }
-
-Plan::Plan(Plan&& other) noexcept = default;
 
 Plan::~Plan() noexcept = default;
 
-StormByte::Safe::Shared<Plan> Plan::Move() {
-	return StormByte::Safe::Shared<Plan>::MakePointer<Plan>(std::move(*this));
+enum Plan::State Plan::State() const noexcept {
+	return m_state.load(StormByte::Safe::MemoryOrder::Acquire);
 }
 
-const StormByte::Multimedia::Container* Plan::ContainerFromWriter(
-	const BufferedLocationWriter& writer) noexcept {
-	const auto ext = ExtensionOf(std::string_view{writer.Path()});
-	if (ext.empty())
-		return nullptr;
-	auto found = StormByte::Multimedia::Registry::Instance().FindContainer(ext);
-	if (!found)
-		return nullptr;
-	return &found.value().get();
+enum Plan::State Plan::State(enum State desired,
+	StormByte::Safe::Optional<StormByte::Safe::String> reason) const noexcept {
+	if (desired == State::Running && !Check())
+		return State();
+	StormByte::Safe::UniqueLock lock(m_state_mutex);
+	const auto current = m_state.load(StormByte::Safe::MemoryOrder::Acquire);
+	const bool accepted = (current == State::Created && (desired == State::Running || desired == State::Failed))
+		|| (current == State::Running && (desired == State::Finished || desired == State::Failed))
+		|| (current == State::Failed && desired == State::Failed);
+	if (accepted) {
+		if (desired == State::Failed && reason && !m_error)
+			m_error = std::move(reason);
+		m_state.store(desired, StormByte::Safe::MemoryOrder::Release);
+	}
+	if (accepted && m_observers)
+		for (auto* observer : m_observers->Stages)
+			observer->Wake();
+	return accepted ? desired : current;
+}
+
+StormByte::Safe::Optional<StormByte::Safe::String> Plan::Error() const noexcept {
+	StormByte::Safe::UniqueLock lock(m_state_mutex);
+	return m_error;
+}
+
+void Plan::Observe(Step& step) noexcept {
+	StormByte::Safe::UniqueLock lock(m_state_mutex);
+	if (!m_observers)
+		m_observers = StormByte::Safe::Unique<Observers>::MakePointer<Observers>();
+	auto& stages = m_observers->Stages;
+	if (std::find(stages.begin(), stages.end(), &step) == stages.end())
+		stages.push_back(&step);
+}
+
+void Plan::Unobserve(Step& step) noexcept {
+	StormByte::Safe::UniqueLock lock(m_state_mutex);
+	if (!m_observers)
+		return;
+	auto& stages = m_observers->Stages;
+	const auto found = std::find(stages.begin(), stages.end(), &step);
+	if (found != stages.end())
+		stages.erase(found);
+}
+
+void Plan::Complete(Step& step, bool success) noexcept {
+	if (!success) {
+		State(State::Failed, step.Error().value_or(StormByte::Safe::String{"pipeline stage stopped before completion"}));
+		return;
+	}
+	StormByte::Safe::UniqueLock lock(m_state_mutex);
+	if (!m_observers || State() != State::Running)
+		return;
+	auto& completed = m_observers->Completed;
+	if (std::find(completed.begin(), completed.end(), &step) == completed.end())
+		completed.push_back(&step);
+	if (completed.size() != m_observers->Stages.size())
+		return;
+	m_state.store(State::Finished, StormByte::Safe::MemoryOrder::Release);
+	for (auto* observer : m_observers->Stages)
+		observer->Wake();
 }
 
 BufferedLocationReader& Plan::Reader() noexcept {
@@ -216,45 +370,54 @@ Plan::operator bool() const noexcept {
 }
 
 CheckResult Plan::Check() const {
+	return Validate(true);
+}
+
+CheckResult Plan::Validate(bool tracks) const {
+	const auto fail = [this](const char* reason) -> CheckResult {
+		State(State::Failed, StormByte::Safe::String{reason});
+		const auto error = Error().value_or(StormByte::Safe::String{reason});
+		return StormByte::Unexpected<PlanException>("{}", std::string_view{error});
+	};
+	if (State() == State::Failed)
+		return fail("plan has failed");
 	if (!m_reader || !m_writer)
-		return StormByte::Unexpected<PlanException>("plan was moved-from");
-	if (!m_snapshot)
-		return StormByte::Unexpected<PlanException>("source snapshot failed");
-	if (m_writer->Path().empty())
-		return StormByte::Unexpected<PlanException>("destination path is empty");
+		return fail("plan location owner is empty");
 	if (!m_container)
-		return StormByte::Unexpected<PlanException>("destination container is unknown");
+		return fail("destination container is unknown");
+	if (!m_format)
+		return fail("destination container has no registered buffered FFmpeg muxer");
+	if (!m_snapshot)
+		return fail("source snapshot failed");
+	if (!tracks)
+		return CheckResult{};
 	if (m_tracks.empty())
-		return StormByte::Unexpected<PlanException>("plan has no tracks");
+		return fail("plan has no tracks");
 
 	for (const auto& held : m_tracks) {
 		if (!held)
-			return StormByte::Unexpected<PlanException>("plan holds an empty track");
+			return fail("plan holds an empty track");
 		const Track& track = *held;
 		if (track.In() < 0)
-			return StormByte::Unexpected<PlanException>("track origin index is negative");
+			return fail("track origin index is negative");
 		if (track.Type() == StormByte::Multimedia::Type::Unknown)
-			return StormByte::Unexpected<PlanException>("track type is unknown");
+			return fail("track type is unknown");
 
 		if (track.Type() == StormByte::Multimedia::Type::Attachment) {
 			const auto mime = AttachmentMime(track.Config());
 			if (!mime || mime->empty())
-				return StormByte::Unexpected<PlanException>("attachment MIME is empty");
+				return fail("attachment MIME is empty");
 			if (!Detail::MimePatternOk(*mime))
-				return StormByte::Unexpected<PlanException>("attachment MIME is not exact, type-star or star-star");
+				return fail("attachment MIME is not exact, type-star or star-star");
 			continue;
 		}
 
 		const auto* dest = DestinationCodec(track.Config());
 		if (dest && dest->Type() != track.Type())
-			return StormByte::Unexpected<PlanException>("destination codec type does not match the track");
+			return fail("destination codec type does not match the track");
 	}
 
 	return CheckResult{};
-}
-
-Demuxer& StormByte::Multimedia::Pipeline::operator>>(Plan&& plan, Demuxer& demuxer) noexcept {
-	return plan.Move() >> demuxer;
 }
 
 Demuxer& StormByte::Multimedia::Pipeline::operator>>(StormByte::Safe::Shared<Plan> plan, Demuxer& demuxer) noexcept {
@@ -263,19 +426,6 @@ Demuxer& StormByte::Multimedia::Pipeline::operator>>(StormByte::Safe::Shared<Pla
 		return demuxer;
 	}
 
-	bool alreadyBound = false;
-	{
-		StormByte::Safe::UniqueLock lock(demuxer.m_planMutex);
-		alreadyBound = static_cast<bool>(demuxer.m_plan);
-		if (!alreadyBound)
-			demuxer.m_plan = std::move(plan);
-	}
-	if (alreadyBound) {
-		demuxer.Fail(StormByte::Safe::String{"demuxer already has a plan"});
-		return demuxer;
-	}
-
-	demuxer.m_planPresent.notify_all();
-	demuxer.Wake();
+	demuxer.Plan(std::move(plan));
 	return demuxer;
 }

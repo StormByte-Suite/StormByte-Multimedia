@@ -57,6 +57,9 @@
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/config/audio.hxx>
+#include <StormByte/multimedia/pipeline/config/subtitle.hxx>
+#include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
@@ -70,8 +73,8 @@
 #include <StormByte/safe/pointers.hxx>
 
 #include <chrono>
-#include <cstdlib>
 #include <format>
+#include <map>
 #include <mutex>
 #include <string_view>
 #include <utility>
@@ -92,21 +95,29 @@ namespace {
 			|| type == StormByte::Multimedia::Type::Subtitle;
 	}
 
-	bool PlanWantsAttachments(const Plan* plan) noexcept {
-		if (!plan)
-			return false;
-		for (const auto& track : plan->Tracks()) {
-			if (track && track->Type() == StormByte::Multimedia::Type::Attachment)
-				return true;
-		}
-		return false;
+	const Codec* DestinationCodec(const Config::Base* config) noexcept {
+		if (!config)
+			return nullptr;
+		if (const auto* video = dynamic_cast<const Config::Video*>(config))
+			return video->Codec();
+		if (const auto* audio = dynamic_cast<const Config::Audio*>(config))
+			return audio->Codec();
+		if (const auto* subtitle = dynamic_cast<const Config::Subtitle*>(config))
+			return subtitle->Codec();
+		return nullptr;
 	}
 }
+
+class Muxer::Connections final {
+	public:
+		std::map<int, Encoder*> encoders;	///< Borrowed encoders indexed by destination slot.
+};
 
 Muxer::Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
 : Step(std::move(log), Producer::Muxer, Kinds{Kind::Packet}, Kinds{}),
 	m_container(nullptr),
 	m_origin(nullptr),
+	m_connections(StormByte::Safe::MakeUnique<Connections>()),
 	m_closed(false),
 	m_reserved(0),
 	m_positionNs(-1) {
@@ -167,7 +178,7 @@ bool Muxer::Ready() const noexcept {
 
 StormByte::Size Muxer::InputCeiling() const noexcept {
 	if (!m_plan || m_plan->Tracks().empty())
-		std::abort();
+		return 0;
 	for (const auto& held : m_plan->Tracks()) {
 		if (!held)
 			continue;
@@ -178,7 +189,7 @@ StormByte::Size Muxer::InputCeiling() const noexcept {
 		const std::size_t n = cap.Packets();
 		return n > 0 ? n : 8;
 	}
-	std::abort();
+	return 0;
 }
 
 StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Language(int output_index) const noexcept {
@@ -210,8 +221,81 @@ void Muxer::Title(int output_index, StormByte::Safe::String title) noexcept {
 void Muxer::WaitArmed() noexcept {
 	pipe().WaitWake(this, [](void* context) noexcept {
 		const auto& owner = *static_cast<Muxer*>(context);
-		return owner.Stopping() || owner.Armed();
+		if (owner.Stopping())
+			return true;
+		if (!owner.Plan() || owner.Plan()->State() == Plan::State::Created)
+			return false;
+		if (owner.Plan()->State() != Plan::State::Running)
+			return true;
+		return owner.Armed() && (owner.m_wired.empty() || owner.m_origin);
 	});
+}
+
+bool Muxer::ConnectInput(Step& source) noexcept {
+	return source.Connect(*this);
+}
+
+bool Muxer::SetupPlan() noexcept {
+	WaitArmed();
+	if (Stopping())
+		return false;
+	if (!Plan() || Plan()->State() != Plan::State::Running) {
+		Fail(Plan() ? Plan()->Error().value_or(StormByte::Safe::String("plan is not running"))
+			: StormByte::Safe::String("muxer has no plan"));
+		return false;
+	}
+	if (!SpawnBackend())
+		return false;
+
+	int slot = 0;
+	for (const auto& held : Plan()->Tracks()) {
+		if (!held || !Muxable(held->Type()))
+			continue;
+		const auto& track = *held;
+		const auto encoder = m_connections->encoders.find(slot);
+		if (DestinationCodec(track.Config())) {
+			if (encoder == m_connections->encoders.end()) {
+				Fail("plan encode track has no encoder connection");
+				return false;
+			}
+			struct Pending {
+				Muxer& owner;
+				Encoder& encoder;
+			} pending{*this, *encoder->second};
+			pipe().WaitWake(&pending, [](void* context) noexcept {
+				const auto& wait = *static_cast<Pending*>(context);
+				const auto state = wait.encoder.Status();
+				return wait.owner.Stopping()
+					|| wait.owner.Plan()->State() != Plan::State::Running
+					|| wait.encoder.Ready() || wait.encoder.Failed()
+					|| state == State::Stopping || state == State::Stopped;
+			});
+			if (Stopping())
+				return false;
+			if (Plan()->State() != Plan::State::Running || !encoder->second->Ready()) {
+				Fail(encoder->second->Error().value_or(StormByte::Safe::String("encoder is not ready")));
+				return false;
+			}
+			if (!m_backend->ReserveEncoder(*this, *encoder->second))
+				return false;
+		}
+		else {
+			if (encoder != m_connections->encoders.end() || !m_wired.contains(track.In())) {
+				Fail("plan remux track has no matching connection");
+				return false;
+			}
+			if (!m_backend->ReserveRemux(*this, track.In()))
+				return false;
+		}
+		const Backend::Pipeline::Ceiling capacity{Plan(), Producer::Muxer, track};
+		const auto packets = capacity.Packets();
+		pipe().Capacity(encoder != m_connections->encoders.end() ? encoder->first : track.In(),
+			packets > 0 ? packets : StormByte::Size{8});
+		++slot;
+	}
+	if (!BindPlanAttachments() || Stopping() || Plan()->State() != Plan::State::Running)
+		return false;
+	return ArmOctets();
 }
 
 bool Muxer::SpawnBackend() noexcept {
@@ -264,7 +348,16 @@ bool Muxer::BindPlanAttachments() noexcept {
 	if (!m_backend)
 		return SpawnBackend();
 	m_attachments.clear();
-	if (!PlanWantsAttachments(m_plan.get()))
+	bool wantsAttachments = false;
+	if (m_plan) {
+		for (const auto& track : m_plan->Tracks()) {
+			if (track && track->Type() == Type::Attachment) {
+				wantsAttachments = true;
+				break;
+			}
+		}
+	}
+	if (!wantsAttachments)
 		return m_backend->BindAttachments(*this, m_attachments);
 	if (!m_plan || !*m_plan) {
 		Fail("plan snapshot is not available");
@@ -315,80 +408,45 @@ void Muxer::ClockPass(std::int64_t ns) noexcept {
 }
 
 Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& muxer) noexcept {
-	if (!muxer.m_plan)
-		muxer.m_plan = encoder.m_plan;
-	if (!encoder.m_plan)
-		encoder.m_plan = muxer.m_plan;
-	muxer.pipe().Listen();
-	if (muxer.Failed() || encoder.Failed())
+	if (!muxer.ConnectInput(encoder))
 		return encoder;
-	if (!muxer.SpawnBackend())
+	if (encoder.Index() < 0 || muxer.m_connections->encoders.contains(encoder.Index())) {
+		muxer.Fail("duplicate or invalid mux encoder output index");
 		return encoder;
-	if (!muxer.ArmOctets())
-		return encoder;
-
-	if (!muxer.m_backend->ReserveEncoder(muxer, encoder))
-		return encoder;
+	}
+	muxer.m_connections->encoders.emplace(encoder.Index(), &encoder);
 	encoder.pipe().To(encoder.Index()) >> muxer.pipe();
-	if (const std::size_t cap = muxer.InputCeiling(); cap > 0)
-		muxer.pipe().Capacity(encoder.Index(), cap);
 	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
-	muxer.Log(Level::Debug, std::format("reserve encoder t={}", encoder.Index()));
-	if (muxer.Armed())
-		muxer.Wake();
+	muxer.Log(Level::Debug, std::format("bind encoder t={}", encoder.Index()));
+	muxer.Wake();
 	return encoder;
 }
 
 Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& muxer) noexcept {
-	if (!muxer.m_plan)
-		muxer.m_plan = remuxer.m_plan;
-	if (!remuxer.m_plan)
-		remuxer.m_plan = muxer.m_plan;
-	muxer.pipe().Listen();
-	if (muxer.Failed() || remuxer.Failed())
+	if (!muxer.ConnectInput(remuxer))
 		return remuxer;
-	if (!muxer.SpawnBackend())
-		return remuxer;
-	if (muxer.m_wired.contains(remuxer.In())) {
-		muxer.Fail("track already wired to muxer");
+	if (remuxer.In() < 0 || muxer.m_wired.contains(remuxer.In())) {
+		muxer.Fail("duplicate or invalid mux remux input index");
 		return remuxer;
 	}
-	if (!muxer.ArmOctets())
-		return remuxer;
-
-	if (!muxer.m_backend->ReserveRemux(muxer, remuxer.In()))
-		return remuxer;
 	muxer.m_wired.insert(remuxer.In());
 	remuxer.pipe().To(remuxer.In()) >> muxer.pipe();
-	if (const std::size_t cap = muxer.InputCeiling(); cap > 0)
-		muxer.pipe().Capacity(remuxer.In(), cap);
 	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
-	muxer.Log(Level::Debug, std::format("reserve remux t={}", remuxer.In()));
-	if (muxer.Armed())
-		muxer.Wake();
+	muxer.Log(Level::Debug, std::format("bind remux t={}", remuxer.In()));
+	muxer.Wake();
 	return remuxer;
 }
 
 Muxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Muxer& muxer) noexcept {
-	if (!muxer.m_plan)
-		muxer.m_plan = demuxer.m_plan;
-	if (!demuxer.m_plan)
-		demuxer.m_plan = muxer.m_plan;
-	if (muxer.Failed())
+	if (!muxer.ConnectInput(demuxer))
 		return muxer;
-	if (!demuxer.Plan()) {
-		muxer.Fail("demuxer has no plan");
+	if (muxer.m_origin && muxer.m_origin != &demuxer) {
+		muxer.Fail("muxer origin is already bound");
 		return muxer;
 	}
-	if (!muxer.SpawnBackend())
-		return muxer;
-	if (!muxer.ArmOctets())
-		return muxer;
-
 	muxer.m_origin = &demuxer;
 	muxer.m_progress = demuxer.m_progress;
-	if (!muxer.BindPlanAttachments())
-		return muxer;
 	muxer.Log(Level::Debug, "bound remux origin");
+	muxer.Wake();
 	return muxer;
 }

@@ -55,6 +55,8 @@
 #include <StormByte/safe/pointers.hxx>
 
 #include <cstdint>
+#include <initializer_list>
+#include <vector>
 
 /**
  * @brief StormByte library facilities.
@@ -133,6 +135,52 @@ StormByte::Safe::Shared<StormByte::Logger::Log> MakeLogger();
  * @return Zero on success, one on failure or timeout.
  */
 int WaitForManualPipeline(StormByte::Multimedia::Pipeline::Step& last);
+
+/**
+ * @brief Stops every borrowed manual stage before their destructors join workers.
+ *
+ * Declare after all stages and graphs so early returns request cancellation
+ * while every connected peer is still alive. Teardown and Plan state changes
+ * must be externally serialized by the caller.
+ */
+class ManualPipelineStop final {
+	public:
+		/**
+		 * @brief Retains the stage addresses for cancellation.
+		 * @param stages Borrowed stages that must outlive this guard.
+		 */
+		explicit ManualPipelineStop(std::initializer_list<StormByte::Multimedia::Pipeline::Step*> stages);
+
+		/**
+		 * @brief Requests cancellation on every retained stage.
+		 */
+		~ManualPipelineStop() noexcept;
+
+		/**
+		 * @brief Copy construction is disabled.
+		 */
+		ManualPipelineStop(const ManualPipelineStop&) = delete;
+
+		/**
+		 * @brief Move construction is disabled.
+		 */
+		ManualPipelineStop(ManualPipelineStop&&) = delete;
+
+		/**
+		 * @brief Copy assignment is disabled.
+		 * @return This guard.
+		 */
+		ManualPipelineStop& operator=(const ManualPipelineStop&) = delete;
+
+		/**
+		 * @brief Move assignment is disabled.
+		 * @return This guard.
+		 */
+		ManualPipelineStop& operator=(ManualPipelineStop&&) = delete;
+
+	private:
+		std::vector<StormByte::Multimedia::Pipeline::Step*> m_stages;	///< Borrowed stages kept alive by the caller.
+};
 
 /**
  * @brief Checks the properties of an output containing one audio stream.

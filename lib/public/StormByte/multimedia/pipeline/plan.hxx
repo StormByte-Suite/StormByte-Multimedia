@@ -58,7 +58,9 @@
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/function.hxx>
+#include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
@@ -78,6 +80,38 @@ namespace StormByte {
 	 */
 	namespace Multimedia {
 		/**
+		 * @namespace Backend::Pipeline
+		 * @brief Internal pipeline consumers of the plan intention.
+		 */
+		namespace Backend::Pipeline {
+			/**
+			 * @brief Backend source restoration and track routing.
+			 */
+			class Demuxer;
+
+			/**
+			 * @brief Per-track queue capacity calculation.
+			 */
+			class Ceiling;
+
+			/**
+			 * @namespace Detail::Muxer::FFmpeg
+			 * @brief Output format implementation.
+			 */
+			namespace Detail::Muxer::FFmpeg {
+				/**
+				 * @brief Writes the resolved plan container.
+				 */
+				class Container;
+			}
+
+			/**
+			 * @brief Backend coordinator publishing execution state.
+			 */
+			class Transcoder;
+		}
+
+		/**
 		 * @namespace StormByte::Multimedia::Pipeline
 		 * @brief Demux / decode / filter / encode / mux types.
 		 *
@@ -88,6 +122,46 @@ namespace StormByte {
 				 * @brief Demux stage receiving the job intention.
 				 */
 			class Demuxer;
+
+			/**
+			 * @brief Decoder consuming the source snapshot.
+			 */
+			class Decoder;
+
+			/**
+			 * @brief Encoder consuming destination tracks.
+			 */
+			class Encoder;
+
+			/**
+			 * @brief Remux stage consuming the source snapshot.
+			 */
+			class Remuxer;
+
+			/**
+			 * @brief Output stage consuming the owned writer and container.
+			 */
+			class Muxer;
+
+			/**
+			 * @brief Filter facade consulting the source snapshot.
+			 */
+			class Filters;
+
+			/**
+			 * @brief Pipeline stage observing the shared plan state.
+			 */
+			class Step;
+
+			/**
+			 * @brief Private route for filter chains.
+			 */
+			class Route;
+
+			/**
+			 * @brief Public job facade publishing failure and cancellation.
+			 */
+			class Transcoder;
 
 			/**
 			 * @class Plan
@@ -102,8 +176,11 @@ namespace StormByte {
 			 * explicit duration avoids scanning; otherwise the full source
 			 * is scanned before pipeline stages are created.
 			 *
-			 * Destination container is resolved from the writer path
-			 * extension. There is no Container argument.
+			 * Destination container is an owned copy of an explicit identity,
+			 * or the registry identity matched to FFmpeg's filename guess.
+			 * Explicit identities ignore the filename when selecting the muxer.
+			 * Stages retain this noncopyable, nonmovable intention exclusively
+			 * through @ref StormByte::Safe::Shared.
 			 *
 			 * Mux output order is the order of @ref add. `add` is not
 			 * idempotent. A track omitted from @ref Tracks is dropped.
@@ -116,6 +193,29 @@ namespace StormByte {
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Plan {
 				public:
+					/**
+					 * @enum State
+					 * @brief Shared execution state of the pipeline plan.
+					 */
+					enum class State: std::uint8_t {
+						Created,	///< Constructed and not yet running.
+						Running,	///< Pipeline execution has started.
+						Finished,	///< Pipeline execution completed successfully.
+						Failed		///< Pipeline formation or execution failed.
+					};
+
+					/**
+					 * @brief Reads the synchronized execution state.
+					 * @return Current plan state.
+					 */
+					enum State State() const noexcept;
+
+					/**
+					 * @brief Copies the synchronized first failure reason.
+					 * @return Failure message, if one has been provided.
+					 */
+					StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
+
 					/**
 					 * @name Lifecycle
 					 * @{
@@ -174,16 +274,78 @@ namespace StormByte {
 						const StormByte::Safe::Function<void(double)>* progress) noexcept;
 
 					/**
+					 * @brief Builds local locations with an owned explicit container copy.
+					 * @param source Input path.
+					 * @param destination Output path; its suffix does not select the format.
+					 * @param container Registered writable destination identity to copy.
+					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 */
+					Plan(const StormByte::Safe::String& source,
+						const StormByte::Safe::String& destination,
+						const class Container& container,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Builds a local reader and owns the writer and a container copy.
+					 * @param source Input path.
+					 * @param writer Owned output location.
+					 * @param container Registered writable destination identity to copy.
+					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 */
+					Plan(const StormByte::Safe::String& source,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						const class Container& container,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Owns the reader and a container copy and builds a local writer.
+					 * @param reader Owned input location.
+					 * @param destination Output path; its suffix does not select the format.
+					 * @param container Registered writable destination identity to copy.
+					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 */
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						const StormByte::Safe::String& destination,
+						const class Container& container,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Owns both locations and a copy of the explicit destination identity.
+					 * @param reader Owned input location.
+					 * @param writer Owned output location.
+					 * @param container Registered writable destination identity to copy.
+					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 */
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						const class Container& container,
+						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+
+					/**
+					 * @brief Owns locations and a container copy while observing duration resolution.
+					 * @param reader Owned input location.
+					 * @param writer Owned output location.
+					 * @param container Registered writable destination identity to copy.
+					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 * @param progress Borrowed duration observer; null disables updates.
+					 */
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						const class Container& container,
+						StormByte::Safe::Optional<std::int64_t> duration,
+						const StormByte::Safe::Function<void(double)>* progress) noexcept;
+
+					/**
 					 * @brief Copy construction is not supported.
 					 * @param other Source plan.
 					 */
 					Plan(const Plan& other) = delete;
 
 					/**
-					 * @brief Move constructor.
-					 * @param other Plan to take.
+					 * @brief Move construction is not supported; stages retain shared ownership.
+					 * @param other Source plan.
 					 */
-					Plan(Plan&& other) noexcept;
+					Plan(Plan&& other) noexcept = delete;
 
 					/**
 					 * @brief Destructor.
@@ -198,29 +360,15 @@ namespace StormByte {
 					Plan& operator=(const Plan& other) = delete;
 
 					/**
-					 * @brief Move assignment.
-					 * @param other Plan to take.
-					 * @return *this.
+					 * @brief Move assignment is not supported; stages retain shared ownership.
+					 * @param other Source plan.
+					 * @return This plan.
 					 */
 					Plan& operator=(Plan&& other) noexcept = delete;
 
 					/**
 					 * @}
 					 */
-
-					/**
-					 * @brief Deep copy is not supported.
-					 * @return Owning pointer to the copied plan.
-					 */
-					StormByte::Safe::Shared<Plan> Clone() const = delete;
-
-					/**
-					 * @brief Move into a new pointer.
-					 * @return Owning pointer to the moved @ref Plan.
-					 * @note Derived plans must override this in their provider module,
-					 *       using Shared<Plan>::MakePointer<Derived> to avoid slicing.
-					 */
-					virtual StormByte::Safe::Shared<Plan> Move();
 
 					/**
 					 * @brief Same as @ref Check having a value.
@@ -232,18 +380,6 @@ namespace StormByte {
 					 * @name Job
 					 * @{
 					 */
-
-					/**
-					 * @brief Origin reader owned by this Plan.
-					 * @return Reader.
-					 */
-					StormByte::Buffer::IO::BufferedLocationReader& Reader() noexcept;
-
-					/**
-					 * @brief Origin reader owned by this Plan.
-					 * @return Reader.
-					 */
-					const StormByte::Buffer::IO::BufferedLocationReader& Reader() const noexcept;
 
 					/**
 					 * @brief Shared telemetry for the owned input reader.
@@ -258,6 +394,65 @@ namespace StormByte {
 					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> OutputTelemetry() const noexcept;
 
 					/**
+					 * @brief Appends a clone of @p track. Not idempotent.
+					 * @param track Track to copy.
+					 */
+					inline void add(const Track& track) {
+						m_tracks.add(track);
+					}
+
+					/**
+					 * @brief Appends @p track. Not idempotent. Order is mux order.
+					 * @param track Track to take.
+					 */
+					inline void add(Track&& track) {
+						m_tracks.add(std::move(track));
+					}
+
+					/**
+					 * @brief Tube tracks. Index is mux slot.
+					 * @return Track list.
+					 */
+					inline const class Tracks& Tracks() const noexcept {
+						return m_tracks;
+					}
+
+					/**
+					 * @}
+					 */
+
+					/**
+					 * @brief Whether this intention is well formed.
+					 *
+					 * Publishes Failed and preserves the first reason on validation failure.
+					 * Construction validates locations and format separately, without tracks.
+					 * Fails when: either location owner is empty; the constructor
+					 * snapshot failed; no registered buffered muxer resolves; @ref Tracks is
+					 * empty; @ref Track::In is negative; @ref Track::Type
+					 * is @ref Type::Unknown; an attachment MIME is empty
+					 * or is not an exact type/subtype, a type-star
+					 * category, or star-star (all).
+					 * Duplicate @ref Track::In is allowed. Encode knobs on a
+					 * remux track (`Codec() == nullptr`) are ignored.
+					 *
+					 * @return Empty value, or @ref PlanException.
+					 */
+					virtual CheckResult Check() const;
+
+				private:
+					/**
+					 * @brief Origin reader owned by this Plan.
+					 * @return Reader.
+					 */
+					StormByte::Buffer::IO::BufferedLocationReader& Reader() noexcept;
+
+					/**
+					 * @brief Origin reader owned by this Plan.
+					 * @return Reader.
+					 */
+					const StormByte::Buffer::IO::BufferedLocationReader& Reader() const noexcept;
+
+					/**
 					 * @brief Consultation snapshot taken in the constructor.
 					 * @return File snapshot (streams, attachments, metadata).
 					 *
@@ -267,8 +462,8 @@ namespace StormByte {
 					const StormByte::Multimedia::File& Snapshot() const noexcept;
 
 					/**
-					 * @brief Destination container (registry, from writer extension).
-					 * @return Container.
+					 * @brief Owned destination identity resolved during construction.
+					 * @return Container copy; valid only after construction validation succeeds.
 					 */
 					inline const class Container& Container() const noexcept {
 						return *m_container;
@@ -295,77 +490,137 @@ namespace StormByte {
 					}
 
 					/**
-					 * @brief Tube tracks. Index is mux slot.
-					 * @return Track list.
+					 * @brief Allows the input stage to consume source data.
 					 */
-					inline const class Tracks& Tracks() const noexcept {
-						return m_tracks;
-					}
+					friend class Demuxer;
 
 					/**
-					 * @brief Appends a clone of @p track. Not idempotent.
-					 * @param track Track to copy.
+					 * @brief Allows decoder snapshot consultation.
 					 */
-					inline void add(const Track& track) {
-						m_tracks.add(track);
-					}
+					friend class Decoder;
 
 					/**
-					 * @brief Appends @p track. Not idempotent. Order is mux order.
-					 * @param track Track to take.
+					 * @brief Allows encoder track consultation.
 					 */
-					inline void add(Track&& track) {
-						m_tracks.add(std::move(track));
-					}
+					friend class Encoder;
 
 					/**
-					 * @}
+					 * @brief Allows remux snapshot consultation.
 					 */
+					friend class Remuxer;
 
 					/**
-					 * @brief Whether this intention is well formed.
-					 *
-					 * Fails when: the Plan was moved-from; the constructor
-					 * snapshot failed; @ref Path is empty; @ref Tracks is
-					 * empty; @ref Track::In is negative; @ref Track::Type
-					 * is @ref Type::Unknown; an attachment MIME is empty
-					 * or is not an exact type/subtype, a type-star
-					 * category, or star-star (all).
-					 * Duplicate @ref Track::In is allowed. Encode knobs on a
-					 * remux track (`Codec() == nullptr`) are ignored.
-					 *
-					 * @return Empty value, or @ref PlanException.
+					 * @brief Allows the output stage to consume destination data.
 					 */
-					virtual CheckResult Check() const;
+					friend class Muxer;
 
-				private:
 					/**
-					 * @brief Resolves the registry container from the writer path.
-					 * @param writer Sink whose Path() has the extension.
-					 * @return Registry container pointer, or nullptr.
+					 * @brief Allows filter matching against the source snapshot.
 					 */
-					static const class Container* ContainerFromWriter(
-						const StormByte::Buffer::IO::BufferedLocationWriter& writer) noexcept;
+					friend class Filters;
+
+					/**
+					 * @brief Allows backend source restoration.
+					 */
+					friend class Backend::Pipeline::Demuxer;
+
+					/**
+					 * @brief Allows backend capacity calculation.
+					 */
+					friend class Backend::Pipeline::Ceiling;
+
+					/**
+					 * @brief Allows muxing with the resolved FFmpeg identity.
+					 */
+					friend class Backend::Pipeline::Detail::Muxer::FFmpeg::Container;
+
+					/**
+					 * @brief Allows stages to register state notifications.
+					 */
+					friend class Step;
+
+					/**
+					 * @brief Allows private route snapshot consultation.
+					 */
+					friend class Route;
+
+					/**
+					 * @brief Allows the public facade to publish failure and cancellation.
+					 */
+					friend class Transcoder;
+
+					/**
+					 * @brief Allows the backend coordinator to publish execution state.
+					 */
+					friend class Backend::Pipeline::Transcoder;
+
+					/**
+					 * @brief Applies a valid transition and preserves the first failure reason.
+					 * @param desired Requested execution state.
+					 * @param reason Optional reason used only for an accepted failure.
+					 * @return Actual state after accepting or rejecting the transition.
+					 */
+					enum State State(enum State desired,
+						StormByte::Safe::Optional<StormByte::Safe::String> reason = {}) const noexcept;
+
+					/**
+					 * @brief Registers a borrowed stage before checking the published state.
+					 * @param step Stage kept alive through all notifications by its owner.
+					 */
+					void Observe(Step& step) noexcept;
+
+					/**
+					 * @brief Removes a borrowed stage during externally serialized teardown.
+					 * @param step Stage whose owner has completed outstanding notifications.
+					 */
+					void Unobserve(Step& step) noexcept;
+
+					/**
+					 * @brief Records completion of a stage participating in this plan.
+					 * @param step Participating stage whose execution has ended.
+					 * @param success Whether the stage completed successfully.
+					 */
+					void Complete(Step& step, bool success) noexcept;
+
+					/**
+					 * @brief Provider-owned borrowed notification registry.
+					 */
+					class Observers;
+
+					/**
+					 * @brief Constructs locations, snapshot and a validated destination identity.
+					 * @param reader Owned input location.
+					 * @param writer Owned output location.
+					 * @param container Explicit identity to copy; null guesses from the filename.
+					 * @param duration Authoritative source duration or automatic scan.
+					 * @param progress Borrowed duration observer.
+					 */
+					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+						const class Container* container,
+						StormByte::Safe::Optional<std::int64_t> duration,
+						const StormByte::Safe::Function<void(double)>* progress) noexcept;
+
+					/**
+					 * @brief Validates construction data and optionally all selected tracks.
+					 * @param tracks Whether empty or invalid tracks are failures.
+					 * @return Success or the preserved first plan failure.
+					 */
+					CheckResult Validate(bool tracks) const;
 
 					StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry> m_input_telemetry;		///< Input counters retained independently of the reader.
 					StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry> m_output_telemetry;		///< Output counters retained independently of the writer.
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;	///< Owned origin octets.
 					StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;	///< Owned destination octets.
 					StormByte::Safe::Unique<StormByte::Multimedia::File> m_snapshot;			///< Provider-owned constructor probe.
-					const class Container* m_container;						///< Borrowed destination container from the registry.
+					const class Container* m_container = nullptr;			///< Borrowed destination identity owned by the registry.
+					const char* m_format = nullptr;						///< Process-lifetime resolved FFmpeg muxer name.
 					class Tracks m_tracks;								///< Tube tracks indexed by mux slot.
+					mutable StormByte::Safe::Mutex m_state_mutex;		///< Synchronizes execution state and failure reason.
+					mutable StormByte::Safe::Atomic<enum State> m_state{State::Created};	///< Published execution state.
+					mutable StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< First supplied failure reason.
+					StormByte::Safe::Unique<Observers> m_observers;	///< Provider-owned notification registry.
 			};
-
-			/**
-			 * @brief Hands @p plan to @p demuxer. Not a Step bind.
-			 * @param plan Intention (moved).
-			 * @param demuxer Destination.
-			 * @return @p demuxer.
-			 *
-			 * Stores the Plan on the Demuxer and wakes it. A second Plan
-			 * is Fail. Does not call @ref Plan::Check and does not bind hoppers.
-			 */
-			STORMBYTE_MULTIMEDIA_PUBLIC Demuxer& operator>>(Plan&& plan, Demuxer& demuxer) noexcept;
 
 			/**
 			 * @brief Transfers a shared intention without slicing its dynamic type.

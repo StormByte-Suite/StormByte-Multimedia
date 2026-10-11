@@ -162,9 +162,9 @@ namespace StormByte {
 			 * @param muxer Destination.
 			 * @return @p encoder.
 			 *
-			 * Binds the Plan on the first reservation. Opens the Plan
-			 * writer for output. Releases setup when all muxable tracks
-			 * required by the Plan have been reserved.
+				 * Registers a borrowed graph edge and binds the typed packet lane,
+				 * even without a Plan. Backend reservation and writer opening are
+				 * deferred until Setup observes a running Plan.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Encoder& operator>>(Encoder& encoder, Muxer& muxer) noexcept;
 
@@ -174,9 +174,9 @@ namespace StormByte {
 			 * @param muxer Destination.
 			 * @return @p remuxer.
 			 *
-			 * Binds the Plan on the first reservation. Opens the Plan
-			 * writer for output. Releases setup when all muxable tracks
-			 * required by the Plan have been reserved.
+				 * Registers a borrowed graph edge and binds the typed packet lane,
+				 * even without a Plan. Backend reservation and writer opening are
+				 * deferred until Setup observes a running Plan.
 			 */
 			STORMBYTE_MULTIMEDIA_PUBLIC Remuxer& operator>>(Remuxer& remuxer, Muxer& muxer) noexcept;
 
@@ -185,7 +185,7 @@ namespace StormByte {
 			 *
 			 * Required when any remux track is reserved. Without it the muxer
 			 * cannot clone origin codec parameters. Also shares the tube
-			 * @ref Progress clock. Opens the Plan writer if needed.
+				 * @ref Progress clock. Does not open the writer during connection.
 			 * There is no @c file >> muxer and no
 			 * @c muxer >> path.
 			 *
@@ -314,7 +314,7 @@ namespace StormByte {
 					 * @brief Maximum number of queued input packets.
 					 *
 					 * The first muxable Plan track determines the limit.
-					 * Calling without a bound Plan aborts the process.
+					 * Returns zero before a Plan supplies a muxable track.
 					 *
 					 * @return Max queued packets. Never 0 after a live Plan.
 					 */
@@ -408,6 +408,24 @@ namespace StormByte {
 					void WaitArmed() noexcept;
 
 					/**
+					 * @brief Registers an input edge before any pipe binding.
+					 * @param source Borrowed producer stage.
+					 * @return false when the shared graph rejects the connection.
+					 */
+					bool ConnectInput(Step& source) noexcept;
+
+					/**
+					 * @brief Reserves streams, copies tags and opens output on the worker.
+					 * @return false after cancellation or failure.
+					 */
+					bool SetupPlan() noexcept;
+
+					/**
+					 * @brief Provider-owned storage for borrowed encoder connections.
+					 */
+					class Connections;
+
+					/**
 					 * @brief Creates the container backend from the Plan extension.
 					 * @return false after Fail.
 					 */
@@ -479,6 +497,7 @@ namespace StormByte {
 					StormByte::Safe::Shared<class Progress> m_progress;		///< Shared tube clock retained through Base-heap ownership.
 					Attachments m_attachments;					///< Catalogue for header write
 					StormByte::Safe::Set<int> m_wired;					///< Remux input indices already reserved; encoder output indices are checked by the backend.
+					StormByte::Safe::Unique<Connections> m_connections;	///< Provider-owned borrowed encoder registry; stages must outlive this muxer.
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;	///< Per-output language
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;		///< Per-output title
 					StormByte::Safe::Atomic<bool> m_closed;				///< Set by Finish / Fail

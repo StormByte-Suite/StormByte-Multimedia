@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
+#include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/vector.hxx>
@@ -213,6 +214,12 @@ namespace StormByte::Multimedia::Pipeline {
 			StormByte::Safe::Vector<Filter::Report> Reports() const noexcept;
 
 		private:
+			/**
+			 * @brief Source media of this route in the origin plan snapshot.
+			 * @return Stream type, or @ref StormByte::Multimedia::Type::Unknown when unpublished.
+			 */
+			enum StormByte::Multimedia::Type SourceMedia() const noexcept;
+
 			/**
 			 * @brief Wires this track from the stored origin to destination.
 			 *

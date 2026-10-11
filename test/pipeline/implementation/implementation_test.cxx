@@ -54,8 +54,10 @@
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
+#include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
+#include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
@@ -64,6 +66,7 @@
 #include <array>
 #include <chrono>
 #include <thread>
+#include <type_traits>
 #include <utility>
 
 using namespace StormByte::Multimedia;
@@ -72,6 +75,61 @@ using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
 namespace {
+	template<typename Intention>
+	concept PublicReader = requires(Intention& plan) { plan.Reader(); };
+
+	template<typename Intention>
+	concept PublicWriter = requires(Intention& plan) { plan.Writer(); };
+
+	template<typename Intention>
+	concept PublicPath = requires(const Intention& plan) { plan.Path(); };
+
+	template<typename Intention>
+	concept PublicTracks = requires(const Intention& plan) { plan.Tracks(); };
+
+	template<typename Intention>
+	concept PublicContainer = requires(const Intention& plan) { plan.Container(); };
+
+	template<typename Intention>
+	concept PublicSnapshot = requires(const Intention& plan) { plan.Snapshot(); };
+
+	template<typename Intention>
+	concept PublicClone = requires(const Intention& plan) { plan.Clone(); };
+
+	template<typename Intention>
+	concept PublicMove = requires(Intention& plan) { plan.Move(); };
+
+	template<typename Intention>
+	concept ValueBinding = requires(Intention& plan, Demuxer& demuxer) { plan >> demuxer; };
+
+	template<typename Intention>
+	concept PublicConfiguration = requires(Intention& plan, const Track& track) {
+		plan.add(track);
+		plan.Check();
+		plan.State();
+		plan.Error();
+		plan.InputTelemetry();
+		plan.OutputTelemetry();
+	};
+
+	template<typename Intention>
+	concept PublicStateSetter = requires(const Intention& plan) {
+		plan.State(Intention::State::Running);
+	};
+
+	static_assert(!std::is_copy_constructible_v<Plan> && !std::is_copy_assignable_v<Plan>);
+	static_assert(!std::is_move_constructible_v<Plan> && !std::is_move_assignable_v<Plan>);
+	static_assert(!std::is_copy_constructible_v<Container>);
+	static_assert(PublicConfiguration<Plan>);
+	static_assert(std::is_enum_v<decltype(std::declval<const Plan&>().State())>);
+	static_assert(!std::is_convertible_v<decltype(std::declval<const Plan&>().State()), int>);
+	static_assert(!PublicStateSetter<Plan>);
+	static_assert(!PublicReader<Plan> && !PublicWriter<Plan> && !PublicPath<Plan>);
+	static_assert(PublicTracks<Plan> && !PublicContainer<Plan> && !PublicSnapshot<Plan>);
+	static_assert(!PublicClone<Plan> && !PublicMove<Plan> && !ValueBinding<Plan>);
+	static_assert(std::is_same_v<decltype(std::declval<Step&>().Plan()),
+		StormByte::Safe::Shared<Plan>>);
+
 static int CheckTranscoderDecoderPin(std::string_view pin, std::string_view destination,
 	std::string_view expectedError = {}) {
 	auto codec = Registry::Instance().FindCodec("AC-3");
@@ -97,27 +155,26 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 	auto codec = Registry::Instance().FindCodec("AC-3");
 	TEST_REQUIRE(codec && codec.value().get().HasAccess(Access{Operation::Write}));
 	const auto output = OutputPath(destination);
-	Plan plan{StormByte::Safe::String{FixturePath("audio/noise_stereo.wav").string()},
-		StormByte::Safe::String{output.string()}, 2000000000LL};
+	auto plan = StormByte::Safe::MakeShared<Plan>(StormByte::Safe::String{FixturePath("audio/noise_stereo.wav").string()},
+		StormByte::Safe::String{output.string()}, 2000000000LL);
 	Config::Audio audio;
 	audio.Codec(codec.value().get());
 	Config::Implementation implementation;
 	implementation.Decoder = StormByte::Safe::String{pin};
 	audio.Implementation(std::move(implementation));
-	plan.add(Track{0, std::move(audio)});
-	TEST_REQUIRE(plan.Check());
+	plan->add(Track{0, std::move(audio)});
+	TEST_REQUIRE(plan->Check());
 	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
 	Demuxer demuxer{noLogger};
 	Decoder decoder{noLogger, 0};
 	Encoder encoder{noLogger, 0, codec.value().get()};
 	Muxer muxer{noLogger};
-	std::move(plan) >> demuxer;
+	ManualPipelineStop teardown{&demuxer, &decoder, &encoder, &muxer};
 	demuxer >> muxer;
 	demuxer >> decoder;
 	decoder >> encoder;
 	encoder >> muxer;
-	TEST_REQUIRE(decoder.Implementation());
-	TEST_REQUIRE(TestView(decoder.Implementation().value()) == pin);
+	plan >> demuxer;
 	if (!expectedError.empty()) {
 		const auto deadline = std::chrono::steady_clock::now() + 30s;
 		while (!decoder.Failed() && decoder.Status() != State::Stopped
@@ -126,6 +183,7 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 		TEST_REQUIRE(decoder.Failed());
 		TEST_REQUIRE(decoder.Error());
 		TEST_REQUIRE(TestView(decoder.Error().value()).find(expectedError) != std::string_view::npos);
+		TEST_REQUIRE(plan->State() == Plan::State::Failed);
 		return 0;
 	}
 	const auto deadline = std::chrono::steady_clock::now() + 30s;
@@ -142,30 +200,11 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 				<< stage->Error().value_or(StormByte::Safe::String{"no error message"}) << std::endl;
 	}
 	TEST_REQUIRE(muxer.Status() == State::Stopped);
+	for (Step* stage : std::array<Step*, 4>{&demuxer, &decoder, &encoder, &muxer})
+		TEST_REQUIRE(WaitForManualPipeline(*stage) == 0);
 	TEST_REQUIRE(!demuxer.Failed() && !decoder.Failed() && !encoder.Failed());
+	TEST_REQUIRE(plan->State() == Plan::State::Finished);
 	return CheckSingleAudioOutput(output, "Matroska", "AC-3", 2, 48000);
-}
-
-static int CheckImmediatePlanBinding() {
-	StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
-	const auto output = OutputPath("pipeline/immediate-plan-binding.mka");
-	for (int attempt = 0; attempt < 16; ++attempt) {
-		Plan plan{StormByte::Safe::String{FixturePath("audio/noise_stereo.wav").string()},
-			StormByte::Safe::String{output.string()}, 2000000000LL};
-		Config::Audio audio;
-		plan.add(Track{0, std::move(audio)});
-		TEST_REQUIRE(plan.Check());
-
-		Demuxer demuxer{noLogger};
-		std::move(plan) >> demuxer;
-		const auto deadline = std::chrono::steady_clock::now() + 5s;
-		while (demuxer.Status() == State::Created && std::chrono::steady_clock::now() < deadline)
-			std::this_thread::sleep_for(1ms);
-		TEST_REQUIRE(demuxer.Status() != State::Created);
-		TEST_REQUIRE(!demuxer.Failed());
-		demuxer.Stop();
-	}
-	return 0;
 }
 }
 
@@ -187,10 +226,6 @@ int test_manual_selects_plan_decoder_implementation() {
 	return CheckManualDecoderPin("pcm_s16le", "pipeline/manual-pinned-decoder.mka");
 }
 
-int test_manual_demuxer_immediate_plan_binding() {
-	return CheckImmediatePlanBinding();
-}
-
 int test_manual_rejects_missing_decoder_implementation() {
 	return CheckManualDecoderPin("stormbyte_nonexistent_decoder", "pipeline/manual-missing-decoder.mka",
 		"decoder implementation is unavailable");
@@ -207,7 +242,6 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_rejects_missing_decoder_implementation", test_transcoder_rejects_missing_decoder_implementation},
 		TestEntry{"test_transcoder_rejects_mismatched_decoder_implementation", test_transcoder_rejects_mismatched_decoder_implementation},
 		TestEntry{"test_manual_selects_plan_decoder_implementation", test_manual_selects_plan_decoder_implementation},
-		TestEntry{"test_manual_demuxer_immediate_plan_binding", test_manual_demuxer_immediate_plan_binding},
 		TestEntry{"test_manual_rejects_missing_decoder_implementation", test_manual_rejects_missing_decoder_implementation},
 		TestEntry{"test_manual_rejects_mismatched_decoder_implementation", test_manual_rejects_mismatched_decoder_implementation},
 	};

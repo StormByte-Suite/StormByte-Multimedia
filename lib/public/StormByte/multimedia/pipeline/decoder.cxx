@@ -119,6 +119,33 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 
 Decoder::~Decoder() noexcept = default;
 
+bool Decoder::WaitForPlan() noexcept {
+	return WaitPlan();
+}
+
+bool Decoder::SetupPlan() noexcept {
+	try {
+		if (!m_implementation && !m_look) {
+			for (const auto& track : Plan()->Tracks()) {
+				if (!track || track->In() != m_index || !track->Config())
+					continue;
+				const auto& implementation = track->Config()->Implementation();
+				if (implementation.Decoder)
+					Implementation(*implementation.Decoder);
+				break;
+			}
+		}
+		InheritSourceTags();
+		if (const std::size_t capacity = InputCeiling(); capacity > 0)
+			pipe().Capacity(m_index, capacity);
+	}
+	catch (...) {
+		Fail("failed to configure decoder from plan");
+		return false;
+	}
+	return true;
+}
+
 Decoder::operator bool() const noexcept {
 	return !Failed() && Ready() && m_backend && m_backend->IsOpen();
 }
@@ -189,6 +216,18 @@ void Decoder::Stamp(StormByte::Safe::Optional<StormByte::Safe::String> language,
 		m_title.reset();
 	else
 		m_title = std::move(title);
+}
+
+void Decoder::InheritSourceTags() {
+	const auto plan = Plan();
+	if (!plan)
+		return;
+	for (const auto& stream : plan->Snapshot().Streams()) {
+		if (stream.Index() != m_index)
+			continue;
+		Stamp(stream.Metadata().Language(), stream.Metadata().Title());
+		break;
+	}
 }
 
 void Decoder::AttachOrigin(Demuxer& demuxer) noexcept {

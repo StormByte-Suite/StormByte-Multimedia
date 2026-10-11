@@ -85,6 +85,9 @@ using namespace std::string_view_literals;
 				<< error.value_or(StormByte::Safe::String{"no error message"}) << std::endl;
 			return 1;
 		}
+		TEST_REQUIRE(job.Plan());
+		TEST_REQUIRE(job.Plan()->State() == Plan::State::Finished);
+		TEST_REQUIRE(!job.Plan()->Error());
 		return 0;
 	}
 
@@ -127,6 +130,10 @@ using namespace std::string_view_literals;
 		}
 		TEST_REQUIRE(job.Status() == Status::Error);
 		TEST_REQUIRE(job.Failed());
+		if (job.Plan()) {
+			TEST_REQUIRE(job.Plan()->State() == Plan::State::Failed);
+			TEST_REQUIRE(job.Plan()->Error());
+		}
 		const auto error = job.Error();
 		TEST_REQUIRE(error && !error->empty());
 		if (!expectedMessage.empty()) {
@@ -151,6 +158,13 @@ using namespace std::string_view_literals;
 		if (last.Status() != State::Stopped)
 			return 1;
 		return 0;
+	}
+
+	ManualPipelineStop::ManualPipelineStop(std::initializer_list<Step*> stages): m_stages(stages) {}
+
+	ManualPipelineStop::~ManualPipelineStop() noexcept {
+		for (Step* stage : m_stages)
+			stage->Stop();
 	}
 
 	int CheckSingleAudioOutput(const std::filesystem::path& output, std::string_view container,

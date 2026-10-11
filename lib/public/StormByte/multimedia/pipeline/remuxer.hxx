@@ -247,7 +247,26 @@ namespace StormByte {
 					 */
 					void Emit(Packet::PointerType packet) noexcept;
 
-					int m_index;		///< Origin stream index
+					/**
+					 * @brief Waits for the bound plan to run or execution to terminate.
+					 * @return true only while the plan is running.
+					 */
+					bool WaitForPlan() noexcept;
+
+					/**
+					 * @brief Applies input capacity after the plan starts.
+					 */
+					void SetupPlan() noexcept;
+
+					/**
+					 * @brief Registers the borrowed origin edge before binding its lane.
+					 * @param demuxer Origin stage.
+					 * @return false when the graph connection is rejected.
+					 */
+					bool ConnectOrigin(Demuxer& demuxer) noexcept;
+
+					int m_index;		///< Origin stream index.
+					Demuxer* m_origin = nullptr;	///< Borrowed origin; must outlive this stage.
 					Join m_join{*this};	///< Halt before other members die
 			};
 		}

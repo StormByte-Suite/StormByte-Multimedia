@@ -77,6 +77,40 @@ Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) no
 
 Remuxer::~Remuxer() noexcept = default;
 
+bool Remuxer::WaitForPlan() noexcept {
+	return WaitPlan();
+}
+
+void Remuxer::SetupPlan() noexcept {
+	if (const std::size_t capacity = InputCeiling(); capacity > 0)
+		pipe().Capacity(m_index, capacity);
+	pipe().WaitWake(this, [](void* context) noexcept {
+		const auto& owner = *static_cast<Remuxer*>(context);
+		return owner.Stopping() || owner.Plan()->State() != Plan::State::Running
+			|| (owner.m_origin && (owner.m_origin->Failed()
+				|| owner.m_origin->Ready() || owner.m_origin->Eof()));
+	});
+	if (Stopping())
+		return;
+	if (Plan()->State() != Plan::State::Running) {
+		Fail(Plan()->Error().value_or(StormByte::Safe::String("plan is not running")));
+		return;
+	}
+	if (m_origin->Failed())
+		Fail(m_origin->Error().value_or(StormByte::Safe::String("demuxer failed")));
+}
+
+bool Remuxer::ConnectOrigin(Demuxer& demuxer) noexcept {
+	if (!demuxer.Connect(*this))
+		return false;
+	if (m_origin && m_origin != &demuxer) {
+		Fail("remuxer origin is already bound");
+		return false;
+	}
+	m_origin = &demuxer;
+	return true;
+}
+
 StormByte::Size Remuxer::InputCeiling() const noexcept {
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
 	const auto* track = StormByte::Multimedia::Backend::Pipeline::TrackByIn(plan, m_index);
@@ -93,16 +127,15 @@ void Remuxer::Emit(Packet::PointerType packet) noexcept {
 Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept {
 	if (remuxer.Failed())
 		return remuxer;
-	if (!remuxer.m_plan)
-		remuxer.m_plan = demuxer.m_plan;
+	if (!remuxer.ConnectOrigin(demuxer))
+		return remuxer;
 	if (demuxer.Failed()) {
 		remuxer.Fail(demuxer.Error().value_or(StormByte::Safe::String("demuxer failed")));
 		return remuxer;
 	}
 
 	demuxer.pipe().To(remuxer.In()) >> remuxer.pipe();
-	if (const std::size_t cap = remuxer.InputCeiling(); cap > 0)
-		remuxer.pipe().Capacity(remuxer.In(), cap);
+	remuxer.Wake();
 	demuxer.Log(Level::Debug, std::format("bind remuxer t={}", remuxer.In()));
 	return remuxer;
 }

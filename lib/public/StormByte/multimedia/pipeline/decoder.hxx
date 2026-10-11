@@ -403,10 +403,27 @@ namespace StormByte::Multimedia::Pipeline {
 				StormByte::Safe::Optional<StormByte::Safe::String> title) noexcept;
 
 			/**
+			 * @brief Copies language and title from the bound plan snapshot.
+			 */
+			void InheritSourceTags();
+
+			/**
 			 * @brief Records the demuxer of demuxer >> decoder.
 			 * @param demuxer Origin demuxer.
 			 */
 			void AttachOrigin(Demuxer& demuxer) noexcept;
+
+			/**
+			 * @brief Waits for a running plan, including cancellation and failure.
+			 * @return true only while the plan is running.
+			 */
+			bool WaitForPlan() noexcept;
+
+			/**
+			 * @brief Applies source implementation, tags and capacity on the worker.
+			 * @return false after failure.
+			 */
+			bool SetupPlan() noexcept;
 
 			/**
 			 * @brief Measure origin will not push more packets.

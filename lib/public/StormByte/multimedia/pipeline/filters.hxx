@@ -375,6 +375,17 @@ namespace StormByte {
 					using Attached = Detail::FiltersAttached;
 
 					/**
+					 * @brief Tests global analytics against a resolved source track.
+					 * @param filter Analytics leaf.
+					 * @param origin Source stage carrying the shared intention.
+					 * @param destination Destination producer kind.
+					 * @param track Source stream index.
+					 * @return Whether the leaf applies; an unpublished Plan defers media validation.
+					 */
+					static bool Matches(const Filter::FFmpeg& filter, const Step& origin,
+						Producer destination, int track) noexcept;
+
+					/**
 					 * @brief Whether a measure pass started by @ref Close is active.
 					 * @return true until FinishMeasure, otherwise false.
 					 */

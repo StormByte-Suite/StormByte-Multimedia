@@ -157,6 +157,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			virtual void CloseOutput() noexcept = 0;
 
+			virtual void Completed(bool success) noexcept {}
+
 			/**
 			 * @brief Pumper has CAS Created → Ready. Wake waiters.
 			 */

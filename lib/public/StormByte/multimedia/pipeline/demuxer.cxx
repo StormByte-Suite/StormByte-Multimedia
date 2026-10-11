@@ -117,11 +117,7 @@ Progress::Pointer Demuxer::Progress() const noexcept {
 }
 
 void Demuxer::WaitForPlan() noexcept {
-	StormByte::Safe::UniqueLock lock(m_planMutex);
-	m_planPresent.wait(lock, [this]() {
-		return Stopping() || static_cast<bool>(m_plan);
-	});
-	if (!Stopping() && m_plan)
+	if (WaitPlan())
 		LatchDuration();
 }
 
@@ -241,8 +237,8 @@ Packet::PointerType Demuxer::Wrap(
 Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& decoder) noexcept {
 	if (decoder.Failed())
 		return decoder;
-	if (!decoder.Plan())
-		decoder.m_plan = demuxer.m_plan;
+	if (!demuxer.Connect(decoder))
+		return decoder;
 	if (demuxer.Failed()) {
 		decoder.Fail(demuxer.Error().value_or(StormByte::Safe::String("demuxer failed")));
 		return decoder;
@@ -259,12 +255,7 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 					break;
 				}
 			}
-			for (const auto& stream : plan->Snapshot().Streams()) {
-				if (stream.Index() != decoder.Index())
-					continue;
-				decoder.Stamp(stream.Metadata().Language(), stream.Metadata().Title());
-				break;
-			}
+			decoder.InheritSourceTags();
 		}
 		catch (...) {
 			decoder.Fail("failed to copy source stream tags");

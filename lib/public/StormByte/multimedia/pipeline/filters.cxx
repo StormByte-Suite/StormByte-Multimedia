@@ -86,27 +86,6 @@ namespace {
 		return -1;
 	}
 
-	enum StormByte::Multimedia::Type StreamMedia(const Step& origin, int track) noexcept {
-		const auto& plan = origin.Plan();
-		if (!plan || !*plan)
-			return StormByte::Multimedia::Type::Unknown;
-		for (const auto& stream : plan->Snapshot().Streams()) {
-			if (stream.Index() == track)
-				return stream.Type();
-		}
-
-		return StormByte::Multimedia::Type::Unknown;
-	}
-
-	bool Matches(const Filter::FFmpeg& filter, const Step& origin, Producer dest, int track) noexcept {
-		if (dest != Producer::Encoder && dest != Producer::Remuxer)
-			return false;
-		const auto media = StreamMedia(origin, track);
-		if (media != StormByte::Multimedia::Type::Unknown && filter.Media() != media)
-			return false;
-		return true;
-	}
-
 	std::string FlattenKey(std::string_view leaf, StormByte::Safe::Optional<int> track,
 		std::map<std::string, int>& seen) noexcept {
 		std::string base(leaf);
@@ -124,6 +103,20 @@ namespace {
 }
 
 Filters::Filters() noexcept = default;
+
+bool Filters::Matches(const Filter::FFmpeg& filter, const Step& origin,
+	Producer destination, int track) noexcept {
+	if (destination != Producer::Encoder && destination != Producer::Remuxer)
+		return false;
+	const auto plan = origin.Plan();
+	if (!plan || !*plan)
+		return true;
+	for (const auto& stream : plan->Snapshot().Streams()) {
+		if (stream.Index() == track)
+			return filter.Media() == stream.Type();
+	}
+	return true;
+}
 
 Filters::Handle::Handle(Filters& owner, StormByte::Size index) noexcept
 : m_owner(&owner), m_index(index) {}
@@ -204,14 +197,6 @@ Filters& Filters::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	if (m_progress)
 		m_progress->HasAnalytics(true);
 	for (const auto& stretch : m_stretches) {
-		StormByte::Safe::Shared<const Plan> plan;
-		if (stretch.Origin)
-			plan = stretch.Origin->Plan();
-		if (!plan && stretch.Destination)
-			plan = stretch.Destination->Plan();
-		if (!plan)
-			continue;
-		filter->m_plan = plan;
 		if (filter->m_origin < 0)
 			filter->m_origin = stretch.Track;
 		break;
@@ -268,25 +253,6 @@ void Filters::Close() noexcept {
 	for (auto& stretch : m_stretches) {
 		if (!stretch.Lane || !stretch.Origin || !stretch.Destination)
 			continue;
-		StormByte::Safe::Shared<const Plan> plan = stretch.Origin->Plan();
-		if (!plan)
-			plan = stretch.Destination->Plan();
-		if (plan) {
-			for (auto& item : m_reports) {
-				if (!item.Filter)
-					continue;
-				item.Filter->m_plan = plan;
-				if (item.Filter->m_origin < 0)
-					item.Filter->m_origin = stretch.Track;
-			}
-			for (auto& global : m_globals) {
-				if (!global.Filter)
-					continue;
-				global.Filter->m_plan = plan;
-				if (global.Filter->m_origin < 0)
-					global.Filter->m_origin = stretch.Track;
-			}
-		}
 		for (auto& global : m_globals) {
 			if (global.Filter && Matches(*global.Filter, *stretch.Origin,
 				stretch.Destination->m_name, stretch.Track))

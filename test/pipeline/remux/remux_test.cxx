@@ -59,6 +59,7 @@
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
+#include <StormByte/multimedia/registry.hxx>
 
 #include <array>
 #include <utility>
@@ -142,15 +143,16 @@ int test_transcoder_remux_omits_unselected_attachments() {
 int test_hand_built_pipe_remux_preserves_pgs_and_attachments() {
 	const auto input = FixturePath("video/anime_like.mkv");
 	const auto output = OutputPath("pipeline/manual-remux.mkv");
-	Plan plan{StormByte::Safe::String{input.string()}, StormByte::Safe::String{output.string()}, 2000000000LL};
-	plan.add(Track{0, StormByte::Multimedia::Type::Video});
-	plan.add(Track{1, StormByte::Multimedia::Type::Audio});
-	plan.add(Track{2, Config::Subtitle{}});
-	plan.add(Track{3, Config::Subtitle{}});
-	plan.add(Track{4, Config::Subtitle{}});
+	auto plan = StormByte::Safe::MakeShared<Plan>(StormByte::Safe::String{input.string()},
+		StormByte::Safe::String{output.string()}, 2000000000LL);
+	plan->add(Track{0, StormByte::Multimedia::Type::Video});
+	plan->add(Track{1, StormByte::Multimedia::Type::Audio});
+	plan->add(Track{2, Config::Subtitle{}});
+	plan->add(Track{3, Config::Subtitle{}});
+	plan->add(Track{4, Config::Subtitle{}});
 	Config::Attachment attachments{std::string_view{"*/*"}};
-	plan.add(Track{0, std::move(attachments)});
-	const auto planCheck = plan.Check();
+	plan->add(Track{0, std::move(attachments)});
+	const auto planCheck = plan->Check();
 	if (!planCheck) {
 		std::cerr << "[DETAIL] Manual Plan check: "
 			<< planCheck.error()->what() << std::endl;
@@ -165,15 +167,66 @@ int test_hand_built_pipe_remux_preserves_pgs_and_attachments() {
 	Remuxer english{noLogger, 3};
 	Remuxer japanese{noLogger, 4};
 	Muxer muxer{noLogger};
-	std::move(plan) >> demuxer;
+	ManualPipelineStop teardown{&demuxer, &video, &audio, &spanish, &english, &japanese, &muxer};
 	demuxer >> muxer;
 	demuxer >> video >> muxer;
 	demuxer >> audio >> muxer;
 	demuxer >> spanish >> muxer;
 	demuxer >> english >> muxer;
 	demuxer >> japanese >> muxer;
+	plan >> demuxer;
+	TEST_REQUIRE(plan->State() == Plan::State::Running);
 	TEST_REQUIRE(WaitForManualPipeline(muxer) == 0);
+	for (Step* stage : std::array<Step*, 6>{&demuxer, &video, &audio, &spanish, &english, &japanese})
+		TEST_REQUIRE(WaitForManualPipeline(*stage) == 0);
+	TEST_REQUIRE(plan->State() == Plan::State::Finished);
 	return CheckRemuxOutput(output);
+}
+
+int test_manual_explicit_container_overrides_filename() {
+	const auto container = Registry::Instance().FindContainer("Matroska");
+	TEST_REQUIRE(container);
+	const auto& identity = container.value().get();
+	for (const auto suffix : std::array{"unknown-container", "mp3"}) {
+		const auto output = OutputPath(std::string{"pipeline/manual-explicit."} + suffix);
+		auto plan = StormByte::Safe::MakeShared<Plan>(
+			TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), identity, 2000000000LL);
+		plan->add(Track{0, StormByte::Multimedia::Type::Audio});
+		TEST_REQUIRE(plan->Check());
+		StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
+		Demuxer demuxer{noLogger};
+		Remuxer remuxer{noLogger, 0};
+		Muxer muxer{noLogger};
+		ManualPipelineStop teardown{&demuxer, &remuxer, &muxer};
+		demuxer >> muxer;
+		demuxer >> remuxer >> muxer;
+		plan >> demuxer;
+		TEST_REQUIRE(plan->State() == Plan::State::Running);
+		TEST_REQUIRE(WaitForManualPipeline(muxer) == 0);
+		TEST_REQUIRE(WaitForManualPipeline(demuxer) == 0);
+		TEST_REQUIRE(WaitForManualPipeline(remuxer) == 0);
+		TEST_REQUIRE(plan->State() == Plan::State::Finished);
+		TEST_REQUIRE(CheckSingleAudioOutput(output, "Matroska", "PCM S16 LE", 2, 48000) == 0);
+	}
+	return 0;
+}
+
+int test_transcoder_explicit_container_overrides_filename() {
+	const auto container = Registry::Instance().FindContainer("Matroska");
+	TEST_REQUIRE(container);
+	const auto& identity = container.value().get();
+	for (const auto suffix : std::array{"unknown-container", "mp3"}) {
+		const auto output = OutputPath(std::string{"pipeline/transcoder-explicit."} + suffix);
+		auto logger = MakeLogger();
+		Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output),
+			identity, logger, 2000000000LL};
+		job.Audio(0).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		TEST_REQUIRE(CheckSingleAudioOutput(output, "Matroska", "PCM S16 LE", 2, 48000) == 0);
+	}
+	return 0;
 }
 
 int main(int argc, char** argv) {
@@ -181,6 +234,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_remux_preserves_pgs_and_attachments", test_transcoder_remux_preserves_pgs_and_attachments},
 		TestEntry{"test_transcoder_remux_omits_unselected_attachments", test_transcoder_remux_omits_unselected_attachments},
 		TestEntry{"test_hand_built_pipe_remux_preserves_pgs_and_attachments", test_hand_built_pipe_remux_preserves_pgs_and_attachments},
+		TestEntry{"test_manual_explicit_container_overrides_filename", test_manual_explicit_container_overrides_filename},
+		TestEntry{"test_transcoder_explicit_container_overrides_filename", test_transcoder_explicit_container_overrides_filename},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

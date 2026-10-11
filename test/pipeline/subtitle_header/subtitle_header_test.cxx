@@ -65,6 +65,8 @@
 #include <StormByte/multimedia/registry.hxx>
 
 #include <array>
+#include <chrono>
+#include <thread>
 #include <utility>
 
 using namespace StormByte::Multimedia;
@@ -99,13 +101,13 @@ namespace {
 			return TEST_SKIP;
 		const auto output = OutputPath(destination);
 		{
-			Plan plan{StormByte::Safe::String{FixturePath(source).string()},
-				StormByte::Safe::String{output.string()}, 2000000000LL};
-			plan.add(Track{audioIndex, StormByte::Multimedia::Type::Audio});
+			auto plan = StormByte::Safe::MakeShared<Plan>(StormByte::Safe::String{FixturePath(source).string()},
+				StormByte::Safe::String{output.string()}, 2000000000LL);
+			plan->add(Track{audioIndex, StormByte::Multimedia::Type::Audio});
 			Config::Subtitle config;
 			config.Codec(codec.value().get());
-			plan.add(Track{subtitleIndex, std::move(config)});
-			TEST_REQUIRE(plan.Check());
+			plan->add(Track{subtitleIndex, std::move(config)});
+			TEST_REQUIRE(plan->Check());
 			StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
 			Demuxer demuxer{noLogger};
 			Remuxer audio{noLogger, audioIndex};
@@ -113,18 +115,27 @@ namespace {
 			auto subtitle = StormByte::Safe::MakeShared<Encoder>(noLogger, 1, codec.value().get());
 			Muxer muxer{noLogger};
 			Filters graph;
-			std::move(plan) >> demuxer;
+			ManualPipelineStop teardown{&demuxer, &audio, cueDrain.get(), subtitle.get(), &muxer};
 			demuxer >> muxer;
 			demuxer >> audio >> muxer;
 			demuxer >> *cueDrain;
 			*subtitle >> muxer;
-			TEST_REQUIRE(subtitle->Opened());
 			graph.Between(cueDrain, subtitle).Add(StormByte::Safe::MakeShared<EmptyCues>());
 			graph.Close();
+			plan >> demuxer;
+			TEST_REQUIRE(plan->State() == Plan::State::Running);
 			TEST_REQUIRE(WaitForManualPipeline(muxer) == 0);
 			TEST_REQUIRE(WaitForManualPipeline(*cueDrain) == 0);
+			TEST_REQUIRE(WaitForManualPipeline(demuxer) == 0);
+			TEST_REQUIRE(WaitForManualPipeline(audio) == 0);
+			TEST_REQUIRE(WaitForManualPipeline(*subtitle) == 0);
+			const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+			while (!graph.Idle() && std::chrono::steady_clock::now() < deadline)
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			TEST_REQUIRE(graph.Idle());
 			TEST_REQUIRE(!cueDrain->Failed());
 			TEST_REQUIRE(!demuxer.Failed() && !audio.Failed() && !subtitle->Failed() && !muxer.Failed());
+			TEST_REQUIRE(plan->State() == Plan::State::Finished);
 		}
 		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
