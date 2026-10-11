@@ -75,20 +75,11 @@ using namespace StormByte::Multimedia;
 
 namespace {
 	bool ValidDoviMetadata(const AVFrameSideData* side) noexcept {
-		Property::DOVI validated;
-		if (!side || !side->data || !validated.LoadMetadata(std::as_bytes(std::span{side->data, side->size})))
+		if (!side || !side->data || side->size < sizeof(AVDOVIMetadata))
 			return false;
-		AVDOVIMetadata metadata;
-		std::memcpy(&metadata, side->data, sizeof(metadata));
-		const auto aligned = [side](std::size_t offset, std::size_t alignment) noexcept {
-			return (reinterpret_cast<std::uintptr_t>(side->data) + offset) % alignment == 0;
-		};
-		return aligned(0, alignof(AVDOVIMetadata))
-			&& aligned(metadata.header_offset, alignof(AVDOVIRpuDataHeader))
-			&& aligned(metadata.mapping_offset, alignof(AVDOVIDataMapping))
-			&& aligned(metadata.color_offset, alignof(AVDOVIColorMetadata))
-			&& (metadata.num_ext_blocks == 0 || (aligned(metadata.ext_block_offset, alignof(AVDOVIDmData))
-				&& metadata.ext_block_size % alignof(AVDOVIDmData) == 0));
+
+		Property::DOVI validated;
+		return validated.LoadMetadata(std::as_bytes(std::span{side->data, side->size}));
 	}
 
 	constexpr const char DefaultAssHeader[] =
