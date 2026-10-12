@@ -14,6 +14,9 @@ if(WITH_EBUR128 STREQUAL "SYSTEM")
 	target_link_libraries(ebur128 INTERFACE EBUR128::ebur128)
 	message(STATUS "libebur128 [SYSTEM]")
 elseif(WITH_EBUR128 STREQUAL "BUNDLED")
+	target_include_directories(StormByte-Multimedia BEFORE PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}/src/ebur128"
+	)
 	set(EBUR128_PATCH "${CMAKE_CURRENT_LIST_DIR}/0001-cmake-minimum-3.5.patch")
 	buildmaster_component(
 		ebur128

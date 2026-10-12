@@ -4,6 +4,10 @@ else()
 	set(STORMBYTE_BUFFER_OPTSTR "ALIAS=StormByte::Buffer")
 endif()
 
+target_include_directories(StormByte-Multimedia BEFORE PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/src/lib/public"
+)
+
 if(BUILD_SHARED_LIBS)
     set(_sb_buf_mode shared)
 else()

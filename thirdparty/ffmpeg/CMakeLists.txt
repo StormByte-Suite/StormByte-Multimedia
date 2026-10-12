@@ -126,6 +126,9 @@ else()
 	list(APPEND FFMPEG_MESON_OPTIONS ${FFMPEG_PLUGIN_OPTIONS})
 
 	set(FFMPEG_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
+	target_include_directories(StormByte-Multimedia BEFORE PRIVATE
+		"${FFMPEG_SRC_DIR}"
+	)
 
 	set(FFMPEG_BM_OPTS "REQUIRE_TOOL=pkgconfig")
 	list(APPEND FFMPEG_BM_OPTS

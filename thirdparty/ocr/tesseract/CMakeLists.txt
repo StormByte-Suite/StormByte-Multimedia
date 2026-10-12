@@ -4,6 +4,30 @@ endif()
 
 set(TESSERACT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESSERACT_COMPONENT "tesseract")
+
+set(_tess_root "${CMAKE_CURRENT_LIST_DIR}/src")
+set(_tess_includes "${_tess_root}/include")
+if(EXISTS "${_tess_root}/include/tesseract/version.h.in"
+		AND EXISTS "${_tess_root}/VERSION")
+	file(STRINGS "${_tess_root}/VERSION" _tess_plain)
+	string(REGEX REPLACE "^([^.]*)\\..*" "\\1" GENERIC_MAJOR_VERSION "${_tess_plain}")
+	string(REGEX REPLACE "^[^.]*\\.([^.]*)\\..*" "\\1" GENERIC_MINOR_VERSION "${_tess_plain}")
+	string(REGEX REPLACE "^[^.]*\\.[^.]*\\.([0-9]*).*" "\\1" GENERIC_MICRO_VERSION "${_tess_plain}")
+	string(STRIP "${_tess_plain}" PACKAGE_VERSION)
+	configure_file(
+		"${_tess_root}/include/tesseract/version.h.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/include/tesseract/version.h"
+		@ONLY
+	)
+	set(_tess_includes "${CMAKE_CURRENT_BINARY_DIR}/include" "${_tess_includes}")
+	unset(_tess_plain)
+	unset(GENERIC_MAJOR_VERSION)
+	unset(GENERIC_MINOR_VERSION)
+	unset(GENERIC_MICRO_VERSION)
+	unset(PACKAGE_VERSION)
+endif()
+target_include_directories(StormByte-Multimedia BEFORE PRIVATE ${_tess_includes})
+
 set(TESSERACT_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-cmake-unversioned-tesseract-output-name.patch"
 )

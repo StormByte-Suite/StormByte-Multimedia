@@ -12,6 +12,9 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/cmake-wrapper/src/*.traineddata")
 	list(LENGTH _bundled _bundled_n)
 	message(STATUS "tessdata ${_bundled_n} languages [BUNDLED]")
+	target_include_directories(StormByte-Multimedia BEFORE PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}/cmake-wrapper/include"
+	)
 endif()
 
 buildmaster_component(

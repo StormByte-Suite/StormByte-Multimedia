@@ -14,6 +14,9 @@ if(WITH_ZIMG STREQUAL "SYSTEM")
 	target_link_libraries(zimg INTERFACE zimg::zimg)
 	message(STATUS "zimg [SYSTEM]")
 elseif(WITH_ZIMG STREQUAL "BUNDLED")
+	target_include_directories(StormByte-Multimedia BEFORE PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}/cmake-wrapper/src/src/zimg/api"
+	)
 	buildmaster_component(
 		zimg
 		"zimg"
