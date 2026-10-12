@@ -88,7 +88,7 @@ namespace StormByte {
 			 * @ref StormByte::Multimedia::Codec of that AU. The Packet does
 			 * not open a codec.
 			 *
-			 * Copies and @ref Clone share media buffers rather than duplicating
+			 * Copies and @c Clone share media buffers rather than duplicating
 			 * compressed bytes.
 			 * Metadata accessors borrow their wrappers until this packet is modified or
 			 * destroyed. Safe optional arrow access returns a read-only snapshot for the
@@ -152,7 +152,7 @@ namespace StormByte {
 					 *        libav packet is referenced (`av_packet_ref`).
 					 * @param other Source packet.
 					 *
-					 * Not a deep copy of compressed bytes. @ref Clone uses
+					 * Not a deep copy of compressed bytes. @c Clone uses
 					 * this constructor.
 					 * @throws StormByte::Exception If safe metadata storage cannot be copied.
 					 * @throws std::bad_alloc If the private backend holder cannot be allocated.

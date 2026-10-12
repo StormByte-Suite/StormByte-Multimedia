@@ -76,7 +76,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 	 * changing duration (or both). Typical jobs: fit a track
 	 * to a picture cut, retune a source a few cents, slow
 	 * speech a notch without the chipmunk effect. It is not
-	 * @ref StormByte::Multimedia::Pipeline::Filter::Audio::Resample: sample rate stays put; only tempo/pitch
+	 * @ref StormByte::Multimedia::Pipeline::Filter::Audio::Resample "Resample": sample rate stays put; only tempo/pitch
 	 * move. Hardware does not apply to audio.
 	 *
 	 * @par Algorithm

@@ -199,7 +199,7 @@ namespace StormByte {
 			 * @class Muxer
 			 * @brief Writes interleaved packets to the Plan writer.
 			 *
-			 * Destination is the seekable @ref Plan::Writer. The writer's
+			 * Destination is the seekable writer owned by @ref StormByte::Multimedia::Pipeline::Plan. The writer's
 			 * path extension determines the destination container.
 			 *
 			 * Does not write the container header until @ref Armed is true.

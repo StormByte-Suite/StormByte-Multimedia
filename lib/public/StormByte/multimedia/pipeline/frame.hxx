@@ -89,7 +89,7 @@ namespace StormByte {
 			 * and analytics filters and @ref Encoder. Provides pixels or samples,
 			 * timestamps and the stream tags the decoder copied across.
 			 *
-			 * Copies and @ref Clone share media buffers rather than duplicating
+			 * Copies and @c Clone share media buffers rather than duplicating
 			 * pixels or samples.
 			 * Metadata accessors borrow their wrappers until this frame is modified or
 			 * destroyed. Safe optional arrow access returns a read-only snapshot for the
@@ -154,7 +154,7 @@ namespace StormByte {
 					 *        libav frame is referenced (`av_frame_ref`).
 					 * @param other Source frame.
 					 *
-					 * Not a deep copy of planes. @ref Clone uses this
+					 * Not a deep copy of planes. @c Clone uses this
 					 * constructor. @ref Filter::FFmpeg::Save still emits a
 					 * new frame when a filter paints.
 					 * @throws StormByte::Exception If safe metadata storage cannot be copied.
