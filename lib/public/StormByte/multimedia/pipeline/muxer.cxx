@@ -267,6 +267,7 @@ bool Muxer::SetupPlan() noexcept {
 				const auto state = wait.encoder.Status();
 				return wait.owner.Stopping()
 					|| wait.owner.Plan()->State() != Plan::State::Running
+					|| wait.owner.pipe().InputEof()
 					|| wait.encoder.Ready() || wait.encoder.Failed()
 					|| state == State::Stopping || state == State::Stopped;
 			});

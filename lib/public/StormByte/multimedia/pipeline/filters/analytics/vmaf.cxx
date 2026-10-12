@@ -174,9 +174,9 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 	cfg.n_threads = Threads();
 	cfg.n_subsample = 1;
 	if (vmaf_init(&lane.vmaf, cfg) != 0) {
-		Log(Level::Error, "vmaf_init failed");
 		lane.vmaf = nullptr;
 		lane.failed = true;
+		Fail("vmaf_init failed");
 		return false;
 	}
 
@@ -184,24 +184,25 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 	modelCfg.name = "vmaf";
 	modelCfg.flags = VMAF_MODEL_FLAGS_DEFAULT;
 	if (vmaf_model_load(&lane.model, &modelCfg, m_modelName.Bytes()) != 0) {
-		Log(Level::Error, std::format("vmaf_model_load({}) failed", static_cast<std::string_view>(m_modelName)));
 		vmaf_close(lane.vmaf);
 		lane.vmaf = nullptr;
 		lane.failed = true;
+		Fail(std::format("vmaf_model_load({}) failed", static_cast<std::string_view>(m_modelName)));
 		return false;
 	}
 
 	if (vmaf_use_features_from_model(lane.vmaf, lane.model) != 0) {
-		Log(Level::Error, "vmaf_use_features_from_model failed");
 		vmaf_close(lane.vmaf);
 		lane.vmaf = nullptr;
 		vmaf_model_destroy(lane.model);
 		lane.model = nullptr;
 		lane.failed = true;
+		Fail("vmaf_use_features_from_model failed");
 		return false;
 	}
 
-	Log(Level::Debug, std::format("libvmaf ready threads={} subsample=1", cfg.n_threads));
+	Log(Level::Debug, std::format("libvmaf ready version={} picture_bytes={} threads={} subsample=1",
+		vmaf_version(), sizeof(VmafPicture), cfg.n_threads));
 	return true;
 }
 
@@ -241,13 +242,22 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 		src = &scaled;
 	}
 
+	if (Pix(*src) != fmt || src->BitsPerComponent() != static_cast<int>(bpc)) {
+		vmaf_picture_unref(pic);
+		return false;
+	}
+
 	const int planes = (fmt == VMAF_PIX_FMT_YUV400P) ? 1 : 3;
 	const int bytesPel = (bpc > 8) ? 2 : 1;
 	for (int p = 0; p < planes; ++p) {
-		if (!src->Data(p) || !pic->data[p])
-			continue;
 		const int height = static_cast<int>(pic->h[p]);
 		const int widthBytes = static_cast<int>(pic->w[p]) * bytesPel;
+		const int64_t sourceStride = src->Linesize(p);
+		const int64_t sourceBytes = sourceStride < 0 ? -sourceStride : sourceStride;
+		if (!src->Data(p) || !pic->data[p] || sourceBytes < widthBytes || pic->stride[p] < widthBytes) {
+			vmaf_picture_unref(pic);
+			return false;
+		}
 		CopyPlane(src->Data(p), src->Linesize(p),
 			static_cast<uint8_t*>(pic->data[p]), pic->stride[p],
 			widthBytes, height);
@@ -256,10 +266,14 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 }
 
 void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned index) noexcept {
-	if (!lane.vmaf || !ref || !dist)
+	if (!lane.vmaf || !ref || !dist) {
+		lane.failed = true;
+		Fail(std::format("VMAF pair {} has no context or frame", index));
 		return;
+	}
 	if (ref.Width() <= 0 || ref.Height() <= 0 || dist.Width() <= 0 || dist.Height() <= 0) {
-		Log(Level::Warning, "look has no picture size, skip pair");
+		lane.failed = true;
+		Fail(std::format("VMAF pair {} has no picture size", index));
 		return;
 	}
 
@@ -278,8 +292,9 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 	}
 
 	else if (ref.Width() != lane.width || ref.Height() != lane.height) {
-		Log(Level::Warning, std::format("skip pair, ref size {}x{} latch {}x{}",
-			ref.Width(), ref.Height(), lane.width, lane.height));
+		lane.failed = true;
+		Fail(std::format("VMAF pair {} ref size {}x{} differs from latch {}x{}",
+			index, ref.Width(), ref.Height(), lane.width, lane.height));
 		return;
 	}
 
@@ -287,19 +302,25 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 	VmafPicture pdist{};
 	if (!Fill(lane, ref, lane.width, lane.height, &pref)
 		|| !Fill(lane, dist, lane.width, lane.height, &pdist)) {
-		Log(Level::Warning, std::format(
-			"skip pair, fill failed ref={}x{} dist={}x{} latch={}x{}",
-			ref.Width(), ref.Height(), dist.Width(), dist.Height(),
-			lane.width, lane.height));
-		vmaf_picture_unref(&pref);
-		vmaf_picture_unref(&pdist);
+		if (pref.ref)
+			vmaf_picture_unref(&pref);
+		if (pdist.ref)
+			vmaf_picture_unref(&pdist);
+		lane.failed = true;
+		Fail(std::format("VMAF pair {} fill failed ref={}x{} fmt={} bpc={} dist={}x{} fmt={} bpc={} latch={}x{}",
+			index, ref.Width(), ref.Height(), ref.FormatName(), ref.BitsPerComponent(),
+			dist.Width(), dist.Height(), dist.FormatName(), dist.BitsPerComponent(), lane.width, lane.height));
 		return;
 	}
 
-	if (vmaf_read_pictures(lane.vmaf, &pref, &pdist, index) != 0) {
-		Log(Level::Warning, "skip pair, vmaf_read_pictures failed");
-		vmaf_picture_unref(&pref);
-		vmaf_picture_unref(&pdist);
+	const int result = vmaf_read_pictures(lane.vmaf, &pref, &pdist, index);
+	if (result != 0) {
+		if (pref.ref)
+			vmaf_picture_unref(&pref);
+		if (pdist.ref)
+			vmaf_picture_unref(&pdist);
+		lane.failed = true;
+		Fail(std::format("vmaf_read_pictures failed at index {}: {}", index, result));
 		return;
 	}
 
@@ -309,7 +330,7 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 }
 
 void VMAF::Drain(Lane& lane) noexcept {
-	while (!lane.ref.empty() && !lane.dist.empty()) {
+	while (!lane.failed && !Failed() && !lane.ref.empty() && !lane.dist.empty()) {
 		FFrame ref = std::move(lane.ref.front());
 		FFrame dist = std::move(lane.dist.front());
 		lane.ref.pop_front();
@@ -340,7 +361,7 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 
 	const FFrame& raw = AVFrame();
 	if (!raw) {
-		Log(Level::Warning, std::format("frame has no backend producer={}", ToString(producer)));
+		Fail(std::format("VMAF frame has no backend producer={}", ToString(producer)));
 		return;
 	}
 
@@ -357,7 +378,8 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 
 	FFrame clone = raw.Clone();
 	if (!clone) {
-		Log(Level::Warning, "AVFrame::Clone failed");
+		lane.failed = true;
+		Fail("VMAF AVFrame::Clone failed");
 		return;
 	}
 
@@ -394,15 +416,21 @@ void VMAF::Eof() noexcept {
 			track, lane.scored, lane.ref.size(), lane.dist.size(),
 			lane.peakRef, lane.peakDist, lane.failed,
 			lane.width, lane.height));
-		if (!lane.ref.empty() || !lane.dist.empty())
-			Log(Level::Warning, std::format("leftover looks t={} ref={} dist={}",
+		if (!lane.failed && (!lane.ref.empty() || !lane.dist.empty())) {
+			lane.failed = true;
+			Fail(std::format("unpaired VMAF looks at EOF t={} ref={} dist={}",
 				track, lane.ref.size(), lane.dist.size()));
+		}
 		DropParked(lane);
-		if (lane.vmaf && lane.scored > 0)
-			vmaf_read_pictures(lane.vmaf, nullptr, nullptr, 0);
+		if (!lane.failed && lane.vmaf && lane.scored > 0) {
+			if (const int result = vmaf_read_pictures(lane.vmaf, nullptr, nullptr, 0); result != 0) {
+				lane.failed = true;
+				Fail(std::format("vmaf_read_pictures flush failed for track {}: {}", track, result));
+			}
+		}
 		if (lane.failed || !lane.vmaf || !lane.model || lane.scored == 0) {
 			if (!lane.failed)
-				Log(Level::Error, std::format("t={} no scored pairs", track));
+				Fail(std::format("VMAF t={} no scored pairs", track));
 			lane.failed = true;
 			continue;
 		}
@@ -412,8 +440,8 @@ void VMAF::Eof() noexcept {
 		const unsigned last = lane.scored - 1;
 		if (vmaf_score_pooled(lane.vmaf, lane.model, VMAF_POOL_METHOD_MEAN, &mean, 0, last) != 0
 			|| vmaf_score_pooled(lane.vmaf, lane.model, VMAF_POOL_METHOD_MIN, &mn, 0, last) != 0) {
-			Log(Level::Error, std::format("t={} vmaf_score_pooled failed", track));
 			lane.failed = true;
+			Fail(std::format("VMAF t={} vmaf_score_pooled failed", track));
 			continue;
 		}
 
@@ -425,7 +453,7 @@ void VMAF::Eof() noexcept {
 	}
 
 	if (m_lanes.empty())
-		Log(Level::Error, "no scored pairs");
+		Fail("VMAF no scored pairs");
 	else if (scored > 0)
 		Log(Level::Debug, std::format("eof tracks={} scored={}", m_lanes.size(), scored));
 }
@@ -433,7 +461,7 @@ void VMAF::Eof() noexcept {
 class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexcept {
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	data.emplace(StormByte::Safe::String("model"), m_modelName);
-	bool failed = m_lanes.empty();
+	bool failed = Failed() || m_lanes.empty();
 	unsigned ok = 0;
 	for (const auto& [track, lanePointer] : m_lanes) {
 		const Lane& lane = *lanePointer;
