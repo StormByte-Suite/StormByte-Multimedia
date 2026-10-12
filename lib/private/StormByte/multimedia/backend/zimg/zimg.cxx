@@ -158,6 +158,8 @@ namespace StormByte::Multimedia::Backend {
 			}
 			fmt.field_parity = ZIMG_FIELD_PROGRESSIVE;
 			fmt.alpha = ZIMG_ALPHA_NONE;
+			if (IsRgb(desc) && (desc->flags & AV_PIX_FMT_FLAG_ALPHA) != 0 && desc->nb_components >= 4)
+				fmt.alpha = ZIMG_ALPHA_STRAIGHT;
 			return true;
 		}
 

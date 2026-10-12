@@ -73,6 +73,7 @@ namespace StormByte::Multimedia::Backend {
 	 * Same shape as @ref StormByte::Multimedia::FFmpeg::Sws:
 	 * @ref Open, @ref Ensure, @ref Scale.
 	 * Packed RGB and hardware frames fail @ref Open.
+	 * Planar RGB keeps a straight alpha plane when the pixel format has one.
 	 * Scale copies color tags from the source.
 	 * Tiles follow FFmpeg vf_zscale: source @c active_region, destination
 	 * height is the strip, destination pointers are offset. Worker threads

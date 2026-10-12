@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/property/point.hxx>
+#include <StormByte/multimedia/property/resolution.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/binary.hxx>
@@ -114,6 +115,22 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * broken logo logs a Warning and becomes passthrough;
 	 * it does not Fail the job.
 	 *
+	 * @par Design size
+	 * Optional @ref Property::Resolution is the video size the still was drawn
+	 * for. Empty keeps the decoded pixels. One axis may be zero: `0x1080`
+	 * follows the frame height and `3840x0` the frame width, with one factor
+	 * so the still is not stretched. `0x0` disables the overlay. Anchor margins
+	 * use that factor. Absolute @ref Property::Point values stay in destination
+	 * pixels. The encoded source is kept; @ref Clean drops only the scaled cache.
+	 * The first frame of a run selects the size. Later frames reuse it until
+	 * the picture size changes or @ref Clean runs.
+	 *
+	 * @par Colour and alpha
+	 * Only the logo rectangle is rewritten. A fully transparent pixel is not
+	 * written, so the sample under it keeps its colour, depth and side data.
+	 * Partial alpha blends in linear light. On PQ and HLG, SDR white is placed
+	 * at 203 cd/m². Frame transfer, primaries and HDR metadata are not retagged.
+	 *
 	 * @par Do not stack
 	 * One Watermark. Do not Hold-probe twice. Absolute
 	 * @ref Property::Point skips Hold (frame pixels).
@@ -153,13 +170,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param anchor Placement relative to measured bars.
 			 * @param opacity 0–100. 0 = no-op.
 			 * @param margin Pixels from the anchored active edge.
+			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
+			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note File bytes are copied into the filter's persistent @ref StormByte::Safe::Binary.
 			 * A missing or unreadable file logs a Warning and disables the overlay.
 			 * Allocation or path-conversion exceptions terminate because this is noexcept.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::String logo, Anchor anchor,
-				unsigned opacity = 100, int margin = 0) noexcept;
+				unsigned opacity = 100, int margin = 0,
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
 
 			/**
 			 * @brief Logo bytes at an anchor on the active picture.
@@ -168,13 +188,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param anchor Placement relative to measured bars.
 			 * @param opacity 0–100. 0 = no-op.
 			 * @param margin Pixels from the anchored active edge.
+			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
+			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note The encoded source is copied into Watermark's persistent @ref StormByte::Safe::Binary
 			 * and remains there across @ref Clean and filter replays. Allocation failure terminates
 			 * because this constructor is noexcept.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				const StormByte::Safe::Binary& logo, Anchor anchor,
-				unsigned opacity = 100, int margin = 0) noexcept;
+				unsigned opacity = 100, int margin = 0,
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
 
 			/**
 			 * @brief Logo at an absolute top-left. No Hold.
@@ -182,6 +205,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param logo UTF-8 path to a still image (png, jpeg, webp, bmp), read once during construction.
 			 * @param position Top-left of the logo in frame pixels.
 			 * @param opacity 0–100. 0 = no-op.
+			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
+			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note File bytes are copied into the filter's persistent @ref StormByte::Safe::Binary.
 			 * A missing or unreadable file logs a Warning and disables the overlay.
 			 * Allocation or path-conversion exceptions terminate because this is noexcept.
@@ -189,7 +214,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::String logo,
 				StormByte::Multimedia::Property::Point position,
-				unsigned opacity = 100) noexcept;
+				unsigned opacity = 100,
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
 
 			/**
 			 * @brief Logo bytes at an absolute top-left. No Hold.
@@ -197,6 +223,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param logo Encoded PNG, JPEG, WebP or BMP bytes; copied into provider-owned storage.
 			 * @param position Top-left of the logo in frame pixels.
 			 * @param opacity 0–100. 0 = no-op.
+			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
+			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note The encoded source is copied into Watermark's persistent @ref StormByte::Safe::Binary
 			 * and remains there across @ref Clean and filter replays. Allocation failure terminates
 			 * because this constructor is noexcept.
@@ -204,7 +232,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				const StormByte::Safe::Binary& logo,
 				StormByte::Multimedia::Property::Point position,
-				unsigned opacity = 100) noexcept;
+				unsigned opacity = 100,
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
 
 			/**
 			 * @brief Copy constructor (deleted). Filters are unique in the tube.
@@ -305,12 +334,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param opacity Logo opacity from 0 to 100.
 			 * @param margin Anchor margin in pixels.
 			 * @param binaryInput Whether @p logo is the caller-provided source.
+			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::String path, const StormByte::Safe::Binary& logo,
 				StormByte::Safe::Optional<Anchor> anchor,
 				StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> position,
-				unsigned opacity, int margin, bool binaryInput) noexcept;
+				unsigned opacity, int margin, bool binaryInput,
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept;
 
 			/**
 			 * @brief Hold ceiling in units.
@@ -362,6 +393,37 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Paint() noexcept;
 
 			/**
+			 * @brief Scales the decoded still once for @p frameW x @p frameH.
+			 * @param frameW Picture width of this run.
+			 * @param frameH Picture height of this run.
+			 * @return false if the logo was disabled.
+			 */
+			bool Prepare(int frameW, int frameH) noexcept;
+
+			/**
+			 * @brief Builds the linear logo for @p src, reusing the cache when the tags match.
+			 * @param src Live picture whose colour tags select the conversion.
+			 * @return false if the logo could not be converted.
+			 */
+			bool EnsureLinear(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+
+			/**
+			 * @brief Blends the logo into a clone of @p src and @ref FFmpeg::Save.
+			 * @param src Live picture. Not modified.
+			 * @param x Left of the logo in frame pixels.
+			 * @param y Top of the logo in frame pixels.
+			 * @return false if this format must use the full-frame fallback.
+			 */
+			bool Composite(const StormByte::Multimedia::FFmpeg::AVFrame& src, int x, int y) noexcept;
+
+			/**
+			 * @brief Previous full-frame blend, used when @ref Composite cannot represent @p src.
+			 * @param x Left of the logo in frame pixels.
+			 * @param y Top of the logo in frame pixels.
+			 */
+			void PaintLegacy(int x, int y) noexcept;
+
+			/**
 			 * @brief Samples letterbox / pillarbox on the luma view of @p src.
 			 * @param src Live RAII frame.
 			 * @return true if this frame updated or confirmed the rectangle.
@@ -374,7 +436,22 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			StormByte::Safe::Optional<Anchor> m_anchor;	///< Relative placement
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> m_point;	///< Absolute placement
 			unsigned m_opacity;				///< 0–100
-			int m_margin;					///< Anchor margin
+			int m_margin;					///< Authored anchor margin
+			StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> m_designed;	///< Empty keeps native pixels
+			StormByte::Safe::Vector<std::uint8_t> m_scaled;	///< Scaled sRGB RGBA. Empty uses @ref m_rgba
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_linear;	///< Cached linear logo, GBRAPF32
+			int m_scaledMargin;				///< Margin for this run
+			int m_paintW;					///< Width used when painting
+			int m_paintH;					///< Height used when painting
+			int m_preparedW;				///< Frame width the cache was built for
+			int m_preparedH;				///< Frame height the cache was built for
+			int m_linearTrc;				///< Transfer the linear cache matches
+			int m_linearPri;				///< Primaries the linear cache matches
+			int m_linearMat;				///< Matrix the linear cache matches
+			int m_linearRange;				///< Range the linear cache matches
+			bool m_prepared;				///< Geometry cache is valid
+			bool m_linearReady;				///< Linear logo matches the current tags
+			bool m_legacyNoted;				///< Fallback blend already logged
 			int m_logoWidth;				///< Decoded logo width
 			int m_logoHeight;				///< Decoded logo height
 			bool m_decoded;					///< Decode attempted
