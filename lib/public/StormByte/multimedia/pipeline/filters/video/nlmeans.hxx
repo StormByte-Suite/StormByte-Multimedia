@@ -82,6 +82,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * One frame. Each sample is a similarity-weighted average
 	 * of patches inside a search window. No Hold.
 	 * Implemented on the frame, not via avfilter `nlmeans`.
+	 * Rolling integer sums reuse patch distances for each displacement
+	 * instead of visiting every patch sample for every candidate.
 	 *
 	 * @par Defaults
 	 * Empty arguments pick a profile from the first video frame:

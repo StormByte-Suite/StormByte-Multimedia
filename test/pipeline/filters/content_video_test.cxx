@@ -90,12 +90,18 @@ int test_video_content_restores_compatible_missing_metadata() {
 	NativeFrame replacement;
 	TEST_REQUIRE(source.Get() && replacement.Get());
 	HdrColor(*source.Get());
-	HdrColor(*replacement.Get());
+	replacement.Get()->width = 16;
+	replacement.Get()->height = 16;
+	replacement.Get()->format = source.Get()->format;
 	for (const auto type : {AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,
 		AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER})
 		TEST_REQUIRE(av_frame_new_side_data(source.Get(), type, 8));
 	VideoContent content;
 	content.Put(source.Get(), replacement.Get());
+	TEST_REQUIRE(replacement.Get()->colorspace == source.Get()->colorspace);
+	TEST_REQUIRE(replacement.Get()->color_trc == source.Get()->color_trc);
+	TEST_REQUIRE(replacement.Get()->color_primaries == source.Get()->color_primaries);
+	TEST_REQUIRE(replacement.Get()->color_range == source.Get()->color_range);
 	for (const auto type : {AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,
 		AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER})
 		TEST_REQUIRE(av_frame_get_side_data(replacement.Get(), type));
@@ -108,13 +114,19 @@ int test_video_content_keeps_profile5_color_encoding() {
 	TEST_REQUIRE(source.Get() && replacement.Get());
 	HdrColor(*source.Get());
 	HdrColor(*replacement.Get());
-	source.Get()->colorspace = replacement.Get()->colorspace = AVCOL_SPC_IPT_C2;
-	source.Get()->color_range = replacement.Get()->color_range = AVCOL_RANGE_JPEG;
+	source.Get()->colorspace = AVCOL_SPC_IPT_C2;
+	source.Get()->color_range = AVCOL_RANGE_JPEG;
+	replacement.Get()->colorspace = AVCOL_SPC_UNSPECIFIED;
+	replacement.Get()->color_range = AVCOL_RANGE_UNSPECIFIED;
+	replacement.Get()->color_primaries = AVCOL_PRI_UNSPECIFIED;
+	replacement.Get()->color_trc = AVCOL_TRC_UNSPECIFIED;
 	TEST_REQUIRE(av_frame_new_side_data(source.Get(), AV_FRAME_DATA_DOVI_RPU_BUFFER, 8));
 	TEST_REQUIRE(!VideoContent::HdrCompatible(source.Get()));
 	VideoContent content;
 	content.Put(source.Get(), replacement.Get());
 	TEST_REQUIRE(av_frame_get_side_data(replacement.Get(), AV_FRAME_DATA_DOVI_RPU_BUFFER));
+	TEST_REQUIRE(replacement.Get()->colorspace == AVCOL_SPC_IPT_C2);
+	TEST_REQUIRE(replacement.Get()->color_range == AVCOL_RANGE_JPEG);
 	replacement.Get()->format = AV_PIX_FMT_YUV420P;
 	content.Put(source.Get(), replacement.Get());
 	TEST_REQUIRE(!av_frame_get_side_data(replacement.Get(), AV_FRAME_DATA_DOVI_RPU_BUFFER));

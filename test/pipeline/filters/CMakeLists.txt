@@ -1,6 +1,11 @@
 add_executable(MultimediaPipelineFilterTests filter_test.cxx)
 target_link_libraries(MultimediaPipelineFilterTests PRIVATE multimedia_pipeline_test_support)
 
+add_executable(MultimediaPipelineNlMeansTests nlmeans_plane_test.cxx)
+target_include_directories(MultimediaPipelineNlMeansTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
+target_link_libraries(MultimediaPipelineNlMeansTests PRIVATE multimedia_pipeline_test_support)
+add_pipeline_test(MultimediaPipelineNlMeansTests test_nlmeans_rolling_sums_match_reference)
+
 add_executable(MultimediaPipelineContentVideoTests content_video_test.cxx
 	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx")
 target_include_directories(MultimediaPipelineContentVideoTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")

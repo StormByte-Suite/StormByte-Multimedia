@@ -32,6 +32,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Inherit unspecified color tags when replacing video pixels before checking HDR/Dolby Vision compatibility, preserving metadata for pixel-only replacements while keeping explicit SDR conversions authoritative.
+- Reuse rolling integer patch sums in NlMeans instead of recomputing each patch for every candidate pixel. Preserve the search window, independently clamped borders, strength, weights and rounding without adding threads or changing defaults.
 - Keep frame metadata consistent with color conversions: retain or restore HDR10/HDR10+ only for compatible output colorimetry and Dolby Vision only while its source color encoding remains compatible. Remove incompatible native side data, wrapper HDR/DOVI properties and attachments so encoding cannot restore them after tone mapping. Update replacement color descriptions and preserve SDR color signaling even when an encoder does not support HDR10.
 - Use a valid BM3D block size, supply Decimate with the source's nominal frame rate and propagate its negotiated output cadence, and initialize Yadif/Bwdif delayed frames as genuinely empty while emitting their final buffered picture at EOF.
 - Correct FFmpeg frame-filter buffering and EOF handling:

@@ -50,11 +50,10 @@
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/nlmeans.hxx>
+#include <StormByte/multimedia/pipeline/filters/video/nlmeans_plane.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
 
-#include <algorithm>
-#include <cmath>
 #include <cstdint>
 #include <format>
 
@@ -71,41 +70,6 @@ namespace {
 		return depth <= 8 ? 8 : (depth <= 10 ? 10 : 12);
 	}
 
-	int Pel(const uint8_t* base, int stride, int x, int y, int bpc) noexcept {
-		const uint8_t* row = base + y * stride;
-		if (bpc <= 8)
-			return row[x];
-		return reinterpret_cast<const uint16_t*>(row)[x];
-	}
-
-	void Put(uint8_t* row, int x, int bpc, int value) noexcept {
-		const int maxv = (1 << bpc) - 1;
-		value = std::clamp(value, 0, maxv);
-		if (bpc <= 8)
-			row[x] = static_cast<uint8_t>(value);
-		else
-			reinterpret_cast<uint16_t*>(row)[x] = static_cast<uint16_t>(value);
-	}
-
-	double PatchDist(const uint8_t* s, int stride, int x, int y,
-		int nx, int ny, int p, int w, int h, int bpc, int peak) noexcept {
-		double acc = 0.0;
-		unsigned n = 0;
-		for (int j = -p; j <= p; ++j) {
-			const int y0 = std::clamp(y + j, 0, h - 1);
-			const int y1 = std::clamp(ny + j, 0, h - 1);
-			for (int i = -p; i <= p; ++i) {
-				const int x0 = std::clamp(x + i, 0, w - 1);
-				const int x1 = std::clamp(nx + i, 0, w - 1);
-				const int d = Pel(s, stride, x0, y0, bpc) - Pel(s, stride, x1, y1, bpc);
-				acc += static_cast<double>(d) * static_cast<double>(d);
-				++n;
-			}
-		}
-		const double norm = static_cast<double>(peak) * static_cast<double>(peak) * static_cast<double>(n);
-		return acc / norm;
-	}
-
 	void FilterPlane(const FFrame& src, FFrame& dst, int plane, int bpc,
 		int research, int patch, double h) noexcept {
 		const int w = src.PlaneWidth(plane);
@@ -117,28 +81,8 @@ namespace {
 		if (!s || !d || w <= 0 || hgt <= 0)
 			return;
 
-		const int peak = (1 << bpc) - 1;
-		const double inv = 1.0 / std::max(1e-8, h * h);
-		for (int y = 0; y < hgt; ++y) {
-			uint8_t* drow = d + y * ds;
-			for (int x = 0; x < w; ++x) {
-				double acc = 0.0;
-				double wgt = 0.0;
-				const int y0 = std::max(0, y - research);
-				const int y1 = std::min(hgt - 1, y + research);
-				const int x0 = std::max(0, x - research);
-				const int x1 = std::min(w - 1, x + research);
-				for (int ny = y0; ny <= y1; ++ny) {
-					for (int nx = x0; nx <= x1; ++nx) {
-						const double dist = PatchDist(s, ss, x, y, nx, ny, patch, w, hgt, bpc, peak);
-						const double ww = std::exp(-dist * inv);
-						acc += static_cast<double>(Pel(s, ss, nx, ny, bpc)) * ww;
-						wgt += ww;
-					}
-				}
-				Put(drow, x, bpc, static_cast<int>(acc / std::max(wgt, 1e-8) + 0.5));
-			}
-		}
+		StormByte::Multimedia::Pipeline::Filter::Video::Detail::FilterPlane(
+			s, d, ss, ds, w, hgt, bpc, research, patch, h);
 	}
 }
 

@@ -196,6 +196,21 @@ namespace {
 	}
 }
 
+void Video::ResolveColor(const ::AVFrame* before, ::AVFrame* after) noexcept {
+	if (!before || !after)
+		return;
+	if (after->color_trc == AVCOL_TRC_UNSPECIFIED)
+		after->color_trc = before->color_trc;
+	if (after->color_primaries == AVCOL_PRI_UNSPECIFIED)
+		after->color_primaries = before->color_primaries;
+	if (after->colorspace == AVCOL_SPC_UNSPECIFIED)
+		after->colorspace = before->colorspace;
+	if (after->color_range == AVCOL_RANGE_UNSPECIFIED)
+		after->color_range = before->color_range;
+	if (after->chroma_location == AVCHROMA_LOC_UNSPECIFIED)
+		after->chroma_location = before->chroma_location;
+}
+
 bool Video::HdrCompatible(const ::AVFrame* frame) noexcept {
 	if (!frame)
 		return false;
@@ -219,6 +234,7 @@ bool Video::DoviCompatible(const ::AVFrame* before, const ::AVFrame* after) noex
 void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 	m_warning.clear();
 	m_diagnostic.clear();
+	ResolveColor(before, after);
 	if (after) {
 		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
 			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,

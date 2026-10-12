@@ -120,6 +120,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Content {
 			void Put(const ::AVFrame* before, ::AVFrame* after) noexcept override;
 
 			/**
+			 * @brief Inherits unspecified replacement color tags without overwriting explicit conversions.
+			 * @param before Native source frame, or nullptr.
+			 * @param after Native replacement frame, or nullptr.
+			 */
+			static void ResolveColor(const ::AVFrame* before, ::AVFrame* after) noexcept;
+
+			/**
 			 * @brief Whether the replacement still represents HDR10 pixels.
 			 * @param frame Native replacement frame, or nullptr.
 			 * @return True for 10-bit or deeper BT.2020 PQ YUV.
