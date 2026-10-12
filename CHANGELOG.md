@@ -35,6 +35,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Link the video-content regression tests against the bundled FFmpeg pack when available, retaining its platform dependencies such as Windows BCrypt instead of linking only the individual FFmpeg archives.
 - Link bundled FFmpeg plugin archives through normal symbol extraction rather than whole-archive forcing. Preserve FFmpeg's explicitly registered codecs and filters while avoiding duplicate Vorbis objects and import descriptors in Windows test executables.
 - Compile bundled VMAF consumers against the public headers from the same source checkout as the bundled library, available before dependency installation. Prevent clean builds from picking up system headers with a different `VmafPicture` layout, which caused first-pair `EINVAL` failures and memory corruption. Add an 8-bit and 10-bit allocation, pool, read, flush and scoring API regression for both dependency modes.
 - Treat VMAF picture preparation, read, flush and score-pooling errors as terminal failures instead of silently skipping pairs; stop draining after failure and report runtime version and picture diagnostics. Allow muxer encoder readiness waits to end when their input reaches EOF.
