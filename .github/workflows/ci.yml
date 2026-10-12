@@ -197,8 +197,8 @@ jobs:
   #     actions: write
   #   with:
   #     doc_target: StormByteMultimediaDoc
-  #     extra-cmake-options: -DENABLE_DOC=ON -DWITH_STORMBYTE=BUNDLED -DWITH_FFMPEG=SYSTEM -DWITH_VMAF=BUNDLED
-  #     extra-install: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev nasm"
+  #     extra-cmake-options: -DENABLE_DOC=ON -DWITH_STORMBYTE=BUNDLED -DWITH_FFMPEG=SYSTEM -DWITH_VMAF=SYSTEM -DWITH_OCR=SYSTEM -DWITH_ZIMG=SYSTEM -DWITH_EBUR128=SYSTEM
+  #     extra-install: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libvmaf-dev libzimg-dev libebur128-dev libtesseract-dev libleptonica-dev tesseract-ocr-eng nasm"
   #     docs_output_dir: ./_site
 
   docs:
@@ -242,8 +242,8 @@ jobs:
       - name: Install extra packages
         uses: stormbytepp/githubactions/.github/actions/install-cached@master
         with:
-          packages: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev nasm"
-          cache-key: extra-apt-packages-ffmpeg9-docs
+          packages: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libvmaf-dev libzimg-dev libebur128-dev libtesseract-dev libleptonica-dev tesseract-ocr-eng nasm"
+          cache-key: extra-apt-packages-ffmpeg9-system-deps-docs
           lists-cache-key: apt-lists
 
       - name: Configure CMake
@@ -257,7 +257,10 @@ jobs:
             -DENABLE_DOC=ON \
             -DWITH_STORMBYTE=BUNDLED \
             -DWITH_FFMPEG=SYSTEM \
-            -DWITH_VMAF=BUNDLED
+            -DWITH_VMAF=SYSTEM \
+            -DWITH_OCR=SYSTEM \
+            -DWITH_ZIMG=SYSTEM \
+            -DWITH_EBUR128=SYSTEM
 
       - name: Build documentation target
         run: |
