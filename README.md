@@ -4,14 +4,14 @@ Contributor guides: [Contributing](CONTRIBUTING.md) and [Coding Style](CODING_ST
 
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
 ![C++26](https://img.shields.io/badge/C%2B%2B-26-00599C?logo=c%2B%2B&logoColor=white)
-![CMake](https://img.shields.io/badge/CMake-3.12+-064F8C?logo=cmake&logoColor=white)
+![CMake](https://img.shields.io/badge/CMake-3.25+-064F8C?logo=cmake&logoColor=white)
 ![License: LGPL v3 / Commercial](https://img.shields.io/badge/License-LGPL_v3%20%2F%20Commercial-blue.svg)
 [![CI](https://github.com/StormBytePP/StormByte-Multimedia/actions/workflows/ci.yml/badge.svg)](https://github.com/StormBytePP/StormByte-Multimedia/actions/workflows/ci.yml)
 [![Sponsor](https://img.shields.io/badge/Sponsor-StormBytePP-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/StormBytePP)
 
-**StormByte-Multimedia** is a high-level, extensible C++26 library for building media workflows: inspect files, select streams, remux or transcode them, apply filters, and collect progress and analytics. It uses libav as its media engine, transparently; routine use is expressed entirely through StormByte types such as `File`, `Plan`, `Transcoder`, `Step` and typed filters. You do not need to know libav APIs to build or run a job.
+**StormByte-Multimedia** turns a media file into a checked, asynchronous C++ job. Map the streams you want, say which ones to copy or encode, call `Run()`, and observe progress or the final error. The fluent `Transcoder` handles the demux/decode/filter/encode/mux machinery; everyday applications work with `File`, registered codecs, and typed filters rather than FFmpeg's C API.
 
-The high-level API does not trade away control. Use `Transcoder` for the common File-to-File workflow, derive from it to add application-specific plans and lifecycle hooks, or wire the same `Step`s by hand when you need a custom graph. Custom filters use StormByte's RAII frame and packet types; only reach for the advanced libav-backed filter surface when those wrappers do not provide an operation your filter needs.
+Start with `Transcoder` for a File-to-File job. When a product needs custom policy, derive from it and override plan factories or lifecycle hooks. When the graph itself is unusual, wire the same stages by hand. Custom filters use StormByte's RAII frame and packet types; reach for the libav-backed filter surface only when those wrappers do not provide the operation you need.
 
 It depends on [StormByte Base](https://github.com/StormBytePP/StormByte), [StormByte Buffer](https://github.com/StormBytePP/StormByte-Buffer) and [StormByte Logger](https://github.com/StormBytePP/StormByte-Logger). Public headers live under `StormByte/multimedia/` and cover the registry, containers, codecs, `File`, and the pipeline (`Plan`, `Step`, `Transcoder`, filters).
 
@@ -41,6 +41,7 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 
 ## Table of Contents
 
+- [Quick start](#quick-start)
 - [What this module does](#what-this-module-does)
 - [The rest of the suite](#the-rest-of-the-suite)
 - [Documentation](#documentation)
@@ -64,6 +65,54 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - This README: how to build, the two entry points, the tube contract, codec compatibility and distribution flags.
 - Doxygen class reference (headers under `StormByte/multimedia/`): [https://suite.stormbyte.org/StormByte-Multimedia/](https://suite.stormbyte.org/StormByte-Multimedia/).
 - Logger contract used by every `Step`: [https://suite.stormbyte.org/StormByte-Logger/](https://suite.stormbyte.org/StormByte-Logger/).
+
+## Quick start
+
+Remux the first video stream from one file into Matroska. `Transcoder` infers the destination container from the output suffix; the application does not create FFmpeg contexts or connect pipeline stages.
+
+```cpp
+#include <StormByte/logger/threaded_log.hxx>
+#include <StormByte/multimedia/pipeline/transcoder.hxx>
+#include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
+
+#include <chrono>
+#include <iostream>
+#include <thread>
+
+using StormByte::Logger::Level;
+using StormByte::Logger::ThreadedLog;
+using StormByte::Multimedia::Pipeline::Status;
+using StormByte::Multimedia::Pipeline::Transcoder;
+using StormByte::Safe::String;
+
+int main(int argc, char** argv) {
+	if (argc != 3) {
+		std::cerr << "usage: " << argv[0] << " <input> <output.mkv>\n";
+		return 1;
+	}
+
+	auto logger = StormByte::Safe::MakeShared<ThreadedLog>(std::clog, Level::Notice, "[%L] %T %c");
+	Transcoder job{String{argv[1]}, String{argv[2]}, logger};
+	job.Video(0).Remux();
+	if (job.Failed())
+		return 1;
+
+	job.Run();
+	for (;;) {
+		const auto status = job.Status();
+		if (status == Status::Done)
+			return 0;
+		if (status == Status::Error || status == Status::Aborted) {
+			std::cerr << job.Error().value_or(String{"media job failed"}) << '\n';
+			return 1;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	}
+}
+```
+
+Track mapping is the whole job description: call `Video(n)`, `Audio(n)` or `Subtitle(n)`, then choose `Remux()` or `Codec(...)`. Add only the streams you want in the output. The [full example below](#1-transcoder-file--file) adds encoding, filters, attachments and progress reporting.
 
 ## Codec compatibility
 
@@ -100,7 +149,7 @@ You either let `Transcoder` assemble a job from a fluent map of origin streams, 
 
 `Transcoder` is the recommended starting point for a File-to-File job. Construct it with source and destination paths, map **output** tracks in mux order, choose remux or encoding, attach filters, and run. The destination container is inferred from the writer path unless an explicit registered `const Container&` override is supplied. The stock class is complete for remuxing, transcoding and filtering; inheritance is for adding application-specific behavior, not a prerequisite for ordinary use.
 
-It is also **designed to be inherited**. Override `EmptyPlan()` / `EmptySettled()` for application-specific state, or lifecycle hooks such as `OnProgress`, `OnDone` and `OnError` to connect a UI, scheduler or batch runner. You can extend the job description and orchestration while retaining the same pipeline stages and behavior.
+To integrate with a UI, scheduler or batch runner, override lifecycle hooks such as `OnProgress`, `OnDone` and `OnError`. For application-specific state, specialize `EmptyPlan()` / `EmptySettled()` while retaining the same pipeline stages and behavior.
 
 Open the source, map streams, run, poll:
 
@@ -303,26 +352,7 @@ Keep every stage alive through execution, failure propagation and Plan notificat
 
 The library publishes `Finished` when every participating stage has completed successfully. Muxer completion alone is insufficient while filters or analytics are still active; keep the graph and its endpoints alive until `Idle`. On failure, preserve `Plan::Error()` and tear down the whole graph. Applications observe `plan->State()`; they do not publish it.
 
-`Filters` sits between two `StormByte::Safe::Shared<Step>` ends when you need a filter chain or analytics. `Transcoder` builds that graph for you. By hand:
-
-```cpp
-#include <StormByte/multimedia/pipeline/filters.hxx>
-#include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
-#include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
-
-auto decode = StormByte::Safe::MakeShared<Decoder>(logger, 0);
-auto encode = StormByte::Safe::MakeShared<Encoder>(logger, 0, hevc->get());
-Filters graph;
-demux >> mux;
-demux >> *decode;
-*encode >> mux;
-graph.Between(decode, encode).Add<Filter::Video::Scale>(logger, 1920u, 1080u);
-graph.Add<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"});	// one node, every matching stretch
-graph.Close();
-plan >> demux;
-```
-
-This is an alternative assembly sequence, not a graph to attach after starting the preceding example. Connect its source and mux destination first, register all filters, analytics consumers and forks, and call `graph.Close()` **before** `plan >> demux`. Binding publishes `Running`. Keep the graph and its endpoints alive until execution and notifications finish, and wait for `graph.Idle()` as well as every stage. Observe `Finished`; do not publish it.
+`Filters` sits between two `StormByte::Safe::Shared<Step>` endpoints when you need a filter chain or analytics; `Transcoder` builds that graph for you. In a manual graph, create the shared decoder and encoder, connect the demuxer and muxer, register filters and analytics, call `Filters::Close()`, and only then bind the Plan to the demuxer. This ordering ensures consumers are connected before workers start. Keep the graph and endpoints alive through completion and notifications, wait for `graph.Idle()` as well as every stage, and observe `Finished` rather than publishing it.
 
 ## Plan, items and the tube contract
 
