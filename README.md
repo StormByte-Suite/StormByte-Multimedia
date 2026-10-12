@@ -386,7 +386,7 @@ Choose bundled or system dependencies and optional features with these CMake opt
 | Option | Values | Meaning |
 | --- | --- | --- |
 | `WITH_FFMPEG` | `BUNDLED` (default) / `SYSTEM` | Use the bundled libav media engine or a compatible system installation. |
-| `WITH_VMAF` | `BUNDLED` (default) / `SYSTEM` | Use bundled or system libvmaf for VMAF analytics. |
+| `WITH_VMAF` | `BUNDLED` / `SYSTEM` | Use libvmaf from the same dependency mode as `WITH_FFMPEG`. A differing value is overridden in the CMake cache with a `STATUS` message; mixed bundled/system modes are not used. |
 | `WITH_OCR` | `BUNDLED` (default) / `SYSTEM` | Tesseract/Leptonica; Windows forces bundled OCR. |
 | `WITH_TESSDATA` | `BUNDLED` / `SYSTEM` | OCR language models; selected languages must be installed and discoverable. |
 | `WITH_ZIMG` | `BUNDLED` / `SYSTEM` | zimg dependency used by image processing. |

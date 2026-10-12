@@ -5,6 +5,7 @@ if(NOT DEFINED WITH_VMAF)
 		set(WITH_VMAF "BUNDLED" CACHE STRING "Use VMAF libraries (SYSTEM or BUNDLED)")
 	endif()
 endif()
+include("${CMAKE_SOURCE_DIR}/cmake/align_vmaf.cmake")
 set_property(CACHE WITH_VMAF PROPERTY STRINGS SYSTEM BUNDLED)
 
 if(WITH_VMAF STREQUAL "SYSTEM")

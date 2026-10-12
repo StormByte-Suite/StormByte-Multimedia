@@ -34,6 +34,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Align `WITH_VMAF` with `WITH_FFMPEG` before selecting the VMAF dependency, overriding mismatched values in the CMake cache with a `STATUS` message instead of mixing bundled and system library ABIs. Add configuration sanity coverage for both matching modes, both override directions and default VMAF selection.
 - Declare libaom AV1 HDR10 support for color signaling and static metadata preservation through the pipeline and Matroska. Exercise every declared HDR10 encoder explicitly, and extend Dolby Vision reencode, watermark and pixel-replacement checks to SVT-AV1 and libaom, including combined HDR10 metadata and regenerated AV1 profile 10. Initialize look-decoder Dolby Vision configuration from effective packet codec parameters instead of inheriting the source HEVC profile. Check parsed AV1 Dolby Vision metadata without requiring HEVC-format raw RPU buffers, and account for static HDR metadata quantization only when converting HEVC to AV1.
 - Skip license-excluded Rubberband and VagueDenoiser tests without referencing their omitted classes, and use VP9 instead of the GPL-only x264 encoder for general video-filter tests so permitted filters still run with `WITH_GPL=OFF` and `WITH_NONFREE=OFF`.
 - Inherit unspecified color tags when replacing video pixels before checking HDR/Dolby Vision compatibility, preserving metadata for pixel-only replacements while keeping explicit SDR conversions authoritative.
