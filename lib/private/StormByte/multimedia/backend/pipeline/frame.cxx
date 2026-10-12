@@ -49,7 +49,9 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/content.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/content/video.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
+#include <StormByte/multimedia/ffmpeg/property.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/property/audio.hxx>
 #include <StormByte/multimedia/property/channel_layout.hxx>
@@ -136,6 +138,10 @@ void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexce
 			if (m_handle.Width() <= 0 || m_handle.Height() <= 0)
 				return;
 			const auto sar = m_handle.SampleAspectRatio();
+			const auto color = FFmpeg::MapColor(m_handle, frame.m_video->Color());
+			auto hdr = frame.m_video->HDR10();
+			if (!color.IsHDR10())
+				hdr.reset();
 			auto dovi = frame.m_video->DOVI();
 			const auto* metadata = m_handle.SideData(AV_FRAME_DATA_DOVI_METADATA);
 			const auto* rpu = m_handle.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER);
@@ -150,12 +156,12 @@ void Frame::BindProperties(StormByte::Multimedia::Pipeline::Frame& frame) noexce
 					dovi = std::move(merged);
 			}
 			frame.m_video = Property::Video(
-				frame.m_video->Color(),
+				color,
 				Property::Resolution{
 					static_cast<std::uint32_t>(m_handle.Width()),
 					static_cast<std::uint32_t>(m_handle.Height())
 				},
-				frame.m_video->HDR10(),
+				std::move(hdr),
 				frame.m_video->FrameRate(),
 				sar.Valid() ? std::optional<Property::AVRational>{sar} : frame.m_video->SampleAspectRatio(),
 				std::move(dovi));
@@ -190,6 +196,28 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 	m_warning.clear();
 	m_contentValid = true;
 	const ::AVFrame* before = m_handle.Get();
+	if (owner.Type() == Type::Video && raw) {
+		const bool keepsHdr = Detail::Content::Video::HdrCompatible(raw);
+		const bool keepsDovi = !before || Detail::Content::Video::DoviCompatible(before, raw);
+		if ((!keepsHdr || !keepsDovi) && owner.m_video) {
+			const auto video = *owner.m_video;
+			owner.m_video = Property::Video(video.Color(), video.Resolution(),
+				keepsHdr ? video.HDR10() : StormByte::Safe::Optional<Property::HDR10>{},
+				video.FrameRate(), video.SampleAspectRatio(),
+				keepsDovi ? video.DOVI() : StormByte::Safe::Optional<Property::DOVI>{});
+		}
+		StormByte::Safe::Vector<StormByte::Multimedia::Pipeline::SideData> kept;
+		for (const auto& attachment : owner.m_attachments) {
+			using StormByte::Multimedia::Pipeline::SideDataKind;
+			const auto kind = attachment.Kind();
+			const bool hdr = kind == SideDataKind::MasteringDisplay || kind == SideDataKind::ContentLight
+				|| kind == SideDataKind::HdrPlus;
+			const bool dovi = kind == SideDataKind::DolbyVision || kind == SideDataKind::DolbyVisionRpu;
+			if ((!hdr || keepsHdr) && (!dovi || keepsDovi))
+				kept.push_back(attachment);
+		}
+		owner.m_attachments = std::move(kept);
+	}
 	auto content = Content::For(owner.Type());
 	content->Put(before, raw);
 	m_warning = content->Warning();
@@ -197,6 +225,12 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 	if (before && raw) {
 		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
 			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL}) {
+			if (owner.Type() == Type::Video) {
+				const bool dovi = type == AV_FRAME_DATA_DOVI_METADATA || type == AV_FRAME_DATA_DOVI_RPU_BUFFER;
+				if (dovi ? !Detail::Content::Video::DoviCompatible(before, raw)
+					: !Detail::Content::Video::HdrCompatible(raw))
+					continue;
+			}
 			if (av_frame_get_side_data(before, type) && !av_frame_get_side_data(raw, type))
 				m_contentValid = false;
 		}

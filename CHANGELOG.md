@@ -32,6 +32,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Keep frame metadata consistent with color conversions: retain or restore HDR10/HDR10+ only for compatible output colorimetry and Dolby Vision only while its source color encoding remains compatible. Remove incompatible native side data, wrapper HDR/DOVI properties and attachments so encoding cannot restore them after tone mapping. Update replacement color descriptions and preserve SDR color signaling even when an encoder does not support HDR10.
+- Use a valid BM3D block size, supply Decimate with the source's nominal frame rate and propagate its negotiated output cadence, and initialize Yadif/Bwdif delayed frames as genuinely empty while emitting their final buffered picture at EOF.
 - Correct FFmpeg frame-filter buffering and EOF handling:
 	- Return a genuinely empty `AVFrame` on graph `EAGAIN` or EOF, preventing the endless zero-sample `adeclick` flush loop.
 	- Consume inputs that a graph retains instead of passing them through, drain all available outputs, and emit delayed EOF frames using retained input lineage rather than silently dropping them.

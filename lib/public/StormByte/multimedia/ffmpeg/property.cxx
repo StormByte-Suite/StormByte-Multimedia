@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/ffmpeg/AVStream.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
 #include <StormByte/multimedia/ffmpeg/property.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/property/av_rational.hxx>
 
 #include <cstdint>
@@ -393,6 +394,16 @@ namespace {
 				return ChannelLayout::Unknown;
 		}
 	}
+}
+
+Color FFmpeg::MapColor(const AVFrame& frame, const Color& fallback) noexcept {
+	return Color{
+		MapPixelFormat(frame.Format()),
+		frame.ColorRange() == AVCOL_RANGE_UNSPECIFIED ? fallback.Range() : MapRange(frame.ColorRange()),
+		frame.ColorSpace() == AVCOL_SPC_UNSPECIFIED ? fallback.Space() : MapSpace(frame.ColorSpace()),
+		frame.ColorPrimaries() == AVCOL_PRI_UNSPECIFIED ? fallback.Primaries() : MapPrimaries(frame.ColorPrimaries()),
+		frame.ColorTransfer() == AVCOL_TRC_UNSPECIFIED ? fallback.Transfer() : MapTransfer(frame.ColorTransfer())
+	};
 }
 
 StormByte::Multimedia::Stream::Properties FFmpeg::MapProperties(const AVStream& stream) noexcept {

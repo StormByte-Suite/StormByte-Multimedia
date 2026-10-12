@@ -249,6 +249,43 @@ int test_filter_graph_fps_count_and_timestamps() {
 	return 1;
 }
 
+int test_filter_graph_decimate_uses_nominal_cadence() {
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocVideo(16, 16, AV_PIX_FMT_YUV420P));
+	for (int plane = 0; plane < 3; ++plane) {
+		const int size = plane == 0 ? 16 : 8;
+		for (int row = 0; row < size; ++row)
+			std::memset(source.Data(plane) + row * source.Linesize(plane), plane == 0 ? 16 : 128, size);
+	}
+	source.TimeBase({1, 1000});
+	source.DurationTicks(42);
+	auto graph = FFmpeg::AVFilterGraph::Open(source, "decimate=cycle=5", {24, 1});
+	TEST_REQUIRE(graph);
+	TEST_REQUIRE(graph.FrameRate().num == 96 && graph.FrameRate().den == 5);
+	unsigned count = 0;
+	for (int index = 0; index < 10; ++index) {
+		source.Pts((index * 1000 + 12) / 24);
+		FFmpeg::AVFrame output;
+		TEST_REQUIRE(graph.Filter(source, output));
+		for (unsigned attempts = 0; output && attempts < 16; ++attempts) {
+			TEST_REQUIRE(++count <= 8);
+			TEST_REQUIRE(graph.Receive(output));
+		}
+		TEST_REQUIRE(!output);
+	}
+	for (unsigned attempts = 0; attempts < 16; ++attempts) {
+		FFmpeg::AVFrame output;
+		TEST_REQUIRE(graph.Flush(output));
+		if (!output) {
+			TEST_REQUIRE(count == 8);
+			return 0;
+		}
+		TEST_REQUIRE(++count <= 8);
+	}
+	TEST_REQUIRE(false);
+	return 1;
+}
+
 int test_filter_graph_adeclick_flush_is_bounded() {
 	FFmpeg::AVFrame source;
 	TEST_REQUIRE(source.AllocAudio(1024, AV_SAMPLE_FMT_S16, FFmpeg::AVChannelLayout::Default(2), 48000));
@@ -545,6 +582,7 @@ int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_filter_graph_delayed_output_and_eof", test_filter_graph_delayed_output_and_eof},
 		TestEntry{"test_filter_graph_fps_count_and_timestamps", test_filter_graph_fps_count_and_timestamps},
+		TestEntry{"test_filter_graph_decimate_uses_nominal_cadence", test_filter_graph_decimate_uses_nominal_cadence},
 		TestEntry{"test_filter_graph_adeclick_flush_is_bounded", test_filter_graph_adeclick_flush_is_bounded},
 		TestEntry{"test_filter_zimg_cache_tracks_input_color", test_filter_zimg_cache_tracks_input_color},
 		TestEntry{"test_filter_adeclick", test_filter_adeclick},

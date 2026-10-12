@@ -55,6 +55,7 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -88,7 +89,8 @@ FFmpeg::AVFilterGraph::AVFilterGraph(AVFilterGraph&& other) noexcept
 	m_graph(std::move(other.m_graph)),
 	m_closed(other.m_closed),
 	m_endPts(other.m_endPts),
-	m_timeBase(other.m_timeBase) {
+	m_timeBase(other.m_timeBase),
+	m_frameRate(other.m_frameRate) {
 	other.m_src = nullptr;
 	other.m_sink = nullptr;
 	other.m_w = 0;
@@ -120,6 +122,7 @@ FFmpeg::AVFilterGraph& FFmpeg::AVFilterGraph::operator=(AVFilterGraph&& other) n
 		m_closed = other.m_closed;
 		m_endPts = other.m_endPts;
 		m_timeBase = other.m_timeBase;
+		m_frameRate = other.m_frameRate;
 		other.m_src = nullptr;
 		other.m_sink = nullptr;
 		other.m_w = 0;
@@ -139,6 +142,11 @@ FFmpeg::AVFilterGraph::operator bool() const noexcept {
 
 FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	std::string_view graph) noexcept {
+	return Open(src, graph, FFmpeg::AVRational{0, 1});
+}
+
+FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
+	std::string_view graph, FFmpeg::AVRational frameRate) noexcept {
 	if (!src || graph.empty())
 		return AVFilterGraph(nullptr);
 	if (src.Hardware())
@@ -172,6 +180,17 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 		std::snprintf(args, sizeof(args),
 			"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
 			src.Width(), src.Height(), src.Format(), timeBase.num, timeBase.den, sarN, sarD);
+		auto rate = frameRate;
+		if (!rate.Valid() && src.DurationTicks() > 0 && src.DurationTicks() <= std::numeric_limits<int>::max()) {
+			const auto duration = av_mul_q(::AVRational{timeBase.num, timeBase.den},
+				::AVRational{static_cast<int>(src.DurationTicks()), 1});
+			const auto inverse = av_inv_q(duration);
+			rate = FFmpeg::AVRational{inverse.num, inverse.den};
+		}
+		if (rate.Valid()) {
+			const auto used = std::char_traits<char>::length(args);
+			std::snprintf(args + used, sizeof(args) - used, ":frame_rate=%d/%d", rate.num, rate.den);
+		}
 	} else {
 		const char* fmt = av_get_sample_fmt_name(static_cast<AVSampleFormat>(src.Format()));
 		if (!fmt) {
@@ -244,15 +263,21 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	wrap.m_graph = chain;
 	wrap.m_closed = false;
 	wrap.m_timeBase = timeBase;
+	wrap.m_frameRate = frameRate;
 	return wrap;
 }
 
 bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) noexcept {
+	return Ensure(src, graph, FFmpeg::AVRational{0, 1});
+}
+
+bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph, FFmpeg::AVRational frameRate) noexcept {
 	const bool video = src.Width() > 0 && src.Height() > 0;
 	const auto timeBase = src.TimeBase().Valid() ? src.TimeBase()
 		: FFmpeg::AVRational{1, video ? 1 : src.SampleRate()};
 	const bool same = m_ptr && m_src && m_sink && !m_closed
 		&& m_timeBase.num == timeBase.num && m_timeBase.den == timeBase.den
+		&& m_frameRate.num == frameRate.num && m_frameRate.den == frameRate.den
 		&& m_graph == StormByte::Safe::String{graph}
 		&& m_fmt == src.Format()
 		&& m_w == (video ? src.Width() : 0)
@@ -262,11 +287,18 @@ bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) n
 		&& m_mask == (video ? 0ull : src.ChannelLayout().Mask());
 	if (same)
 		return true;
-	AVFilterGraph next = Open(src, graph);
+	AVFilterGraph next = Open(src, graph, frameRate);
 	if (!next)
 		return false;
 	*this = std::move(next);
 	return true;
+}
+
+FFmpeg::AVRational FFmpeg::AVFilterGraph::FrameRate() const noexcept {
+	if (!m_sink)
+		return FFmpeg::AVRational{0, 1};
+	const auto rate = av_buffersink_get_frame_rate(m_sink);
+	return FFmpeg::AVRational{rate.num, rate.den};
 }
 
 bool FFmpeg::AVFilterGraph::Filter(const AVFrame& src, AVFrame& dst) const noexcept {
@@ -324,6 +356,7 @@ void FFmpeg::AVFilterGraph::Free() noexcept {
 	m_closed = false;
 	m_endPts = AV_NOPTS_VALUE;
 	m_timeBase = FFmpeg::AVRational{0, 1};
+	m_frameRate = FFmpeg::AVRational{0, 1};
 	if (m_ptr)
 		avfilter_graph_free(&m_ptr);
 }

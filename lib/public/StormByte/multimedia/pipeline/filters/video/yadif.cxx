@@ -142,8 +142,8 @@ enum Type Yadif::Media() const noexcept {
 }
 
 void Yadif::Clean() noexcept {
-	m_prev.Unref();
-	m_cur.Unref();
+	m_prev.Reset(nullptr);
+	m_cur.Reset(nullptr);
 }
 
 void Yadif::Setup() noexcept {
@@ -155,8 +155,10 @@ void Yadif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 		Log(Level::Warning, "yadif: empty current look");
 		return;
 	}
-	if (m_onlyInterlaced && !cur.Interlaced())
+	if (m_onlyInterlaced && !cur.Interlaced()) {
+		EmitFrame(cur.Clone());
 		return;
+	}
 
 	FFrame out;
 	if (!out.AllocVideo(cur.Width(), cur.Height(), cur.Format()) || !out.CopyProps(cur)) {
@@ -173,7 +175,7 @@ void Yadif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 
 	Log(Level::LowLevel, std::format("yadif weave {}x{} tff={} pts={}",
 		cur.Width(), cur.Height(), tff, cur.Pts()));
-	Save(std::move(out));
+	EmitFrame(std::move(out));
 }
 
 void Yadif::Process(const Pipeline::Frame& frame) noexcept {
@@ -193,6 +195,7 @@ void Yadif::Process(const Pipeline::Frame& frame) noexcept {
 
 	if (!m_cur) {
 		m_cur = std::move(incoming);
+		Drop();
 		return;
 	}
 

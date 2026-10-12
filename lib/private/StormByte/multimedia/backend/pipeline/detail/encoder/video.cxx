@@ -198,7 +198,7 @@ namespace {
 			params.ColorTransfer(ToAVTransfer(video.Color().Transfer()));
 			if (writeHdr10 && video.HDR10())
 				params.WriteHdr10(*video.HDR10());
-			if (!keepHdrSignal) {
+			if (!keepHdrSignal && (video.Color().IsHDR10() || video.Color().IsHLG())) {
 				params.ColorSpace(AVCOL_SPC_UNSPECIFIED);
 				params.ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
 				params.ColorTransfer(AVCOL_TRC_UNSPECIFIED);
@@ -217,7 +217,8 @@ namespace {
 			const auto sar = handle->SampleAspectRatio();
 			if (sar.Valid())
 				params.SampleAspectRatio(sar);
-			if (keepHdrSignal && !writeHdr10) {
+			if (!writeHdr10 && (keepHdrSignal || (handle->ColorTransfer() != AVCOL_TRC_SMPTE2084
+				&& handle->ColorTransfer() != AVCOL_TRC_ARIB_STD_B67))) {
 				if (handle->ColorRange() != AVCOL_RANGE_UNSPECIFIED)
 					params.ColorRange(handle->ColorRange());
 				if (handle->ColorSpace() != AVCOL_SPC_UNSPECIFIED)
@@ -373,7 +374,8 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 
 	if (frame->Video() && frame->Video()->HDR10() && owner.Capabilities().Has(Feature::HDR10))
 		handle->WriteHdr10(*frame->Video()->HDR10());
-	else if (!owner.Capabilities().Has(Feature::HDR10)) {
+	else if (!owner.Capabilities().Has(Feature::HDR10)
+		&& (handle->ColorTransfer() == AVCOL_TRC_SMPTE2084 || handle->ColorTransfer() == AVCOL_TRC_ARIB_STD_B67)) {
 		handle->ColorSpace(AVCOL_SPC_UNSPECIFIED);
 		handle->ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
 		handle->ColorTransfer(AVCOL_TRC_UNSPECIFIED);

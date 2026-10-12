@@ -69,7 +69,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Content {
 	 * fields, or a top-left origin when libavfilter crop cleared
 	 * them. Pad and an unnamed transform drop
 	 * @c AV_FRAME_DATA_DYNAMIC_HDR_PLUS and fill @ref Warning.
-	 * Static HDR10 and Dolby Vision are not handled.
+	 * Static HDR10 and Dolby Vision are retained only while the
+	 * replacement color description remains compatible.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -117,5 +118,20 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Content {
 			 * @param after Raw frame the leaf produced. May be nullptr.
 			 */
 			void Put(const ::AVFrame* before, ::AVFrame* after) noexcept override;
+
+			/**
+			 * @brief Whether the replacement still represents HDR10 pixels.
+			 * @param frame Native replacement frame, or nullptr.
+			 * @return True for 10-bit or deeper BT.2020 PQ YUV.
+			 */
+			static bool HdrCompatible(const ::AVFrame* frame) noexcept;
+
+			/**
+			 * @brief Whether a replacement retains the source Dolby Vision color encoding.
+			 * @param before Native source frame, or nullptr.
+			 * @param after Native replacement frame, or nullptr.
+			 * @return True when matrix, primaries, transfer, range and depth are unchanged.
+			 */
+			static bool DoviCompatible(const ::AVFrame* before, const ::AVFrame* after) noexcept;
 	};
 }

@@ -155,12 +155,36 @@ namespace StormByte {
 					static AVFilterGraph Open(const AVFrame& src, std::string_view graph) noexcept;
 
 					/**
+					 * @brief Builds a graph with an explicit nominal video cadence.
+					 * @param src Model frame.
+					 * @param graph Filterchain.
+					 * @param frameRate Nominal source cadence; invalid means derive from frame duration.
+					 * @return Configured graph, or empty on failure.
+					 */
+					static AVFilterGraph Open(const AVFrame& src, std::string_view graph, AVRational frameRate) noexcept;
+
+					/**
 					 * @brief Rebuilds if geometry, format, layout or chain changed.
 					 * @param src Model frame.
 					 * @param graph Filterchain.
 					 * @return false if the graph could not be (re)opened.
 					 */
 					bool Ensure(const AVFrame& src, std::string_view graph) noexcept;
+
+					/**
+					 * @brief Rebuilds for a changed frame description, chain or nominal cadence.
+					 * @param src Model frame.
+					 * @param graph Filterchain.
+					 * @param frameRate Nominal source cadence.
+					 * @return False if the graph could not be configured.
+					 */
+					bool Ensure(const AVFrame& src, std::string_view graph, AVRational frameRate) noexcept;
+
+					/**
+					 * @brief Nominal video cadence negotiated at the sink.
+					 * @return Output cadence, or an invalid rational when unspecified.
+					 */
+					AVRational FrameRate() const noexcept;
 
 					/**
 					 * @brief Pushes @p src and pulls into @p dst (`KEEP_REF` on the source).
@@ -221,6 +245,7 @@ namespace StormByte {
 					bool m_closed = false;			///< Source already closed.
 					mutable std::int64_t m_endPts = INT64_MIN;	///< End of the last accepted input in source ticks.
 					AVRational m_timeBase{0, 1};		///< Cached source timestamp timebase.
+					AVRational m_frameRate{0, 1};		///< Explicit nominal source cadence.
 			};
 
 			/// @cond

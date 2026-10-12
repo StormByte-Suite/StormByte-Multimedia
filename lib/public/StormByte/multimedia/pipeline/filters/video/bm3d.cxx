@@ -98,7 +98,7 @@ void Bm3d::Latch(int width, int height) noexcept {
 
 StormByte::Safe::String Bm3d::Chain() const noexcept {
 	return StormByte::Safe::String{std::format(
-		"bm3d=sigma={}:block=4:bstep={}:group={}:range={}:estim=basic",
+		"bm3d=sigma={}:block=8:bstep={}:group={}:range={}:estim=basic",
 		m_sigma, m_bstep, m_group, m_range)};
 }
 

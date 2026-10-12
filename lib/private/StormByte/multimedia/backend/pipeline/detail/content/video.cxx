@@ -53,6 +53,7 @@
 extern "C" {
 #include <libavutil/frame.h>
 #include <libavutil/hdr_dynamic_metadata.h>
+#include <libavutil/pixdesc.h>
 #include <libavutil/rational.h>
 }
 
@@ -195,14 +196,48 @@ namespace {
 	}
 }
 
+bool Video::HdrCompatible(const ::AVFrame* frame) noexcept {
+	if (!frame)
+		return false;
+	const auto* descriptor = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(frame->format));
+	return descriptor && descriptor->comp[0].depth >= 10
+		&& frame->color_trc == AVCOL_TRC_SMPTE2084
+		&& frame->color_primaries == AVCOL_PRI_BT2020
+		&& (frame->colorspace == AVCOL_SPC_BT2020_NCL || frame->colorspace == AVCOL_SPC_BT2020_CL);
+}
+
+bool Video::DoviCompatible(const ::AVFrame* before, const ::AVFrame* after) noexcept {
+	if (!before || !after)
+		return false;
+	const auto* source = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(before->format));
+	const auto* replacement = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(after->format));
+	return source && replacement && source->comp[0].depth == replacement->comp[0].depth
+		&& before->color_trc == after->color_trc && before->color_primaries == after->color_primaries
+		&& before->colorspace == after->colorspace && before->color_range == after->color_range;
+}
+
 void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 	m_warning.clear();
 	m_diagnostic.clear();
+	if (after) {
+		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
+			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,
+			AV_FRAME_DATA_DYNAMIC_HDR_PLUS}) {
+			const bool dovi = type == AV_FRAME_DATA_DOVI_METADATA || type == AV_FRAME_DATA_DOVI_RPU_BUFFER;
+			if ((dovi && before && !DoviCompatible(before, after)) || (!dovi && !HdrCompatible(after))) {
+				av_frame_remove_side_data(after, type);
+				m_diagnostic += std::format(" side-data:{}=dropped-incompatible-color", static_cast<int>(type));
+			}
+		}
+	}
 	if (before && after) {
 		for (const auto type : {AV_FRAME_DATA_DOVI_METADATA, AV_FRAME_DATA_DOVI_RPU_BUFFER,
 			AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL}) {
 			const auto* source = av_frame_get_side_data(before, type);
 			const auto* replacement = av_frame_get_side_data(after, type);
+			const bool dovi = type == AV_FRAME_DATA_DOVI_METADATA || type == AV_FRAME_DATA_DOVI_RPU_BUFFER;
+			if (dovi ? !DoviCompatible(before, after) : !HdrCompatible(after))
+				continue;
 			const char* name = "unknown";
 			switch (type) {
 				case AV_FRAME_DATA_DOVI_METADATA: name = "dovi-metadata"; break;

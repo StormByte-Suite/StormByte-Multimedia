@@ -151,8 +151,8 @@ enum Type Bwdif::Media() const noexcept {
 }
 
 void Bwdif::Clean() noexcept {
-	m_prev.Unref();
-	m_cur.Unref();
+	m_prev.Reset(nullptr);
+	m_cur.Reset(nullptr);
 }
 
 void Bwdif::Setup() noexcept {
@@ -164,8 +164,10 @@ void Bwdif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 		Log(Level::Warning, "bwdif: empty current look");
 		return;
 	}
-	if (m_onlyInterlaced && !cur.Interlaced())
+	if (m_onlyInterlaced && !cur.Interlaced()) {
+		EmitFrame(cur.Clone());
 		return;
+	}
 
 	FFrame out;
 	if (!out.AllocVideo(cur.Width(), cur.Height(), cur.Format()) || !out.CopyProps(cur)) {
@@ -182,7 +184,7 @@ void Bwdif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 
 	Log(Level::LowLevel, std::format("bwdif weave {}x{} tff={} pts={}",
 		cur.Width(), cur.Height(), tff, cur.Pts()));
-	Save(std::move(out));
+	EmitFrame(std::move(out));
 }
 
 void Bwdif::Process(const Pipeline::Frame& frame) noexcept {
@@ -202,6 +204,7 @@ void Bwdif::Process(const Pipeline::Frame& frame) noexcept {
 
 	if (!m_cur) {
 		m_cur = std::move(incoming);
+		Drop();
 		return;
 	}
 

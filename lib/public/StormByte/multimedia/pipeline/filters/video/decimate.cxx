@@ -106,14 +106,16 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 	}
 
 	const StormByte::Safe::String chain = Chain();
+	const auto frameRate = frame.Video() && frame.Video()->FrameRate()
+		? *frame.Video()->FrameRate() : Property::AVRational{0, 1};
 	if (!m_graph) {
-		FGraph opened = FGraph::Open(src, chain);
+		FGraph opened = FGraph::Open(src, chain, frameRate);
 		if (!opened) {
 			Fail("decimate: AVFilterGraph::Open failed");
 			return;
 		}
 		m_graph = Safe::MakeUnique<FGraph>(std::move(opened));
-	} else if (!m_graph->Ensure(src, chain)) {
+	} else if (!m_graph->Ensure(src, chain, frameRate)) {
 		Fail("decimate: AVFilterGraph::Ensure failed");
 		return;
 	}
@@ -141,7 +143,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"decimate {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	EmitGraph(*m_graph, std::move(out));
+	EmitGraph(*m_graph, std::move(out), m_graph->FrameRate());
 }
 
 void Decimate::Eof() noexcept {
@@ -158,7 +160,7 @@ void Decimate::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"decimate flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		EmitFrame(std::move(out));
+		EmitFrame(std::move(out), m_graph->FrameRate());
 	}
 	m_graph.reset();
 }

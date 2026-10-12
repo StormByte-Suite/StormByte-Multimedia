@@ -74,6 +74,20 @@ namespace StormByte {
 			class AVStream;
 
 			/**
+			 * @brief Forward declaration of the native frame adapter.
+			 */
+			class AVFrame;
+
+			/**
+			 * @brief Maps a frame's color tags, retaining fallback values for unspecified tags.
+			 * @param frame Native frame adapter.
+			 * @param fallback Previous color description.
+			 * @return Color description of the replacement pixels.
+			 */
+			STORMBYTE_MULTIMEDIA_PUBLIC Property::Color MapColor(const AVFrame& frame,
+				const Property::Color& fallback) noexcept;
+
+			/**
 			 * @brief Builds the public property bag from a stream view.
 			 * @param stream Stream view.
 			 * @return Video, audio or monostate.
