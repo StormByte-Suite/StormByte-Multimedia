@@ -179,6 +179,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			void StampOutgoing() noexcept;
 
 			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;	///< Opened encoder.
+			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame> m_input;	///< Prepared frame retained unchanged across EAGAIN.
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> m_inputSource;	///< Retained source identity for the pending submission.
 			StormByte::Multimedia::FFmpeg::AVPacket m_scratch;					///< Receive scratch
 			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Base-owned packets waiting for Mux.
 			StormByte::Multimedia::Pipeline::Encoder* m_owner;							///< Owner for Take/Wrap

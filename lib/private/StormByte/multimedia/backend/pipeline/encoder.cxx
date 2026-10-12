@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
+#include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>

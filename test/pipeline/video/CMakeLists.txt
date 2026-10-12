@@ -1,5 +1,12 @@
-add_executable(MultimediaPipelineVideoTests video_test.cxx)
+add_executable(MultimediaPipelineVideoTests video_test.cxx
+	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx")
 target_link_libraries(MultimediaPipelineVideoTests PRIVATE multimedia_pipeline_test_support)
+if(TARGET ffmpeg-pack)
+	target_link_libraries(MultimediaPipelineVideoTests PRIVATE ffmpeg-pack)
+else()
+	target_link_libraries(MultimediaPipelineVideoTests PRIVATE ffmpeg)
+endif()
+target_include_directories(MultimediaPipelineVideoTests SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
 
 add_optional_pipeline_test(MultimediaPipelineVideoTests test_transcoder_hevc_encode_output_file_properties)
 add_optional_pipeline_test(MultimediaPipelineVideoTests test_transcoder_hevc_encode_preserves_hdr10_metadata)

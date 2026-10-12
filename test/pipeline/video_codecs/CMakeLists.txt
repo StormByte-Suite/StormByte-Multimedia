@@ -1,5 +1,12 @@
-add_executable(MultimediaPipelineVideoCodecTests video_codec_test.cxx)
+add_executable(MultimediaPipelineVideoCodecTests video_codec_test.cxx
+	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx")
 target_link_libraries(MultimediaPipelineVideoCodecTests PRIVATE multimedia_pipeline_test_support)
+if(TARGET ffmpeg-pack)
+	target_link_libraries(MultimediaPipelineVideoCodecTests PRIVATE ffmpeg-pack)
+else()
+	target_link_libraries(MultimediaPipelineVideoCodecTests PRIVATE ffmpeg)
+endif()
+target_include_directories(MultimediaPipelineVideoCodecTests SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
 
 foreach(test_name IN ITEMS
 	test_svt_av1_encodes_matroska
@@ -11,6 +18,7 @@ foreach(test_name IN ITEMS
 	test_libvpx_encodes_vp9_webm
 	test_openh264_encodes_h264_matroska
 	test_kvazaar_encodes_hevc_matroska
+	test_vaapi_encodes_hevc_main_matroska
 	test_libwebp_anim_encodes_webp
 	test_libwebp_decodes_animated_webp
 )

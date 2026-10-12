@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/video.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/features.hxx>
+#include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <tables/encoder/table.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/property/color.hxx>
@@ -325,8 +326,19 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	}
 
+	FFmpeg::AVFrame firstFrame;
+	if (!firstFrame.Ref(*handle)) {
+		owner.Fail("failed to reference first encoder frame");
+		return false;
+	}
+	if (!FFmpeg::VideoInput::Attach(frame.Attachments(), firstFrame)) {
+		owner.Fail("failed to preserve first-frame static HDR attachments");
+		return false;
+	}
+	if (need.Has(Feature::HDR10) && frame.Video() && frame.Video()->HDR10())
+		firstFrame.WriteHdr10(*frame.Video()->HDR10());
 	auto opened = StormByte::Multimedia::Backend::Pipeline::OpenCodec(
-		owner, std::move(params), VideoTimeBase(frame), need, handle);
+		owner, std::move(params), VideoTimeBase(frame), need, &firstFrame);
 	if (!opened)
 		return false;
 
@@ -351,8 +363,8 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	if (!m_encoder)
 		return false;
-	auto* handle = FrameHandle(owner, *frame);
-	if (!handle || !*handle) {
+	const auto* source = FrameHandle(owner, *frame);
+	if (!source || !*source) {
 		owner.Fail("frame has no backend buffer");
 		return false;
 	}
@@ -362,60 +374,78 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const int ctxH = ctx ? ctx->height : 0;
 	const int ctxFmt = ctx ? static_cast<int>(ctx->pix_fmt) : -1;
 
-	if (ctx && (handle->Width() != ctxW
-			|| handle->Height() != ctxH
-			|| handle->Format() != ctxFmt)) {
+	if (ctx && (source->Width() != ctxW || source->Height() != ctxH)) {
 		owner.Fail(std::format(
 			"encoder frame mismatch ctx={}x{} fmt={} in={}x{} fmt={}",
 			ctxW, ctxH, ctxFmt,
-			handle->Width(), handle->Height(), handle->Format()));
+			source->Width(), source->Height(), source->Format()));
 		return false;
 	}
 
-	if (frame->Video() && frame->Video()->HDR10() && owner.Capabilities().Has(Feature::HDR10))
-		handle->WriteHdr10(*frame->Video()->HDR10());
-	else if (!owner.Capabilities().Has(Feature::HDR10)
-		&& (handle->ColorTransfer() == AVCOL_TRC_SMPTE2084 || handle->ColorTransfer() == AVCOL_TRC_ARIB_STD_B67)) {
-		handle->ColorSpace(AVCOL_SPC_UNSPECIFIED);
-		handle->ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
-		handle->ColorTransfer(AVCOL_TRC_UNSPECIFIED);
-		handle->RemoveSideData(AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
-		handle->RemoveSideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
-		handle->RemoveSideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
-	}
-	if (frame->Video() && frame->Video()->SampleAspectRatio()
-		&& frame->Video()->SampleAspectRatio()->Valid())
-		handle->SampleAspectRatio(*frame->Video()->SampleAspectRatio());
-	handle->WriteSideData(frame->Attachments());
-	const auto* doviConfiguration = ctx ? av_packet_side_data_get(ctx->coded_side_data,
-		ctx->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF) : nullptr;
-	const bool doviActive = doviConfiguration && doviConfiguration->data
-		&& doviConfiguration->size >= sizeof(AVDOVIDecoderConfigurationRecord)
-		&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(doviConfiguration->data)->rpu_present_flag;
-	if (doviActive && !handle->SideData(AV_FRAME_DATA_DOVI_METADATA)) {
-		owner.Fail("Dolby Vision frame lost parsed metadata before encoding");
+	if (m_inputSource && m_inputSource.get() != frame.get()) {
+		owner.Fail("encoder retry requires the retained source frame");
 		return false;
 	}
+	if (!m_inputSource) {
+		m_input.emplace();
+		if (!m_encoder->PrepareFrame(*source, *m_input)) {
+			m_input.reset();
+			owner.Fail(std::format("cannot prepare sample-exact encoder input or hardware transfer fmt={} from fmt={}",
+				ctxFmt, source->Format()));
+			return false;
+		}
+		auto* handle = &*m_input;
+		handle->TimeBase(m_timeBase);
+		if (frame->Video() && frame->Video()->SampleAspectRatio()
+			&& frame->Video()->SampleAspectRatio()->Valid())
+			handle->SampleAspectRatio(*frame->Video()->SampleAspectRatio());
+		if (!FFmpeg::VideoInput::Attach(frame->Attachments(), *handle)) {
+			owner.Fail("failed to preserve encoder static HDR attachments");
+			return false;
+		}
+		if (frame->Video() && frame->Video()->HDR10() && owner.Capabilities().Has(Feature::HDR10))
+			handle->WriteHdr10(*frame->Video()->HDR10());
+		else if (!owner.Capabilities().Has(Feature::HDR10)
+			&& (handle->ColorTransfer() == AVCOL_TRC_SMPTE2084 || handle->ColorTransfer() == AVCOL_TRC_ARIB_STD_B67)) {
+			handle->ColorSpace(AVCOL_SPC_UNSPECIFIED);
+			handle->ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
+			handle->ColorTransfer(AVCOL_TRC_UNSPECIFIED);
+			handle->RemoveSideData(AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+			handle->RemoveSideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+			handle->RemoveSideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+		}
+		const auto* doviConfiguration = ctx ? av_packet_side_data_get(ctx->coded_side_data,
+			ctx->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF) : nullptr;
+		const bool doviActive = doviConfiguration && doviConfiguration->data
+			&& doviConfiguration->size >= sizeof(AVDOVIDecoderConfigurationRecord)
+			&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(doviConfiguration->data)->rpu_present_flag;
+		if (doviActive && !handle->SideData(AV_FRAME_DATA_DOVI_METADATA)) {
+			owner.Fail("Dolby Vision frame lost parsed metadata before encoding");
+			return false;
+		}
 
-	if (frame->Pts())
-		handle->Pts(StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(
-			frame->Pts()->Nanoseconds().count(), m_timeBase));
-	else
-		handle->Pts(AV_NOPTS_VALUE);
-	if (frame->Duration()) {
-		auto duration = StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(
-			frame->Duration()->Nanoseconds().count(), m_timeBase);
-		if (duration <= 0)
-			duration = 1;
-		handle->DurationTicks(duration);
+		if (frame->Pts())
+			handle->Pts(StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(
+				frame->Pts()->Nanoseconds().count(), m_timeBase));
+		else
+			handle->Pts(AV_NOPTS_VALUE);
+		if (frame->Duration()) {
+			auto duration = StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(
+				frame->Duration()->Nanoseconds().count(), m_timeBase);
+			if (duration <= 0)
+				duration = 1;
+			handle->DurationTicks(duration);
+		}
+		else
+			handle->DurationTicks(1);
+		m_inputSource = frame;
 	}
-	else
-		handle->DurationTicks(1);
 
+	auto* handle = &*m_input;
 	const auto result = m_encoder->SendFrame(*handle);
 	if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
 		return false;
-	if (result == StormByte::Multimedia::FFmpeg::OperationResult::Error) {
+	if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
 		owner.Fail(std::format(
 			"failed to send frame ctx={}x{} fmt={} in={}x{} fmt={} pts={}",
 			ctxW, ctxH, ctxFmt,
@@ -424,6 +454,8 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	}
 
+	m_input.reset();
+	m_inputSource = {};
 	return true;
 }
 

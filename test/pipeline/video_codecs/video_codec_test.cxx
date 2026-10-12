@@ -49,6 +49,7 @@
  */
 
 #include "../helpers.hxx"
+#include "../hardware_capability.hxx"
 
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/format.hxx>
@@ -57,6 +58,10 @@
 #include <StormByte/multimedia/registry.hxx>
 
 #include <libavutil/pixfmt.h>
+
+extern "C" {
+	#include <libavformat/avformat.h>
+}
 
 #include <array>
 #include <utility>
@@ -87,7 +92,7 @@ namespace {
 
 	int CheckVideoCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
-		std::string_view decoder = {}) {
+		std::string_view decoder = {}, AVPixelFormat sourceFormat = AV_PIX_FMT_NONE) {
 		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
@@ -97,6 +102,13 @@ namespace {
 		TEST_REQUIRE(codec);
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
+		if (sourceFormat != AV_PIX_FMT_NONE) {
+			const auto* concrete = avcodec_find_encoder_by_name(std::string{encoder}.c_str());
+			if (!concrete)
+				return TEST_SKIP;
+			if (const int result = CheckHardwareEncoderCapability(concrete, 320, 192, sourceFormat); result != 0)
+				return result;
+		}
 		auto logger = MakeLogger();
 		{
 					TEST_PHASE("creating transcoder");
@@ -107,6 +119,8 @@ namespace {
 			if (!decoder.empty())
 				track.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{decoder});
 			track.Filter<Filter::Video::Scale>(logger, 320u, 192u);
+			if (sourceFormat != AV_PIX_FMT_NONE)
+				track.Filter<Filter::Video::Format>(logger, sourceFormat);
 			if (encoder == "libwebp" || encoder == "libwebp_anim")
 				track.Filter<Filter::Video::Format>(logger, AV_PIX_FMT_YUV420P);
 			else if (encoder == "libsvtav1")
@@ -194,6 +208,33 @@ int test_x265_encodes_hevc_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/x265.mkv", "Matroska", "H.265", "libx265");
 }
 
+int test_vaapi_encodes_hevc_main_matroska() {
+	const auto input = FixturePath("video/xvid_mp3_stereo.avi");
+	auto source = File::Open(TestLocation(input));
+	TEST_REQUIRE(source && !source.value().Streams().empty());
+	const auto sourceVideo = source.value().Streams()[0].Video();
+	TEST_REQUIRE(sourceVideo && !sourceVideo.value().HDR10());
+	TEST_REQUIRE(sourceVideo.value().Color().PixelFormat() == Property::PixelFormat::YUV420P);
+	const auto output = OutputPath("pipeline/video-codecs/vaapi-hevc-main.mkv");
+	if (const int result = CheckVideoCodec(input, output, "Matroska", "H.265", "hevc_vaapi", {},
+		AV_PIX_FMT_NV12); result != 0)
+		return result;
+	auto encoded = File::Open(TestLocation(output));
+	TEST_REQUIRE(encoded && encoded.value().Streams().size() == 1);
+	const auto encodedVideo = encoded.value().Streams()[0].Video();
+	TEST_REQUIRE(encodedVideo && !encodedVideo.value().HDR10());
+	TEST_REQUIRE(encodedVideo.value().Color().PixelFormat() == Property::PixelFormat::YUV420P);
+	AVFormatContext* native = nullptr;
+	const auto closeInput = [](AVFormatContext* context) { avformat_close_input(&context); };
+	const int opened = avformat_open_input(&native, output.string().c_str(), nullptr, nullptr);
+	std::unique_ptr<AVFormatContext, decltype(closeInput)> inspected(native, closeInput);
+	TEST_REQUIRE(opened >= 0);
+	TEST_REQUIRE(avformat_find_stream_info(inspected.get(), nullptr) >= 0);
+	TEST_REQUIRE(inspected->nb_streams == 1);
+	TEST_REQUIRE(inspected->streams[0]->codecpar->profile == AV_PROFILE_HEVC_MAIN);
+	return 0;
+}
+
 int test_libwebp_anim_encodes_webp() {
 	return CheckVideoEncode("pipeline/video-codecs/webp-anim.webp", "WebP", "WebP", "libwebp_anim");
 }
@@ -221,6 +262,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_openh264_encodes_h264_matroska", test_openh264_encodes_h264_matroska},
 		TestEntry{"test_kvazaar_encodes_hevc_matroska", test_kvazaar_encodes_hevc_matroska},
 		TestEntry{"test_x265_encodes_hevc_matroska", test_x265_encodes_hevc_matroska},
+		TestEntry{"test_vaapi_encodes_hevc_main_matroska", test_vaapi_encodes_hevc_main_matroska},
 		TestEntry{"test_libwebp_anim_encodes_webp", test_libwebp_anim_encodes_webp},
 		TestEntry{"test_libwebp_decodes_animated_webp", test_libwebp_decodes_animated_webp},
 	};

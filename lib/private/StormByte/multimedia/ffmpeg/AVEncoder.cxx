@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <StormByte/multimedia/property/dovi.hxx>
 
 #include <cstring>
@@ -68,6 +69,7 @@ extern "C" {
 	#include <libavutil/dovi_meta.h>
 	#include <libavutil/frame.h>
 	#include <libavutil/hdr_dynamic_metadata.h>
+	#include <libavutil/hwcontext.h>
 	#include <libavutil/mem.h>
 	#include <libavutil/opt.h>
 }
@@ -277,6 +279,18 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	}
 
 	PromoteCodedSideData(ctx);
+	if (firstFrame) {
+		for (const auto type : {AV_FRAME_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL}) {
+			if (av_frame_side_data_get(ctx->decoded_side_data, ctx->nb_decoded_side_data, type))
+				continue;
+			const auto* metadata = firstFrame->SideData(type);
+			if (metadata && av_frame_side_data_clone(&ctx->decoded_side_data,
+				&ctx->nb_decoded_side_data, metadata, 0) < 0) {
+				avcodec_free_context(&ctx);
+				return Unexpected<FFmpeg::EncoderError>("failed to preserve first-frame HDR10 metadata");
+			}
+		}
+	}
 	const auto* dovi = av_packet_side_data_get(ctx->coded_side_data,
 		ctx->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF);
 	const bool needsDovi = dovi && dovi->data && dovi->size >= sizeof(AVDOVIDecoderConfigurationRecord)
@@ -342,6 +356,14 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		return Unexpected<FFmpeg::EncoderError>("failed to enable native Dolby Vision encoding");
 	}
 
+	if (ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+		std::string error;
+		if (!VideoInput::Configure(ctx, codec, firstFrame ? firstFrame->Get() : nullptr, error)) {
+			avcodec_free_context(&ctx);
+			return Unexpected<FFmpeg::EncoderError>("encoder '{}' input: {}", codec_name, error);
+		}
+	}
+
 	const int opened = avcodec_open2(ctx, codec, nullptr);
 	if (opened < 0) {
 		const std::string why = AvError(opened);
@@ -378,6 +400,35 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	if (bsf)
 		opened->m_bsf_pipeline.Add(std::move(*bsf));
 	return opened;
+}
+
+bool FFmpeg::AVEncoder::PrepareFrame(const AVFrame& source, AVFrame& destination) const noexcept {
+	if (!m_ptr || m_ptr->codec_type != AVMEDIA_TYPE_VIDEO || &source == &destination
+		|| !source || !destination || source.Width() != m_ptr->width || source.Height() != m_ptr->height)
+		return false;
+	const auto* sourceFrames = VideoInput::Frames(source.Get());
+	if (VideoInput::Hardware(source.Format()) && !sourceFrames)
+		return false;
+	if (sourceFrames && m_ptr->hw_frames_ctx
+		&& source.Get()->hw_frames_ctx->data == m_ptr->hw_frames_ctx->data
+		&& source.Format() == m_ptr->pix_fmt)
+		return destination.Ref(source);
+	AVFrame downloaded;
+	const AVFrame* input = &source;
+	if (sourceFrames) {
+		if (!VideoInput::Download(source.Get(), downloaded.Get()))
+			return false;
+		input = &downloaded;
+	}
+	if (!VideoInput::Hardware(m_ptr->pix_fmt))
+		return VideoInput::Prepare(*input, m_ptr->pix_fmt, destination);
+	if (!m_ptr->hw_frames_ctx || !m_ptr->hw_frames_ctx->data)
+		return false;
+	const auto* pool = reinterpret_cast<const AVHWFramesContext*>(m_ptr->hw_frames_ctx->data);
+	AVFrame upload;
+	if (!VideoInput::Prepare(*input, pool->sw_format, upload))
+		return false;
+	return VideoInput::Upload(m_ptr, upload.Get(), destination.Get());
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {

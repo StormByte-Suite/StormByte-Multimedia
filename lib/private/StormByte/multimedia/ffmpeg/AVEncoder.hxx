@@ -125,12 +125,20 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param stream_index Output track index.
 			 * @param options av_opt_set pairs applied before avcodec_open2.
 			 * @param time_base Encoder time base. Ignored if num/den are not positive.
-			 * @param firstFrame Optional parsed metadata for native Dolby Vision configuration.
+			 * @param firstFrame Optional source hardware context and parsed Dolby Vision metadata.
 			 * @return Encoder or EncoderError.
 			 */
 			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 				const Safe::Map<Safe::String, Safe::String>& options, AVRational time_base,
 				const AVFrame* firstFrame = nullptr) noexcept;
+
+			/**
+			 * @brief Prepares exact CPU input or transfers through validated hardware frame contexts.
+			 * @param source Immutable source frame.
+			 * @param destination Separate frame owner, retained by the caller across EAGAIN.
+			 * @return Whether format, context, transfer and property validation succeeded.
+			 */
+			bool PrepareFrame(const AVFrame& source, AVFrame& destination) const noexcept;
 
 			/**
 			 * @brief Sends a frame to the encoder.

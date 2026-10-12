@@ -49,6 +49,7 @@
  */
 
 #include "../helpers.hxx"
+#include "../hardware_capability.hxx"
 
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/tonemap.hxx>
@@ -129,6 +130,18 @@ namespace {
 		TEST_REQUIRE(codec);
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
+
+		const std::string implementation{encoder};
+		if (const auto* concrete = avcodec_find_encoder_by_name(implementation.c_str());
+			concrete && avcodec_get_hw_config(concrete, 0)) {
+			auto source = File::Open(TestLocation(FixturePath("video/hdr10_metadata_source.mkv")));
+			TEST_REQUIRE(source && source.value().Streams().size() == 1);
+			const auto video = source.value().Streams()[0].Video();
+			TEST_REQUIRE(video);
+			if (const int result = CheckHardwareEncoderCapability(concrete, video.value().Resolution().Width(),
+				video.value().Resolution().Height()); result != 0)
+				return result;
+		}
 
 		const auto output = OutputPath(destination);
 		auto logger = MakeLogger();
