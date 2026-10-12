@@ -125,6 +125,7 @@ void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (out.Width() <= 0 || out.Height() <= 0 || out.Format() == FFrame::FormatNone()) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"atadenoise wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
@@ -134,7 +135,7 @@ void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"atadenoise {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Atadenoise::Eof() noexcept {
@@ -151,7 +152,7 @@ void Atadenoise::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"atadenoise flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

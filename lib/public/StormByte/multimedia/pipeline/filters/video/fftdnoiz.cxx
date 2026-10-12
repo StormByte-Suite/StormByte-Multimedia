@@ -125,6 +125,7 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (out.Width() <= 0 || out.Height() <= 0 || out.Format() == FFrame::FormatNone()) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"fftdnoiz wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
@@ -141,7 +142,7 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"fftdnoiz {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Fftdnoiz::Eof() noexcept {
@@ -158,7 +159,7 @@ void Fftdnoiz::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"fftdnoiz flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

@@ -51,6 +51,7 @@
 #pragma once
 
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
+#include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/string.hxx>
@@ -170,6 +171,13 @@ namespace StormByte {
 					bool Filter(const AVFrame& src, AVFrame& dst) const noexcept;
 
 					/**
+					 * @brief Pulls another available output without closing the source.
+					 * @param dst Output frame with the sink's timestamp timebase.
+					 * @return False on failure; true with empty dst on EAGAIN or EOF.
+					 */
+					bool Receive(AVFrame& dst) const noexcept;
+
+					/**
 					 * @brief Closes the source once and pulls one flushed frame into @p dst.
 					 * @param dst Destination; unreferenced then filled by the sink.
 					 * @return false on failure. Empty @p dst with true is EAGAIN/EOF.
@@ -211,6 +219,8 @@ namespace StormByte {
 					std::uint64_t m_mask = 0;		///< Cached native channel mask.
 					StormByte::Safe::String m_graph;			///< Cached filterchain.
 					bool m_closed = false;			///< Source already closed.
+					mutable std::int64_t m_endPts = INT64_MIN;	///< End of the last accepted input in source ticks.
+					AVRational m_timeBase{0, 1};		///< Cached source timestamp timebase.
 			};
 
 			/// @cond

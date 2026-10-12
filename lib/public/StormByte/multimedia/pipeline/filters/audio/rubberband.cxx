@@ -116,6 +116,7 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (out.NbSamples() <= 0 || out.SampleRate() <= 0) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"rubberband wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
@@ -125,7 +126,7 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"rubberband ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Rubberband::Eof() noexcept {
@@ -142,7 +143,9 @@ void Rubberband::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"rubberband flush ch={} rate={} samples={} pts={}",
 			out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
+		if (Failed())
+			break;
 	}
 	m_graph.reset();
 }

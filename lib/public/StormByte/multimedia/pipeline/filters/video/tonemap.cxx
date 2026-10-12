@@ -180,6 +180,7 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!HasPicture(curved)) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"tonemap wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
@@ -233,7 +234,7 @@ void Tonemap::Eof() noexcept {
 		out.DurationTicks(curved.DurationTicks());
 		Log(Level::LowLevel, std::format(
 			"tonemap flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

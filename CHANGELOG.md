@@ -23,6 +23,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Changed
 
+- Add explicit `Drop`, `EmitFrame` and `EmitGraph` operations for custom buffering frame filters, while keeping `Save` as a one-for-one replacement. Graph adapters expose non-closing `Receive`, and native frames expose their timestamp timebase.
 - Breaking manual pipeline Plan API and lifecycle:
 	- Make Plan noncopyable and nonmovable, retain it through `Safe::Shared<Plan>`, and remove value binding and `Clone`/`Move` requirements for derived Plans. Keep public configuration, `Check` and `Tracks()`; make snapshot, container, location and path getters private while retaining State, Error and I/O telemetry observation. There is no public state setter.
 	- Introduce shared `Created -> Running -> Finished` execution state with terminal Failed, first-failure preservation and rejection of failure after Finished. Constructors still launch stage workers, but setup waits for Running; complete wiring and `Filters::Close` before Plan binding, which publishes Running. The library publishes Finished when participating stages complete, and Failed on the first formation or execution error. Successful completion requires all stages and analytics, not just muxer EOF.
@@ -31,6 +32,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Correct FFmpeg frame-filter buffering and EOF handling:
+	- Return a genuinely empty `AVFrame` on graph `EAGAIN` or EOF, preventing the endless zero-sample `adeclick` flush loop.
+	- Consume inputs that a graph retains instead of passing them through, drain all available outputs, and emit delayed EOF frames using retained input lineage rather than silently dropping them.
+	- Carry decoder/source/sink timebases through graph processing, preserve the input end timestamp when closing the graph, and update emitted timing and configured FPS while retaining unique output parts.
+- Translate FFmpeg chroma positions to zimg's distinct enum values and include input range, matrix, transfer, primaries and chroma position in cached conversion keys.
+- Strengthen filter tests with explicit output properties, bounded EOF/sample conservation, FPS frame counts and timestamps, zimg cache comparisons and SDR color tags; replace the invalid TTML/Matroska success expectation with TTML/MP4 coverage and an explicit Matroska rejection case.
 - Peek compressed audio/video packet payloads during decoder submission without extracting bytes or advancing the FIFO cursor, so an `EAGAIN` retry resubmits the original data rather than an empty packet.
 - Abort shared pipeline hoppers on failure or cancellation to wake capacity-blocked producers, and request cancellation across graph routes before joining their workers during teardown.
 - Use default pthread attributes for bundled Kvazaar workers on MSVC instead of passing an uninitialized attribute object to thread creation.

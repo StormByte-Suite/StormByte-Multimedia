@@ -118,6 +118,7 @@ void Limiter::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"limiter wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
@@ -127,7 +128,7 @@ void Limiter::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"limiter ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Limiter::Eof() noexcept {
@@ -144,7 +145,7 @@ void Limiter::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"limiter flush ch={} samples={} pts={}",
 			out.Channels(), out.NbSamples(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

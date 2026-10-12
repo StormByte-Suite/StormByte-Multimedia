@@ -118,6 +118,7 @@ void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"afftdn wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
@@ -127,7 +128,7 @@ void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"afftdn ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Afftdn::Eof() noexcept {
@@ -144,7 +145,7 @@ void Afftdn::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"afftdn flush ch={} samples={} pts={}",
 			out.Channels(), out.NbSamples(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

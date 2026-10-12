@@ -41,6 +41,7 @@
 #include <StormByte/size.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
@@ -603,6 +604,36 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			void Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept;
 
 			/**
+			 * @brief Emits a distinct filtered frame without forwarding the input.
+			 * @param incoming Output frame, with its native timebase and timestamps.
+			 * @param frameRate Optional output video frame rate.
+			 *
+			 * May be called repeatedly from Process or Eof. Eof uses the last
+			 * input's lineage; timing comes from the output, not the input.
+			 * Does not change the replacement semantics of Save.
+			 */
+			void EmitFrame(StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
+				StormByte::Safe::Optional<Property::AVRational> frameRate = {}) noexcept;
+
+			/**
+			 * @brief Consumes the current input without passthrough.
+			 *
+			 * Use when a buffering graph has accepted input but has no output.
+			 * The borrowed input remains valid until Process returns.
+			 */
+			void Drop() noexcept;
+
+			/**
+			 * @brief Emits a graph's first output and drains all currently available frames.
+			 * @param graph Graph whose source remains open.
+			 * @param incoming First output already received from the graph.
+			 * @param frameRate Optional output video frame rate.
+			 */
+			void EmitGraph(StormByte::Multimedia::FFmpeg::AVFilterGraph& graph,
+				StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
+				StormByte::Safe::Optional<Property::AVRational> frameRate = {}) noexcept;
+
+			/**
 			 * @brief Replaces the media of the current packet.
 			 * @param incoming Distinct RAII packet taken by rvalue.
 			 *
@@ -1086,6 +1117,29 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param incoming Ignored.
 			 */
 			void Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept = delete;
+
+			/**
+			 * @brief Deleted. Analytics must not emit rewritten frames.
+			 * @param incoming Ignored.
+			 * @param frameRate Ignored.
+			 */
+			void EmitFrame(StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
+				StormByte::Safe::Optional<Property::AVRational> frameRate = {}) noexcept = delete;
+
+			/**
+			 * @brief Deleted. Analytics must not emit rewritten graph output.
+			 * @param graph Ignored.
+			 * @param incoming Ignored.
+			 * @param frameRate Ignored.
+			 */
+			void EmitGraph(StormByte::Multimedia::FFmpeg::AVFilterGraph& graph,
+				StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
+				StormByte::Safe::Optional<Property::AVRational> frameRate = {}) noexcept = delete;
+
+			/**
+			 * @brief Deleted. Analytics must not discard frames.
+			 */
+			void Drop() noexcept = delete;
 
 			/**
 			 * @brief Deleted. Holding would mix reference and distorted looks.

@@ -51,6 +51,9 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/ffmpeg/AVChannelLayout.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/frames.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/psnr.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/ssim.hxx>
@@ -90,10 +93,12 @@
 #include <StormByte/multimedia/registry.hxx>
 
 #include <array>
+#include <cstring>
 #include <string>
 
 extern "C" {
 	#include <libavutil/pixfmt.h>
+	#include <libavutil/samplefmt.h>
 }
 
 using namespace StormByte::Multimedia;
@@ -102,7 +107,8 @@ using namespace std::string_view_literals;
 
 namespace {
 	template<typename Attach>
-	int RunVideo(const char* leaf, Attach&& attach) {
+	int RunVideo(const char* leaf, Attach&& attach, unsigned width = 0,
+		unsigned height = 0, unsigned fps = 0) {
 		auto codec = Registry::Instance().FindCodec("H.264");
 		TEST_REQUIRE(codec);
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
@@ -124,12 +130,25 @@ namespace {
 		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
-		TEST_REQUIRE(!opened.value().Streams().empty());
+		TEST_REQUIRE(opened.value().Streams().size() == 1);
+		const auto stream = opened.value().Streams()[0];
+		TEST_REQUIRE(stream.Type() == StormByte::Multimedia::Type::Video);
+		const auto video = stream.Video();
+		TEST_REQUIRE(video);
+		if (width > 0)
+			TEST_REQUIRE(video->Resolution().Width() == width);
+		if (height > 0)
+			TEST_REQUIRE(video->Resolution().Height() == height);
+		if (fps > 0) {
+			TEST_REQUIRE(video->FrameRate());
+			TEST_REQUIRE(video->FrameRate()->num == static_cast<int>(fps) * video->FrameRate()->den);
+		}
 		return 0;
 	}
 
 	template<typename Attach>
-	int RunAudio(const char* leaf, std::string_view fixture, Attach&& attach) {
+	int RunAudio(const char* leaf, std::string_view fixture, Attach&& attach,
+		unsigned channels = 2, unsigned sampleRate = 48000) {
 		auto codec = Registry::Instance().FindCodec("FLAC");
 		TEST_REQUIRE(codec);
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
@@ -149,7 +168,13 @@ namespace {
 		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
-		TEST_REQUIRE(!opened.value().Streams().empty());
+		TEST_REQUIRE(opened.value().Streams().size() == 1);
+		const auto stream = opened.value().Streams()[0];
+		TEST_REQUIRE(stream.Type() == StormByte::Multimedia::Type::Audio);
+		const auto audio = stream.Audio();
+		TEST_REQUIRE(audio);
+		TEST_REQUIRE(audio->Channels() == channels);
+		TEST_REQUIRE(audio->SampleRate() == sampleRate);
 		return 0;
 	}
 
@@ -168,6 +193,146 @@ namespace {
 		TEST_REQUIRE(job.Reports().size() >= 1);
 		return 0;
 	}
+}
+
+int test_filter_graph_delayed_output_and_eof() {
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocVideo(16, 16, AV_PIX_FMT_YUV420P));
+	source.Pts(0);
+	auto graph = FFmpeg::AVFilterGraph::Open(source, "reverse");
+	TEST_REQUIRE(graph);
+	FFmpeg::AVFrame output;
+	TEST_REQUIRE(graph.Filter(source, output));
+	TEST_REQUIRE(!output);
+	TEST_REQUIRE(graph.Flush(output));
+	TEST_REQUIRE(output);
+	TEST_REQUIRE(output.Width() == 16 && output.Height() == 16);
+	TEST_REQUIRE(graph.Flush(output));
+	TEST_REQUIRE(!output);
+	TEST_REQUIRE(graph.Flush(output));
+	TEST_REQUIRE(!output);
+	return 0;
+}
+
+int test_filter_graph_fps_count_and_timestamps() {
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocVideo(16, 16, AV_PIX_FMT_YUV420P));
+	source.TimeBase({1, 24});
+	source.DurationTicks(1);
+	auto graph = FFmpeg::AVFilterGraph::Open(source, "fps=fps=25:round=near");
+	TEST_REQUIRE(graph);
+	unsigned count = 0;
+	for (int index = 0; index < 48; ++index) {
+		source.Pts(index);
+		FFmpeg::AVFrame output;
+		TEST_REQUIRE(graph.Filter(source, output));
+		while (output) {
+			TEST_REQUIRE(count < 50);
+			TEST_REQUIRE(output.TimeBase().num == 1 && output.TimeBase().den == 25);
+			TEST_REQUIRE(output.Pts() == count);
+			++count;
+			TEST_REQUIRE(graph.Receive(output));
+		}
+	}
+	for (unsigned remaining = 0; remaining < 51; ++remaining) {
+		FFmpeg::AVFrame output;
+		TEST_REQUIRE(graph.Flush(output));
+		if (!output) {
+			TEST_REQUIRE(count == 50);
+			return 0;
+		}
+		TEST_REQUIRE(count < 50);
+		TEST_REQUIRE(output.Pts() == count);
+		++count;
+	}
+	TEST_REQUIRE(false);
+	return 1;
+}
+
+int test_filter_graph_adeclick_flush_is_bounded() {
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocAudio(1024, AV_SAMPLE_FMT_S16, FFmpeg::AVChannelLayout::Default(2), 48000));
+	std::memset(source.Data(0), 0, 1024 * 2 * sizeof(std::int16_t));
+	source.TimeBase({1, 48000});
+	source.DurationTicks(1024);
+	auto graph = FFmpeg::AVFilterGraph::Open(source, "adeclick");
+	TEST_REQUIRE(graph);
+	unsigned samples = 0;
+	for (int index = 0; index < 8; ++index) {
+		source.Pts(index * 1024);
+		FFmpeg::AVFrame output;
+		TEST_REQUIRE(graph.Filter(source, output));
+		for (unsigned attempts = 0; output && attempts < 32; ++attempts) {
+			TEST_REQUIRE(output.NbSamples() > 0);
+			samples += static_cast<unsigned>(output.NbSamples());
+			TEST_REQUIRE(samples <= 8192);
+			TEST_REQUIRE(graph.Receive(output));
+		}
+		TEST_REQUIRE(!output);
+	}
+	for (unsigned attempts = 0; attempts < 32; ++attempts) {
+		FFmpeg::AVFrame output;
+		TEST_REQUIRE(graph.Flush(output));
+		if (!output) {
+			TEST_REQUIRE(samples == 8192);
+			return 0;
+		}
+		TEST_REQUIRE(output.NbSamples() > 0);
+		samples += static_cast<unsigned>(output.NbSamples());
+		TEST_REQUIRE(samples <= 8192);
+	}
+	TEST_REQUIRE(false);
+	return 1;
+}
+
+int test_filter_zimg_cache_tracks_input_color() {
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocVideo(16, 16, AV_PIX_FMT_YUV420P10LE));
+	for (int plane = 0; plane < 3; ++plane) {
+		const int size = plane == 0 ? 16 : 8;
+		for (int row = 0; row < size; ++row) {
+			auto* pixels = reinterpret_cast<std::uint16_t*>(source.Data(plane) + row * source.Linesize(plane));
+			for (int column = 0; column < size; ++column)
+				pixels[column] = static_cast<std::uint16_t>(plane == 0 ? 512 : 400 + ((row + column) % 2) * 200);
+		}
+	}
+	FFmpeg::AVFrame::ColorTarget target;
+	target.transfer = AVCOL_TRC_LINEAR;
+	target.primaries = AVCOL_PRI_BT709;
+	target.matrix = AVCOL_SPC_RGB;
+	target.range = AVCOL_RANGE_JPEG;
+	target.peak = 100.0;
+	FFmpeg::AVFrame::ScaleContext cached;
+	static constexpr std::array colors{
+		std::array<int, 5>{AVCOL_TRC_SMPTE2084, AVCOL_PRI_BT2020, AVCOL_SPC_BT2020_NCL, AVCOL_RANGE_MPEG, AVCHROMA_LOC_LEFT},
+		std::array<int, 5>{AVCOL_TRC_SMPTE2084, AVCOL_PRI_BT2020, AVCOL_SPC_BT2020_NCL, AVCOL_RANGE_JPEG, AVCHROMA_LOC_LEFT},
+		std::array<int, 5>{AVCOL_TRC_SMPTE2084, AVCOL_PRI_BT709, AVCOL_SPC_BT2020_NCL, AVCOL_RANGE_MPEG, AVCHROMA_LOC_LEFT},
+		std::array<int, 5>{AVCOL_TRC_ARIB_STD_B67, AVCOL_PRI_BT2020, AVCOL_SPC_BT2020_NCL, AVCOL_RANGE_MPEG, AVCHROMA_LOC_LEFT},
+		std::array<int, 5>{AVCOL_TRC_SMPTE2084, AVCOL_PRI_BT2020, AVCOL_SPC_BT709, AVCOL_RANGE_MPEG, AVCHROMA_LOC_LEFT},
+		std::array<int, 5>{AVCOL_TRC_SMPTE2084, AVCOL_PRI_BT2020, AVCOL_SPC_BT2020_NCL, AVCOL_RANGE_MPEG, AVCHROMA_LOC_BOTTOM},
+	};
+	for (const auto& color : colors) {
+		source.ColorTransfer(color[0]);
+		source.ColorPrimaries(color[1]);
+		source.ColorSpace(color[2]);
+		source.ColorRange(color[3]);
+		source.ChromaLocation(color[4]);
+		FFmpeg::AVFrame reused;
+		reused.Format(AV_PIX_FMT_GBRPF32LE);
+		TEST_REQUIRE(source.ScaleTo(cached, reused, 16, 16, FFmpeg::AVFrame::Resample::Default,
+			FFmpeg::AVFrame::Scaler::Zimg, target));
+		FFmpeg::AVFrame fresh;
+		fresh.Format(AV_PIX_FMT_GBRPF32LE);
+		FFmpeg::AVFrame::ScaleContext reference;
+		TEST_REQUIRE(source.ScaleTo(reference, fresh, 16, 16, FFmpeg::AVFrame::Resample::Default,
+			FFmpeg::AVFrame::Scaler::Zimg, target));
+		for (int plane = 0; plane < 3; ++plane) {
+			for (int row = 0; row < 16; ++row)
+				TEST_REQUIRE(std::memcmp(reused.Data(plane) + row * reused.Linesize(plane),
+					fresh.Data(plane) + row * fresh.Linesize(plane), 16 * sizeof(float)) == 0);
+		}
+	}
+	return 0;
 }
 
 int test_filter_adeclick() {
@@ -209,7 +374,7 @@ int test_filter_loudnorm() {
 int test_filter_resample() {
 	return RunAudio("resample", "audio/noise_stereo.wav", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Audio::Resample>(logger, StormByte::Safe::Optional<int>{44100});
-	});
+	}, 2, 44100);
 }
 
 int test_filter_rubberband() {
@@ -221,7 +386,7 @@ int test_filter_rubberband() {
 int test_filter_upmix() {
 	return RunAudio("upmix", "audio/noise_stereo.wav", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Audio::Upmix>(logger, Property::ChannelLayout::FivePointOne);
-	});
+	}, 6, 48000);
 }
 
 int test_filter_atadenoise() {
@@ -251,7 +416,7 @@ int test_filter_cas() {
 int test_filter_crop() {
 	return RunVideo("crop", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::Crop>(logger, 0, 0, 160, 120);
-	});
+	}, 160, 120);
 }
 
 int test_filter_deband() {
@@ -299,7 +464,7 @@ int test_filter_format() {
 int test_filter_fps() {
 	return RunVideo("fps", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::Fps>(logger, 25u);
-	});
+	}, 0, 0, 25);
 }
 
 int test_filter_hqdn3d() {
@@ -311,7 +476,7 @@ int test_filter_hqdn3d() {
 int test_filter_interpolate() {
 	return RunVideo("interpolate", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::Interpolate>(logger, 25u);
-	});
+	}, 0, 0, 25);
 }
 
 int test_filter_nlmeans() {
@@ -323,13 +488,13 @@ int test_filter_nlmeans() {
 int test_filter_pad() {
 	return RunVideo("pad", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::Pad>(logger, 1920u, 1080u);
-	});
+	}, 1920, 1080);
 }
 
 int test_filter_scale() {
 	return RunVideo("scale", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::Scale>(logger, 320u, 180u);
-	});
+	}, 320, 180);
 }
 
 int test_filter_vaguedenoiser() {
@@ -378,6 +543,10 @@ int test_filter_xpsnr() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_filter_graph_delayed_output_and_eof", test_filter_graph_delayed_output_and_eof},
+		TestEntry{"test_filter_graph_fps_count_and_timestamps", test_filter_graph_fps_count_and_timestamps},
+		TestEntry{"test_filter_graph_adeclick_flush_is_bounded", test_filter_graph_adeclick_flush_is_bounded},
+		TestEntry{"test_filter_zimg_cache_tracks_input_color", test_filter_zimg_cache_tracks_input_color},
 		TestEntry{"test_filter_adeclick", test_filter_adeclick},
 		TestEntry{"test_filter_afftdn", test_filter_afftdn},
 		TestEntry{"test_filter_denoise", test_filter_denoise},

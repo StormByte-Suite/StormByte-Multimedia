@@ -117,6 +117,7 @@ void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"adeclick wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
@@ -126,7 +127,7 @@ void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"adeclick ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Adeclick::Eof() noexcept {
@@ -143,7 +144,9 @@ void Adeclick::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"adeclick flush ch={} samples={} pts={}",
 			out.Channels(), out.NbSamples(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
+		if (Failed())
+			break;
 	}
 	m_graph.reset();
 }

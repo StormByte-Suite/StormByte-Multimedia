@@ -124,6 +124,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"decimate wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
@@ -140,7 +141,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"decimate {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Decimate::Eof() noexcept {
@@ -157,7 +158,7 @@ void Decimate::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"decimate flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

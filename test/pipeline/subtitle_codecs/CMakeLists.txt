@@ -6,7 +6,8 @@ foreach(test_name IN ITEMS
 	test_ass_encodes_matroska
 	test_webvtt_encodes_vtt
 	test_mov_text_encodes_mp4
-	test_ttml_encodes_matroska
+	test_ttml_encodes_mp4
+	test_ttml_rejects_matroska
 	test_pgssub_remuxes_sup
 )
 	add_optional_pipeline_test(MultimediaPipelineSubtitleCodecTests ${test_name})

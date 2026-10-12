@@ -119,6 +119,7 @@ void Cas::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"cas wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
@@ -135,7 +136,7 @@ void Cas::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"cas {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Cas::Eof() noexcept {
@@ -152,7 +153,7 @@ void Cas::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"cas flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

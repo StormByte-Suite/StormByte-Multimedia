@@ -121,6 +121,7 @@ void Fps::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"fps wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
@@ -136,7 +137,7 @@ void Fps::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"fps {}/{} {}x{} pts={}",
 		m_num, m_den, out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
 }
 
 void Fps::Eof() noexcept {
@@ -152,7 +153,9 @@ void Fps::Eof() noexcept {
 			break;
 		Log(Level::LowLevel, std::format(
 			"fps flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
+		if (Failed())
+			break;
 	}
 	m_graph.reset();
 }

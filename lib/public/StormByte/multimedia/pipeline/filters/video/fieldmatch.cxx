@@ -146,6 +146,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"fieldmatch wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
@@ -162,7 +163,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"fieldmatch {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Fieldmatch::Eof() noexcept {
@@ -179,7 +180,7 @@ void Fieldmatch::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"fieldmatch flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

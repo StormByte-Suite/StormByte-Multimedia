@@ -132,6 +132,7 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"deflicker wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
@@ -148,7 +149,7 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"deflicker {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Deflicker::Eof() noexcept {
@@ -165,7 +166,7 @@ void Deflicker::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"deflicker flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

@@ -271,6 +271,12 @@ int test_transcoder_without_enforce_features_drops_hdr10() {
 	const auto encodedVideo = stream.Video();
 	TEST_REQUIRE(encodedVideo);
 	TEST_REQUIRE(!encodedVideo.value().HDR10());
+	const auto& color = encodedVideo.value().Color();
+	TEST_REQUIRE(color.PixelFormat() == Property::PixelFormat::YUV420P);
+	TEST_REQUIRE(color.Range() == Property::Range::TV);
+	TEST_REQUIRE(color.Space() == Property::Space::BT709);
+	TEST_REQUIRE(color.Primaries() == Property::Primaries::BT709);
+	TEST_REQUIRE(color.Transfer() == Property::Transfer::BT709);
 	return 0;
 }
 

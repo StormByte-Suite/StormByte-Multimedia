@@ -128,6 +128,7 @@ void Resample::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"resample wait {}->{} Hz pts={}",
 			src.SampleRate(), want, src.Pts()));
@@ -137,7 +138,7 @@ void Resample::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"resample {}->{} Hz samples={} pts={}",
 		src.SampleRate(), out.SampleRate(), out.NbSamples(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Resample::Eof() noexcept {
@@ -154,7 +155,7 @@ void Resample::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"resample flush {} Hz samples={} pts={}",
 			out.SampleRate(), out.NbSamples(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

@@ -191,6 +191,9 @@ class FFmpeg::PrivateState {
 		std::unique_ptr<StormByte::Multimedia::Backend::Pipeline::Pumper> pumper;	///< Worker driver allocated and destroyed in Multimedia
 		std::deque<Item::PointerType> queue;										///< Held input items awaiting delayed filter output
 		StormByte::Multimedia::FFmpeg::AVFrame::ScaleContext scaling;			///< Reusable scaler graphs and workers owned by this filter.
+		Item::PointerType lastFrame;	///< Last input lineage for delayed output
+		bool drop = false;			///< Suppress current input passthrough
+		std::uint64_t nextPart = 0;	///< Next part of the current input lineage
 };
 
 FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -324,6 +327,13 @@ void FFmpeg::Release() noexcept {
 		m_current = std::move(item);
 		if (!m_current)
 			continue;
+		m_state->drop = false;
+		m_state->nextPart = m_state->lastFrame
+			&& TrackOf(*m_current) == TrackOf(*m_state->lastFrame)
+			&& SerialOf(*m_current) == SerialOf(*m_state->lastFrame)
+			? std::max(m_state->nextPart, PartOf(*m_current)) : PartOf(*m_current);
+		if (m_current->Kind() == Kind::Frame)
+			m_state->lastFrame = m_current->Clone();
 		Log(Level::LowLevel, std::format("release-item index={} count={} t={} {}:{} kind={}",
 			releaseIndex++, parked.size(), TrackOf(*m_current),
 			SerialOf(*m_current).value_or(0), PartOf(*m_current),
@@ -348,7 +358,9 @@ void FFmpeg::Release() noexcept {
 			m_current.reset();
 			continue;
 		}
-		if (m_current)
+		if (m_state->drop)
+			m_current.reset();
+		else if (m_current)
 			Emit(std::move(m_current));
 	}
 
@@ -461,6 +473,72 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 		packet->Track(), packet->Serial().value_or(0), packet->Part()));
 }
 
+void FFmpeg::Drop() noexcept {
+	if (!MeasuringTwoPass())
+		m_state->drop = true;
+}
+
+void FFmpeg::EmitFrame(StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
+	StormByte::Safe::Optional<Property::AVRational> frameRate) noexcept {
+	if (MeasuringTwoPass() || Failed() || Stopping())
+		return;
+	if (!incoming) {
+		Drop();
+		return;
+	}
+	auto model = m_current ? m_current : m_state->lastFrame;
+	if (!model || model->Kind() != Kind::Frame) {
+		Fail("filtered output has no input lineage");
+		return;
+	}
+	auto current = m_current;
+	m_current = model->Clone();
+	auto frame = StormByte::Safe::DynamicPointerCast<Pipeline::Frame>(m_current);
+	const auto timeBase = incoming.TimeBase();
+	const auto pts = incoming.Pts();
+	const bool audio = incoming.NbSamples() > 0 && incoming.SampleRate() > 0;
+	const auto duration = audio ? incoming.NbSamples() : incoming.DurationTicks();
+	const auto durationBase = audio ? Property::AVRational{1, incoming.SampleRate()} : timeBase;
+	Save(std::move(incoming));
+	if (!Failed()) {
+		if (timeBase.Valid()) {
+			frame->m_pts = pts == std::numeric_limits<std::int64_t>::min()
+				? StormByte::Safe::Optional<Property::Duration>{}
+				: StormByte::Safe::Optional<Property::Duration>{Property::Duration{
+					std::chrono::nanoseconds{timeBase.Rescale(pts, Property::AVRational{1, 1000000000})}}};
+			frame->m_duration = duration > 0
+				? StormByte::Safe::Optional<Property::Duration>{Property::Duration{
+					std::chrono::nanoseconds{durationBase.Rescale(duration, Property::AVRational{1, 1000000000})}}}
+				: StormByte::Safe::Optional<Property::Duration>{};
+			frame->m_dts.reset();
+		}
+		if (frameRate && frame->m_video) {
+			const auto video = *frame->m_video;
+			frame->m_video = Property::Video(video.Color(), video.Resolution(), video.HDR10(),
+				*frameRate, video.SampleAspectRatio(), video.DOVI());
+		}
+		frame->m_part = m_state->nextPart++;
+		Emit(std::move(m_current));
+	}
+	m_current = std::move(current);
+	Drop();
+}
+
+void FFmpeg::EmitGraph(StormByte::Multimedia::FFmpeg::AVFilterGraph& graph,
+	StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
+	StormByte::Safe::Optional<Property::AVRational> frameRate) noexcept {
+	Drop();
+	while (incoming && !Failed() && !Stopping()) {
+		EmitFrame(std::move(incoming), frameRate);
+		if (Failed() || Stopping())
+			return;
+		if (!graph.Receive(incoming)) {
+			Fail("failed to receive pending filter output");
+			return;
+		}
+	}
+}
+
 void FFmpeg::Open() noexcept {
 	StormByte::Safe::String scope("Filters/");
 	scope.append(Name());
@@ -501,6 +579,13 @@ void FFmpeg::CallLastChance() noexcept {
 
 void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 	m_current = std::move(item);
+	m_state->drop = false;
+	m_state->nextPart = m_state->lastFrame
+		&& TrackOf(*m_current) == TrackOf(*m_state->lastFrame)
+		&& SerialOf(*m_current) == SerialOf(*m_state->lastFrame)
+		? std::max(m_state->nextPart, PartOf(*m_current)) : PartOf(*m_current);
+	if (!IsAnalytics(*this) && m_current->Kind() == Kind::Frame)
+		m_state->lastFrame = m_current->Clone();
 	Log(Level::LowLevel, std::format("in t={} {}:{}",
 		TrackOf(*m_current), SerialOf(*m_current).value_or(0), PartOf(*m_current)));
 
@@ -549,7 +634,9 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 		}
 	}
 
-	if (m_current)
+	if (m_state->drop)
+		m_current.reset();
+	else if (m_current)
 		Emit(std::move(m_current));
 }
 

@@ -313,6 +313,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				video->SampleAspectRatio(), video->DOVI());
 		}
 
+		holder->Handle().TimeBase(m_timeBase);
 		auto frame = StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>::MakePointer<
 			StormByte::Multimedia::Pipeline::Frame>(
 				owner.Index(),

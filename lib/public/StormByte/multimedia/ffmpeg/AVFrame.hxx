@@ -430,6 +430,18 @@ namespace StormByte {
 					void DurationTicks(std::int64_t duration) noexcept;
 
 					/**
+					 * @brief Native timebase for frame timestamps.
+					 * @return Timebase, or an invalid rational when unspecified.
+					 */
+					AVRational TimeBase() const noexcept;
+
+					/**
+					 * @brief Sets the native timestamp timebase without rescaling.
+					 * @param timeBase Units of Pts and DurationTicks.
+					 */
+					void TimeBase(AVRational timeBase) noexcept;
+
+					/**
 					 * @brief Color range.
 					 * @return `AVColorRange` as int.
 					 */

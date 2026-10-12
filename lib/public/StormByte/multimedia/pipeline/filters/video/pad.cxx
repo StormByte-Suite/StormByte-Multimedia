@@ -134,6 +134,7 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"pad wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
@@ -149,7 +150,7 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"pad {}x{} -> {}x{} pts={}",
 		src.Width(), src.Height(), out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Pad::Eof() noexcept {
@@ -165,7 +166,7 @@ void Pad::Eof() noexcept {
 			break;
 		Log(Level::LowLevel, std::format(
 			"pad flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

@@ -112,9 +112,24 @@ int test_mov_text_encodes_mp4() {
 		"MP4", "3GPP Timed Text", "mov_text");
 }
 
-int test_ttml_encodes_matroska() {
-	return CheckSubtitleEncode("subtitles/anime_eng.srt", "pipeline/subtitle-codecs/ttml.mks",
-		"Matroska", "TTML", "ttml");
+int test_ttml_encodes_mp4() {
+	return CheckSubtitleEncode("subtitles/anime_eng.srt", "pipeline/subtitle-codecs/ttml.mp4",
+		"MP4", "TTML", "ttml");
+}
+
+int test_ttml_rejects_matroska() {
+	auto codec = Registry::Instance().FindCodec("TTML");
+	TEST_REQUIRE(codec);
+	if (!codec.value().get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("subtitles/anime_eng.srt")),
+		TestLocation(OutputPath("pipeline/subtitle-codecs/ttml.mks")), logger};
+	job.Subtitle(0).Codec(codec.value().get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"ttml"});
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	return WaitForTranscoderFailure(job, "does not support codec ttml");
 }
 
 int test_pgssub_remuxes_sup() {
@@ -144,7 +159,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_ass_encodes_matroska", test_ass_encodes_matroska},
 		TestEntry{"test_webvtt_encodes_vtt", test_webvtt_encodes_vtt},
 		TestEntry{"test_mov_text_encodes_mp4", test_mov_text_encodes_mp4},
-		TestEntry{"test_ttml_encodes_matroska", test_ttml_encodes_matroska},
+		TestEntry{"test_ttml_encodes_mp4", test_ttml_encodes_mp4},
+		TestEntry{"test_ttml_rejects_matroska", test_ttml_rejects_matroska},
 		TestEntry{"test_pgssub_remuxes_sup", test_pgssub_remuxes_sup},
 	};
 	return RunSelectedTest(argc, argv, tests);

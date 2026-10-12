@@ -323,6 +323,7 @@ void Denoise::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"denoise wait ch={} pts={}", src.Channels(), src.Pts()));
 		return;
@@ -330,7 +331,7 @@ void Denoise::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"denoise ch={} samples={} pts={}",
 		out.Channels(), out.NbSamples(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Denoise::Eof() noexcept {
@@ -350,7 +351,7 @@ void Denoise::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

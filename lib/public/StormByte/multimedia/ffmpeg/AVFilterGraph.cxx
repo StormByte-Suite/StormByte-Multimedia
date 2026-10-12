@@ -86,7 +86,9 @@ FFmpeg::AVFilterGraph::AVFilterGraph(AVFilterGraph&& other) noexcept
 	m_ch(other.m_ch),
 	m_mask(other.m_mask),
 	m_graph(std::move(other.m_graph)),
-	m_closed(other.m_closed) {
+	m_closed(other.m_closed),
+	m_endPts(other.m_endPts),
+	m_timeBase(other.m_timeBase) {
 	other.m_src = nullptr;
 	other.m_sink = nullptr;
 	other.m_w = 0;
@@ -116,6 +118,8 @@ FFmpeg::AVFilterGraph& FFmpeg::AVFilterGraph::operator=(AVFilterGraph&& other) n
 		m_mask = other.m_mask;
 		m_graph = std::move(other.m_graph);
 		m_closed = other.m_closed;
+		m_endPts = other.m_endPts;
+		m_timeBase = other.m_timeBase;
 		other.m_src = nullptr;
 		other.m_sink = nullptr;
 		other.m_w = 0;
@@ -155,6 +159,8 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 		return AVFilterGraph(nullptr);
 
 	char args[512];
+	const auto timeBase = src.TimeBase().Valid() ? src.TimeBase()
+		: FFmpeg::AVRational{1, video ? 1 : src.SampleRate()};
 	if (video) {
 		const auto sar = src.SampleAspectRatio();
 		int sarN = sar.Valid() ? sar.num : 1;
@@ -164,8 +170,8 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 		if (sarD <= 0)
 			sarD = 1;
 		std::snprintf(args, sizeof(args),
-			"video_size=%dx%d:pix_fmt=%d:time_base=1/1:pixel_aspect=%d/%d",
-			src.Width(), src.Height(), src.Format(), sarN, sarD);
+			"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
+			src.Width(), src.Height(), src.Format(), timeBase.num, timeBase.den, sarN, sarD);
 	} else {
 		const char* fmt = av_get_sample_fmt_name(static_cast<AVSampleFormat>(src.Format()));
 		if (!fmt) {
@@ -181,8 +187,8 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 			described = std::to_string(src.Channels());
 		std::snprintf(layout, sizeof(layout), "%s", described.c_str());
 		std::snprintf(args, sizeof(args),
-			"time_base=1/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
-			src.SampleRate(), src.SampleRate(), fmt, layout);
+			"time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
+			timeBase.num, timeBase.den, src.SampleRate(), fmt, layout);
 	}
 
 	AVFilterContext* in = nullptr;
@@ -237,12 +243,16 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	wrap.m_mask = audio ? src.ChannelLayout().Mask() : 0;
 	wrap.m_graph = chain;
 	wrap.m_closed = false;
+	wrap.m_timeBase = timeBase;
 	return wrap;
 }
 
 bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) noexcept {
 	const bool video = src.Width() > 0 && src.Height() > 0;
+	const auto timeBase = src.TimeBase().Valid() ? src.TimeBase()
+		: FFmpeg::AVRational{1, video ? 1 : src.SampleRate()};
 	const bool same = m_ptr && m_src && m_sink && !m_closed
+		&& m_timeBase.num == timeBase.num && m_timeBase.den == timeBase.den
 		&& m_graph == StormByte::Safe::String{graph}
 		&& m_fmt == src.Format()
 		&& m_w == (video ? src.Width() : 0)
@@ -260,31 +270,45 @@ bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) n
 }
 
 bool FFmpeg::AVFilterGraph::Filter(const AVFrame& src, AVFrame& dst) const noexcept {
-	if (!m_ptr || !m_src || !m_sink || m_closed || !src.Get() || !dst.Get())
+	if (!m_ptr || !m_src || !m_sink || m_closed || !src.Get())
 		return false;
 	if (av_buffersrc_add_frame_flags(m_src, const_cast<::AVFrame*>(src.Get()),
 			AV_BUFFERSRC_FLAG_KEEP_REF) < 0)
 		return false;
+	if (src.Pts() != AV_NOPTS_VALUE)
+		m_endPts = src.Pts() + (src.DurationTicks() > 0 ? src.DurationTicks() : 0);
+	return Receive(dst);
+}
+
+bool FFmpeg::AVFilterGraph::Receive(AVFrame& dst) const noexcept {
+	if (!m_ptr || !m_sink)
+		return false;
+	if (!dst.Get())
+		dst.Reset(av_frame_alloc());
+	if (!dst.Get())
+		return false;
 	av_frame_unref(dst.Get());
 	const int rc = av_buffersink_get_frame(m_sink, dst.Get());
-	if (rc == AVERROR(EAGAIN) || rc == AVERROR_EOF)
+	if (rc == AVERROR(EAGAIN) || rc == AVERROR_EOF) {
+		dst.Reset(nullptr);
 		return true;
+	}
+	if (rc >= 0) {
+		const auto timeBase = av_buffersink_get_time_base(m_sink);
+		dst.TimeBase(FFmpeg::AVRational{timeBase.num, timeBase.den});
+	}
 	return rc >= 0;
 }
 
 bool FFmpeg::AVFilterGraph::Flush(AVFrame& dst) noexcept {
-	if (!m_ptr || !m_src || !m_sink || !dst.Get())
+	if (!m_ptr || !m_src || !m_sink)
 		return false;
 	if (!m_closed) {
-		if (av_buffersrc_close(m_src, AV_NOPTS_VALUE, 0) < 0)
+		if (av_buffersrc_close(m_src, m_endPts, 0) < 0)
 			return false;
 		m_closed = true;
 	}
-	av_frame_unref(dst.Get());
-	const int rc = av_buffersink_get_frame(m_sink, dst.Get());
-	if (rc == AVERROR(EAGAIN) || rc == AVERROR_EOF)
-		return true;
-	return rc >= 0;
+	return Receive(dst);
 }
 
 void FFmpeg::AVFilterGraph::Free() noexcept {
@@ -298,6 +322,8 @@ void FFmpeg::AVFilterGraph::Free() noexcept {
 	m_mask = 0;
 	m_graph.clear();
 	m_closed = false;
+	m_endPts = AV_NOPTS_VALUE;
+	m_timeBase = FFmpeg::AVRational{0, 1};
 	if (m_ptr)
 		avfilter_graph_free(&m_ptr);
 }

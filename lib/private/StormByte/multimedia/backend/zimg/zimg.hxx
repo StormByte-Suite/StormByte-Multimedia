@@ -185,6 +185,11 @@ namespace StormByte::Multimedia::Backend {
 				int srcW = 0;						///< Cached source width
 				int srcH = 0;						///< Cached source height
 				int srcFmt = 0;						///< Cached source format
+				int srcTransfer = 0;					///< Cached source transfer
+				int srcPrimaries = 0;				///< Cached source primaries
+				int srcMatrix = 0;					///< Cached source matrix
+				int srcRange = 0;					///< Cached source range
+				int srcChroma = 0;					///< Cached source chroma location
 				int dstW = 0;						///< Cached destination width
 				int dstH = 0;						///< Cached destination height
 				int dstFmt = 0;						///< Cached destination format

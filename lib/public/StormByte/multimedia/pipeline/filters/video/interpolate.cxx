@@ -124,6 +124,7 @@ void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"interpolate wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
@@ -139,7 +140,7 @@ void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"interpolate {}/{} {}x{} pts={}",
 		m_num, m_den, out.Width(), out.Height(), out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
 }
 
 void Interpolate::Eof() noexcept {
@@ -156,7 +157,7 @@ void Interpolate::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"interpolate flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
 	}
 	m_graph.reset();
 }

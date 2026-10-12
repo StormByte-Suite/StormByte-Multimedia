@@ -186,6 +186,7 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"downmix wait {}ch->{} pts={}",
 			have, ToString(m_target), src.Pts()));
@@ -196,7 +197,7 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 		"downmix {}ch->{} ({}) pts={}",
 		have, ToString(m_target),
 		m_pan ? "pan" : "aformat", out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Downmix::Eof() noexcept {
@@ -213,7 +214,7 @@ void Downmix::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"downmix flush {}ch pts={}",
 			out.Channels(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }

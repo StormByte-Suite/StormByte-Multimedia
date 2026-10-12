@@ -182,8 +182,8 @@ namespace StormByte::Multimedia::Backend {
 				? static_cast<zimg_color_primaries_e>(primaries)
 				: ZIMG_PRIMARIES_UNSPECIFIED;
 			const int chroma = src.ChromaLocation();
-			in.chroma_location = (chroma >= 0)
-				? static_cast<zimg_chroma_location_e>(chroma)
+			in.chroma_location = (chroma >= AVCHROMA_LOC_LEFT && chroma <= AVCHROMA_LOC_BOTTOM)
+				? static_cast<zimg_chroma_location_e>(chroma - AVCHROMA_LOC_LEFT)
 				: ZIMG_CHROMA_LEFT;
 			out.pixel_range = in.pixel_range;
 			out.matrix_coefficients = in.matrix_coefficients;
@@ -408,6 +408,11 @@ namespace StormByte::Multimedia::Backend {
 		slot.srcW = src.Width();
 		slot.srcH = src.Height();
 		slot.srcFmt = src.Format();
+		slot.srcTransfer = src.ColorTransfer();
+		slot.srcPrimaries = src.ColorPrimaries();
+		slot.srcMatrix = src.ColorSpace();
+		slot.srcRange = src.ColorRange();
+		slot.srcChroma = src.ChromaLocation();
 		slot.dstW = dst.Width();
 		slot.dstH = dst.Height();
 		slot.dstFmt = dst.Format();
@@ -478,6 +483,9 @@ namespace StormByte::Multimedia::Backend {
 		for (auto& slot : m_slots) {
 			if (!slot.strips.empty()
 				&& slot.srcW == srcW && slot.srcH == srcH && slot.srcFmt == srcFmt
+				&& slot.srcTransfer == src.ColorTransfer() && slot.srcPrimaries == src.ColorPrimaries()
+				&& slot.srcMatrix == src.ColorSpace() && slot.srcRange == src.ColorRange()
+				&& slot.srcChroma == src.ChromaLocation()
 				&& slot.dstW == dstW && slot.dstH == dstH && slot.dstFmt == dstFmt
 				&& slot.filter == key
 				&& slot.outTransfer == transfer && slot.outPrimaries == primaries

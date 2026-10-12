@@ -496,6 +496,15 @@ int FFmpeg::AVFrame::ColorPrimaries() const noexcept {
 	return m_ptr ? static_cast<int>(m_ptr->color_primaries) : 0;
 }
 
+FFmpeg::AVRational FFmpeg::AVFrame::TimeBase() const noexcept {
+	return m_ptr ? FFmpeg::FromRaw(m_ptr->time_base) : FFmpeg::AVRational{0, 1};
+}
+
+void FFmpeg::AVFrame::TimeBase(FFmpeg::AVRational timeBase) noexcept {
+	if (m_ptr)
+		m_ptr->time_base = FFmpeg::ToRaw(timeBase);
+}
+
 void FFmpeg::AVFrame::ColorPrimaries(int primaries) noexcept {
 	if (m_ptr)
 		m_ptr->color_primaries = static_cast<AVColorPrimaries>(primaries);

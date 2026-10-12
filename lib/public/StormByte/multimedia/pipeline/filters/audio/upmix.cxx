@@ -229,6 +229,7 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
+		Drop();
 		Log(Level::LowLevel, std::format(
 			"upmix wait {}ch->{} pts={}",
 			have, ToString(m_target), src.Pts()));
@@ -243,7 +244,7 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, std::format(
 		"upmix {}ch->{} ({}) pts={}",
 		have, ToString(m_target), how, out.Pts()));
-	Save(std::move(out));
+	EmitGraph(*m_graph, std::move(out));
 }
 
 void Upmix::Eof() noexcept {
@@ -260,7 +261,7 @@ void Upmix::Eof() noexcept {
 		Log(Level::LowLevel, std::format(
 			"upmix flush {}ch pts={}",
 			out.Channels(), out.Pts()));
-		Save(std::move(out));
+		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
 }
