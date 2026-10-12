@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/video.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
+#include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
@@ -262,6 +263,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 		if (!raw.Load(data, static_cast<int>(n), owner.Index(), packet->KeyFrame())) {
 			owner.Fail("out of memory copying packet");
+			return false;
+		}
+		if (!StormByte::Multimedia::Backend::Pipeline::Packet::CopyProperties(*packet, raw)) {
+			owner.Fail("failed to copy video packet properties");
 			return false;
 		}
 

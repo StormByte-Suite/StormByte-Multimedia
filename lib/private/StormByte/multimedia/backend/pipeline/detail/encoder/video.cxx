@@ -313,8 +313,11 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	Features need = owner.Require();
 	const bool keepsHdr = RowKeeps(owner, Feature::HDR10);
 	const bool keepsDovi = RowKeeps(owner, Feature::DOVI);
-	if (keepsHdr && frame.Video() && frame.Video()->HDR10())
+	if (keepsHdr && frame.Video() && frame.Video()->HDR10()) {
 		need.Add(Feature::HDR10);
+		if (frame.Video()->HDR10()->IsHDR10Plus())
+			need.Add(Feature::HDR10Plus);
+	}
 	if (keepsDovi && ((frame.Video() && frame.Video()->DOVI() && frame.Video()->DOVI()->Present())
 		|| handle->SideData(AV_FRAME_DATA_DOVI_METADATA) || handle->SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER)))
 		need.Add(Feature::DOVI);

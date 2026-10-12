@@ -170,8 +170,6 @@ FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext*
 	AVFormatContext out(ctx, nullptr, true);
 	if (harvest)
 		out.HarvestSideData();
-	else if (ctx)
-		av_seek_frame(ctx, -1, 0, AVSEEK_FLAG_BACKWARD);
 	return out;
 }
 

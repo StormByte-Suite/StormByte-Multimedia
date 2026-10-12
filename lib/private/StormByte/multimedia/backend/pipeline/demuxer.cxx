@@ -157,6 +157,10 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 		owner.Fail("reader open failed");
 		return false;
 	}
+	if (!reader.Rewind()) {
+		owner.Fail("reader rewind failed");
+		return false;
+	}
 
 	m_ctx->avio.emplace(reader);
 	if (!m_ctx->avio->Arm() || !m_ctx->avio->Context()) {
@@ -289,14 +293,23 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 			break;
 		}
 
+		if (!holder->Handle()) {
+			owner.Fail("out of memory retaining demuxed packet");
+			return {};
+		}
+		std::swap(holder->Handle(), m_ctx->scratch);
+		const auto pts = TicksToPts(holder->Handle().Pts(), tb);
+		const auto dts = TicksToPts(holder->Handle().Dts(), tb);
+		const auto duration = TicksToDuration(holder->Handle().Duration(), tb);
+		const bool keyframe = (holder->Handle().Flags() & AV_PKT_FLAG_KEY) != 0;
 		auto packet = owner.Wrap(
 			index,
 			KindOf(*m_ctx->format, index),
 			StormByte::Buffer::FIFO{std::move(bytes)},
-			TicksToPts(m_ctx->scratch.Pts(), tb),
-			TicksToPts(m_ctx->scratch.Dts(), tb),
-			TicksToDuration(m_ctx->scratch.Duration(), tb),
-			(m_ctx->scratch.Flags() & AV_PKT_FLAG_KEY) != 0,
+			pts,
+			dts,
+			duration,
+			keyframe,
 			std::move(holder)
 		);
 		m_ctx->scratch.Unref();

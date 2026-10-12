@@ -206,6 +206,17 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			static bool CopyProperties(const StormByte::Multimedia::Pipeline::Packet& packet,
 				::AVPacket* destination) noexcept;
 
+			/**
+			 * @brief Copies packet properties while keeping raw destination access private.
+			 * @param packet Source packet whose payload remains untouched.
+			 * @param destination Native wrapper receiving packet properties.
+			 * @return Whether all packet properties were copied successfully.
+			 */
+			static bool CopyProperties(const StormByte::Multimedia::Pipeline::Packet& packet,
+				StormByte::Multimedia::FFmpeg::AVPacket& destination) noexcept {
+				return CopyProperties(packet, destination.Get());
+			}
+
 		private:
 			StormByte::Multimedia::FFmpeg::AVPacket m_handle;	///< FFmpeg packet
 			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVCodecParameters> m_params;	///< Producer codecpar.

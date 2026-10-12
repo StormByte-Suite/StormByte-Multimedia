@@ -21,6 +21,15 @@ Both fixtures contain one HEVC Main 10 stream, 320x192, 24 fps, 48 frames and tw
 
 The combined fixture has mastering-display primaries G(13250,34500), B(7500,3000), R(34000,16000) and white point WP(15635,16450), with chromaticity denominator 50000; maximum/minimum luminance 4000/0.005 nits; MaxCLL 636 and MaxFALL 103. `File` exposes stream configuration; decoded pipeline frames additionally expose parsed metadata and owned RPU bytes.
 
+### HDR10+
+
+- `video/hdr10plus_metadata_source.mkv`: fixed synthetic HEVC Main 10 source, 1920x1080, `yuv420p10le`, 24 fps, 48 frames and two seconds, with BT.2020 primaries, BT.2020 NCL matrix and PQ transfer. It combines the existing `hdr10_metadata_source.mkv` picture source with registered SMPTE ST 2094-40 dynamic metadata; it is not calibrated HDR content.
+- `video/hdr10plus_metadata.json`: the retained authoring metadata, HDR10+ profile A, JSON version 1.0, application version 1, one window and 48 frame entries. Two distinct payloads alternate on successive frames: targeted display luminance 400/600 nits, different MaxSCL, average/percentile distributions, knee points and four Bezier anchors. Tests construct these expected values in-process, without a JSON reader or authoring-tool dependency.
+
+Static mastering metadata: G(13250,34500), B(7500,3000), R(34000,16000), WP(15635,16450), denominator 50000; maximum/minimum luminance 1000/0.005 nits; MaxCLL 1000 and MaxFALL 400. A one-off `ffprobe` validation on 2026-10-12 found 48 decoded frames, each carrying mastering-display, content-light and HDR10+ side data. Strict `hdr10plus_tool` extraction checks the registered HEVC SEI against the retained JSON. These tools are fixture-authoring/validation tools only, never repository test dependencies; tests do not regenerate either file.
+
+The in-process HDR10+ suite checks public `File` detection against the static-only fixture, registry capabilities, Matroska remux, x265 HEVC, libaom AV1 and both native/libvpx VP9 decoders. Every hop compares all 48 normalized T.35 payloads, monotonic 24 fps timestamps within Matroska's 1 ms rounding, color properties and static HDR10, allowing only AV1 static-metadata quantization. The HEVC -> AV1 -> HEVC case also remuxes final HEVC to an elementary stream and requires native decoded `AVFrame` HDR10+ side data on every frame, proving registered SEI preservation independently of Matroska BlockAdditions. Raw-stream decoding is compared in display order, without a container timestamp requirement. VP9 support is limited to the existing Matroska ITU-T T.35 BlockAddition route, not invented VP9 bitstream metadata.
+
 ## Audio
 
 - `audio/noise_stereo.wav` and `audio/noise_stereo.mp3`: stereo PCM and MP3 sources.

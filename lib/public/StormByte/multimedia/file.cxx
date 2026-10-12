@@ -346,10 +346,12 @@ bool File::DetectHdr10Plus(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector
 			decoders[source.Index()] = StormByte::Safe::Shared<FFmpeg::AVDecoder>::MakePointer<FFmpeg::AVDecoder>(std::move(*opened));
 	}
 	int decodedFrames = 0;
-	const auto collect = [&streams, &decodedFrames](FFmpeg::AVDecoder& decoder) {
+	const auto collect = [&streams, &found, &decodedFrames](FFmpeg::AVDecoder& decoder) {
 		FFmpeg::AVFrame frame;
 		while (decodedFrames < Hdr10PlusVideoPackets && decoder.ReceiveFrame(frame) == FFmpeg::OperationResult::Success) {
 			++decodedFrames;
+			if (frame.SideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS))
+				found.insert(decoder.StreamIndex());
 			const auto* metadata = frame.SideData(AV_FRAME_DATA_DOVI_METADATA);
 			const auto* rpu = frame.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER);
 			if (metadata || rpu) {
