@@ -27,7 +27,7 @@ buildmaster_component(
 	"${WEBP_SRC_DIR}"
 	"${WEBP_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
-	"webp;webpdemux;webpmux;sharpyuv"
+	"webpdemux;webpmux;webp;sharpyuv"
 	"GIT={RESET;PATCH={${WEBP_PATCHES}};TITLE=libwebp pkg-config}"
 )
 buildmaster_group_add(ff-video webp)
