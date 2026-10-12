@@ -157,7 +157,7 @@ else()
 	buildmaster_group_add(ff-plugins ffmpeg)
 	buildmaster_link(ffmpeg ffmpeg-plugins)
 
-	# Static: one rescanned archive plus WHOLE plugins. Shared: the
+	# Static: one rescanned archive plus normally extracted plugins. Shared: the
 	# component INTERFACE already carries the plugins. LINK= stays on
 	# the pack because REPACK does not copy it from ffmpeg.
 	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")

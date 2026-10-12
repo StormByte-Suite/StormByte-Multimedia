@@ -3,9 +3,9 @@ include(helpers.cmake)
 buildmaster_group(ff-plugins "FFmpeg plugins")
 
 if(WIN32)
-	set(_FFMPEG_PLUGINS_OPTS "TOOLCHAIN=msvc;WHOLE;REQUIRE_TOOL=pkgconfig")
+	set(_FFMPEG_PLUGINS_OPTS "TOOLCHAIN=msvc;REQUIRE_TOOL=pkgconfig")
 else()
-	set(_FFMPEG_PLUGINS_OPTS "WHOLE;REQUIRE_TOOL=pkgconfig")
+	set(_FFMPEG_PLUGINS_OPTS "REQUIRE_TOOL=pkgconfig")
 endif()
 
 if(CMAKE_INTERPROCEDURAL_OPTIMIZATION
