@@ -16,6 +16,9 @@ if(WITH_VMAF STREQUAL "SYSTEM")
 	message(STATUS "VMAF ${VMAF_VERSION} [SYSTEM] include=${VMAF_INCLUDE_DIRS}")
 elseif(WITH_VMAF STREQUAL "BUNDLED")
 	set(VMAF_GIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+	target_include_directories(StormByte-Multimedia BEFORE PRIVATE
+		"${VMAF_GIT_DIR}/libvmaf/include"
+	)
 
 	set(VMAF_COMPONENT "VMAF library")
 	set(VMAF_OPTIONS

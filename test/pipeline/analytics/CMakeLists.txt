@@ -3,3 +3,11 @@ target_link_libraries(MultimediaPipelineAnalyticsTests PRIVATE multimedia_pipeli
 
 add_pipeline_test(MultimediaPipelineAnalyticsTests test_transcoder_vmaf_remux_matches_source_at_100)
 add_pipeline_test(MultimediaPipelineAnalyticsTests test_transcoder_vmaf_hevc_remux_matches_source_at_100)
+
+add_executable(MultimediaPipelineVmafApiTests vmaf_api_test.cxx)
+target_link_libraries(MultimediaPipelineVmafApiTests PRIVATE multimedia_test_support vmaf)
+if(WITH_VMAF STREQUAL "BUNDLED")
+	target_include_directories(MultimediaPipelineVmafApiTests BEFORE PRIVATE
+		"${PROJECT_SOURCE_DIR}/thirdparty/vmaf/src/libvmaf/include")
+endif()
+add_pipeline_test(MultimediaPipelineVmafApiTests test_vmaf_picture_api_contract)
