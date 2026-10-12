@@ -189,8 +189,10 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 
 			/**
 			 * @brief Stops every feeder and joins.
+			 * @param cancelPending Aborts pending output while the owning stage is alive.
+			 * Final worker destruction only joins and does not access the owning stage.
 			 */
-			void StopFeed() noexcept;
+			void StopFeed(bool cancelPending = false) noexcept;
 
 			/**
 			 * @brief Whether any park still holds a packet.

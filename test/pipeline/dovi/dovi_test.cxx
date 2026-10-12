@@ -90,6 +90,7 @@ namespace {
 	constexpr Fixture dovi_hdr10{"video/dovi_hdr10.mkv", "dovi-hdr10", 8, 1, true};
 
 	enum class DoviComparison { Exact, Regenerated };
+	enum class HdrComparison { Exact, Av1Quantized };
 
 	struct NativeMetadata {
 		AVDOVIMetadata metadata{};
@@ -134,8 +135,14 @@ namespace {
 		TEST_REQUIRE(dovi.ConfigurationPresent());
 		TEST_REQUIRE(dovi.VersionMajor() == 1);
 		TEST_REQUIRE(dovi.VersionMinor() == 0);
+		if (dovi.Profile() != fixture.profile)
+			std::cerr << "[DETAIL] Dolby Vision profile: expected=" << static_cast<unsigned>(fixture.profile)
+				<< " actual=" << static_cast<unsigned>(dovi.Profile()) << std::endl;
 		TEST_REQUIRE(dovi.Profile() == fixture.profile);
-		TEST_REQUIRE(dovi.Level() == 1);
+		if (fixture.profile == 10)
+			TEST_REQUIRE(dovi.Level() > 0);
+		else
+			TEST_REQUIRE(dovi.Level() == 1);
 		TEST_REQUIRE(dovi.CompatibilityId() == fixture.compatibility);
 		TEST_REQUIRE(dovi.Compression() == 0);
 		TEST_REQUIRE(dovi.RpuPresent());
@@ -176,8 +183,8 @@ namespace {
 			TEST_REQUIRE(std::ranges::equal(after.Rpu(), before.Rpu()));
 		else {
 			TEST_REQUIRE(before.MetadataPresent());
-			TEST_REQUIRE(!before.Rpu().empty());
-			TEST_REQUIRE(!after.Rpu().empty());
+			TEST_REQUIRE(before.Rpu().empty() == (before.Profile() == 10));
+			TEST_REQUIRE(after.Rpu().empty() == (after.Profile() == 10));
 			TEST_REQUIRE(after.Compression() == 0);
 		}
 		return 0;
@@ -225,12 +232,17 @@ namespace {
 		return 0;
 	}
 
-	bool same_point(const Property::Point& before, const Property::Point& after) {
-		return before.X() == after.X() && before.Y() == after.Y();
+	bool same_point(const Property::Point& before, const Property::Point& after,
+		int tolerance_x = 0, int tolerance_y = 0) {
+		const auto difference_x = static_cast<std::int64_t>(before.X()) - after.X();
+		const auto difference_y = static_cast<std::int64_t>(before.Y()) - after.Y();
+		return difference_x >= -tolerance_x && difference_x <= tolerance_x
+			&& difference_y >= -tolerance_y && difference_y <= tolerance_y;
 	}
 
 	int check_same_video(const Property::Video& before, const Property::Video& after,
-		DoviComparison comparison = DoviComparison::Exact) {
+		DoviComparison comparison = DoviComparison::Exact,
+		HdrComparison hdr_comparison = HdrComparison::Exact) {
 		TEST_REQUIRE(after.Resolution().Width() == before.Resolution().Width());
 		TEST_REQUIRE(after.Resolution().Height() == before.Resolution().Height());
 		TEST_REQUIRE(after.Color().PixelFormat() == before.Color().PixelFormat());
@@ -247,11 +259,15 @@ namespace {
 			const auto actual = after.HDR10().value();
 			TEST_REQUIRE(actual.Origin() == original.Origin());
 			TEST_REQUIRE(actual.IsHDR10Plus() == original.IsHDR10Plus());
-			TEST_REQUIRE(same_point(original.Red(), actual.Red()));
-			TEST_REQUIRE(same_point(original.Green(), actual.Green()));
-			TEST_REQUIRE(same_point(original.Blue(), actual.Blue()));
-			TEST_REQUIRE(same_point(original.White(), actual.White()));
-			TEST_REQUIRE(same_point(original.Luminance(), actual.Luminance()));
+			const int chroma_tolerance = hdr_comparison == HdrComparison::Av1Quantized ? 1 : 0;
+			const int min_luminance_tolerance = hdr_comparison == HdrComparison::Av1Quantized ? 1 : 0;
+			const int max_luminance_tolerance = hdr_comparison == HdrComparison::Av1Quantized ? 20 : 0;
+			TEST_REQUIRE(same_point(original.Red(), actual.Red(), chroma_tolerance, chroma_tolerance));
+			TEST_REQUIRE(same_point(original.Green(), actual.Green(), chroma_tolerance, chroma_tolerance));
+			TEST_REQUIRE(same_point(original.Blue(), actual.Blue(), chroma_tolerance, chroma_tolerance));
+			TEST_REQUIRE(same_point(original.White(), actual.White(), chroma_tolerance, chroma_tolerance));
+			TEST_REQUIRE(same_point(original.Luminance(), actual.Luminance(),
+				min_luminance_tolerance, max_luminance_tolerance));
 			TEST_REQUIRE(actual.LightLevel().has_value() == original.LightLevel().has_value());
 			if (original.LightLevel())
 				TEST_REQUIRE(same_point(original.LightLevel().value(), actual.LightLevel().value()));
@@ -434,7 +450,8 @@ namespace {
 	};
 
 	int check_decoded_frames(const FrameAudit& before, const FrameAudit& after, const Fixture& fixture,
-		DoviComparison comparison = DoviComparison::Exact) {
+		DoviComparison comparison = DoviComparison::Exact, const Fixture* output_fixture = nullptr,
+		HdrComparison hdr_comparison = HdrComparison::Exact) {
 		TEST_PHASE("checking decoded frame counts and HDR/DOVI side data");
 		TEST_REQUIRE(!before.videos.empty());
 		TEST_REQUIRE(after.videos.size() == before.videos.size());
@@ -452,36 +469,46 @@ namespace {
 			TEST_REQUIRE(original.DOVI().has_value() == (fixture.profile != 0));
 			TEST_REQUIRE(original.HDR10().has_value() == fixture.hdr10);
 			const int expectedDoviSideData = fixture.profile != 0 ? 1 : 0;
+			const auto& destination_fixture = output_fixture ? *output_fixture : fixture;
+			const int expectedSourceRpu = fixture.profile != 0 && fixture.profile != 10 ? 1 : 0;
+			const int expectedDestinationRpu = destination_fixture.profile != 0
+				&& destination_fixture.profile != 10 ? 1 : 0;
 			TEST_REQUIRE(before.dovi_metadata_counts[index] == expectedDoviSideData);
-			TEST_REQUIRE(before.dovi_rpu_counts[index] == expectedDoviSideData);
+			TEST_REQUIRE(before.dovi_rpu_counts[index] == expectedSourceRpu);
 			TEST_REQUIRE(after.dovi_metadata_counts[index] == expectedDoviSideData);
-			TEST_REQUIRE(after.dovi_rpu_counts[index] == expectedDoviSideData);
+			TEST_REQUIRE(after.dovi_rpu_counts[index] == expectedDestinationRpu);
 			if (original.DOVI()) {
 				const auto dovi = original.DOVI().value();
 				TEST_REQUIRE(check_dovi(dovi, fixture) == 0);
 				TEST_REQUIRE(dovi.MetadataPresent());
-				TEST_REQUIRE(!dovi.Rpu().empty());
+				TEST_REQUIRE(dovi.Rpu().empty() == (fixture.profile == 10));
 				TEST_REQUIRE(dovi.BlBitDepth() == 10);
 				TEST_REQUIRE(dovi.VdrBitDepth() > 0);
 				TEST_REQUIRE(dovi.SignalBitDepth() > 0);
 				TEST_REQUIRE(dovi.SourceMinPq() <= dovi.SourceMaxPq());
 				TEST_REQUIRE(dovi.SourceMaxPq() <= 4095);
-				TEST_REQUIRE(before.side_data_counts[index] >= 2);
-				TEST_REQUIRE(after.side_data_counts[index] >= 2);
+				TEST_REQUIRE(before.side_data_counts[index] >= 1 + expectedSourceRpu);
+				TEST_REQUIRE(after.side_data_counts[index] >= 1 + expectedDestinationRpu);
 			}
-			TEST_REQUIRE(check_same_video(original, actual, comparison) == 0);
+			TEST_REQUIRE(check_same_video(original, actual, comparison, hdr_comparison) == 0);
 			if (actual.DOVI())
-				TEST_REQUIRE(check_dovi(actual.DOVI().value(), fixture) == 0);
+				TEST_REQUIRE(check_dovi(actual.DOVI().value(), output_fixture ? *output_fixture : fixture) == 0);
 		}
 		return 0;
 	}
 
 	enum class Transform { Remux, Encode, Watermark, Replace };
 
-	int check_pipeline(const Fixture& fixture, Transform transform, std::string_view operation) {
+	int check_pipeline(const Fixture& fixture, Transform transform, std::string_view operation,
+		std::string_view codec_name = "H.265", std::string_view implementation = "libx265") {
 		TEST_PHASE("preparing DOVI pipeline outputs");
 		const auto comparison = transform == Transform::Remux
 			? DoviComparison::Exact : DoviComparison::Regenerated;
+		const auto hdr_comparison = transform != Transform::Remux && codec_name == "AV1"
+			? HdrComparison::Av1Quantized : HdrComparison::Exact;
+		Fixture encoded_fixture = fixture;
+		if (transform != Transform::Remux && codec_name == "AV1" && fixture.profile != 0)
+			encoded_fixture.profile = 10;
 		const auto output = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 			+ "-" + std::string{operation} + ".mkv");
 		auto before = StormByte::Safe::MakeShared<FrameAudit>();
@@ -495,13 +522,21 @@ namespace {
 			if (transform == Transform::Remux)
 				track.Remux();
 			else {
-				auto codec = Registry::Instance().FindCodec("H.265");
+				auto codec = Registry::Instance().FindCodec(codec_name);
 				TEST_REQUIRE(codec);
 				if (!codec.value().get().HasAccess(Access{Operation::Write}))
 					return TEST_SKIP;
 				track.Codec(codec.value().get())
-					.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libx265"})
-					.Preset(StormByte::Safe::String{"ultrafast"});
+					.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{implementation});
+				if (implementation == "libx265")
+					track.Preset(StormByte::Safe::String{"ultrafast"});
+				else if (implementation == "libsvtav1")
+					track.Preset(StormByte::Safe::String{"12"}).CRF(40);
+				else {
+					StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+					options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+					track.FineTune(std::move(options)).BitRate(1500000);
+				}
 				track.Filter<AuditFrames>(logger, before);
 				if (transform == Transform::Watermark)
 					track.Filter<Filter::Video::Watermark>(logger,
@@ -524,7 +559,8 @@ namespace {
 			TEST_REQUIRE(check_decoded_frames(*before, *after, fixture) == 0);
 		}
 		TEST_PHASE("checking encoder output audit");
-		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, encoded_frames->destination, fixture, comparison) == 0);
+		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, encoded_frames->destination, fixture,
+			comparison, &encoded_fixture, hdr_comparison) == 0);
 		const auto verification = OutputPath("pipeline/dovi/" + std::string{fixture.name}
 			+ "-" + std::string{operation} + "-verified.mkv");
 		TEST_PHASE("opening encoded output for stream inspection");
@@ -538,11 +574,11 @@ namespace {
 		const auto stream = encoded.value().Streams()[0];
 		TEST_REQUIRE(stream.Index() == 0);
 		TEST_REQUIRE(stream.Type() == StormByte::Multimedia::Type::Video);
-		TEST_REQUIRE(stream.Codec().Name() == "H.265");
+		TEST_REQUIRE(stream.Codec().Name() == codec_name);
 		const auto original = source.value().Streams()[0].Video();
 		const auto actual = stream.Video();
 		TEST_REQUIRE(original && actual);
-		TEST_REQUIRE(check_same_video(original.value(), actual.value(), comparison) == 0);
+		TEST_REQUIRE(check_same_video(original.value(), actual.value(), comparison, hdr_comparison) == 0);
 		if (comparison == DoviComparison::Regenerated && fixture.profile == 5) {
 			TEST_REQUIRE(actual.value().Color().Space() == Property::Space::IPTC2);
 			TEST_REQUIRE(actual.value().Color().Primaries() == Property::Primaries::BT2020);
@@ -550,7 +586,7 @@ namespace {
 			TEST_REQUIRE(!actual.value().HDR10());
 		}
 		if (actual.value().DOVI())
-			TEST_REQUIRE(check_dovi(actual.value().DOVI().value(), fixture) == 0);
+			TEST_REQUIRE(check_dovi(actual.value().DOVI().value(), encoded_fixture) == 0);
 		const auto duration = encoded.value().Duration();
 		TEST_REQUIRE(duration && duration.value().Nanoseconds().count() > 0);
 		auto reopened_frames = StormByte::Safe::MakeShared<EncodedAudit>();
@@ -580,8 +616,9 @@ namespace {
 				== verifiedFrameRate->num * sourceFrameRate->den);
 		}
 		TEST_PHASE("checking reopened encoded frames");
-		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, reopened_frames->source, fixture, comparison) == 0);
-		TEST_REQUIRE(check_decoded_frames(reopened_frames->source, reopened_frames->destination, fixture) == 0);
+		TEST_REQUIRE(check_decoded_frames(encoded_frames->source, reopened_frames->source, fixture,
+			comparison, &encoded_fixture, hdr_comparison) == 0);
+		TEST_REQUIRE(check_decoded_frames(reopened_frames->source, reopened_frames->destination, encoded_fixture) == 0);
 		return 0;
 	}
 
@@ -885,6 +922,18 @@ int test_dovi_decoder_table_capabilities() {
 int test_dovi_encoder_table_capabilities() {
 	const auto table = Tables::Encoder::Video();
 	constexpr std::array enabled{std::string_view{"libx265"}, std::string_view{"libsvtav1"}, std::string_view{"libaom-av1"}};
+	constexpr std::array hdr10_enabled{
+		std::string_view{"libx265"}, std::string_view{"libsvtav1"}, std::string_view{"libaom-av1"},
+		std::string_view{"libvpx-vp9"}, std::string_view{"hevc_nvenc"},
+		std::string_view{"hevc_qsv"}, std::string_view{"hevc_vaapi"}
+	};
+	for (const auto name : hdr10_enabled) {
+		const auto found = std::ranges::find_if(table, [name](const auto& row) {
+			return std::string_view{row.name} == name;
+		});
+		TEST_REQUIRE(found != table.end());
+		TEST_REQUIRE(found->features.Has(Feature::HDR10));
+	}
 	for (const auto name : enabled) {
 		const auto found = std::ranges::find_if(table, [name](const auto& row) {
 			return std::string_view{row.name} == name;
@@ -895,6 +944,8 @@ int test_dovi_encoder_table_capabilities() {
 	for (const auto& row : table) {
 		const bool expected = std::ranges::find(enabled, std::string_view{row.name}) != enabled.end();
 		TEST_REQUIRE(row.features.Has(Feature::DOVI) == expected);
+		const bool hdr10_expected = std::ranges::find(hdr10_enabled, std::string_view{row.name}) != hdr10_enabled.end();
+		TEST_REQUIRE(row.features.Has(Feature::HDR10) == hdr10_expected);
 		if (expected)
 			TEST_REQUIRE(!row.features.Has(Feature::HardwareAcceleration));
 	}
@@ -903,6 +954,24 @@ int test_dovi_encoder_table_capabilities() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_reencode_svt_av1_dovi_only", [] { return check_pipeline(dovi_only, Transform::Encode, "reencode-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_reencode_svt_av1_hdr10_only", [] { return check_pipeline(hdr10_only, Transform::Encode, "reencode-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_reencode_svt_av1_dovi_hdr10", [] { return check_pipeline(dovi_hdr10, Transform::Encode, "reencode-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_watermark_svt_av1_dovi_only", [] { return check_pipeline(dovi_only, Transform::Watermark, "watermark-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_watermark_svt_av1_hdr10_only", [] { return check_pipeline(hdr10_only, Transform::Watermark, "watermark-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_watermark_svt_av1_dovi_hdr10", [] { return check_pipeline(dovi_hdr10, Transform::Watermark, "watermark-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_replace_frame_svt_av1_dovi_only", [] { return check_pipeline(dovi_only, Transform::Replace, "replace-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_replace_frame_svt_av1_hdr10_only", [] { return check_pipeline(hdr10_only, Transform::Replace, "replace-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_replace_frame_svt_av1_dovi_hdr10", [] { return check_pipeline(dovi_hdr10, Transform::Replace, "replace-svt-av1", "AV1", "libsvtav1"); }},
+		TestEntry{"test_reencode_aom_av1_dovi_only", [] { return check_pipeline(dovi_only, Transform::Encode, "reencode-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_reencode_aom_av1_hdr10_only", [] { return check_pipeline(hdr10_only, Transform::Encode, "reencode-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_reencode_aom_av1_dovi_hdr10", [] { return check_pipeline(dovi_hdr10, Transform::Encode, "reencode-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_watermark_aom_av1_dovi_only", [] { return check_pipeline(dovi_only, Transform::Watermark, "watermark-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_watermark_aom_av1_hdr10_only", [] { return check_pipeline(hdr10_only, Transform::Watermark, "watermark-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_watermark_aom_av1_dovi_hdr10", [] { return check_pipeline(dovi_hdr10, Transform::Watermark, "watermark-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_replace_frame_aom_av1_dovi_only", [] { return check_pipeline(dovi_only, Transform::Replace, "replace-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_replace_frame_aom_av1_hdr10_only", [] { return check_pipeline(hdr10_only, Transform::Replace, "replace-aom-av1", "AV1", "libaom-av1"); }},
+		TestEntry{"test_replace_frame_aom_av1_dovi_hdr10", [] { return check_pipeline(dovi_hdr10, Transform::Replace, "replace-aom-av1", "AV1", "libaom-av1"); }},
 		TestEntry{"test_file_dovi_only_configuration_and_metadata", test_file_dovi_only_configuration_and_metadata},
 		TestEntry{"test_file_hdr10_only_without_dovi", test_file_hdr10_only_without_dovi},
 		TestEntry{"test_file_dovi_hdr10_configuration_and_metadata", test_file_dovi_hdr10_configuration_and_metadata},

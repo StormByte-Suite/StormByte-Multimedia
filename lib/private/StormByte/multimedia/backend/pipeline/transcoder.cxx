@@ -394,6 +394,23 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	};
 	std::vector<EncodeLane> lanes;
 	std::vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Remuxer>> remuxes;
+	auto stopStages = [&]() noexcept {
+		demux->Stop();
+		mux->Stop();
+		for (auto& lane : lanes) {
+			lane.Decoder->Stop();
+			lane.Encoder->Stop();
+		}
+		for (auto& remux : remuxes)
+			remux->Stop();
+	};
+	struct StageCancellation {
+		decltype(stopStages)& Action;
+
+		~StageCancellation() noexcept {
+			Action();
+		}
+	} cancellation{stopStages};
 
 	int muxIndex = 0;
 	for (auto& slot : Mapped) {

@@ -51,7 +51,9 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#ifdef STORMBYTE_TEST_WITH_GPL
 #include <StormByte/multimedia/pipeline/filters/audio/rubberband.hxx>
+#endif
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
@@ -65,6 +67,10 @@ namespace {
 	int CheckAudioCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
 		std::uint8_t channels, std::string_view decoder = {}) {
+#ifdef STORMBYTE_TEST_WITHOUT_FDK_AAC
+		if (encoder == "libfdk_aac" || decoder == "libfdk_aac")
+			return TEST_SKIP;
+#endif
 		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
@@ -76,12 +82,8 @@ namespace {
 
 		auto codec = Registry::Instance().FindCodec(codecName);
 		TEST_REQUIRE(codec);
-		if (!codec.value().get().HasAccess(Access{Operation::Write})) {
-#ifdef STORMBYTE_TEST_REQUIRE_FDK_AAC
-			TEST_REQUIRE(encoder != "libfdk_aac");
-#endif
+		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
-		}
 		auto logger = MakeLogger();
 			TEST_PHASE("creating transcoder");
 			Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
@@ -97,10 +99,6 @@ namespace {
 		TEST_PHASE("starting transcoder run");
 		job.Run();
 		const int result = WaitForOptionalCodec(job);
-#ifdef STORMBYTE_TEST_REQUIRE_FDK_AAC
-		if (encoder == "libfdk_aac" || decoder == "libfdk_aac")
-			TEST_REQUIRE(result != TEST_SKIP);
-#endif
 		if (result != 0)
 			return result;
 		TEST_REQUIRE(CheckSingleAudioOutput(output, containerName, codecName, channels, 48000) == 0);
@@ -218,6 +216,7 @@ int test_eac3_encodes_stereo_matroska() {
 }
 
 int test_rubberband_stretches_stereo_wav() {
+#ifdef STORMBYTE_TEST_WITH_GPL
 	auto flac = Registry::Instance().FindCodec("FLAC");
 	TEST_REQUIRE(flac);
 	if (!flac.value().get().HasAccess(Access{Operation::Write}))
@@ -253,6 +252,9 @@ int test_rubberband_stretches_stereo_wav() {
 	TEST_REQUIRE(after * 10 < before * 8);
 	TEST_REQUIRE(after * 10 > before * 3);
 	return 0;
+#else
+	return TEST_SKIP;
+#endif
 }
 
 int main(int argc, char** argv) {

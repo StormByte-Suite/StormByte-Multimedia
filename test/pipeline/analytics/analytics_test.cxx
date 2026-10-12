@@ -94,7 +94,10 @@ static int CheckVmafRemux(std::string_view source, std::string_view destination)
 }
 
 int test_transcoder_vmaf_remux_matches_source_at_100() {
-	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-remux.mkv");
+	const int result = CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-remux.mkv");
+	if (result != 0)
+		return result;
+	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-remux-repeat.mkv");
 }
 
 int test_transcoder_vmaf_hevc_remux_matches_source_at_100() {

@@ -331,6 +331,28 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 				}
 			}
 		}
+		::AVCodecParameters* effective = avcodec_parameters_alloc();
+		if (!effective || !params.Export(effective)) {
+			avcodec_parameters_free(&effective);
+			Fail("failed to inspect look codec parameters");
+			return false;
+		}
+		StormByte::Safe::Optional<Property::DOVI> dovi;
+		if (const auto* configuration = av_packet_side_data_get(effective->coded_side_data,
+			effective->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF)) {
+			Property::DOVI parsed;
+			if (!parsed.LoadConfiguration(std::span<const std::byte>{
+				reinterpret_cast<const std::byte*>(configuration->data), configuration->size})) {
+				avcodec_parameters_free(&effective);
+				Fail("invalid look Dolby Vision configuration");
+				return false;
+			}
+			dovi = std::move(parsed);
+		}
+		avcodec_parameters_free(&effective);
+		if (video)
+			video = Property::Video(video->Color(), video->Resolution(), video->HDR10(),
+				video->FrameRate(), video->SampleAspectRatio(), std::move(dovi));
 		Bind(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Decoder::Video>(
 			std::move(*opened), timeBase, std::move(video)));
 	}

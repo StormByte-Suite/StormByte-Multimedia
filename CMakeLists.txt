@@ -20,6 +20,7 @@ include(cmake/asan.cmake)
 cmake_policy(SET CMP0079 NEW)
 
 include(cmake/load_buildmaster.cmake)
+include(cmake/filter_licenses.cmake)
 add_subdirectory(doc)
 add_subdirectory(lib)
 add_subdirectory(thirdparty)

@@ -107,8 +107,7 @@ static int CheckManualRejectsInvalidSource(std::string_view source, std::string_
 	demuxer >> video >> muxer;
 	plan >> demuxer;
 	const auto deadline = std::chrono::steady_clock::now() + 30s;
-	while (demuxer.Status() != State::Failed && demuxer.Status() != State::Stopped &&
-		std::chrono::steady_clock::now() < deadline)
+	while ((!demuxer.Failed() || !muxer.Failed()) && std::chrono::steady_clock::now() < deadline)
 		std::this_thread::sleep_for(10ms);
 	TEST_REQUIRE(demuxer.Status() == State::Failed);
 	const auto error = demuxer.Error();

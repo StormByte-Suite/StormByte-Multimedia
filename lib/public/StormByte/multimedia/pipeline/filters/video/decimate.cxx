@@ -55,7 +55,13 @@
 
 #include <algorithm>
 #include <format>
+#include <limits>
 #include <utility>
+
+extern "C" {
+	#include <libavutil/avutil.h>
+	#include <libavutil/rational.h>
+}
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -67,7 +73,7 @@ Decimate::Decimate(Safe::Shared<StormByte::Logger::Log> log,
 	Safe::Optional<unsigned> cycle,
 	Safe::Optional<double> dupthresh,
 	Safe::Optional<double> scthresh) noexcept
-	: Filter::Process(std::move(log), Safe::String("decimate")),
+	: Filter::ProcessTwoPasses(std::move(log), Safe::String("decimate")),
 	m_cycleIn(cycle), m_dupIn(dupthresh), m_scIn(scthresh) {}
 
 Decimate::~Decimate() noexcept = default;
@@ -78,10 +84,97 @@ enum Type Decimate::Media() const noexcept {
 
 void Decimate::Clean() noexcept {
 	m_graph.reset();
+	m_rate = {0, 1};
+	m_timeBase = {0, 1};
+	m_lastPts.reset();
+	m_ticks = 0;
+	m_intervals = 0;
+	m_minDelta = 0;
+	m_maxDelta = 0;
+	m_durationTicks = 0;
+	m_durationValid = true;
+	m_timingValid = true;
 }
 
 void Decimate::Setup() noexcept {
-	Clean();
+	m_graph.reset();
+}
+
+void Decimate::Observe(const FFrame& src, Property::AVRational rate) noexcept {
+	if (rate.num > 0 && rate.den > 0) {
+		m_rate = rate;
+		return;
+	}
+	const auto clock = src.TimeBase();
+	if (clock.num <= 0 || clock.den <= 0) {
+		m_timingValid = false;
+		return;
+	}
+	if (m_timeBase.num == 0)
+		m_timeBase = clock;
+	else if (m_timeBase != clock) {
+		m_timingValid = false;
+		return;
+	}
+	const auto duration = src.DurationTicks();
+	if (duration <= 0 || (m_durationTicks > 0 && duration != m_durationTicks))
+		m_durationValid = false;
+	else
+		m_durationTicks = duration;
+	const auto pts = src.Pts();
+	if (pts == AV_NOPTS_VALUE) {
+		m_lastPts.reset();
+		return;
+	}
+	if (m_lastPts) {
+		if (pts <= *m_lastPts || (*m_lastPts < 0 && pts > std::numeric_limits<std::int64_t>::max() + *m_lastPts)) {
+			m_timingValid = false;
+			return;
+		}
+		const auto delta = pts - *m_lastPts;
+		if (m_ticks > std::numeric_limits<std::int64_t>::max() - delta
+			|| m_intervals == std::numeric_limits<std::int64_t>::max()) {
+			m_timingValid = false;
+			return;
+		}
+		m_ticks += delta;
+		m_minDelta = m_intervals == 0 ? delta : std::min(m_minDelta, delta);
+		m_maxDelta = std::max(m_maxDelta, delta);
+		++m_intervals;
+	}
+	m_lastPts = pts;
+}
+
+void Decimate::Measure(const Pipeline::Frame& frame) noexcept {
+	if (frame.Type() != Type::Video)
+		return;
+	const FFrame& src = AVFrame();
+	if (!src || src.Width() <= 0 || src.Height() <= 0)
+		return;
+	Observe(src, frame.Video() && frame.Video()->FrameRate()
+		? *frame.Video()->FrameRate() : Property::AVRational{0, 1});
+}
+
+void Decimate::Measured() noexcept {
+	if (m_rate.num > 0 && m_rate.den > 0)
+		return;
+	if (!m_timingValid || m_timeBase.num <= 0 || m_timeBase.den <= 0)
+		return;
+	const auto ticks = m_intervals > 0 ? m_ticks : m_durationTicks;
+	const auto intervals = m_intervals > 0 ? m_intervals : 1;
+	if (ticks <= 0 || (m_intervals > 0 ? m_maxDelta - m_minDelta > 1 : !m_durationValid))
+		return;
+	const auto limit = std::numeric_limits<std::int64_t>::max();
+	if (intervals > limit / m_timeBase.den || ticks > limit / m_timeBase.num)
+		return;
+	Property::AVRational resolved;
+	if (av_reduce(&resolved.num, &resolved.den, intervals * m_timeBase.den,
+		ticks * m_timeBase.num, std::numeric_limits<int>::max()))
+		m_rate = resolved;
+}
+
+StormByte::Multimedia::Property::AVRational Decimate::Cadence(Property::AVRational rate) const noexcept {
+	return rate.num > 0 && rate.den > 0 ? rate : m_rate;
 }
 
 StormByte::Safe::String Decimate::Chain() const noexcept {
@@ -106,8 +199,12 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 	}
 
 	const StormByte::Safe::String chain = Chain();
-	const auto frameRate = frame.Video() && frame.Video()->FrameRate()
-		? *frame.Video()->FrameRate() : Property::AVRational{0, 1};
+	const auto frameRate = Cadence(frame.Video() && frame.Video()->FrameRate()
+		? *frame.Video()->FrameRate() : Property::AVRational{0, 1});
+	if (frameRate.num <= 0 || frameRate.den <= 0) {
+		Fail("decimate: cannot resolve a constant cadence from stream FPS or frame timing");
+		return;
+	}
 	if (!m_graph) {
 		FGraph opened = FGraph::Open(src, chain, frameRate);
 		if (!opened) {

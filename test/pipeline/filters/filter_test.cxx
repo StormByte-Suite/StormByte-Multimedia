@@ -65,7 +65,9 @@
 #include <StormByte/multimedia/pipeline/filters/audio/limiter.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/resample.hxx>
+#ifdef STORMBYTE_TEST_WITH_GPL
 #include <StormByte/multimedia/pipeline/filters/audio/rubberband.hxx>
+#endif
 #include <StormByte/multimedia/pipeline/filters/audio/upmix.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/atadenoise.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/bm3d.hxx>
@@ -85,7 +87,9 @@
 #include <StormByte/multimedia/pipeline/filters/video/nlmeans.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/pad.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
+#ifdef STORMBYTE_TEST_WITH_GPL
 #include <StormByte/multimedia/pipeline/filters/video/vaguedenoiser.hxx>
+#endif
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/yadif.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
@@ -94,6 +98,7 @@
 
 #include <array>
 #include <cstring>
+#include <limits>
 #include <string>
 
 extern "C" {
@@ -105,11 +110,40 @@ using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
 using namespace std::string_view_literals;
 
+namespace StormByte::Multimedia::Pipeline::Filter::Video {
+	/**
+	 * @brief Exercises cadence resolution without mounting a pipeline.
+	 */
+	struct DecimateCadenceTest {
+		/**
+		 * @brief Observes one source frame and optional stream cadence.
+		 * @param filter Decimate leaf under test.
+		 * @param source Source timing.
+		 * @param rate Declared cadence, or invalid when missing.
+		 */
+		static void Observe(Decimate& filter, const StormByte::Multimedia::FFmpeg::AVFrame& source,
+			Property::AVRational rate = {0, 1}) {
+			filter.Observe(source, rate);
+		}
+
+		/**
+		 * @brief Resolves current-stream or measured cadence.
+		 * @param filter Decimate leaf under test.
+		 * @param rate Current stream cadence, or invalid when missing.
+		 * @return Resolved cadence, or zero when unavailable.
+		 */
+		static Property::AVRational Cadence(const Decimate& filter,
+			Property::AVRational rate = {0, 1}) {
+			return filter.Cadence(rate);
+		}
+	};
+}
+
 namespace {
 	template<typename Attach>
 	int RunVideo(const char* leaf, Attach&& attach, unsigned width = 0,
 		unsigned height = 0, unsigned fps = 0) {
-		auto codec = Registry::Instance().FindCodec("H.264");
+		auto codec = Registry::Instance().FindCodec("VP9");
 		TEST_REQUIRE(codec);
 		if (!codec.value().get().HasAccess(Access{Operation::Write}))
 			return TEST_SKIP;
@@ -119,8 +153,12 @@ namespace {
 		Transcoder job{TestLocation(FixturePath("video/xvid_mp3_stereo.avi")), TestLocation(output), logger, 2000000000LL};
 		auto track = job.Video(0);
 		track.Codec(codec.value().get())
-			.Implementation(StormByte::Safe::String{"libx264"})
-			.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
+			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libvpx-vp9"})
+			.BitRate(1500000);
+		StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+		options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+		options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
+		track.FineTune(std::move(options));
 		attach(track, logger);
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 		TEST_PHASE("starting transcoder run");
@@ -193,6 +231,93 @@ namespace {
 		TEST_REQUIRE(job.Reports().size() >= 1);
 		return 0;
 	}
+}
+
+int test_filter_decimate_cadence_metadata_and_lifecycle() {
+	using CadenceTest = Filter::Video::DecimateCadenceTest;
+	Filter::Video::Decimate filter{{}};
+	FFmpeg::AVFrame source;
+	CadenceTest::Observe(filter, source, {30000, 1001});
+	filter.Measured();
+	filter.Setup();
+	TEST_REQUIRE((CadenceTest::Cadence(filter) == Property::AVRational{30000, 1001}));
+	TEST_REQUIRE((CadenceTest::Cadence(filter, {25, 1}) == Property::AVRational{25, 1}));
+	TEST_REQUIRE((CadenceTest::Cadence(filter, {24, 0}) == Property::AVRational{30000, 1001}));
+	filter.Clean();
+	TEST_REQUIRE(CadenceTest::Cadence(filter).num == 0);
+	return 0;
+}
+
+int test_filter_decimate_cadence_rejects_invalid_timing() {
+	using CadenceTest = Filter::Video::DecimateCadenceTest;
+	Filter::Video::Decimate filter{{}};
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocVideo(16, 16, AV_PIX_FMT_YUV420P));
+	source.TimeBase({1, 1000});
+	for (const auto pts : {0, 40, 100}) {
+		source.Pts(pts);
+		CadenceTest::Observe(filter, source);
+	}
+	filter.Measured();
+	TEST_REQUIRE(CadenceTest::Cadence(filter).num == 0);
+	filter.Clean();
+	for (const auto pts : {40, 40}) {
+		source.Pts(pts);
+		CadenceTest::Observe(filter, source);
+	}
+	filter.Measured();
+	TEST_REQUIRE(CadenceTest::Cadence(filter).num == 0);
+	filter.Clean();
+	source.Pts(std::numeric_limits<std::int64_t>::min() + 1);
+	CadenceTest::Observe(filter, source);
+	source.Pts(std::numeric_limits<std::int64_t>::max());
+	CadenceTest::Observe(filter, source);
+	filter.Measured();
+	TEST_REQUIRE(CadenceTest::Cadence(filter).num == 0);
+	filter.Clean();
+	source.Pts(std::numeric_limits<std::int64_t>::min());
+	source.TimeBase({0, 1});
+	CadenceTest::Observe(filter, source);
+	filter.Measured();
+	TEST_REQUIRE(CadenceTest::Cadence(filter).num == 0);
+	return 0;
+}
+
+int test_filter_decimate_cadence_source_timing() {
+	using CadenceTest = Filter::Video::DecimateCadenceTest;
+	Filter::Video::Decimate filter{{}};
+	FFmpeg::AVFrame source;
+	TEST_REQUIRE(source.AllocVideo(16, 16, AV_PIX_FMT_YUV420P));
+	source.TimeBase({1, 30000});
+	for (int index = 0; index <= 10; ++index) {
+		source.Pts(index * 1001);
+		CadenceTest::Observe(filter, source, {0, 0});
+	}
+	filter.Measured();
+	filter.Setup();
+	TEST_REQUIRE((CadenceTest::Cadence(filter) == Property::AVRational{30000, 1001}));
+	filter.Clean();
+	source.TimeBase({1, 1000});
+	for (int index = 0; index <= 24; ++index) {
+		source.Pts((index * 1000 + 12) / 24);
+		CadenceTest::Observe(filter, source);
+	}
+	filter.Measured();
+	TEST_REQUIRE((CadenceTest::Cadence(filter) == Property::AVRational{24, 1}));
+	filter.Clean();
+	source.TimeBase({1, 24000});
+	source.Pts(std::numeric_limits<std::int64_t>::min());
+	source.DurationTicks(1001);
+	CadenceTest::Observe(filter, source);
+	CadenceTest::Observe(filter, source);
+	filter.Measured();
+	TEST_REQUIRE((CadenceTest::Cadence(filter) == Property::AVRational{24000, 1001}));
+	filter.Clean();
+	source.DurationTicks(0);
+	CadenceTest::Observe(filter, source);
+	filter.Measured();
+	TEST_REQUIRE(CadenceTest::Cadence(filter).num == 0);
+	return 0;
 }
 
 int test_filter_graph_delayed_output_and_eof() {
@@ -415,9 +540,13 @@ int test_filter_resample() {
 }
 
 int test_filter_rubberband() {
+#ifdef STORMBYTE_TEST_WITH_GPL
 	return RunAudio("rubberband", "audio/noise_stereo.wav", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Audio::Rubberband>(logger, StormByte::Safe::Optional<double>{1.25});
 	});
+#else
+	return TEST_SKIP;
+#endif
 }
 
 int test_filter_upmix() {
@@ -535,9 +664,13 @@ int test_filter_scale() {
 }
 
 int test_filter_vaguedenoiser() {
+#ifdef STORMBYTE_TEST_WITH_GPL
 	return RunVideo("vaguedenoiser", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::VagueDenoiser>(logger);
 	});
+#else
+	return TEST_SKIP;
+#endif
 }
 
 int test_filter_watermark() {
@@ -580,6 +713,9 @@ int test_filter_xpsnr() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_filter_decimate_cadence_metadata_and_lifecycle", test_filter_decimate_cadence_metadata_and_lifecycle},
+		TestEntry{"test_filter_decimate_cadence_rejects_invalid_timing", test_filter_decimate_cadence_rejects_invalid_timing},
+		TestEntry{"test_filter_decimate_cadence_source_timing", test_filter_decimate_cadence_source_timing},
 		TestEntry{"test_filter_graph_delayed_output_and_eof", test_filter_graph_delayed_output_and_eof},
 		TestEntry{"test_filter_graph_fps_count_and_timestamps", test_filter_graph_fps_count_and_timestamps},
 		TestEntry{"test_filter_graph_decimate_uses_nominal_cadence", test_filter_graph_decimate_uses_nominal_cadence},

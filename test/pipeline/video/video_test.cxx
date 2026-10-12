@@ -86,42 +86,77 @@ namespace {
 	}
 
 	int CheckHdr10EncodeOutput(const std::filesystem::path& output, std::string_view expectedCodec) {
-	const auto sourcePath = FixturePath("video/hdr10_metadata_source.mkv");
-	TEST_PHASE("opening media file for inspection");
-	auto source = File::Open(StormByte::Safe::String{sourcePath.string()});
-	TEST_REQUIRE(source);
-	TEST_REQUIRE(source.value().Streams().size() == 1);
-	const auto sourceVideo = source.value().Streams()[0].Video();
-	TEST_REQUIRE(sourceVideo && sourceVideo.value().HDR10());
-	TEST_REQUIRE(sourceVideo.value().HDR10()->Origin() == StormByte::Multimedia::Property::HDR10::Source::Metadata);
+		const auto sourcePath = FixturePath("video/hdr10_metadata_source.mkv");
+		TEST_PHASE("opening media file for inspection");
+		auto source = File::Open(StormByte::Safe::String{sourcePath.string()});
+		TEST_REQUIRE(source);
+		TEST_REQUIRE(source.value().Streams().size() == 1);
+		const auto sourceVideo = source.value().Streams()[0].Video();
+		TEST_REQUIRE(sourceVideo && sourceVideo.value().HDR10());
+		TEST_REQUIRE(sourceVideo.value().HDR10()->Origin() == StormByte::Multimedia::Property::HDR10::Source::Metadata);
 
-	TEST_PHASE("opening media file for inspection");
-	auto encoded = File::Open(StormByte::Safe::String{output.string()});
-	TEST_REQUIRE(encoded);
-	TEST_REQUIRE(encoded.value().Streams().size() == 1);
-	const auto stream = encoded.value().Streams()[0];
-	TEST_REQUIRE(stream.Codec().Name() == expectedCodec);
-	const auto encodedVideo = stream.Video();
-	TEST_REQUIRE(encodedVideo && encodedVideo.value().HDR10());
-	TEST_REQUIRE(encodedVideo.value().Resolution().Width() == sourceVideo.value().Resolution().Width());
-	TEST_REQUIRE(encodedVideo.value().Resolution().Height() == sourceVideo.value().Resolution().Height());
-	TEST_REQUIRE(encodedVideo.value().Color().PixelFormat() == sourceVideo.value().Color().PixelFormat());
-	TEST_REQUIRE(encodedVideo.value().Color().Space() == sourceVideo.value().Color().Space());
-	TEST_REQUIRE(encodedVideo.value().Color().Primaries() == sourceVideo.value().Color().Primaries());
-	TEST_REQUIRE(encodedVideo.value().Color().Transfer() == sourceVideo.value().Color().Transfer());
-	const auto& before = sourceVideo.value().HDR10().value();
-	const auto& after = encodedVideo.value().HDR10().value();
-	TEST_REQUIRE(after.Origin() == StormByte::Multimedia::Property::HDR10::Source::Metadata);
-	TEST_REQUIRE(SamePoint(after.Red(), before.Red()));
-	TEST_REQUIRE(SamePoint(after.Green(), before.Green()));
-	TEST_REQUIRE(SamePoint(after.Blue(), before.Blue()));
-	TEST_REQUIRE(SamePoint(after.White(), before.White()));
-	TEST_REQUIRE(SamePoint(after.Luminance(), before.Luminance()));
-	TEST_REQUIRE(after.LightLevel().has_value() == before.LightLevel().has_value());
-	if (before.LightLevel())
-		TEST_REQUIRE(SamePoint(after.LightLevel().value(), before.LightLevel().value()));
-	return 0;
-}
+		TEST_PHASE("opening media file for inspection");
+		auto encoded = File::Open(StormByte::Safe::String{output.string()});
+		TEST_REQUIRE(encoded);
+		TEST_REQUIRE(encoded.value().Container().Name() == "Matroska");
+		TEST_REQUIRE(encoded.value().Streams().size() == 1);
+		const auto stream = encoded.value().Streams()[0];
+		TEST_REQUIRE(stream.Codec().Name() == expectedCodec);
+		const auto encodedVideo = stream.Video();
+		TEST_REQUIRE(encodedVideo && encodedVideo.value().HDR10());
+		TEST_REQUIRE(encodedVideo.value().Resolution().Width() == sourceVideo.value().Resolution().Width());
+		TEST_REQUIRE(encodedVideo.value().Resolution().Height() == sourceVideo.value().Resolution().Height());
+		TEST_REQUIRE(encodedVideo.value().Color().PixelFormat() == sourceVideo.value().Color().PixelFormat());
+		TEST_REQUIRE(encodedVideo.value().Color().Space() == sourceVideo.value().Color().Space());
+		TEST_REQUIRE(encodedVideo.value().Color().Primaries() == sourceVideo.value().Color().Primaries());
+		TEST_REQUIRE(encodedVideo.value().Color().Transfer() == sourceVideo.value().Color().Transfer());
+		const auto& before = sourceVideo.value().HDR10().value();
+		const auto& after = encodedVideo.value().HDR10().value();
+		TEST_REQUIRE(after.Origin() == StormByte::Multimedia::Property::HDR10::Source::Metadata);
+		TEST_REQUIRE(SamePoint(after.Red(), before.Red()));
+		TEST_REQUIRE(SamePoint(after.Green(), before.Green()));
+		TEST_REQUIRE(SamePoint(after.Blue(), before.Blue()));
+		TEST_REQUIRE(SamePoint(after.White(), before.White()));
+		TEST_REQUIRE(SamePoint(after.Luminance(), before.Luminance()));
+		TEST_REQUIRE(after.LightLevel().has_value() == before.LightLevel().has_value());
+		if (before.LightLevel())
+			TEST_REQUIRE(SamePoint(after.LightLevel().value(), before.LightLevel().value()));
+		return 0;
+	}
+
+	int CheckHdr10Encode(std::string_view destination, std::string_view codecName, std::string_view encoder) {
+		auto codec = Registry::Instance().FindCodec(codecName);
+		TEST_REQUIRE(codec);
+		if (!codec.value().get().HasAccess(Access{Operation::Write}))
+			return TEST_SKIP;
+
+		const auto output = OutputPath(destination);
+		auto logger = MakeLogger();
+		TEST_PHASE("creating transcoder");
+		Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
+		auto track = job.Video(0);
+		track.Codec(codec.value().get())
+			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});
+		if (encoder == "libx265")
+			track.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
+		else if (encoder == "libsvtav1")
+			track.Preset(StormByte::Safe::String{"12"}).CRF(40);
+		else if (encoder == "libaom-av1" || encoder == "libvpx-vp9") {
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+			options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+			if (encoder == "libvpx-vp9")
+				options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
+			track.FineTune(std::move(options)).BitRate(500000);
+		}
+		else
+			track.BitRate(500000);
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		TEST_PHASE("starting transcoder run");
+		job.Run();
+		if (const int result = WaitForOptionalCodec(job); result != 0)
+			return result;
+		return CheckHdr10EncodeOutput(output, codecName);
+	}
 
 	class UnenforcedPlan final: public Plan {
 		public:
@@ -173,50 +208,43 @@ int test_transcoder_hevc_encode_output_file_properties() {
 	auto logger = MakeLogger();
 	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
-	job.Video(0).Codec(hevc.value().get());
+	job.Video(0).Codec(hevc.value().get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libx265"})
+		.Preset(StormByte::Safe::String{"ultrafast"});
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	TEST_PHASE("starting transcoder run");
 	job.Run();
-	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	if (const int result = WaitForOptionalCodec(job); result != 0)
+		return result;
 	return CheckEncodedVideoOutput(output, "H.265");
 }
 
 int test_transcoder_hevc_encode_preserves_hdr10_metadata() {
-	auto& registry = Registry::Instance();
-	auto hevc = registry.FindCodec("H.265");
-	TEST_REQUIRE(hevc);
-	if (!hevc.value().get().HasAccess(Access{Operation::Write}))
-		return TEST_SKIP;
+	return CheckHdr10Encode("pipeline/encoded-hevc-hdr10.mkv", "H.265", "libx265");
+}
 
-	const auto output = OutputPath("pipeline/encoded-hevc-hdr10.mkv");
-	auto logger = MakeLogger();
-	TEST_PHASE("creating transcoder");
-	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
-	job.Video(0).Codec(hevc.value().get());
-	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
-	TEST_PHASE("starting transcoder run");
-	job.Run();
-	TEST_REQUIRE(WaitForTranscoder(job) == 0);
-	return CheckHdr10EncodeOutput(output, "H.265");
+int test_transcoder_svt_av1_encode_preserves_hdr10_metadata() {
+	return CheckHdr10Encode("pipeline/encoded-svt-av1-hdr10.mkv", "AV1", "libsvtav1");
+}
+
+int test_transcoder_aom_av1_encode_preserves_hdr10_metadata() {
+	return CheckHdr10Encode("pipeline/encoded-aom-av1-hdr10.mkv", "AV1", "libaom-av1");
 }
 
 int test_transcoder_vp9_encode_preserves_hdr10_metadata() {
-	auto& registry = Registry::Instance();
-	auto vp9 = registry.FindCodec("VP9");
-	TEST_REQUIRE(vp9);
-	if (!vp9.value().get().HasAccess(Access{Operation::Write}))
-		return TEST_SKIP;
+	return CheckHdr10Encode("pipeline/encoded-vp9-hdr10.mkv", "VP9", "libvpx-vp9");
+}
 
-	const auto output = OutputPath("pipeline/encoded-vp9-hdr10.mkv");
-	auto logger = MakeLogger();
-	TEST_PHASE("creating transcoder");
-	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
-	job.Video(0).Codec(vp9.value().get());
-	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
-	TEST_PHASE("starting transcoder run");
-	job.Run();
-	TEST_REQUIRE(WaitForTranscoder(job) == 0);
-	return CheckHdr10EncodeOutput(output, "VP9");
+int test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata() {
+	return CheckHdr10Encode("pipeline/encoded-hevc-nvenc-hdr10.mkv", "H.265", "hevc_nvenc");
+}
+
+int test_transcoder_hevc_qsv_encode_preserves_hdr10_metadata() {
+	return CheckHdr10Encode("pipeline/encoded-hevc-qsv-hdr10.mkv", "H.265", "hevc_qsv");
+}
+
+int test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata() {
+	return CheckHdr10Encode("pipeline/encoded-hevc-vaapi-hdr10.mkv", "H.265", "hevc_vaapi");
 }
 
 int test_transcoder_enforce_features_rejects_hdr10_loss() {
@@ -284,7 +312,12 @@ int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_transcoder_hevc_encode_output_file_properties", test_transcoder_hevc_encode_output_file_properties},
 		TestEntry{"test_transcoder_hevc_encode_preserves_hdr10_metadata", test_transcoder_hevc_encode_preserves_hdr10_metadata},
+		TestEntry{"test_transcoder_svt_av1_encode_preserves_hdr10_metadata", test_transcoder_svt_av1_encode_preserves_hdr10_metadata},
+		TestEntry{"test_transcoder_aom_av1_encode_preserves_hdr10_metadata", test_transcoder_aom_av1_encode_preserves_hdr10_metadata},
 		TestEntry{"test_transcoder_vp9_encode_preserves_hdr10_metadata", test_transcoder_vp9_encode_preserves_hdr10_metadata},
+		TestEntry{"test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata", test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata},
+		TestEntry{"test_transcoder_hevc_qsv_encode_preserves_hdr10_metadata", test_transcoder_hevc_qsv_encode_preserves_hdr10_metadata},
+		TestEntry{"test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata", test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata},
 		TestEntry{"test_transcoder_enforce_features_rejects_hdr10_loss", test_transcoder_enforce_features_rejects_hdr10_loss},
 		TestEntry{"test_transcoder_without_enforce_features_drops_hdr10", test_transcoder_without_enforce_features_drops_hdr10},
 	};

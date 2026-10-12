@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
+#include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/demuxer.hxx>
@@ -93,8 +94,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		StopFeed();
 	}
 
-	void Demux::StopFeed() noexcept {
+	void Demux::StopFeed(bool cancelPending) noexcept {
 		m_feedStop.store(true, StormByte::Safe::MemoryOrder::Release);
+		if (cancelPending) {
+			m_owner.pipe().Abort();
+			StormByte::Safe::UniqueLock lock(m_parkMutex);
+			m_park.clear();
+		}
 		m_parkCv.notify_all();
 		for (auto& feeder : m_feeds)
 			feeder->Join();
@@ -169,14 +175,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		if (Stopping()) {
-			StopFeed();
+			StopFeed(true);
 			return;
 		}
 
 		const bool measure = m_owner.Measuring();
 		Packet::PointerType packet = m_owner.m_backend->Read(m_owner);
 		if (m_owner.Failed()) {
-			StopFeed();
+			StopFeed(true);
 			return;
 		}
 		if (!packet) {
@@ -192,7 +198,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			if (!m_owner.Eof())
 				return;
 
-			StopFeed();
+			const auto plan = m_owner.Plan();
+			StopFeed(Stopping() || (plan && plan->State() == StormByte::Multimedia::Pipeline::Plan::State::Failed));
 			Ended();
 			return;
 		}

@@ -18,12 +18,10 @@ foreach(test_name IN ITEMS
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;video-codecs")
 endforeach()
 
-if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_GPL))
-	foreach(test_name IN ITEMS
-		test_x264_encodes_h264_mp4
-		test_x265_encodes_hevc_matroska
-	)
-		add_optional_pipeline_test(MultimediaPipelineVideoCodecTests ${test_name})
-		set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;video-codecs")
-	endforeach()
-endif()
+foreach(test_name IN ITEMS
+	test_x264_encodes_h264_mp4
+	test_x265_encodes_hevc_matroska
+)
+	add_optional_pipeline_test(MultimediaPipelineVideoCodecTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;video-codecs")
+endforeach()

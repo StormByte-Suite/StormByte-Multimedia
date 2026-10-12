@@ -1,6 +1,8 @@
-if(WITH_OCR STREQUAL "BUNDLED")
-	add_executable(MultimediaPipelineOcrTests ocr_test.cxx)
-	target_link_libraries(MultimediaPipelineOcrTests PRIVATE multimedia_pipeline_test_support)
+add_executable(MultimediaPipelineOcrTests ocr_test.cxx)
+target_link_libraries(MultimediaPipelineOcrTests PRIVATE multimedia_pipeline_test_support)
 
-	add_pipeline_test(MultimediaPipelineOcrTests test_transcoder_ocr_japanese_pgs_to_subrip)
+if(WITH_OCR STREQUAL "BUNDLED")
+	target_compile_definitions(MultimediaPipelineOcrTests PRIVATE STORMBYTE_TEST_WITH_BUNDLED_OCR)
 endif()
+
+add_optional_pipeline_test(MultimediaPipelineOcrTests test_transcoder_ocr_japanese_pgs_to_subrip)

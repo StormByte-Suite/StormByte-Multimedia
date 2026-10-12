@@ -1,7 +1,10 @@
 add_executable(MultimediaPipelineAudioCodecTests audio_codec_test.cxx)
 target_link_libraries(MultimediaPipelineAudioCodecTests PRIVATE multimedia_pipeline_test_support)
-if(WITH_FFMPEG STREQUAL "BUNDLED" AND WITH_NONFREE)
-	target_compile_definitions(MultimediaPipelineAudioCodecTests PRIVATE STORMBYTE_TEST_REQUIRE_FDK_AAC)
+if(WITH_GPL)
+	target_compile_definitions(MultimediaPipelineAudioCodecTests PRIVATE STORMBYTE_TEST_WITH_GPL)
+endif()
+if(WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_NONFREE)
+	target_compile_definitions(MultimediaPipelineAudioCodecTests PRIVATE STORMBYTE_TEST_WITHOUT_FDK_AAC)
 endif()
 
 foreach(test_name IN ITEMS
@@ -24,18 +27,14 @@ foreach(test_name IN ITEMS
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
 endforeach()
 
-if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_NONFREE))
-	foreach(test_name IN ITEMS
-		test_fdk_aac_encodes_stereo_mp4
-		test_fdk_aac_encodes_surround_mp4
-		test_fdk_aac_decodes_surround_to_flac
-	)
-		add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
-		set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
-	endforeach()
-endif()
+foreach(test_name IN ITEMS
+	test_fdk_aac_encodes_stereo_mp4
+	test_fdk_aac_encodes_surround_mp4
+	test_fdk_aac_decodes_surround_to_flac
+)
+	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+endforeach()
 
-if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_GPL))
-	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests test_rubberband_stretches_stereo_wav)
-	set_tests_properties("pipeline.test_rubberband_stretches_stereo_wav" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
-endif()
+add_optional_pipeline_test(MultimediaPipelineAudioCodecTests test_rubberband_stretches_stereo_wav)
+set_tests_properties("pipeline.test_rubberband_stretches_stereo_wav" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")

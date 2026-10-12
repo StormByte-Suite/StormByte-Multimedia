@@ -131,13 +131,13 @@ namespace {
 		StormByte::Safe::Shared<Plan>>);
 
 static int CheckTranscoderDecoderPin(std::string_view pin, std::string_view destination,
-	std::string_view expectedError = {}) {
+	std::string_view expectedError = {}, std::string_view source = "audio/noise_stereo.wav") {
 	auto codec = Registry::Instance().FindCodec("AC-3");
 	TEST_REQUIRE(codec && codec.value().get().HasAccess(Access{Operation::Write}));
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
 	TEST_PHASE("creating transcoder");
-	Transcoder job{TestLocation(FixturePath("audio/noise_stereo.wav")), TestLocation(output), logger, 2000000000LL};
+	Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger, 2000000000LL};
 	job.Audio(0).Codec(codec.value().get())
 		.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{pin})
 		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"ac3"});
@@ -213,8 +213,12 @@ int test_transcoder_selects_decoder_implementation() {
 }
 
 int test_transcoder_rejects_missing_decoder_implementation() {
-	return CheckTranscoderDecoderPin("stormbyte_nonexistent_decoder", "pipeline/missing-decoder.mka",
+	const int result = CheckTranscoderDecoderPin("stormbyte_nonexistent_decoder", "pipeline/missing-decoder.mka",
 		"decoder implementation is unavailable");
+	if (result != 0)
+		return result;
+	return CheckTranscoderDecoderPin("stormbyte_nonexistent_decoder", "pipeline/missing-aac-decoder.mka",
+		"decoder implementation is unavailable", "audio/noise_51.m4a");
 }
 
 int test_transcoder_rejects_mismatched_decoder_implementation() {

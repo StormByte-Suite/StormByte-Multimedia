@@ -59,6 +59,7 @@
 #include <StormByte/safe/string.hxx>
 #include <StormByte/type_traits/safe.hxx>
 
+#include <cstdint>
 #include <string>
 
 /**
@@ -68,7 +69,7 @@
 namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	/**
 	 * @class Decimate
-	 * @brief Cycle decimator via libavfilter `decimate`. Process leaf.
+	 * @brief Cycle decimator via libavfilter `decimate`. Two-pass process leaf.
 	 *
 	 * Attach with @c job.Video(in).Filter<Fieldmatch>(log).Filter<Decimate>(log).
 	 *
@@ -84,6 +85,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Drops one frame in every @a cycle as the most-duplicate
 	 * of that window. Metrics use @a dupthresh / @a scthresh.
 	 * The graph owns the cycle; this leaf does not Hold.
+	 * Valid stream FPS is preferred, including preceding FPS filters.
+	 * Otherwise the measure pass resolves cadence from frame timestamps
+	 * or consistent frame durations. Missing or irregular timing fails
+	 * rather than inventing a nominal rate. No caller FPS is required.
 	 *
 	 * Early frames may not leave @c buffersink (`EAGAIN`).
 	 * @ref Process then returns without @ref Filter::FFmpeg::Save.
@@ -110,7 +115,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * a Safe owner. Private storage is created, used and destroyed out of line
 	 * by the provider; the private Chain string never transfers ownership to callers.
 	 */
-	class STORMBYTE_MULTIMEDIA_PUBLIC Decimate: public Filter::Process {
+	class STORMBYTE_MULTIMEDIA_PUBLIC Decimate: public Filter::ProcessTwoPasses {
+		/**
+		 * @brief Focused test access to the private cadence observer.
+		 */
+		friend struct DecimateCadenceTest;
 		public:
 			/**
 			 * @brief Cycle decimator (`decimate`).
@@ -137,7 +146,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Decimate(Decimate&& other) noexcept = delete;
 
 			/**
-			 * @brief Drops the cached graph.
+			 * @brief Drops the cached graph and measured cadence.
 			 */
 			~Decimate() noexcept override;
 
@@ -167,9 +176,20 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Clean() noexcept override;
 
 			/**
-			 * @brief Resets the graph before the first frame.
+			 * @brief Resets the graph, retaining resolved cadence between passes.
 			 */
 			void Setup() noexcept override;
+
+			/**
+			 * @brief Observes stream FPS and source timing without dropping frames.
+			 * @param frame Current pipeline unit. Non-video is ignored.
+			 */
+			void Measure(const Pipeline::Frame& frame) noexcept override;
+
+			/**
+			 * @brief Resolves the observed cadence after the measure pass.
+			 */
+			void Measured() noexcept override;
 
 			/**
 			 * @brief Pushes one video frame through `decimate` and Save.
@@ -184,6 +204,20 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 		private:
 			/**
+			 * @brief Accumulates exact source-clock timing or valid stream FPS.
+			 * @param src Source video frame.
+			 * @param rate Declared stream FPS, or an invalid rational.
+			 */
+			void Observe(const StormByte::Multimedia::FFmpeg::AVFrame& src, Property::AVRational rate) noexcept;
+
+			/**
+			 * @brief Prefers current stream FPS over the measured fallback.
+			 * @param rate Current stream FPS, or an invalid rational.
+			 * @return Valid nominal cadence, or zero when unresolved.
+			 */
+			Property::AVRational Cadence(Property::AVRational rate) const noexcept;
+
+			/**
 			 * @brief Builds the avfilter chain.
 			 * @return `decimate=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
@@ -193,6 +227,16 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Safe::Optional<double> m_dupIn;		///< Caller dupthresh, or empty
 			Safe::Optional<double> m_scIn;		///< Caller scthresh, or empty
 			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Reused graph
+			Property::AVRational m_rate{0, 1};			///< Resolved nominal FPS
+			Property::AVRational m_timeBase{0, 1};		///< Observed source clock
+			Safe::Optional<std::int64_t> m_lastPts;		///< Previous valid timestamp
+			std::int64_t m_ticks = 0;						///< Accumulated timestamp intervals
+			std::int64_t m_intervals = 0;					///< Number of timestamp intervals
+			std::int64_t m_minDelta = 0;					///< Shortest timestamp interval
+			std::int64_t m_maxDelta = 0;					///< Longest timestamp interval
+			std::int64_t m_durationTicks = 0;				///< Consistent duration fallback
+			bool m_durationValid = true;					///< All observed durations agree
+			bool m_timingValid = true;					///< Source clock and timestamps agree
 	};
 }
 

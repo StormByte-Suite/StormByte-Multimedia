@@ -5,6 +5,13 @@ file(GLOB_RECURSE STORMBYTE_MULTIMEDIA_SOURCES CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_LIST_DIR}/private/*.cxx"
 )
 
+foreach(_filter IN LISTS STORMBYTE_MULTIMEDIA_DISABLED_FILTERS)
+	list(REMOVE_ITEM STORMBYTE_MULTIMEDIA_SOURCES
+		"${CMAKE_CURRENT_LIST_DIR}/public/StormByte/multimedia/pipeline/filters/${_filter}.cxx"
+		"${CMAKE_CURRENT_LIST_DIR}/private/StormByte/multimedia/pipeline/filters/${_filter}.cxx"
+	)
+endforeach()
+
 if(BUILD_SHARED_LIBS)
 	set(_mode shared)
 else()

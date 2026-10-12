@@ -23,23 +23,30 @@ foreach(test_name IN ITEMS
 	add_pipeline_test(MultimediaPipelineDoviTests ${test_name})
 endforeach()
 
-if(NOT (WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WITH_GPL))
-	foreach(test_name IN ITEMS
-		test_reencode_dovi_only
-		test_reencoded_dovi_audit_and_vmaf_frame_counts
-		test_reencode_hdr10_only
-		test_reencode_dovi_hdr10
-		test_watermark_dovi_only
-		test_watermark_hdr10_only
-		test_watermark_dovi_hdr10
-		test_replace_frame_dovi_only
-		test_replace_frame_hdr10_only
-		test_replace_frame_dovi_hdr10
-		test_unsupported_hevc_dovi_only
-		test_unsupported_hevc_dovi_hdr10)
-		add_optional_pipeline_test(MultimediaPipelineDoviTests ${test_name})
-	endforeach()
-endif()
+foreach(test_name IN ITEMS
+	test_reencode_dovi_only
+	test_reencoded_dovi_audit_and_vmaf_frame_counts
+	test_reencode_hdr10_only
+	test_reencode_dovi_hdr10
+	test_watermark_dovi_only
+	test_watermark_hdr10_only
+	test_watermark_dovi_hdr10
+	test_replace_frame_dovi_only
+	test_replace_frame_hdr10_only
+	test_replace_frame_dovi_hdr10
+	test_unsupported_hevc_dovi_only
+	test_unsupported_hevc_dovi_hdr10)
+	add_optional_pipeline_test(MultimediaPipelineDoviTests ${test_name})
+endforeach()
 
 add_optional_pipeline_test(MultimediaPipelineDoviTests test_unsupported_vp9_dovi_only)
 add_optional_pipeline_test(MultimediaPipelineDoviTests test_unsupported_vp9_dovi_hdr10)
+
+foreach(encoder IN ITEMS svt_av1 aom_av1)
+	foreach(fixture IN ITEMS dovi_only hdr10_only dovi_hdr10)
+		foreach(operation IN ITEMS reencode watermark replace_frame)
+			add_optional_pipeline_test(MultimediaPipelineDoviTests test_${operation}_${encoder}_${fixture})
+			set_tests_properties("pipeline.test_${operation}_${encoder}_${fixture}" PROPERTIES TIMEOUT 90)
+		endforeach()
+	endforeach()
+endforeach()
