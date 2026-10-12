@@ -88,3 +88,6 @@
 [submodule "ebur128"]
 	path = thirdparty/ebur128/src
 	url = https://github.com/jiixyj/libebur128.git
+[submodule "thirdparty/ffmpeg/plugins/deps/ffnvcodec/src"]
+	path = thirdparty/ffmpeg/plugins/deps/ffnvcodec/src
+	url = https://github.com/FFmpeg/nv-codec-headers.git

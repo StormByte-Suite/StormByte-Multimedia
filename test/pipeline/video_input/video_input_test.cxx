@@ -307,7 +307,14 @@ int test_hardware_capability_classifier() {
 	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_QSV, AVERROR_EXTERNAL, false, true));
 	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_QSV, AVERROR(ENOSYS), true));
 	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(ENOSYS), true));
-	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(ENOSYS), true));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(ENOSYS), true));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(ENOSYS), false));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(EPERM), false));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(EPERM), true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_QSV, AVERROR(EPERM), false));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EPERM), false));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, true, false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, true));
 	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_UNKNOWN, false, true));
 	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR_EXTERNAL, false, true));
 	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_NONE, AVERROR(ENOSYS), true));
@@ -331,6 +338,33 @@ int test_hardware_capability_classifier() {
  */
 int test_hardware_hevc_nvenc_capability() {
 	const auto* codec = avcodec_find_encoder_by_name("hevc_nvenc");
+	return codec ? CheckHardwareEncoderCapability(codec, 1920, 1080) : TEST_SKIP;
+}
+
+/**
+ * @brief Probes the concrete 8-bit H.264 NVENC implementation.
+ * @return Zero when usable, TEST_SKIP when unavailable, one on an unexpected failure.
+ */
+int test_hardware_h264_nvenc_capability() {
+	const auto* codec = avcodec_find_encoder_by_name("h264_nvenc");
+	return codec ? CheckHardwareEncoderCapability(codec, 1920, 1080, AV_PIX_FMT_NV12) : TEST_SKIP;
+}
+
+/**
+ * @brief Probes H.264 NVENC 10-bit input support advertised by API 13.0 and later.
+ * @return Zero when usable, TEST_SKIP when the device lacks the capability, one on unexpected failure.
+ */
+int test_hardware_h264_nvenc_10bit_capability() {
+	const auto* codec = avcodec_find_encoder_by_name("h264_nvenc");
+	return codec ? CheckHardwareEncoderCapability(codec, 1920, 1080, AV_PIX_FMT_YUV420P10LE) : TEST_SKIP;
+}
+
+/**
+ * @brief Probes the concrete 10-bit AV1 NVENC implementation.
+ * @return Zero when usable, TEST_SKIP when unavailable, one on an unexpected failure.
+ */
+int test_hardware_av1_nvenc_capability() {
+	const auto* codec = avcodec_find_encoder_by_name("av1_nvenc");
 	return codec ? CheckHardwareEncoderCapability(codec, 1920, 1080) : TEST_SKIP;
 }
 
@@ -644,7 +678,10 @@ int main(int argc, char** argv) {
 	constexpr TestEntry tests[] = {
 		{"test_encoder_configs", test_encoder_configs},
 		{"test_hardware_capability_classifier", test_hardware_capability_classifier},
+				{"test_hardware_h264_nvenc_capability", test_hardware_h264_nvenc_capability},
+				{"test_hardware_h264_nvenc_10bit_capability", test_hardware_h264_nvenc_10bit_capability},
 		{"test_hardware_hevc_nvenc_capability", test_hardware_hevc_nvenc_capability},
+				{"test_hardware_av1_nvenc_capability", test_hardware_av1_nvenc_capability},
 		{"test_hardware_hevc_qsv_capability", test_hardware_hevc_qsv_capability},
 		{"test_hardware_hevc_vaapi_capability", test_hardware_hevc_vaapi_capability},
 		{"test_hardware_plan_selection", test_hardware_plan_selection},

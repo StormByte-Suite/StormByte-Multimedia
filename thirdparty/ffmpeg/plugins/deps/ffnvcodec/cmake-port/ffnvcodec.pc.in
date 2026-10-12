@@ -1,0 +1,10 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: ffnvcodec
+Description: FFmpeg NVIDIA codec headers
+Version: 13.1.15.0
+Libs:
+Cflags: -I${includedir}

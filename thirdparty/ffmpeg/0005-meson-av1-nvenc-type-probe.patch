@@ -1,0 +1,157 @@
+From c418dd9f183c7d532213c40ccad5ea53673cb788 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 12 Oct 2026 18:57:18 +0200
+Subject: [PATCH] meson: fix NVIDIA codec detection and CUDA compiler selection
+
+Match configure's NVIDIA OS/CPU allowlist, validate the NVENC API and
+AV1 type requirements for NVENC and NVDEC/CUVID, and propagate those
+checks into generated component configuration. Reject explicit NVIDIA
+codec requests on unsupported targets and prevent auto-detection from
+re-enabling them.
+
+Keep the legacy CUDA SDK-to-NVCC behavior while preserving an explicitly
+enabled CUDA LLVM selection. This allows Clang to remain the chosen
+backend when the deprecated SDK option is also enabled.
+---
+ meson.build | 62 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 58 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index b2898afa9c..7b1c01b357 100644
+--- a/meson.build
++++ b/meson.build
+@@ -196,6 +196,23 @@ common_deps = [thread_dep]
+ cpu = host_machine.cpu_family()
+ host_system = host_machine.system()
+ 
++# Match configure's supported architectures and operating systems for the
++# dynamically loaded NVIDIA codec APIs.
++nvidia_codec_supported = false
++if ['x86', 'x86_64'].contains(cpu)
++  nvidia_codec_supported = ['linux', 'freebsd', 'windows', 'cygwin'].contains(host_system)
++elif ['aarch64', 'ppc64'].contains(cpu) and host_machine.endian() == 'little'
++  nvidia_codec_supported = ['linux', 'windows'].contains(host_system)
++endif
++
++if not nvidia_codec_supported
++  foreach component : ['ffnvcodec', 'nvenc', 'nvdec', 'cuvid']
++    if get_option(component).enabled()
++      error('@0@ is not supported on @1@/@2@'.format(component, host_system, cpu))
++    endif
++  endforeach
++endif
++
+ if host_system == 'windows'
+   common_deps += [cc.find_library('ws2_32')]
+ endif
+@@ -1148,6 +1165,10 @@ else
+ endif
+ 
+ foreach check : check_pkg_config
++  if check[0] == 'ffnvcodec' and not nvidia_codec_supported
++    conf.set10('ffnvcodec', false)
++    continue
++  endif
+   all_checks += [['pkg-config', check]]
+ endforeach
+ 
+@@ -1442,6 +1463,20 @@ check_types = [
+   ['VdpPictureInfoAV1', ['vdpau/vdpau.h']],
+ ]
+ 
++if get_option('nvenc').allowed() and nvidia_codec_supported
++  check_types += [
++    ['NV_ENC_PIC_PARAMS_AV1', ['ffnvcodec/nvEncodeAPI.h'],
++      {'preconditions': ['ffnvcodec'], 'extra_deps': ['ffnvcodec_extra_deps']}],
++  ]
++endif
++
++if (get_option('nvdec').allowed() or get_option('cuvid').allowed()) and nvidia_codec_supported
++  check_types += [
++    ['CUVIDAV1PICPARAMS', ['ffnvcodec/dynlink_cuda.h', 'ffnvcodec/dynlink_cuviddec.h'],
++      {'preconditions': ['ffnvcodec'], 'extra_deps': ['ffnvcodec_extra_deps']}],
++  ]
++endif
++
+ if get_option('vaapi').allowed()
+   check_types += [
+     ['VAPictureParameterBufferHEVC', ['va/va.h', 'va/va_dec_hevc.h']],
+@@ -1763,6 +1798,7 @@ config_extra = [
+   'cbs_vp8',
+   'cbs_vp9',
+   'celp_math',
++  'cuvidav1picparams',
+   'd3d12_intra_refresh',
+   'd3d12_motion_estimator',
+   'd3d12_video_process_reference_info',
+@@ -1827,6 +1863,7 @@ config_extra = [
+   'msmpeg4dec',
+   'msmpeg4enc',
+   'mss34dsp',
++  'nv_enc_pic_params_av1',
+   'pixblockdsp',
+   'qpeldsp',
+   'qsv',
+@@ -1951,6 +1988,16 @@ check_compiles = [
+   ['intrinsics_sse2', ['emmintrin.h'], '__m128i test = _mm_setzero_si128();'],
+ ]
+ 
++if get_option('nvenc').allowed()
++  check_compiles += [
++    ['nvenc', ['ffnvcodec/nvEncodeAPI.h'], '''
++      NV_ENCODE_API_FUNCTION_LIST flist;
++      void f(void) { struct { const GUID guid; } codecs[] = { { NV_ENC_CODEC_H264_GUID } }; }
++      int main(void) { return 0; }
++    ''', {'preconditions': ['ffnvcodec'], 'extra_deps': ['ffnvcodec_extra_deps']}],
++  ]
++endif
++
+ if get_option('schannel').allowed()
+   check_compiles += [
+     ['dtls_protocol', ['windows.h', 'security.h', 'schnlsp.h'], 'int i = SP_PROT_DTLS1_X_CLIENT;', {'c_args': ['-DSECURITY_WIN32'], 'link_with': ['secur32', 'ncrypt', 'crypt32']}],
+@@ -2178,7 +2225,12 @@ if ['linux', 'openbsd', 'android', 'freebsd', 'netbsd'].contains(host_system)
+   conf.set('section_data_rel_ro', 1)
+ endif
+ 
+-if get_option('ff_cuda_nvcc').allowed()
++use_cuda_nvcc = get_option('ff_cuda_nvcc').enabled()
++if get_option('ff_cuda_sdk').enabled() and not get_option('ff_cuda_llvm').enabled()
++  use_cuda_nvcc = true
++endif
++
++if use_cuda_nvcc
+   nvcc_default = find_program('nvcc')
+   nvccflags_default = ['-gencode', 'arch=compute_30,code=sm_30', '-O2']
+ 
+@@ -2199,7 +2251,7 @@ else
+   nvccflags += ['-m32']
+ endif
+ 
+-if get_option('ff_cuda_nvcc').allowed()
++if use_cuda_nvcc
+   nvccflags += ['-ptx']
+ else
+   nvccflags += ['-S', '-nocudalib', '-nocudainc', '--cuda-device-only', '-Wno-c++11-narrowing', '-include', meson.current_source_dir() / 'compat/cuda/cuda_runtime.h']
+@@ -2216,7 +2268,7 @@ f = configure_file(
+   capture: true,
+ )
+ 
+-if get_option('ff_cuda_nvcc').allowed()
++if use_cuda_nvcc
+   cuda_llvm = run_command(nvcc_default, nvccflags, f, check: false)
+   if cuda_llvm.returncode() != 0
+     error('failed checking for nvcc.')
+@@ -2528,7 +2580,9 @@ endforeach
+ # or they've already passed
+ foreach component : external_autodetect_library_list + hwaccel_autodetect_library_list
+   opt_name = options_map.get(component, component)
+-  if conf.get(component, 1) == 1
++  if ['ffnvcodec', 'nvenc', 'nvdec', 'cuvid'].contains(component) and not nvidia_codec_supported
++    conf.set10(component, false)
++  elif conf.get(component, 1) == 1
+     conf.set10(component, get_option(opt_name).allowed())
+   endif
+ endforeach
+-- 
+2.55.0
+

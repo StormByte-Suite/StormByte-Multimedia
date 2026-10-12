@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <memory>
+#include <string_view>
 
 /**
  * @brief Classifies only independently proven device absence or backend capability errors.
@@ -13,17 +14,21 @@
  * @param status Native device creation or encoder opening result.
  * @param prepared Whether sample-exact encoder input preparation succeeded.
  * @param absent Whether an independent device inventory proved the device absent.
+ * @param nvencFormatUnsupported Whether FFmpeg rejected the requested NVENC codec/bit-depth on every device.
  * @return Whether this preflight result denotes unavailable hardware rather than a test failure.
  */
-inline bool HardwareCapabilityUnavailable(AVHWDeviceType device, int status, bool prepared, bool absent = false) noexcept {
+inline bool HardwareCapabilityUnavailable(AVHWDeviceType device, int status, bool prepared, bool absent = false,
+	bool nvencFormatUnsupported = false) noexcept {
 	if (device == AV_HWDEVICE_TYPE_NONE || status >= 0 || status == AVERROR(EINVAL)
 		|| status == AVERROR(ENOMEM))
 		return false;
 	if (!prepared)
-		return (device == AV_HWDEVICE_TYPE_QSV && absent) || status == AVERROR(ENODEV)
-			|| status == AVERROR(ENOENT) || status == AVERROR(ENOSYS);
-	return (device == AV_HWDEVICE_TYPE_VAAPI || device == AV_HWDEVICE_TYPE_QSV)
-		&& status == AVERROR(ENOSYS);
+		return (device == AV_HWDEVICE_TYPE_QSV && absent)
+			|| (device == AV_HWDEVICE_TYPE_CUDA && status == AVERROR(EPERM))
+			|| status == AVERROR(ENODEV) || status == AVERROR(ENOENT) || status == AVERROR(ENOSYS);
+	return ((device == AV_HWDEVICE_TYPE_CUDA || device == AV_HWDEVICE_TYPE_VAAPI || device == AV_HWDEVICE_TYPE_QSV)
+		&& status == AVERROR(ENOSYS))
+		|| (device == AV_HWDEVICE_TYPE_CUDA && nvencFormatUnsupported && status == AVERROR_EXTERNAL);
 }
 
 /**
@@ -132,7 +137,9 @@ inline int CheckHardwareEncoderCapability(const AVCodec* codec, int width, int h
 		std::cout << "[Hardware] " << codec->name << ": " << depth << "-bit encoder preflight available\n";
 		return 0;
 	}
-	const bool unavailable = HardwareCapabilityUnavailable(deviceType, opened, true);
+	const bool nvencFormatUnsupported = codec->name && std::string_view{codec->name} == "h264_nvenc"
+		&& depth > 8;
+	const bool unavailable = HardwareCapabilityUnavailable(deviceType, opened, true, false, nvencFormatUnsupported);
 	char message[AV_ERROR_MAX_STRING_SIZE]{};
 	av_strerror(opened, message, sizeof(message));
 	std::cout << "[Hardware] " << codec->name << ": prepared " << depth << "-bit encoder open " << opened

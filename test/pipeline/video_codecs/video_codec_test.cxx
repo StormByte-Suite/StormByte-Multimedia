@@ -56,6 +56,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
+#include <tables/decoder/table.hxx>
+#include <tables/encoder/table.hxx>
 
 #include <libavutil/pixfmt.h>
 
@@ -63,7 +65,9 @@ extern "C" {
 	#include <libavformat/avformat.h>
 }
 
+#include <algorithm>
 #include <array>
+#include <string_view>
 #include <utility>
 
 using namespace StormByte::Multimedia;
@@ -208,6 +212,56 @@ int test_x265_encodes_hevc_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/x265.mkv", "Matroska", "H.265", "libx265");
 }
 
+int test_nvenc_feature_contract() {
+	const auto& encoders = Tables::Encoder::Video();
+	const auto findEncoder = [&encoders](std::string_view name) {
+		return std::find_if(encoders.begin(), encoders.end(), [name](const auto& row) {
+			return name == row.name;
+		});
+	};
+	const auto h264 = findEncoder("h264_nvenc");
+	const auto hevc = findEncoder("hevc_nvenc");
+	const auto av1 = findEncoder("av1_nvenc");
+	TEST_REQUIRE(h264 != encoders.end());
+	TEST_REQUIRE(hevc != encoders.end());
+	TEST_REQUIRE(av1 != encoders.end());
+	TEST_REQUIRE(!h264->features.Has(Feature::TenBit));
+	TEST_REQUIRE(!h264->features.Has(Feature::HDR10));
+	TEST_REQUIRE(hevc->features.Has(Feature::TenBit));
+	TEST_REQUIRE(hevc->features.Has(Feature::HDR10));
+	TEST_REQUIRE(!hevc->features.Has(Feature::HDR10Plus));
+	TEST_REQUIRE(!hevc->features.Has(Feature::DOVI));
+	TEST_REQUIRE(av1->features.Has(Feature::TenBit));
+	TEST_REQUIRE(av1->features.Has(Feature::HDR10));
+	TEST_REQUIRE(!av1->features.Has(Feature::HDR10Plus));
+	TEST_REQUIRE(!av1->features.Has(Feature::DOVI));
+	for (const auto& row : Tables::Decoder::Video()) {
+		TEST_REQUIRE(std::string_view{row.name}.find("_nvdec") == std::string_view::npos);
+		TEST_REQUIRE(std::string_view{row.name}.find("_cuvid") == std::string_view::npos);
+	}
+	return 0;
+}
+
+int test_nvenc_encodes_h264_mp4() {
+	const auto* encoder = avcodec_find_encoder_by_name("h264_nvenc");
+	if (!encoder)
+		return TEST_SKIP;
+	if (const int result = CheckHardwareEncoderCapability(encoder, 320, 192, AV_PIX_FMT_NV12); result != 0)
+		return result;
+	return CheckVideoCodec(FixturePath("video/xvid_mp3_stereo.avi"), OutputPath("pipeline/video-codecs/nvenc-h264.mp4"),
+		"MP4", "H.264", "h264_nvenc");
+}
+
+int test_nvenc_encodes_h264_10bit_matroska() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"), OutputPath("pipeline/video-codecs/nvenc-h264-10bit.mkv"),
+		"Matroska", "H.264", "h264_nvenc", {}, AV_PIX_FMT_YUV420P10LE);
+}
+
+int test_nvenc_encodes_av1_matroska() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"), OutputPath("pipeline/video-codecs/nvenc-av1.mkv"),
+		"Matroska", "AV1", "av1_nvenc", {}, AV_PIX_FMT_YUV420P10LE);
+}
+
 int test_vaapi_encodes_hevc_main_matroska() {
 	const auto input = FixturePath("video/xvid_mp3_stereo.avi");
 	auto source = File::Open(TestLocation(input));
@@ -262,6 +316,10 @@ int main(int argc, char** argv) {
 		TestEntry{"test_openh264_encodes_h264_matroska", test_openh264_encodes_h264_matroska},
 		TestEntry{"test_kvazaar_encodes_hevc_matroska", test_kvazaar_encodes_hevc_matroska},
 		TestEntry{"test_x265_encodes_hevc_matroska", test_x265_encodes_hevc_matroska},
+		TestEntry{"test_nvenc_feature_contract", test_nvenc_feature_contract},
+		TestEntry{"test_nvenc_encodes_h264_mp4", test_nvenc_encodes_h264_mp4},
+		TestEntry{"test_nvenc_encodes_h264_10bit_matroska", test_nvenc_encodes_h264_10bit_matroska},
+		TestEntry{"test_nvenc_encodes_av1_matroska", test_nvenc_encodes_av1_matroska},
 		TestEntry{"test_vaapi_encodes_hevc_main_matroska", test_vaapi_encodes_hevc_main_matroska},
 		TestEntry{"test_libwebp_anim_encodes_webp", test_libwebp_anim_encodes_webp},
 		TestEntry{"test_libwebp_decodes_animated_webp", test_libwebp_decodes_animated_webp},
