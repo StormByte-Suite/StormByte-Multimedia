@@ -55,6 +55,7 @@
 #include <tesseract/baseapi.h>
 
 #include <utility>
+#include <vector>
 
 /**
  * @file engine.cxx
@@ -70,20 +71,51 @@ namespace StormByte::Multimedia::OCR {
 	}
 
 	/**
-	 * @class Engine::Impl
+	 * @class Engine::Model
 	 * @brief Owns TessBaseAPI and caches the last successful Init language.
 	 */
-	class Engine::Impl {
+	class Engine::Model {
 		public:
+			/**
+			 * @brief Supplies secondary language models from the embedded catalog.
+			 * @param filename Tesseract model path, with either platform's separators.
+			 * @param destination Receives the requested model bytes.
+			 * @return true if the exact model was found and copied.
+			 */
+			static bool Read(const char* filename, std::vector<char>* destination) noexcept {
+				if (!filename || !destination)
+					return false;
+				try {
+					std::string_view name{filename};
+					const auto separator = name.find_last_of("/\\");
+					if (separator != std::string_view::npos)
+						name.remove_prefix(separator + 1);
+					constexpr std::string_view extension = ".traineddata";
+					if (!name.ends_with(extension))
+						return false;
+					name.remove_suffix(extension.size());
+					const auto model = TessData(name);
+					if (!model)
+						return false;
+					const auto bytes = *model;
+					const auto* begin = reinterpret_cast<const char*>(bytes.data());
+					destination->assign(begin, begin + bytes.size());
+					return true;
+				}
+				catch (...) {
+					return false;
+				}
+			}
+
 			/**
 			 * @brief Constructs an unopened Tesseract handle.
 			 */
-			Impl() noexcept = default;
+			Model() noexcept = default;
 
 			/**
 			 * @brief Ends Tesseract.
 			 */
-			~Impl() noexcept {
+			~Model() noexcept {
 				m_api.End();
 			}
 
@@ -121,7 +153,7 @@ namespace StormByte::Multimedia::OCR {
 					nullptr,
 					nullptr,
 					false,
-					nullptr);
+					&Read);
 				if (rc != 0)
 					return false;
 
@@ -137,10 +169,10 @@ namespace StormByte::Multimedia::OCR {
 	};
 
 	Engine::Engine() noexcept
-	: m_impl(StormByte::Safe::MakeUnique<Impl>()) {}
+	: m_model(StormByte::Safe::MakeUnique<Model>()) {}
 
 	Engine::Engine(StormByte::Safe::String language) noexcept
-	: m_impl(StormByte::Safe::MakeUnique<Impl>()), m_language(std::move(language)) {}
+	: m_model(StormByte::Safe::MakeUnique<Model>()), m_language(std::move(language)) {}
 
 	Engine::Engine(Engine&&) noexcept = default;
 	Engine::~Engine() noexcept = default;
@@ -154,8 +186,8 @@ namespace StormByte::Multimedia::OCR {
 		if (m_language == language)
 			return;
 		m_language = std::move(language);
-		if (m_impl)
-			m_impl->m_open = false;
+		if (m_model)
+			m_model->m_open = false;
 	}
 
 	ExpectedText Engine::Recognize(
@@ -163,11 +195,11 @@ namespace StormByte::Multimedia::OCR {
 		int width,
 		int height,
 		int stride) noexcept {
-		if (!m_impl)
+		if (!m_model)
 			return Unexpected<OCRException>("OCR engine is not available");
 		if (width <= 0 || height <= 0 || stride < width || gray.size() < static_cast<std::size_t>(stride * height))
 			return Unexpected<OCRException>("invalid OCR image");
-		if (!m_impl->Open(m_language)) {
+		if (!m_model->Open(m_language)) {
 			if (!m_language.empty())
 				return std::unexpected<StormByte::Safe::Shared<StormByte::Multimedia::Exception>>(
 					StormByte::Safe::Shared<StormByte::Multimedia::Exception>::MakePointer<TessDataNotFoundException>(
@@ -177,8 +209,8 @@ namespace StormByte::Multimedia::OCR {
 					FallbackLanguage));
 		}
 
-		m_impl->m_api.SetImage(gray.data(), width, height, 1, stride);
-		char* raw = m_impl->m_api.GetUTF8Text();
+		m_model->m_api.SetImage(gray.data(), width, height, 1, stride);
+		char* raw = m_model->m_api.GetUTF8Text();
 		if (!raw)
 			return Unexpected<OCRException>("tesseract returned no text");
 		StormByte::Safe::String text(raw);

@@ -175,12 +175,12 @@ namespace StormByte::Multimedia::OCR {
 
 		private:
 			/**
-			 * @class Impl
+			 * @class Model
 			 * @brief Tesseract handle and last opened language.
 			 */
-			class Impl;
+			class Model;
 
-			StormByte::Safe::Unique<Impl> m_impl;	///< Base-owned backend session.
+			StormByte::Safe::Unique<Model> m_model;	///< Base-owned model session.
 			StormByte::Safe::String m_language;	///< Caller language pin; empty uses `eng`.
 	};
 }

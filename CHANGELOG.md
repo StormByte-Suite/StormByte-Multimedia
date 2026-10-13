@@ -33,6 +33,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Add audio/video frame filters, packet filters, two-pass processing and independent analytics routes. VMAF reports per-track mean/minimum scores and scored-frame counts; regional Degrain is explicitly experimental and heuristic, not motion-compensated restoration.
 	- Add bitmap subtitle OCR through Tesseract, including language-aware PGS-to-SubRip conversion with bundled or system OCR language models. Attachment inclusion is explicit; attachments are dropped unless requested.
 	- Bundle selected `tessdata_best` LSTM models for European and major Asian subtitle languages plus Arabic, Hebrew, Turkish and Persian. Keep base language identifiers in the tessdata wrapper's CMake configuration and include available vertical variants automatically; leave system-installed model selection unchanged.
+	- Load secondary Tesseract language models, including vertical variants requested by the primary model, from the embedded catalog rather than the filesystem. Resolve model paths with Unix or Windows separators and retain exact-language selection without fallback.
 	- Add automatic supported-layout adaptation for 7.1-to-5.1 AC-3/E-AC3 encoding. MP3 encoding with more than two input channels requires an explicit downmix.
 	- Add progress snapshots and retained stage/job telemetry for media counts, operation timing, waits and sampled process RSS.
 	- Add `Property::Space::IPTC2` for FFmpeg's IPT-PQ-C2 matrix coefficient and Dolby Vision Profile 5 signaling.
