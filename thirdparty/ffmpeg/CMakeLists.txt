@@ -80,6 +80,7 @@ else()
 	set(FFMPEG_MESON_OPTIONS
 		asm=enabled
 		inline_asm=enabled
+		checkasm=disabled # This is only the check_asm test binary
 		programs=disabled
 		tests=disabled
 		avdevice=disabled
