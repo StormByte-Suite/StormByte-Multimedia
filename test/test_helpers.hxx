@@ -80,24 +80,25 @@ struct TestEntry {
 };
 
 /** @brief Active per-test output namespace, set by the selected test runner. */
-inline thread_local std::filesystem::path ActiveTestOutputScope;
+inline thread_local const std::filesystem::path* ActiveTestOutputScope = nullptr;
 
 /** @brief Restores the previous output namespace when a test case finishes. */
 class TestOutputScope final {
 	public:
 		/** @brief Selects a unique output directory for one test case. */
 		explicit TestOutputScope(std::filesystem::path scope)
-		: m_previous(std::move(ActiveTestOutputScope)) {
-			ActiveTestOutputScope = std::move(scope);
+		: m_previous(ActiveTestOutputScope), m_scope(std::move(scope)) {
+			ActiveTestOutputScope = &m_scope;
 		}
 
 		/** @brief Restores the previous output directory. */
 		~TestOutputScope() {
-			ActiveTestOutputScope = std::move(m_previous);
+			ActiveTestOutputScope = m_previous;
 		}
 
 	private:
-		std::filesystem::path m_previous; ///< Namespace active before this test.
+		const std::filesystem::path* m_previous; ///< Namespace active before this test.
+		std::filesystem::path m_scope; ///< Namespace owned by this test scope.
 };
 
 /** @brief Logs lifecycle around one function so a timeout identifies the active case. */
@@ -145,8 +146,8 @@ inline std::filesystem::path FixturePath(std::string_view relativePath) {
 /** @brief Resolves a generated result path and creates its parent directory. */
 inline std::filesystem::path OutputPath(std::string_view relativePath) {
 	auto path = std::filesystem::path{STORMBYTE_TEST_OUTPUT_DIR};
-	if (!ActiveTestOutputScope.empty())
-		path /= ActiveTestOutputScope;
+	if (ActiveTestOutputScope != nullptr)
+		path /= *ActiveTestOutputScope;
 	path /= relativePath;
 	std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
 	std::error_code error;
