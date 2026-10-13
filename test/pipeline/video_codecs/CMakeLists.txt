@@ -23,6 +23,8 @@ endforeach()
 foreach(test_name IN ITEMS
 		test_nvenc_encodes_h264_mp4
 		test_nvenc_encodes_h264_10bit_matroska
+		test_nvenc_encodes_hevc_main_matroska
+		test_nvenc_encodes_hevc_main10_matroska
 		test_nvenc_encodes_av1_matroska
 	test_x264_encodes_h264_mp4
 	test_x265_encodes_hevc_matroska

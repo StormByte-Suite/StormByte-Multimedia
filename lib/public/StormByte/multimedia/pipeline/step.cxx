@@ -149,12 +149,16 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		}
 
 		void Completed(bool success) noexcept override {
+			if (m_step.m_name == Producer::Encoder)
+				m_step.WakeDownstream();
 			m_step.NotifyComplete(success);
 		}
 
 		void BecameReady() noexcept override {
 			m_step.Log(Level::Debug, "ready");
 			m_step.Wake();
+			if (m_step.m_name == Producer::Encoder)
+				m_step.WakeDownstream();
 		}
 
 		void RecordWork(std::chrono::nanoseconds duration) noexcept override {
@@ -335,6 +339,8 @@ void Step::Fail(StormByte::Safe::String reason) noexcept {
 		plan = m_plan;
 	}
 	m_telemetry->SetError(message);
+	if (m_name == Producer::Encoder)
+		WakeDownstream();
 	if (plan)
 		plan->State(Plan::State::Failed, message);
 	Log(Level::Error, message);
@@ -387,6 +393,16 @@ StormByte::Safe::Optional<StormByte::Safe::String> Step::Error() const noexcept 
 
 void Step::Wake() noexcept {
 	m_state->pipe.Wake();
+}
+
+void Step::WakeDownstream() noexcept {
+	std::vector<Step*> downstream;
+	{
+		StormByte::Safe::UniqueLock lock(m_state->mutex);
+		downstream = m_state->downstream;
+	}
+	for (auto* stage : downstream)
+		stage->m_state->pipe.Wake();
 }
 
 Backend::Pipeline::Pipe& Step::pipe() noexcept {

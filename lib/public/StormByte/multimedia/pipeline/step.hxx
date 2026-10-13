@@ -728,6 +728,11 @@ namespace StormByte {
 					void CloseHoppers() noexcept;
 
 					/**
+					 * @brief Wakes connected consumers after an encoder lifecycle transition.
+					 */
+					void WakeDownstream() noexcept;
+
+					/**
 					 * @brief Binds one shared intention and propagates it through registered links.
 					 * @param plan Shared job intention; conflicting identities fail the job.
 					 */

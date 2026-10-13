@@ -157,6 +157,30 @@ namespace {
 			containerName, codecName, encoder);
 	}
 
+	int CheckNvencHevcEncode(std::string_view source, std::string_view destination,
+		AVPixelFormat sourceFormat, int expectedProfile) {
+		const auto* encoder = avcodec_find_encoder_by_name("hevc_nvenc");
+		if (!encoder)
+			return TEST_SKIP;
+		if (const int result = CheckHardwareEncoderCapability(encoder, 320, 192, sourceFormat); result != 0)
+			return result;
+		const auto output = OutputPath(destination);
+		if (const int result = CheckVideoCodec(FixturePath(source), output, "Matroska", "H.265",
+			"hevc_nvenc"); result != 0)
+			return result;
+
+		AVFormatContext* native = nullptr;
+		const auto closeInput = [](AVFormatContext* context) { avformat_close_input(&context); };
+		const int opened = avformat_open_input(&native, output.string().c_str(), nullptr, nullptr);
+		std::unique_ptr<AVFormatContext, decltype(closeInput)> inspected(native, closeInput);
+		TEST_REQUIRE(opened >= 0);
+		TEST_REQUIRE(avformat_find_stream_info(inspected.get(), nullptr) >= 0);
+		TEST_REQUIRE(inspected->nb_streams == 1);
+		TEST_REQUIRE(inspected->streams[0]->codecpar->codec_id == AV_CODEC_ID_HEVC);
+		TEST_REQUIRE(inspected->streams[0]->codecpar->profile == expectedProfile);
+		return 0;
+	}
+
 	int CheckAv1Decode(std::string_view decoder, std::string_view encodedName, std::string_view decodedName) {
 		const auto encoded = OutputPath(encodedName);
 		const int result = CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"), encoded,
@@ -258,6 +282,16 @@ int test_nvenc_encodes_h264_10bit_matroska() {
 		"Matroska", "H.264", "h264_nvenc", {}, AV_PIX_FMT_YUV420P10LE);
 }
 
+int test_nvenc_encodes_hevc_main_matroska() {
+	return CheckNvencHevcEncode("video/xvid_mp3_stereo.avi", "pipeline/video-codecs/nvenc-hevc-main.mkv",
+		AV_PIX_FMT_NV12, AV_PROFILE_HEVC_MAIN);
+}
+
+int test_nvenc_encodes_hevc_main10_matroska() {
+	return CheckNvencHevcEncode("video/hdr10_metadata_source.mkv", "pipeline/video-codecs/nvenc-hevc-main10.mkv",
+		AV_PIX_FMT_YUV420P10LE, AV_PROFILE_HEVC_MAIN_10);
+}
+
 int test_nvenc_encodes_av1_matroska() {
 	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"), OutputPath("pipeline/video-codecs/nvenc-av1.mkv"),
 		"Matroska", "AV1", "av1_nvenc", {}, AV_PIX_FMT_YUV420P10LE);
@@ -320,6 +354,8 @@ int RunPipelineVideoCodecTests(int argc, char** argv) {
 		TestEntry{"test_nvenc_feature_contract", test_nvenc_feature_contract},
 		TestEntry{"test_nvenc_encodes_h264_mp4", test_nvenc_encodes_h264_mp4},
 		TestEntry{"test_nvenc_encodes_h264_10bit_matroska", test_nvenc_encodes_h264_10bit_matroska},
+		TestEntry{"test_nvenc_encodes_hevc_main_matroska", test_nvenc_encodes_hevc_main_matroska},
+		TestEntry{"test_nvenc_encodes_hevc_main10_matroska", test_nvenc_encodes_hevc_main10_matroska},
 		TestEntry{"test_nvenc_encodes_av1_matroska", test_nvenc_encodes_av1_matroska},
 		TestEntry{"test_vaapi_encodes_hevc_main_matroska", test_vaapi_encodes_hevc_main_matroska},
 		TestEntry{"test_libwebp_anim_encodes_webp", test_libwebp_anim_encodes_webp},

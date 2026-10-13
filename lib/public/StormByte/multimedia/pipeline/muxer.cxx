@@ -274,7 +274,9 @@ bool Muxer::SetupPlan() noexcept {
 			if (Stopping())
 				return false;
 			const auto& opened = *encoder->second;
-			const bool usable = !opened.Failed() && (opened.Ready() || opened.Opened());
+			const auto state = opened.Status();
+			const bool completed = state == State::Stopped && opened.pipe().InputEof();
+			const bool usable = !opened.Failed() && (opened.Ready() || opened.Opened() || completed);
 			if (Plan()->State() != Plan::State::Running || !usable) {
 				Fail(opened.Error().value_or(StormByte::Safe::String("encoder is not ready")));
 				return false;
