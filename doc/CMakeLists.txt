@@ -35,7 +35,7 @@ if(ENABLE_DOC)
 	set(DOXYGEN_INCLUDE_PATH
 		"${CMAKE_SOURCE_DIR}/lib/public"
 		"${CMAKE_BINARY_DIR}/lib/public"
-		"${CMAKE_BINARY_DIR}/stormbyte-buildmaster/install/include"
+		"${BUILDMASTER_INSTALL_INCLUDEDIR}"
 		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/lib/public"
 		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/thirdparty/StormByte/logger/src/lib/public"
 		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/thirdparty/StormByte/system/src/lib/public"
