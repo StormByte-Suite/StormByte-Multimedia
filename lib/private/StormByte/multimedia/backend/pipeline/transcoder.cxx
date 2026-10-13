@@ -221,8 +221,11 @@ void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcep
 }
 
 void Transcoder::RequestCancel() noexcept {
-	Cancel.store(true, StormByte::Safe::MemoryOrder::Release);
-	Paused.store(false, StormByte::Safe::MemoryOrder::Release);
+	{
+		StormByte::Safe::UniqueLock lock(PauseMutex);
+		Cancel.store(true, StormByte::Safe::MemoryOrder::Release);
+		Paused.store(false, StormByte::Safe::MemoryOrder::Release);
+	}
 	PauseCv.notify_all();
 }
 

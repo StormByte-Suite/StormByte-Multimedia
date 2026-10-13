@@ -95,11 +95,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	}
 
 	void Demux::StopFeed(bool cancelPending) noexcept {
-		m_feedStop.store(true, StormByte::Safe::MemoryOrder::Release);
-		if (cancelPending) {
+		if (cancelPending)
 			m_owner.pipe().Abort();
+		{
+			// Publish under the mutex so a feeder cannot miss it between predicate and wait.
 			StormByte::Safe::UniqueLock lock(m_parkMutex);
-			m_park.clear();
+			m_feedStop.store(true, StormByte::Safe::MemoryOrder::Release);
+			if (cancelPending)
+				m_park.clear();
 		}
 		m_parkCv.notify_all();
 		for (auto& feeder : m_feeds)

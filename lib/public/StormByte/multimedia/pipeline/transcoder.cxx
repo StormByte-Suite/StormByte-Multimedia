@@ -597,7 +597,10 @@ void Transcoder::Resume() noexcept {
 		return;
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Paused)
 		return;
-	m_backend->Paused.store(false, StormByte::Safe::MemoryOrder::Release);
+	{
+		StormByte::Safe::UniqueLock lock(m_backend->PauseMutex);
+		m_backend->Paused.store(false, StormByte::Safe::MemoryOrder::Release);
+	}
 	m_backend->Status.store(Status::Running, StormByte::Safe::MemoryOrder::Release);
 	m_backend->PauseCv.notify_all();
 	JobLog(m_logger, Level::Notice, "resumed");
