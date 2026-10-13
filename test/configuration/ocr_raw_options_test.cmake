@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.20)
+
+if(NOT DEFINED REPO OR NOT DEFINED WORK)
+	message(FATAL_ERROR "REPO and WORK are required")
+endif()
+
+function(buildmaster_component)
+endfunction()
+
+function(buildmaster_link)
+endfunction()
+
+function(buildmaster_group_add)
+endfunction()
+
+function(target_include_directories)
+endfunction()
+
+set(CMAKE_CURRENT_BINARY_DIR "${WORK}")
+set(CMAKE_CURRENT_SOURCE_DIR "${REPO}/thirdparty/ocr/tesseract")
+set(CMAKE_CXX_FLAGS "user-flags-sentinel")
+foreach(msvc_mode IN ITEMS FALSE TRUE)
+	set(MSVC "${msvc_mode}")
+	include("${REPO}/thirdparty/ocr/tesseract/CMakeLists.txt")
+	if(MSVC)
+		set(prefix /D)
+	else()
+		set(prefix -D)
+	endif()
+	set(expected "CMAKE_CXX_FLAGS=user-flags-sentinel ${prefix}TESSERACT_DISABLE_DEBUG_FONTS ${prefix}TESSERACT_IMAGEDATA_AS_PIX")
+	if(NOT "${expected}" IN_LIST TESSERACT_OPTIONS)
+		message(FATAL_ERROR "Bundled Tesseract must preserve caller flags and enable raw image storage")
+	endif()
+	if(NOT CMAKE_CXX_FLAGS STREQUAL "user-flags-sentinel")
+		message(FATAL_ERROR "Tesseract options changed the outer compiler flags")
+	endif()
+endforeach()

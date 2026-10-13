@@ -36,4 +36,10 @@ if(ENABLE_TEST)
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/simd_options_test.cmake")
 	set_tests_properties(configuration.test_simd_options
 		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration")
+	add_test(NAME configuration.test_ocr_raw_options
+		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+		"-DWORK=${PROJECT_BINARY_DIR}/test-output/ocr-raw-options"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/ocr_raw_options_test.cmake")
+	set_tests_properties(configuration.test_ocr_raw_options
+		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration;ocr")
 endif()

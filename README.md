@@ -450,6 +450,8 @@ Codec availability depends on the selected media-engine build and its installed 
 
 OCR converts bitmap subtitle frames to text when a text subtitle codec is selected. Source language metadata selects the Tesseract model; a missing model is an error, not a translation service. Bundled tessdata uses `tessdata_best` LSTM models and embeds only the languages listed in [the tessdata wrapper configuration](thirdparty/ocr/tessdata/cmake-wrapper/CMakeLists.txt). Maintain `TESSDATA_LANGUAGES` using base model identifiers only; the generator also includes each available `_vert` variant automatically. The current selection contains 55 base languages and four vertical variants, covering European and major Asian subtitle languages plus Arabic, Hebrew, Turkish and Persian. System tessdata requires an installation discoverable by the configured paths or Tesseract environment and embeds the installed models without applying the bundled selection.
 
+Bitmap subtitle OCR consumes decoded grayscale pixels, not encoded JPEG, PNG or TIFF files. Bundled Tesseract keeps its internal image data as Leptonica `Pix` objects and omits TIFF-backed diagnostic fonts; bundled Leptonica's external image codecs remain disabled.
+
 Typical configure:
 
 ```sh
