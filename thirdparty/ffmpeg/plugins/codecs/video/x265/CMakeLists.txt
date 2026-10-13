@@ -89,7 +89,11 @@ endif()
 # (notably sse_t* ctuDistortion). Combining their IR violates the ODR, as
 # diagnosed by GCC LTO. Keep all bit depths outside IPO on every compiler;
 # native optimization and assembly remain enabled.
-set(X265_12_OPTSTR "SOURCE=source;NOINSTALL;IPO=off;GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-json11-cstdint.patch;TITLE=json11 cstdint}")
+set(X265_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-json11-cstdint.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-respect-archive-version.patch"
+)
+set(X265_12_OPTSTR "SOURCE=source;NOINSTALL;IPO=off;GIT={RESET;PATCH={${X265_PATCHES}};TITLE=x265 compatibility}")
 set(X265_10_OPTSTR "SOURCE=source;NOINSTALL;IPO=off")
 set(X265_8_OPTSTR "SOURCE=source;IPO=off")
 if(FFMPEG_BUNDLED_TYPE STREQUAL "static")

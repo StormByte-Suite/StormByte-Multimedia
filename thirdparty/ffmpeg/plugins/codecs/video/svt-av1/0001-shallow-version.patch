@@ -1,0 +1,34 @@
+diff --git a/Source/Lib/Codec/ConfigureGitVersion.cmake b/Source/Lib/Codec/ConfigureGitVersion.cmake
+--- a/Source/Lib/Codec/ConfigureGitVersion.cmake
++++ b/Source/Lib/Codec/ConfigureGitVersion.cmake
+@@ -175,7 +175,7 @@
+     execute_process(COMMAND
+         ${GIT_EXECUTABLE} -C ${git_root_dir}
+             describe
+-            --tags --dirty --abbrev
++            --tags --abbrev
+             --match "${match_pattern}"
+         RESULT_VARIABLE res
+         OUTPUT_VARIABLE out
+@@ -194,7 +194,7 @@
+     execute_process(COMMAND
+         ${GIT_EXECUTABLE} -C ${git_root_dir}
+             describe
+-            --tags --dirty --abbrev
++            --tags --abbrev
+             --always
+             --match "v[0-9]*.[0-9]*.[0-9]"
+             --match "v[0-9]*.[0-9]*.[0-9]-rc*"
+@@ -278,7 +278,11 @@
+ if(describe_result)
+     message(WARNING "Failure to get version from Git: ${describe_error}")
+ else()
+-    set(PACKAGE_VERSION_STRING "${describe_output}")
++    if(describe_output MATCHES "^[0-9a-f]+$")
++        set(PACKAGE_VERSION_STRING "${PACKAGE_VERSION_STRING}+g${describe_output}")
++    else()
++        set(PACKAGE_VERSION_STRING "${describe_output}")
++    endif()
+ endif()
+ 
+ configure_version()

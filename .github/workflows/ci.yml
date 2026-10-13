@@ -31,7 +31,7 @@ jobs:
       - name: Warm repository + submodule cache
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: recursive
 
   ###########################################################################
@@ -65,7 +65,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: recursive
 
       - name: Install nasm/yasm (bundled FFmpeg)
@@ -112,7 +112,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: recursive
 
       - name: Build with toolchain
@@ -149,7 +149,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: recursive
 
       # Temporary until BuildMaster's stamp walker handles symbolic links before SHA256.
@@ -232,7 +232,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: recursive
 
       - name: Install toolchain (docs)

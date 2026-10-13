@@ -103,6 +103,18 @@ if(ENABLE_TEST)
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/simd_options_test.cmake")
 	set_tests_properties(configuration.test_simd_options
 		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration")
+	add_test(NAME configuration.test_x265_shallow_version
+		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+		"-DWORK=${PROJECT_BINARY_DIR}/test-output/x265-shallow-version"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/x265_shallow_version_test.cmake")
+	set_tests_properties(configuration.test_x265_shallow_version
+		PROPERTIES TIMEOUT 30 LABELS "multimedia;configuration")
+	add_test(NAME configuration.test_shallow_codec_versions
+		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+		"-DWORK=${PROJECT_BINARY_DIR}/test-output/shallow-codec-versions"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/shallow_codec_versions_test.cmake")
+	set_tests_properties(configuration.test_shallow_codec_versions
+		PROPERTIES TIMEOUT 60 LABELS "multimedia;configuration")
 	add_test(NAME configuration.test_ocr_raw_options
 		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
 		"-DWORK=${PROJECT_BINARY_DIR}/test-output/ocr-raw-options"

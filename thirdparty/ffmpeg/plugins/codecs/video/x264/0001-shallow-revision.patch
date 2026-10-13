@@ -1,0 +1,36 @@
+diff --git a/version.py b/version.py
+--- a/version.py
++++ b/version.py
+@@ -10,6 +10,7 @@
+ # Usage:
+ # version.py [--build | --revision | --commit-hash | --package-version]
+ import argparse
++import json
+ import subprocess
+ import os
+ import sys
+@@ -57,7 +58,14 @@
+        localver = len(output)
+        head_commit = output[0][0:7]
+ 
+-       if localver > 1:
++       shallow = subprocess.run(['git', '--git-dir=' + git_dir, 'rev-parse', '--is-shallow-repository'], stdout=subprocess.PIPE, text=True, check=True).stdout.strip() == 'true'
++       if shallow:
++           with open(os.path.join(srcroot, 'shallow_version.json'), 'r') as version_file:
++               pinned_version = json.load(version_file)
++           if pinned_version['commit'] != output[0]:
++               raise RuntimeError('Update shallow_version.json for the pinned x264 commit')
++           ver = pinned_version['revision']
++       elif localver > 1:
+            git_cmd = subprocess.run(['git', '--git-dir=' + git_dir, 'rev-list', 'origin/master..HEAD'], stdout=subprocess.PIPE, text=True)
+            ver_diff = len(git_cmd.stdout.strip().splitlines())
+            ver = localver - ver_diff
+diff --git a/shallow_version.json b/shallow_version.json
+new file mode 100644
+--- /dev/null
++++ b/shallow_version.json
+@@ -0,0 +1,4 @@
++{
++  "commit": "00852f599572d10798b2dafd2c5286213d0ce795",
++  "revision": "3223+93"
++}

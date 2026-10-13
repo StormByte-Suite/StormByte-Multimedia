@@ -26,7 +26,7 @@ buildmaster_component(
 	"${SVTAV1_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"SvtAv1Enc"
-	""
+	"GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-shallow-version.patch;TITLE=SVT-AV1 shallow version}"
 )
 buildmaster_group_add(ff-video svt-av1)
 register_plugin(svt-av1 "libsvtav1=enabled")

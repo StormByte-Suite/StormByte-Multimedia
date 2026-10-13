@@ -1,0 +1,23 @@
+diff --git a/source/cmake/Version.cmake b/source/cmake/Version.cmake
+--- a/source/cmake/Version.cmake
++++ b/source/cmake/Version.cmake
+@@ -48,7 +48,7 @@
+     endif()
+ endif(HG_EXECUTABLE)
+ find_package(Git QUIET) #No restrictions on Git versions used, any versions from 1.8.x to 2.2.x or later should do.
+-if(GIT_FOUND)
++if(GIT_FOUND AND NOT DEFINED GIT_ARCHETYPE)
+     find_program(GIT_EXECUTABLE git)
+     message(STATUS "GIT_EXECUTABLE ${GIT_EXECUTABLE}")
+     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
+diff --git a/x265Version.txt b/x265Version.txt
+--- a/x265Version.txt
++++ b/x265Version.txt
+@@ -2,3 +2,3 @@
+-repositorychangeset: 6318f22
+-releasetagdistance: 1
+-releasetag: 4.0
++repositorychangeset: e444744c03978c1fb4e037168967020cf2648427
++releasetagdistance: 0
++releasetag: 4.2
+

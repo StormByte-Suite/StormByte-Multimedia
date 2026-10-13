@@ -42,6 +42,11 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
 	list(APPEND OPUS_OPTIONS "-DCMAKE_ASM_NASM_FLAGS=-DPIC -w-pp-macro-params-legacy")
 endif()
 
+set(OPUS_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-copy-DNN-data.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-shallow-package-version.patch"
+)
+
 buildmaster_component(
 	opus
 	"${OPUS_COMPONENT}"
@@ -49,7 +54,7 @@ buildmaster_component(
 	"${OPUS_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"opus"
-	"BACKEND=cmake;GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-copy-DNN-data.patch;TITLE=Opus copy DNN data};FILES={URL=https://media.xiph.org/opus/models/opus_data-${OPUS_DATA_HASH}.tar.gz;NAME=opus-dnn;SHA256=${OPUS_DATA_HASH};UNPACK;TITLE=Opus DNN data}"
+	"BACKEND=cmake;GIT={RESET;PATCH={${OPUS_PATCHES}};TITLE=Opus compatibility};FILES={URL=https://media.xiph.org/opus/models/opus_data-${OPUS_DATA_HASH}.tar.gz;NAME=opus-dnn;SHA256=${OPUS_DATA_HASH};UNPACK;TITLE=Opus DNN data}"
 )
 buildmaster_group_add(ff-audio opus)
 register_plugin(opus "libopus=enabled")

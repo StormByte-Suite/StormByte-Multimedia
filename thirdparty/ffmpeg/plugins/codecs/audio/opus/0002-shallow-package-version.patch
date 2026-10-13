@@ -1,0 +1,46 @@
+diff --git a/cmake/OpusPackageVersion.cmake b/cmake/OpusPackageVersion.cmake
+index 447ce3b1..d8be7da8 100644
+--- a/cmake/OpusPackageVersion.cmake
++++ b/cmake/OpusPackageVersion.cmake
+@@ -28,10 +28,11 @@ function(get_package_version PACKAGE_VERSION PROJECT_VERSION)
+       message(STATUS "Opus package version from git repo: ${OPUS_PACKAGE_VERSION}")
+     endif()
+ 
+-  elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/package_version"
++  endif()
++  if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/stormbyte_package_version"
+          AND NOT OPUS_PACKAGE_VERSION)
+     # Not a git repo, lets' try to parse it from package_version file if exists
+-    file(STRINGS package_version OPUS_PACKAGE_VERSION
++    file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/stormbyte_package_version" OPUS_PACKAGE_VERSION
+          LIMIT_COUNT 1
+          REGEX "PACKAGE_VERSION=")
+     string(REPLACE "PACKAGE_VERSION="
+diff --git a/meson/get-version.py b/meson/get-version.py
+index d3835f13..8ed458ea 100755
+--- a/meson/get-version.py
++++ b/meson/get-version.py
+@@ -36,11 +36,9 @@ if __name__ == '__main__':
+ 
+         if is_git and have_git:
+             git_cmd = subprocess.run(['git', '--git-dir=' + git_dir, 'describe', 'HEAD'], stdout=subprocess.PIPE)
+-            if git_cmd.returncode:
+-                print('ERROR: Could not extract package version via `git describe` in', srcroot, file=sys.stderr)
+-                sys.exit(-1)
+-            package_version = git_cmd.stdout.decode('ascii').strip().lstrip('v')
+-        else:
++            if git_cmd.returncode == 0:
++                package_version = git_cmd.stdout.decode('ascii').strip().lstrip('v')
++        if not package_version:
+-            with open(os.path.join(srcroot, 'package_version'), 'r') as f:
++            with open(os.path.join(srcroot, 'stormbyte_package_version'), 'r') as f:
+                 for line in f:
+                     if line.startswith('PACKAGE_VERSION="'):
+diff --git a/stormbyte_package_version b/stormbyte_package_version
+new file mode 100644
+index 00000000..c5e0eec0
+--- /dev/null
++++ b/stormbyte_package_version
+@@ -0,0 +1,2 @@
++AUTO_UPDATE=no
++PACKAGE_VERSION="1.6.1"
