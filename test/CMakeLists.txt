@@ -25,4 +25,10 @@ if(ENABLE_TEST)
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/bundled_includes_test.cmake")
 	set_tests_properties(configuration.test_bundled_checkout_includes
 		PROPERTIES TIMEOUT 30 LABELS "multimedia;configuration")
+	add_test(NAME configuration.test_tessdata_language_selection
+		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+		"-DWORK=${PROJECT_BINARY_DIR}/test-output/tessdata-selection"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/tessdata_selection_test.cmake")
+	set_tests_properties(configuration.test_tessdata_language_selection
+		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration;ocr")
 endif()

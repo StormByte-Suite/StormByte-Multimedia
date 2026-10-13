@@ -81,13 +81,13 @@
 	url = https://github.com/tesseract-ocr/tesseract.git
 [submodule "tessdata"]
 	path = thirdparty/ocr/tessdata/cmake-wrapper/src
-	url = https://github.com/tesseract-ocr/tessdata_fast.git
+	url = https://github.com/tesseract-ocr/tessdata_best.git
 [submodule "StormByte Suite - Buffer"]
 	path = thirdparty/StormByte/buffer/src
 	url = https://github.com/StormByte-Suite/StormByte-Buffer.git
 [submodule "ebur128"]
 	path = thirdparty/ebur128/src
 	url = https://github.com/jiixyj/libebur128.git
-[submodule "thirdparty/ffmpeg/plugins/deps/ffnvcodec/src"]
+[submodule "NVIDIA codec headers"]
 	path = thirdparty/ffmpeg/plugins/deps/ffnvcodec/src
 	url = https://github.com/FFmpeg/nv-codec-headers.git

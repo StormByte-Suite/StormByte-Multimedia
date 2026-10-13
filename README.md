@@ -446,7 +446,7 @@ With `SYSTEM`, the system installation determines codec availability and its ass
 
 Codec availability depends on the selected media-engine build and its installed dependencies, not just the registry name. A pinned implementation such as `libx265` must be present in that build. The library's tests exercise media through the StormByte API and do not require separate command-line media tools.
 
-OCR converts bitmap subtitle frames to text when a text subtitle codec is selected. Source language metadata selects the Tesseract model; a missing model is an error, not a translation service. Bundled tessdata packages language models separately from the OCR engine. System tessdata requires an installation discoverable by the configured paths or Tesseract environment.
+OCR converts bitmap subtitle frames to text when a text subtitle codec is selected. Source language metadata selects the Tesseract model; a missing model is an error, not a translation service. Bundled tessdata uses `tessdata_best` LSTM models and embeds only the languages listed in [the tessdata wrapper configuration](thirdparty/ocr/tessdata/cmake-wrapper/CMakeLists.txt). Maintain `TESSDATA_LANGUAGES` using base model identifiers only; the generator also includes each available `_vert` variant automatically. The current selection contains 55 base languages and four vertical variants, covering European and major Asian subtitle languages plus Arabic, Hebrew, Turkish and Persian. System tessdata requires an installation discoverable by the configured paths or Tesseract environment and embeds the installed models without applying the bundled selection.
 
 Typical configure:
 

@@ -17,7 +17,23 @@ if(NOT DEFINED GENERATED_TESSDATA_DIR)
 	set(GENERATED_TESSDATA_DIR "${CMAKE_CURRENT_BINARY_DIR}/tessdata")
 endif()
 
-file(GLOB TESSDATA_FILES CONFIGURE_DEPENDS "${TESSDATA_DIR}/*.traineddata")
+if(DEFINED TESSDATA_LANGUAGES)
+	set(TESSDATA_FILES "")
+	foreach(language IN LISTS TESSDATA_LANGUAGES)
+		set(model "${TESSDATA_DIR}/${language}.traineddata")
+		if(NOT EXISTS "${model}")
+			message(FATAL_ERROR "[tessdata] Selected language model is missing: ${model}")
+		endif()
+		list(APPEND TESSDATA_FILES "${model}")
+		set(vertical "${TESSDATA_DIR}/${language}_vert.traineddata")
+		if(EXISTS "${vertical}")
+			list(APPEND TESSDATA_FILES "${vertical}")
+		endif()
+	endforeach()
+	list(REMOVE_DUPLICATES TESSDATA_FILES)
+else()
+	file(GLOB TESSDATA_FILES CONFIGURE_DEPENDS "${TESSDATA_DIR}/*.traineddata")
+endif()
 
 if(NOT TESSDATA_FILES)
 	message(WARNING "[tessdata] No .traineddata files found in \"${TESSDATA_DIR}\"")
@@ -25,7 +41,14 @@ if(NOT TESSDATA_FILES)
 endif()
 
 list(LENGTH TESSDATA_FILES _count)
-message(STATUS "[tessdata] Generating ${_count} tessdata languages")
+if(DEFINED TESSDATA_LANGUAGES)
+	set(_base_languages ${TESSDATA_LANGUAGES})
+	list(REMOVE_DUPLICATES _base_languages)
+	list(LENGTH _base_languages _base_count)
+	message(STATUS "[tessdata] Generating ${_count} models for ${_base_count} selected languages (including available vertical variants)")
+else()
+	message(STATUS "[tessdata] Generating ${_count} installed models")
+endif()
 
 file(MAKE_DIRECTORY "${GENERATED_TESSDATA_DIR}")
 
@@ -104,6 +127,8 @@ ${SWITCH_CASES}			default:
 
 list(APPEND STORMBYTE_TESSDATA_GENERATED_SOURCE "${_catalog}")
 
-set_source_files_properties(${STORMBYTE_TESSDATA_GENERATED_SOURCE} PROPERTIES
-	COMPILE_OPTIONS "$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-c23-extensions>"
-)
+if(NOT CMAKE_SCRIPT_MODE_FILE)
+	set_source_files_properties(${STORMBYTE_TESSDATA_GENERATED_SOURCE} PROPERTIES
+		COMPILE_OPTIONS "$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-c23-extensions>"
+	)
+endif()

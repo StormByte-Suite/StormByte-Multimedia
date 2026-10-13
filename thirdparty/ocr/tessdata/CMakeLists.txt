@@ -8,10 +8,7 @@ if(WITH_OCR STREQUAL "SYSTEM")
 		"WITH_OCR=SYSTEM;CMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/cmake"
 	)
 else()
-	file(GLOB _bundled
-		"${CMAKE_CURRENT_LIST_DIR}/cmake-wrapper/src/*.traineddata")
-	list(LENGTH _bundled _bundled_n)
-	message(STATUS "tessdata ${_bundled_n} languages [BUNDLED]")
+	message(STATUS "tessdata best [BUNDLED]: languages selected in cmake-wrapper/CMakeLists.txt")
 	target_include_directories(StormByte-Multimedia BEFORE PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/cmake-wrapper/include"
 	)
