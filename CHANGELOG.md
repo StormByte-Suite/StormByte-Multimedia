@@ -22,7 +22,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ## [Unreleased]
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/v1.0.0...HEAD
 
-## [1.0.0] - 2026-10-12
+## [1.0.0] - 2026-10-13
 
 ### Added
 
@@ -63,6 +63,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Declare static HDR10 signaling/preservation for libaom AV1 and HDR10 signaling for SVT-AV1. Preserve replacement-frame HDR/Dolby Vision metadata without overwriting recalculated HDR10+ or duplicating DOVI entries; initialize look-decoder Dolby Vision from effective packet parameters, not stale source HEVC profile. Check AV1 profile 10 metadata without requiring HEVC-format raw RPU buffers, and allow only AV1 representation quantization during HEVC-to-AV1 static metadata comparisons.
 	- Classify Dolby Vision Profile 5 IPT-C2/PQ separately from HDR10; HDR10 heuristics require a BT.2020 NCL/CL matrix as well as BT.2020 primaries and PQ transfer.
 - Muxing, codecs and packet flow:
+	- Implement buffered AVIO backpressure handling: preserve temporary reader unavailability as EAGAIN rather than EOF and rearm retained AVIO EAGAIN before the next packet read. Flush pending writer bytes and split oversized output blocks within the callback without loss or duplication, while preserving terminal I/O errors.
 	- Keep remux input indices separate from encoder output indices during reservation/routing; respect reservation failures before publishing connections. Preserve packet properties and side data, including late libaom AV1 extradata and audio skip samples, by copying after payload allocation. Clone remux codec parameters after short sources reach EOF so subtitle-only outputs can write headers.
 	- Prepare subtitle encoders during mux reservation so real codec parameters/extradata exist before the first cue. Remove flush-time substitution of unopened encoders with SubRip, preserve audio/video decoder errors, support delayed subtitle tracks, and supply MOV timed-text encoders with ASS rectangles while retaining cue timing.
 	- Adapt JPEG/PNG/BMP attachments to MOV/MP4 cover-art packets, retain Matroska serialization and existing `File` classification, and reject unsupported MP4 attachments. Implement Watermark setup for path and binary overlays.

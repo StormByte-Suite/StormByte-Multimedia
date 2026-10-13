@@ -161,6 +161,8 @@ namespace StormByte::Multimedia::Backend {
 			reinterpret_cast<std::byte*>(buf), static_cast<std::size_t>(bufSize)));
 		if (got.status == Status::Error || got.status == Status::Failed)
 			return AVERROR(EIO);
+		if (got.status == Status::TryAgain)
+			return AVERROR(EAGAIN);
 		if (got.count == 0)
 			return AVERROR_EOF;
 		return static_cast<int>(got.count);
@@ -173,13 +175,27 @@ namespace StormByte::Multimedia::Backend {
 		if (!self->m_writer)
 			return AVERROR(EINVAL);
 
-		const auto put = self->m_writer->Write(std::span<const std::byte>(
-			reinterpret_cast<const std::byte*>(buf), static_cast<std::size_t>(bufSize)));
-		if (put.status == Status::Error || put.status == Status::Failed)
-			return AVERROR(EIO);
-		if (put.count == 0)
-			return AVERROR(EIO);
-		return static_cast<int>(put.count);
+		const auto bytes = std::span<const std::byte>(
+			reinterpret_cast<const std::byte*>(buf), static_cast<std::size_t>(bufSize));
+		std::size_t offset = 0;
+		while (offset < bytes.size()) {
+			auto block = bytes.subspan(offset);
+			auto put = self->m_writer->Write(block);
+			if (put.status == Status::TryAgain) {
+				if (put.count != 0 || self->m_writer->Flush().status != Status::Ok)
+					return AVERROR(EIO);
+				std::size_t size = block.size();
+				const auto chunk = static_cast<std::size_t>(self->m_writer->WriteChunk());
+				if (chunk != 0 && self->m_writer->BackPressure() != 0 && size > chunk)
+					size = chunk;
+				block = block.first(size);
+				put = self->m_writer->Write(block);
+			}
+			if (put.status != Status::Ok || put.count != StormByte::ByteSize{block.size()})
+				return AVERROR(EIO);
+			offset += block.size();
+		}
+		return bufSize;
 	}
 
 	std::int64_t FileAvio::Seek(void* opaque, std::int64_t offset, int whence) noexcept {

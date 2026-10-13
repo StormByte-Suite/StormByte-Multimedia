@@ -376,6 +376,10 @@ StormByte::Safe::Optional<Property::Duration> FFmpeg::AVFormatContext::Duration(
 
 FFmpeg::OperationResult FFmpeg::AVFormatContext::ReadPacket(AVPacket& packet) noexcept {
 	packet.Unref();
+	if (m_ptr->pb && m_ptr->pb->error == AVERROR(EAGAIN)) {
+		m_ptr->pb->error = 0;
+		m_ptr->pb->eof_reached = 0;
+	}
 	int ret = av_read_frame(m_ptr, packet.Get());
 	switch(ret) {
 		case AVERROR(EAGAIN):
