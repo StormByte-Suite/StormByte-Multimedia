@@ -2,7 +2,6 @@ add_executable(MultimediaPipelineOcrTests ocr_test.cxx)
 target_link_libraries(MultimediaPipelineOcrTests PRIVATE multimedia_pipeline_test_support)
 
 if(WITH_OCR STREQUAL "BUNDLED")
-	target_compile_definitions(MultimediaPipelineOcrTests PRIVATE STORMBYTE_TEST_WITH_BUNDLED_OCR)
 	add_executable(MultimediaOcrModelTests model_reader_test.cxx
 		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ocr/engine.cxx"
 		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ocr/exception.cxx")

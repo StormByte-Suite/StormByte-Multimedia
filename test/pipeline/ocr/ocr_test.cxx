@@ -64,7 +64,6 @@ using namespace StormByte::Multimedia::Pipeline;
 using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
-#ifdef STORMBYTE_TEST_WITH_BUNDLED_OCR
 namespace {
 	std::string ReadFileBytes(const std::filesystem::path& path) {
 		std::ifstream input{path, std::ios::binary};
@@ -79,10 +78,8 @@ namespace {
 		return result;
 	}
 }
-#endif
 
 int test_transcoder_ocr_japanese_pgs_to_subrip() {
-#ifdef STORMBYTE_TEST_WITH_BUNDLED_OCR
 	auto& registry = Registry::Instance();
 	auto subrip = registry.FindCodec("SubRip");
 	TEST_REQUIRE(subrip);
@@ -118,9 +115,6 @@ int test_transcoder_ocr_japanese_pgs_to_subrip() {
 	TEST_REQUIRE(foundSubtitleToken);
 	TEST_REQUIRE(foundDepartureToken);
 	return 0;
-#else
-	return TEST_SKIP;
-#endif
 }
 
 int main(int argc, char** argv) {

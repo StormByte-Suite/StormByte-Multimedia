@@ -49,7 +49,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Require stages to outlive execution, propagation and notifications; stop peers before joins and serialize state publication with teardown.
 	- Accept registered `const Container&` overrides for Plan and Transcoder, independent of the output suffix. The Plan borrows the registry identity, which must outlive it.
 - Select muxers from the output path through FFmpeg's format support, with explicit policies for Matroska, WebM and MOV/MP4 and clear failures for unsupported combinations.
-- Keep optional codec, HDR/Dolby Vision and Japanese OCR cases registered across dependency/license configurations. Skip missing write support or unavailable pinned implementations; skip bundled FDK-AAC cases before pipeline startup when nonfree support is disabled, and skip Japanese OCR with system OCR independently of FFmpeg. Remove the bundled FDK-AAC availability requirement.
+- Keep optional codec, HDR/Dolby Vision and Japanese OCR cases registered across dependency/license configurations. Skip missing write support or unavailable pinned implementations; skip bundled FDK-AAC cases before pipeline startup when nonfree support is disabled. Run Japanese OCR recognition checks with both bundled and system OCR. Remove the bundled FDK-AAC availability requirement.
 - Exclude GPL-dependent filters from compilation and header installation when `WITH_GPL=OFF`; Rubberband and VagueDenoiser require GPL. The current filter set has no nonfree-dependent filters; keep the independent Hqdn3d implementation available without GPL.
 
 - Build and dependency consistency:
