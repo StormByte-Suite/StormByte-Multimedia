@@ -1,6 +1,7 @@
 add_subdirectory(StormByte)
 add_subdirectory(ffmpeg)
 add_subdirectory(ocr)
+add_subdirectory(tessdata)
 if(MSVC)
 	add_subdirectory(pthread-win32)
 endif()

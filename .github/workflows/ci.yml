@@ -88,6 +88,7 @@ jobs:
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
+            -DWITH_TESSDATA=BUNDLED
             -DWITH_VMAF=BUNDLED
             -DWITH_NONFREE=${{ matrix.extra }}
             -DWITH_GPL=${{ matrix.extra }}
@@ -125,6 +126,7 @@ jobs:
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
+            -DWITH_TESSDATA=BUNDLED
             -DWITH_VMAF=BUNDLED
             -DWITH_NONFREE=${{ matrix.extra }}
             -DWITH_GPL=${{ matrix.extra }}
@@ -172,6 +174,7 @@ jobs:
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
+            -DWITH_TESSDATA=BUNDLED
             -DWITH_VMAF=BUNDLED
             -DWITH_NONFREE=${{ matrix.extra }}
             -DWITH_GPL=${{ matrix.extra }}
@@ -259,6 +262,7 @@ jobs:
             -DWITH_FFMPEG=SYSTEM \
             -DWITH_VMAF=SYSTEM \
             -DWITH_OCR=SYSTEM \
+            -DWITH_TESSDATA=BUNDLED \
             -DWITH_ZIMG=SYSTEM \
             -DWITH_EBUR128=SYSTEM
 

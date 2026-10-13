@@ -16,7 +16,7 @@ if(MISSING_MODEL)
 	list(APPEND TESSDATA_LANGUAGES absent)
 endif()
 message(STATUS "[tessdata selection test] Using synthetic fixtures, not the bundled language selection")
-include("${REPO}/thirdparty/ocr/tessdata/cmake-wrapper/tessdata.cmake")
+include("${REPO}/thirdparty/tessdata/cmake-wrapper/tessdata.cmake")
 
 list(LENGTH TESSDATA_FILES count)
 if(NOT count EQUAL 4)

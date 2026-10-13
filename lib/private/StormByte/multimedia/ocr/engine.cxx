@@ -56,6 +56,11 @@
 
 #include <utility>
 #include <vector>
+#include <algorithm>
+#include <limits>
+#ifdef STORMBYTE_MULTIMEDIA_TESSDATA_SYSTEM
+	#include <filesystem>
+#endif
 
 /**
  * @file engine.cxx
@@ -82,6 +87,7 @@ namespace StormByte::Multimedia::OCR {
 			 * @param destination Receives the requested model bytes.
 			 * @return true if the exact model was found and copied.
 			 */
+#ifndef STORMBYTE_MULTIMEDIA_TESSDATA_SYSTEM
 			static bool Read(const char* filename, std::vector<char>* destination) noexcept {
 				if (!filename || !destination)
 					return false;
@@ -106,6 +112,7 @@ namespace StormByte::Multimedia::OCR {
 					return false;
 				}
 			}
+#endif
 
 			/**
 			 * @brief Constructs an unopened Tesseract handle.
@@ -121,7 +128,7 @@ namespace StormByte::Multimedia::OCR {
 
 			/**
 			 * @brief Loads tessdata and inits Tesseract when the language changed.
-			 * @param language Stream pin. Empty uses the default `eng` blob (no language pin).
+			 * @param language Stream pin. Empty selects `eng` from the configured model source.
 			 * @return true if Tesseract is ready.
 			 *
 			 * A non-empty pin must load that exact tessdata. There is no silent
@@ -138,6 +145,14 @@ namespace StormByte::Multimedia::OCR {
 				m_open = false;
 				m_openLanguage.clear();
 
+#ifdef STORMBYTE_MULTIMEDIA_TESSDATA_SYSTEM
+				std::error_code error;
+				const auto path = std::filesystem::path{STORMBYTE_MULTIMEDIA_TESSDATA_DIR}
+					/ (static_cast<std::string>(key) + ".traineddata");
+				if (!std::filesystem::is_regular_file(path, error) || error)
+					return false;
+				const int rc = m_api.Init(STORMBYTE_MULTIMEDIA_TESSDATA_DIR, key.c_str(), tesseract::OEM_DEFAULT);
+#else
 				auto blob = TessData(key);
 				if (!blob.has_value())
 					return false;
@@ -154,6 +169,7 @@ namespace StormByte::Multimedia::OCR {
 					nullptr,
 					false,
 					&Read);
+#endif
 				if (rc != 0)
 					return false;
 
@@ -197,7 +213,11 @@ namespace StormByte::Multimedia::OCR {
 		int stride) noexcept {
 		if (!m_model)
 			return Unexpected<OCRException>("OCR engine is not available");
-		if (width <= 0 || height <= 0 || stride < width || gray.size() < static_cast<std::size_t>(stride * height))
+		constexpr int border = 10;
+		if (width <= 0 || height <= 0 || stride < width
+			|| width > std::numeric_limits<int>::max() - 2 * border
+			|| height > std::numeric_limits<int>::max() - 2 * border
+			|| static_cast<std::size_t>(height) > gray.size() / static_cast<std::size_t>(stride))
 			return Unexpected<OCRException>("invalid OCR image");
 		if (!m_model->Open(m_language)) {
 			if (!m_language.empty())
@@ -209,7 +229,21 @@ namespace StormByte::Multimedia::OCR {
 					FallbackLanguage));
 		}
 
-		m_model->m_api.SetImage(gray.data(), width, height, 1, stride);
+		const int paddedWidth = width + 2 * border;
+		const int paddedHeight = height + 2 * border;
+		if (static_cast<std::size_t>(paddedHeight) > std::numeric_limits<std::size_t>::max() / static_cast<std::size_t>(paddedWidth))
+			return Unexpected<OCRException>("OCR image is too large");
+		std::vector<std::uint8_t> pixels;
+		try {
+			pixels.assign(static_cast<std::size_t>(paddedWidth) * static_cast<std::size_t>(paddedHeight), 255);
+			for (int row = 0; row < height; ++row)
+				std::copy_n(gray.data() + static_cast<std::size_t>(row) * static_cast<std::size_t>(stride), width,
+					pixels.data() + static_cast<std::size_t>(row + border) * static_cast<std::size_t>(paddedWidth) + border);
+		}
+		catch (...) {
+			return Unexpected<OCRException>("Could not allocate OCR image margins");
+		}
+		m_model->m_api.SetImage(pixels.data(), paddedWidth, paddedHeight, 1, paddedWidth);
 		char* raw = m_model->m_api.GetUTF8Text();
 		if (!raw)
 			return Unexpected<OCRException>("tesseract returned no text");

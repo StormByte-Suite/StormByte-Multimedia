@@ -34,4 +34,3 @@ else()
 endif()
 
 buildmaster_link(StormByte-Multimedia tesseract)
-add_subdirectory(tessdata)

@@ -22,6 +22,9 @@ function(_tessdata_models dir out_var)
 endfunction()
 
 set(_tessdata_candidates "")
+if(DEFINED TESSDATA_DIR AND NOT TESSDATA_DIR STREQUAL "")
+	list(APPEND _tessdata_candidates "${TESSDATA_DIR}")
+endif()
 
 if(DEFINED TESSDATA_PREFIX AND NOT TESSDATA_PREFIX STREQUAL "")
 	list(APPEND _tessdata_candidates
