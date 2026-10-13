@@ -50,6 +50,7 @@
 
 #include "../helpers.hxx"
 #include "../hardware_capability.hxx"
+#include "runners.hxx"
 
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/tonemap.hxx>
@@ -321,7 +322,7 @@ int test_transcoder_without_enforce_features_drops_hdr10() {
 	return 0;
 }
 
-int main(int argc, char** argv) {
+int RunPipelineVideoTests(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_transcoder_hevc_encode_output_file_properties", test_transcoder_hevc_encode_output_file_properties},
 		TestEntry{"test_transcoder_hevc_encode_preserves_hdr10_metadata", test_transcoder_hevc_encode_preserves_hdr10_metadata},

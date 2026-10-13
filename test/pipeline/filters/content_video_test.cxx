@@ -1,4 +1,5 @@
 #include "../helpers.hxx"
+#include "runners.hxx"
 
 #include <StormByte/multimedia/backend/pipeline/detail/content/video.hxx>
 
@@ -133,7 +134,7 @@ int test_video_content_keeps_profile5_color_encoding() {
 	return 0;
 }
 
-int main(int argc, char** argv) {
+int RunPipelineContentVideoTests(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_video_content_keeps_compatible_hdr_and_dovi", test_video_content_keeps_compatible_hdr_and_dovi},
 		TestEntry{"test_video_content_drops_hdr_and_dovi_after_tonemap", test_video_content_drops_hdr_and_dovi_after_tonemap},

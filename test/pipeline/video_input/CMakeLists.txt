@@ -1,12 +1,4 @@
-add_executable(MultimediaPipelineVideoInputTests video_input_test.cxx
-	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx")
-target_link_libraries(MultimediaPipelineVideoInputTests PRIVATE multimedia_test_support)
-if(TARGET ffmpeg-pack)
-	target_link_libraries(MultimediaPipelineVideoInputTests PRIVATE ffmpeg-pack)
-else()
-	target_link_libraries(MultimediaPipelineVideoInputTests PRIVATE ffmpeg)
-endif()
-target_include_directories(MultimediaPipelineVideoInputTests SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
+add_ffmpeg_test_executable(MultimediaPipelineVideoInputTests RunPipelineVideoInputTests)
 
 add_pipeline_test(MultimediaPipelineVideoInputTests test_encoder_configs)
 add_pipeline_test(MultimediaPipelineVideoInputTests test_hardware_capability_classifier)

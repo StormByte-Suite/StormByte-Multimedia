@@ -1,4 +1,5 @@
 #include "../test_helpers.hxx"
+#include "runners.hxx"
 
 #include <StormByte/buffer/fifo.hxx>
 #include <StormByte/buffer/io/parameters.hxx>
@@ -259,7 +260,7 @@ int test_file_avio_write_origin_error() {
 	return 0;
 }
 
-int main(int argc, char** argv) {
+int RunFileAvioTests(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_file_avio_read_retry_before_data", test_file_avio_read_retry_before_data},
 		TestEntry{"test_file_avio_read_retry_between_blocks", test_file_avio_read_retry_between_blocks},

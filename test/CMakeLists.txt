@@ -12,6 +12,67 @@ if(ENABLE_TEST)
 		"${PROJECT_BINARY_DIR}/test-output/pipeline"
 	)
 
+	# One shared library absorbs every private translation unit and test
+	# body that calls FFmpeg. bfd therefore scans the static pack here and
+	# inside StormByte-Multimedia, not once per executable. Runners are
+	# dllimport/dllexport (visibility default elsewhere). Executables link
+	# this library and Multimedia only.
+	add_library(StormByte-Multimedia-Test SHARED
+		file/file_avio_test.cxx
+		pipeline/helpers.cxx
+		pipeline/video/video_test.cxx
+		pipeline/video_input/video_input_test.cxx
+		pipeline/video_codecs/video_codec_test.cxx
+		pipeline/filters/content_video_test.cxx
+		pipeline/hdr10plus/hdr10plus_test.cxx
+		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/file_avio.cxx"
+		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx"
+		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx"
+		"${PROJECT_SOURCE_DIR}/lib/tables/decoder/video.cxx"
+		"${PROJECT_SOURCE_DIR}/lib/tables/encoder/video.cxx"
+	)
+	target_link_libraries(StormByte-Multimedia-Test PUBLIC multimedia_test_support)
+	stormbyte_link_ffmpeg(StormByte-Multimedia-Test)
+	target_include_directories(StormByte-Multimedia-Test
+		PRIVATE
+			"${CMAKE_CURRENT_SOURCE_DIR}"
+			"${PROJECT_SOURCE_DIR}/lib"
+		SYSTEM PRIVATE
+			"${PROJECT_SOURCE_DIR}/lib/private"
+	)
+	if(WITH_FFMPEG STREQUAL "BUNDLED")
+		target_include_directories(StormByte-Multimedia-Test BEFORE PRIVATE
+			"${PROJECT_SOURCE_DIR}/thirdparty/ffmpeg/src")
+	endif()
+	target_compile_definitions(StormByte-Multimedia-Test
+		PRIVATE StormByte_Multimedia_Test_EXPORTS
+		INTERFACE STORMBYTE_MULTIMEDIA_TEST_SHARED
+	)
+	set_target_properties(StormByte-Multimedia-Test PROPERTIES
+		LINKER_LANGUAGE CXX
+		POSITION_INDEPENDENT_CODE ON
+		CXX_VISIBILITY_PRESET hidden
+		VISIBILITY_INLINES_HIDDEN ON
+		LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+		ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+	)
+	foreach(_cfg Debug Release RelWithDebInfo MinSizeRel)
+		string(TOUPPER "${_cfg}" _cfg_u)
+		set_target_properties(StormByte-Multimedia-Test PROPERTIES
+			LIBRARY_OUTPUT_DIRECTORY_${_cfg_u} "${CMAKE_BINARY_DIR}/lib"
+			RUNTIME_OUTPUT_DIRECTORY_${_cfg_u} "${CMAKE_BINARY_DIR}/lib"
+			ARCHIVE_OUTPUT_DIRECTORY_${_cfg_u} "${CMAKE_BINARY_DIR}/lib"
+		)
+	endforeach()
+
+	function(add_ffmpeg_test_executable target runner)
+		add_executable(${target} "${PROJECT_SOURCE_DIR}/test/runner_main.cxx")
+		target_compile_definitions(${target} PRIVATE "STORMBYTE_TEST_RUNNER=${runner}")
+		target_include_directories(${target} PRIVATE "${PROJECT_SOURCE_DIR}/test")
+		target_link_libraries(${target} PRIVATE StormByte-Multimedia-Test StormByte::Multimedia)
+	endfunction()
+
 	add_subdirectory(registry)
 	add_subdirectory(file)
 	add_subdirectory(pipeline)

@@ -50,6 +50,7 @@
 
 #include "../helpers.hxx"
 #include "../hardware_capability.hxx"
+#include "runners.hxx"
 
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/format.hxx>
@@ -303,7 +304,7 @@ int test_libwebp_decodes_animated_webp() {
 		"WebM", "VP9", "libvpx-vp9", "webp");
 }
 
-int main(int argc, char** argv) {
+int RunPipelineVideoCodecTests(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_svt_av1_encodes_matroska", test_svt_av1_encodes_matroska},
 		TestEntry{"test_svt_av1_encodes_mp4", test_svt_av1_encodes_mp4},

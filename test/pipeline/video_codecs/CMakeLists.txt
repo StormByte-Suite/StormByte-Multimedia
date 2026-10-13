@@ -1,15 +1,4 @@
-add_executable(MultimediaPipelineVideoCodecTests video_codec_test.cxx
-	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx"
-	"${PROJECT_SOURCE_DIR}/lib/tables/decoder/video.cxx"
-	"${PROJECT_SOURCE_DIR}/lib/tables/encoder/video.cxx")
-target_link_libraries(MultimediaPipelineVideoCodecTests PRIVATE multimedia_pipeline_test_support)
-if(TARGET ffmpeg-pack)
-	target_link_libraries(MultimediaPipelineVideoCodecTests PRIVATE ffmpeg-pack)
-else()
-	target_link_libraries(MultimediaPipelineVideoCodecTests PRIVATE ffmpeg)
-endif()
-target_include_directories(MultimediaPipelineVideoCodecTests PRIVATE "${PROJECT_SOURCE_DIR}/lib")
-target_include_directories(MultimediaPipelineVideoCodecTests SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
+add_ffmpeg_test_executable(MultimediaPipelineVideoCodecTests RunPipelineVideoCodecTests)
 
 add_pipeline_test(MultimediaPipelineVideoCodecTests test_nvenc_feature_contract)
 

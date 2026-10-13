@@ -1,4 +1,5 @@
 #include "../helpers.hxx"
+#include "runners.hxx"
 
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
@@ -434,7 +435,7 @@ int test_x265_hdr10plus() {
 	return CheckPipeline("H.265", "libx265");
 }
 
-int main(int argc, char** argv) {
+int RunPipelineHdr10PlusTests(int argc, char** argv) {
 	const std::array tests{
 		// -------------------
 		// Detection

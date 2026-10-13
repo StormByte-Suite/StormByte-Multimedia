@@ -1,5 +1,6 @@
 #include "../../test_helpers.hxx"
 #include "../hardware_capability.hxx"
+#include "runners.hxx"
 
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 
@@ -671,7 +672,7 @@ int test_wrapper_attachments() {
 	return 0;
 }
 
-int main(int argc, char** argv) {
+int RunPipelineVideoInputTests(int argc, char** argv) {
 	// -------------------
 	// Input
 	// -------------------

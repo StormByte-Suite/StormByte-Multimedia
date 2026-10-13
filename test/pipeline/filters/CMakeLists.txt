@@ -9,15 +9,7 @@ target_include_directories(MultimediaPipelineNlMeansTests PRIVATE "${PROJECT_SOU
 target_link_libraries(MultimediaPipelineNlMeansTests PRIVATE multimedia_pipeline_test_support)
 add_pipeline_test(MultimediaPipelineNlMeansTests test_nlmeans_rolling_sums_match_reference)
 
-add_executable(MultimediaPipelineContentVideoTests content_video_test.cxx
-	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx")
-target_include_directories(MultimediaPipelineContentVideoTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
-target_link_libraries(MultimediaPipelineContentVideoTests PRIVATE multimedia_pipeline_test_support)
-if(TARGET ffmpeg-pack)
-	target_link_libraries(MultimediaPipelineContentVideoTests PRIVATE ffmpeg-pack)
-else()
-	target_link_libraries(MultimediaPipelineContentVideoTests PRIVATE ffmpeg)
-endif()
+add_ffmpeg_test_executable(MultimediaPipelineContentVideoTests RunPipelineContentVideoTests)
 foreach(test_name IN ITEMS
 	test_video_content_keeps_compatible_hdr_and_dovi
 	test_video_content_drops_hdr_and_dovi_after_tonemap

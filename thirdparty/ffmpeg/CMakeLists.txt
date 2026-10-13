@@ -8,6 +8,50 @@ if(NOT DEFINED WITH_FFMPEG)
 	endif()
 endif()
 
+# Private link used by the shared host and by StormByte-Multimedia-Test.
+# Static pack: one merged archive (the six FFmpeg libs) plus ffmpeg-plugins
+# once. REPACK does not copy ffmpeg's LINK interface, so the plugin edge on
+# the pack is required and is not a second copy. The repeated bfd warnings
+# are duplicate objects already inside that archive (framepool.c is compiled
+# into both libswscale and libavfilter); they are not the six libs linked twice.
+function(stormbyte_ffmpeg_absorb target)
+	# Hide symbols contributed by static archives so their PC-relative
+	# relocations resolve locally. No gc-sections / -dead_strip / /OPT:REF —
+	# they can drop live objects. /FORCE:MULTIPLE covers duplicate helpers
+	# already present in the merged archive. Frameworks stay PRIVATE.
+	if(NOT DEFINED FFMPEG_BUNDLED_TYPE OR NOT FFMPEG_BUNDLED_TYPE STREQUAL "static")
+		return()
+	endif()
+	if(WIN32)
+		target_link_options(${target} PRIVATE "/FORCE:MULTIPLE")
+	elseif(APPLE)
+		foreach(_fw IN ITEMS
+			VideoToolbox
+			AudioToolbox
+			CoreMedia
+			CoreVideo
+			CoreFoundation
+		)
+			find_library(_SB_MM_FW_${_fw} "${_fw}" REQUIRED)
+			target_link_libraries(${target} PRIVATE "${_SB_MM_FW_${_fw}}")
+		endforeach()
+	elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+		target_link_options(${target} PRIVATE
+			"-Wl,--exclude-libs,ALL"
+			"-Wl,--no-undefined"
+		)
+	endif()
+endfunction()
+
+function(stormbyte_link_ffmpeg target)
+	if(WITH_FFMPEG STREQUAL "SYSTEM" OR NOT TARGET ffmpeg-pack)
+		target_link_libraries(${target} PRIVATE ffmpeg)
+	else()
+		target_link_libraries(${target} PRIVATE ffmpeg-pack)
+	endif()
+	stormbyte_ffmpeg_absorb(${target})
+endfunction()
+
 if(WITH_FFMPEG STREQUAL "SYSTEM")
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 	find_package(FFmpeg REQUIRED)
@@ -166,7 +210,9 @@ else()
 
 	# Static: one rescanned archive plus normally extracted plugins. Shared: the
 	# component INTERFACE already carries the plugins. LINK= stays on
-	# the pack because REPACK does not copy it from ffmpeg.
+	# the pack because REPACK does not copy it from ffmpeg. Do not also
+	# INTERFACE-link the unmerged ffmpeg target: that would put the six
+	# archives on the link line next to the pack.
 	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
 		set(_FF_PACK_OPTS "REPACK")
 		if(WIN32)
@@ -190,13 +236,12 @@ else()
 	if(BUILD_SHARED_LIBS)
 		buildmaster_depend(StormByte-Multimedia "${_FF_LINK}")
 		function(_sb_mm_link_ffmpeg_private)
-			target_link_libraries(StormByte-Multimedia PRIVATE "${_FF_LINK}")
+			stormbyte_link_ffmpeg(StormByte-Multimedia)
 		endfunction()
-		buildmaster_hook_graph(_sb_mm_link_ffmpeg_private zz-ffmpeg-private-link
-			CAPTURE _FF_LINK
-		)
+		buildmaster_hook_graph(_sb_mm_link_ffmpeg_private zz-ffmpeg-private-link)
 	else()
 		buildmaster_link(StormByte-Multimedia "${_FF_LINK}")
+		stormbyte_ffmpeg_absorb(StormByte-Multimedia)
 	endif()
 
 	function(_stormbyte_ffmpeg_announce_build)
@@ -219,38 +264,6 @@ else()
 	buildmaster_hook_graph(_stormbyte_ffmpeg_announce_build zz-ffmpeg-announce
 		CAPTURE FFMPEG_PLUGIN_OPTIONS
 	)
-
-	# Static media dependencies are absorbed into the host DSO. Hide symbols
-	# contributed by static archives so their PC-relative relocations resolve
-	# locally without binding Multimedia's own public RTTI or host symbols.
-	# No gc-sections / -dead_strip / /OPT:REF — they can drop live objects.
-	# /FORCE:MULTIPLE: duplicate helpers across the static archives.
-	# Frameworks: find_library, already PRIVATE, so tests do not inherit them.
-	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
-		if(WIN32)
-			target_link_options(StormByte-Multimedia PRIVATE
-				"/FORCE:MULTIPLE"
-			)
-		elseif(APPLE)
-			foreach(_fw IN ITEMS
-				VideoToolbox
-				AudioToolbox
-				CoreMedia
-				CoreVideo
-				CoreFoundation
-			)
-				find_library(_SB_MM_FW_${_fw} "${_fw}" REQUIRED)
-				target_link_libraries(StormByte-Multimedia PRIVATE
-					"${_SB_MM_FW_${_fw}}"
-				)
-			endforeach()
-		elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-			target_link_options(StormByte-Multimedia PRIVATE
-				"-Wl,--exclude-libs,ALL"
-				"-Wl,--no-undefined"
-			)
-		endif()
-	endif()
 endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/ffmpeg.cmake)
