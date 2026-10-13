@@ -316,8 +316,17 @@ int test_hardware_capability_classifier() {
 	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EPERM), false));
 	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, true, false, true));
 	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, true));
-	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_UNKNOWN, false, true));
-	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR_EXTERNAL, false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, false));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, false, true));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_UNKNOWN, false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EIO), false));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EIO), false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EIO), true, true));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR_EXTERNAL, false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VULKAN, AVERROR_EXTERNAL, false));
+	TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VULKAN, AVERROR_EXTERNAL, false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VULKAN, AVERROR(EINVAL), false, true));
+	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_DRM, AVERROR_EXTERNAL, false, true));
 	TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_NONE, AVERROR(ENOSYS), true));
 	TEST_REQUIRE(CheckHardwareEncoderCapability(nullptr, 1920, 1080) == 1);
 	TEST_REQUIRE(CheckHardwareEncoderCapability(avcodec_find_encoder_by_name("hevc_qsv"), 0, 1080) == 1);
@@ -441,7 +450,8 @@ int test_hardware_transfer() {
 		const bool configured = Input::Configure(context.get(), codec, nullptr, error);
 		const char* name = av_hwdevice_get_type_name(configuration->device_type);
 		if (available < 0) {
-			TEST_REQUIRE(HardwareCapabilityUnavailable(configuration->device_type, available, false));
+			TEST_REQUIRE(HardwareCapabilityUnavailable(configuration->device_type, available, false,
+				HardwareDeviceAbsent(configuration->device_type)));
 			TEST_REQUIRE(!configured && error.starts_with("hardware device unavailable ("));
 			TEST_REQUIRE(!context->hw_device_ctx && !context->hw_frames_ctx);
 			std::cout << "[Hardware] " << name << ": verified unavailable-device error\n";

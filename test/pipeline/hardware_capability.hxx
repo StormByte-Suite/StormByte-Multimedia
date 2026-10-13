@@ -8,6 +8,10 @@
 #include <memory>
 #include <string_view>
 
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
 /**
  * @brief Classifies only independently proven device absence or backend capability errors.
  * @param device Hardware backend selected from the concrete encoder configuration.
@@ -23,7 +27,8 @@ inline bool HardwareCapabilityUnavailable(AVHWDeviceType device, int status, boo
 		|| status == AVERROR(ENOMEM))
 		return false;
 	if (!prepared)
-		return (device == AV_HWDEVICE_TYPE_QSV && absent)
+		return (absent && (device == AV_HWDEVICE_TYPE_QSV || device == AV_HWDEVICE_TYPE_CUDA
+			|| device == AV_HWDEVICE_TYPE_VAAPI || device == AV_HWDEVICE_TYPE_VULKAN))
 			|| (device == AV_HWDEVICE_TYPE_CUDA && status == AVERROR(EPERM))
 			|| status == AVERROR(ENODEV) || status == AVERROR(ENOENT) || status == AVERROR(ENOSYS);
 	return ((device == AV_HWDEVICE_TYPE_CUDA || device == AV_HWDEVICE_TYPE_VAAPI || device == AV_HWDEVICE_TYPE_QSV)
@@ -59,6 +64,84 @@ inline bool IntelRenderDeviceAbsent() {
 #else
 	return false;
 #endif
+}
+
+/**
+ * @brief Checks whether the current process may open a device node for reading and writing.
+ * @param path Device node path.
+ * @return True when the node exists and is accessible to the current credentials.
+ */
+inline bool DeviceNodeUsable(const std::filesystem::path& path) {
+#ifdef __linux__
+	return ::access(path.c_str(), R_OK | W_OK) == 0;
+#else
+	static_cast<void>(path);
+	return false;
+#endif
+}
+
+/**
+ * @brief Checks Linux NVIDIA control and GPU nodes, as required by CUDA and NVIDIA-backed VAAPI/Vulkan.
+ * @return True only on Linux when no NVIDIA GPU node is usable by this process (absent or permission denied).
+ */
+inline bool NvidiaDeviceInaccessible() {
+#ifdef __linux__
+	if (!DeviceNodeUsable("/dev/nvidiactl"))
+		return true;
+	for (int index = 0; index < 64; ++index)
+		if (DeviceNodeUsable("/dev/nvidia" + std::to_string(index)))
+			return false;
+	return true;
+#else
+	return false;
+#endif
+}
+
+/**
+ * @brief Checks Linux DRM render nodes usable by VAAPI and Vulkan from this process.
+ * @return True only when a complete readable inventory has no accessible render node; NVIDIA nodes also require
+ * accessible NVIDIA device nodes.
+ */
+inline bool RenderDeviceUnusable() {
+#ifdef __linux__
+	std::error_code error;
+	const std::filesystem::path root{"/sys/class/drm"};
+	if (!std::filesystem::exists(root, error))
+		return !error;
+	std::filesystem::directory_iterator entries(root, error);
+	if (error)
+		return false;
+	const std::filesystem::directory_iterator end;
+	for (; entries != end; entries.increment(error)) {
+		if (error)
+			return false;
+		const std::string name = entries->path().filename().string();
+		if (!name.starts_with("renderD") || !DeviceNodeUsable(std::filesystem::path{"/dev/dri"} / name))
+			continue;
+		std::ifstream vendor(entries->path() / "device/vendor");
+		unsigned identifier = 0;
+		if (!(vendor >> std::hex >> identifier) || identifier != 0x10de || !NvidiaDeviceInaccessible())
+			return false;
+	}
+	return !error;
+#else
+	return false;
+#endif
+}
+
+/**
+ * @brief Independently proves that the backend's device cannot be reached by this process.
+ * @param device Hardware backend selected from the concrete encoder configuration.
+ * @return True when the platform inventory proves the device absent or inaccessible.
+ */
+inline bool HardwareDeviceAbsent(AVHWDeviceType device) {
+	switch (device) {
+		case AV_HWDEVICE_TYPE_QSV:		return IntelRenderDeviceAbsent();
+		case AV_HWDEVICE_TYPE_CUDA:		return NvidiaDeviceInaccessible();
+		case AV_HWDEVICE_TYPE_VAAPI:
+		case AV_HWDEVICE_TYPE_VULKAN:	return RenderDeviceUnusable();
+		default:						return false;
+	}
 }
 
 inline int HardwareHevcProfile(AVPixelFormat sourceFormat) noexcept {
@@ -102,12 +185,12 @@ inline int CheckHardwareEncoderCapability(const AVCodec* codec, int width, int h
 	const int created = av_hwdevice_ctx_create(&device, deviceType, nullptr, nullptr, 0);
 	av_buffer_unref(&device);
 	if (created < 0) {
-		const bool absent = deviceType == AV_HWDEVICE_TYPE_QSV && IntelRenderDeviceAbsent();
+		const bool absent = HardwareDeviceAbsent(deviceType);
 		const bool unavailable = HardwareCapabilityUnavailable(deviceType, created, false, absent);
 		char message[AV_ERROR_MAX_STRING_SIZE]{};
 		av_strerror(created, message, sizeof(message));
 		std::cout << "[Hardware] " << codec->name << ": device preflight " << created << " (" << message
-			<< ")" << (absent ? "; no Intel DRM render device" : "")
+			<< ")" << (absent ? "; device absent or inaccessible" : "")
 			<< (unavailable ? "; SKIP\n" : "; FAIL\n");
 		return unavailable ? TEST_SKIP : 1;
 	}
