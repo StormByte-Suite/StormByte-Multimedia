@@ -179,9 +179,14 @@ else()
 	)
 
 	set(FFMPEG_BM_OPTS "REQUIRE_TOOL=pkgconfig")
+	set(FFMPEG_PATCHES
+		"${CMAKE_CURRENT_LIST_DIR}/0001-mov-read-track-name-as-raw-utf8.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0005-meson-av1-nvenc-type-probe.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0006-meson-nvidia-platform-guards.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0007-meson-simplify-nvidia-feature-gating.patch"
+	)
 	list(APPEND FFMPEG_BM_OPTS
-		#"GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-mov-read-track-name-as-raw-utf8.patch;PATCH=${CMAKE_CURRENT_LIST_DIR}/0005-meson-av1-nvenc-type-probe.patch;TITLE=FFmpeg compatibility patches}"
-		"GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-mov-read-track-name-as-raw-utf8.patch;PATCH=${CMAKE_CURRENT_LIST_DIR}/0005-meson-av1-nvenc-type-probe.patch;TITLE=FFmpeg compatibility patches}"
+		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"
 	)
 	if(WIN32)
 		list(APPEND FFMPEG_BM_OPTS "TOOLCHAIN=msvc")

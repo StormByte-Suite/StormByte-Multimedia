@@ -1,0 +1,85 @@
+From 92ff7360841116b80994b8feb92a52594dd7372d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Tue, 13 Oct 2026 16:30:52 +0200
+Subject: [PATCH] meson: simplify NVIDIA feature gating
+
+Use disable_if() to disable auto options on unsupported targets and reject
+explicitly enabled features with targeted errors. This makes each
+FeatureOption the source of truth for pkg-config and API probes, so those
+checks can rely on allowed() without repeating platform predicates.
+
+Keep the final component configuration guard because the generic
+auto-detection pass reads the original options and could re-enable NVIDIA
+components.
+---
+ meson.build | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 3210e9f450..7ed5cb886c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -205,21 +205,22 @@ elif ['aarch64', 'ppc64'].contains(cpu) and host_machine.endian() == 'little'
+   nvidia_codec_supported = ['linux', 'windows'].contains(host_system)
+ endif
+ 
+-ffnvcodec_opt = get_option('ffnvcodec').disable_auto_if(not nvidia_codec_supported).disable_if(
++ffnvcodec_opt = get_option('ffnvcodec').disable_if(
+   not nvidia_codec_supported,
+   error_message: 'ffnvcodec is not supported on @0@/@1@'.format(host_system, cpu),
+ )
+-nvenc_opt = get_option('nvenc').disable_auto_if(not nvidia_codec_supported)
+-nvdec_opt = get_option('nvdec').disable_auto_if(not nvidia_codec_supported)
+-cuvid_opt = get_option('cuvid').disable_auto_if(not nvidia_codec_supported)
+-
+-if not nvidia_codec_supported
+-  foreach component : ['nvenc', 'nvdec', 'cuvid']
+-    if get_option(component).enabled()
+-      error('@0@ is not supported on @1@/@2@'.format(component, host_system, cpu))
+-    endif
+-  endforeach
+-endif
++nvenc_opt = get_option('nvenc').disable_if(
++  not nvidia_codec_supported,
++  error_message: 'nvenc is not supported on @0@/@1@'.format(host_system, cpu),
++)
++nvdec_opt = get_option('nvdec').disable_if(
++  not nvidia_codec_supported,
++  error_message: 'nvdec is not supported on @0@/@1@'.format(host_system, cpu),
++)
++cuvid_opt = get_option('cuvid').disable_if(
++  not nvidia_codec_supported,
++  error_message: 'cuvid is not supported on @0@/@1@'.format(host_system, cpu),
++)
+ 
+ if host_system == 'windows'
+   common_deps += [cc.find_library('ws2_32')]
+@@ -1479,14 +1480,14 @@ check_types = [
+   ['VdpPictureInfoAV1', ['vdpau/vdpau.h']],
+ ]
+ 
+-if nvenc_opt.allowed() and nvidia_codec_supported
++if nvenc_opt.allowed()
+   check_types += [
+     ['NV_ENC_PIC_PARAMS_AV1', ['ffnvcodec/nvEncodeAPI.h'],
+       {'preconditions': ['ffnvcodec'], 'extra_deps': ['ffnvcodec_extra_deps']}],
+   ]
+ endif
+ 
+-if (nvdec_opt.allowed() or cuvid_opt.allowed()) and nvidia_codec_supported
++if nvdec_opt.allowed() or cuvid_opt.allowed()
+   check_types += [
+     ['CUVIDAV1PICPARAMS', ['ffnvcodec/dynlink_cuda.h', 'ffnvcodec/dynlink_cuviddec.h'],
+       {'preconditions': ['ffnvcodec'], 'extra_deps': ['ffnvcodec_extra_deps']}],
+@@ -2004,7 +2005,7 @@ check_compiles = [
+   ['intrinsics_sse2', ['emmintrin.h'], '__m128i test = _mm_setzero_si128();'],
+ ]
+ 
+-if nvenc_opt.allowed() and nvidia_codec_supported
++if nvenc_opt.allowed()
+   check_compiles += [
+     ['nvenc', ['ffnvcodec/nvEncodeAPI.h'], '''
+       NV_ENCODE_API_FUNCTION_LIST flist;
+-- 
+2.55.0
+
