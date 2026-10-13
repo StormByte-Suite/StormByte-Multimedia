@@ -34,6 +34,8 @@ else()
 	endif()
 
 	set(FFMPEG_MESON_OPTIONS
+		asm=enabled
+		inline_asm=enabled
 		programs=disabled
 		tests=disabled
 		avdevice=disabled
@@ -85,6 +87,10 @@ else()
 		libtensorflow=disabled
 		nanosleep=disabled
 	)
+
+	if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
+		list(APPEND FFMPEG_MESON_OPTIONS x86asm=enabled)
+	endif()
 
 	if(APPLE)
 		list(APPEND FFMPEG_MESON_OPTIONS

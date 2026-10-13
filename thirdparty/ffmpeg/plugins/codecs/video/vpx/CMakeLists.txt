@@ -16,6 +16,7 @@ set(VPX_OPTIONS
 	"-Dvp9_decoder=enabled"
 	"-Dvp9_highbitdepth=enabled"
 	"-Dmultithread=enabled"
+	"-Druntime_cpu_detect=enabled"
 )
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
 	list(APPEND VPX_OPTIONS "-Dcpu=aarch64")

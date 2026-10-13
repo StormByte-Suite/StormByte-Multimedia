@@ -145,6 +145,12 @@ endif()
 
 add_library(zimg ${ZIMG_CORE_SOURCES} ${ZIMG_SIMD_SOURCES})
 
+if(ZIMG_ENABLE_SIMD AND ZIMG_IS_X86)
+	target_compile_definitions(zimg PRIVATE ZIMG_X86 ZIMG_X86_AVX512)
+elseif(ZIMG_ENABLE_SIMD AND ZIMG_IS_ARM)
+	target_compile_definitions(zimg PRIVATE ZIMG_ARM)
+endif()
+
 if(MSVC)
 	target_compile_options(zimg PRIVATE /EHsc)
 endif()
@@ -165,16 +171,33 @@ target_include_directories(zimg
 
 target_compile_definitions(zimg PRIVATE $<$<CONFIG:Release>:NDEBUG>)
 
-if(ZIMG_ENABLE_SIMD AND ZIMG_IS_X86 AND NOT MSVC)
-	set_source_files_properties(${ZIMG_SSE_SOURCES} PROPERTIES COMPILE_OPTIONS "-msse")
-	set_source_files_properties(${ZIMG_SSE2_SOURCES} PROPERTIES COMPILE_OPTIONS "-msse2")
-	set_source_files_properties(${ZIMG_AVX_SOURCES} PROPERTIES COMPILE_OPTIONS "-mavx")
-	set_source_files_properties(${ZIMG_F16C_SOURCES} PROPERTIES COMPILE_OPTIONS "-mavx;-mf16c")
-	set_source_files_properties(${ZIMG_AVX2_SOURCES} PROPERTIES COMPILE_OPTIONS "-mavx2;-mf16c;-mfma")
-	set_source_files_properties(${ZIMG_AVX512_SOURCES} PROPERTIES
-		COMPILE_OPTIONS "-mavx512f;-mavx512cd;-mavx512vl;-mavx512bw;-mavx512dq")
-	set_source_files_properties(${ZIMG_AVX512_VNNI_SOURCES} PROPERTIES
-		COMPILE_OPTIONS "-mavx512f;-mavx512cd;-mavx512vl;-mavx512bw;-mavx512dq;-mavx512vnni")
+if(ZIMG_ENABLE_SIMD AND ZIMG_IS_X86)
+	if(NOT MSVC OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		set_source_files_properties(${ZIMG_SSE_SOURCES} PROPERTIES COMPILE_OPTIONS "-msse")
+		set_source_files_properties(${ZIMG_SSE2_SOURCES} PROPERTIES COMPILE_OPTIONS "-msse2")
+		set_source_files_properties(${ZIMG_AVX_SOURCES} PROPERTIES COMPILE_OPTIONS "-mavx")
+		set_source_files_properties(${ZIMG_F16C_SOURCES} PROPERTIES COMPILE_OPTIONS "-mavx;-mf16c")
+		set_source_files_properties(${ZIMG_AVX2_SOURCES} PROPERTIES COMPILE_OPTIONS "-mavx2;-mf16c;-mfma")
+		set_source_files_properties(${ZIMG_AVX512_SOURCES} PROPERTIES
+			COMPILE_OPTIONS "-mavx512f;-mavx512cd;-mavx512vl;-mavx512bw;-mavx512dq")
+		set_source_files_properties(${ZIMG_AVX512_VNNI_SOURCES} PROPERTIES
+			COMPILE_OPTIONS "-mavx512f;-mavx512cd;-mavx512vl;-mavx512bw;-mavx512dq;-mavx512vnni")
+		if(MSVC)
+			foreach(source IN LISTS ZIMG_SIMD_SOURCES)
+				get_source_file_property(options "${source}" COMPILE_OPTIONS)
+				list(TRANSFORM options PREPEND "/clang:")
+				set_source_files_properties("${source}" PROPERTIES COMPILE_OPTIONS "${options}")
+			endforeach()
+		endif()
+	else()
+		if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+			set_source_files_properties(${ZIMG_SSE_SOURCES} PROPERTIES COMPILE_OPTIONS "/arch:SSE")
+			set_source_files_properties(${ZIMG_SSE2_SOURCES} PROPERTIES COMPILE_OPTIONS "/arch:SSE2")
+		endif()
+		set_source_files_properties(${ZIMG_AVX_SOURCES} ${ZIMG_F16C_SOURCES} PROPERTIES COMPILE_OPTIONS "/arch:AVX")
+		set_source_files_properties(${ZIMG_AVX2_SOURCES} PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
+		set_source_files_properties(${ZIMG_AVX512_SOURCES} ${ZIMG_AVX512_VNNI_SOURCES} PROPERTIES COMPILE_OPTIONS "/arch:AVX512")
+	endif()
 endif()
 
 if(ZIMG_ENABLE_SIMD AND ZIMG_IS_ARM AND NOT MSVC)

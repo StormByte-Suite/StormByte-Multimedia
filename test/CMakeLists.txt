@@ -31,4 +31,9 @@ if(ENABLE_TEST)
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/tessdata_selection_test.cmake")
 	set_tests_properties(configuration.test_tessdata_language_selection
 		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration;ocr")
+	add_test(NAME configuration.test_simd_options
+		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/simd_options_test.cmake")
+	set_tests_properties(configuration.test_simd_options
+		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration")
 endif()
