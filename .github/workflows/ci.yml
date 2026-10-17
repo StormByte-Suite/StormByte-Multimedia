@@ -92,6 +92,7 @@ jobs:
             -DWITH_VMAF=BUNDLED
             -DWITH_NONFREE=${{ matrix.extra }}
             -DWITH_GPL=${{ matrix.extra }}
+            ${{ matrix.compiler == 'clang-libc++' && '-DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_STANDARD_LIBRARIES=-stdlib=libc++' || '' }}
           run-tests: true
           ctest-options: --output-on-failure --test-dir ${{ github.workspace }}/build/test
 
