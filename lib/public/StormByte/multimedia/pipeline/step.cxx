@@ -64,7 +64,6 @@
 
 #include <chrono>
 #include <algorithm>
-#include <format>
 #include <limits>
 #include <memory>
 #include <string>
@@ -501,12 +500,12 @@ void Step::Launch() noexcept {
 
 void Step::Halt() noexcept {
 	const auto label = Label();
-	Log(Level::LowLevel, std::format("halt/join begin stage={} instance={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("halt/join begin stage={} instance={}",
 		std::string_view{label}, static_cast<const void*>(this)));
 	Stop();
 	if (m_state->pumper)
 		m_state->pumper->Halt();
-	Log(Level::LowLevel, std::format("halt/join end stage={} instance={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("halt/join end stage={} instance={}",
 		std::string_view{label}, static_cast<const void*>(this)));
 }
 

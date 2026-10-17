@@ -55,7 +55,6 @@
 #include <StormByte/multimedia/type.hxx>
 
 #include <cstdint>
-#include <format>
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -113,7 +112,7 @@ void NlMeans::Latch(int width, int height) noexcept {
 	m_patch = m_patchIn.value_or(uhd ? 1u : 2u);
 	m_h = m_hIn.value_or(uhd ? 0.8 : 1.0);
 	m_latched = true;
-	Log(Level::Debug, std::format("nlmeans latch {}x{} r={} p={} h={:.3f} uhd={}",
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("nlmeans latch {}x{} r={} p={} h={:.3f} uhd={}",
 		width, height, m_research, m_patch, m_h, uhd));
 }
 
@@ -141,7 +140,7 @@ void NlMeans::Process(const Pipeline::Frame& frame) noexcept {
 		FilterPlane(src, out, i, bpc,
 			static_cast<int>(m_research), static_cast<int>(m_patch), m_h);
 
-	Log(Level::LowLevel, std::format("nlmeans {}x{} r={} p={} h={:.3f} pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("nlmeans {}x{} r={} p={} h={:.3f} pts={}",
 		src.Width(), src.Height(), m_research, m_patch, m_h, src.Pts()));
 	Save(std::move(out));
 }

@@ -55,7 +55,6 @@
 #include <cmath>
 #include <cstdint>
 #include <deque>
-#include <format>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -286,7 +285,7 @@ void XPSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 		lane.min = frameX;
 
 	++lane.scored;
-	Log(Level::LowLevel, std::format("scored n={} xpsnr={:.3f} ref_pts={} dist_pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("scored n={} xpsnr={:.3f} ref_pts={} dist_pts={}",
 		lane.scored, frameX, ref.Pts(), d->Pts()));
 }
 
@@ -393,7 +392,7 @@ void XPSNR::Eof() noexcept {
 		if (!lane.min)
 			lane.min = lane.mean;
 		scored += lane.scored;
-		Log(Level::Notice, std::format("t={} mean={:.3f} min={:.3f} n={} latch={}x{}",
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("t={} mean={:.3f} min={:.3f} n={} latch={}x{}",
 			track, *lane.mean, *lane.min, lane.scored, lane.width, lane.height));
 	}
 
@@ -426,16 +425,16 @@ class StormByte::Multimedia::Pipeline::Filter::Report XPSNR::Report() const noex
 		const Lane& lane = *lanePointer;
 		if (lane.mean && lane.min) {
 			const double peak = static_cast<double>((1 << lane.bpc) - 1);
-			data.emplace(key(track, "xpsnr_mean"), std::format("{:.6f}", *lane.mean));
-			data.emplace(key(track, "xpsnr_min"), std::format("{:.6f}", *lane.min));
+			data.emplace(key(track, "xpsnr_mean"), StormByte::Safe::String::ReplaceToken("{:.6f}", *lane.mean));
+			data.emplace(key(track, "xpsnr_min"), StormByte::Safe::String::ReplaceToken("{:.6f}", *lane.min));
 			if (lane.y.frames)
-				data.emplace(key(track, "xpsnr_y"), std::format("{:.6f}",
+				data.emplace(key(track, "xpsnr_y"), StormByte::Safe::String::ReplaceToken("{:.6f}",
 					MeanPsnr(lane.y.mse, lane.y.frames, peak)));
 			if (lane.u.frames)
-				data.emplace(key(track, "xpsnr_u"), std::format("{:.6f}",
+				data.emplace(key(track, "xpsnr_u"), StormByte::Safe::String::ReplaceToken("{:.6f}",
 					MeanPsnr(lane.u.mse, lane.u.frames, peak)));
 			if (lane.v.frames)
-				data.emplace(key(track, "xpsnr_v"), std::format("{:.6f}",
+				data.emplace(key(track, "xpsnr_v"), StormByte::Safe::String::ReplaceToken("{:.6f}",
 					MeanPsnr(lane.v.mse, lane.v.frames, peak)));
 		}
 		data.emplace(key(track, "frames"), std::to_string(lane.scored));

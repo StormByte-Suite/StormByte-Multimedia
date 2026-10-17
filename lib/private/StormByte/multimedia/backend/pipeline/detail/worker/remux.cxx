@@ -56,7 +56,6 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <string>
 #include <string_view>
 
@@ -115,7 +114,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
-		Log(Level::LowLevel, std::format("fwd t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("fwd t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
 			packet->Track(), *packet->Serial(), packet->Part(),
 			Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
 			static_cast<std::size_t>(packet->Payload().Available()),

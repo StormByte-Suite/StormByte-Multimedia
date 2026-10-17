@@ -61,7 +61,6 @@ extern "C" {
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <format>
 #include <string>
 
 using StormByte::Multimedia::Backend::Pipeline::Detail::Content::Video;
@@ -333,7 +332,7 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 		const double sx = static_cast<double>(out.width) / static_cast<double>(in.width);
 		const double sy = static_cast<double>(out.height) / static_cast<double>(in.height);
 		ScaleEllipses(*plus, sx, sy);
-		m_diagnostic += std::format(" hdr10plus=remapped-scale:{:.6f}x{:.6f}", sx, sy);
+		m_diagnostic += StormByte::Safe::String::ReplaceToken(" hdr10plus=remapped-scale:{:.6f}x{:.6f}", sx, sy);
 		return;
 	}
 

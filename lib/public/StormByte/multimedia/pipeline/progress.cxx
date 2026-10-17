@@ -53,7 +53,6 @@
 
 #include <chrono>
 #include <cstddef>
-#include <format>
 #include <optional>
 #include <string_view>
 
@@ -248,7 +247,7 @@ Progress::operator StormByte::Safe::String() const {
 	ProgressLock lock(m_reentrantLock, m_lock, m_lockDepth);
 	if (m_calculatingDuration) {
 		if (m_durationCalculation)
-			return StormByte::Safe::String(std::format("Calculating duration {} {:6.2f}%", m_durationIndicator, *m_durationCalculation));
+			return StormByte::Safe::String::ReplaceToken("Calculating duration {} {:6.2f}%", m_durationIndicator, *m_durationCalculation);
 		constexpr std::string_view activity = "|/-\\";
 		const auto tick = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now().time_since_epoch()).count() / 125;
@@ -258,12 +257,12 @@ Progress::operator StormByte::Safe::String() const {
 	std::string line;
 	const bool measureLive = m_hasMeasure && !m_measureDone;
 	if (const auto v = Measure(); v && measureLive)
-		line += std::format("measure {:6.2f}%  ", *v);
+		line += StormByte::Safe::String::ReplaceToken("measure {:6.2f}%  ", *v);
 	if (!measureLive) {
 		if (const auto v = Analytics(); v && !m_analyticsDone)
-			line += std::format("analytics {:6.2f}%  ", *v);
+			line += StormByte::Safe::String::ReplaceToken("analytics {:6.2f}%  ", *v);
 	}
-	line += std::format("all {:6.2f}%", All());
+	line += StormByte::Safe::String::ReplaceToken("all {:6.2f}%", All());
 	return StormByte::Safe::String(line);
 }
 

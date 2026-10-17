@@ -57,7 +57,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <format>
 #include <limits>
 
 extern "C" {
@@ -292,7 +291,7 @@ void Loudnorm::CloseMeter() noexcept {
 		worstTp = std::max(worstTp, DbTp(lin));
 	m_limit = std::isfinite(worstTp) && worstTp + gainDb > m_targetTp;
 	m_ready = true;
-	Log(Level::Notice, std::format(
+	Log(Level::Notice, StormByte::Safe::String::ReplaceToken(
 		"loudnorm I={:.2f} LRA={:.2f} targetI={:.2f} targetTP={:.2f} gain={:.3f} dB limit={} frames={}",
 		m_measuredI, m_measuredLra, m_targetI, m_targetTp, gainDb,
 		m_limit ? 1 : 0, m_frames));
@@ -365,7 +364,7 @@ void Loudnorm::Process(const Pipeline::Frame& frame) noexcept {
 		Fail("loudnorm: AllocAudio failed");
 		return;
 	}
-	Log(Level::LowLevel, std::format("loudnorm process pts={} gain={:.6f}", src.Pts(), m_gain));
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("loudnorm process pts={} gain={:.6f}", src.Pts(), m_gain));
 	Save(std::move(out));
 }
 
@@ -378,15 +377,15 @@ class StormByte::Multimedia::Pipeline::Filter::Report Loudnorm::Report() const n
 	if (!m_ready)
 		return { Filter::Report::Status::Failed, {} };
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
-	data.emplace(StormByte::Safe::String("I"), std::format("{:.3f}", m_measuredI));
-	data.emplace(StormByte::Safe::String("LRA"), std::format("{:.3f}", m_measuredLra));
-	data.emplace(StormByte::Safe::String("I_target"), std::format("{:.3f}", m_targetI));
-	data.emplace(StormByte::Safe::String("TP_target"), std::format("{:.3f}", m_targetTp));
-	data.emplace(StormByte::Safe::String("gain_db"), std::format("{:.3f}", 20.0 * std::log10(std::max(m_gain, 1e-12))));
+	data.emplace(StormByte::Safe::String("I"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_measuredI));
+	data.emplace(StormByte::Safe::String("LRA"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_measuredLra));
+	data.emplace(StormByte::Safe::String("I_target"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_targetI));
+	data.emplace(StormByte::Safe::String("TP_target"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_targetTp));
+	data.emplace(StormByte::Safe::String("gain_db"), StormByte::Safe::String::ReplaceToken("{:.3f}", 20.0 * std::log10(std::max(m_gain, 1e-12))));
 	data.emplace(StormByte::Safe::String("limit"), m_limit ? "1" : "0");
 	data.emplace(StormByte::Safe::String("frames"), std::to_string(m_frames));
 	data.emplace(StormByte::Safe::String("channels"), std::to_string(m_channels));
 	for (std::size_t c = 0; c < m_tp.size(); ++c)
-		data.emplace(StormByte::Safe::String::ReplaceToken("TP_{}", c), std::format("{:.3f}", DbTp(m_tp[c])));
+		data.emplace(StormByte::Safe::String::ReplaceToken("TP_{}", c), StormByte::Safe::String::ReplaceToken("{:.3f}", DbTp(m_tp[c])));
 	return { Filter::Report::Status::Ok, std::move(data) };
 }

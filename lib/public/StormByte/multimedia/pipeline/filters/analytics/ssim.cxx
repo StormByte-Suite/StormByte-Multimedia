@@ -53,7 +53,6 @@
 
 #include <cstdint>
 #include <deque>
-#include <format>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -280,7 +279,7 @@ void SSIM::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 		lane.min = frameSsim;
 
 	++lane.scored;
-	Log(Level::LowLevel, std::format("scored n={} ssim={:.6f} ref_pts={} dist_pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("scored n={} ssim={:.6f} ref_pts={} dist_pts={}",
 		lane.scored, frameSsim, ref.Pts(), d->Pts()));
 }
 
@@ -386,7 +385,7 @@ void SSIM::Eof() noexcept {
 		if (!lane.min)
 			lane.min = lane.mean;
 		scored += lane.scored;
-		Log(Level::Notice, std::format("t={} mean={:.6f} min={:.6f} n={} latch={}x{}",
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("t={} mean={:.6f} min={:.6f} n={} latch={}x{}",
 			track, *lane.mean, *lane.min, lane.scored, lane.width, lane.height));
 	}
 
@@ -418,16 +417,16 @@ class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const noexc
 	for (const auto& [track, lanePointer] : m_lanes) {
 		const Lane& lane = *lanePointer;
 		if (lane.mean && lane.min) {
-			data.emplace(key(track, "ssim_mean"), std::format("{:.6f}", *lane.mean));
-			data.emplace(key(track, "ssim_min"), std::format("{:.6f}", *lane.min));
+			data.emplace(key(track, "ssim_mean"), StormByte::Safe::String::ReplaceToken("{:.6f}", *lane.mean));
+			data.emplace(key(track, "ssim_min"), StormByte::Safe::String::ReplaceToken("{:.6f}", *lane.min));
 			if (lane.y.frames)
-				data.emplace(key(track, "ssim_y"), std::format("{:.6f}",
+				data.emplace(key(track, "ssim_y"), StormByte::Safe::String::ReplaceToken("{:.6f}",
 					MeanSsim(lane.y.sum, lane.y.frames)));
 			if (lane.u.frames)
-				data.emplace(key(track, "ssim_u"), std::format("{:.6f}",
+				data.emplace(key(track, "ssim_u"), StormByte::Safe::String::ReplaceToken("{:.6f}",
 					MeanSsim(lane.u.sum, lane.u.frames)));
 			if (lane.v.frames)
-				data.emplace(key(track, "ssim_v"), std::format("{:.6f}",
+				data.emplace(key(track, "ssim_v"), StormByte::Safe::String::ReplaceToken("{:.6f}",
 					MeanSsim(lane.v.sum, lane.v.frames)));
 		}
 		data.emplace(key(track, "frames"), std::to_string(lane.scored));

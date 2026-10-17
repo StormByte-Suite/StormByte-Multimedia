@@ -53,7 +53,6 @@
 #include <StormByte/safe/memory_order.hxx>
 
 #include <chrono>
-#include <format>
 #include <utility>
 
 using namespace StormByte::Multimedia::Backend::Pipeline;
@@ -112,10 +111,10 @@ void Pumper::Launch() noexcept {
 		m_host.BecameReady();
 		Pump();
 		const bool success = !Stopping();
-		m_host.Log(Level::LowLevel, std::format("worker pump returned; close output begin host={}",
+		m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker pump returned; close output begin host={}",
 			static_cast<const void*>(&m_host)));
 		m_host.CloseOutput();
-		m_host.Log(Level::LowLevel, std::format("worker close output end host={}",
+		m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker close output end host={}",
 			static_cast<const void*>(&m_host)));
 		expected = static_cast<int>(State::Stopping);
 		if (!m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),
@@ -219,16 +218,16 @@ void Pumper::PumpPop() noexcept {
 
 			if (!Stopping()) {
 				const auto started = std::chrono::steady_clock::now();
-				m_host.Log(Level::LowLevel, std::format("worker EOF process begin host={}",
+				m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker EOF process begin host={}",
 					static_cast<const void*>(&m_host)));
 				m_worker->Process({});
-				m_host.Log(Level::LowLevel, std::format("worker EOF process end; record work begin host={}",
+				m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker EOF process end; record work begin host={}",
 					static_cast<const void*>(&m_host)));
 				m_host.RecordWork(Elapsed(started));
-				m_host.Log(Level::LowLevel, std::format("worker EOF record work end; dump work begin host={}",
+				m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker EOF record work end; dump work begin host={}",
 					static_cast<const void*>(&m_host)));
 				m_host.DumpWork();
-				m_host.Log(Level::LowLevel, std::format("worker EOF dump work end host={}",
+				m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker EOF dump work end host={}",
 					static_cast<const void*>(&m_host)));
 			}
 

@@ -54,7 +54,6 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -92,7 +91,7 @@ void Bm3d::Latch(int width, int height) noexcept {
 	m_range = m_rangeIn.value_or(9u);
 	m_bstep = m_bstepIn.value_or(4u);
 	m_latched = true;
-	Log(Level::Debug, std::format(
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken(
 		"bm3d latch {}x{} sigma={:.3f} group={} range={} bstep={} uhd={}",
 		width, height, m_sigma, m_group, m_range, m_bstep, uhd));
 }
@@ -138,7 +137,7 @@ void Bm3d::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"bm3d {}x{} sigma={:.3f} group={} range={} bstep={} pts={}",
 		src.Width(), src.Height(), m_sigma, m_group, m_range, m_bstep, src.Pts()));
 	Save(std::move(out));

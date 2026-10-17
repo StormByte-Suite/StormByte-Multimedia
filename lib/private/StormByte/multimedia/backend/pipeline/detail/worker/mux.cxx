@@ -60,7 +60,6 @@
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <string>
 #include <string_view>
 
@@ -141,7 +140,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (pos >= 0)
 			m_owner.ClockPass(pos);
 
-		Log(Level::LowLevel, std::format("written t={} {}:{} pts={} dts={} pos={} bytes={} raw={} fnv1a={:016x}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("written t={} {}:{} pts={} dts={} pos={} bytes={} raw={} fnv1a={:016x}",
 			track, packet->Serial().value_or(0), packet->Part(),
 			Ns(packet->Pts()), Ns(packet->Dts()),
 			pos, std::string_view{payloadLength}, payloadBytes, payloadDigest));

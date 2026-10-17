@@ -56,7 +56,6 @@
 #include <cstdint>
 #include <cstring>
 #include <deque>
-#include <format>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -449,7 +448,7 @@ void VMAF::Eof() noexcept {
 		lane.mean = mean;
 		lane.min = mn;
 		scored += lane.scored;
-		Log(Level::Notice, std::format("t={} mean={:.3f} min={:.3f} n={} latch={}x{}",
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("t={} mean={:.3f} min={:.3f} n={} latch={}x{}",
 			track, mean, mn, lane.scored, lane.width, lane.height));
 	}
 
@@ -482,8 +481,8 @@ class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexc
 	for (const auto& [track, lanePointer] : m_lanes) {
 		const Lane& lane = *lanePointer;
 		if (lane.mean) {
-			data.emplace(key(track, "vmaf_mean"), std::format("{:.17g}", *lane.mean));
-			data.emplace(key(track, "vmaf_min"), std::format("{:.17g}", *lane.min));
+			data.emplace(key(track, "vmaf_mean"), StormByte::Safe::String::ReplaceToken("{:.17g}", *lane.mean));
+			data.emplace(key(track, "vmaf_min"), StormByte::Safe::String::ReplaceToken("{:.17g}", *lane.min));
 		}
 
 		data.emplace(key(track, "frames"), std::to_string(lane.scored));

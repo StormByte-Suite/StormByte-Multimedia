@@ -58,7 +58,6 @@
 #include <cmath>
 #include <cstdint>
 #include <deque>
-#include <format>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -541,7 +540,7 @@ void Degrain::Decide() noexcept {
 		m_sigmaP50 = Median(strengths);
 		m_sigmaMin = *std::min_element(strengths.begin(), strengths.end());
 		m_sigmaMax = *std::max_element(strengths.begin(), strengths.end());
-		Log(Level::Notice, std::format("regional targets frames={} active={} sigma min/p50/max={:.3f}/{:.3f}/{:.3f}",
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("regional targets frames={} active={} sigma min/p50/max={:.3f}/{:.3f}/{:.3f}",
 			m_frames, m_ran, m_sigmaMin, m_sigmaP50, m_sigmaMax));
 	}
 }
@@ -572,7 +571,7 @@ bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
 	input.ColorPrimaries(AVCOL_PRI_UNSPECIFIED);
 	input.ColorTransfer(AVCOL_TRC_UNSPECIFIED);
 	input.Pts(0);
-	const std::string chain = std::format(
+	const StormByte::Safe::String chain = StormByte::Safe::String::ReplaceToken(
 		"fftdnoiz=sigma={:.9f}:prev=1:next=1:block=32:overlap=0.5:planes={},format=pix_fmts={}",
 		sigma, current.PlaneCount() == 1 ? 1 : 7, current.FormatName());
 	FGraph graph = FGraph::Open(input, chain);
@@ -757,9 +756,9 @@ class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const no
 	data.emplace(StormByte::Safe::String("applied"), StormByte::Safe::String(std::to_string(m_applied)));
 	data.emplace(StormByte::Safe::String("unsupported"), StormByte::Safe::String(std::to_string(m_unsupported)));
 	data.emplace(StormByte::Safe::String("rejected"), StormByte::Safe::String(std::to_string(m_rejected)));
-	data.emplace(StormByte::Safe::String("sigma"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaP50)));
-	data.emplace(StormByte::Safe::String("sigma_min"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaMin)));
-	data.emplace(StormByte::Safe::String("sigma_max"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaMax)));
-	data.emplace(StormByte::Safe::String("sigma_p50"), StormByte::Safe::String(std::format("{:.3f}", m_sigmaP50)));
+	data.emplace(StormByte::Safe::String("sigma"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_sigmaP50));
+	data.emplace(StormByte::Safe::String("sigma_min"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_sigmaMin));
+	data.emplace(StormByte::Safe::String("sigma_max"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_sigmaMax));
+	data.emplace(StormByte::Safe::String("sigma_p50"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_sigmaP50));
 	return Filter::Report(ok ? Filter::Report::Status::Ok : Filter::Report::Status::None, std::move(data));
 }

@@ -51,7 +51,6 @@
 #include <StormByte/multimedia/property/duration.hxx>
 
 #include <cstdint>
-#include <format>
 
 using namespace StormByte::Multimedia::Property;
 
@@ -76,8 +75,8 @@ StormByte::Safe::String Duration::ToString() const {
 	const std::int64_t hour = total_m / 60;
 
 	if (hour > 0)
-		return StormByte::Safe::String(std::format("{}:{:02}:{:02}.{:03}", hour, min, sec, milli));
+		return StormByte::Safe::String::ReplaceToken("{}:{:02}:{:02}.{:03}", hour, min, sec, milli);
 	if (min > 0)
-		return StormByte::Safe::String(std::format("{}:{:02}.{:03}", min, sec, milli));
-	return StormByte::Safe::String(std::format("{}.{:03}", sec, milli));
+		return StormByte::Safe::String::ReplaceToken("{}:{:02}.{:03}", min, sec, milli);
+	return StormByte::Safe::String::ReplaceToken("{}.{:03}", sec, milli);
 }

@@ -60,7 +60,6 @@
 #include <StormByte/safe/string.hxx>
 
 #include <chrono>
-#include <format>
 #include <string>
 #include <string_view>
 
@@ -172,7 +171,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
-		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
 			packet->Track(), *packet->Serial(), packet->Part(),
 			Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
 			static_cast<std::size_t>(packet->Payload().Available()),
@@ -221,19 +220,19 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (m_owner.Failed() || !m_owner.m_backend)
 			return;
 		const auto started = std::chrono::steady_clock::now();
-		Log(Level::LowLevel, std::format("decoder EOF submit begin t={} look={} owner={}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder EOF submit begin t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
 		m_owner.m_backend->Flush(m_owner);
-		Log(Level::LowLevel, std::format("decoder EOF submit end t={} look={} owner={}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder EOF submit end t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
 		std::size_t received = 0;
 		for (;;) {
 			if (m_owner.Failed())
 				return;
-			Log(Level::LowLevel, std::format("decoder drain receive begin t={} look={} owner={} iteration={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder drain receive begin t={} look={} owner={} iteration={}",
 				m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner), received));
 			Frame::PointerType frame = m_owner.m_backend->Receive(m_owner);
-			Log(Level::LowLevel, std::format("decoder drain receive end t={} look={} owner={} iteration={} frame={} failed={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder drain receive end t={} look={} owner={} iteration={} frame={} failed={}",
 				m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner), received,
 				static_cast<bool>(frame), m_owner.Failed()));
 			if (!frame)
@@ -243,20 +242,20 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
 				frame->Track(), frame->Serial().value_or(0), frame->Part(),
 				Ns(frame->Pts()), Ns(frame->Dts()), Ns(frame->Duration())));
-			Log(Level::LowLevel, std::format("decoder drain emit begin t={} look={} owner={} iteration={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder drain emit begin t={} look={} owner={} iteration={}",
 				m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner), received));
 			Emit(std::move(frame));
-			Log(Level::LowLevel, std::format("decoder drain emit end; record work begin t={} look={} owner={} iteration={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder drain emit end; record work begin t={} look={} owner={} iteration={}",
 				m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner), received));
 			m_owner.RecordWork(ElapsedUs(started));
-			Log(Level::LowLevel, std::format("decoder drain record work end t={} look={} owner={} iteration={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder drain record work end t={} look={} owner={} iteration={}",
 				m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner), received));
 			++received;
 		}
-		Log(Level::LowLevel, std::format("decoder drain complete; backend release begin t={} look={} owner={}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder drain complete; backend release begin t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
 		m_owner.m_backend.reset();
-		Log(Level::LowLevel, std::format("decoder backend release end t={} look={} owner={}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder backend release end t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
 	}
 }

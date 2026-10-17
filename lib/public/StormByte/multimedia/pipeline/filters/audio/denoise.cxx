@@ -56,7 +56,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <format>
 #include <utility>
 
 extern "C" {
@@ -258,7 +257,7 @@ void Denoise::Vote() noexcept {
 	const double frac = static_cast<double>(bestN)
 		/ static_cast<double>(m_cand.size());
 	if (bestI < 0 || bestN < MinMatches || frac < MinFrac) {
-		Log(Level::Warning, std::format(
+		Log(Level::Warning, StormByte::Safe::String::ReplaceToken(
 			"denoise: room tone not stable (matches={} cand={} frac={:.2f}); leaving audio untouched",
 			bestN, static_cast<std::uint64_t>(m_cand.size()), frac));
 		return;
@@ -268,7 +267,7 @@ void Denoise::Vote() noexcept {
 	m_matches = bestN;
 	m_nf = std::clamp(m_cand[static_cast<std::size_t>(bestI)].rmsDb, -80.0, -20.0);
 	m_nr = std::clamp(m_nrIn.value_or(12.0), 1.0, 30.0);
-	Log(Level::Notice, std::format(
+	Log(Level::Notice, StormByte::Safe::String::ReplaceToken(
 		"denoise room-tone nf={:.1f} nr={:.1f} matches={} cand={}",
 		m_nf, m_nr, m_matches, static_cast<std::uint64_t>(m_cand.size())));
 }
@@ -362,8 +361,8 @@ class StormByte::Multimedia::Pipeline::Filter::Report Denoise::Report() const no
 		return { Filter::Report::Status::Failed, {} };
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	data.emplace(StormByte::Safe::String("skip"), m_skip ? "1" : "0");
-	data.emplace(StormByte::Safe::String("nf"), std::format("{:.3f}", m_nf));
-	data.emplace(StormByte::Safe::String("nr"), std::format("{:.3f}", m_nr));
+	data.emplace(StormByte::Safe::String("nf"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_nf));
+	data.emplace(StormByte::Safe::String("nr"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_nr));
 	data.emplace(StormByte::Safe::String("matches"), std::to_string(m_matches));
 	data.emplace(StormByte::Safe::String("candidates"), std::to_string(m_cand.size()));
 	data.emplace(StormByte::Safe::String("frames"), std::to_string(m_frames));

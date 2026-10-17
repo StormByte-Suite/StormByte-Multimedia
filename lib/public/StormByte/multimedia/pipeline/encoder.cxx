@@ -68,7 +68,6 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/pointers.hxx>
 
-#include <format>
 #include <string_view>
 #include <utility>
 
@@ -156,10 +155,10 @@ bool Encoder::SetupPlan() noexcept {
 Encoder::~Encoder() noexcept {
 	Halt();
 	const auto implementation = m_implementation.value_or(StormByte::Safe::String{"auto"});
-	Log(Level::LowLevel, std::format("backend release begin stage=Encoder t={} impl={} instance={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("backend release begin stage=Encoder t={} impl={} instance={}",
 		m_index, std::string_view{implementation}, static_cast<const void*>(this)));
 	m_backend.reset();
-	Log(Level::LowLevel, std::format("backend release end stage=Encoder t={} impl={} instance={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("backend release end stage=Encoder t={} impl={} instance={}",
 		m_index, std::string_view{implementation}, static_cast<const void*>(this)));
 }
 
@@ -277,7 +276,7 @@ Packet::PointerType Encoder::Wrap(
 	}
 
 	const auto payloadLength = static_cast<StormByte::Safe::String>(payload.Available());
-	Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={} key={} bytes={} raw={} fnv1a={:016x}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={} key={} bytes={} raw={} fnv1a={:016x}",
 		index, *m_serial, m_part, Ns(pts), Ns(dts), Ns(duration), keyFrame ? 1 : 0,
 		std::string_view{payloadLength}, static_cast<std::size_t>(payload.Available()),
 		StormByte::Multimedia::Backend::Pipeline::Detail::PacketDigest(payload)));
