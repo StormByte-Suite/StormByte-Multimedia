@@ -104,7 +104,7 @@ jobs:
         uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
         with:
           toolchain: ${{ matrix.compiler }}
-          ccache-key: v1-release-${{ matrix.compiler }}
+          ccache-key: v1-${{ matrix.compiler }}-extra-OFF
           buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-${{ matrix.compiler }}
           build-type: ${{ env.BUILD_TYPE }}
           configure-options: >-
@@ -172,7 +172,7 @@ jobs:
         uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
         with:
           toolchain: clang
-          ccache-key: v1-release-clang
+          ccache-key: v1-clang-extra-OFF
           buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-clang
           build-type: ${{ env.BUILD_TYPE }}
           configure-options: >-
@@ -248,7 +248,7 @@ jobs:
         uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
         with:
           toolchain: clang-cl
-          ccache-key: v1-release-clang-cl
+          ccache-key: v1-clang-cl-extra-OFF
           buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-clang-cl
           build-type: ${{ env.BUILD_TYPE }}
           configure-options: >-
