@@ -233,15 +233,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Materialize tessdata configs link as a regular file
-        shell: pwsh
-        run: |
-          $repo = "thirdparty/tessdata/cmake-wrapper/src"
-          git -C $repo config core.symlinks false
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          git -C $repo checkout-index --force -- configs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
       - name: Install nasm (bundled FFmpeg)
         uses: stormbytepp/githubactions/.github/actions/install-cached@master
         with:
