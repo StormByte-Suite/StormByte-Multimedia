@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/pipeline/filters/analytics/ssim.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
 #include <deque>
@@ -220,18 +221,18 @@ void SSIM::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 		lane.width = ref.Width();
 		lane.height = ref.Height();
 		lane.bpc = Bpc(ref);
-		Log(Level::Debug, std::format(
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken(
 			"first pair latch={}x{} bpc={} ref_fmt={} ref_pts={} dist={}x{} dist_fmt={} dist_pts={}",
 			lane.width, lane.height, lane.bpc,
 			ref.FormatName(), ref.Pts(),
 			dist.Width(), dist.Height(),
 			dist.FormatName(), dist.Pts()));
 		if (dist.Width() != lane.width || dist.Height() != lane.height)
-			Log(Level::Notice, std::format("geometry ref={}x{} dist={}x{}, scaling dist",
+			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("geometry ref={}x{} dist={}x{}, scaling dist",
 				lane.width, lane.height, dist.Width(), dist.Height()));
 	}
 	else if (ref.Width() != lane.width || ref.Height() != lane.height) {
-		Log(Level::Warning, std::format("skip pair, ref size {}x{} latch {}x{}",
+		Log(Level::Warning, StormByte::Safe::String::ReplaceToken("skip pair, ref size {}x{} latch {}x{}",
 			ref.Width(), ref.Height(), lane.width, lane.height));
 		return;
 	}
@@ -298,13 +299,13 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	const Producer producer = frame.Producer();
 	if (producer != Producer::Decoder && !DistLook(producer)) {
-		Log(Level::Debug, std::format("ignore producer={}", ToString(producer)));
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("ignore producer={}", ToString(producer)));
 		return;
 	}
 
 	const FFrame& raw = AVFrame();
 	if (!raw) {
-		Log(Level::Warning, std::format("frame has no backend producer={}", ToString(producer)));
+		Log(Level::Warning, StormByte::Safe::String::ReplaceToken("frame has no backend producer={}", ToString(producer)));
 		return;
 	}
 
@@ -325,7 +326,7 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 
 	if (producer == Producer::Decoder) {
 		if (lane.scored == 0 && lane.ref.empty())
-			Log(Level::Debug, std::format("first ref t={} {}x{} fmt={} bpc={} pts={}",
+			Log(Level::Debug, StormByte::Safe::String::ReplaceToken("first ref t={} {}x{} fmt={} bpc={} pts={}",
 				frame.Track(), raw.Width(), raw.Height(),
 				raw.FormatName(), Bpc(raw), raw.Pts()));
 		lane.ref.push_back(std::move(clone));
@@ -334,7 +335,7 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	else {
 		if (lane.scored == 0 && lane.dist.empty())
-			Log(Level::Debug, std::format("first dist t={} producer={} {}x{} fmt={} bpc={} pts={}",
+			Log(Level::Debug, StormByte::Safe::String::ReplaceToken("first dist t={} producer={} {}x{} fmt={} bpc={} pts={}",
 				frame.Track(), ToString(producer),
 				raw.Width(), raw.Height(), raw.FormatName(), Bpc(raw), raw.Pts()));
 		lane.dist.push_back(std::move(clone));
@@ -342,7 +343,7 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 			lane.peakDist = lane.dist.size();
 	}
 
-	Log(Level::LowLevel, std::format("park t={} producer={} ref={} dist={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
 }
@@ -352,17 +353,17 @@ void SSIM::Eof() noexcept {
 	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
 		Lane& lane = *lanePointer;
 		Drain(lane);
-		Log(Level::Debug, std::format(
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken(
 			"eof t={} scored={} ref={} dist={} peak_ref={} peak_dist={} failed={} latch={}x{}",
 			track, lane.scored, lane.ref.size(), lane.dist.size(),
-			lane.peakRef, lane.peakDist, lane.failed,
+			lane.peakRef, lane.peakDist, lane.failed ? "true" : "false",
 			lane.width, lane.height));
 		if (!lane.ref.empty() || !lane.dist.empty())
-			Log(Level::Warning, std::format("leftover looks t={} ref={} dist={}",
+			Log(Level::Warning, StormByte::Safe::String::ReplaceToken("leftover looks t={} ref={} dist={}",
 				track, lane.ref.size(), lane.dist.size()));
 		DropParked(lane);
 		if (lane.scored == 0) {
-			Log(Level::Error, std::format("t={} no scored pairs", track));
+			Log(Level::Error, StormByte::Safe::String::ReplaceToken("t={} no scored pairs", track));
 			lane.failed = true;
 			continue;
 		}
@@ -392,7 +393,7 @@ void SSIM::Eof() noexcept {
 	if (m_lanes.empty())
 		Log(Level::Error, "no scored pairs");
 	else if (scored > 0)
-		Log(Level::Debug, std::format("eof tracks={} scored={}", m_lanes.size(), scored));
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const noexcept {
@@ -411,7 +412,7 @@ class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const noexc
 	const auto key = [prefix](int track, std::string_view name) {
 		if (!prefix)
 			return StormByte::Safe::String(name);
-		return StormByte::Safe::String(std::format("{}.{}", track, name));
+		return StormByte::Safe::String::ReplaceToken("{}.{}", track, name);
 	};
 
 	for (const auto& [track, lanePointer] : m_lanes) {

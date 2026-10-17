@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <format>
 #include <string>
@@ -63,7 +64,7 @@ namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
-		return std::format("{}", value->Nanoseconds().count());
+		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
 	}
 }
 
@@ -88,7 +89,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		Log(Level::Notice, std::format("open t={}", m_owner.m_index));
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open t={}", m_owner.m_index));
 	}
 
 	void Remux::Process(Item::PointerType item) noexcept {

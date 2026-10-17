@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/content/video.hxx>
+#include <StormByte/safe/string.hxx>
 
 extern "C" {
 #include <libavutil/frame.h>
@@ -242,7 +243,7 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 			const bool dovi = type == AV_FRAME_DATA_DOVI_METADATA || type == AV_FRAME_DATA_DOVI_RPU_BUFFER;
 			if ((dovi && before && !DoviCompatible(before, after)) || (!dovi && !HdrCompatible(after))) {
 				av_frame_remove_side_data(after, type);
-				m_diagnostic += std::format(" side-data:{}=dropped-incompatible-color", static_cast<int>(type));
+				m_diagnostic += StormByte::Safe::String::ReplaceToken(" side-data:{}=dropped-incompatible-color", static_cast<int>(type));
 			}
 		}
 	}
@@ -263,24 +264,24 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 				default: break;
 			}
 			if (!source) {
-				m_diagnostic += std::format(" {}=source-absent", name);
+				m_diagnostic += StormByte::Safe::String::ReplaceToken(" {}=source-absent", name);
 				continue;
 			}
 			if (replacement) {
-				m_diagnostic += std::format(" {}=already-present-kept:{}B", name, replacement->size);
+				m_diagnostic += StormByte::Safe::String::ReplaceToken(" {}=already-present-kept:{}B", name, replacement->size);
 				continue;
 			}
 			if (av_frame_side_data_clone(&after->side_data, &after->nb_side_data, source, 0) < 0) {
-				m_diagnostic += std::format(" {}=copy-failed:{}B", name, source->size);
+				m_diagnostic += StormByte::Safe::String::ReplaceToken(" {}=copy-failed:{}B", name, source->size);
 				m_warning = std::string_view("failed to preserve Dolby Vision/HDR10 frame side data");
 			}
 			else {
-				m_diagnostic += std::format(" {}=copied:{}B", name, source->size);
+				m_diagnostic += StormByte::Safe::String::ReplaceToken(" {}=copied:{}B", name, source->size);
 			}
 		}
 		if ((av_frame_get_side_data(before, AV_FRAME_DATA_DOVI_METADATA)
 			|| av_frame_get_side_data(before, AV_FRAME_DATA_DOVI_RPU_BUFFER)) && !Same(Read(before), Read(after))) {
-			m_diagnostic += std::format(" dovi-geometry={}x{}->{}x{} crop={},{},{},{}->{},{},{},{}",
+			m_diagnostic += StormByte::Safe::String::ReplaceToken(" dovi-geometry={}x{}->{}x{} crop={},{},{},{}->{},{},{},{}",
 				before->width, before->height, after->width, after->height,
 				before->crop_top, before->crop_bottom, before->crop_left, before->crop_right,
 				after->crop_top, after->crop_bottom, after->crop_left, after->crop_right);
@@ -291,9 +292,9 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 		if (!sourcePlus)
 			m_diagnostic += " hdr10plus=source-absent";
 		else if (!replacementPlus)
-			m_diagnostic += std::format(" hdr10plus=missing-on-replacement:{}B", sourcePlus->size);
+			m_diagnostic += StormByte::Safe::String::ReplaceToken(" hdr10plus=missing-on-replacement:{}B", sourcePlus->size);
 		else
-			m_diagnostic += std::format(" hdr10plus=already-present-kept:{}B", replacementPlus->size);
+			m_diagnostic += StormByte::Safe::String::ReplaceToken(" hdr10plus=already-present-kept:{}B", replacementPlus->size);
 	}
 	if (!after)
 		return;
@@ -345,6 +346,6 @@ void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
 	}
 
 	MapWindowsToOrigin(*plus, in.width, in.height, x0, y0, out.width, out.height);
-	m_diagnostic += std::format(" hdr10plus=remapped-crop:{}x{}@{},{}",
+	m_diagnostic += StormByte::Safe::String::ReplaceToken(" hdr10plus=remapped-crop:{}x{}@{},{}",
 		in.width, in.height, x0, y0);
 }

@@ -52,10 +52,10 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <climits>
 #include <cstring>
-#include <format>
 #include <span>
 
 extern "C" {
@@ -102,7 +102,7 @@ namespace {
 						hint = ".bmp";
 					}
 					if (codec == AV_CODEC_ID_NONE) {
-						owner.Fail(std::format("MP4 attachment cannot be represented as cover art: {}", type));
+						owner.Fail(StormByte::Safe::String::ReplaceToken("MP4 attachment cannot be represented as cover art: {}", type));
 						return false;
 					}
 					const auto bytes = UnreadSpan(attachment.Payload());
@@ -153,7 +153,7 @@ namespace {
 					const int result = av_interleaved_write_frame(&context, packet);
 					av_packet_free(&packet);
 					if (result < 0) {
-						owner.Fail(std::format("MP4 cover write failed: {}",
+						owner.Fail(StormByte::Safe::String::ReplaceToken("MP4 cover write failed: {}",
 							static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(result))));
 						return false;
 					}

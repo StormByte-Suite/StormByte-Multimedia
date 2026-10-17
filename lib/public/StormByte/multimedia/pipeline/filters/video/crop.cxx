@@ -51,11 +51,11 @@
 #include <StormByte/multimedia/pipeline/filters/video/crop.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -396,7 +396,7 @@ void Crop::Apply() noexcept {
 		Fail("crop: ApplyCropping failed");
 		return;
 	}
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"crop {}x{} -> {}x{} bars LRTB={},{};{},{}",
 		src.Width(), src.Height(), out.Width(), out.Height(),
 		left, right, top, bottom));
@@ -414,7 +414,7 @@ void Crop::Process(const Pipeline::Frame& frame) noexcept {
 			Hold(ProbeMax);
 		const bool usable = ProbeBars(AVFrame());
 		if (usable && Sure()) {
-			Log(Level::Debug, std::format(
+			Log(Level::Debug, StormByte::Safe::String::ReplaceToken(
 				"crop stable release bars LRTB={},{};{},{}",
 				m_left, m_right, m_top, m_bottom));
 			m_released = true;

@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/atadenoise.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -92,9 +92,9 @@ StormByte::Safe::String Atadenoise::Chain() const noexcept {
 	const double lb = m_lbIn.value_or(0.04);
 	const double ca = m_caIn.value_or(0.02);
 	const double cb = m_cbIn.value_or(0.04);
-	return Safe::String(std::format(
+	return StormByte::Safe::String::ReplaceToken(
 		"atadenoise=s={}:0a={}:0b={}:1a={}:1b={}:2a={}:2b={}",
-		s, la, lb, ca, cb, ca, cb));
+		s, la, lb, ca, cb, ca, cb);
 }
 
 void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
@@ -126,13 +126,13 @@ void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (out.Width() <= 0 || out.Height() <= 0 || out.Format() == FFrame::FormatNone()) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"atadenoise wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"atadenoise {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -149,7 +149,7 @@ void Atadenoise::Eof() noexcept {
 		}
 		if (out.Width() <= 0 || out.Height() <= 0 || out.Format() == FFrame::FormatNone())
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"atadenoise flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));

@@ -58,6 +58,7 @@
 #include <StormByte/multimedia/property/color.hxx>
 #include <StormByte/multimedia/property/hdr10.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <cstdint>
 #include <cstring>
@@ -378,7 +379,7 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const int ctxFmt = ctx ? static_cast<int>(ctx->pix_fmt) : -1;
 
 	if (ctx && (source->Width() != ctxW || source->Height() != ctxH)) {
-		owner.Fail(std::format(
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"encoder frame mismatch ctx={}x{} fmt={} in={}x{} fmt={}",
 			ctxW, ctxH, ctxFmt,
 			source->Width(), source->Height(), source->Format()));
@@ -393,7 +394,7 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		m_input.emplace();
 		if (!m_encoder->PrepareFrame(*source, *m_input)) {
 			m_input.reset();
-			owner.Fail(std::format("cannot prepare sample-exact encoder input or hardware transfer fmt={} from fmt={}",
+			owner.Fail(StormByte::Safe::String::ReplaceToken("cannot prepare sample-exact encoder input or hardware transfer fmt={} from fmt={}",
 				ctxFmt, source->Format()));
 			return false;
 		}
@@ -449,7 +450,7 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
 		return false;
 	if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
-		owner.Fail(std::format(
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"failed to send frame ctx={}x{} fmt={} in={}x{} fmt={} pts={}",
 			ctxW, ctxH, ctxFmt,
 			handle->Width(), handle->Height(), handle->Format(),

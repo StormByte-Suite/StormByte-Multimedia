@@ -53,8 +53,8 @@
 #include <StormByte/multimedia/pipeline/filters/audio/upmix.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -127,19 +127,19 @@ StormByte::Safe::String Upmix::SurroundChain(const FFrame& src) const noexcept {
 	const StormByte::Safe::String in = inLayout ? inLayout.Describe() : StormByte::Safe::String{};
 	const int lfe = TargetHasLfe() ? 1 : 0;
 	if (!in.empty())
-		return StormByte::Safe::String(std::format(
+		return StormByte::Safe::String::ReplaceToken(
 			"surround=chl_in={}:chl_out={}:lfe={}:lfe_mode=add:lfe_low=128:lfe_high=256",
-			in, out, lfe));
-	return StormByte::Safe::String(std::format(
+			in, out, lfe);
+	return StormByte::Safe::String::ReplaceToken(
 		"surround=chl_out={}:lfe={}:lfe_mode=add:lfe_low=128:lfe_high=256",
-		out, lfe));
+		out, lfe);
 }
 
 StormByte::Safe::String Upmix::AformatChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
-	return StormByte::Safe::String(std::format("aformat=channel_layouts={}", name));
+	return StormByte::Safe::String::ReplaceToken("aformat=channel_layouts={}", name);
 }
 
 StormByte::Safe::String Upmix::PanChain() const noexcept {
@@ -147,12 +147,12 @@ StormByte::Safe::String Upmix::PanChain() const noexcept {
 	if (name.empty())
 		return {};
 	if (TargetHasLfe())
-		return StormByte::Safe::String(std::format(
+		return StormByte::Safe::String::ReplaceToken(
 			"pan={}|FL=FL|FR=FR|FC=0.707*FL+0.707*FR|LFE=0.5*FL+0.5*FR|BL=FL|BR=FR|SL=FL|SR=FR",
-			name));
-	return StormByte::Safe::String(std::format(
+			name);
+	return StormByte::Safe::String::ReplaceToken(
 		"pan={}|FL=FL|FR=FR|FC=0.707*FL+0.707*FR|BL=FL|BR=FR|SL=FL|SR=FR",
-		name));
+		name);
 }
 
 bool Upmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
@@ -184,12 +184,12 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (have == static_cast<int>(want)) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"upmix no-op {}ch pts={}", have, src.Pts()));
 		return;
 	}
 	if (have > static_cast<int>(want)) {
-		Fail(std::format(
+		Fail(StormByte::Safe::String::ReplaceToken(
 			"upmix: {} channels cannot shrink to {}; use Downmix",
 			have, ToString(m_target)));
 		return;
@@ -230,7 +230,7 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"upmix wait {}ch->{} pts={}",
 			have, ToString(m_target), src.Pts()));
 		return;
@@ -241,7 +241,7 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 		how = "aformat";
 	else if (m_mode == Mode::Pan)
 		how = "pan";
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"upmix {}ch->{} ({}) pts={}",
 		have, ToString(m_target), how, out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -258,7 +258,7 @@ void Upmix::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"upmix flush {}ch pts={}",
 			out.Channels(), out.Pts()));
 		EmitFrame(std::move(out));

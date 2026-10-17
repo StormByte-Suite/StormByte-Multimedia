@@ -55,8 +55,8 @@
 #include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <string>
 #include <thread>
 
@@ -64,7 +64,7 @@ namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
-		return std::format("{}", value->Nanoseconds().count());
+		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
 	}
 }
 
@@ -109,11 +109,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (opening && !m_owner.m_backend->Open(m_owner, *frame))
 			return;
 		if (opening)
-			Log(Level::Notice, std::format("open t={} codec={} impl={}",
+			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open t={} codec={} impl={}",
 				m_owner.m_index, std::string(m_owner.m_codec->Name()),
 				std::string_view{m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})}));
 
-		Log(Level::LowLevel, std::format("in t={} {}:{} pts={} dts={}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{} pts={} dts={}",
 			m_owner.m_index, *frame->Serial(), frame->Part(),
 			Ns(frame->Pts()), Ns(frame->Dts())));
 		m_owner.m_serial = *frame->Serial();

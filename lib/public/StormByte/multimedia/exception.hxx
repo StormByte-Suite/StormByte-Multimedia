@@ -74,7 +74,7 @@ namespace StormByte {
 		 * This type applies the `Multimedia` segment. A further segment is an @ref Path
 		 * (`File`, `Codec`, `Plan`, `AV.Decoder`). The body does not include the path.
 		 * Literal `{}` are replaced by @ref StormByte::Safe::String::ReplaceToken.
-		 * This does not call `std::format`, so a specifier such as `{:.3f}` is not a token.
+		 * A specifier such as `{:.3f}` is not a token.
 		 * A number uses `std::to_string`. The destructor is defined in this module.
 		 *
 		 * @note Base automatically recognizes complete exception derivatives as
@@ -102,7 +102,7 @@ namespace StormByte {
 				/**
 				 * @brief Replace literal `{}` under `StormByte.Multimedia`.
 				 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
-				 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+				 * @param pattern Body with literal `{}` tokens.
 				 * @param args Replacements. One per token, in order.
 				 */
 				template <typename... Args>
@@ -120,7 +120,7 @@ namespace StormByte {
 				 * @brief Replace literal `{}` under an additional Multimedia path.
 				 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
 				 * @param path Additional segments nested below `StormByte.Multimedia`.
-				 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+				 * @param pattern Body with literal `{}` tokens.
 				 * @param args Replacements. One per token, in order.
 				 */
 				template <typename... Args>

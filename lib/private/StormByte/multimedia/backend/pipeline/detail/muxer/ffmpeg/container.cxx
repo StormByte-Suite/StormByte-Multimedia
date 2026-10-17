@@ -63,11 +63,11 @@
 #include <StormByte/multimedia/pipeline/side_data.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
-#include <format>
 #include <span>
 #include <string>
 #include <utility>
@@ -537,7 +537,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				const int supported = avformat_query_codec(m_ctx->oformat,
 					stream->codecpar->codec_id, FF_COMPLIANCE_NORMAL);
 				if (supported == 0) {
-					owner.Fail(std::format("destination {} does not support codec {}",
+					owner.Fail(StormByte::Safe::String::ReplaceToken("destination {} does not support codec {}",
 						owner.Destination().Name(), avcodec_get_name(stream->codecpar->codec_id)));
 					return false;
 				}
@@ -585,7 +585,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const int rc = avformat_write_header(m_ctx, &opts);
 		av_dict_free(&opts);
 		if (rc < 0) {
-			owner.Fail(std::format("avformat_write_header failed: {}",
+			owner.Fail(StormByte::Safe::String::ReplaceToken("avformat_write_header failed: {}",
 				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(rc))));
 			return false;
 		}
@@ -675,7 +675,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const int rc = av_interleaved_write_frame(m_ctx, raw);
 		av_packet_free(&raw);
 		if (rc < 0) {
-			owner.Fail(std::format("av_interleaved_write_frame failed: {}",
+			owner.Fail(StormByte::Safe::String::ReplaceToken("av_interleaved_write_frame failed: {}",
 				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(rc))));
 			return false;
 		}

@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/format.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -92,7 +92,7 @@ void Format::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (src.Format() == m_pixFmt) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"format no-op {} pts={}", src.FormatName(), src.Pts()));
 		return;
 	}
@@ -109,7 +109,7 @@ void Format::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"format {} -> {} {}x{} pts={}",
 		src.FormatName(), out.FormatName(), out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));

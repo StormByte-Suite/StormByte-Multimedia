@@ -57,6 +57,7 @@
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <format>
 #include <utility>
@@ -127,7 +128,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	}
 
 	void Demux::FeedTrack(int track) noexcept {
-		NameThread(std::format("STMM:DmxF{}", track));
+		NameThread(StormByte::Safe::String::ReplaceToken("STMM:DmxF{}", track));
 		for (;;) {
 			Packet::PointerType packet;
 			{
@@ -168,7 +169,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_positionNs.store(-1, StormByte::Safe::MemoryOrder::Release);
 		m_owner.m_nextSerial.clear();
 		m_feedStop.store(false, StormByte::Safe::MemoryOrder::Release);
-			Log(Level::Notice, std::format("open {}", std::string_view{m_owner.Origin().Path()}));
+			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open {}", std::string_view{m_owner.Origin().Path()}));
 	}
 
 	void Demux::Process(Item::PointerType) noexcept {

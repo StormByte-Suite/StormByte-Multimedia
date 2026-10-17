@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/vaguedenoiser.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -87,9 +87,9 @@ StormByte::Safe::String VagueDenoiser::Chain() const noexcept {
 	const double thr = m_thrIn.value_or(2.0);
 	const unsigned steps = m_stepsIn.value_or(6u);
 	const double pct = m_pctIn.value_or(85.0);
-	return StormByte::Safe::String(std::format(
+	return StormByte::Safe::String::ReplaceToken(
 		"vaguedenoiser=threshold={}:nsteps={}:percent={}:method=garrote",
-		thr, steps, pct));
+		thr, steps, pct);
 }
 
 void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept {
@@ -120,13 +120,13 @@ void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!out) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"vaguedenoiser wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"vaguedenoiser {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));

@@ -52,9 +52,9 @@
 #include <StormByte/multimedia/pipeline/filters/video/deflicker.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -97,7 +97,7 @@ StormByte::Safe::String Deflicker::Chain() const noexcept {
 	std::string mode = std::string(m_modeIn.value_or(Safe::String("am")));
 	if (!ModeOk(mode))
 		mode = "am";
-	return StormByte::Safe::String{std::format("deflicker=size={}:mode={}", size, mode)};
+	return StormByte::Safe::String::ReplaceToken("deflicker=size={}:mode={}", size, mode);
 }
 
 void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
@@ -133,7 +133,7 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"deflicker wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
@@ -146,7 +146,7 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"deflicker {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -163,7 +163,7 @@ void Deflicker::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"deflicker flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));

@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/pad.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -82,9 +82,9 @@ void Pad::Setup() noexcept {
 }
 
 StormByte::Safe::String Pad::Chain() const noexcept {
-	return StormByte::Safe::String(std::format(
+	return StormByte::Safe::String::ReplaceToken(
 		"pad=width={}:height={}:x=(ow-iw)/2:y=(oh-ih)/2:color=black",
-		m_width, m_height));
+		m_width, m_height);
 }
 
 void Pad::Process(const Pipeline::Frame& frame) noexcept {
@@ -110,7 +110,7 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (static_cast<std::uint32_t>(src.Width()) == m_width
 		&& static_cast<std::uint32_t>(src.Height()) == m_height) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"pad no-op {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
 	}
@@ -135,7 +135,7 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"pad wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
 	}
@@ -147,7 +147,7 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"pad {}x{} -> {}x{} pts={}",
 		src.Width(), src.Height(), out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -164,7 +164,7 @@ void Pad::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"pad flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));
 	}

@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <array>
@@ -56,7 +57,6 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
-#include <format>
 #include <fstream>
 #include <utility>
 
@@ -708,14 +708,14 @@ void Watermark::Clean() noexcept {
 
 void Watermark::Setup() noexcept {
 	if (m_designed)
-		Log(Level::LowLevel, std::format("opacity {}%, margin {}, designed {}x{}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("opacity {}%, margin {}, designed {}x{}",
 			m_opacity, m_margin, m_designed->Width(), m_designed->Height()));
 	else
-		Log(Level::LowLevel, std::format("opacity {}%, margin {}", m_opacity, m_margin));
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("opacity {}%, margin {}", m_opacity, m_margin));
 }
 
 void Watermark::DisableLogo(std::string_view why) noexcept {
-	Log(Level::Warning, std::format("disabled: {}", why));
+	Log(Level::Warning, StormByte::Safe::String::ReplaceToken("disabled: {}", why));
 	m_opacity = 0;
 	m_rgba.clear();
 	m_scaled.clear();
@@ -834,7 +834,7 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 
 bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	if (!Luma(src) || m_luma->Width() < 16 || m_luma->Height() < 16) {
-			Log(Level::LowLevel, std::format("probe skip luma={}x{}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("probe skip luma={}x{}",
 			m_luma ? m_luma->Width() : 0,
 			m_luma ? m_luma->Height() : 0));
 		return false;
@@ -857,7 +857,7 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 		if (core > edge) {
 			ApplyLut(gray, StretchLut(edge, core));
 			found = Measure(gray);
-					Log(Level::LowLevel, std::format(
+					Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 				"probe stretch edge={} core={} found={},{};{},{}",
 				edge, core, found.top, found.bottom, found.left, found.right));
 		}
@@ -866,12 +866,12 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	if (!Boxed(found)) {
 		ApplyLut(gray, GammaLut(0.45));
 		found = Measure(gray);
-			Log(Level::LowLevel, std::format("probe gamma found={},{};{},{}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("probe gamma found={},{};{},{}",
 			found.top, found.bottom, found.left, found.right));
 	}
 
 	if (!Boxed(found)) {
-			Log(Level::LowLevel, std::format(
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"probe unboxed raw={} found={},{};{},{} bars={},{};{},{} stable={}",
 			static_cast<int>(rawBoxed), found.top, found.bottom, found.left, found.right,
 			m_barTop, m_barBottom, m_barLeft, m_barRight, m_stable));
@@ -913,7 +913,7 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	else
 		m_stable = 0;
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"probe same={} stable={} found={},{};{},{} bars={},{};{},{}",
 		static_cast<int>(same), m_stable,
 		found.top, found.bottom, found.left, found.right,
@@ -924,7 +924,7 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 void Watermark::Process(const Pipeline::Frame& frame) noexcept {
 	if (m_opacity == 0)
 		return;
-	Log(Level::LowLevel, std::format("process t={} {}:{} opacity={} released={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("process t={} {}:{} opacity={} released={}",
 		frame.Track(), frame.Serial().value_or(0), frame.Part(), m_opacity,
 		static_cast<int>(m_released)));
 
@@ -936,14 +936,14 @@ void Watermark::Process(const Pipeline::Frame& frame) noexcept {
 		const bool usable = ProbeBars(src);
 		const bool boxed = (m_barTop > 4 && m_barBottom > 4)
 			|| (m_barLeft > 4 && m_barRight > 4);
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"hold-state t={} {}:{} usable={} boxed={} stable={} held={} bars={},{};{},{}",
 			frame.Track(), frame.Serial().value_or(0), frame.Part(),
 			static_cast<int>(usable), static_cast<int>(boxed), m_stable,
 			static_cast<unsigned>(HeldFor()),
 			m_barTop, m_barBottom, m_barLeft, m_barRight));
 		if (usable && boxed && m_stable >= 8) {
-			Log(Level::LowLevel, std::format("stable-release t={} {}:{}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("stable-release t={} {}:{}",
 				frame.Track(), frame.Serial().value_or(0), frame.Part()));
 			m_released = true;
 			Release();
@@ -959,7 +959,7 @@ void Watermark::Process(const Pipeline::Frame& frame) noexcept {
 }
 
 void Watermark::LastChance(const Pipeline::Frame& frame) noexcept {
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"last-chance t={} {}:{} stable={} bars={},{};{},{}",
 		frame.Track(), frame.Serial().value_or(0), frame.Part(),
 		m_stable, m_barTop, m_barBottom, m_barLeft, m_barRight));
@@ -1008,7 +1008,7 @@ bool Watermark::Prepare(int frameW, int frameH) noexcept {
 			DisableLogo("failed to scale logo");
 			return false;
 		}
-		Log(Level::LowLevel, std::format("logo {}x{} frame {}x{} -> {}x{} margin {}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("logo {}x{} frame {}x{} -> {}x{} margin {}",
 			m_logoWidth, m_logoHeight, frameW, frameH, m_paintW, m_paintH, m_scaledMargin));
 	}
 	m_prepared = true;

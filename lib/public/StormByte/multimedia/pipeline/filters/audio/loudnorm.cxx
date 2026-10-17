@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cmath>
@@ -386,6 +387,6 @@ class StormByte::Multimedia::Pipeline::Filter::Report Loudnorm::Report() const n
 	data.emplace(StormByte::Safe::String("frames"), std::to_string(m_frames));
 	data.emplace(StormByte::Safe::String("channels"), std::to_string(m_channels));
 	for (std::size_t c = 0; c < m_tp.size(); ++c)
-		data.emplace(StormByte::Safe::String(std::format("TP_{}", c)), std::format("{:.3f}", DbTp(m_tp[c])));
+		data.emplace(StormByte::Safe::String::ReplaceToken("TP_{}", c), std::format("{:.3f}", DbTp(m_tp[c])));
 	return { Filter::Report::Status::Ok, std::move(data) };
 }

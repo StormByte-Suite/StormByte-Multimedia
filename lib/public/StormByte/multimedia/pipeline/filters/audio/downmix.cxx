@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/audio/downmix.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -108,14 +108,14 @@ StormByte::Safe::String Downmix::AformatChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
-	return StormByte::Safe::String(std::format("aformat=channel_layouts={}", name));
+	return StormByte::Safe::String::ReplaceToken("aformat=channel_layouts={}", name);
 }
 
 StormByte::Safe::String Downmix::PanChain() const noexcept {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
-	return StormByte::Safe::String(std::format("pan={}|FL=FL+0.707*LFE|FR=FR+0.707*LFE", name));
+	return StormByte::Safe::String::ReplaceToken("pan={}|FL=FL+0.707*LFE|FR=FR+0.707*LFE", name);
 }
 
 bool Downmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
@@ -147,12 +147,12 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (have == static_cast<int>(want)) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"downmix no-op {}ch pts={}", have, src.Pts()));
 		return;
 	}
 	if (have < static_cast<int>(want)) {
-		Fail(std::format(
+		Fail(StormByte::Safe::String::ReplaceToken(
 			"downmix: {} channels cannot reach {}",
 			have, ToString(m_target)));
 		return;
@@ -187,13 +187,13 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"downmix wait {}ch->{} pts={}",
 			have, ToString(m_target), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"downmix {}ch->{} ({}) pts={}",
 		have, ToString(m_target),
 		m_pan ? "pan" : "aformat", out.Pts()));
@@ -211,7 +211,7 @@ void Downmix::Eof() noexcept {
 		}
 		if (out.NbSamples() <= 0)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"downmix flush {}ch pts={}",
 			out.Channels(), out.Pts()));
 		EmitFrame(std::move(out));

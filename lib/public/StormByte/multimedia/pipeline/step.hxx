@@ -580,7 +580,7 @@ namespace StormByte {
 					/**
 					 * @brief Writes one log line on the scoped module logger.
 					 * @param level StormByte::Logger::Level of this line.
-					 * @param message Already-formatted text (caller may use std::format).
+					 * @param message Already-formatted text (caller may use `Safe::String::ReplaceToken`).
 					 *        Must not include the level name; Logger prints that.
 					 *
 					 * No-op without a logger. Overrides may customize delivery.

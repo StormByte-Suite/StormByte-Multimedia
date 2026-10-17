@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/fps.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -82,7 +82,7 @@ void Fps::Setup() noexcept {
 }
 
 StormByte::Safe::String Fps::Chain() const noexcept {
-	return StormByte::Safe::String{std::format("fps=fps={}/{}:round=near", m_num, m_den)};
+	return StormByte::Safe::String::ReplaceToken("fps=fps={}/{}:round=near", m_num, m_den);
 }
 
 void Fps::Process(const Pipeline::Frame& frame) noexcept {
@@ -122,7 +122,7 @@ void Fps::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"fps wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
 	}
@@ -134,7 +134,7 @@ void Fps::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"fps {}/{} {}x{} pts={}",
 		m_num, m_den, out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
@@ -151,7 +151,7 @@ void Fps::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"fps flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
 		if (Failed())

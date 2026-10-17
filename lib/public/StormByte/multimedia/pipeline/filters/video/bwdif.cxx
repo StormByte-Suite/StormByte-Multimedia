@@ -52,10 +52,10 @@
 #include <StormByte/multimedia/pipeline/filters/video/bwdif.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cstdint>
-#include <format>
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -182,8 +182,8 @@ void Bwdif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 	for (int i = 0; i < planes; ++i)
 		FilterPlane(prev, cur, next, out, i, bpc, tff);
 
-	Log(Level::LowLevel, std::format("bwdif weave {}x{} tff={} pts={}",
-		cur.Width(), cur.Height(), tff, cur.Pts()));
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("bwdif weave {}x{} tff={} pts={}",
+		cur.Width(), cur.Height(), tff ? "true" : "false", cur.Pts()));
 	EmitFrame(std::move(out));
 }
 

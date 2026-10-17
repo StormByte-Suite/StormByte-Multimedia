@@ -80,6 +80,7 @@ extern "C" {
 }
 
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/safe/string.hxx>
 
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
@@ -89,7 +90,7 @@ namespace {
 	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
-		return std::format("{}", value->Nanoseconds().count());
+		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
 	}
 
 	const Codec* DestinationCodec(const Config::Base* config) noexcept {
@@ -342,6 +343,6 @@ const void* Encoder::FrameHandle(const Frame& frame) noexcept {
 
 StormByte::Safe::String Encoder::Label() const noexcept {
 	if (m_implementation && !m_implementation->empty())
-		return StormByte::Safe::String(std::format("Encoder({})", std::string_view{*m_implementation}));
+		return StormByte::Safe::String::ReplaceToken("Encoder({})", std::string_view{*m_implementation});
 	return StormByte::Safe::String("Encoder(" + std::string(m_codec->Name()) + ")");
 }

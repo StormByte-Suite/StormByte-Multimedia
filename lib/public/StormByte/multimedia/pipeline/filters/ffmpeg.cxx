@@ -62,11 +62,11 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <chrono>
 #include <deque>
-#include <format>
 #include <limits>
 #include <memory>
 #include <string>
@@ -300,7 +300,7 @@ void FFmpeg::Hold(std::uint8_t n) noexcept {
 
 	m_hold = n == 0 ? std::numeric_limits<std::uint8_t>::max() : n;
 	m_heldFor = 0;
-	Log(Level::LowLevel, std::format("hold n={} t={} {}:{} queue={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("hold n={} t={} {}:{} queue={}",
 		static_cast<unsigned>(m_hold), TrackOf(*m_current),
 		SerialOf(*m_current).value_or(0), PartOf(*m_current), m_state->queue.size()));
 	Park();
@@ -309,7 +309,7 @@ void FFmpeg::Hold(std::uint8_t n) noexcept {
 void FFmpeg::Release() noexcept {
 	if (!Held())
 		return;
-	Log(Level::LowLevel, std::format("release held={} queue={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("release held={} queue={}",
 		static_cast<unsigned>(m_heldFor), m_state->queue.size()));
 	m_hold = 0;
 	m_heldFor = 0;
@@ -334,7 +334,7 @@ void FFmpeg::Release() noexcept {
 			? std::max(m_state->nextPart, PartOf(*m_current)) : PartOf(*m_current);
 		if (m_current->Kind() == Kind::Frame)
 			m_state->lastFrame = m_current->Clone();
-		Log(Level::LowLevel, std::format("release-item index={} count={} t={} {}:{} kind={}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("release-item index={} count={} t={} {}:{} kind={}",
 			releaseIndex++, parked.size(), TrackOf(*m_current),
 			SerialOf(*m_current).value_or(0), PartOf(*m_current),
 			static_cast<unsigned>(m_current->Kind())));
@@ -441,8 +441,8 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 	if (!frame->m_backend->Warning().empty())
 		Log(Level::Warning, frame->m_backend->Warning());
 	if (!frame->m_backend->Diagnostic().empty())
-		Log(Level::LowLevel, std::format("frame side-data{}", frame->m_backend->Diagnostic()));
-	Log(Level::LowLevel, std::format("save frame t={} {}:{}",
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("frame side-data{}", frame->m_backend->Diagnostic()));
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("save frame t={} {}:{}",
 		frame->Track(), frame->Serial().value_or(0), frame->Part()));
 }
 
@@ -469,7 +469,7 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 	packet->m_payload = StormByte::Buffer::FIFO{};
 	packet->m_backend->Handle().Reset(incoming.Detach());
 	packet->m_backend->BindProperties(*packet);
-	Log(Level::LowLevel, std::format("save packet t={} {}:{}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("save packet t={} {}:{}",
 		packet->Track(), packet->Serial().value_or(0), packet->Part()));
 }
 
@@ -586,7 +586,7 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 		? std::max(m_state->nextPart, PartOf(*m_current)) : PartOf(*m_current);
 	if (!IsAnalytics(*this) && m_current->Kind() == Kind::Frame)
 		m_state->lastFrame = m_current->Clone();
-	Log(Level::LowLevel, std::format("in t={} {}:{}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{}",
 		TrackOf(*m_current), SerialOf(*m_current).value_or(0), PartOf(*m_current)));
 
 	if (IsAnalytics(*this)) {
@@ -751,7 +751,7 @@ void FFmpeg::RecordWork(std::int64_t microseconds) noexcept {
 void FFmpeg::DumpWork() noexcept {
 	if (m_workN == 0)
 		return;
-	Log(Level::Debug, std::format("work n={} min={}us max={}us last={}us",
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("work n={} min={}us max={}us last={}us",
 		m_workN, m_workMin, m_workMax, m_lastWork));
 	m_workN = 0;
 	m_workMin = std::numeric_limits<std::int64_t>::max();

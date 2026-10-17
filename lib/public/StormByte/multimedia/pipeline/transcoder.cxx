@@ -66,6 +66,7 @@
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/unique_lock.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <limits>
@@ -432,7 +433,7 @@ bool Transcoder::ProbeSource() noexcept {
 		return false;
 	}
 	m_consult = StormByte::Safe::Unique<File>::MakePointer<File>(std::move(*opened));
-	JobLog(m_logger, Level::Notice, std::format("probed source {}", std::string_view{path}));
+	JobLog(m_logger, Level::Notice, StormByte::Safe::String::ReplaceToken("probed source {}", std::string_view{path}));
 	return true;
 }
 

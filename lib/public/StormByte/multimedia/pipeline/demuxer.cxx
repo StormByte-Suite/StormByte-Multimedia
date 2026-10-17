@@ -63,10 +63,10 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <chrono>
-#include <format>
 #include <utility>
 
 using namespace StormByte::Multimedia;
@@ -78,7 +78,7 @@ namespace {
 	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
-		return std::format("{}", value->Nanoseconds().count());
+		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
 	}
 }
 
@@ -213,7 +213,7 @@ Packet::PointerType Demuxer::Wrap(
 	}
 
 	const std::uint64_t serial = m_nextSerial[track]++;
-	Log(Level::LowLevel, std::format("t={} {} {}:0 pts={} dts={} dur={} key={} bytes={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("t={} {} {}:0 pts={} dts={} dur={} key={} bytes={}",
 		track, ToString(type), serial, Ns(pts), Ns(dts), Ns(duration),
 		keyframe ? 1 : 0, static_cast<std::uint64_t>(payload.Size())));
 	auto packet = Packet::PointerType::MakePointer<Packet>(
@@ -267,6 +267,6 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	demuxer.pipe().To(decoder.Index()) >> decoder.pipe();
 	if (const std::size_t cap = decoder.InputCeiling(); cap > 0)
 		decoder.pipe().Capacity(decoder.Index(), cap);
-	demuxer.Log(Level::Debug, std::format("bind decoder t={}", decoder.Index()));
+	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind decoder t={}", decoder.Index()));
 	return decoder;
 }

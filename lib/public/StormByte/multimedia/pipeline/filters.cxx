@@ -60,6 +60,7 @@
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <map>
@@ -426,7 +427,7 @@ StormByte::Safe::Vector<TelemetryStage> Filters::StageTelemetries() const noexce
 		if (!item.Filter)
 			continue;
 		const auto leafName = item.Filter->Name();
-		std::string name = std::format("{}[", static_cast<std::string_view>(leafName));
+		std::string name = std::string(StormByte::Safe::String::ReplaceToken("{}[", static_cast<std::string_view>(leafName)));
 		name += item.Track ? std::to_string(*item.Track) : "general";
 		name += "]";
 		auto metrics = item.Filter->Telemetry();

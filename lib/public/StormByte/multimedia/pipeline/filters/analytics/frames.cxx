@@ -51,8 +51,8 @@
 #include <StormByte/multimedia/pipeline/filters/analytics/frames.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 
 using StormByte::Multimedia::Pipeline::Filter::Video::CountFrames;
 using StormByte::Multimedia::Pipeline::Producer;
@@ -88,15 +88,15 @@ void CountFrames::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	auto count = m_frames[frame.Track()];
 	count = static_cast<std::uint64_t>(count) + 1;
-	Log(Level::LowLevel, std::format("count t={} producer={} pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("count t={} producer={} pts={}",
 		frame.Track(), static_cast<int>(frame.Producer()),
 		frame.Pts() ? frame.Pts()->Nanoseconds().count() : 0));
 }
 
 void CountFrames::Eof() noexcept {
 	for (const auto& [track, n] : std::as_const(m_frames))
-		Log(Level::Notice, std::format("t={} frames={}", track, n));
-	Log(Level::Debug, std::format("eof tracks={}", m_frames.size()));
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("t={} frames={}", track, n));
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={}", m_frames.size()));
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report CountFrames::Report() const noexcept {
@@ -108,7 +108,7 @@ class StormByte::Multimedia::Pipeline::Filter::Report CountFrames::Report() cons
 		data.emplace(Safe::String("frames"), Safe::String(std::to_string(m_frames.begin()->second)));
 	else {
 		for (const auto& [track, n] : m_frames)
-			data.emplace(Safe::String(std::format("{}.frames", track)), Safe::String(std::to_string(n)));
+			data.emplace(StormByte::Safe::String::ReplaceToken("{}.frames", track), Safe::String(std::to_string(n)));
 	}
 	return { Filter::Report::Status::Ok, std::move(data) };
 }

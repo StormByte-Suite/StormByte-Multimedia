@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/pipeline/filters/video/bm3d.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <format>
 #include <utility>
@@ -97,9 +98,9 @@ void Bm3d::Latch(int width, int height) noexcept {
 }
 
 StormByte::Safe::String Bm3d::Chain() const noexcept {
-	return StormByte::Safe::String{std::format(
+	return StormByte::Safe::String::ReplaceToken(
 		"bm3d=sigma={}:block=8:bstep={}:group={}:range={}:estim=basic",
-		m_sigma, m_bstep, m_group, m_range)};
+		m_sigma, m_bstep, m_group, m_range);
 }
 
 void Bm3d::Process(const Pipeline::Frame& frame) noexcept {

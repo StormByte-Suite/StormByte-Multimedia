@@ -71,9 +71,9 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
-#include <format>
 #include <map>
 #include <mutex>
 #include <string_view>
@@ -345,7 +345,7 @@ bool Muxer::ArmOctets() noexcept {
 	if (!m_backend->BindSink(*this))
 		return false;
 
-	Log(Level::Notice, std::format("writer {}", std::string_view{m_plan->Path()}));
+	Log(Level::Notice, StormByte::Safe::String::ReplaceToken("writer {}", std::string_view{m_plan->Path()}));
 	return true;
 }
 
@@ -422,7 +422,7 @@ Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& mu
 	muxer.m_connections->encoders.emplace(encoder.Index(), &encoder);
 	encoder.pipe().To(encoder.Index()) >> muxer.pipe();
 	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
-	muxer.Log(Level::Debug, std::format("bind encoder t={}", encoder.Index()));
+	muxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind encoder t={}", encoder.Index()));
 	muxer.Wake();
 	return encoder;
 }
@@ -437,7 +437,7 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& mu
 	muxer.m_wired.insert(remuxer.In());
 	remuxer.pipe().To(remuxer.In()) >> muxer.pipe();
 	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
-	muxer.Log(Level::Debug, std::format("bind remux t={}", remuxer.In()));
+	muxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind remux t={}", remuxer.In()));
 	muxer.Wake();
 	return remuxer;
 }

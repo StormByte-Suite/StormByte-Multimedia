@@ -68,8 +68,8 @@
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 extern "C" {
@@ -296,7 +296,7 @@ bool Decoder::ResetAfterMeasure() noexcept {
 	m_serial.reset();
 	m_part = 0;
 	m_inDts.reset();
-	Log(Level::Debug, std::format("reopen after measure t={}", m_index));
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("reopen after measure t={}", m_index));
 	return true;
 }
 
@@ -367,7 +367,7 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 			std::move(*opened), timeBase));
 	}
 
-	Log(Level::Debug, std::format("look open t={}", m_index));
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("look open t={}", m_index));
 	return static_cast<bool>(m_backend);
 }
 
@@ -381,6 +381,6 @@ StormByte::Safe::String Decoder::Label() const noexcept {
 	}
 
 	if (m_implementation && !m_implementation->empty())
-		return StormByte::Safe::String(std::format("Decoder({})", std::string_view{*m_implementation}));
+		return StormByte::Safe::String::ReplaceToken("Decoder({})", std::string_view{*m_implementation});
 	return StormByte::Safe::String("Decoder(t=" + std::to_string(m_index) + ")");
 }

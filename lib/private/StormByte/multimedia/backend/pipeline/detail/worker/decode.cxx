@@ -57,6 +57,7 @@
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
 #include <format>
@@ -67,7 +68,7 @@ namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
-		return std::format("{}", value->Nanoseconds().count());
+		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
 	}
 
 	std::int64_t ElapsedUs(std::chrono::steady_clock::time_point started) noexcept {
@@ -92,7 +93,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (!m_owner.WaitForPlan() || !m_owner.SetupPlan())
 			return;
 		if (m_owner.m_look) {
-			Log(Level::Notice, std::format("look t={}", m_owner.m_index));
+			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("look t={}", m_owner.m_index));
 			return;
 		}
 
@@ -125,7 +126,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_serial.reset();
 		m_owner.m_part = 0;
 		m_owner.m_inDts.reset();
-		Log(Level::Notice, std::format("open t={} impl={}",
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open t={} impl={}",
 			m_owner.m_index, std::string_view{m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})}));
 	}
 
@@ -182,7 +183,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		auto emit = [this, &started, &emitted](Frame::PointerType frame) {
 			m_owner.StampLineage(*frame);
 			m_owner.StampLook(*frame);
-			Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
 				frame->Track(), frame->Serial().value_or(0), frame->Part(),
 				Ns(frame->Pts()), Ns(frame->Dts()), Ns(frame->Duration())));
 			Emit(std::move(frame));
@@ -239,7 +240,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				break;
 			m_owner.StampLineage(*frame);
 			m_owner.StampLook(*frame);
-			Log(Level::LowLevel, std::format("out t={} {}:{} pts={} dts={} dur={}",
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
 				frame->Track(), frame->Serial().value_or(0), frame->Part(),
 				Ns(frame->Pts()), Ns(frame->Dts()), Ns(frame->Duration())));
 			Log(Level::LowLevel, std::format("decoder drain emit begin t={} look={} owner={} iteration={}",

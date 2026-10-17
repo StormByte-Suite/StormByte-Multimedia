@@ -52,10 +52,10 @@
 #include <StormByte/multimedia/pipeline/filters/video/deband.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cstdint>
-#include <format>
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -182,7 +182,7 @@ void Deband::Process(const Pipeline::Frame& frame) noexcept {
 			static_cast<int>(m_range), static_cast<int>(m_threshold),
 			static_cast<int>(m_grain), src.Pts());
 
-	Log(Level::LowLevel, std::format("deband {}x{} range={} thr={} grain={} pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("deband {}x{} range={} thr={} grain={} pts={}",
 		src.Width(), src.Height(), m_range, m_threshold, m_grain, src.Pts()));
 	Save(std::move(out));
 }

@@ -49,8 +49,8 @@
  */
 
 #include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 
 using namespace StormByte::Multimedia::Pipeline::Filter::Video;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
@@ -81,7 +81,7 @@ enum StormByte::Multimedia::Type Scale::Media() const noexcept {
 void Scale::Clean() noexcept {}
 
 void Scale::Setup() noexcept {
-	Log(Level::Debug, std::format("target {}x{}", m_width, m_height));
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("target {}x{}", m_width, m_height));
 }
 
 void Scale::Process(const Pipeline::Frame&) noexcept {
@@ -110,11 +110,11 @@ void Scale::Process(const Pipeline::Frame&) noexcept {
 	}
 
 	if (static_cast<int>(dstW) == src.Width() && static_cast<int>(dstH) == src.Height()) {
-		Log(Level::LowLevel, std::format("passthrough {}x{}", src.Width(), src.Height()));
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("passthrough {}x{}", src.Width(), src.Height()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format("{}x{} -> {}x{}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("{}x{} -> {}x{}",
 		src.Width(), src.Height(), dstW, dstH));
 
 	const auto filter = m_filter.value_or(FFrame::Resample::Default);

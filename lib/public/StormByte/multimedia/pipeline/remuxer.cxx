@@ -60,8 +60,8 @@
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <string>
 
 using namespace StormByte::Multimedia::Pipeline;
@@ -136,7 +136,7 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& 
 
 	demuxer.pipe().To(remuxer.In()) >> remuxer.pipe();
 	remuxer.Wake();
-	demuxer.Log(Level::Debug, std::format("bind remuxer t={}", remuxer.In()));
+	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind remuxer t={}", remuxer.In()));
 	return remuxer;
 }
 

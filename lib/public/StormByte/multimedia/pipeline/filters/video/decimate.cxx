@@ -52,9 +52,9 @@
 #include <StormByte/multimedia/pipeline/filters/video/decimate.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
-#include <format>
 #include <limits>
 #include <utility>
 
@@ -181,8 +181,8 @@ StormByte::Safe::String Decimate::Chain() const noexcept {
 	unsigned cycle = std::clamp(m_cycleIn.value_or(5u), 2u, 25u);
 	const double dup = std::clamp(m_dupIn.value_or(1.1), 0.0, 100.0);
 	const double sc = std::clamp(m_scIn.value_or(15.0), 0.0, 100.0);
-	return StormByte::Safe::String{std::format("decimate=cycle={}:dupthresh={}:scthresh={}",
-		cycle, dup, sc)};
+	return StormByte::Safe::String::ReplaceToken("decimate=cycle={}:dupthresh={}:scthresh={}",
+		cycle, dup, sc);
 }
 
 void Decimate::Process(const Pipeline::Frame& frame) noexcept {
@@ -224,7 +224,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"decimate wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
@@ -237,7 +237,7 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"decimate {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out), m_graph->FrameRate());
@@ -254,7 +254,7 @@ void Decimate::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"decimate flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out), m_graph->FrameRate());

@@ -59,6 +59,7 @@
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/pointers.hxx>
+#include <StormByte/safe/string.hxx>
 
 using namespace StormByte::Multimedia::Pipeline;
 
@@ -177,12 +178,12 @@ void Route::Close() noexcept {
 	for (const auto& filter : m_filters) {
 		if (!StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)
 			&& !filter->Receives().Has(stretch)) {
-			destination.Fail(std::format("{} does not cover this stretch", filter->Name()));
+			destination.Fail(StormByte::Safe::String::ReplaceToken("{} does not cover this stretch", filter->Name()));
 			return;
 		}
 
 		if (media != StormByte::Multimedia::Type::Unknown && filter->Media() != media) {
-			destination.Fail(std::format("{} media does not match this stretch", filter->Name()));
+			destination.Fail(StormByte::Safe::String::ReplaceToken("{} media does not match this stretch", filter->Name()));
 			return;
 		}
 	}

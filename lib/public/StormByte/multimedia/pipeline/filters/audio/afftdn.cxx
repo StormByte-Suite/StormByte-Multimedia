@@ -52,9 +52,9 @@
 #include <StormByte/multimedia/pipeline/filters/audio/afftdn.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -87,7 +87,7 @@ StormByte::Safe::String Afftdn::Chain() const noexcept {
 	const double nr = std::clamp(m_nrIn.value_or(12.0), 0.01, 97.0);
 	const double nf = std::clamp(m_nfIn.value_or(-50.0), -80.0, -20.0);
 	const int tn = m_trackIn.value_or(false) ? 1 : 0;
-	return StormByte::Safe::String(std::format("afftdn=nr={}:nf={}:tn={}:nt=w:om=o", nr, nf, tn));
+	return StormByte::Safe::String::ReplaceToken("afftdn=nr={}:nf={}:tn={}:nt=w:om=o", nr, nf, tn);
 }
 
 void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
@@ -119,13 +119,13 @@ void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"afftdn wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"afftdn ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -142,7 +142,7 @@ void Afftdn::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"afftdn flush ch={} samples={} pts={}",
 			out.Channels(), out.NbSamples(), out.Pts()));
 		EmitFrame(std::move(out));

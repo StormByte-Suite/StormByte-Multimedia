@@ -58,6 +58,7 @@
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/memory_order.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <format>
 #include <string>
@@ -67,7 +68,7 @@ namespace {
 	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
 		if (!value)
 			return "-";
-		return std::format("{}", value->Nanoseconds().count());
+		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
 	}
 }
 

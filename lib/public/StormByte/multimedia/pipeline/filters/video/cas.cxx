@@ -52,9 +52,9 @@
 #include <StormByte/multimedia/pipeline/filters/video/cas.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -84,7 +84,7 @@ void Cas::Setup() noexcept {
 
 StormByte::Safe::String Cas::Chain() const noexcept {
 	const double strength = std::clamp(m_strengthIn.value_or(0.4), 0.0, 1.0);
-	return Safe::String(std::format("cas=strength={}", strength));
+	return StormByte::Safe::String::ReplaceToken("cas=strength={}", strength);
 }
 
 void Cas::Process(const Pipeline::Frame& frame) noexcept {
@@ -120,7 +120,7 @@ void Cas::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"cas wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
@@ -133,7 +133,7 @@ void Cas::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"cas {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -150,7 +150,7 @@ void Cas::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"cas flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));

@@ -51,10 +51,10 @@
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/unique_lock.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <charconv>
-#include <format>
 #include <limits>
 #include <optional>
 #include <string>
@@ -156,7 +156,9 @@ namespace {
 	}
 
 	std::string OptionalBytes(const StormByte::Safe::Optional<std::uint64_t>& value) {
-		return value ? std::format("{} B", value.value()) : "unavailable";
+		return value
+			? std::string(StormByte::Safe::String::ReplaceToken("{} B", value.value()))
+			: std::string("unavailable");
 	}
 }
 
@@ -326,16 +328,16 @@ StageTelemetry::operator StormByte::Safe::String() const {
 	const auto setup = std::chrono::duration_cast<std::chrono::microseconds>(SetupTime()).count();
 	const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(Elapsed()).count();
 	const auto error = Error();
-	std::string report = std::format(
+	std::string report = std::string(StormByte::Safe::String::ReplaceToken(
 		"origin={} state={} calls={} in(frame={},packet={}) out(frame={},packet={}) "
 		"process(total={}us,mean={}us,min={}us,max={}us) "
 		"wait(n={},total={}us,max={}us) setup={}us elapsed={}us",
 		static_cast<std::string>(Origin()), StateName(Status()), ProcessCalls(),
 		InputFrames(), InputPackets(),
 		OutputFrames(), OutputPackets(), process_total, process_mean,
-		process_min, process_max, WaitCount(), wait_total, wait_max, setup, elapsed);
+		process_min, process_max, WaitCount(), wait_total, wait_max, setup, elapsed));
 	if (error)
-		report += std::format(" error={}", static_cast<std::string>(error.value()));
+		report += StormByte::Safe::String::ReplaceToken(" error={}", static_cast<std::string>(error.value()));
 	return StormByte::Safe::String{std::string_view{report}};
 }
 
@@ -402,13 +404,13 @@ std::uint64_t JobTelemetry::MemorySamples() const noexcept {
 }
 
 JobTelemetry::operator StormByte::Safe::String() const {
-	std::string report = std::format("process_rss(current={},min={},max={},peak={},samples={})",
+	std::string report = std::string(StormByte::Safe::String::ReplaceToken("process_rss(current={},min={},max={},peak={},samples={})",
 		OptionalBytes(MemoryCurrent()), OptionalBytes(MemoryMinimum()),
-		OptionalBytes(MemoryMaximum()), OptionalBytes(PeakMemory()), MemorySamples());
+		OptionalBytes(MemoryMaximum()), OptionalBytes(PeakMemory()), MemorySamples()));
 	for (const auto& entry: Stages()) {
 		const Stage stage = entry;
 		const std::string metrics = static_cast<std::string>(*stage.Metrics);
-		report += std::format("\n{}: {}", static_cast<std::string>(stage.Name), metrics);
+		report += StormByte::Safe::String::ReplaceToken("\n{}: {}", static_cast<std::string>(stage.Name), metrics);
 	}
 	return StormByte::Safe::String{std::string_view{report}};
 }

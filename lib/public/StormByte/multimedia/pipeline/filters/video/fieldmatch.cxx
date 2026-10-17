@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/fieldmatch.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -110,8 +110,8 @@ StormByte::Safe::String Fieldmatch::Chain() const noexcept {
 	std::string comb = std::string(m_combIn.value_or(Safe::String("sc")));
 	if (!CombOk(comb))
 		comb = "sc";
-	return StormByte::Safe::String{std::format("fieldmatch=order={}:mode={}:combmatch={}",
-		order, mode, comb)};
+	return StormByte::Safe::String::ReplaceToken("fieldmatch=order={}:mode={}:combmatch={}",
+		order, mode, comb);
 }
 
 void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
@@ -147,7 +147,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"fieldmatch wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
@@ -160,7 +160,7 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"fieldmatch {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -177,7 +177,7 @@ void Fieldmatch::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"fieldmatch flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));

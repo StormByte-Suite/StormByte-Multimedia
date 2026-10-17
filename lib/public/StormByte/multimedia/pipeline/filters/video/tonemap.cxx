@@ -53,8 +53,8 @@
 #include <StormByte/multimedia/pipeline/filters/video/tonemap.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 extern "C" {
@@ -131,8 +131,8 @@ StormByte::Safe::String Tonemap::Operator() const noexcept {
 }
 
 StormByte::Safe::String Tonemap::Chain() const noexcept {
-	return StormByte::Safe::String(std::format(
-		"tonemap=tonemap={}:desat=0", static_cast<std::string_view>(Operator())));
+	return StormByte::Safe::String::ReplaceToken(
+		"tonemap=tonemap={}:desat=0", static_cast<std::string_view>(Operator()));
 }
 
 void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
@@ -148,7 +148,7 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (!NeedsMap(src)) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"tonemap no-op trc={} pts={}", src.ColorTransfer(), src.Pts()));
 		return;
 	}
@@ -181,7 +181,7 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!HasPicture(curved)) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"tonemap wait {}x{} pts={}", src.Width(), src.Height(), src.Pts()));
 		return;
 	}
@@ -202,7 +202,7 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 	out.Pts(src.Pts());
 	out.DurationTicks(src.DurationTicks());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"tonemap {} {}x{} pts={}",
 		static_cast<std::string_view>(Operator()), out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));
@@ -232,7 +232,7 @@ void Tonemap::Eof() noexcept {
 		}
 		out.Pts(curved.Pts());
 		out.DurationTicks(curved.DurationTicks());
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"tonemap flush {}x{} pts={}", out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));
 	}

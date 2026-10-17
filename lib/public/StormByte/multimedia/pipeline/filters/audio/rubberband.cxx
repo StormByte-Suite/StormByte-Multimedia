@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/audio/rubberband.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -84,8 +84,8 @@ void Rubberband::Setup() noexcept {
 StormByte::Safe::String Rubberband::Chain() const noexcept {
 	const double tempo = m_tempoIn.value_or(1.0);
 	const double pitch = m_pitchIn.value_or(1.0);
-	return StormByte::Safe::String(std::format(
-		"aformat=sample_fmts=fltp,rubberband=tempo={}:pitch={}", tempo, pitch));
+	return StormByte::Safe::String::ReplaceToken(
+		"aformat=sample_fmts=fltp,rubberband=tempo={}:pitch={}", tempo, pitch);
 }
 
 void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
@@ -117,13 +117,13 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (out.NbSamples() <= 0 || out.SampleRate() <= 0) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"rubberband wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"rubberband ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -140,7 +140,7 @@ void Rubberband::Eof() noexcept {
 		}
 		if (out.NbSamples() <= 0 || out.SampleRate() <= 0)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"rubberband flush ch={} rate={} samples={} pts={}",
 			out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 		EmitFrame(std::move(out));

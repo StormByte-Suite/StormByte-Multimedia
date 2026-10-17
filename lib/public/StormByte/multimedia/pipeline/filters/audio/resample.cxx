@@ -52,8 +52,8 @@
 #include <StormByte/multimedia/pipeline/filters/audio/resample.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -86,7 +86,7 @@ int Resample::Rate() const noexcept {
 }
 
 StormByte::Safe::String Resample::Chain() const noexcept {
-	return StormByte::Safe::String(std::format("aresample=osr={}", Rate()));
+	return StormByte::Safe::String::ReplaceToken("aresample=osr={}", Rate());
 }
 
 void Resample::Process(const Pipeline::Frame& frame) noexcept {
@@ -104,7 +104,7 @@ void Resample::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	if (src.SampleRate() == want) {
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"resample no-op {} Hz pts={}", want, src.Pts()));
 		return;
 	}
@@ -129,13 +129,13 @@ void Resample::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"resample wait {}->{} Hz pts={}",
 			src.SampleRate(), want, src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"resample {}->{} Hz samples={} pts={}",
 		src.SampleRate(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -152,7 +152,7 @@ void Resample::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"resample flush {} Hz samples={} pts={}",
 			out.SampleRate(), out.NbSamples(), out.Pts()));
 		EmitFrame(std::move(out));

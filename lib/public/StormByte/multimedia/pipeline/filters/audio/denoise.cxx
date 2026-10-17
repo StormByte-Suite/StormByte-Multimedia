@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/pipeline/filters/audio/denoise.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cmath>
@@ -223,7 +224,7 @@ void Denoise::Vote() noexcept {
 	m_voted = true;
 	m_skip = true;
 	if (m_cand.size() < static_cast<std::size_t>(MinMatches)) {
-		Log(Level::Warning, std::format(
+		Log(Level::Warning, StormByte::Safe::String::ReplaceToken(
 			"denoise: not enough room-tone windows ({}); leaving audio untouched",
 			m_cand.size()));
 		return;
@@ -273,7 +274,7 @@ void Denoise::Vote() noexcept {
 }
 
 StormByte::Safe::String Denoise::Chain() const noexcept {
-	return StormByte::Safe::String(std::format("afftdn=nr={}:nf={}:tn=0", m_nr, m_nf));
+	return StormByte::Safe::String::ReplaceToken("afftdn=nr={}:nf={}:tn=0", m_nr, m_nf);
 }
 
 void Denoise::Measure(const Pipeline::Frame& frame) noexcept {
@@ -324,11 +325,11 @@ void Denoise::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"denoise wait ch={} pts={}", src.Channels(), src.Pts()));
 		return;
 	}
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"denoise ch={} samples={} pts={}",
 		out.Channels(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));

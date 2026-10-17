@@ -65,9 +65,9 @@
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/memory_order.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
-#include <format>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -679,6 +679,6 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	Status.store(StormByte::Multimedia::Pipeline::Status::Done, StormByte::Safe::MemoryOrder::Release);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now() - started).count();
-	JobLog(job.Logger(), Level::Info, std::format("done tracks={} {}ms", Mapped.size(), ms));
+	JobLog(job.Logger(), Level::Info, StormByte::Safe::String::ReplaceToken("done tracks={} {}ms", Mapped.size(), ms));
 	job.OnDone();
 }

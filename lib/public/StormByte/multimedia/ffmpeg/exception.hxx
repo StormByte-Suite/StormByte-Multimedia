@@ -77,7 +77,7 @@ namespace StormByte {
 			 *
 			 * A further segment (`BSF`, `Decoder`, `Encoder`) is an @ref Path.
 			 * Literal `{}` are replaced by @ref StormByte::Safe::String::ReplaceToken.
-			 * This does not call `std::format`.
+			 * Only literal `{}` tokens are replaced.
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public Multimedia::Exception {
 				public:
@@ -98,7 +98,7 @@ namespace StormByte {
 					/**
 					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV`.
 					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
-					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param pattern Body with literal `{}` tokens.
 					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
@@ -116,7 +116,7 @@ namespace StormByte {
 					 * @brief Replace literal `{}` under an additional AV path.
 					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
 					 * @param path Additional segments nested below `StormByte.Multimedia.AV`.
-					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param pattern Body with literal `{}` tokens.
 					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
@@ -172,7 +172,7 @@ namespace StormByte {
 					/**
 					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV.BSF`.
 					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
-					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param pattern Body with literal `{}` tokens.
 					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
@@ -228,7 +228,7 @@ namespace StormByte {
 					/**
 					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV.Decoder`.
 					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
-					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param pattern Body with literal `{}` tokens.
 					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
@@ -284,7 +284,7 @@ namespace StormByte {
 					/**
 					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV.Encoder`.
 					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
-					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param pattern Body with literal `{}` tokens.
 					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>

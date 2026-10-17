@@ -56,7 +56,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -173,8 +172,8 @@ void Yadif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 	for (int i = 0; i < planes; ++i)
 		FilterPlane(prev, cur, next, out, i, bpc, tff);
 
-	Log(Level::LowLevel, std::format("yadif weave {}x{} tff={} pts={}",
-		cur.Width(), cur.Height(), tff, cur.Pts()));
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("yadif weave {}x{} tff={} pts={}",
+		cur.Width(), cur.Height(), tff ? "true" : "false", cur.Pts()));
 	EmitFrame(std::move(out));
 }
 

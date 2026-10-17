@@ -52,10 +52,10 @@
 #include <StormByte/multimedia/pipeline/filters/audio/limiter.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cmath>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -87,7 +87,7 @@ StormByte::Safe::String Limiter::Chain() const noexcept {
 	const double db = m_ceilIn.value_or(-1.5);
 	double lin = std::pow(10.0, db / 20.0);
 	lin = std::clamp(lin, 0.0625, 1.0);
-	return StormByte::Safe::String(std::format("alimiter=limit={}:level=0:latency=1", lin));
+	return StormByte::Safe::String::ReplaceToken("alimiter=limit={}:level=0:latency=1", lin);
 }
 
 void Limiter::Process(const Pipeline::Frame& frame) noexcept {
@@ -119,13 +119,13 @@ void Limiter::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"limiter wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"limiter ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -142,7 +142,7 @@ void Limiter::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"limiter flush ch={} samples={} pts={}",
 			out.Channels(), out.NbSamples(), out.Pts()));
 		EmitFrame(std::move(out));

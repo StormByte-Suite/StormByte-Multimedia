@@ -50,6 +50,7 @@
 
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cstdint>
@@ -187,7 +188,7 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 		vmaf_close(lane.vmaf);
 		lane.vmaf = nullptr;
 		lane.failed = true;
-		Fail(std::format("vmaf_model_load({}) failed", static_cast<std::string_view>(m_modelName)));
+		Fail(StormByte::Safe::String::ReplaceToken("vmaf_model_load({}) failed", static_cast<std::string_view>(m_modelName)));
 		return false;
 	}
 
@@ -201,14 +202,14 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 		return false;
 	}
 
-	Log(Level::Debug, std::format("libvmaf ready version={} picture_bytes={} threads={} subsample=1",
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("libvmaf ready version={} picture_bytes={} threads={} subsample=1",
 		vmaf_version(), sizeof(VmafPicture), cfg.n_threads));
 	return true;
 }
 
 void VMAF::Setup() noexcept {
 	Clean();
-	Log(Level::Debug, std::format("setup model={}", static_cast<std::string_view>(m_modelName)));
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("setup model={}", static_cast<std::string_view>(m_modelName)));
 }
 
 bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexcept {
@@ -268,32 +269,32 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned index) noexcept {
 	if (!lane.vmaf || !ref || !dist) {
 		lane.failed = true;
-		Fail(std::format("VMAF pair {} has no context or frame", index));
+		Fail(StormByte::Safe::String::ReplaceToken("VMAF pair {} has no context or frame", index));
 		return;
 	}
 	if (ref.Width() <= 0 || ref.Height() <= 0 || dist.Width() <= 0 || dist.Height() <= 0) {
 		lane.failed = true;
-		Fail(std::format("VMAF pair {} has no picture size", index));
+		Fail(StormByte::Safe::String::ReplaceToken("VMAF pair {} has no picture size", index));
 		return;
 	}
 
 	if (lane.width == 0) {
 		lane.width = ref.Width();
 		lane.height = ref.Height();
-		Log(Level::Debug, std::format(
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken(
 			"first pair index={} latch={}x{} ref_fmt={} ref_bpc={} ref_pts={} dist={}x{} dist_fmt={} dist_bpc={} dist_pts={}",
 			index, lane.width, lane.height,
 			ref.FormatName(), Bpc(ref), ref.Pts(),
 			dist.Width(), dist.Height(),
 			dist.FormatName(), Bpc(dist), dist.Pts()));
 		if (dist.Width() != lane.width || dist.Height() != lane.height)
-			Log(Level::Notice, std::format("geometry ref={}x{} dist={}x{}, scaling dist",
+			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("geometry ref={}x{} dist={}x{}, scaling dist",
 				lane.width, lane.height, dist.Width(), dist.Height()));
 	}
 
 	else if (ref.Width() != lane.width || ref.Height() != lane.height) {
 		lane.failed = true;
-		Fail(std::format("VMAF pair {} ref size {}x{} differs from latch {}x{}",
+		Fail(StormByte::Safe::String::ReplaceToken("VMAF pair {} ref size {}x{} differs from latch {}x{}",
 			index, ref.Width(), ref.Height(), lane.width, lane.height));
 		return;
 	}
@@ -307,7 +308,7 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 		if (pdist.ref)
 			vmaf_picture_unref(&pdist);
 		lane.failed = true;
-		Fail(std::format("VMAF pair {} fill failed ref={}x{} fmt={} bpc={} dist={}x{} fmt={} bpc={} latch={}x{}",
+		Fail(StormByte::Safe::String::ReplaceToken("VMAF pair {} fill failed ref={}x{} fmt={} bpc={} dist={}x{} fmt={} bpc={} latch={}x{}",
 			index, ref.Width(), ref.Height(), ref.FormatName(), ref.BitsPerComponent(),
 			dist.Width(), dist.Height(), dist.FormatName(), dist.BitsPerComponent(), lane.width, lane.height));
 		return;
@@ -320,12 +321,12 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 		if (pdist.ref)
 			vmaf_picture_unref(&pdist);
 		lane.failed = true;
-		Fail(std::format("vmaf_read_pictures failed at index {}: {}", index, result));
+		Fail(StormByte::Safe::String::ReplaceToken("vmaf_read_pictures failed at index {}: {}", index, result));
 		return;
 	}
 
 	++lane.scored;
-	Log(Level::LowLevel, std::format("scored index={} n={} ref_pts={} dist_pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("scored index={} n={} ref_pts={} dist_pts={}",
 		index, lane.scored, ref.Pts(), dist.Pts()));
 }
 
@@ -355,13 +356,13 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	const Producer producer = frame.Producer();
 	if (producer != Producer::Decoder && !DistLook(producer)) {
-		Log(Level::Debug, std::format("ignore producer={}", ToString(producer)));
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("ignore producer={}", ToString(producer)));
 		return;
 	}
 
 	const FFrame& raw = AVFrame();
 	if (!raw) {
-		Fail(std::format("VMAF frame has no backend producer={}", ToString(producer)));
+		Fail(StormByte::Safe::String::ReplaceToken("VMAF frame has no backend producer={}", ToString(producer)));
 		return;
 	}
 
@@ -385,7 +386,7 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 
 	if (producer == Producer::Decoder) {
 		if (lane.scored == 0 && lane.ref.empty())
-			Log(Level::Debug, std::format("first ref t={} {}x{} fmt={} bpc={} pts={}",
+			Log(Level::Debug, StormByte::Safe::String::ReplaceToken("first ref t={} {}x{} fmt={} bpc={} pts={}",
 				frame.Track(), raw.Width(), raw.Height(),
 				raw.FormatName(), Bpc(raw), raw.Pts()));
 		lane.ref.push_back(std::move(clone));
@@ -394,7 +395,7 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	else {
 		if (lane.scored == 0 && lane.dist.empty())
-			Log(Level::Debug, std::format("first dist t={} producer={} {}x{} fmt={} bpc={} pts={}",
+			Log(Level::Debug, StormByte::Safe::String::ReplaceToken("first dist t={} producer={} {}x{} fmt={} bpc={} pts={}",
 				frame.Track(), ToString(producer),
 				raw.Width(), raw.Height(), raw.FormatName(), Bpc(raw), raw.Pts()));
 		lane.dist.push_back(std::move(clone));
@@ -402,7 +403,7 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 			lane.peakDist = lane.dist.size();
 	}
 
-	Log(Level::LowLevel, std::format("park t={} producer={} ref={} dist={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
 }
@@ -412,25 +413,25 @@ void VMAF::Eof() noexcept {
 	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
 		Lane& lane = *lanePointer;
 		Drain(lane);
-		Log(Level::Debug, std::format("eof t={} scored={} ref={} dist={} peak_ref={} peak_dist={} failed={} latch={}x{}",
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof t={} scored={} ref={} dist={} peak_ref={} peak_dist={} failed={} latch={}x{}",
 			track, lane.scored, lane.ref.size(), lane.dist.size(),
-			lane.peakRef, lane.peakDist, lane.failed,
+			lane.peakRef, lane.peakDist, lane.failed ? "true" : "false",
 			lane.width, lane.height));
 		if (!lane.failed && (!lane.ref.empty() || !lane.dist.empty())) {
 			lane.failed = true;
-			Fail(std::format("unpaired VMAF looks at EOF t={} ref={} dist={}",
+			Fail(StormByte::Safe::String::ReplaceToken("unpaired VMAF looks at EOF t={} ref={} dist={}",
 				track, lane.ref.size(), lane.dist.size()));
 		}
 		DropParked(lane);
 		if (!lane.failed && lane.vmaf && lane.scored > 0) {
 			if (const int result = vmaf_read_pictures(lane.vmaf, nullptr, nullptr, 0); result != 0) {
 				lane.failed = true;
-				Fail(std::format("vmaf_read_pictures flush failed for track {}: {}", track, result));
+				Fail(StormByte::Safe::String::ReplaceToken("vmaf_read_pictures flush failed for track {}: {}", track, result));
 			}
 		}
 		if (lane.failed || !lane.vmaf || !lane.model || lane.scored == 0) {
 			if (!lane.failed)
-				Fail(std::format("VMAF t={} no scored pairs", track));
+				Fail(StormByte::Safe::String::ReplaceToken("VMAF t={} no scored pairs", track));
 			lane.failed = true;
 			continue;
 		}
@@ -441,7 +442,7 @@ void VMAF::Eof() noexcept {
 		if (vmaf_score_pooled(lane.vmaf, lane.model, VMAF_POOL_METHOD_MEAN, &mean, 0, last) != 0
 			|| vmaf_score_pooled(lane.vmaf, lane.model, VMAF_POOL_METHOD_MIN, &mn, 0, last) != 0) {
 			lane.failed = true;
-			Fail(std::format("VMAF t={} vmaf_score_pooled failed", track));
+			Fail(StormByte::Safe::String::ReplaceToken("VMAF t={} vmaf_score_pooled failed", track));
 			continue;
 		}
 
@@ -455,7 +456,7 @@ void VMAF::Eof() noexcept {
 	if (m_lanes.empty())
 		Fail("VMAF no scored pairs");
 	else if (scored > 0)
-		Log(Level::Debug, std::format("eof tracks={} scored={}", m_lanes.size(), scored));
+		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexcept {
@@ -475,7 +476,7 @@ class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexc
 	auto key = [prefix](int track, const char* name) {
 		if (!prefix)
 			return StormByte::Safe::String(name);
-		return StormByte::Safe::String(std::format("{}.{}", track, name));
+		return StormByte::Safe::String::ReplaceToken("{}.{}", track, name);
 	};
 
 	for (const auto& [track, lanePointer] : m_lanes) {

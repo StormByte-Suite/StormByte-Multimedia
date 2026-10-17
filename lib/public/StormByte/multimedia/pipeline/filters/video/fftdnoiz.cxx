@@ -52,9 +52,9 @@
 #include <StormByte/multimedia/pipeline/filters/video/fftdnoiz.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -88,9 +88,9 @@ StormByte::Safe::String Fftdnoiz::Chain() const noexcept {
 	const double sigma = std::clamp(m_sigmaIn.value_or(1.0), 0.0, 100.0);
 	const unsigned prev = std::min(m_prevIn.value_or(1u), 1u);
 	const unsigned next = std::min(m_nextIn.value_or(1u), 1u);
-	return StormByte::Safe::String(std::format(
+	return StormByte::Safe::String::ReplaceToken(
 		"fftdnoiz=sigma={}:prev={}:next={}:block=32:overlap=0.5",
-		sigma, prev, next));
+		sigma, prev, next);
 }
 
 void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
@@ -126,7 +126,7 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (out.Width() <= 0 || out.Height() <= 0 || out.Format() == FFrame::FormatNone()) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"fftdnoiz wait {}x{} pts={}",
 			src.Width(), src.Height(), src.Pts()));
 		return;
@@ -139,7 +139,7 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 	out.ChromaLocation(src.ChromaLocation());
 	out.SampleAspectRatio(src.SampleAspectRatio());
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"fftdnoiz {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -156,7 +156,7 @@ void Fftdnoiz::Eof() noexcept {
 		}
 		if (out.Width() <= 0 || out.Height() <= 0 || out.Format() == FFrame::FormatNone())
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"fftdnoiz flush {}x{} pts={}",
 			out.Width(), out.Height(), out.Pts()));
 		EmitFrame(std::move(out));

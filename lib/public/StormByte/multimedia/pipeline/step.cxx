@@ -60,6 +60,7 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/unique_lock.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
 #include <algorithm>
@@ -470,7 +471,7 @@ std::int64_t Step::LastWork() const noexcept {
 void Step::DumpWork() noexcept {
 	if (m_workN == 0)
 		return;
-	Log(Level::Debug, std::format("work n={} min={}us max={}us",
+	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("work n={} min={}us max={}us",
 		m_workN, m_workMin, m_workMax));
 	m_workN = 0;
 	m_workMin = std::numeric_limits<std::int64_t>::max();

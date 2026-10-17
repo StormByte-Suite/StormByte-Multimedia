@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/pipeline/progress.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <chrono>
 #include <cstddef>
@@ -252,7 +253,7 @@ Progress::operator StormByte::Safe::String() const {
 		const auto tick = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now().time_since_epoch()).count() / 125;
 		m_durationIndicator = activity[static_cast<std::size_t>(tick) % activity.size()];
-		return StormByte::Safe::String(std::format("Calculating duration {}", m_durationIndicator));
+		return StormByte::Safe::String::ReplaceToken("Calculating duration {}", m_durationIndicator);
 	}
 	std::string line;
 	const bool measureLive = m_hasMeasure && !m_measureDone;

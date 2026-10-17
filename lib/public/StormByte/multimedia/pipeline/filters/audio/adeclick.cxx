@@ -52,9 +52,9 @@
 #include <StormByte/multimedia/pipeline/filters/audio/adeclick.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
-#include <format>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -86,7 +86,7 @@ StormByte::Safe::String Adeclick::Chain() const noexcept {
 	if (!m_thrIn)
 		return StormByte::Safe::String("adeclick");
 	const double t = std::clamp(*m_thrIn, 1.0, 100.0);
-	return StormByte::Safe::String(std::format("adeclick=threshold={}", t));
+	return StormByte::Safe::String::ReplaceToken("adeclick=threshold={}", t);
 }
 
 void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
@@ -118,13 +118,13 @@ void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	if (!out) {
 		Drop();
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"adeclick wait ch={} rate={} pts={}",
 			src.Channels(), src.SampleRate(), src.Pts()));
 		return;
 	}
 
-	Log(Level::LowLevel, std::format(
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"adeclick ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
@@ -141,7 +141,7 @@ void Adeclick::Eof() noexcept {
 		}
 		if (!out)
 			break;
-		Log(Level::LowLevel, std::format(
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 			"adeclick flush ch={} samples={} pts={}",
 			out.Channels(), out.NbSamples(), out.Pts()));
 		EmitFrame(std::move(out));

@@ -87,7 +87,7 @@ namespace StormByte {
 					/**
 					 * @brief Replace literal `{}` under `StormByte.Multimedia.Plan`.
 					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
-					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param pattern Body with literal `{}` tokens.
 					 * @param args Replacements. One per token, in order.
 					 */
 					template<typename... Args>

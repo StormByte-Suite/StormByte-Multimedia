@@ -52,11 +52,11 @@
 #include <StormByte/multimedia/pipeline/filters/video/hqdn3d.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/string.hxx>
 
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <format>
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -191,7 +191,7 @@ void Hqdn3d::Process(const Pipeline::Frame& frame) noexcept {
 			luma ? m_ls : m_cs, luma ? m_lt : m_ct);
 	}
 
-	Log(Level::LowLevel, std::format("hqdn3d {}x{} pts={}",
+	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("hqdn3d {}x{} pts={}",
 		src.Width(), src.Height(), src.Pts()));
 	m_prev = out.Clone();
 	Save(std::move(out));
