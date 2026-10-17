@@ -54,7 +54,6 @@
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/string.hxx>
 
-#include <format>
 #include <string_view>
 #include <utility>
 
@@ -70,11 +69,14 @@ namespace StormByte {
 	namespace Multimedia {
 		/**
 		 * @class Exception
-		 * @brief Base exception for the Multimedia module.
+		 * @brief Base exception for the Multimedia module. `what()` is `StormByte.Multimedia: message`.
 		 *
-		 * The first argument is the subsystem tag (`File`, `Codec`). It is
-		 * copied into a temporary @ref StormByte::Exception::Path; Base formats
-		 * and copies the message during construction.
+		 * This type applies the `Multimedia` segment. A further segment is an @ref Path
+		 * (`File`, `Codec`, `Plan`, `AV.Decoder`). The body does not include the path.
+		 * Literal `{}` are replaced by @ref StormByte::Safe::String::ReplaceToken.
+		 * This does not call `std::format`, so a specifier such as `{:.3f}` is not a token.
+		 * A number uses `std::to_string`. The destructor is defined in this module.
+		 *
 		 * @note Base automatically recognizes complete exception derivatives as
 		 * MaybeSafe. This hierarchy keeps copy/move operations and destruction in
 		 * the multimedia provider and messages in Base-owned storage. Compatible
@@ -84,21 +86,54 @@ namespace StormByte {
 		class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public StormByte::Exception {
 			public:
 				/**
-				 * @brief Constructs a formatted Multimedia exception.
-				 * @tparam Args Format argument types.
-				 * @param component Subsystem name (`File`, `Codec`, `Container`).
-				 * @param fmt Format string.
-				 * @param args Format arguments.
+				 * @struct Path
+				 * @brief Additional path segments nested below `StormByte.Multimedia`.
+				 */
+				struct Path {
+					std::string_view segments; ///< Additional dotted path segments.
+
+					/**
+					 * @brief Wraps additional path segments.
+					 * @param segments Dotted segments appended below `Multimedia`. Empty adds none.
+					 */
+					explicit constexpr Path(std::string_view segments = {}) noexcept: segments(segments) {}
+				};
+
+				/**
+				 * @brief Replace literal `{}` under `StormByte.Multimedia`.
+				 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+				 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+				 * @param args Replacements. One per token, in order.
 				 */
 				template <typename... Args>
-				Exception(std::string_view component, std::format_string<Args...> fmt, Args&&... args):
-					StormByte::Exception(
-						StormByte::Exception::Path{[component] {
-							StormByte::Safe::String path{"Multimedia."};
-							path += component;
-							return path;
-						}()},
-						fmt, std::forward<Args>(args)...) {}
+					requires (sizeof...(Args) >= 1)
+				explicit Exception(std::string_view pattern, Args&&... args)
+					: StormByte::Exception(StormByte::Exception::Path{"Multimedia"}, pattern, std::forward<Args>(args)...) {}
+
+				/**
+				 * @brief Copy a borrowed plain message under `StormByte.Multimedia`.
+				 * @param message Exception text. Copied during the call and never retained.
+				 */
+				explicit Exception(std::string_view message);
+
+				/**
+				 * @brief Replace literal `{}` under an additional Multimedia path.
+				 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+				 * @param path Additional segments nested below `StormByte.Multimedia`.
+				 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+				 * @param args Replacements. One per token, in order.
+				 */
+				template <typename... Args>
+					requires (sizeof...(Args) >= 1)
+				explicit Exception(Path path, std::string_view pattern, Args&&... args)
+					: Exception(path, static_cast<std::string_view>(StormByte::Safe::String::ReplaceToken(pattern, std::forward<Args>(args)...))) {}
+
+				/**
+				 * @brief Copy a borrowed plain message under an additional Multimedia path.
+				 * @param path Additional segments nested below `StormByte.Multimedia`.
+				 * @param message Exception text. Not a format string.
+				 */
+				explicit Exception(Path path, std::string_view message);
 
 				/**
 				 * @brief Copy constructor.
@@ -143,7 +178,7 @@ namespace StormByte {
 				 * @param codec StormByte name or FFmpeg id that was not found.
 				 */
 				explicit CodecNotFoundException(std::string_view codec):
-					Exception("Codec", "codec '{}' not found", codec) {}
+					Exception(Path{"Codec"}, "codec '{}' not found", codec) {}
 
 				/**
 				 * @brief Copy constructor.
@@ -188,7 +223,7 @@ namespace StormByte {
 				 * @param container StormByte name or FFmpeg format id that was not found.
 				 */
 				explicit ContainerNotFoundException(std::string_view container):
-					Exception("Container", "container '{}' not found", container) {}
+					Exception(Path{"Container"}, "container '{}' not found", container) {}
 
 				/**
 				 * @brief Copy constructor.
@@ -233,7 +268,7 @@ namespace StormByte {
 				 * @param message Already formatted reason text.
 				 */
 				explicit FileOpenException(std::string_view message):
-					Exception("File", "{}", message) {}
+					Exception(Path{"File"}, message) {}
 
 				/**
 				 * @brief Copy constructor.
@@ -279,7 +314,8 @@ namespace StormByte {
 				 * @param reason Why Open failed.
 				 */
 				explicit FilePathOpenException(std::string_view path, std::string_view reason):
-					FileOpenException(std::format("failed to open '{}': {}", path, reason)) {}
+					FileOpenException(static_cast<std::string_view>(StormByte::Safe::String::ReplaceToken(
+						"failed to open '{}': {}", path, reason))) {}
 
 				/**
 				 * @brief Copy constructor.
@@ -324,7 +360,8 @@ namespace StormByte {
 				 * @param reason Why Open failed (empty, corrupt, I/O).
 				 */
 				explicit FileBufferOpenException(std::string_view reason):
-					FileOpenException(std::format("failed to open buffer: {}", reason)) {}
+					FileOpenException(static_cast<std::string_view>(StormByte::Safe::String::ReplaceToken(
+						"failed to open buffer: {}", reason))) {}
 
 				/**
 				 * @brief Copy constructor.
@@ -369,7 +406,7 @@ namespace StormByte {
 				 * @param message Already formatted reason text.
 				 */
 				explicit TranscodeException(std::string_view message):
-					Exception("Transcode", "{}", message) {}
+					Exception(Path{"Transcode"}, message) {}
 
 				/**
 				 * @brief Copy constructor.

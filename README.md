@@ -13,7 +13,7 @@ Contributor guides: [Contributing](CONTRIBUTING.md) and [Coding Style](CODING_ST
 
 Start with `Transcoder` for a File-to-File job. When a product needs custom policy, derive from it and override plan factories or lifecycle hooks. When the graph itself is unusual, wire the same stages by hand. Custom filters use StormByte's RAII frame and packet types; reach for the libav-backed filter surface only when those wrappers do not provide the operation you need.
 
-It depends on [StormByte Base](https://github.com/StormBytePP/StormByte), [StormByte Buffer](https://github.com/StormBytePP/StormByte-Buffer) and [StormByte Logger](https://github.com/StormBytePP/StormByte-Logger). Public headers live under `StormByte/multimedia/` and cover the registry, containers, codecs, `File`, and the pipeline (`Plan`, `Step`, `Transcoder`, filters).
+It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0) 2.1.0, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2) 2.0.2, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2) 2.0.2 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2) 2.0.2. Each is a release archive. Public headers live under `StormByte/multimedia/` and cover the registry, containers, codecs, `File`, and the pipeline (`Plan`, `Step`, `Transcoder`, filters).
 
 The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, Network and System are **other repositories**. This one does not implement them.
 
@@ -434,8 +434,10 @@ Choose bundled or system dependencies and optional features with these CMake opt
 | `WITH_OCR` | `BUNDLED` (default) / `SYSTEM` | Tesseract/Leptonica; Windows forces bundled OCR. |
 | `WITH_TESSDATA` | `BUNDLED` (default) / `SYSTEM` | Independent model source: embedded `tessdata_best` selection or installed model files loaded at runtime. |
 | `WITH_ZIMG` | `BUNDLED` / `SYSTEM` | zimg dependency used by image processing. |
-| `BUILD_SHARED_LIBS` | `ON` (default) / `OFF` | Shared or static Multimedia and StormByte libraries. |
-| `ENABLE_TEST` | `ON` / `OFF` (default) | Register and build this module's CTest suite. |
+| `BUILD_SHARED_LIBS` | `ON` (default) / `OFF` | Shared or static Multimedia. StormByte archives follow the same mode. |
+| `ENABLE_TEST` | `ON` / `OFF` (default) | Register and build this module's CTest suite. `ENABLE_PGO` turns tests on only in the instrumented tree. |
+| `ENABLE_LTO` | `ON` (default) / `OFF` | Link-time optimization for every build type. Combines with `ENABLE_PGO`. |
+| `ENABLE_PGO` | `ON` / `OFF` (default) | Train in `pgo-instr`, then compile this directory with the profile. The installed library is the profiled one. |
 | `ENABLE_ASAN` | `ON` / `OFF` (default) | Debug ASan/UBSan on supported non-Windows builds; disabled for Release. |
 | `WITH_GPL` | `ON` / `OFF` | Allow GPL-licensed components in the bundled media engine, such as x265 and Rubberband. When `OFF`, omit Multimedia's Rubberband and VagueDenoiser sources and installed headers for both bundled and system FFmpeg. It does not control decoding support. |
 | `WITH_NONFREE` | `ON` / `OFF` | Allow nonfree components in the bundled media engine, such as FDK-AAC, and dependent Multimedia filters. No current Multimedia filter requires a nonfree component. |
@@ -464,7 +466,7 @@ cmake -S . -B build \
 
 ## Installation
 
-Building from source requires a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and the StormByte modules listed above. The root currently declares an older CMake minimum; that declaration does not remove the newer language-standard requirement. A bundled build also builds its media dependencies, so the required platform toolchain may include additional tools.
+Building from source requires a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and [StormByte-BuildMaster](https://github.com/StormByte-Suite/StormByte-BuildMaster) 2.1.0 or newer (the `buildmaster` pin). Base, Buffer, Logger and System are not submodules: BuildMaster downloads the release archive for this OS and C++ runtime. A bundled media build still needs the codec submodules (`git clone --recursive`) and, on x86, NASM.
 
 ```sh
 git clone --recursive https://github.com/StormBytePP/StormByte-Multimedia.git

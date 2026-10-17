@@ -88,7 +88,7 @@ namespace StormByte {
 					 */
 					explicit TessDataNotFoundException(std::string_view lang):
 							StormByte::Multimedia::Exception(
-								"OCR",
+								Path{"OCR"},
 								"unsupported or missing language: {}",
 								lang
 							) {}
@@ -104,11 +104,6 @@ namespace StormByte {
 					 * @param other Exception to take.
 					 */
 					TessDataNotFoundException(TessDataNotFoundException&& other) noexcept;
-
-					/**
-					 * @brief Inherits the formatted Multimedia::Exception constructors.
-					 */
-					using StormByte::Multimedia::Exception::Exception;
 
 					/**
 					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.
@@ -148,11 +143,7 @@ namespace StormByte {
 					 * @param reason Already worded failure text.
 					 */
 					explicit OCRException(std::string_view reason):
-							StormByte::Multimedia::Exception(
-								"OCR",
-								"{}",
-								reason
-							) {}
+							StormByte::Multimedia::Exception(Path{"OCR"}, reason) {}
 
 					/**
 					 * @brief Copy constructor.
@@ -165,11 +156,6 @@ namespace StormByte {
 					 * @param other Exception to take.
 					 */
 					OCRException(OCRException&& other) noexcept;
-
-					/**
-					 * @brief Inherits the formatted Multimedia::Exception constructors.
-					 */
-					using StormByte::Multimedia::Exception::Exception;
 
 					/**
 					 * @brief Destructor. Defined in the Multimedia library to anchor RTTI.

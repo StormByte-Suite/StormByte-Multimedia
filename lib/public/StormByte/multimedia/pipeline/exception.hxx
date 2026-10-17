@@ -53,7 +53,6 @@
 #include <StormByte/multimedia/exception.hxx>
 #include <StormByte/multimedia/visibility.h>
 
-#include <format>
 #include <string_view>
 #include <utility>
 
@@ -86,21 +85,22 @@ namespace StormByte {
 			class STORMBYTE_MULTIMEDIA_PUBLIC PlanException: public StormByte::Multimedia::Exception {
 				public:
 					/**
-					 * @brief Constructs a formatted Plan exception.
-					 * @tparam Args Format argument types.
-					 * @param fmt Format string.
-					 * @param args Format arguments.
+					 * @brief Replace literal `{}` under `StormByte.Multimedia.Plan`.
+					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param args Replacements. One per token, in order.
 					 */
 					template<typename... Args>
-					PlanException(std::format_string<Args...> fmt, Args&&... args):
-						StormByte::Multimedia::Exception("Plan", fmt, std::forward<Args>(args)...) {}
+						requires (sizeof...(Args) >= 1)
+					PlanException(std::string_view pattern, Args&&... args):
+						StormByte::Multimedia::Exception(Path{"Plan"}, pattern, std::forward<Args>(args)...) {}
 
 					/**
-					 * @brief Constructs a Plan exception from a message.
-					 * @param message Exception message.
+					 * @brief Copy a borrowed plain message under `StormByte.Multimedia.Plan`.
+					 * @param message Exception text. Not a format string.
 					 */
 					explicit PlanException(std::string_view message):
-						StormByte::Multimedia::Exception("Plan", "{}", message) {}
+						StormByte::Multimedia::Exception(Path{"Plan"}, message) {}
 
 					/**
 					 * @brief Copy constructor.

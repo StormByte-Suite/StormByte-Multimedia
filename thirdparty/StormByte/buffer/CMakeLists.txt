@@ -1,25 +1,26 @@
-if(MSVC)
-	set(STORMBYTE_BUFFER_OPTSTR "TOOLCHAIN=clang-cl;ALIAS=StormByte::Buffer")
-else()
-	set(STORMBYTE_BUFFER_OPTSTR "ALIAS=StormByte::Buffer")
-endif()
+include("${CMAKE_SOURCE_DIR}/cmake/stormbyte.cmake")
 
-target_include_directories(StormByte-Multimedia BEFORE PRIVATE
-    "${CMAKE_CURRENT_LIST_DIR}/src/lib/public"
-)
+set(STORMBYTE_BUFFER_VERSION "2.0.2")
+stormbyte_component_url(STORMBYTE_BUFFER_URL "${STORMBYTE_BUFFER_VERSION}" "StormByte-Buffer")
+
+set(STORMBYTE_BUFFER_OPTSTR "BACKEND=binary;ALIAS=StormByte::Buffer")
 
 if(BUILD_SHARED_LIBS)
-    set(_sb_buf_mode shared)
+	set(STORMBYTE_BUFFER_MODE shared)
 else()
-    set(_sb_buf_mode static)
+	set(STORMBYTE_BUFFER_MODE static)
 endif()
 
 buildmaster_component(
-    StormByte-Buffer
-    "StormByte Suite - Buffer"
-    "${CMAKE_CURRENT_LIST_DIR}/src"
-    "WITH_STORMBYTE=BUNDLED"
-    "${_sb_buf_mode}"
-    "StormByte-Buffer"
-    "${STORMBYTE_BUFFER_OPTSTR}"
+	StormByte-Buffer
+	"StormByte Suite - Buffer"
+	"${STORMBYTE_BUFFER_URL}"
+	""
+	"${STORMBYTE_BUFFER_MODE}"
+	"StormByte-Buffer"
+	"${STORMBYTE_BUFFER_OPTSTR}"
 )
+
+if(WIN32 AND BUILD_SHARED_LIBS)
+	target_compile_definitions(StormByte-Buffer INTERFACE STORMBYTE_BUFFER_SHARED)
+endif()

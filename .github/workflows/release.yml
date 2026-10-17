@@ -1,0 +1,416 @@
+name: Release
+
+# Manual only. In the Actions tab, pick a tag. master (or any branch)
+# fails before the build. The zips replace the assets of that tag's release.
+# A retag of the same name is replaced.
+#
+# Same shape as ci.yml, with two differences: ci.yml is left as the
+# GPL/nonfree matrix, and this workflow always builds the redistributable
+# configuration (everything BUNDLED, WITH_GPL=OFF, WITH_NONFREE=OFF) with
+# LTO and PGO. Docs are deployed here as well; ci.yml still has its own
+# docs job and is not edited by the port.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  BUILD_TYPE: Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require a tag
+        run: |
+          set -euo pipefail
+          if [ "${{ github.ref_type }}" != "tag" ]; then
+            echo "::error::Selected ref is '${{ github.ref_name }}'. Run this workflow on a tag, not on master."
+            exit 1
+          fi
+          echo "Release tag: ${{ github.ref_name }}"
+
+  checkout-bootstrap:
+    needs: guard
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    name: checkout-bootstrap (${{ matrix.os }})
+    steps:
+      - name: Warm repository + submodule cache
+        uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+  apt-bootstrap:
+    needs: guard
+    runs-on: ubuntu-26.04
+    name: apt-bootstrap
+    steps:
+      - name: Warm APT package indexes
+        uses: stormbytepp/githubactions/.github/actions/update-apt-cached@master
+        with:
+          cache-key: apt-lists
+
+  ###########################################################################
+  # Linux. libstdc++ and libc++. No GCC archive: it matches libstdc++.
+  # Name: StormByte-Multimedia-<tag>-linux-x64-<stdlib>.zip
+  ###########################################################################
+  build-linux:
+    needs: [checkout-bootstrap, apt-bootstrap]
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: clang
+            stdlib: libstdc++
+            asset: linux-x64-libstdc++
+          - compiler: clang-libc++
+            stdlib: libc++
+            asset: linux-x64-libc++
+    name: linux-${{ matrix.stdlib }}
+    env:
+      LD_LIBRARY_PATH: ${{ github.workspace }}/build/lib:${{ github.workspace }}/build/buildmaster/install/lib:${{ github.workspace }}/build/buildmaster/install/lib64
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Install nasm/yasm (bundled FFmpeg)
+        uses: stormbytepp/githubactions/.github/actions/install-cached@master
+        with:
+          packages: "nasm yasm"
+          cache-key: apt-nasm-yasm
+          lists-cache-key: apt-lists
+          rotate-weekly: true
+
+      - name: Build with toolchain
+        uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
+        with:
+          toolchain: ${{ matrix.compiler }}
+          ccache-key: v1-release-${{ matrix.compiler }}
+          buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-${{ matrix.compiler }}
+          build-type: ${{ env.BUILD_TYPE }}
+          configure-options: >-
+            -DENABLE_LTO=ON
+            -DENABLE_PGO=ON
+            -DWITH_FFMPEG=BUNDLED
+            -DWITH_STORMBYTE=BUNDLED
+            -DWITH_OCR=BUNDLED
+            -DWITH_TESSDATA=BUNDLED
+            -DWITH_VMAF=BUNDLED
+            -DWITH_ZIMG=BUNDLED
+            -DWITH_EBUR128=BUNDLED
+            -DWITH_NONFREE=OFF
+            -DWITH_GPL=OFF
+            -DBUILD_SHARED_LIBS=ON
+            -DCMAKE_CXX_FLAGS=-stdlib=${{ matrix.stdlib }}
+          run-tests: false
+          install: true
+          install-location: package
+
+      - name: Zip the install prefix
+        id: zip
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset }}.zip"
+          for notice in LICENSE COPYING.* THIRD-PARTY; do
+            if [[ -f "${notice}" ]]; then
+              cp "${notice}" package/
+            fi
+          done
+          (
+            cd package
+            cmake -E tar cf "../${name}" --format=zip -- .
+          )
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          echo "Packed ${name}"
+          cmake -E tar tf "${name}"
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.zip.outputs.name }}
+          path: ${{ steps.zip.outputs.name }}
+          if-no-files-found: error
+
+  ###########################################################################
+  # macOS. Apple Clang only. One archive, no standard-library suffix.
+  ###########################################################################
+  build-macos:
+    needs: [checkout-bootstrap]
+    runs-on: macos-latest
+    name: macos
+    env:
+      DYLD_LIBRARY_PATH: ${{ github.workspace }}/build/lib:${{ github.workspace }}/build/buildmaster/install/lib:${{ github.workspace }}/build/buildmaster/install/lib64
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Build with toolchain
+        uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
+        with:
+          toolchain: clang
+          ccache-key: v1-release-clang
+          buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-clang
+          build-type: ${{ env.BUILD_TYPE }}
+          configure-options: >-
+            -DENABLE_LTO=ON
+            -DENABLE_PGO=ON
+            -DWITH_FFMPEG=BUNDLED
+            -DWITH_STORMBYTE=BUNDLED
+            -DWITH_OCR=BUNDLED
+            -DWITH_TESSDATA=BUNDLED
+            -DWITH_VMAF=BUNDLED
+            -DWITH_ZIMG=BUNDLED
+            -DWITH_EBUR128=BUNDLED
+            -DWITH_NONFREE=OFF
+            -DWITH_GPL=OFF
+            -DBUILD_SHARED_LIBS=ON
+          run-tests: false
+          install: true
+          install-location: package
+
+      - name: Zip the install prefix
+        id: zip
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="${{ github.event.repository.name }}-${{ github.ref_name }}-macos-arm64.zip"
+          for notice in LICENSE COPYING.* THIRD-PARTY; do
+            if [[ -f "${notice}" ]]; then
+              cp "${notice}" package/
+            fi
+          done
+          (
+            cd package
+            cmake -E tar cf "../${name}" --format=zip -- .
+          )
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          echo "Packed ${name}"
+          cmake -E tar tf "${name}"
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.zip.outputs.name }}
+          path: ${{ steps.zip.outputs.name }}
+          if-no-files-found: error
+
+  ###########################################################################
+  # Windows. clang-cl. No libc++ suffix: it shares the MSVC archive.
+  ###########################################################################
+  build-windows:
+    needs: [checkout-bootstrap]
+    runs-on: windows-latest
+    name: windows-clang-cl
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Materialize tessdata configs link as a regular file
+        shell: pwsh
+        run: |
+          $repo = "thirdparty/tessdata/cmake-wrapper/src"
+          git -C $repo config core.symlinks false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git -C $repo checkout-index --force -- configs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install nasm (bundled FFmpeg)
+        uses: stormbytepp/githubactions/.github/actions/install-cached@master
+        with:
+          packages: nasm
+
+      - name: Add DLL directories to PATH
+        shell: pwsh
+        run: |
+          echo "${{ github.workspace }}\build\lib" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}\build\buildmaster\install\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build with toolchain
+        uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
+        with:
+          toolchain: clang-cl
+          ccache-key: v1-release-clang-cl
+          buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-clang-cl
+          build-type: ${{ env.BUILD_TYPE }}
+          configure-options: >-
+            -DENABLE_LTO=ON
+            -DENABLE_PGO=ON
+            -DWITH_FFMPEG=BUNDLED
+            -DWITH_STORMBYTE=BUNDLED
+            -DWITH_OCR=BUNDLED
+            -DWITH_TESSDATA=BUNDLED
+            -DWITH_VMAF=BUNDLED
+            -DWITH_ZIMG=BUNDLED
+            -DWITH_EBUR128=BUNDLED
+            -DWITH_NONFREE=OFF
+            -DWITH_GPL=OFF
+            -DBUILD_SHARED_LIBS=ON
+          run-tests: false
+          install: true
+          install-location: package
+
+      - name: Zip the install prefix
+        id: zip
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="${{ github.event.repository.name }}-${{ github.ref_name }}-windows-x64.zip"
+          for notice in LICENSE COPYING.* THIRD-PARTY; do
+            if [[ -f "${notice}" ]]; then
+              cp "${notice}" package/
+            fi
+          done
+          (
+            cd package
+            cmake -E tar cf "../${name}" --format=zip -- .
+          )
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          echo "Packed ${name}"
+          cmake -E tar tf "${name}"
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.zip.outputs.name }}
+          path: ${{ steps.zip.outputs.name }}
+          if-no-files-found: error
+
+  publish:
+    needs: [build-linux, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download archives
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Attach archives to this tag's release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="${{ github.ref_name }}"
+          shopt -s nullglob
+          files=(dist/*.zip)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "::error::No archives to upload"
+            exit 1
+          fi
+          printf 'Uploading to %s:\n' "$tag"
+          printf '  %s\n' "${files[@]}"
+          gh release upload "$tag" "${files[@]}" --repo "$GH_REPO" --clobber
+
+  docs:
+    needs: [guard, checkout-bootstrap, apt-bootstrap]
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      actions: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+    steps:
+      - name: Checkout repository and submodules
+        uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Install toolchain (docs)
+        id: toolchain
+        uses: stormbytepp/githubactions/.github/actions/install-toolchain@master
+        with:
+          toolchain: clang
+          docs: true
+
+      - name: FFmpeg 9 PPA (until Ubuntu archives it)
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository -y ppa:ubuntuhandbook1/ffmpeg9
+          sudo apt-get update
+
+      - name: Install extra packages
+        uses: stormbytepp/githubactions/.github/actions/install-cached@master
+        with:
+          packages: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libvmaf-dev libzimg-dev libebur128-dev libtesseract-dev libleptonica-dev tesseract-ocr-eng nasm"
+          cache-key: extra-apt-packages-ffmpeg9-system-deps-docs
+          lists-cache-key: apt-lists
+
+      - name: Configure CMake
+        run: |
+          set -euo pipefail
+          cmake -S . -B "${{ github.workspace }}/build" \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER="${{ steps.toolchain.outputs.c_compiler }}" \
+            -DCMAKE_CXX_COMPILER="${{ steps.toolchain.outputs.cxx_compiler }}" \
+            -DENABLE_DOC=ON \
+            -DWITH_STORMBYTE=BUNDLED \
+            -DWITH_FFMPEG=SYSTEM \
+            -DWITH_VMAF=SYSTEM \
+            -DWITH_OCR=SYSTEM \
+            -DWITH_TESSDATA=BUNDLED \
+            -DWITH_ZIMG=SYSTEM \
+            -DWITH_EBUR128=SYSTEM \
+            -DWITH_NONFREE=OFF \
+            -DWITH_GPL=OFF
+
+      - name: Build documentation target
+        run: |
+          set -euo pipefail
+          cmake --build "${{ github.workspace }}/build" \
+            --target StormByteMultimediaDoc \
+            --parallel
+
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

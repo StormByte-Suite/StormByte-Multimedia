@@ -36,10 +36,6 @@ if(ENABLE_DOC)
 		"${CMAKE_SOURCE_DIR}/lib/public"
 		"${CMAKE_BINARY_DIR}/lib/public"
 		"${BUILDMASTER_INSTALL_INCLUDEDIR}"
-		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/lib/public"
-		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/thirdparty/StormByte/logger/src/lib/public"
-		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/thirdparty/StormByte/system/src/lib/public"
-		"${CMAKE_SOURCE_DIR}/thirdparty/StormByte/buffer/src/thirdparty/StormByte/system/src/thirdparty/StormByte/base/src/lib/public"
 	)
 	set(DOXYGEN_STRIP_FROM_PATH "${CMAKE_SOURCE_DIR}")
 	set(DOXYGEN_STRIP_FROM_INC_PATH "${CMAKE_SOURCE_DIR}/lib/public")

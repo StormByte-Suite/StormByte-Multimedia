@@ -50,7 +50,26 @@
 
 #include <StormByte/multimedia/exception.hxx>
 
+#include <string>
+
 using namespace StormByte::Multimedia;
+
+namespace {
+	std::string FullPath(std::string_view extra) {
+		std::string path = "Multimedia";
+		if (!extra.empty()) {
+			path.push_back('.');
+			path.append(extra);
+		}
+		return path;
+	}
+}
+
+Exception::Exception(std::string_view message):
+	StormByte::Exception(StormByte::Exception::Path{"Multimedia"}, message) {}
+
+Exception::Exception(Path path, std::string_view message):
+	StormByte::Exception(StormByte::Exception::Path{FullPath(path.segments)}, message) {}
 
 Exception::Exception(const Exception& other) = default;
 

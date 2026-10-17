@@ -50,7 +50,26 @@
 
 #include <StormByte/multimedia/ffmpeg/exception.hxx>
 
+#include <string>
+
 using namespace StormByte::Multimedia::FFmpeg;
+
+namespace {
+	std::string AvPath(std::string_view extra) {
+		std::string path = "AV";
+		if (!extra.empty()) {
+			path.push_back('.');
+			path.append(extra);
+		}
+		return path;
+	}
+}
+
+Exception::Exception(std::string_view message):
+	Multimedia::Exception(Multimedia::Exception::Path{"AV"}, message) {}
+
+Exception::Exception(Path path, std::string_view message):
+	Multimedia::Exception(Multimedia::Exception::Path{AvPath(path.segments)}, message) {}
 
 Exception::Exception(const Exception& other) = default;
 

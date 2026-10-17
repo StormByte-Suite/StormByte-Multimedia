@@ -73,32 +73,63 @@ namespace StormByte {
 		namespace FFmpeg {
 			/**
 			 * @class Exception
-			 * @brief Base for FFmpeg backend errors.
+			 * @brief Base for FFmpeg backend errors. `what()` is `StormByte.Multimedia.AV: message`.
+			 *
+			 * A further segment (`BSF`, `Decoder`, `Encoder`) is an @ref Path.
+			 * Literal `{}` are replaced by @ref StormByte::Safe::String::ReplaceToken.
+			 * This does not call `std::format`.
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC Exception: public Multimedia::Exception {
 				public:
 					/**
-					 * @brief Constructs a formatted AV exception.
-					 * @tparam Args Format argument types.
-					 * @param component Subsystem label (`BSF`, `Decoder`, `Encoder`).
-					 * @param fmt Format string.
-					 * @param args Format arguments.
+					 * @struct Path
+					 * @brief Additional path segments nested below `StormByte.Multimedia.AV`.
 					 */
-					template <typename... Args>
-					Exception(std::string_view component, std::format_string<Args...> fmt, Args&&... args):
-						Multimedia::Exception(
-							[component] {
-								StormByte::Safe::String path{"AV."};
-								path += component;
-								return path;
-							}(), fmt, std::forward<Args>(args)...) {}
+					struct Path {
+						std::string_view segments; ///< Additional dotted path segments.
+
+						/**
+						 * @brief Wraps additional path segments.
+						 * @param segments Dotted segments appended below `AV`. Empty adds none.
+						 */
+						explicit constexpr Path(std::string_view segments = {}) noexcept: segments(segments) {}
+					};
 
 					/**
-					 * @brief Constructs from a preformatted message (`Unexpected<E>(fmt, …)`).
-					 * @param message Already formatted text.
+					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV`.
+					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param args Replacements. One per token, in order.
 					 */
-					explicit Exception(std::string_view message):
-						Multimedia::Exception("AV", "{}", message) {}
+					template <typename... Args>
+						requires (sizeof...(Args) >= 1)
+					explicit Exception(std::string_view pattern, Args&&... args)
+						: Exception(Path{}, pattern, std::forward<Args>(args)...) {}
+
+					/**
+					 * @brief Copy a borrowed plain message under `StormByte.Multimedia.AV`.
+					 * @param message Exception text. Not a format string.
+					 */
+					explicit Exception(std::string_view message);
+
+					/**
+					 * @brief Replace literal `{}` under an additional AV path.
+					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+					 * @param path Additional segments nested below `StormByte.Multimedia.AV`.
+					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param args Replacements. One per token, in order.
+					 */
+					template <typename... Args>
+						requires (sizeof...(Args) >= 1)
+					explicit Exception(Path path, std::string_view pattern, Args&&... args)
+						: Exception(path, static_cast<std::string_view>(StormByte::Safe::String::ReplaceToken(pattern, std::forward<Args>(args)...))) {}
+
+					/**
+					 * @brief Copy a borrowed plain message under an additional AV path.
+					 * @param path Additional segments nested below `StormByte.Multimedia.AV`.
+					 * @param message Exception text. Not a format string.
+					 */
+					explicit Exception(Path path, std::string_view message);
 
 					/**
 					 * @brief Copy constructor.
@@ -139,19 +170,22 @@ namespace StormByte {
 			class STORMBYTE_MULTIMEDIA_PUBLIC BSFError: public Exception {
 				public:
 					/**
-					 * @brief Constructs a BSF error.
-					 * @tparam Args Format argument types.
-					 * @param fmt Format string.
-					 * @param args Format arguments.
+					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV.BSF`.
+					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
-					BSFError(std::format_string<Args...> fmt, Args&&... args):
-						Exception("BSF", fmt, std::forward<Args>(args)...) {}
+						requires (sizeof...(Args) >= 1)
+					BSFError(std::string_view pattern, Args&&... args):
+						Exception(Path{"BSF"}, pattern, std::forward<Args>(args)...) {}
 
 					/**
-					 * @brief Inherits the constructors of StormByte::Multimedia::FFmpeg::Exception.
+					 * @brief Copy a borrowed plain message under `StormByte.Multimedia.AV.BSF`.
+					 * @param message Exception text. Not a format string.
 					 */
-					using Exception::Exception;
+					explicit BSFError(std::string_view message):
+						Exception(Path{"BSF"}, message) {}
 
 					/**
 					 * @brief Copy constructor.
@@ -192,19 +226,22 @@ namespace StormByte {
 			class STORMBYTE_MULTIMEDIA_PUBLIC DecoderError: public Exception {
 				public:
 					/**
-					 * @brief Constructs a decoder error.
-					 * @tparam Args Format argument types.
-					 * @param fmt Format string.
-					 * @param args Format arguments.
+					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV.Decoder`.
+					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
-					DecoderError(std::format_string<Args...> fmt, Args&&... args):
-						Exception("Decoder", fmt, std::forward<Args>(args)...) {}
+						requires (sizeof...(Args) >= 1)
+					DecoderError(std::string_view pattern, Args&&... args):
+						Exception(Path{"Decoder"}, pattern, std::forward<Args>(args)...) {}
 
 					/**
-					 * @brief Inherits the constructors of StormByte::Multimedia::FFmpeg::Exception.
+					 * @brief Copy a borrowed plain message under `StormByte.Multimedia.AV.Decoder`.
+					 * @param message Exception text. Not a format string.
 					 */
-					using Exception::Exception;
+					explicit DecoderError(std::string_view message):
+						Exception(Path{"Decoder"}, message) {}
 
 					/**
 					 * @brief Copy constructor.
@@ -245,19 +282,22 @@ namespace StormByte {
 			class STORMBYTE_MULTIMEDIA_PUBLIC EncoderError: public Exception {
 				public:
 					/**
-					 * @brief Constructs an encoder error.
-					 * @tparam Args Format argument types.
-					 * @param fmt Format string.
-					 * @param args Format arguments.
+					 * @brief Replace literal `{}` under `StormByte.Multimedia.AV.Encoder`.
+					 * @tparam Args Views, numbers, or types that convert to `std::string`. A number uses `std::to_string`.
+					 * @param pattern Body with literal `{}` tokens. Not a `std::format` string.
+					 * @param args Replacements. One per token, in order.
 					 */
 					template <typename... Args>
-					EncoderError(std::format_string<Args...> fmt, Args&&... args):
-						Exception("Encoder", fmt, std::forward<Args>(args)...) {}
+						requires (sizeof...(Args) >= 1)
+					EncoderError(std::string_view pattern, Args&&... args):
+						Exception(Path{"Encoder"}, pattern, std::forward<Args>(args)...) {}
 
 					/**
-					 * @brief Inherits the constructors of StormByte::Multimedia::FFmpeg::Exception.
+					 * @brief Copy a borrowed plain message under `StormByte.Multimedia.AV.Encoder`.
+					 * @param message Exception text. Not a format string.
 					 */
-					using Exception::Exception;
+					explicit EncoderError(std::string_view message):
+						Exception(Path{"Encoder"}, message) {}
 
 					/**
 					 * @brief Copy constructor.

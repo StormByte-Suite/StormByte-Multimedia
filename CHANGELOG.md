@@ -11,7 +11,7 @@ StormByte Multimedia turns media files into checked, asynchronous C++ jobs. Its 
 
 The C++26 API includes codec and container registries, `File` inspection, owned `Plan`s, pipeline stages, filters, analytics, progress and telemetry. Backend codec and format contexts remain private; filter-facing frame, packet and graph adapters are available when needed. Cross-module values and lifetimes use StormByte Base's `Safe` APIs and require compatible provider/consumer ABIs.
 
-The module uses StormByte Base, Buffer, Logger and System, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
+The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0) 2.1.0, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2) 2.0.2, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2) 2.0.2 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2) 2.0.2, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
 
 Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. Third-party dependencies and redistributed fixtures keep their own licenses; neither option grants codec patent rights. GPL/nonfree FFmpeg build options affect the resulting binary's redistribution requirements, not the license of the original Multimedia source.
 
@@ -20,7 +20,25 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
 ## [Unreleased]
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/v1.0.0...HEAD
+
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
+
+## [1.0.1] - 2026-10-17
+
+### Added
+
+- `ENABLE_PGO` and `ENABLE_LTO`. Profile-guided optimization trains in `pgo-instr` and installs this build. Link-time optimization follows `ENABLE_LTO` (default ON) for every build type. Both apply to Multimedia. Base, Buffer, Logger and System are not rebuilt.
+- `THIRD-PARTY` and the extra `COPYING.*` texts for components compiled into the shared library. The published release archives are built with every media dependency `BUNDLED`, `WITH_GPL=OFF` and `WITH_NONFREE=OFF`, so x264, x265, Rubberband and FDK-AAC are not in those zips. `COPYING.*` is copied into the zip when it is present.
+- macOS release archive is Apple Clang only. The file is `macos-arm64`, with no standard-library suffix. Linux ships `libstdc++` and `libc++`. Windows has no runtime suffix. CI is unchanged and still builds the extra GPL/nonfree matrix.
+
+### Changed
+
+- Requires [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0) 2.1.0, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2) 2.0.2, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2) 2.0.2 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2) 2.0.2. Each is a release archive (`stormbyte_component_url`) linked with `BACKEND=binary`. Base, Logger and System are declared here: Buffer no longer carries them as submodules. The archive matches this OS and C++ runtime. Doxygen reads headers from `${BUILDMASTER_INSTALL_INCLUDEDIR}` after those archives unpack. BuildMaster is >= 2.1.0.
+- **Breaking**: Multimedia exceptions replace literal `{}` with `Safe::String::ReplaceToken`. They no longer call `std::format`, so a specifier such as `{:.3f}` is not a token. A number uses `std::to_string` (`true` becomes `1`). Paths are segments: `StormByte.Multimedia`, then `File`, `Codec`, `Plan`, `AV`, `AV.Decoder` and `OCR`. An empty extra path does not add a trailing dot.
+- Release builds no longer pass `/fp:fast`. `OPTIMIZATION_FLAGS_{LINUX,MAC,WINDOWS}` append `-O2` / `/O2` and the CPU baseline only when the caller did not already set flags. `-O2` is last so it wins over a default `-O3`, which miscompiles codec and color paths.
+- Bumped the project version to 1.0.1.
+
+[1.0.1]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...1.0.1
 
 ## [1.0.0] - 2026-10-13
 

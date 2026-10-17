@@ -1,0 +1,122 @@
+This file is a notice for the binary archive of StormByte-Multimedia. It is not a
+license and it does not change LICENSE.
+
+Original source of StormByte-Multimedia is dual-licensed. LICENSE is that grant:
+GNU Lesser General Public License v3.0 or later, or a commercial license
+from the copyright holder. COPYING.LGPLv3 is the LGPL-3 text. The commercial
+license does not replace the license of any third-party code compiled into
+the binary. Neither grant adds a patent license.
+
+The release archives are built with every media dependency BUNDLED,
+WITH_GPL=OFF and WITH_NONFREE=OFF. x264, x265, Rubberband, VagueDenoiser's
+GPL path and FDK-AAC are not in those archives. A build that turns either
+switch on is a different binary and is not described here.
+
+This archive does not include a kit of relocatable object files. The way
+provided to rebuild or replace this library is to compile its corresponding
+source. That source is the Git tag of the release, checked out with its
+submodules:
+
+  git clone --recursive --branch <tag> https://github.com/StormByte-Suite/StormByte-Multimedia.git
+
+The automatic GitHub source zip of the tag does not contain the submodules.
+It is not, by itself, the complete corresponding source of this binary.
+The release page is:
+
+  https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.1
+
+Rebuild that tag with the same switches this archive used:
+
+  -DWITH_FFMPEG=BUNDLED -DWITH_ZIMG=BUNDLED -DWITH_EBUR128=BUNDLED
+  -DWITH_VMAF=BUNDLED -DWITH_OCR=BUNDLED -DWITH_TESSDATA=BUNDLED
+  -DWITH_STORMBYTE=BUNDLED -DWITH_GPL=OFF -DWITH_NONFREE=OFF
+  -DBUILD_SHARED_LIBS=ON
+
+Substituting the resulting shared library is the relink method provided
+with this binary. FFmpeg and the codec plugins are compiled in (static
+absorb). They are not separate shared libraries in the zip. The C++ runtime
+is not in this archive. The dynamic loader still has to provide libc++,
+libstdc++ or the MSVC CRT, whichever this build was linked against.
+
+The commercial option in LICENSE covers original StormByte-Multimedia
+source only. It does not relicense the compiled-in components below. A
+binary that contains them still has to meet their licenses, including the
+LGPL terms for FFmpeg, LAME and (on Windows) pthreads-win32.
+
+Compiled into this shared library
+---------------------------------
+
+Pinned by the gitlinks of tag 1.0.1. Copyright lines live in each tree.
+
+  - FFmpeg (meson port, LGPL build: gpl=disabled, nonfree=disabled,
+    version3=disabled). LGPL-2.1-or-later. COPYING.LGPLv2.1.
+    https://ffmpeg.org/  https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg
+  - dav1d. BSD-2-Clause. COPYING.BSD-2-Clause.
+    https://code.videolan.org/videolan/dav1d
+  - libaom. BSD-2-Clause, plus the Alliance for Open Media patent license.
+    COPYING.BSD-2-Clause. https://aomedia.org/
+  - SVT-AV1. BSD-2-Clause, plus the Alliance for Open Media patent license.
+    COPYING.BSD-2-Clause. https://gitlab.com/AOMediaCodec/SVT-AV1
+  - libvpx. BSD. COPYING.BSD-3-Clause.
+    https://chromium.googlesource.com/webm/libvpx
+  - Kvazaar (HEVC encoder). BSD-3-Clause. COPYING.BSD-3-Clause.
+    https://github.com/ultravideo/kvazaar
+  - OpenH264. BSD-2-Clause. COPYING.BSD-2-Clause.
+    https://github.com/cisco/openh264
+    Cisco's MPEG-LA payment covers Cisco's own official binaries, not a
+    binary compiled and shipped by someone else. See below.
+  - libwebp. BSD. COPYING.BSD-3-Clause.
+    https://chromium.googlesource.com/webm/libwebp
+  - Opus. BSD-3-Clause. COPYING.BSD-3-Clause.
+    https://gitlab.xiph.org/xiph/opus
+  - Vorbis. BSD. COPYING.BSD-3-Clause.
+    https://gitlab.xiph.org/xiph/vorbis
+  - Ogg. BSD. COPYING.BSD-3-Clause.
+    https://gitlab.xiph.org/xiph/ogg
+  - LAME (MP3 encoder). LGPL-2.0-or-later. COPYING.LGPLv2.1.
+    https://github.com/lameproject/lame
+  - zlib. zlib license. COPYING.zlib. https://github.com/madler/zlib
+  - liblzma (XZ Utils library only). 0BSD. COPYING.0BSD.
+    https://github.com/tukaani-project/xz
+  - libbzip2. bzip2 license. COPYING.bzip2.
+    https://sourceware.org/bzip2/
+  - libsamplerate. BSD-2-Clause. COPYING.BSD-2-Clause.
+    https://github.com/libsndfile/libsamplerate
+  - nv-codec-headers. MIT. COPYING.MIT.
+    https://github.com/FFmpeg/nv-codec-headers
+  - zimg. WTFPL. COPYING.WTFPL. https://github.com/sekrit-twc/zimg
+  - libvmaf. BSD-2-Clause. COPYING.BSD-2-Clause.
+    https://github.com/Netflix/vmaf
+  - libebur128. MIT. COPYING.MIT. https://github.com/jiixyj/libebur128
+  - Leptonica. BSD-2-Clause. COPYING.BSD-2-Clause.
+    https://github.com/DanBloomberg/leptonica
+  - Tesseract. Apache-2.0. COPYING.Apache-2.0.
+    https://github.com/tesseract-ocr/tesseract
+  - tessdata_best models embedded in the library. Apache-2.0.
+    COPYING.Apache-2.0. https://github.com/tesseract-ocr/tessdata_best
+  - pthreads-win32, Windows builds only, static. LGPL-2.1-or-later.
+    COPYING.LGPLv2.1. https://github.com/GerHobbelt/pthread-win32
+
+Not in this archive: x264 (GPL-2.0), x265 (GPL-2.0), Rubberband (GPL),
+FDK-AAC (nonfree / Fraunhofer). Their source may still be in the git tree.
+This build does not compile them.
+
+Linked at run time, not compiled in
+------------------------------------
+
+These are other shared libraries. They are not inside this file. Each has
+its own release archive, its own LICENSE and its own THIRD-PARTY.
+
+  - StormByte Base 2.1.0 — https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0
+  - StormByte-Buffer 2.0.2 — https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2
+  - StormByte-Logger 2.0.2 — https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2
+  - StormByte-System 2.0.2 — https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2
+
+Patents
+-------
+
+Nothing in LICENSE, COPYING.LGPLv3 or this file is a patent license.
+H.264 (OpenH264 and FFmpeg's native decoder), HEVC (Kvazaar and FFmpeg's
+native decoder) and other codecs can be patent-encumbered where you
+distribute the binary. Obtain those rights separately if the law where
+you ship requires it.
