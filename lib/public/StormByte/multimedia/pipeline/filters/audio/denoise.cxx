@@ -260,7 +260,7 @@ void Denoise::Vote() noexcept {
 	if (bestI < 0 || bestN < MinMatches || frac < MinFrac) {
 		Log(Level::Warning, std::format(
 			"denoise: room tone not stable (matches={} cand={} frac={:.2f}); leaving audio untouched",
-			bestN, m_cand.size(), frac));
+			bestN, static_cast<std::uint64_t>(m_cand.size()), frac));
 		return;
 	}
 
@@ -270,7 +270,7 @@ void Denoise::Vote() noexcept {
 	m_nr = std::clamp(m_nrIn.value_or(12.0), 1.0, 30.0);
 	Log(Level::Notice, std::format(
 		"denoise room-tone nf={:.1f} nr={:.1f} matches={} cand={}",
-		m_nf, m_nr, m_matches, m_cand.size()));
+		m_nf, m_nr, m_matches, static_cast<std::uint64_t>(m_cand.size())));
 }
 
 StormByte::Safe::String Denoise::Chain() const noexcept {
