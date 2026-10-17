@@ -1,0 +1,46 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2026-10-17 11:18:53.138607260 +0000
++++ b/CMakeLists.txt	2026-10-17 11:25:11.738623640 +0000
+@@ -6,11 +6,42 @@
+ 
+ project(Opus LANGUAGES C VERSION ${PROJECT_VERSION})
+ 
++if(OPUS_DNN_DATA_DIR)
++    if(EXISTS "${OPUS_DNN_DATA_DIR}/dnn/fargan_data.c")
++        set(OPUS_DNN_DATA_ROOT "${OPUS_DNN_DATA_DIR}/dnn")
++    elseif(EXISTS "${OPUS_DNN_DATA_DIR}/fargan_data.c")
++        set(OPUS_DNN_DATA_ROOT "${OPUS_DNN_DATA_DIR}")
++    else()
++        message(FATAL_ERROR "OPUS_DNN_DATA_DIR='${OPUS_DNN_DATA_DIR}' has no model sources")
++    endif()
++endif()
++
+ include(OpusFunctions)
+ include(OpusBuildtype)
+ include(OpusConfig)
+ include(OpusSources)
+ include(GNUInstallDirs)
++# Model .c files are not in the git checkout. Do not copy them into the
++# source tree: BuildMaster resets and git-cleans that tree around the
++# build, and a second tree (ENABLE_PGO) shares it. Compile the unpack.
++if(OPUS_DNN_DATA_ROOT)
++    file(TO_CMAKE_PATH "${OPUS_DNN_DATA_ROOT}" OPUS_DNN_DATA_ROOT)
++    foreach(_opus_dnn_list IN ITEMS
++            deep_plc_sources dred_sources osce_sources
++            deep_plc_headers dred_headers osce_headers)
++        set(_opus_dnn_rewritten "")
++        foreach(_opus_dnn_file IN LISTS ${_opus_dnn_list})
++            get_filename_component(_opus_dnn_base "${_opus_dnn_file}" NAME)
++            if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_opus_dnn_file}"
++                    AND EXISTS "${OPUS_DNN_DATA_ROOT}/${_opus_dnn_base}")
++                list(APPEND _opus_dnn_rewritten "${OPUS_DNN_DATA_ROOT}/${_opus_dnn_base}")
++            else()
++                list(APPEND _opus_dnn_rewritten "${_opus_dnn_file}")
++            endif()
++        endforeach()
++        set(${_opus_dnn_list} ${_opus_dnn_rewritten})
++    endforeach()
++endif()
+ include(CMakeDependentOption)
+ include(FeatureSummary)
+ 

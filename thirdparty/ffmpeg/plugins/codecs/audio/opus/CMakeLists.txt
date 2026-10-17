@@ -17,10 +17,12 @@ endif()
 
 set(OPUS_COMPONENT "Opus codec")
 set(OPUS_DNN_UNPACK "${BUILDMASTER_BINDIR}/files/opus-dnn")
-# The model tarball unpacks to <build>/files/opus-dnn/dnn/. That path is this
-# tree's build directory. ENABLE_PGO configures a second tree (pgo-instr) and
-# does not inherit include paths that point at the other one, so the system
-# include is written here and passed into the nested configure.
+# Headers included by in-tree sources live in this tree's unpack
+# (files/opus-dnn/dnn). ENABLE_PGO configures a second tree and does not
+# inherit include paths that point at the other one, so the system include
+# is written here. The model .c files are compiled from that unpack by
+# 0001-dnn-data-from-unpack.patch. They must not be copied into the git
+# checkout: stamp git-cleans it, and both trees share that checkout.
 file(TO_CMAKE_PATH "${OPUS_DNN_UNPACK}" _opus_dnn_unpack)
 file(TO_CMAKE_PATH "${CMAKE_CURRENT_BINARY_DIR}/opus_system_includes.cmake" _opus_inc_cmake)
 file(WRITE "${_opus_inc_cmake}"
@@ -55,7 +57,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
 endif()
 
 set(OPUS_PATCHES
-	"${CMAKE_CURRENT_LIST_DIR}/0001-copy-DNN-data.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0001-dnn-data-from-unpack.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0002-shallow-package-version.patch"
 )
 
