@@ -17,7 +17,19 @@ endif()
 
 set(OPUS_COMPONENT "Opus codec")
 set(OPUS_DNN_UNPACK "${BUILDMASTER_BINDIR}/files/opus-dnn")
+# The model tarball unpacks to <build>/files/opus-dnn/dnn/. That path is this
+# tree's build directory. ENABLE_PGO configures a second tree (pgo-instr) and
+# does not inherit include paths that point at the other one, so the system
+# include is written here and passed into the nested configure.
+file(TO_CMAKE_PATH "${OPUS_DNN_UNPACK}" _opus_dnn_unpack)
+file(TO_CMAKE_PATH "${CMAKE_CURRENT_BINARY_DIR}/opus_system_includes.cmake" _opus_inc_cmake)
+file(WRITE "${_opus_inc_cmake}"
+	"include_directories(BEFORE SYSTEM\n"
+	"\t\"${_opus_dnn_unpack}/dnn\"\n"
+	"\t\"${_opus_dnn_unpack}\"\n"
+	")\n")
 set(OPUS_OPTIONS
+	"-DCMAKE_PROJECT_INCLUDE=${_opus_inc_cmake}"
 	"-DOPUS_BUILD_SHARED_LIBRARY=${OPUS_SHARED_MODE}"
 	"-DOPUS_BUILD_TESTING=OFF"
 	"-DOPUS_CUSTOM_MODES=ON"
