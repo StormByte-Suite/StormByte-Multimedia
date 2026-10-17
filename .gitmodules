@@ -82,9 +82,6 @@
 [submodule "tessdata"]
 	path = thirdparty/tessdata/cmake-wrapper/src
 	url = https://github.com/tesseract-ocr/tessdata_best.git
-[submodule "StormByte Suite - Buffer"]
-	path = thirdparty/StormByte/buffer/src
-	url = https://github.com/StormByte-Suite/StormByte-Buffer.git
 [submodule "ebur128"]
 	path = thirdparty/ebur128/src
 	url = https://github.com/jiixyj/libebur128.git
