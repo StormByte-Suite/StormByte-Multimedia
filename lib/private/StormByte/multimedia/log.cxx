@@ -68,17 +68,17 @@ namespace StormByte::Multimedia {
 		void ConfigureModule(StormByte::Logger::Log& mm) {
 			mm.Format("[%L] %T %c");
 
-			// StormByte::Logger::ThrottleSpec low;
-			// low.Level = StormByte::Logger::Level::LowLevel;
-			// low.Rate = 8.0;
-			// low.Burst = 16;
-			// low.Policy = StormByte::Logger::ThrottlePolicy::Window;
-			// low.WindowKeep = 12;
-			// low.WindowPeriod = 16;
-			// mm.Throttle(low);
+			StormByte::Logger::ThrottleSpec low;
+			low.Level = StormByte::Logger::Level::LowLevel;
+			low.Rate = 8.0;
+			low.Burst = 16;
+			low.Policy = StormByte::Logger::ThrottlePolicy::Window;
+			low.WindowKeep = 12;
+			low.WindowPeriod = 16;
+			mm.Throttle(low);
 
-			// mm.Throttle(StormByte::Logger::Level::Debug, 2.0, 4);
-			// mm.Throttle(StormByte::Logger::Level::Notice, 4.0, 8);
+			mm.Throttle(StormByte::Logger::Level::Debug, 2.0, 4);
+			mm.Throttle(StormByte::Logger::Level::Notice, 4.0, 8);
 		}
 
 		StormByte::Safe::Shared<StormByte::Logger::Log> ModuleRoot(
