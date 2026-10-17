@@ -31,6 +31,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - `THIRD-PARTY` and the extra `COPYING.*` texts for components compiled into the shared library. The published release archives are built with every media dependency `BUNDLED`, `WITH_GPL=OFF` and `WITH_NONFREE=OFF`, so x264, x265, Rubberband and FDK-AAC are not in those zips. `COPYING.*` is copied into the zip when it is present.
 - macOS release archive is Apple Clang only. The file is `macos-arm64`, with no standard-library suffix. Linux ships `libstdc++` and `libc++`. Windows has no runtime suffix. CI is unchanged and still builds the extra GPL/nonfree matrix.
 
+### Fixed
+
+- `ENABLE_PGO` no longer applies third-party patches twice. Training configures the same checkout again and BuildMaster resets those trees; every target now waits until that training finishes, so a custom target cannot `git apply` the same patch while it is already applied.
+
 ### Changed
 
 - Requires [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0) 2.1.0, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2) 2.0.2, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2) 2.0.2 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2) 2.0.2. Each is a release archive (`stormbyte_component_url`) linked with `BACKEND=binary`. Base, Logger and System are declared here: Buffer no longer carries them as submodules. The archive matches this OS and C++ runtime. Doxygen reads headers from `${BUILDMASTER_INSTALL_INCLUDEDIR}` after those archives unpack. BuildMaster is >= 2.1.0.
