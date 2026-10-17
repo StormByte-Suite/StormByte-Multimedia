@@ -34,6 +34,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Fixed
 
 - `ENABLE_PGO` no longer applies third-party patches twice. Training configures the same checkout again and BuildMaster resets those trees; every target now waits until that training finishes, so a custom target cannot `git apply` the same patch while it is already applied.
+- `configuration.test_bundled_checkout_includes` no longer loads the StormByte component lists in script mode. Those components are release archives, and `cmake -P` has no architecture, so `stormbyte_component_url` aborted PGO training. The test now checks that Base, Buffer, Logger and System use `BACKEND=binary` and do not prepend a source checkout.
 
 ### Changed
 

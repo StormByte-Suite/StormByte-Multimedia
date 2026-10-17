@@ -57,9 +57,6 @@ if(DEFINED TEST_CASE)
 		endif()
 		include("${REPO}/thirdparty/ebur128/CMakeLists.txt")
 		set(_need "ebur128/src/ebur128")
-	elseif(TEST_CASE STREQUAL "buffer-bundled")
-		include("${REPO}/thirdparty/StormByte/buffer/CMakeLists.txt")
-		set(_need "buffer/src/lib/public")
 	elseif(TEST_CASE STREQUAL "tesseract-bundled")
 		include("${REPO}/thirdparty/ocr/tesseract/CMakeLists.txt")
 		set(_need "tesseract/src/include")
@@ -111,11 +108,23 @@ else()
 		message(FATAL_ERROR "System FFmpeg must not use the bundled checkout include directory")
 	endif()
 
+	foreach(component IN ITEMS base buffer logger system)
+		file(READ "${REPO}/thirdparty/StormByte/${component}/CMakeLists.txt" _stormbyte_lists)
+		if(NOT _stormbyte_lists MATCHES "stormbyte_component_url")
+			message(FATAL_ERROR "StormByte ${component} is not a release archive")
+		endif()
+		if(NOT _stormbyte_lists MATCHES "BACKEND=binary")
+			message(FATAL_ERROR "StormByte ${component} is not BACKEND=binary")
+		endif()
+		if(_stormbyte_lists MATCHES "target_include_directories")
+			message(FATAL_ERROR "StormByte ${component} must not prepend a source checkout")
+		endif()
+	endforeach()
+
 	foreach(case IN ITEMS
 		vmaf-bundled vmaf-system
 		zimg-bundled zimg-system
 		ebur128-bundled ebur128-system
-		buffer-bundled
 		tesseract-bundled
 		leptonica-bundled
 		tessdata-bundled tessdata-system
