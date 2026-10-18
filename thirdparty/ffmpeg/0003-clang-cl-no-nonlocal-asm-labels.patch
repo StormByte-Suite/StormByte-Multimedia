@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+--- a/meson.build
++++ b/meson.build
+@@ -3000,7 +3000,8 @@
+ # of inline assembly to nonlocal labels defined within inline assembly,
+ # see https://github.com/llvm/llvm-project/issues/76046.
+ # Original bug report: https://github.com/llvm/llvm-project/issues/64127
+-if cc.get_id() != 'clang' or host_system != 'windows'
++# Meson reports clang-cl as clang-cl, not clang. Same failure.
++if not (cc.get_id() in ['clang', 'clang-cl'] and host_system == 'windows')
+   asm_inline_checks += [
+     ['"Label:\\n"', 'inline_asm_nonlocal_labels']
+   ]

@@ -232,6 +232,7 @@ else()
 	set(FFMPEG_PATCHES
 		"${CMAKE_CURRENT_LIST_DIR}/0001-mov-read-track-name-as-raw-utf8.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0002-clang-cl-no-options-strict.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0003-clang-cl-no-nonlocal-asm-labels.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"
