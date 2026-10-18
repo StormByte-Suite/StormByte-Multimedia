@@ -245,7 +245,7 @@ jobs:
               f"settings set target.env-vars DYLD_LIBRARY_PATH={lib_path} DYLD_FALLBACK_LIBRARY_PATH={lib_path}\n"
               f"target create {exe}\n"
               "settings set -- target.run-args test_hevc_av1_hevc_hdr10plus\n"
-              f"process launch --stdout {temp}/hdr10.out --stderr {temp}/hdr10.err\n"
+              "process launch\n"
               "thread backtrace all\n"
               "register read\n"
               "image lookup -a $pc\n"
@@ -258,10 +258,6 @@ jobs:
           lldb --batch -s "${RUNNER_TEMP}/hdr10.lldb"
           lldb_status=$?
           set -e
-          echo "===== test stdout (tail) ====="
-          tail -n 40 "${RUNNER_TEMP}/hdr10.out" || true
-          echo "===== test stderr (tail) ====="
-          tail -n 40 "${RUNNER_TEMP}/hdr10.err" || true
           echo "lldb exit ${lldb_status}"
           exit 1
 
