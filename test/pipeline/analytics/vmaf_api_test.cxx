@@ -64,7 +64,12 @@ int test_vmaf_picture_api_contract() {
 	for (const unsigned depth : {8u, 10u}) {
 		Context owner;
 		VmafConfiguration configuration{};
-		configuration.n_threads = 2;
+		configuration.n_threads =
+#if defined(__LLVM_INSTR_PROFILE_GENERATE)
+			0;
+#else
+			2;
+#endif
 		configuration.n_subsample = 1;
 		configuration.log_level = VMAF_LOG_LEVEL_WARNING;
 		VmafModelConfig modelConfiguration{};

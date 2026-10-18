@@ -343,11 +343,20 @@ void VMAF::Drain(Lane& lane) noexcept {
 }
 
 unsigned VMAF::Threads() const noexcept {
+#if defined(__LLVM_INSTR_PROFILE_GENERATE)
+	// Clang's counters are not atomic. libvmaf's pool races them and the
+	// instrumented tests segfault. Atomic updates fix the race and stall ADM
+	// past the training timeout. Zero threads means no pool: extraction stays
+	// on the caller. The installed build is not instrumented, so it keeps the
+	// hardware pool.
+	return 0;
+#else
 	if (m_threads)
 		return std::max<unsigned>(1u, *m_threads);
 	if (const unsigned hw = std::thread::hardware_concurrency(); hw > 0)
 		return hw;
 	return 1;
+#endif
 }
 
 void VMAF::Process(const Pipeline::Frame& frame) noexcept {
