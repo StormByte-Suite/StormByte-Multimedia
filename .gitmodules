@@ -6,10 +6,10 @@
 	url = https://github.com/mstorsjo/fdk-aac.git
 [submodule "Ogg container"]
 	path = thirdparty/ffmpeg/plugins/containers/ogg/src
-	url = https://gitlab.xiph.org/xiph/ogg.git
+	url = https://github.com/xiph/ogg.git
 [submodule "Vorbis codec"]
 	path = thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src
-	url = https://gitlab.xiph.org/xiph/vorbis.git
+	url = https://github.com/xiph/vorbis.git
 [submodule "FFmpeg"]
 	path = thirdparty/ffmpeg/src
 	url = https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg.git
