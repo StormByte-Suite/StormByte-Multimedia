@@ -3,8 +3,6 @@ name: CI
 permissions:
   actions: write
   contents: read
-  pages: write
-  id-token: write
 
 on:
   push:
@@ -35,7 +33,7 @@ jobs:
           submodules: recursive
 
   ###########################################################################
-  # 0b. Warm APT lists only (Linux + docs)
+  # 0b. Warm APT lists only (Linux builds)
   ###########################################################################
   apt-bootstrap:
     runs-on: ubuntu-26.04
@@ -213,110 +211,3 @@ jobs:
             -DWITH_GPL=${{ matrix.extra }}
           run-tests: true
           ctest-options: --output-on-failure --test-dir ${{ github.workspace }}/build/test
-
-  ###########################################################################
-  # DOCS (master push / manual only)
-  #
-  # generate-and-deploy-docs.yml extra-install is archive apt only.
-  # Ubuntu still ships FFmpeg < 9.0.0; WITH_FFMPEG=SYSTEM is a hard
-  # CMake error. Restore the reusable job when archive ffmpeg >= 9
-  # and delete the inline job below.
-  ###########################################################################
-  # docs:
-  #   needs: [checkout-bootstrap, apt-bootstrap]
-  #   if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
-  #   uses: stormbytepp/githubactions/.github/workflows/generate-and-deploy-docs.yml@master
-  #   permissions:
-  #     contents: read
-  #     pages: write
-  #     id-token: write
-  #     actions: write
-  #   with:
-  #     doc_target: StormByteMultimediaDoc
-  #     extra-cmake-options: -DENABLE_DOC=ON -DWITH_STORMBYTE=BUNDLED -DWITH_FFMPEG=SYSTEM -DWITH_VMAF=SYSTEM -DWITH_OCR=SYSTEM -DWITH_ZIMG=SYSTEM -DWITH_EBUR128=SYSTEM
-  #     extra-install: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libvmaf-dev libzimg-dev libebur128-dev libtesseract-dev libleptonica-dev tesseract-ocr-eng nasm"
-  #     docs_output_dir: ./_site
-
-  docs:
-    needs: [checkout-bootstrap, apt-bootstrap]
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
-    runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-      actions: write
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    environment:
-      name: github-pages
-    steps:
-      - name: Checkout repository and submodules
-        uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
-        with:
-          fetch-depth: 1
-          submodules: recursive
-
-      - name: Install toolchain (docs)
-        id: toolchain
-        uses: stormbytepp/githubactions/.github/actions/install-toolchain@master
-        with:
-          toolchain: clang
-          docs: true
-
-      # Temporary: official Ubuntu FFmpeg is < 9. Remove this step when
-      # apt ffmpeg >= 9.0.0 and switch back to the reusable workflow.
-      - name: FFmpeg 9 PPA (until Ubuntu archives it)
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository -y ppa:ubuntuhandbook1/ffmpeg9
-          sudo apt-get update
-
-      - name: Install extra packages
-        uses: stormbytepp/githubactions/.github/actions/install-cached@master
-        with:
-          packages: "ffmpeg libavcodec-dev libavformat-dev libavutil-dev libavfilter-dev libswscale-dev libswresample-dev libvmaf-dev libzimg-dev libebur128-dev libtesseract-dev libleptonica-dev tesseract-ocr-eng nasm"
-          cache-key: extra-apt-packages-ffmpeg9-system-deps-docs
-          lists-cache-key: apt-lists
-
-      - name: Configure CMake
-        run: |
-          set -euo pipefail
-          cmake -S . -B "${{ github.workspace }}/build" \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_COMPILER="${{ steps.toolchain.outputs.c_compiler }}" \
-            -DCMAKE_CXX_COMPILER="${{ steps.toolchain.outputs.cxx_compiler }}" \
-            -DENABLE_DOC=ON \
-            -DWITH_STORMBYTE=BUNDLED \
-            -DWITH_FFMPEG=SYSTEM \
-            -DWITH_VMAF=SYSTEM \
-            -DWITH_OCR=SYSTEM \
-            -DWITH_TESSDATA=BUNDLED \
-            -DWITH_ZIMG=SYSTEM \
-            -DWITH_EBUR128=SYSTEM
-
-      - name: Build documentation target
-        run: |
-          set -euo pipefail
-          cmake --build "${{ github.workspace }}/build" \
-            --target StormByteMultimediaDoc \
-            --parallel
-
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./docs
-          destination: ./_site
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: ./_site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

@@ -7,8 +7,7 @@ name: Release
 # Same shape as ci.yml, with two differences: ci.yml is left as the
 # GPL/nonfree matrix, and this workflow always builds the redistributable
 # configuration (everything BUNDLED, WITH_GPL=OFF, WITH_NONFREE=OFF) with
-# LTO and PGO. Docs are deployed here as well; ci.yml still has its own
-# docs job and is not edited by the port.
+# LTO and PGO. Docs are deployed only here.
 
 on:
   workflow_dispatch:
@@ -380,7 +379,11 @@ jobs:
           toolchain: clang
           docs: true
 
-      - name: FFmpeg 9 PPA (until Ubuntu archives it)
+      # Ubuntu archive FFmpeg is still older than 9.0.2, which is what
+      # WITH_FFMPEG=SYSTEM requires. The handbook PPA ships 9.0.2. Drop
+      # this step once the archive has it and the reusable docs workflow
+      # can install the packages itself.
+      - name: FFmpeg 9.0.2 from ppa:ubuntuhandbook1/ffmpeg9
         run: |
           set -euo pipefail
           sudo apt-get update
