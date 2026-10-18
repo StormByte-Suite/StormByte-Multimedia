@@ -1,6 +1,6 @@
 [submodule "Opus codec"]
 	path = thirdparty/ffmpeg/plugins/codecs/audio/opus/src
-	url = https://gitlab.xiph.org/xiph/opus.git
+	url = https://github.com/xiph/opus.git
 [submodule "FDK-AAC codec"]
 	path = thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src
 	url = https://github.com/mstorsjo/fdk-aac.git
