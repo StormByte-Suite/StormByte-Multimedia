@@ -21,13 +21,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### Changed
-
-- Bundled static FFmpeg is no longer merged into `ffmpeg-pack`. `llvm-lib` cannot put LTO bitcode into that archive, which is what stopped Windows LTO. Linux wraps the six archives in a rescan group (`--start-group`) on `StormByte-Multimedia` and on `StormByte-Multimedia-Test`. macOS and Windows link those archives directly; those linkers already rescan. Plugins stay outside the group, as they sat outside the pack. `/FORCE:MULTIPLE` is gone. The six archives are still not whole-archived, so `framepool.c` is not pulled from both `libswscale` and `libavfilter`.
-
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
 
-## [1.0.1] - 2026-10-17
+## [1.0.1] - 2026-10-18
 
 ### Added
 
@@ -44,6 +40,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Changed
 
+- Bundled static FFmpeg is no longer merged into `ffmpeg-pack`. `llvm-lib` cannot put LTO bitcode into that archive, which is what stopped Windows LTO. Linux wraps the six archives in a rescan group (`--start-group`) on `StormByte-Multimedia` and on `StormByte-Multimedia-Test`. macOS and Windows link those archives directly; those linkers already rescan. Plugins stay outside the group, as they sat outside the pack. `/FORCE:MULTIPLE` is gone. The six archives are still not whole-archived, so `framepool.c` is not pulled from both `libswscale` and `libavfilter`.
 - Requires [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0) 2.1.0, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2) 2.0.2, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2) 2.0.2 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2) 2.0.2. Each is a release archive (`stormbyte_component_url`) linked with `BACKEND=binary`. Base, Logger and System are declared here: Buffer no longer carries them as submodules. The archive matches this OS and C++ runtime. Doxygen reads headers from `${BUILDMASTER_INSTALL_INCLUDEDIR}` after those archives unpack. BuildMaster is >= 2.1.0.
 - **Breaking**: Multimedia exceptions replace literal `{}` with `Safe::String::ReplaceToken`. They accept the same fields as that function (`{:.3f}`, `{:02}`, `{:016x}`, and the rest of that set). A `bool` is `true` or `false`. Paths are segments: `StormByte.Multimedia`, then `File`, `Codec`, `Plan`, `AV`, `AV.Decoder` and `OCR`. An empty extra path does not add a trailing dot.
 - Logs, filter graphs, durations and reports use `Safe::String::ReplaceToken` instead of `std::format`. That covers `{:.1f}`, `{:.2f}`, `{:.3f}`, `{:.6f}`, `{:.9f}`, `{:.17g}`, `{:6.2f}`, `{:02}`, `{:03}` and `{:016x}`, plus pointer addresses. The library sources no longer include `<format>`. This needs the Base 2.1.0 retag that teaches `ReplaceToken` those fields.
