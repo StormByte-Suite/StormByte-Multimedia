@@ -9,22 +9,23 @@ if(NOT DEFINED WITH_FFMPEG)
 endif()
 
 # Private link used by the shared host and by StormByte-Multimedia-Test.
-# Static pack: one merged archive (the six FFmpeg libs) plus ffmpeg-plugins
-# once. REPACK does not copy ffmpeg's LINK interface, so the plugin edge on
-# the pack is required and is not a second copy. The repeated bfd warnings
-# are duplicate objects already inside that archive (framepool.c is compiled
-# into both libswscale and libavfilter); they are not the six libs linked twice.
+# Static FFmpeg is six archives, not one merged pack. ld.bfd scans each
+# archive once, so Linux wraps those six in $<LINK_GROUP:RESCAN>
+# (--start-group). ld64 and lld-link already rescan, and CMake's RESCAN
+# feature is not available there (on Apple it is not --start-group).
+# Plugins stay after the group, the same place they sat after the pack.
+# Do not WHOLE the six: framepool.c is in both libswscale and libavfilter.
+# The imported archives (ffmpeg__bm__*) exist only after graph finalize,
+# which is after test/CMakeLists.txt runs, so early callers are recorded
+# and attached from the graph hook.
 function(stormbyte_ffmpeg_absorb target)
 	# Hide symbols contributed by static archives so their PC-relative
 	# relocations resolve locally. No gc-sections / -dead_strip / /OPT:REF —
-	# they can drop live objects. /FORCE:MULTIPLE covers duplicate helpers
-	# already present in the merged archive. Frameworks stay PRIVATE.
+	# they can drop live objects. Frameworks stay PRIVATE.
 	if(NOT DEFINED FFMPEG_BUNDLED_TYPE OR NOT FFMPEG_BUNDLED_TYPE STREQUAL "static")
 		return()
 	endif()
-	if(WIN32)
-		target_link_options(${target} PRIVATE "/FORCE:MULTIPLE")
-	elseif(APPLE)
+	if(APPLE)
 		foreach(_fw IN ITEMS
 			VideoToolbox
 			AudioToolbox
@@ -43,13 +44,62 @@ function(stormbyte_ffmpeg_absorb target)
 	endif()
 endfunction()
 
-function(stormbyte_link_ffmpeg target)
-	if(WITH_FFMPEG STREQUAL "SYSTEM" OR NOT TARGET ffmpeg-pack)
-		target_link_libraries(${target} PRIVATE ffmpeg)
-	else()
-		target_link_libraries(${target} PRIVATE ffmpeg-pack)
+function(_sb_mm_attach_ffmpeg target visibility)
+	if(NOT FFMPEG_BUNDLED_TYPE STREQUAL "static")
+		target_link_libraries(${target} ${visibility} ffmpeg)
+		return()
 	endif()
-	stormbyte_ffmpeg_absorb(${target})
+	if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+		# Not the ffmpeg INTERFACE target: CMake ignores LINK_GROUP on
+		# INTERFACE items. These are the STATIC IMPORTED archives.
+		set(_libs
+			ffmpeg__bm__avutil
+			ffmpeg__bm__avcodec
+			ffmpeg__bm__avformat
+			ffmpeg__bm__swscale
+			ffmpeg__bm__swresample
+			ffmpeg__bm__avfilter
+		)
+		foreach(_lib IN LISTS _libs)
+			if(NOT TARGET "${_lib}")
+				message(FATAL_ERROR
+					"stormbyte_link_ffmpeg: '${_lib}' does not exist yet")
+			endif()
+		endforeach()
+		list(JOIN _libs "," _csv)
+		# Plugins are a second item, outside the group, as they were
+		# outside the pack. Linking ffmpeg itself would also pull the
+		# six archives ungrouped and CMake would fold that back into
+		# the group.
+		target_link_libraries(${target} ${visibility}
+			"$<LINK_GROUP:RESCAN,${_csv}>"
+			ffmpeg-plugins
+		)
+		if(TARGET ffmpeg_install)
+			add_dependencies(${target} ffmpeg_install)
+		endif()
+		return()
+	endif()
+	# Windows / macOS: the ffmpeg INTERFACE already carries the six
+	# archives, the plugins and the platform LINK= libraries.
+	target_link_libraries(${target} ${visibility} ffmpeg)
+endfunction()
+
+function(stormbyte_link_ffmpeg target)
+	set(_vis PRIVATE)
+	if(ARGC GREATER 1)
+		set(_vis "${ARGV1}")
+	endif()
+	if(WITH_FFMPEG STREQUAL "SYSTEM" OR NOT FFMPEG_BUNDLED_TYPE STREQUAL "static")
+		target_link_libraries(${target} ${_vis} ffmpeg)
+		stormbyte_ffmpeg_absorb("${target}")
+	elseif(TARGET ffmpeg__bm__avutil)
+		_sb_mm_attach_ffmpeg("${target}" "${_vis}")
+		stormbyte_ffmpeg_absorb("${target}")
+	else()
+		set_property(GLOBAL APPEND PROPERTY _SB_MM_FFMPEG_PENDING "${target}")
+		set_property(GLOBAL APPEND PROPERTY _SB_MM_FFMPEG_PENDING_VIS "${_vis}")
+	endif()
 endfunction()
 
 if(WITH_FFMPEG STREQUAL "SYSTEM")
@@ -187,10 +237,13 @@ else()
 	)
 	if(WIN32)
 		list(APPEND FFMPEG_BM_OPTS "TOOLCHAIN=msvc")
+		list(APPEND FFMPEG_BM_OPTS "LINK={ws2_32;secur32;bcrypt;ncrypt;crypt32}")
+	elseif(APPLE)
+		list(APPEND FFMPEG_BM_OPTS "LINK=iconv")
 	endif()
 	# Do not WHOLE the six archives. FFmpeg 9 ships framepool.c in both
-	# libswscale and libavfilter; --whole-archive pulls both. Static
-	# builds merge them below so bfd rescans one archive.
+	# libswscale and libavfilter; --whole-archive pulls both. Linux
+	# rescans them as a link group; other linkers rescan on their own.
 	if(CMAKE_INTERPROCEDURAL_OPTIMIZATION
 			OR (CMAKE_BUILD_TYPE STREQUAL "Release"
 				AND CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE))
@@ -211,41 +264,31 @@ else()
 	buildmaster_group_add(ff-plugins ffmpeg)
 	buildmaster_link(ffmpeg ffmpeg-plugins)
 
-	# Static: one rescanned archive plus normally extracted plugins. Shared: the
-	# component INTERFACE already carries the plugins. LINK= stays on
-	# the pack because REPACK does not copy it from ffmpeg. Do not also
-	# INTERFACE-link the unmerged ffmpeg target: that would put the six
-	# archives on the link line next to the pack.
-	if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
-		set(_FF_PACK_OPTS "REPACK")
-		if(WIN32)
-			list(APPEND _FF_PACK_OPTS "LINK={ws2_32;secur32;bcrypt;ncrypt;crypt32}")
-		elseif(APPLE)
-			list(APPEND _FF_PACK_OPTS "LINK=iconv")
-		endif()
-		list(JOIN _FF_PACK_OPTS ";" _FF_PACK_OPTSTR)
-		buildmaster_meta(ffmpeg-pack "FFmpeg static pack" "${_FF_PACK_OPTSTR}")
-		buildmaster_meta_add(ffmpeg-pack ffmpeg)
-		buildmaster_link(ffmpeg-pack ffmpeg-plugins)
-		set(_FF_LINK ffmpeg-pack)
-	else()
-		set(_FF_LINK ffmpeg)
+	# Shared Multimedia absorbs the static archives (or NEEDs the shared
+	# FFmpeg) as PRIVATE, so tests do not inherit them. The test library
+	# calls stormbyte_link_ffmpeg itself. Depend only orders the install;
+	# the hook attaches the link once the imported archives exist.
+	# Static Multimedia publishes the same link as PUBLIC so a consumer
+	# of the .a still sees the six archives.
+	buildmaster_depend(StormByte-Multimedia ffmpeg)
+	if(NOT BUILD_SHARED_LIBS)
+		stormbyte_link_ffmpeg(StormByte-Multimedia PUBLIC)
 	endif()
-
-	# Shared Multimedia absorbs the static pack (or NEEDs the shared
-	# FFmpeg). buildmaster_link is PUBLIC on a host target, so tests
-	# would inherit it. Depend orders the install; the hook attaches
-	# the already-filled INTERFACE as PRIVATE.
-	if(BUILD_SHARED_LIBS)
-		buildmaster_depend(StormByte-Multimedia "${_FF_LINK}")
-		function(_sb_mm_link_ffmpeg_private)
+	function(_sb_mm_link_ffmpeg_private)
+		if(BUILD_SHARED_LIBS)
 			stormbyte_link_ffmpeg(StormByte-Multimedia)
-		endfunction()
-		buildmaster_hook_graph(_sb_mm_link_ffmpeg_private zz-ffmpeg-private-link)
-	else()
-		buildmaster_link(StormByte-Multimedia "${_FF_LINK}")
-		stormbyte_ffmpeg_absorb(StormByte-Multimedia)
-	endif()
+		endif()
+		get_property(_pending GLOBAL PROPERTY _SB_MM_FFMPEG_PENDING)
+		get_property(_pending_vis GLOBAL PROPERTY _SB_MM_FFMPEG_PENDING_VIS)
+		set(_i 0)
+		foreach(_t IN LISTS _pending)
+			list(GET _pending_vis ${_i} _v)
+			math(EXPR _i "${_i} + 1")
+			_sb_mm_attach_ffmpeg("${_t}" "${_v}")
+			stormbyte_ffmpeg_absorb("${_t}")
+		endforeach()
+	endfunction()
+	buildmaster_hook_graph(_sb_mm_link_ffmpeg_private zz-ffmpeg-private-link)
 
 	function(_stormbyte_ffmpeg_announce_build)
 		buildmaster_message(STATUS "Setting up FFmpeg build" 1)

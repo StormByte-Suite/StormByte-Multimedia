@@ -13,10 +13,10 @@ if(ENABLE_TEST)
 	)
 
 	# One shared library absorbs every private translation unit and test
-	# body that calls FFmpeg. bfd therefore scans the static pack here and
-	# inside StormByte-Multimedia, not once per executable. Runners are
-	# dllimport/dllexport (visibility default elsewhere). Executables link
-	# this library and Multimedia only.
+	# body that calls FFmpeg. On Linux, bfd rescans the six static
+	# archives here and inside StormByte-Multimedia, not once per
+	# executable. Runners are dllimport/dllexport (visibility default
+	# elsewhere). Executables link this library and Multimedia only.
 	add_library(StormByte-Multimedia-Test SHARED
 		file/file_avio_test.cxx
 		pipeline/helpers.cxx

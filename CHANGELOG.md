@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Changed
+
+- Bundled static FFmpeg is no longer merged into `ffmpeg-pack`. `llvm-lib` cannot put LTO bitcode into that archive, which is what stopped Windows LTO. Linux wraps the six archives in a rescan group (`--start-group`) on `StormByte-Multimedia` and on `StormByte-Multimedia-Test`. macOS and Windows link those archives directly; those linkers already rescan. Plugins stay outside the group, as they sat outside the pack. `/FORCE:MULTIPLE` is gone. The six archives are still not whole-archived, so `framepool.c` is not pulled from both `libswscale` and `libavfilter`.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
 
 ## [1.0.1] - 2026-10-17
