@@ -1,5 +1,8 @@
 set(VPX_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(VPX_COMPONENT "VPX codec")
+set(VPX_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-clang-cl-simd-target.patch"
+)
 
 set(VPX_OPTIONS
 	"-Dlibs=enabled"
@@ -43,7 +46,7 @@ buildmaster_component(
 	"${VPX_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"vpx"
-	""
+	"GIT={RESET;PATCH={${VPX_PATCHES}};TITLE=libvpx clang-cl SIMD}"
 )
 buildmaster_group_add(ff-video vpx)
 register_plugin(vpx "libvpx=enabled libvpx_vp8_encoder=enabled libvpx_vp8_decoder=enabled libvpx_vp9_encoder=enabled libvpx_vp9_decoder=enabled")
