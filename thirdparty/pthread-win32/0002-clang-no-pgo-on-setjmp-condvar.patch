@@ -1,0 +1,20 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -202,6 +202,16 @@ function(static_lib type def)
+ 
+     target_compile_definitions(${targ} PRIVATE "${def}" ${build_defines} __PTW32_STATIC_LIB __PTW32_BUILD_INLINED)
+     set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
++    # C cleanup implements pthread_cond_wait with setjmp. Clang PGO and LTO
++    # instrument that function and kvazaar's workers never wake.
++    if(CMAKE_C_COMPILER_ID MATCHES "Clang")
++        if(CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
++            target_compile_options(${targ} PRIVATE "/clang:-fno-profile-generate" "/clang:-fno-lto")
++        else()
++            target_compile_options(${targ} PRIVATE "-fno-profile-generate" "-fno-lto")
++        endif()
++        set_property(TARGET ${targ} PROPERTY INTERPROCEDURAL_OPTIMIZATION OFF)
++    endif()
+ 
+     message(STATUS "Static library ${targ}")
+ 
