@@ -80,11 +80,6 @@ if(X265_NASM_PIC)
 	list(APPEND X265_OPT_8 "${X265_NASM_PIC}")
 endif()
 
-set(X265_TC "")
-if(MSVC)
-	set(X265_TC "TOOLCHAIN=msvc")
-endif()
-
 # The multilib variants define x265_analysis_distortion_data differently
 # (notably sse_t* ctuDistortion). Combining their IR violates the ODR, as
 # diagnosed by GCC LTO. Keep all bit depths outside IPO on every compiler;
@@ -98,11 +93,6 @@ set(X265_10_OPTSTR "SOURCE=source;NOINSTALL;IPO=off")
 set(X265_8_OPTSTR "SOURCE=source;IPO=off")
 if(FFMPEG_BUNDLED_TYPE STREQUAL "static")
 	set(X265_8_OPTSTR "${X265_8_OPTSTR};REPACK")
-endif()
-if(NOT X265_TC STREQUAL "")
-	set(X265_12_OPTSTR "${X265_12_OPTSTR};${X265_TC}")
-	set(X265_10_OPTSTR "${X265_10_OPTSTR};${X265_TC}")
-	set(X265_8_OPTSTR "${X265_8_OPTSTR};${X265_TC}")
 endif()
 
 buildmaster_group(ff-x265 "X265")

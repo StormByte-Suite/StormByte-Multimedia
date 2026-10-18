@@ -10,9 +10,7 @@ set(X264_OPTIONS
 )
 
 set(X264_OPTSTR "GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-shallow-revision.patch;TITLE=x264 shallow revision}")
-if(MSVC)
-	string(APPEND X264_OPTSTR ";TOOLCHAIN=msvc")
-elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	# x264 uses -mpreferred-stack-boundary=6 (64 bytes). GCC LTO can apply
 	# that assumption to other dependencies and omit required AVX2 stack
 	# realignment, causing crashes in VMAF, libvpx and Tesseract. Keep x264

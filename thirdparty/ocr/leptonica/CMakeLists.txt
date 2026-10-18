@@ -77,9 +77,6 @@ set(LEPTONICA_PATCHES
 )
 
 set(LEPTONICA_EXTRA "GIT={RESET;PATCH={${LEPTONICA_PATCHES}};TITLE=Leptonica patches}")
-if(WIN32)
-	string(APPEND LEPTONICA_EXTRA ";TOOLCHAIN=msvc")
-endif()
 
 buildmaster_component(
 	leptonica

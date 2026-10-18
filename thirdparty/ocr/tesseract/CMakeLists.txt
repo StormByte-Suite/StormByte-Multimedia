@@ -57,9 +57,6 @@ else()
 endif()
 
 set(TESSERACT_EXTRA "GIT={RESET;PATCH={${TESSERACT_PATCHES}};TITLE=tesseract unversioned name}")
-if(WIN32)
-	string(APPEND TESSERACT_EXTRA ";TOOLCHAIN=msvc")
-endif()
 
 buildmaster_component(
 	tesseract
