@@ -98,6 +98,8 @@ jobs:
           ccache-key: v1-${{ matrix.compiler }}-extra-${{ matrix.extra }}
           build-type: ${{ env.BUILD_TYPE }}
           configure-options: >-
+            -DENABLE_LTO=ON
+            -DENABLE_PGO=OFF
             -DENABLE_TEST=ON
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
@@ -153,6 +155,8 @@ jobs:
           ccache-key: v1-${{ matrix.compiler }}-extra-${{ matrix.extra }}
           build-type: ${{ env.BUILD_TYPE }}
           configure-options: >-
+            -DENABLE_LTO=ON
+            -DENABLE_PGO=OFF
             -DENABLE_TEST=ON
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
@@ -201,6 +205,8 @@ jobs:
           ccache-key: v1-clang-cl-extra-${{ matrix.extra }}
           build-type: ${{ env.BUILD_TYPE }}
           configure-options: >-
+            -DENABLE_LTO=ON
+            -DENABLE_PGO=OFF
             -DENABLE_TEST=ON
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED

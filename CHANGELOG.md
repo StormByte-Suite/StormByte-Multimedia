@@ -23,6 +23,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Changed
 
+- CI builds with `ENABLE_LTO=ON`, `ENABLE_PGO=OFF` and `ENABLE_TEST=ON`, then runs ctest. Profile-guided optimization stays on the release workflow.
+
 - PGO training waits longer for a pipeline test. Under `-fprofile-generate`, `bm3d` on the 48-frame fixture takes about five seconds a frame, and libaom does not finish the 10-bit clip inside 30 seconds. The instrumented tree (`PGO_STAGE=generate`) waits 360 seconds in process and gives ctest 480. A normal build stays at 30 seconds, with ctest at 50 or 90.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
