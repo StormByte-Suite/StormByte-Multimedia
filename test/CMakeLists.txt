@@ -6,6 +6,10 @@ if(ENABLE_TEST)
 	target_compile_definitions(multimedia_test_support INTERFACE
 		"STORMBYTE_TEST_FILES_DIR=\"${PROJECT_SOURCE_DIR}/test/files\""
 		"STORMBYTE_TEST_OUTPUT_DIR=\"${PROJECT_BINARY_DIR}/test-output\"")
+	# GCC -fprofile-generate made bm3d ~5s/frame and libaom miss the 30s wait.
+	if(PGO_STAGE STREQUAL "generate")
+		target_compile_definitions(multimedia_test_support INTERFACE STORMBYTE_MM_TEST_DEADLINE_SEC=360)
+	endif()
 
 	file(MAKE_DIRECTORY
 		"${PROJECT_BINARY_DIR}/test-output"

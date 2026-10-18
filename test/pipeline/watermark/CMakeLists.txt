@@ -7,4 +7,4 @@ set_source_files_properties(watermark_test.cxx PROPERTIES
 
 add_optional_pipeline_test(MultimediaPipelineWatermarkTests test_watermark_path_and_embedded_binary)
 set_tests_properties(pipeline.test_watermark_path_and_embedded_binary PROPERTIES
-	TIMEOUT 90 LABELS "multimedia;pipeline;watermark")
+	TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;watermark")

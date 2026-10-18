@@ -1,9 +1,18 @@
 add_library(multimedia_pipeline_test_support STATIC helpers.cxx)
 target_link_libraries(multimedia_pipeline_test_support PUBLIC multimedia_test_support)
 
+# ctest must outlive the in-process wait (360s while training) plus teardown.
+if(PGO_STAGE STREQUAL "generate")
+	set(PIPELINE_TEST_TIMEOUT 480)
+	set(PIPELINE_TEST_TIMEOUT_LONG 480)
+else()
+	set(PIPELINE_TEST_TIMEOUT 50)
+	set(PIPELINE_TEST_TIMEOUT_LONG 90)
+endif()
+
 function(add_pipeline_test target test_name)
 	add_test(NAME "pipeline.${test_name}" COMMAND ${target} "${test_name}")
-	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 50 LABELS "multimedia;pipeline")
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT} LABELS "multimedia;pipeline")
 endfunction()
 
 function(add_optional_pipeline_test target test_name)

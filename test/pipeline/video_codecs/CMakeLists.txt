@@ -17,7 +17,7 @@ foreach(test_name IN ITEMS
 	test_libwebp_decodes_animated_webp
 )
 	add_optional_pipeline_test(MultimediaPipelineVideoCodecTests ${test_name})
-	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;video-codecs")
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;video-codecs")
 endforeach()
 
 foreach(test_name IN ITEMS
@@ -30,5 +30,5 @@ foreach(test_name IN ITEMS
 	test_x265_encodes_hevc_matroska
 )
 	add_optional_pipeline_test(MultimediaPipelineVideoCodecTests ${test_name})
-	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;video-codecs")
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;video-codecs")
 endforeach()

@@ -64,13 +64,20 @@ using namespace StormByte::Multimedia::Pipeline;
 using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
+// The instrumented tree passes a longer value. bm3d on the 48-frame
+// fixture takes about five seconds a frame under -fprofile-generate.
+#ifndef STORMBYTE_MM_TEST_DEADLINE_SEC
+#define STORMBYTE_MM_TEST_DEADLINE_SEC 30
+#endif
+constexpr auto TestDeadline = std::chrono::seconds{STORMBYTE_MM_TEST_DEADLINE_SEC};
+
 	static bool IsTerminal(Status status) {
 		return status == Status::Done || status == Status::Error || status == Status::Aborted;
 	}
 
 	int WaitForTranscoder(Transcoder& job) {
 		TEST_PHASE("waiting for transcoder completion");
-		const auto deadline = std::chrono::steady_clock::now() + 30s;
+		const auto deadline = std::chrono::steady_clock::now() + TestDeadline;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
 		if (!IsTerminal(job.Status())) {
@@ -120,7 +127,7 @@ using namespace std::string_view_literals;
 
 	int WaitForTranscoderFailure(Transcoder& job, std::string_view expectedMessage) {
 		TEST_PHASE("waiting for expected transcoder failure");
-		const auto deadline = std::chrono::steady_clock::now() + 30s;
+		const auto deadline = std::chrono::steady_clock::now() + TestDeadline;
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);
 		if (!IsTerminal(job.Status())) {
@@ -151,7 +158,7 @@ using namespace std::string_view_literals;
 
 	int WaitForManualPipeline(Step& last) {
 		TEST_PHASE("waiting for manual pipeline completion");
-		const auto deadline = std::chrono::steady_clock::now() + 30s;
+		const auto deadline = std::chrono::steady_clock::now() + TestDeadline;
 		while (last.Status() != State::Stopped && last.Status() != State::Failed &&
 			std::chrono::steady_clock::now() < deadline)
 			std::this_thread::sleep_for(10ms);

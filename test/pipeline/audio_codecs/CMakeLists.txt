@@ -24,7 +24,7 @@ foreach(test_name IN ITEMS
 	test_eac3_encodes_stereo_matroska
 )
 	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
-	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;audio-codecs")
 endforeach()
 
 foreach(test_name IN ITEMS
@@ -33,8 +33,8 @@ foreach(test_name IN ITEMS
 	test_fdk_aac_decodes_surround_to_flac
 )
 	add_optional_pipeline_test(MultimediaPipelineAudioCodecTests ${test_name})
-	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;audio-codecs")
 endforeach()
 
 add_optional_pipeline_test(MultimediaPipelineAudioCodecTests test_rubberband_stretches_stereo_wav)
-set_tests_properties("pipeline.test_rubberband_stretches_stereo_wav" PROPERTIES TIMEOUT 90 LABELS "multimedia;pipeline;audio-codecs")
+set_tests_properties("pipeline.test_rubberband_stretches_stereo_wav" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;audio-codecs")
