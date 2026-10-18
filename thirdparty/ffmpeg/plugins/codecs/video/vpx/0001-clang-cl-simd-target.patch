@@ -1,14 +1,15 @@
 diff --git a/meson.build b/meson.build
 --- a/meson.build
 +++ b/meson.build
-@@ -1728,6 +1728,17 @@
+@@ -1728,6 +1728,18 @@
  		'avx2': c.get_supported_arguments('/arch:AVX2'),
  		'avx512': c.get_supported_arguments('/arch:AVX512'),
  	}
 +	# clang-cl uses the MSVC command line, so it lands in this branch.
-+	# It will not inline an SSSE3 or SSE4.1 builtin unless the file has
-+	# the feature. cl.exe emits the instruction with no extra flag.
-+	if c.get_id() == 'clang'
++	# Meson reports it as clang-cl, not clang. It will not inline an
++	# SSSE3 or SSE4.1 builtin unless the file has the feature. cl.exe
++	# emits the instruction with no extra flag.
++	if c.get_id() != 'msvc'
 +		arch_flags += {
 +			'sse2': ['-msse2'],
 +			'sse3': ['-msse3'],
