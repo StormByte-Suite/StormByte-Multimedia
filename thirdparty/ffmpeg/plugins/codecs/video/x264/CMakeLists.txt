@@ -10,11 +10,14 @@ set(X264_OPTIONS
 )
 
 set(X264_OPTSTR "GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-shallow-revision.patch;TITLE=x264 shallow revision}")
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	# x264 uses -mpreferred-stack-boundary=6 (64 bytes). GCC LTO can apply
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR APPLE)
+	# GCC: x264 uses -mpreferred-stack-boundary=6 (64 bytes). LTO can apply
 	# that assumption to other dependencies and omit required AVX2 stack
-	# realignment, causing crashes in VMAF, libvpx and Tesseract. Keep x264
-	# outside GCC LTO; this does not disable its native SIMD optimizations.
+	# realignment, causing crashes in VMAF, libvpx and Tesseract.
+	# Apple Clang: LTO folds the aarch64 CPU detect into the rest of the
+	# link. The detect comes back with no flags and x264_encoder_open dies
+	# before it prints the profile. That same link takes the elementary
+	# HEVC teardown with it. SIMD stays on.
 	string(APPEND X264_OPTSTR ";IPO=off")
 endif()
 
