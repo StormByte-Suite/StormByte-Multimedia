@@ -21,12 +21,6 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### Changed
-
-- CI builds with `ENABLE_LTO=ON`, `ENABLE_PGO=OFF` and `ENABLE_TEST=ON`, then runs ctest. Profile-guided optimization stays on the release workflow.
-
-- PGO training waits longer for a pipeline test. Under `-fprofile-generate`, `bm3d` on the 48-frame fixture takes about five seconds a frame, and libaom does not finish the 10-bit clip inside 30 seconds. The instrumented tree (`PGO_STAGE=generate`) waits 360 seconds in process and gives ctest 480. A normal build stays at 30 seconds, with ctest at 50 or 90.
-
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
 
 ## [1.0.1] - 2026-10-18
@@ -35,7 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 - `ENABLE_PGO` and `ENABLE_LTO`. Profile-guided optimization trains in `pgo-instr` and installs this build. Link-time optimization follows `ENABLE_LTO` (default ON) for every build type. Both apply to Multimedia. Base, Buffer, Logger and System are not rebuilt.
 - `THIRD-PARTY` and the extra `COPYING.*` texts for components compiled into the shared library. The published release archives are built with every media dependency `BUNDLED`, `WITH_GPL=OFF` and `WITH_NONFREE=OFF`, so x264, x265, Rubberband and FDK-AAC are not in those zips. `COPYING.*` is copied into the zip when it is present.
-- macOS release archive is Apple Clang only. The file is `macos-arm64`, with no standard-library suffix. Linux ships `libstdc++` and `libc++`. Windows has no runtime suffix. CI is unchanged and still builds the extra GPL/nonfree matrix.
+- macOS release archive is Apple Clang only. The file is `macos-arm64`, with no standard-library suffix. Linux ships `libstdc++` and `libc++`. Windows has no runtime suffix. CI still builds the extra GPL/nonfree matrix.
 
 ### Fixed
 
@@ -46,6 +40,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Changed
 
+- CI builds with `ENABLE_LTO=ON`, `ENABLE_PGO=OFF` and `ENABLE_TEST=ON`, then runs ctest. Profile-guided optimization stays on the release workflow.
+- PGO training waits longer for a pipeline test. Under `-fprofile-generate`, `bm3d` on the 48-frame fixture takes about five seconds a frame, and libaom does not finish the 10-bit clip inside 30 seconds. The instrumented tree (`PGO_STAGE=generate`) waits 360 seconds in process and gives ctest 480. A normal build stays at 30 seconds, with ctest at 50 or 90.
 - Bundled static FFmpeg is no longer merged into `ffmpeg-pack`. `llvm-lib` cannot put LTO bitcode into that archive, which is what stopped Windows LTO. Linux wraps the six archives in a rescan group (`--start-group`) on `StormByte-Multimedia` and on `StormByte-Multimedia-Test`. macOS and Windows link those archives directly; those linkers already rescan. Plugins stay outside the group, as they sat outside the pack. `/FORCE:MULTIPLE` is gone. The six archives are still not whole-archived, so `framepool.c` is not pulled from both `libswscale` and `libavfilter`.
 - Requires [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.1.0) 2.1.0, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.2) 2.0.2, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.2) 2.0.2 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.0.2) 2.0.2. Each is a release archive (`stormbyte_component_url`) linked with `BACKEND=binary`. Base, Logger and System are declared here: Buffer no longer carries them as submodules. The archive matches this OS and C++ runtime. Doxygen reads headers from `${BUILDMASTER_INSTALL_INCLUDEDIR}` after those archives unpack. BuildMaster is >= 2.1.0.
 - **Breaking**: Multimedia exceptions replace literal `{}` with `Safe::String::ReplaceToken`. They accept the same fields as that function (`{:.3f}`, `{:02}`, `{:016x}`, and the rest of that set). A `bool` is `true` or `false`. Paths are segments: `StormByte.Multimedia`, then `File`, `Codec`, `Plan`, `AV`, `AV.Decoder` and `OCR`. An empty extra path does not add a trailing dot.
