@@ -66,7 +66,7 @@ int test_vmaf_picture_api_contract() {
 		VmafConfiguration configuration{};
 		configuration.n_threads =
 #if defined(__LLVM_INSTR_PROFILE_GENERATE)
-			0;
+			1;
 #else
 			2;
 #endif
