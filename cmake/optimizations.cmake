@@ -108,3 +108,23 @@ foreach(_lto_cfg DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
 	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_${_lto_cfg} "${ENABLE_LTO}")
 endforeach()
 unset(_lto_cfg)
+
+# Bundled Windows components take this profile. clang-cl must not use
+# TOOLCHAIN=msvc: that profile compiles /GL, and lld-link rejects the
+# objects ("is not a native COFF file"). CMake's own IPO for the MSVC
+# frontend is /GL and /LTCG, which is the same mismatch, so the link
+# uses LLVM -flto instead.
+if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+		AND CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+	set(STORMBYTE_WINDOWS_TOOLCHAIN "clang-cl")
+	if(ENABLE_LTO)
+		foreach(_lto_lang C CXX)
+			set(CMAKE_${_lto_lang}_COMPILE_OPTIONS_IPO "-flto")
+			set(CMAKE_${_lto_lang}_LINK_OPTIONS_IPO "-flto")
+		endforeach()
+		unset(_lto_lang)
+		add_link_options(-flto)
+	endif()
+else()
+	set(STORMBYTE_WINDOWS_TOOLCHAIN "msvc")
+endif()

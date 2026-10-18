@@ -236,7 +236,7 @@ else()
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"
 	)
 	if(WIN32)
-		list(APPEND FFMPEG_BM_OPTS "TOOLCHAIN=msvc")
+		list(APPEND FFMPEG_BM_OPTS "TOOLCHAIN=${STORMBYTE_WINDOWS_TOOLCHAIN}")
 		list(APPEND FFMPEG_BM_OPTS "LINK={ws2_32;secur32;bcrypt;ncrypt;crypt32}")
 	elseif(APPLE)
 		list(APPEND FFMPEG_BM_OPTS "LINK=iconv")

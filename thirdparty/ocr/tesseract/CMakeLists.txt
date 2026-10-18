@@ -58,7 +58,7 @@ endif()
 
 set(TESSERACT_EXTRA "GIT={RESET;PATCH={${TESSERACT_PATCHES}};TITLE=tesseract unversioned name}")
 if(WIN32)
-	string(APPEND TESSERACT_EXTRA ";TOOLCHAIN=msvc")
+	string(APPEND TESSERACT_EXTRA ";TOOLCHAIN=${STORMBYTE_WINDOWS_TOOLCHAIN}")
 endif()
 
 buildmaster_component(

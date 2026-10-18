@@ -82,7 +82,7 @@ endif()
 
 set(X265_TC "")
 if(MSVC)
-	set(X265_TC "TOOLCHAIN=msvc")
+	set(X265_TC "TOOLCHAIN=${STORMBYTE_WINDOWS_TOOLCHAIN}")
 endif()
 
 # The multilib variants define x265_analysis_distortion_data differently
