@@ -37,6 +37,9 @@ elseif(WITH_VMAF STREQUAL "BUNDLED")
 	SET(VMAF_OPTS_WINDOWS)
 	if(WIN32)
 		list(APPEND VMAF_OPTIONS "-Dbundled_winpthreads=false")
+		# svm.cpp is C++ and includes the MSVC STL. libvmaf asks for C++11.
+		# VS 18 <ratio> uses digit separators, which that mode rejects.
+		list(APPEND VMAF_OPTIONS "-Dcpp_std=c++17")
 	endif()
 	if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
 		list(APPEND VMAF_OPTIONS "-Denable_avx512=true")
