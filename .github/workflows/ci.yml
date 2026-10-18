@@ -177,8 +177,93 @@ jobs:
             -DWITH_VMAF=BUNDLED
             -DWITH_NONFREE=${{ matrix.extra }}
             -DWITH_GPL=${{ matrix.extra }}
-          run-tests: true
+          run-tests: ${{ matrix.extra == 'OFF' }}
           ctest-options: --output-on-failure --test-dir ${{ github.workspace }}/build/test
+
+      # extras ON segfaults in pipeline.test_hevc_av1_hevc_hdr10plus after the
+      # elementary HEVC session prints "assert count == 48". The rest of the
+      # suite is not run here: one traced crash is the point of this job.
+      # Homebrew gdb cannot attach on a hosted runner (SIP denies the Mach
+      # task port). lldb is the debugger that can stop the signal.
+      - name: Trace the HDR10+ elementary HEVC crash
+        if: matrix.extra == 'ON'
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install gdb
+
+          lib_path="${GITHUB_WORKSPACE}/build/lib:${GITHUB_WORKSPACE}/build/buildmaster/install/lib:${GITHUB_WORKSPACE}/build/buildmaster/install/lib64"
+          export DYLD_LIBRARY_PATH="${lib_path}${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
+          export DYLD_FALLBACK_LIBRARY_PATH="${DYLD_LIBRARY_PATH}"
+
+          exe=""
+          while IFS= read -r candidate; do
+            exe="${candidate}"
+            break
+          done < <(find "${GITHUB_WORKSPACE}/build" -type f -name MultimediaPipelineHdr10PlusTests)
+          if [[ -z "${exe}" ]]; then
+            cmake --build "${GITHUB_WORKSPACE}/build" --target MultimediaPipelineHdr10PlusTests --parallel
+            while IFS= read -r candidate; do
+              exe="${candidate}"
+              break
+            done < <(find "${GITHUB_WORKSPACE}/build" -type f -name MultimediaPipelineHdr10PlusTests)
+          fi
+          if [[ -z "${exe}" ]]; then
+            echo "MultimediaPipelineHdr10PlusTests was not built" >&2
+            exit 1
+          fi
+          echo "EXE=${exe}"
+          otool -L "${exe}"
+
+          echo "===== gdb: stop at main, then quit (attach probe, not the full run) ====="
+          python3 - "${exe}" << 'PY' || true
+          import subprocess, sys
+          exe = sys.argv[1]
+          try:
+              done = subprocess.run(
+                  ["gdb", "--batch",
+                   "-ex", "set pagination off",
+                   "-ex", "set startup-with-shell off",
+                   "-ex", "start",
+                   "-ex", "info registers",
+                   "-ex", "bt",
+                   "-ex", "quit",
+                   "--args", exe, "test_hevc_av1_hevc_hdr10plus"],
+                  timeout=30)
+              print("gdb exit", done.returncode)
+          except subprocess.TimeoutExpired:
+              print("gdb timed out")
+          PY
+
+          python3 - "${exe}" "${DYLD_LIBRARY_PATH}" "${RUNNER_TEMP}" << 'PY'
+          import pathlib, sys
+          exe, lib_path, temp = sys.argv[1:]
+          path = pathlib.Path(temp) / "hdr10.lldb"
+          path.write_text(
+              "settings set auto-confirm true\n"
+              "settings set target.inherit-env true\n"
+              f"settings set target.env-vars DYLD_LIBRARY_PATH={lib_path} DYLD_FALLBACK_LIBRARY_PATH={lib_path}\n"
+              f"target create {exe}\n"
+              "settings set -- target.run-args test_hevc_av1_hevc_hdr10plus\n"
+              f"process launch --stdout {temp}/hdr10.out --stderr {temp}/hdr10.err\n"
+              "thread backtrace all\n"
+              "register read\n"
+              "image lookup -a $pc\n"
+              "disassemble -p -c 24\n"
+              "quit\n"
+          )
+          PY
+
+          set +e
+          lldb --batch -s "${RUNNER_TEMP}/hdr10.lldb"
+          lldb_status=$?
+          set -e
+          echo "===== test stdout (tail) ====="
+          tail -n 40 "${RUNNER_TEMP}/hdr10.out" || true
+          echo "===== test stderr (tail) ====="
+          tail -n 40 "${RUNNER_TEMP}/hdr10.err" || true
+          echo "lldb exit ${lldb_status}"
+          exit 1
 
   ###########################################################################
   # WINDOWS
