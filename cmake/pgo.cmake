@@ -179,6 +179,7 @@ function(_pgo_strip_profile_flags value out)
 		"-Wno-profile-instr-out-of-date"
 		"/clang:-fprofile-generate=[^ ]+"
 		"/clang:-fprofile-use=[^ ]+"
+		"/clang:-fprofile-update=[^ ]+"
 		"/clang:-Wno-error=profile-instr-unprofiled"
 		"/clang:-Wno-error=profile-instr-out-of-date"
 		"/clang:-Wno-profile-instr-unprofiled"
@@ -211,13 +212,19 @@ macro(_pgo_apply_stage_flags stage)
 				"-fprofile-prefix-path=${CMAKE_BINARY_DIR}")
 			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}")
 		elseif(_pgo_kind STREQUAL "CLANG")
-			list(APPEND _compile "-fprofile-generate=${PGO_PROFILE_DIR}")
+			list(APPEND _compile
+				"-fprofile-generate=${PGO_PROFILE_DIR}"
+				"-fprofile-update=atomic")
 			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}")
 		elseif(_pgo_kind STREQUAL "CLANG_CL")
 			# lld-link is the linker, not clang-cl. A /clang: flag is an input file
 			# to lld-link. Instrumentation stays in the objects; the link only needs
 			# the runtime, added below for targets in this tree.
-			list(APPEND _compile "/clang:-fprofile-generate=${PGO_PROFILE_DIR}")
+			# -fprofile-update is a clang driver flag. clang-cl does not have a / flag
+			# for it. /clang: forwards it, the same way as -fprofile-generate.
+			list(APPEND _compile
+				"/clang:-fprofile-generate=${PGO_PROFILE_DIR}"
+				"/clang:-fprofile-update=atomic")
 			_pgo_link_clang_profile_runtime()
 		else()
 			list(APPEND _compile "/GL")
