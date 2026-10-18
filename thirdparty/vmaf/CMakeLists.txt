@@ -21,6 +21,9 @@ elseif(WITH_VMAF STREQUAL "BUNDLED")
 	)
 
 	set(VMAF_COMPONENT "VMAF library")
+	set(VMAF_PATCHES
+		"${CMAKE_CURRENT_LIST_DIR}/0001-clang-cl-math-and-warnings.patch"
+	)
 	set(VMAF_OPTIONS
 		"-Denable_tests=false"
 		"-Denable_docs=false"
@@ -48,7 +51,7 @@ elseif(WITH_VMAF STREQUAL "BUNDLED")
 		"${VMAF_OPTIONS}"
 		"static"
 		"vmaf"
-		"SOURCE=libvmaf;${VMAF_OPTS_WINDOWS}"
+		"SOURCE=libvmaf;GIT={RESET;PATCH={${VMAF_PATCHES}};TITLE=VMAF clang-cl};${VMAF_OPTS_WINDOWS}"
 	)
 	if(MSVC)
 		buildmaster_link(vmaf pthread-win32)
