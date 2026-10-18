@@ -43,7 +43,6 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Bundled libvmaf is built as C++17 on Windows. Its Meson file asks for C++11, and `svm.cpp` includes the MSVC STL. The Visual Studio 18 `<ratio>` header uses digit separators (`0xFFFF'FFFF`), which C++11 rejects, so clang-cl stopped there. An older STL still compiles as C++11, which is why a local VS 2022 build passed. The Unix build stays C++11.
 - Bundled rubberband is built as C++17 on Windows for the same reason. Its Meson file asks for C++11, and the Visual Studio 18 STL needs C++14 (`constexpr` loops, deduced `auto` and digit separators in `__msvc_bit_utils.hpp`, `<tuple>` and `<xutility>`). clang-cl stopped on `rubberband-c.cpp`. The Unix build stays C++11.
 - Bundled x264 stays out of LTO on macOS as well as with GCC. Apple Clang LTO leaves `x264_cpu_detect` with no flags, so `x264_encoder_open` dies on the empty `using cpu capabilities:` line. `pipeline.test_transcoder_without_enforce_features_drops_hdr10` and `pipeline.test_x264_encodes_h264_mp4` segfault there. x265 on that runner still reports `NEON Neon_DotProd`. The assembly stays enabled.
-- `pipeline.test_hevc_av1_hevc_hdr10plus` no longer opens its own HEVC decoder. That session decoded all 48 frames and then segfaulted while freeing it, on macOS only. A consumer does not do this: the library decoder is `AVDecoder`, and that one had already been created and destroyed earlier in the same run. The elementary file is now read back through the transcoder.
 
 ### Changed
 

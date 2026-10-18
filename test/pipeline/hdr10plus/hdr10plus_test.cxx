@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -23,6 +24,7 @@
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
+	#include <libavformat/avformat.h>
 	#include <libavutil/hdr_dynamic_metadata.h>
 	#include <libavutil/mastering_display_metadata.h>
 	#include <libavutil/mem.h>
@@ -334,12 +336,86 @@ int test_hevc_av1_hevc_hdr10plus() {
 	auto extracted = StormByte::Safe::MakeShared<Trace>();
 	TEST_REQUIRE(Run(hevc, elementary, extracted) == 0);
 	TEST_REQUIRE(CheckSamples(first->m_source, extracted->m_source, true) == 0);
-	// Decode the raw elementary file through the library. A bare avcodec
-	// session is not what a consumer runs, and freeing one here is what
-	// segfaulted on Apple after the 48 frames were already checked.
-	auto reread = StormByte::Safe::MakeShared<Trace>();
-	TEST_REQUIRE(Run(elementary, OutputPath("elementary-reread.mkv"), reread) == 0);
-	TEST_REQUIRE(CheckSamples(first->m_source, reread->m_source, true) == 0);
+	const auto closeInput = [](AVFormatContext* context) { avformat_close_input(&context); };
+	const auto freeDecoder = [](AVCodecContext* context) { avcodec_free_context(&context); };
+	const auto freePacket = [](AVPacket* packet) { av_packet_free(&packet); };
+	const auto freeFrame = [](::AVFrame* frame) { av_frame_free(&frame); };
+	AVFormatContext* input = nullptr;
+	const int opened = avformat_open_input(&input, elementary.string().c_str(), nullptr, nullptr);
+	std::unique_ptr<AVFormatContext, decltype(closeInput)> inputOwner{input, closeInput};
+	TEST_REQUIRE(opened == 0);
+	TEST_REQUIRE(avformat_find_stream_info(input, nullptr) >= 0);
+	TEST_REQUIRE(input->nb_streams == 1);
+	TEST_REQUIRE(input->streams[0]->codecpar->codec_id == AV_CODEC_ID_HEVC);
+	const auto* codec = avcodec_find_decoder_by_name("hevc");
+	TEST_REQUIRE(codec);
+	std::unique_ptr<AVCodecContext, decltype(freeDecoder)> decoder{avcodec_alloc_context3(codec), freeDecoder};
+	TEST_REQUIRE(decoder);
+	TEST_REQUIRE(avcodec_parameters_to_context(decoder.get(), input->streams[0]->codecpar) == 0);
+	TEST_REQUIRE(avcodec_open2(decoder.get(), codec, nullptr) == 0);
+	std::unique_ptr<AVPacket, decltype(freePacket)> packet{av_packet_alloc(), freePacket};
+	std::unique_ptr<::AVFrame, decltype(freeFrame)> frame{av_frame_alloc(), freeFrame};
+	TEST_REQUIRE(packet && frame);
+	std::size_t count = 0;
+	const auto audit = [&]() -> int {
+		TEST_REQUIRE(count < first->m_source.size());
+		int dynamicCount = 0;
+		for (int side = 0; side < frame->nb_side_data; ++side)
+			if (frame->side_data[side]->type == AV_FRAME_DATA_DYNAMIC_HDR_PLUS)
+				++dynamicCount;
+		TEST_REQUIRE(dynamicCount == 1);
+		const auto* dynamic = av_frame_get_side_data(frame.get(), AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+		TEST_REQUIRE(dynamic && dynamic->data && dynamic->size >= sizeof(AVDynamicHDRPlus));
+		const auto payload = Serialize(*reinterpret_cast<const AVDynamicHDRPlus*>(dynamic->data));
+		TEST_REQUIRE(payload == ExpectedPayload(count));
+		TEST_REQUIRE(payload == first->m_source[count].m_payload);
+		const auto* mastering = av_frame_get_side_data(frame.get(), AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+		const auto* light = av_frame_get_side_data(frame.get(), AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+		TEST_REQUIRE(mastering && mastering->data && mastering->size >= sizeof(AVMasteringDisplayMetadata));
+		TEST_REQUIRE(light && light->data && light->size >= sizeof(AVContentLightMetadata));
+		const auto& display = *reinterpret_cast<const AVMasteringDisplayMetadata*>(mastering->data);
+		const auto& levels = *reinterpret_cast<const AVContentLightMetadata*>(light->data);
+		TEST_REQUIRE(display.has_primaries && display.has_luminance);
+		constexpr std::array<std::array<int, 2>, 3> primaries{{{34000, 16000}, {13250, 34500}, {7500, 3000}}};
+		for (std::size_t channel = 0; channel < primaries.size(); ++channel)
+			for (std::size_t coordinate = 0; coordinate < primaries[channel].size(); ++coordinate)
+				TEST_REQUIRE(av_cmp_q(display.display_primaries[channel][coordinate],
+					::AVRational{primaries[channel][coordinate], 50000}) == 0);
+		TEST_REQUIRE(av_cmp_q(display.white_point[0], ::AVRational{15635, 50000}) == 0);
+		TEST_REQUIRE(av_cmp_q(display.white_point[1], ::AVRational{16450, 50000}) == 0);
+		TEST_REQUIRE(av_cmp_q(display.max_luminance, ::AVRational{1000, 1}) == 0);
+		TEST_REQUIRE(av_cmp_q(display.min_luminance, ::AVRational{1, 200}) == 0);
+		TEST_REQUIRE(levels.MaxCLL == 1000 && levels.MaxFALL == 400);
+		TEST_REQUIRE(frame->width == 1920 && frame->height == 1080);
+		TEST_REQUIRE(frame->format == AV_PIX_FMT_YUV420P10LE);
+		TEST_REQUIRE(frame->color_primaries == AVCOL_PRI_BT2020);
+		TEST_REQUIRE(frame->color_trc == AVCOL_TRC_SMPTE2084);
+		TEST_REQUIRE(frame->colorspace == AVCOL_SPC_BT2020_NCL);
+		TEST_REQUIRE(frame->color_range == AVCOL_RANGE_MPEG);
+		++count;
+		return 0;
+	};
+	const auto receive = [&]() -> int {
+		int result = 0;
+		while ((result = avcodec_receive_frame(decoder.get(), frame.get())) == 0) {
+			TEST_REQUIRE(audit() == 0);
+			av_frame_unref(frame.get());
+		}
+		return result;
+	};
+	int read = 0;
+	while ((read = av_read_frame(input, packet.get())) == 0) {
+		TEST_REQUIRE(packet->stream_index == 0);
+		std::size_t metadataSize = 0;
+		TEST_REQUIRE(!av_packet_get_side_data(packet.get(), AV_PKT_DATA_DYNAMIC_HDR10_PLUS, &metadataSize));
+		TEST_REQUIRE(avcodec_send_packet(decoder.get(), packet.get()) == 0);
+		TEST_REQUIRE(receive() == AVERROR(EAGAIN));
+		av_packet_unref(packet.get());
+	}
+	TEST_REQUIRE(read == AVERROR_EOF);
+	TEST_REQUIRE(avcodec_send_packet(decoder.get(), nullptr) == 0);
+	TEST_REQUIRE(receive() == AVERROR_EOF);
+	TEST_REQUIRE(count == 48);
 	return 0;
 }
 
