@@ -8,6 +8,7 @@ set(KVAZAAR_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0005-win-pragma-comment-lib-pthread-when-KVZ_STATIC_LIB.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0006-msvc-default-thread-attributes.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0007-version-header-in-binary-dir.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0008-clang-cl-sse41-target.patch"
 )
 
 set(KVAZAAR_OPTIONS
