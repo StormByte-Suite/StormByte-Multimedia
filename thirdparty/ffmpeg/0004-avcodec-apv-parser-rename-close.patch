@@ -1,0 +1,44 @@
+From c04852057b4da274ed5ab7fb7082e0ad2a1d0bd9 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Sun, 18 Oct 2026 22:07:54 +0000
+Subject: [PATCH] avcodec/apv_parser: rename close to apv_close
+
+Apple Clang LTO keeps this static function as the symbol close and
+then binds libavformat's close(fd) to it. file_close() passes the
+descriptor (3). The parser destructor treats that integer as an
+AVCodecParserContext and faults on the first load (EXC_BAD_ACCESS at
+0x3b, which is 3+0x38). avformat_close_input dies after a successful
+decode. Linux and Windows do not merge the two symbols, so the same
+binary is fine there.
+
+The FFV1 parser had the same function name and was renamed in
+584c41a4ac. This is the only remaining definition.
+
+Signed-off-by: David C. Manuelda <StormByte@gmail.com>
+---
+ libavcodec/apv_parser.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libavcodec/apv_parser.c b/libavcodec/apv_parser.c
+index 3417bd751f..f81b3b8a89 100644
+--- a/libavcodec/apv_parser.c
++++ b/libavcodec/apv_parser.c
+@@ -194,7 +194,7 @@ static av_cold int init(AVCodecParserContext *s)
+     return 0;
+ }
+ 
+-static av_cold void close(AVCodecParserContext *s)
++static av_cold void apv_close(AVCodecParserContext *s)
+ {
+     APVParseContext *p = s->priv_data;
+     ParseContext *pc = &p->pc;
+@@ -209,5 +209,5 @@ const FFCodecParser ff_apv_parser = {
+     .priv_data_size = sizeof(APVParseContext),
+     .init           = init,
+     .parse          = parse,
+-    .close          = close,
++    .close          = apv_close,
+ };
+-- 
+2.39.5
+
