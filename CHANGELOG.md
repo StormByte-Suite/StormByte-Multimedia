@@ -41,6 +41,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Bundled pthread-win32 is not instrumented and not built with LTO when the compiler is Clang. Its C cleanup implements `pthread_cond_wait` with `setjmp`. Profile instrumentation left kvazaar's workers asleep at 0% CPU after `Encoder in`, so `pipeline.test_kvazaar_encodes_hevc_matroska` never produced a packet. `cl.exe` is unchanged.
 - Clang PGO drops `.profraw` files left by compiler probes before ctest, and `llvm-profdata merge` uses `-failure-mode=all`. A probe writes a few hundred bytes for `main`, with a padded empty symbol name. The default failure mode is `any`, so that one file aborted the merge even after the instrumented tests had passed.
 - Bundled libvmaf is built as C++17 on Windows. Its Meson file asks for C++11, and `svm.cpp` includes the MSVC STL. The Visual Studio 18 `<ratio>` header uses digit separators (`0xFFFF'FFFF`), which C++11 rejects, so clang-cl stopped there. An older STL still compiles as C++11, which is why a local VS 2022 build passed. The Unix build stays C++11.
+- Bundled rubberband is built as C++17 on Windows for the same reason. Its Meson file asks for C++11, and the Visual Studio 18 STL needs C++14 (`constexpr` loops, deduced `auto` and digit separators in `__msvc_bit_utils.hpp`, `<tuple>` and `<xutility>`). clang-cl stopped on `rubberband-c.cpp`. The Unix build stays C++11.
 
 ### Changed
 

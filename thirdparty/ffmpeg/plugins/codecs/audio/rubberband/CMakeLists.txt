@@ -11,6 +11,10 @@ set(RUBBERBAND_OPTIONS
 	cmdline=disabled
 	tests=disabled
 )
+if(WIN32)
+	# The VS 18 STL no longer parses as C++11. Rubberband asks for that.
+	list(APPEND RUBBERBAND_OPTIONS "cpp_std=c++17")
+endif()
 
 buildmaster_component(
 	rubberband
