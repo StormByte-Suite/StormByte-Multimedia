@@ -11,12 +11,7 @@ else()
 	add_subdirectory(logger)
 	add_subdirectory(system)
 	add_subdirectory(buffer)
-	buildmaster_link(StormByte-Logger StormByte-Base)
-	buildmaster_link(StormByte-System StormByte-Base)
-	buildmaster_link(StormByte-Buffer StormByte-Base StormByte-Logger StormByte-System)
 endif()
-
-buildmaster_link(StormByte-Multimedia StormByte-Base StormByte-Buffer StormByte-Logger StormByte-System)
 
 # doc/ is added before this directory, so the unpack targets do not exist yet there.
 if(TARGET StormByteMultimediaDoc)

@@ -33,6 +33,8 @@ buildmaster_component(
 	"${_component_options}"
 )
 
+buildmaster_link(StormByte-Multimedia StormByte-Base StormByte-Buffer StormByte-Logger StormByte-System)
+
 if(BUILD_SHARED_LIBS)
 	target_compile_definitions(StormByte-Multimedia
 		PRIVATE StormByte_Multimedia_EXPORTS
