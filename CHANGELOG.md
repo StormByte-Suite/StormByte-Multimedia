@@ -21,7 +21,15 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.2...HEAD
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.3...HEAD
+
+## [1.0.3] - 2026-10-24
+
+### Changed
+
+- Windows Release optimizations use `/arch:AVX` instead of `/arch:AVX2`. The previous baseline required a Haswell-or-newer CPU (AVX2). `/arch:AVX` runs on Sandy Bridge and Ivy Bridge (including the i7-3770K) and later.
+
+[1.0.3]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.2...1.0.3
 
 ## [1.0.2] - 2026-10-23
 
