@@ -347,7 +347,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			owner.Fail("failed to copy source file metadata");
 			return false;
 		}
-		av_dict_set(&m_ctx->metadata, "ENCODER", WritingApp, 0);
 		if (!(ctx->oformat->flags & AVFMT_NOFILE)) {
 			ctx->pb = m_avio->Context();
 			ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
@@ -539,8 +538,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 					track.language = owner.Language(index);
 				if (owner.Title(index))
 					track.title = owner.Title(index);
-				const auto encoderTag = track.encoder->EncoderTag();
-				av_dict_set(&stream->metadata, "ENCODER", encoderTag.data(), 0);
 			}
 
 			else {
@@ -576,6 +573,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				av_dict_set(&stream->metadata, "language", track.language->data(), 0);
 			if (track.title)
 				av_dict_set(&stream->metadata, "title", track.title->data(), 0);
+			// MP3 reuses this field for the technical Xing/LAME gapless identifier.
+			if (std::strcmp(m_ctx->oformat->name, "mp3") != 0
+				&& av_dict_set(&stream->metadata, "encoder", WritingApp, 0) < 0) {
+				owner.Fail("failed to set output stream branding");
+				return false;
+			}
 
 			m_policy->PrepareStream(*stream, haveDefaultVideo, haveDefaultAudio);
 
@@ -611,6 +614,20 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 		AVDictionary* opts = nullptr;
 		m_policy->ConfigureHeader(owner, *m_ctx, spanUs, &opts);
+		const int initialized = avformat_init_output(m_ctx, &opts);
+		if (initialized < 0) {
+			av_dict_free(&opts);
+			owner.Fail(StormByte::Safe::String::ReplaceToken("avformat_init_output failed: {}",
+				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(initialized))));
+			return false;
+		}
+		// FFmpeg initializes its encoder tag in avformat_init_output.
+		if (av_dict_set(&m_ctx->metadata, "encoder", WritingApp, 0) < 0
+			|| av_dict_set(&m_ctx->metadata, "encoding_tool", WritingApp, 0) < 0) {
+			av_dict_free(&opts);
+			owner.Fail("failed to set output container branding");
+			return false;
+		}
 		const int rc = avformat_write_header(m_ctx, &opts);
 		av_dict_free(&opts);
 		if (rc < 0) {
@@ -626,10 +643,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			const FFmpeg::AVRational tb{stream->time_base.num, stream->time_base.den};
 			if (tb.num > 0 && tb.den > 0)
 				track.timeBase = tb;
-			if (track.encoder) {
-				const auto encoderTag = track.encoder->EncoderTag();
-				av_dict_set(&stream->metadata, "ENCODER", encoderTag.data(), 0);
-			}
 		}
 
 		m_header = true;
@@ -736,7 +749,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		if (!m_header)
 			WriteHeaderIfReady(owner);
 		if (m_header && !m_trailer && m_ctx) {
-			av_dict_set(&m_ctx->metadata, "ENCODER", WritingApp, 0);
 			av_write_trailer(m_ctx);
 			m_trailer = true;
 		}

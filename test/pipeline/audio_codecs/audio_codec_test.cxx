@@ -64,6 +64,13 @@ using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
 
 namespace {
+	int CheckOutputBranding(const File& file) {
+		const auto& encoder = file.Metadata().Encoder();
+		TEST_REQUIRE(encoder);
+		TEST_REQUIRE(encoder.value() == "StormByte-Multimedia " STORMBYTE_TEST_MULTIMEDIA_VERSION);
+		return 0;
+	}
+
 	int CheckAudioCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
 		std::uint8_t channels, std::string_view decoder = {}) {
@@ -105,6 +112,7 @@ namespace {
 		TEST_PHASE("opening media file for inspection");
 		auto encoded = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(encoded);
+		TEST_REQUIRE(CheckOutputBranding(encoded.value()) == 0);
 		const auto& duration = encoded.value().Duration();
 		TEST_REQUIRE(duration && duration.value().Nanoseconds().count() > 0);
 		return 0;
@@ -159,6 +167,7 @@ namespace {
 		auto encoded = File::Open(TestLocation(output));
 		TEST_REQUIRE(encoded);
 		TEST_REQUIRE(CheckPlaceholderTags(encoded.value()) == 0);
+		TEST_REQUIRE(CheckOutputBranding(encoded.value()) == 0);
 		return 0;
 	}
 
@@ -174,6 +183,7 @@ namespace {
 			return second;
 		auto encoded = File::Open(TestLocation(output));
 		TEST_REQUIRE(encoded);
+		TEST_REQUIRE(CheckOutputBranding(encoded.value()) == 0);
 		return CheckPlaceholderTags(encoded.value());
 	}
 
@@ -195,6 +205,13 @@ namespace {
 		TEST_REQUIRE(CheckSingleAudioOutput(output, container, codec, 2, 48000) == 0);
 		auto encoded = File::Open(TestLocation(output));
 		TEST_REQUIRE(encoded);
+		TEST_REQUIRE(CheckOutputBranding(encoded.value()) == 0);
+		if (codec == "MP3") {
+			const auto& before = source->Duration();
+			const auto& after = encoded->Duration();
+			TEST_REQUIRE(before && after);
+			TEST_REQUIRE(before->Nanoseconds() == after->Nanoseconds());
+		}
 		return CheckPlaceholderTags(encoded.value());
 	}
 }
@@ -298,6 +315,7 @@ int test_untagged_audio_does_not_gain_music_tags() {
 	auto encoded = File::Open(TestLocation(output));
 	TEST_REQUIRE(encoded);
 	const auto& tags = encoded->Metadata();
+	TEST_REQUIRE(CheckOutputBranding(encoded.value()) == 0);
 	TEST_REQUIRE(!tags.Title());
 	TEST_REQUIRE(!tags.Artist());
 	TEST_REQUIRE(!tags.Album());

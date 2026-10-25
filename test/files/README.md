@@ -48,7 +48,7 @@ The in-process HDR10+ suite checks public `File` detection against the static-on
   | Track | TRCK | `3` |
   | Disc | TPOS | `2` |
 
-  FFmpeg also writes its own encoder identifier (`Lavf63.1.102`); tests do not require that identifier to survive transcoding. SHA-256: `142c0bb795d29bab666824d0ddb5b908fe602efa888d779d73ae632f98a72b9e` (49,837 bytes).
+  The one-off FFmpeg authoring step writes its encoder identifier (`Lavf63.1.102`) into this immutable input fixture. Conversion and remux tests require output `File::Metadata().Encoder()` to equal `StormByte-Multimedia <current build version>`, not this source identifier. Backend technical vendor strings are separate and are not rewritten. SHA-256: `142c0bb795d29bab666824d0ddb5b908fe602efa888d779d73ae632f98a72b9e` (49,837 bytes).
 
   One-off authoring command, run from the repository root; tests neither invoke FFmpeg nor regenerate this fixed fixture:
 

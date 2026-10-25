@@ -1,5 +1,7 @@
 add_executable(MultimediaPipelineAudioCodecTests audio_codec_test.cxx)
 target_link_libraries(MultimediaPipelineAudioCodecTests PRIVATE multimedia_pipeline_test_support)
+target_compile_definitions(MultimediaPipelineAudioCodecTests PRIVATE
+	"STORMBYTE_TEST_MULTIMEDIA_VERSION=\"${PROJECT_VERSION}\"")
 if(WITH_GPL)
 	target_compile_definitions(MultimediaPipelineAudioCodecTests PRIVATE STORMBYTE_TEST_WITH_GPL)
 endif()

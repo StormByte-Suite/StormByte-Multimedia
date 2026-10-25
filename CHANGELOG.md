@@ -32,6 +32,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Encode and remux consistently brand supported editable encoder/application metadata as `StormByte-Multimedia <version>`, using the version read from `VERSION` at configure time. Branding is applied after muxer initialization so FFmpeg cannot replace it with its own identifier. Backend technical vendor fields remain unchanged, including the MP3 Xing/LAME identifier required for gapless delay/padding. Tests verify the exact build version across audio conversions and remux, and MP3 remux retains its duration.
 - Encode and remux now copy the source snapshot's title, artist, album, album artist, composer, genre, comment, copyright, date, track and disc numbers to supported destination metadata. Previously these fields were lost, including MP3-to-MP3 conversions. Output encoder identification is not copied from the source.
 - `File::Metadata()` falls back to stream comments for missing fields in single-audio files, making OpusTags and Vorbis comments readable through the existing typed API. Container tags retain precedence; files with multiple media streams do not merge track tags into file metadata. No public metadata editing API or arbitrary ID3-frame preservation is introduced.
 
