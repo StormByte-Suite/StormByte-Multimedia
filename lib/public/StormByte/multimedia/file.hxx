@@ -202,8 +202,11 @@ namespace StormByte {
 				const StormByte::Safe::Vector<Attachment>& Attachments() const noexcept;
 
 				/**
-				 * @brief Container-level tags captured at Open.
+				 * @brief File tags captured at Open.
 				 * @return Metadata snapshot.
+				 * @note Container tags take precedence. For a single audio stream
+				 * without other media streams (ignoring attachments and covers),
+				 * missing fields fall back to stream tags such as Vorbis comments.
 				 */
 				const Metadata::File& Metadata() const noexcept { return m_metadata; }
 

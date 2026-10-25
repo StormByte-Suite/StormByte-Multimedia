@@ -33,7 +33,53 @@ The in-process HDR10+ suite checks public `File` detection against the static-on
 ## Audio
 
 - `audio/noise_stereo.wav` and `audio/noise_stereo.mp3`: stereo PCM and MP3 sources.
+- `audio/noise_tagged.mp3`: independently generated white noise, seed `20261025`, amplitude `0.1`, two seconds before MP3 encoder padding, 48 kHz, two identical channels, LAME 192 kbit/s. Authored with FFmpeg 9.0.2 on 2026-10-25, with ID3v2.3 and no ID3v1, artwork, lyrics or copyright tag. All descriptive values are placeholders, not references to artists or recordings.
+
+  | Public field | ID3v2.3 frame | Value |
+  | --- | --- | --- |
+  | Title | TIT2 | `Placeholder Track` |
+  | Artist | TPE1 | `Placeholder Artist` |
+  | Album | TALB | `Placeholder Album` |
+  | AlbumArtist | TPE2 | `Placeholder Album Artist` |
+  | Composer | TCOM | `Placeholder Composer` |
+  | Genre | TCON | `Test` |
+  | Comment | COMM | `Synthetic noise fixture` |
+  | Date | TYER | `2026` |
+  | Track | TRCK | `3` |
+  | Disc | TPOS | `2` |
+
+  FFmpeg also writes its own encoder identifier (`Lavf63.1.102`); tests do not require that identifier to survive transcoding. SHA-256: `142c0bb795d29bab666824d0ddb5b908fe602efa888d779d73ae632f98a72b9e` (49,837 bytes).
+
+  One-off authoring command, run from the repository root; tests neither invoke FFmpeg nor regenerate this fixed fixture:
+
+  ```sh
+  ffmpeg -hide_banner -loglevel error -n -f lavfi \
+    -i 'anoisesrc=color=white:amplitude=0.1:sample_rate=48000:duration=2:seed=20261025' \
+    -ac 2 -c:a libmp3lame -b:a 192k -id3v2_version 3 -write_id3v1 0 \
+    -map_metadata -1 \
+    -metadata title='Placeholder Track' -metadata artist='Placeholder Artist' \
+    -metadata album='Placeholder Album' -metadata album_artist='Placeholder Album Artist' \
+    -metadata composer='Placeholder Composer' -metadata genre='Test' \
+    -metadata comment='Synthetic noise fixture' -metadata date='2026' \
+    -metadata track='3' -metadata disc='2' test/files/audio/noise_tagged.mp3
+  ```
+
 - `audio/noise_51.m4a`: 5.1 AAC source.
+- `audio/noise_tagged.opus`: independently generated white noise (not converted from the MP3 fixture), seed `20261026`, amplitude `0.1`, two seconds before encoder padding, 48 kHz, two identical channels, libopus at 128 kbit/s. Contains the same ten placeholder values listed for `audio/noise_tagged.mp3`, stored as OpusTags/Vorbis comments on the audio stream rather than ID3. No copyright, lyrics or artwork. Authored with FFmpeg 9.0.2 on 2026-10-25; its encoder identifier is `Lavc63.1.102 libopus`. SHA-256: `9cabff81136745bc4fd53082f6319354d221e3fdb71dd90b31419ec01a883394` (23,180 bytes).
+
+  One-off authoring command:
+
+  ```sh
+  ffmpeg -hide_banner -loglevel error -n -f lavfi \
+    -i 'anoisesrc=color=white:amplitude=0.1:sample_rate=48000:duration=2:seed=20261026' \
+    -ac 2 -c:a libopus -b:a 128k -map_metadata -1 \
+    -metadata title='Placeholder Track' -metadata artist='Placeholder Artist' \
+    -metadata album='Placeholder Album' -metadata album_artist='Placeholder Album Artist' \
+    -metadata composer='Placeholder Composer' -metadata genre='Test' \
+    -metadata comment='Synthetic noise fixture' -metadata date='2026' \
+    -metadata track='3' -metadata disc='2' test/files/audio/noise_tagged.opus
+  ```
+
 - `audio/noise_51.opus`: 5.1 Opus source.
 - `audio/noise_71.wav`: deterministic seeded PCM S16 LE noise, 48 kHz, eight channels and an explicit WAVEFORMATEXTENSIBLE 7.1 speaker mask (`0x63f`). Covers permitted automatic 7.1-to-5.1 encoding to AC-3/E-AC3 without a manual downmix filter.
 - `audio/noise_opus_source_51.opus`: explicit 5.1 Opus decoder input.
@@ -68,6 +114,7 @@ Generated media is written under the configured `STORMBYTE_TEST_OUTPUT_DIR`, nor
 intermediate inputs within the same case and do not depend on execution order.
 
 - `pipeline/audio-codecs/`: stereo PCM, surround AAC and Opus fixtures exercise FDK-AAC, Vorbis, Opus, LAME, FLAC, ALAC and AC-3/E-AC3. The cases inspect container and codec identities, channel count, 48 kHz sample rate and positive duration. FDK-AAC is required when FFmpeg is bundled with nonfree enabled.
+- Tagged-audio cases independently convert both `audio/noise_tagged.mp3` and `audio/noise_tagged.opus` to Vorbis/Ogg, Opus, native FLAC, ALAC/M4A, AAC/M4A and MP3, then reopen each output through public `File::Metadata()` and assert all ten placeholder fields and the absence of copyright. MP3-to-MP3 and Opus-to-Opus explicitly select encoders and recode; Opus-to-MP3 explicitly selects `libmp3lame`. The MP3 fixture also roundtrips through Vorbis and Opus back to MP3, exercising metadata read from stream comments and written back as ID3. Separate MP3-to-MP3 and Opus-to-Opus remux cases call `Remux()` without an encoder and preserve the same fields. An untagged WAV-to-Opus case must not invent music tags. Tests compare semantic values, not ID3 bytes: Vorbis/Opus/FLAC use Vorbis comments and M4A uses MP4 metadata. Optional encoder availability follows the existing codec test skip policy.
 - `pipeline/video-codecs/`: the H.264 SDR MP4 fixture is scaled to 320x192 for SVT/libaom AV1, VP8/VP9, x264, OpenH264, Kvazaar and x265. AV1 decoder cases generate their own input before selecting dav1d or libaom. The scaled dimensions are multiples of eight for Kvazaar compatibility.
 - `pipeline/mux-policy/`: the stereo PCM fixture produces direct FLAC, FLAC in OGA, ALAC in CAF and direct E-AC3. Negative cases cover incompatible codec/container combinations and WebM attachment rejection.
 - `pipeline/mp4-policy/`: the five-track H.264/AAC/timed-text MP4 fixture exercises individual and mixed outputs, two audio or subtitle tracks, reversed audio order, all five tracks, `.m4a`/`.m4b` aliases and mixed remux/encode. The HEVC MKV supplies a HEVC/AAC remux case. Its synthetic PNG cover is preserved byte-for-byte in video MP4 and audio-only M4A as cover art, and in Matroska as a real attachment. `File` must expose each cover through `Attachments()` without adding a playable video stream. Matroska additionally preserves the original filename. The IPA Mona font exercises explicit rejection of resources that the MP4 backend cannot represent; this is an implementation limit, not a claim that ISO BMFF forbids embedded resources. Successful outputs are checked for track count, order, codec, language, dimensions, audio properties and duration.

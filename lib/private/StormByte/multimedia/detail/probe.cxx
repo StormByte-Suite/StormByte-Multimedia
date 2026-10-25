@@ -108,32 +108,50 @@ StormByte::Multimedia::Detail::Probe::Disposition(int flags) noexcept {
 
 StormByte::Multimedia::Metadata::File
 StormByte::Multimedia::Detail::Probe::File(const FFmpeg::AVFormatContext& ctx) noexcept {
+	const auto streams = ctx.Streams();
+	const FFmpeg::AVStream* audio = nullptr;
+	for (const auto& stream : streams) {
+		if (stream.Type() == AVMEDIA_TYPE_ATTACHMENT
+			|| (stream.Disposition() & AV_DISPOSITION_ATTACHED_PIC))
+			continue;
+		if (stream.Type() != AVMEDIA_TYPE_AUDIO || audio) {
+			audio = nullptr;
+			break;
+		}
+		audio = &stream;
+	}
+	const auto tag = [&ctx, audio](const char* key) {
+		auto value = NonEmpty(ctx.Tag(key));
+		if (!value && audio)
+			value = NonEmpty(audio->Tag(key));
+		return value;
+	};
 	Metadata::File meta;
-	if (const auto value = NonEmpty(ctx.Tag("title")))
+	if (const auto value = tag("title"))
 		meta.Title(*value);
-	if (const auto value = NonEmpty(ctx.Tag("artist")))
+	if (const auto value = tag("artist"))
 		meta.Artist(*value);
-	if (const auto value = NonEmpty(ctx.Tag("album")))
+	if (const auto value = tag("album"))
 		meta.Album(*value);
-	if (const auto value = NonEmpty(ctx.Tag("album_artist")))
+	if (const auto value = tag("album_artist"))
 		meta.AlbumArtist(*value);
-	if (const auto value = NonEmpty(ctx.Tag("composer")))
+	if (const auto value = tag("composer"))
 		meta.Composer(*value);
-	if (const auto value = NonEmpty(ctx.Tag("genre")))
+	if (const auto value = tag("genre"))
 		meta.Genre(*value);
-	if (const auto value = NonEmpty(ctx.Tag("comment")))
+	if (const auto value = tag("comment"))
 		meta.Comment(*value);
-	if (const auto value = NonEmpty(ctx.Tag("copyright")))
+	if (const auto value = tag("copyright"))
 		meta.Copyright(*value);
-	if (const auto value = NonEmpty(ctx.Tag("encoder")))
+	if (const auto value = tag("encoder"))
 		meta.Encoder(*value);
-	if (const auto value = NonEmpty(ctx.Tag("date")))
+	if (const auto value = tag("date"))
 		meta.Date(*value);
-	else if (const auto value = NonEmpty(ctx.Tag("year")))
+	else if (const auto value = tag("year"))
 		meta.Date(*value);
-	if (const auto track = ParseIndex(ctx.Tag("track")))
+	if (const auto track = ParseIndex(tag("track")))
 		meta.Track(*track);
-	if (const auto disc = ParseIndex(ctx.Tag("disc")))
+	if (const auto disc = ParseIndex(tag("disc")))
 		meta.Disc(*disc);
 	return meta;
 }

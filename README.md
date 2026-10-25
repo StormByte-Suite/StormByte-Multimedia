@@ -400,6 +400,7 @@ The library publishes `Finished` when every participating stage has completed su
 - **`Remuxer`** forwards compressed packets and adapts them to the destination. “Copy” as a stage does not exist.
 - **Caps** (hopper capacity and stage ceilings) limit individual queues, not total job memory. Do not treat EOF as Fail. Recoverable logo failures can become Watermark passthrough; invalid plans, unsupported encoders and fatal processing errors remain failures.
 - **Frames and metadata** — filters can replace decoded content while the pipeline preserves the timing and properties it can safely retain. HDR and Dolby Vision metadata is not generally recalibrated to describe changed pixels; see [Dolby Vision metadata and transforms](#dolby-vision-metadata-and-transforms).
+- **Music tags** — the muxer copies the source snapshot's title, artist, album, album artist, composer, genre, comment, copyright, date, track and disc numbers during encode and remux. The destination container decides how to store them: ID3 in MP3, Vorbis comments in Ogg/Opus/FLAC, or MP4 metadata in M4A. `File::Metadata()` reads these fields, preferring container values and falling back to stream comments only for a single audio stream without other media streams (covers and attachments do not count). Output encoder identification is generated afresh, not copied. This preserves the existing typed fields, not arbitrary ID3 frames, track/disc totals or a byte-identical ID3 block; formats without matching tags cannot preserve them. There is no public metadata editing API.
 
 ## DLL boundaries
 

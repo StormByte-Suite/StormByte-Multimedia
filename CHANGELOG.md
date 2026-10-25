@@ -28,6 +28,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Added
 
 - Public, DLL-exported `Codec::HasAccess(Access, Features)` checks whether an available encoder or decoder preserves all requested features. Read and Write are checked independently against private implementation tables and actual FFmpeg implementation availability. Encoder queries share the pipeline selector, so an H.265 build with only Kvazaar no longer appears HDR10- or Dolby Vision-capable to feature-aware callers. The existing generic access query is unchanged; an empty feature mask retains its result.
+- Fixed synthetic-noise MP3 and Opus fixtures with equivalent placeholder music tags, documented authoring commands and checksums. Metadata tests cover both sources converted to Vorbis, Opus, FLAC, ALAC, AAC and MP3, MP3 roundtrips through Vorbis/Opus, remux of both formats, and absence of invented tags on untagged audio.
+
+### Fixed
+
+- Encode and remux now copy the source snapshot's title, artist, album, album artist, composer, genre, comment, copyright, date, track and disc numbers to supported destination metadata. Previously these fields were lost, including MP3-to-MP3 conversions. Output encoder identification is not copied from the source.
+- `File::Metadata()` falls back to stream comments for missing fields in single-audio files, making OpusTags and Vorbis comments readable through the existing typed API. Container tags retain precedence; files with multiple media streams do not merge track tags into file metadata. No public metadata editing API or arbitrary ID3-frame preservation is introduced.
 
 ### Changed
 

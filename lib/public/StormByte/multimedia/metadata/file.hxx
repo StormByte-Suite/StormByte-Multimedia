@@ -89,8 +89,9 @@ namespace StormByte {
 		namespace Metadata {
 			/**
 			 * @class File
-			 * @brief Container-level tags and header fields captured at Open.
+			 * @brief File tags and header fields captured at Open.
 			 *
+			 * Container tags take precedence over single-audio stream comments.
 			 * Duration that requires a demux scan lives on Multimedia::File, not here.
 			 */
 			class STORMBYTE_MULTIMEDIA_PUBLIC File {

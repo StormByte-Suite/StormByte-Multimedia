@@ -53,6 +53,8 @@
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
+#include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/metadata/file.hxx>
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
 #include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/multimedia/pipeline/config/video.hxx>
@@ -93,6 +95,29 @@ namespace {
 	constexpr std::int64_t InterleaveSlotUs = 40LL * 1000;
 	constexpr std::int64_t InterleaveFloorUs = 250000;
 	constexpr std::int64_t InterleaveMixedUs = 60LL * 1000 * 1000;
+
+	bool CopyFileTags(AVDictionary*& destination,
+		const StormByte::Multimedia::Metadata::File& source) noexcept {
+		const auto text = [&destination](const char* key,
+			const StormByte::Safe::Optional<StormByte::Safe::String>& value) {
+			return !value || av_dict_set(&destination, key, value->data(), 0) >= 0;
+		};
+		const auto index = [&destination](const char* key,
+			const StormByte::Safe::Optional<unsigned>& value) {
+			return !value || av_dict_set(&destination, key, std::to_string(*value).c_str(), 0) >= 0;
+		};
+		return text("title", source.Title())
+			&& text("artist", source.Artist())
+			&& text("album", source.Album())
+			&& text("album_artist", source.AlbumArtist())
+			&& text("composer", source.Composer())
+			&& text("genre", source.Genre())
+			&& text("comment", source.Comment())
+			&& text("copyright", source.Copyright())
+			&& text("date", source.Date())
+			&& index("track", source.Track())
+			&& index("disc", source.Disc());
+	}
 
 	bool Encodes(const StormByte::Multimedia::Pipeline::Track& track) noexcept {
 		const auto* config = track.Config();
@@ -318,6 +343,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		m_ctx = ctx;
+		if (!CopyFileTags(m_ctx->metadata, owner.Plan()->Snapshot().Metadata())) {
+			owner.Fail("failed to copy source file metadata");
+			return false;
+		}
 		av_dict_set(&m_ctx->metadata, "ENCODER", WritingApp, 0);
 		if (!(ctx->oformat->flags & AVFMT_NOFILE)) {
 			ctx->pb = m_avio->Context();

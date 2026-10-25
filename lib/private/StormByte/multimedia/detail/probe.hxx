@@ -67,7 +67,7 @@ namespace StormByte::Multimedia::Detail {
 	class STORMBYTE_MULTIMEDIA_PRIVATE Probe {
 		public:
 			/**
-			 * @brief Container tags from an open demuxer.
+			 * @brief Container tags with single-audio stream fallback.
 			 * @param context Format context.
 			 * @return Snapshot.
 			 */

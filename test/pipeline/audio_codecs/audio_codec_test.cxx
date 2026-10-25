@@ -128,6 +128,188 @@ namespace {
 		return CheckAudioCodec(encoded, OutputPath(decodedName), "Matroska", "FLAC",
 			"flac", 2, decoder);
 	}
+
+	int CheckPlaceholderTags(const File& file) {
+		const auto& tags = file.Metadata();
+		TEST_REQUIRE(tags.Title() && tags.Title().value() == "Placeholder Track");
+		TEST_REQUIRE(tags.Artist() && tags.Artist().value() == "Placeholder Artist");
+		TEST_REQUIRE(tags.Album() && tags.Album().value() == "Placeholder Album");
+		TEST_REQUIRE(tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist");
+		TEST_REQUIRE(tags.Composer() && tags.Composer().value() == "Placeholder Composer");
+		TEST_REQUIRE(tags.Genre() && tags.Genre().value() == "Test");
+		TEST_REQUIRE(tags.Comment() && tags.Comment().value() == "Synthetic noise fixture");
+		TEST_REQUIRE(tags.Date() && tags.Date().value() == "2026");
+		TEST_REQUIRE(tags.Track() && tags.Track().value() == 3);
+		TEST_REQUIRE(tags.Disc() && tags.Disc().value() == 2);
+		TEST_REQUIRE(!tags.Copyright());
+		return 0;
+	}
+
+	int CheckTaggedAudioEncode(std::string_view destination, std::string_view container,
+		std::string_view codec, std::string_view encoder,
+		std::string_view fixture = "audio/noise_tagged.mp3") {
+		const auto input = FixturePath(fixture);
+		auto source = File::Open(TestLocation(input));
+		TEST_REQUIRE(source);
+		TEST_REQUIRE(CheckPlaceholderTags(source.value()) == 0);
+		const auto output = OutputPath(destination);
+		const int result = CheckAudioCodec(input, output, container, codec, encoder, 2);
+		if (result != 0)
+			return result;
+		auto encoded = File::Open(TestLocation(output));
+		TEST_REQUIRE(encoded);
+		TEST_REQUIRE(CheckPlaceholderTags(encoded.value()) == 0);
+		return 0;
+	}
+
+	int CheckTaggedAudioRoundtrip(std::string_view destination, std::string_view container,
+		std::string_view codec, std::string_view encoder) {
+		const int first = CheckTaggedAudioEncode(destination, container, codec, encoder);
+		if (first != 0)
+			return first;
+		const auto output = OutputPath("pipeline/audio-codecs/tagged-roundtrip.mp3");
+		const int second = CheckAudioCodec(OutputPath(destination), output, "MP3", "MP3",
+			"libmp3lame", 2);
+		if (second != 0)
+			return second;
+		auto encoded = File::Open(TestLocation(output));
+		TEST_REQUIRE(encoded);
+		return CheckPlaceholderTags(encoded.value());
+	}
+
+	int CheckTaggedAudioRemux(std::string_view fixture, std::string_view destination,
+		std::string_view container, std::string_view codec) {
+		const auto input = FixturePath(fixture);
+		auto source = File::Open(TestLocation(input));
+		TEST_REQUIRE(source);
+		TEST_REQUIRE(CheckPlaceholderTags(source.value()) == 0);
+		const auto output = OutputPath(destination);
+		{
+			auto logger = MakeLogger();
+			Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+			job.Audio(0).Remux();
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		TEST_REQUIRE(CheckSingleAudioOutput(output, container, codec, 2, 48000) == 0);
+		auto encoded = File::Open(TestLocation(output));
+		TEST_REQUIRE(encoded);
+		return CheckPlaceholderTags(encoded.value());
+	}
+}
+
+int test_tagged_mp3_fixture_metadata() {
+	auto source = File::Open(TestLocation(FixturePath("audio/noise_tagged.mp3")));
+	TEST_REQUIRE(source);
+	TEST_REQUIRE(source->Container().Name() == "MP3");
+	TEST_REQUIRE(source->Streams().size() == 1);
+	TEST_REQUIRE(source->Streams()[0].Codec().Name() == "MP3");
+	return CheckPlaceholderTags(source.value());
+}
+
+int test_tagged_opus_fixture_metadata() {
+	auto source = File::Open(TestLocation(FixturePath("audio/noise_tagged.opus")));
+	TEST_REQUIRE(source);
+	TEST_REQUIRE(source->Container().Name() == "Opus");
+	TEST_REQUIRE(source->Streams().size() == 1);
+	TEST_REQUIRE(source->Streams()[0].Codec().Name() == "Opus");
+	return CheckPlaceholderTags(source.value());
+}
+
+int test_opus_tags_preserved_in_vorbis() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.ogg", "Ogg", "Vorbis",
+		"libvorbis", "audio/noise_tagged.opus");
+}
+
+int test_opus_tags_preserved_in_opus() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.opus", "Opus", "Opus",
+		"libopus", "audio/noise_tagged.opus");
+}
+
+int test_opus_tags_preserved_in_flac() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.flac", "FLAC", "FLAC",
+		"flac", "audio/noise_tagged.opus");
+}
+
+int test_opus_tags_preserved_in_alac() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged-alac.m4a", "MP4", "ALAC",
+		"alac", "audio/noise_tagged.opus");
+}
+
+int test_opus_tags_preserved_in_aac() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged-aac.m4a", "MP4", "AAC",
+		"aac", "audio/noise_tagged.opus");
+}
+
+int test_opus_tags_preserved_in_mp3() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.mp3", "MP3", "MP3",
+		"libmp3lame", "audio/noise_tagged.opus");
+}
+
+int test_mp3_tags_preserved_in_vorbis() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.ogg", "Ogg", "Vorbis", "libvorbis");
+}
+
+int test_mp3_tags_preserved_in_opus() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.opus", "Opus", "Opus", "libopus");
+}
+
+int test_mp3_tags_preserved_in_flac() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.flac", "FLAC", "FLAC", "flac");
+}
+
+int test_mp3_tags_preserved_in_alac() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged-alac.m4a", "MP4", "ALAC", "alac");
+}
+
+int test_mp3_tags_preserved_in_aac() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged-aac.m4a", "MP4", "AAC", "aac");
+}
+
+int test_mp3_tags_preserved_in_mp3() {
+	return CheckTaggedAudioEncode("pipeline/audio-codecs/tagged.mp3", "MP3", "MP3", "libmp3lame");
+}
+
+int test_mp3_tags_roundtrip_through_vorbis() {
+	return CheckTaggedAudioRoundtrip("pipeline/audio-codecs/tagged.ogg", "Ogg", "Vorbis", "libvorbis");
+}
+
+int test_mp3_tags_roundtrip_through_opus() {
+	return CheckTaggedAudioRoundtrip("pipeline/audio-codecs/tagged.opus", "Opus", "Opus", "libopus");
+}
+
+int test_mp3_tags_preserved_in_remux() {
+	return CheckTaggedAudioRemux("audio/noise_tagged.mp3",
+		"pipeline/audio-codecs/tagged-remux.mp3", "MP3", "MP3");
+}
+
+int test_opus_tags_preserved_in_remux() {
+	return CheckTaggedAudioRemux("audio/noise_tagged.opus",
+		"pipeline/audio-codecs/tagged-remux.opus", "Opus", "Opus");
+}
+
+int test_untagged_audio_does_not_gain_music_tags() {
+	const auto output = OutputPath("pipeline/audio-codecs/untagged.opus");
+	const int result = CheckAudioCodec(FixturePath("audio/noise_stereo.wav"), output,
+		"Opus", "Opus", "libopus", 2);
+	if (result != 0)
+		return result;
+	auto encoded = File::Open(TestLocation(output));
+	TEST_REQUIRE(encoded);
+	const auto& tags = encoded->Metadata();
+	TEST_REQUIRE(!tags.Title());
+	TEST_REQUIRE(!tags.Artist());
+	TEST_REQUIRE(!tags.Album());
+	TEST_REQUIRE(!tags.AlbumArtist());
+	TEST_REQUIRE(!tags.Composer());
+	TEST_REQUIRE(!tags.Genre());
+	TEST_REQUIRE(!tags.Comment());
+	TEST_REQUIRE(!tags.Date());
+	TEST_REQUIRE(!tags.Track());
+	TEST_REQUIRE(!tags.Disc());
+	TEST_REQUIRE(!tags.Copyright());
+	return 0;
 }
 
 int test_fdk_aac_encodes_stereo_mp4() {
@@ -259,6 +441,25 @@ int test_rubberband_stretches_stereo_wav() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_tagged_mp3_fixture_metadata", test_tagged_mp3_fixture_metadata},
+		TestEntry{"test_tagged_opus_fixture_metadata", test_tagged_opus_fixture_metadata},
+		TestEntry{"test_opus_tags_preserved_in_vorbis", test_opus_tags_preserved_in_vorbis},
+		TestEntry{"test_opus_tags_preserved_in_opus", test_opus_tags_preserved_in_opus},
+		TestEntry{"test_opus_tags_preserved_in_flac", test_opus_tags_preserved_in_flac},
+		TestEntry{"test_opus_tags_preserved_in_alac", test_opus_tags_preserved_in_alac},
+		TestEntry{"test_opus_tags_preserved_in_aac", test_opus_tags_preserved_in_aac},
+		TestEntry{"test_opus_tags_preserved_in_mp3", test_opus_tags_preserved_in_mp3},
+		TestEntry{"test_opus_tags_preserved_in_remux", test_opus_tags_preserved_in_remux},
+		TestEntry{"test_mp3_tags_preserved_in_vorbis", test_mp3_tags_preserved_in_vorbis},
+		TestEntry{"test_mp3_tags_preserved_in_opus", test_mp3_tags_preserved_in_opus},
+		TestEntry{"test_mp3_tags_preserved_in_flac", test_mp3_tags_preserved_in_flac},
+		TestEntry{"test_mp3_tags_preserved_in_alac", test_mp3_tags_preserved_in_alac},
+		TestEntry{"test_mp3_tags_preserved_in_aac", test_mp3_tags_preserved_in_aac},
+		TestEntry{"test_mp3_tags_preserved_in_mp3", test_mp3_tags_preserved_in_mp3},
+		TestEntry{"test_mp3_tags_roundtrip_through_vorbis", test_mp3_tags_roundtrip_through_vorbis},
+		TestEntry{"test_mp3_tags_roundtrip_through_opus", test_mp3_tags_roundtrip_through_opus},
+		TestEntry{"test_mp3_tags_preserved_in_remux", test_mp3_tags_preserved_in_remux},
+		TestEntry{"test_untagged_audio_does_not_gain_music_tags", test_untagged_audio_does_not_gain_music_tags},
 		TestEntry{"test_fdk_aac_encodes_stereo_mp4", test_fdk_aac_encodes_stereo_mp4},
 		TestEntry{"test_fdk_aac_encodes_surround_mp4", test_fdk_aac_encodes_surround_mp4},
 		TestEntry{"test_fdk_aac_decodes_surround_to_flac", test_fdk_aac_decodes_surround_to_flac},
