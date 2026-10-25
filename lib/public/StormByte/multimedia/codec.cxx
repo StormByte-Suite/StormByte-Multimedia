@@ -49,6 +49,14 @@
  */
 
 #include <StormByte/multimedia/codec.hxx>
+#include <tables/decoder/table.hxx>
+#include <tables/encoder/table.hxx>
+
+#include <initializer_list>
+
+extern "C" {
+	#include <libavcodec/avcodec.h>
+}
 
 using namespace StormByte::Multimedia;
 
@@ -71,4 +79,24 @@ bool Codec::operator!=(const Codec& other) const noexcept {
 
 bool Codec::HasAccess(Access access) const noexcept {
 	return m_access.Has(access);
+}
+
+bool Codec::HasAccess(Access access, const Features& need) const noexcept {
+	if (!HasAccess(access))
+		return false;
+	if (need == Features{})
+		return true;
+	if (access.Has(Operation::Write) && !Tables::Encoder::PickEncoder(m_name, {}, need))
+		return false;
+	if (access.Has(Operation::Read)) {
+		for (const auto rows : {Tables::Decoder::Video(), Tables::Decoder::Audio()}) {
+			for (const auto& row : rows) {
+				if (m_name == row.codec && row.features.Has(need)
+					&& avcodec_find_decoder_by_name(row.name) != nullptr)
+					return true;
+			}
+		}
+		return false;
+	}
+	return true;
 }

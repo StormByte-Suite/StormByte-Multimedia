@@ -105,4 +105,21 @@ namespace StormByte::Multimedia::Tables::Encoder {
 	 * @return Span over the static subtitle table.
 	 */
 	std::span<const EncoderDef> Subtitle() noexcept;
+
+	/**
+	 * @brief Finds a listed row without checking features or availability.
+	 * @param codec StormByte codec name.
+	 * @param pin Required implementation name, or empty for any.
+	 * @return First matching row, or nullptr.
+	 */
+	const EncoderDef* FindRow(std::string_view codec, std::string_view pin) noexcept;
+
+	/**
+	 * @brief Selects the available encoder with the lowest preference value.
+	 * @param codec StormByte codec name, not an FFmpeg codec id.
+	 * @param pin Required implementation name, or empty for any.
+	 * @param need Features that one implementation must cover in full.
+	 * @return Matching row, or nullptr. Empty features still require a table row.
+	 */
+	const EncoderDef* PickEncoder(std::string_view codec, std::string_view pin, const Features& need) noexcept;
 }

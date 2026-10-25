@@ -106,6 +106,63 @@ int test_codec_names_resolve_by_public_identity() {
 	return 0;
 }
 
+int test_empty_codec_features_preserve_generic_access() {
+	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+		StormByte::Multimedia::Type::Subtitle, StormByte::Multimedia::Type::Attachment}) {
+		for (const auto codec : Registry::Instance().CodecList(type)) {
+			for (const auto access : {Access{}, Access{Operation::Read}, Access{Operation::Write},
+				Access{Operation::Read | Operation::Write}, Access{Operation::Attach}}) {
+				TEST_REQUIRE(codec.get().HasAccess(access, Features{})
+					== codec.get().HasAccess(access));
+				TEST_REQUIRE(codec.get().HasAccess(access, Feature::None)
+					== codec.get().HasAccess(access));
+			}
+		}
+	}
+	return 0;
+}
+
+int test_codec_features_do_not_combine_unrelated_capabilities() {
+	auto hevc = Registry::Instance().FindCodec("H.265");
+	TEST_REQUIRE(hevc);
+	const auto& codec = hevc->get();
+	TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::SurroundSound));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::SurroundSound));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Read | Operation::Write, Feature::SurroundSound));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::SurroundSound));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::DOVI | Feature::HardwareAcceleration));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::DOVI | Feature::HardwareAcceleration));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Attach, Feature::HDR10));
+	TEST_REQUIRE(codec.HasAccess(Operation::None, Feature::HDR10));
+	return 0;
+}
+
+int test_eac3_encoder_features_preserve_surround_sound() {
+	auto canonical = Registry::Instance().FindCodec("E-AC3");
+	auto alias = Registry::Instance().FindCodec("eac3");
+	TEST_REQUIRE(canonical);
+	TEST_REQUIRE(alias);
+	const auto& codec = canonical->get();
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::SurroundSound)
+		== codec.HasAccess(Operation::Write));
+	TEST_REQUIRE(alias->get().HasAccess(Operation::Write, Feature::SurroundSound)
+		== codec.HasAccess(Operation::Write, Feature::SurroundSound));
+	TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::HDR10));
+	return 0;
+}
+
+int test_codec_without_implementation_rows_keeps_only_generic_access() {
+	auto pcm = Registry::Instance().FindCodec("PCM S16 LE");
+	auto srt = Registry::Instance().FindCodec("SRT");
+	TEST_REQUIRE(pcm);
+	TEST_REQUIRE(srt);
+	TEST_REQUIRE(pcm->get().HasAccess(Operation::Read, Feature::None));
+	TEST_REQUIRE(!pcm->get().HasAccess(Operation::Read, Feature::Lossless));
+	TEST_REQUIRE(!pcm->get().HasAccess(Operation::Write, Feature::Lossless));
+	TEST_REQUIRE(!srt->get().HasAccess(Operation::Read, Feature::SideData));
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_matroska_extensions_resolve_to_same_container", test_matroska_extensions_resolve_to_same_container},
@@ -113,6 +170,10 @@ int main(int argc, char** argv) {
 		TestEntry{"test_mp4_extensions_resolve_to_same_container", test_mp4_extensions_resolve_to_same_container},
 		TestEntry{"test_mp4_registry_exposes_read_and_write_access", test_mp4_registry_exposes_read_and_write_access},
 		TestEntry{"test_codec_names_resolve_by_public_identity", test_codec_names_resolve_by_public_identity},
+		TestEntry{"test_empty_codec_features_preserve_generic_access", test_empty_codec_features_preserve_generic_access},
+		TestEntry{"test_codec_features_do_not_combine_unrelated_capabilities", test_codec_features_do_not_combine_unrelated_capabilities},
+		TestEntry{"test_eac3_encoder_features_preserve_surround_sound", test_eac3_encoder_features_preserve_surround_sound},
+		TestEntry{"test_codec_without_implementation_rows_keeps_only_generic_access", test_codec_without_implementation_rows_keeps_only_generic_access},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

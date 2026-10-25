@@ -64,7 +64,6 @@
 #include <map>
 #include <memory>
 #include <optional>
-#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -104,46 +103,6 @@ namespace {
 		if (ns <= 0)
 			return std::nullopt;
 		return Property::Duration{std::chrono::nanoseconds{ns}};
-	}
-
-	const Tables::Encoder::EncoderDef* ScanRows(
-		std::span<const Tables::Encoder::EncoderDef> rows,
-		std::string_view codec, std::string_view pin, bool matchNeed,
-		const Features& need) noexcept {
-		const Tables::Encoder::EncoderDef* best = nullptr;
-		for (const auto& row : rows) {
-			if (codec != row.codec)
-				continue;
-			if (!pin.empty() && pin != row.name)
-				continue;
-			if (matchNeed && !row.features.Has(need))
-				continue;
-			if (matchNeed && avcodec_find_encoder_by_name(row.name) == nullptr)
-				continue;
-			if (!matchNeed)
-				return &row;
-			if (!best || row.preference < best->preference)
-				best = &row;
-		}
-
-		return best;
-	}
-
-	const Tables::Encoder::EncoderDef* FindRow(std::string_view codec, std::string_view pin) noexcept {
-		if (const auto* row = ScanRows(Tables::Encoder::Video(), codec, pin, false, {}))
-			return row;
-		if (const auto* row = ScanRows(Tables::Encoder::Audio(), codec, pin, false, {}))
-			return row;
-		return ScanRows(Tables::Encoder::Subtitle(), codec, pin, false, {});
-	}
-
-	const Tables::Encoder::EncoderDef* PickEncoder(
-		std::string_view codec, std::string_view pin, const Features& need) noexcept {
-		if (const auto* row = ScanRows(Tables::Encoder::Video(), codec, pin, true, need))
-			return row;
-		if (const auto* row = ScanRows(Tables::Encoder::Audio(), codec, pin, true, need))
-			return row;
-		return ScanRows(Tables::Encoder::Subtitle(), codec, pin, true, need);
 	}
 
 	std::vector<std::pair<std::string, std::string>> SplitBlob(std::string_view blob) noexcept {
@@ -298,7 +257,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 			return std::nullopt;
 		}
 
-		const auto* listed = FindRow(stormName, pin);
+		const auto* listed = Tables::Encoder::FindRow(stormName, pin);
 		if (!listed || !listed->features.Has(need)) {
 			owner.Fail(need.Has(Feature::DOVI) ? "encoder implementation lacks required Dolby Vision support"
 				: "encoder implementation lacks required features");
@@ -306,7 +265,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		}
 	}
 
-	const auto* row = PickEncoder(stormName, pin, need);
+	const auto* row = Tables::Encoder::PickEncoder(stormName, pin, need);
 	const ::AVCodec* codec = nullptr;
 	if (row)
 		codec = avcodec_find_encoder_by_name(row->name);

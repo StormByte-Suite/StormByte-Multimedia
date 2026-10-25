@@ -25,6 +25,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [1.0.3] - 2026-10-24
 
+### Added
+
+- Public, DLL-exported `Codec::HasAccess(Access, Features)` checks whether an available encoder or decoder preserves all requested features. Read and Write are checked independently against private implementation tables and actual FFmpeg implementation availability. Encoder queries share the pipeline selector, so an H.265 build with only Kvazaar no longer appears HDR10- or Dolby Vision-capable to feature-aware callers. The existing generic access query is unchanged; an empty feature mask retains its result.
+
 ### Changed
 
 - Bundled third-party StormByte dependencies now require the matching patch releases (Base 2.2.1, Buffer 2.0.4, Logger 2.0.4, System 2.1.1 where applicable) so a bundled build picks up the /arch:AVX change.

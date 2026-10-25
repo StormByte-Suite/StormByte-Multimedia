@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/type_traits/safe.hxx>
 
@@ -148,6 +149,19 @@ namespace StormByte {
 				 * @return true if every bit in @p access is set.
 				 */
 				bool HasAccess(Access access) const noexcept;
+
+				/**
+				 * @brief Tests access while preserving all requested features.
+				 * @param access Flags to test; Read and Write are checked independently.
+				 * @param need Features required from a single implementation per direction.
+				 * @return true if the generic access flags are set and each requested
+				 * direction has an available implementation whose table row covers @p need.
+				 * @note Empty features are identical to HasAccess(access). Nonempty
+				 * features use StormByte codec names and FFmpeg implementation names,
+				 * never the generic FFmpeg codec-id fallback. Missing rows return false.
+				 * This does not probe hardware devices, settings or container compatibility.
+				 */
+				bool HasAccess(Access access, const Features& need) const noexcept;
 
 			private:
 				/**

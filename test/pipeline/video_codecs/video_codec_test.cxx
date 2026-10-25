@@ -267,6 +267,60 @@ int test_nvenc_feature_contract() {
 	return 0;
 }
 
+int test_hevc_feature_access_matches_available_encoders() {
+	auto hevc = Registry::Instance().FindCodec("H.265");
+	auto alias = Registry::Instance().FindCodec("hevc");
+	TEST_REQUIRE(hevc);
+	TEST_REQUIRE(alias);
+	const auto available = [](const char* name) {
+		return avcodec_find_encoder_by_name(name) != nullptr;
+	};
+	const bool x265 = available("libx265");
+	const bool hdr10 = x265 || available("hevc_nvenc") || available("hevc_qsv")
+		|| available("hevc_vaapi");
+	const auto& codec = hevc->get();
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10) == hdr10);
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::TenBit) == hdr10);
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::DOVI) == x265);
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10Plus) == x265);
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::DOVI) == x265);
+	TEST_REQUIRE(alias->get().HasAccess(Operation::Write, Feature::HDR10) == hdr10);
+	if (available("libkvazaar")) {
+		TEST_REQUIRE(codec.HasAccess(Operation::Write));
+		TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::None));
+		TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::MultiThreaded));
+	}
+	std::cout << "HEVC availability: kvazaar=" << available("libkvazaar")
+		<< ", x265=" << x265 << ", HDR10 encoder=" << hdr10 << '\n';
+	return 0;
+}
+
+int test_feature_access_checks_each_direction_independently() {
+	auto hevc = Registry::Instance().FindCodec("H.265");
+	auto eac3 = Registry::Instance().FindCodec("E-AC3");
+	TEST_REQUIRE(hevc);
+	TEST_REQUIRE(eac3);
+	const bool nativeHevc = avcodec_find_decoder_by_name("hevc") != nullptr;
+	const bool hdrDecoder = nativeHevc || avcodec_find_decoder_by_name("hevc_qsv") != nullptr
+		|| avcodec_find_decoder_by_name("hevc_vaapi") != nullptr;
+	TEST_REQUIRE(hevc->get().HasAccess(Operation::Read, Feature::HDR10) == hdrDecoder);
+	TEST_REQUIRE(hevc->get().HasAccess(Operation::Read, Feature::DOVI) == nativeHevc);
+	TEST_REQUIRE(hevc->get().HasAccess(Operation::Read, Feature::HDR10 | Feature::DOVI) == nativeHevc);
+	TEST_REQUIRE(eac3->get().HasAccess(Operation::Read, Feature::SurroundSound)
+		== (avcodec_find_decoder_by_name("eac3") != nullptr));
+	TEST_REQUIRE(eac3->get().HasAccess(Operation::Write, Feature::SurroundSound)
+		== (avcodec_find_encoder_by_name("eac3") != nullptr));
+	for (const auto ref : {hevc.value(), eac3.value()}) {
+		const auto& codec = ref.get();
+		for (const auto need : {Features{Feature::HDR10}, Features{Feature::DOVI},
+			Features{Feature::SurroundSound}, Features{Feature::HDR10 | Feature::TenBit}}) {
+			TEST_REQUIRE(codec.HasAccess(Operation::Read | Operation::Write, need)
+				== (codec.HasAccess(Operation::Read, need) && codec.HasAccess(Operation::Write, need)));
+		}
+	}
+	return 0;
+}
+
 int test_nvenc_encodes_h264_mp4() {
 	const auto* encoder = avcodec_find_encoder_by_name("h264_nvenc");
 	if (!encoder)
@@ -352,6 +406,8 @@ int RunPipelineVideoCodecTests(int argc, char** argv) {
 		TestEntry{"test_kvazaar_encodes_hevc_matroska", test_kvazaar_encodes_hevc_matroska},
 		TestEntry{"test_x265_encodes_hevc_matroska", test_x265_encodes_hevc_matroska},
 		TestEntry{"test_nvenc_feature_contract", test_nvenc_feature_contract},
+		TestEntry{"test_hevc_feature_access_matches_available_encoders", test_hevc_feature_access_matches_available_encoders},
+		TestEntry{"test_feature_access_checks_each_direction_independently", test_feature_access_checks_each_direction_independently},
 		TestEntry{"test_nvenc_encodes_h264_mp4", test_nvenc_encodes_h264_mp4},
 		TestEntry{"test_nvenc_encodes_h264_10bit_matroska", test_nvenc_encodes_h264_10bit_matroska},
 		TestEntry{"test_nvenc_encodes_hevc_main_matroska", test_nvenc_encodes_hevc_main_matroska},

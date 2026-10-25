@@ -116,6 +116,41 @@ Track mapping is the whole job description: call `Video(n)`, `Audio(n)` or `Subt
 
 ## Codec compatibility
 
+`Codec::HasAccess(Access)` remains a generic capability query. Use the
+`HasAccess(Access, Features)` overload to require all features from one available
+implementation in each requested direction:
+
+```cpp
+#include <StormByte/multimedia/registry.hxx>
+
+using namespace StormByte::Multimedia;
+
+auto hevc = Registry::Instance().FindCodec("H.265");
+if (hevc) {
+	const Codec& codec = hevc->get(); // CodecRef borrows the registry identity.
+	const bool writable = codec.HasAccess(Operation::Write);
+	const bool hdrWritable = codec.HasAccess(Operation::Write, Feature::HDR10);
+	const bool doviReadable = codec.HasAccess(Operation::Read, Feature::DOVI);
+	const bool hdrRoundTrip = codec.HasAccess(
+		Operation::Read | Operation::Write, Feature::HDR10 | Feature::TenBit);
+}
+```
+
+An empty feature mask is exactly the generic query, including for codecs absent
+from the implementation tables. With nonempty features, matching uses the
+StormByte identity (`H.265`, `E-AC3`), the row's full feature mask, and availability
+of its specific FFmpeg implementation name. Registry aliases such as `hevc` and
+`eac3` resolve to the same identities before querying. Encoder matching shares
+the pipeline selector and its lowest-preference rule: a build with only
+`libkvazaar` can write H.265 but cannot write it with HDR10 or Dolby Vision.
+Decoder matching uses the decoder tables; a direction without a covering,
+available row returns false.
+
+This is a compiled-implementation check, not an attempt to open a codec or
+hardware device. It does not guarantee valid settings, device availability,
+container compatibility, or preservation of metadata after filters. It does not
+change decoder selection, encode rules or plan policies.
+
 `Feature::DOVI` indicates that a listed implementation supports Dolby Vision metadata handling for that direction. It is separate from HDR10, HDR10+ and hardware-acceleration support; it does not promise support for every Dolby Vision profile or certify the visual result.
 
 | Direction | Format | Implementations listed with DOVI support |
