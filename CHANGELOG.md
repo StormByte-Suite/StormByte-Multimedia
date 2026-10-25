@@ -27,6 +27,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Added
 
+- Public, DLL-exported `Codec::SubtitleKind()` returns an optional `Text`, `Bitmap` or `Unknown` classification from FFmpeg codec descriptors, independently of encoder/decoder availability. Non-subtitle codecs return an empty optional; binary-packed text such as `mov_text` remains `Text`. Registry tests cover known and unclassified formats, and fixture tests verify PGS in Matroska, timed text in MP4, standalone SRT, and empty results for audio/video streams.
 - Public, DLL-exported `Codec::HasAccess(Access, Features)` checks whether an available encoder or decoder preserves all requested features. Read and Write are checked independently against private implementation tables and actual FFmpeg implementation availability. Encoder queries share the pipeline selector, so an H.265 build with only Kvazaar no longer appears HDR10- or Dolby Vision-capable to feature-aware callers. The existing generic access query is unchanged; an empty feature mask retains its result.
 - Fixed synthetic-noise MP3 and Opus fixtures with equivalent placeholder music tags, documented authoring commands and checksums. Metadata tests cover both sources converted to Vorbis, Opus, FLAC, ALAC, AAC and MP3, MP3 roundtrips through Vorbis/Opus, remux of both formats, and absence of invented tags on untagged audio.
 

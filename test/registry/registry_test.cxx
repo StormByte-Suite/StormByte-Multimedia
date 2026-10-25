@@ -163,8 +163,46 @@ int test_codec_without_implementation_rows_keeps_only_generic_access() {
 	return 0;
 }
 
+int test_subtitle_kind_classifies_text_and_bitmap() {
+	auto& registry = Registry::Instance();
+	for (const auto name : {"SRT", "SubRip", "ASS", "SSA", "WebVTT", "TTML",
+		"3GPP Timed Text", "mov_text", "subrip", "HDMV Text", "EIA-608"}) {
+		auto codec = registry.FindCodec(name);
+		TEST_REQUIRE(codec);
+		const auto kind = codec->get().SubtitleKind();
+		TEST_REQUIRE(kind && kind.value() == SubtitleKind::Text);
+	}
+	for (const auto name : {"PGS", "hdmv_pgs_subtitle", "DVD Subtitle", "DVB Subtitle", "XSUB"}) {
+		auto codec = registry.FindCodec(name);
+		TEST_REQUIRE(codec);
+		const auto kind = codec->get().SubtitleKind();
+		TEST_REQUIRE(kind && kind.value() == SubtitleKind::Bitmap);
+	}
+	return 0;
+}
+
+int test_subtitle_kind_distinguishes_unknown_from_not_applicable() {
+	auto& registry = Registry::Instance();
+	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+		StormByte::Multimedia::Type::Attachment}) {
+		for (const auto codec : registry.CodecList(type))
+			TEST_REQUIRE(!codec.get().SubtitleKind());
+	}
+	for (const auto codec : registry.CodecList(StormByte::Multimedia::Type::Subtitle))
+		TEST_REQUIRE(codec.get().SubtitleKind());
+	for (const auto name : {"DVB Teletext", "ARIB Caption", "IVTV VBI"}) {
+		auto codec = registry.FindCodec(name);
+		TEST_REQUIRE(codec);
+		const auto kind = codec->get().SubtitleKind();
+		TEST_REQUIRE(kind && kind.value() == SubtitleKind::Unknown);
+	}
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_subtitle_kind_classifies_text_and_bitmap", test_subtitle_kind_classifies_text_and_bitmap},
+		TestEntry{"test_subtitle_kind_distinguishes_unknown_from_not_applicable", test_subtitle_kind_distinguishes_unknown_from_not_applicable},
 		TestEntry{"test_matroska_extensions_resolve_to_same_container", test_matroska_extensions_resolve_to_same_container},
 		TestEntry{"test_mov_extensions_resolve_to_same_container", test_mov_extensions_resolve_to_same_container},
 		TestEntry{"test_mp4_extensions_resolve_to_same_container", test_mp4_extensions_resolve_to_same_container},

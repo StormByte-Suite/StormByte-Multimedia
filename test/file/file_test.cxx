@@ -112,6 +112,42 @@ namespace {
 			TEST_REQUIRE(properties.value().Layout() == StormByte::Multimedia::Property::ChannelLayout::Stereo);
 		return 0;
 	}
+
+	int CheckSubtitleKinds(std::string_view fixture, std::string_view codec,
+		SubtitleKind expected, std::size_t expectedCount) {
+		auto opened = OpenFixture(fixture);
+		TEST_REQUIRE(opened);
+		std::size_t count = 0;
+		for (const auto& stream : opened->Streams()) {
+			const auto kind = stream.Codec().SubtitleKind();
+			if (stream.Type() != MediaType::Subtitle) {
+				TEST_REQUIRE(!kind);
+				continue;
+			}
+			++count;
+			TEST_REQUIRE(stream.Codec().Name() == codec);
+			TEST_REQUIRE(kind);
+			TEST_REQUIRE(kind.value() == expected);
+		}
+		TEST_REQUIRE(count == expectedCount);
+		return 0;
+	}
+}
+
+int test_pgs_fixture_subtitles_are_bitmap() {
+	TEST_REQUIRE(CheckSubtitleKinds("video/bluray_like_hdr10.mkv", "PGS", SubtitleKind::Bitmap, 2) == 0);
+	TEST_REQUIRE(CheckSubtitleKinds("video/anime_like.mkv", "PGS", SubtitleKind::Bitmap, 3) == 0);
+	return 0;
+}
+
+int test_mp4_fixture_packed_subtitles_are_text() {
+	return CheckSubtitleKinds("video/bluray_like_hdr10.mp4", "3GPP Timed Text", SubtitleKind::Text, 2);
+}
+
+int test_srt_fixture_subtitles_are_text() {
+	TEST_REQUIRE(CheckSubtitleKinds("subtitles/ocr_eng.srt", "SRT", SubtitleKind::Text, 1) == 0);
+	TEST_REQUIRE(CheckSubtitleKinds("subtitles/late_first_cue.srt", "SRT", SubtitleKind::Text, 1) == 0);
+	return 0;
 }
 
 int test_bluray_like_mkv_streams_and_cover() {
@@ -284,6 +320,9 @@ int test_truncated_file_is_rejected() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_pgs_fixture_subtitles_are_bitmap", test_pgs_fixture_subtitles_are_bitmap},
+		TestEntry{"test_mp4_fixture_packed_subtitles_are_text", test_mp4_fixture_packed_subtitles_are_text},
+		TestEntry{"test_srt_fixture_subtitles_are_text", test_srt_fixture_subtitles_are_text},
 		TestEntry{"test_bluray_like_mkv_streams_and_cover", test_bluray_like_mkv_streams_and_cover},
 		TestEntry{"test_anime_like_mkv_languages_and_font", test_anime_like_mkv_languages_and_font},
 		TestEntry{"test_vp9_mp4_and_avi_container_snapshots", test_vp9_mp4_and_avi_container_snapshots},

@@ -52,6 +52,7 @@
 
 #include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/optional.hxx>
 #include <StormByte/type_traits/safe.hxx>
 
 #include <string_view>
@@ -71,6 +72,16 @@ namespace StormByte {
 		 * @brief Process-wide catalog of codecs and containers.
 		 */
 		class Registry;
+
+		/**
+		 * @enum SubtitleKind
+		 * @brief Semantic subtitle representation, not its on-disk encoding.
+		 */
+		enum class STORMBYTE_MULTIMEDIA_PUBLIC SubtitleKind {
+			Unknown,	///< Subtitle without a reliable representation classification.
+			Text,		///< Text-based cues, including binary-packed text formats.
+			Bitmap		///< Image-based cues.
+		};
 
 		/**
 		 * @class Codec
@@ -142,6 +153,14 @@ namespace StormByte {
 				 * @return View to a process-lifetime literal.
 				 */
 				constexpr std::string_view Description() const noexcept { return m_description; }
+
+				/**
+				 * @brief Classifies subtitle content independently of codec availability.
+				 * @return Empty for non-subtitle codecs; Text, Bitmap or Unknown otherwise.
+				 * @note Describes the format, not decoder output or OCR availability.
+				 * Binary-packed text such as mov_text is Text, not Bitmap.
+				 */
+				StormByte::Safe::Optional<enum SubtitleKind> SubtitleKind() const noexcept;
 
 				/**
 				 * @brief Tests Read/Write flags.

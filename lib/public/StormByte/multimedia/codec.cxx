@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/codec.hxx>
+#include <tables/codec/table.hxx>
 #include <tables/decoder/table.hxx>
 #include <tables/encoder/table.hxx>
 
@@ -75,6 +76,29 @@ bool Codec::operator==(const Codec& other) const noexcept {
 
 bool Codec::operator!=(const Codec& other) const noexcept {
 	return !(*this == other);
+}
+
+StormByte::Safe::Optional<enum SubtitleKind> Codec::SubtitleKind() const noexcept {
+	if (m_type != Type::Subtitle)
+		return std::nullopt;
+
+	int properties = 0;
+	for (const auto& row : Tables::Codec::Subtitle()) {
+		if (m_name != row.name)
+			continue;
+		for (std::size_t i = 0; i < row.FfmpegIdCount(); ++i) {
+			const auto* descriptor = avcodec_descriptor_get_by_name(row.FfmpegId(i));
+			if (descriptor && descriptor->type == AVMEDIA_TYPE_SUBTITLE)
+				properties |= descriptor->props;
+		}
+		break;
+	}
+
+	const bool text = (properties & AV_CODEC_PROP_TEXT_SUB) != 0;
+	const bool bitmap = (properties & AV_CODEC_PROP_BITMAP_SUB) != 0;
+	if (text == bitmap)
+		return StormByte::Multimedia::SubtitleKind::Unknown;
+	return text ? StormByte::Multimedia::SubtitleKind::Text : StormByte::Multimedia::SubtitleKind::Bitmap;
 }
 
 bool Codec::HasAccess(Access access) const noexcept {

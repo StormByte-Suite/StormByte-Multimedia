@@ -116,6 +116,15 @@ Track mapping is the whole job description: call `Video(n)`, `Audio(n)` or `Subt
 
 ## Codec compatibility
 
+`Codec::SubtitleKind()` returns `Safe::Optional<SubtitleKind>`: empty for codecs
+that are not subtitles, otherwise `Text`, `Bitmap` or `Unknown`. Classification
+uses FFmpeg codec descriptors, independently of encoder/decoder availability.
+SRT, ASS, WebVTT and binary-packed `mov_text` are text; PGS, DVD/DVB subtitles
+and XSUB are bitmap. `Unknown` means the subtitle descriptors do not provide an
+unambiguous classification. This describes subtitle content, not whether the
+file contains binary bytes, what a particular decoder emits, or whether OCR is
+available. It is accessible through registry identities and `stream.Codec()`.
+
 `Codec::HasAccess(Access)` remains a generic capability query. Use the
 `HasAccess(Access, Features)` overload to require all features from one available
 implementation in each requested direction:
