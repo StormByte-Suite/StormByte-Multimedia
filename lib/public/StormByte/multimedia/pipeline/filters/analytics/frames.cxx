@@ -86,7 +86,7 @@ void CountFrames::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	if (!DistLook(frame.Producer()))
 		return;
-	auto count = m_frames[frame.Track()];
+	auto& count = m_frames[frame.Track()];
 	count = static_cast<std::uint64_t>(count) + 1;
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("count t={} producer={} pts={}",
 		frame.Track(), static_cast<int>(frame.Producer()),
