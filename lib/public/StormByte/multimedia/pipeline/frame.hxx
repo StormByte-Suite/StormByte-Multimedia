@@ -429,6 +429,7 @@ namespace StormByte {
 					StormByte::Safe::Vector<class SideData> m_attachments;		///< Opaque safe sequence of independently copied side-data blobs.
 					StormByte::Safe::Optional<std::uint64_t> m_serial;			///< Lineage identifier, empty on the sentinel.
 					std::uint64_t m_part;						///< Sub-identifier within the lineage, zero on the sentinel.
+					std::uint32_t m_pass = 0;					///< Decoder read pass: 0 measure or single pass, then 1 after rewind.
 					StormByte::Safe::Unique<Backend::Pipeline::Frame> m_backend;	///< Multimedia-private FFmpeg frame holder.
 			};
 		}

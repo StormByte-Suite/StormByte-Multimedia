@@ -344,6 +344,9 @@ void FFmpeg::Release() noexcept {
 		}
 
 		if (m_current->Kind() == Pipeline::Kind::Frame) {
+			if (MeasuringTwoPass()
+				&& static_cast<const Pipeline::Frame&>(*m_current).m_pass > 0)
+				static_cast<ProcessTwoPasses*>(this)->LeaveMeasure();
 			if (MeasuringTwoPass())
 				static_cast<ProcessTwoPasses*>(this)->Measure(
 					static_cast<const Pipeline::Frame&>(*m_current));
@@ -600,6 +603,9 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 	}
 
 	if (m_current->Kind() == Pipeline::Kind::Frame) {
+		if (MeasuringTwoPass()
+			&& static_cast<const Pipeline::Frame&>(*m_current).m_pass > 0)
+			static_cast<ProcessTwoPasses*>(this)->LeaveMeasure();
 		if (MeasuringTwoPass()) {
 			const auto& frame = static_cast<const Pipeline::Frame&>(*m_current);
 			static_cast<ProcessTwoPasses*>(this)->Measure(frame);
@@ -641,6 +647,8 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 }
 
 void FFmpeg::Finish() noexcept {
+	if (MeasuringTwoPass())
+		static_cast<ProcessTwoPasses*>(this)->LeaveMeasure();
 	if (Held()) {
 		if (!m_current && !m_state->queue.empty())
 			m_current = m_state->queue.back();
@@ -663,27 +671,11 @@ void FFmpeg::Wait() noexcept {
 	Log(Level::LowLevel, "wait");
 	m_state->pipe.Wait(this, [](void* owner) noexcept {
 		auto& filter = *static_cast<FFmpeg*>(owner);
-		if (filter.Stopping() || filter.pipe().Ready())
-			return true;
-		if (!filter.MeasuringTwoPass())
-			return false;
-		auto* two = static_cast<const ProcessTwoPasses*>(&filter);
-		if (two->m_measureOwner && two->m_measureOwner->MeasureReadyToFinish())
-			return true;
-		return two->m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire)
-			&& !two->m_measureDrained.load(StormByte::Safe::MemoryOrder::Acquire)
-			&& !filter.pipe().Ready();
+		return filter.Stopping() || filter.pipe().Ready();
 	}, [](void* owner, std::chrono::nanoseconds duration) noexcept {
 		auto& filter = *static_cast<FFmpeg*>(owner);
 		filter.m_telemetry->RecordWait(duration);
 		filter.Log(Level::LowLevel, "wake");
-		if (filter.MeasuringTwoPass()) {
-			auto* two = static_cast<ProcessTwoPasses*>(&filter);
-			if (two->m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire) && !filter.pipe().Ready())
-				two->DrainMeasure();
-			if (two->m_measureOwner)
-				two->m_measureOwner->MaybeFinishMeasure();
-		}
 	});
 }
 
@@ -785,37 +777,19 @@ void ProcessTwoPasses::Measured() noexcept {}
 
 void ProcessTwoPasses::EnterMeasure() noexcept {
 	m_measuring = true;
-	m_measureClosed.store(false, StormByte::Safe::MemoryOrder::Release);
-	m_measureDrained.store(false, StormByte::Safe::MemoryOrder::Release);
 }
 
 void ProcessTwoPasses::LeaveMeasure() noexcept {
+	if (!m_measuring)
+		return;
 	Eof();
 	DumpWork();
 	m_measuring = false;
-	m_measureClosed.store(false, StormByte::Safe::MemoryOrder::Release);
-	m_measureDrained.store(false, StormByte::Safe::MemoryOrder::Release);
 	Measured();
 }
 
 void ProcessTwoPasses::BindMeasure(StormByte::Multimedia::Pipeline::Filters* owner) noexcept {
 	m_measureOwner = owner;
-}
-
-void ProcessTwoPasses::MeasureSourceClosed() noexcept {
-	m_measureClosed.store(true, StormByte::Safe::MemoryOrder::Release);
-	Wake();
-}
-
-void ProcessTwoPasses::DrainMeasure() noexcept {
-	if (!m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire))
-		return;
-	bool expected = false;
-	if (!m_measureDrained.compare_exchange_strong(expected, true,
-			StormByte::Safe::MemoryOrder::AcqRel, StormByte::Safe::MemoryOrder::Acquire))
-		return;
-	if (m_measureOwner)
-		m_measureOwner->OnMeasureFilterDrained();
 }
 
 Packet::Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept

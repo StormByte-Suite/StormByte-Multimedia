@@ -523,6 +523,7 @@ namespace StormByte::Multimedia::Pipeline {
 			StormByte::Safe::Optional<std::uint64_t> m_serial;	///< Last packet Serial
 			std::uint64_t m_part;									///< Part within Serial
 			StormByte::Safe::Optional<Property::Duration> m_inDts;		///< Dts of last packet
+			std::uint32_t m_pass = 0;								///< Read pass stamped on frames; bumped by ResetAfterMeasure
 			bool m_look = false;									///< Opens from Packet codecpar
 			StormByte::Safe::Optional<Producer> m_lookStamp;	///< Dest-look Producer, or empty
 			StormByte::Safe::Atomic<bool> m_measureClosed{false};	///< Origin will not send more measure packets

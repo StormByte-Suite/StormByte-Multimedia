@@ -62,6 +62,7 @@
 
 #include <utility>
 #include <algorithm>
+#include <chrono>
 #include <string_view>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
@@ -154,10 +155,28 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 					continue;
 				packet = std::move(m_park[track].front());
 				m_park[track].pop_front();
+				++m_feeding;
 			}
 			m_parkCv.notify_all();
 			if (packet)
 				Emit(std::move(packet));
+			{
+				StormByte::Safe::UniqueLock lock(m_parkMutex);
+				--m_feeding;
+			}
+			m_parkCv.notify_all();
+		}
+	}
+
+	void Demux::WaitFeedIdle() noexcept {
+		StormByte::Safe::UniqueLock lock(m_parkMutex);
+		// Stopping has no cv notification here, so poll it.
+		while (!m_parkCv.wait_for(lock, std::chrono::milliseconds(50), [this]() {
+				return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
+					|| (m_feeding == 0 && !ParkPending());
+			})) {
+			if (Stopping())
+				return;
 		}
 	}
 
@@ -202,8 +221,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 		if (!packet) {
 			if (measure) {
-				if (!m_owner.Eof())
+				if (!m_owner.Eof()) {
+					WaitFeedIdle();
+					if (Stopping())
+						return;
 					m_owner.ReachedEof();
+				}
 				if (m_owner.Measuring())
 					Wait();
 				return;

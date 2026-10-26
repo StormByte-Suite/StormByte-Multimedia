@@ -96,10 +96,16 @@
 #include <StormByte/multimedia/property/channel_layout.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
+#include <algorithm>
 #include <array>
+#include <atomic>
+#include <chrono>
+#include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <string>
+#include <thread>
 
 extern "C" {
 	#include <libavutil/pixfmt.h>
@@ -711,6 +717,104 @@ int test_filter_xpsnr() {
 	});
 }
 
+// Analytics taps hang a look decoder off the encoder. Cancelling while the encoder is
+// still inside a slow frame used to free that look before the encoder worker finished,
+// which then woke the freed stage and crashed the job destructor.
+int test_filter_analytics_cancel_mid_encode() {
+	auto codec = Registry::Instance().FindCodec("AV1");
+	TEST_REQUIRE(codec);
+	const auto encoders = codec.value().get().Encoders();
+	if (std::none_of(encoders.begin(), encoders.end(), [](const auto& info) { return info.Name() == "libaom-av1"; }))
+		return TEST_SKIP;
+	for (int round = 0; round < 3; ++round) {
+		const auto output = OutputPath("pipeline/filters/cancel-mid-encode-" + std::to_string(round) + ".mkv");
+		auto logger = MakeLogger();
+		{
+			Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output),
+				logger, 2000000000LL};
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+			options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"4"});
+			job.Video(0).Codec(codec.value().get())
+				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libaom-av1"})
+				.FineTune(std::move(options)).BitRate(500000);
+			job.Filter<Filter::Video::CountFrames>(logger);
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			std::this_thread::sleep_for(std::chrono::milliseconds(600 + 400 * round));
+			job.Cancel();
+		}
+	}
+	return 0;
+}
+
+namespace {
+	struct TwoPassCounts {
+		std::atomic<std::int64_t> measured{0};
+		std::atomic<std::int64_t> processed{0};
+		std::atomic<std::int64_t> firstMeasuredNs{std::numeric_limits<std::int64_t>::min()};
+		std::atomic<std::int64_t> firstProcessedNs{std::numeric_limits<std::int64_t>::min()};
+	};
+
+	std::int64_t PtsNs(const Pipeline::Frame& frame) noexcept {
+		const auto& pts = frame.Pts();
+		return pts ? pts->Nanoseconds().count() : std::numeric_limits<std::int64_t>::min();
+	}
+
+	// Slow pass-through ahead of a two-pass leaf: its hopper stays empty while measure frames are still in flight.
+	class SlowAudioPass final: public Filter::Process {
+		public:
+			explicit SlowAudioPass(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+			: Filter::Process(std::move(log), "slow-audio-pass") {}
+			enum StormByte::Multimedia::Type Media() const noexcept override {
+				return StormByte::Multimedia::Type::Audio;
+			}
+			void Clean() noexcept override {}
+			void Setup() noexcept override {}
+			void Process(const Pipeline::Frame&) noexcept override {
+				std::this_thread::sleep_for(std::chrono::milliseconds(3));
+			}
+	};
+
+	class TwoPassProbe final: public Filter::ProcessTwoPasses {
+		public:
+			TwoPassProbe(StormByte::Safe::Shared<StormByte::Logger::Log> log, TwoPassCounts* counts) noexcept
+			: Filter::ProcessTwoPasses(std::move(log), "two-pass-probe"), m_counts(counts) {}
+			enum StormByte::Multimedia::Type Media() const noexcept override {
+				return StormByte::Multimedia::Type::Audio;
+			}
+			void Clean() noexcept override {}
+			void Setup() noexcept override {}
+			void Measure(const Pipeline::Frame& frame) noexcept override {
+				if (m_counts->measured.fetch_add(1) == 0)
+					m_counts->firstMeasuredNs.store(PtsNs(frame));
+			}
+			void Process(const Pipeline::Frame& frame) noexcept override {
+				if (m_counts->processed.fetch_add(1) == 0)
+					m_counts->firstProcessedNs.store(PtsNs(frame));
+			}
+
+		private:
+			TwoPassCounts* m_counts;
+	};
+}
+
+int test_filter_two_pass_waits_for_slow_upstream() {
+	TwoPassCounts counts;
+	const int result = RunAudio("two-pass-slow-upstream", "audio/noise_stereo.wav", [&counts](auto& track, auto& logger) {
+		track.template Filter<SlowAudioPass>(logger);
+		track.template Filter<TwoPassProbe>(logger, &counts);
+	});
+	if (result != 0)
+		return result;
+	std::cout << "[Test] measured=" << counts.measured.load() << " processed=" << counts.processed.load()
+		<< " firstMeasured=" << counts.firstMeasuredNs.load() << " firstProcessed=" << counts.firstProcessedNs.load()
+		<< std::endl;
+	TEST_REQUIRE(counts.measured.load() > 0);
+	TEST_REQUIRE(counts.processed.load() == counts.measured.load());
+	TEST_REQUIRE(counts.firstProcessedNs.load() == counts.firstMeasuredNs.load());
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_filter_decimate_cadence_metadata_and_lifecycle", test_filter_decimate_cadence_metadata_and_lifecycle},
@@ -755,6 +859,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_filter_psnr", test_filter_psnr},
 		TestEntry{"test_filter_ssim", test_filter_ssim},
 		TestEntry{"test_filter_xpsnr", test_filter_xpsnr},
+		TestEntry{"test_filter_analytics_cancel_mid_encode", test_filter_analytics_cancel_mid_encode},
+		TestEntry{"test_filter_two_pass_waits_for_slow_upstream", test_filter_two_pass_waits_for_slow_upstream},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

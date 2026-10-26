@@ -58,7 +58,6 @@
 
 #include <cctype>
 #include <cstdint>
-#include <cstdio>
 #include <span>
 #include <string>
 #include <string_view>

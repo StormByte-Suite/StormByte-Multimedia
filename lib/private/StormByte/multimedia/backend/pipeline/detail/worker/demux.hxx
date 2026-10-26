@@ -65,6 +65,7 @@
 #include <StormByte/safe/vector.hxx>
 
 #include <cstddef>
+#include <cstdint>
 
 namespace StormByte::Multimedia::Pipeline {
 	class Demuxer;
@@ -203,6 +204,14 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			bool ParkPending() const noexcept;
 
 			/**
+			 * @brief Blocks until every parked packet has been emitted.
+			 *
+			 * Measure EOF must not reach the decoders while a packet is still
+			 * parked or in a feeder's Emit, or it would be decoded as second pass.
+			 */
+			void WaitFeedIdle() noexcept;
+
+			/**
 			 * @brief Park cap for @p track from the Plan's demuxer ceiling.
 			 * @param track Origin stream index.
 			 * @return Packets; @ref ParkFallback when the Plan has no cap for it.
@@ -217,5 +226,6 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			mutable StormByte::Safe::Mutex m_parkMutex;	///< Guards @ref m_park.
 			StormByte::Safe::ConditionVariable m_parkCv;	///< Read / feeder rendezvous.
 			StormByte::Safe::Atomic<bool> m_feedStop{false};	///< Feeder halt.
+			std::uint32_t m_feeding = 0;	///< Packets popped from a park but still in Emit; guarded by @ref m_parkMutex.
 	};
 }

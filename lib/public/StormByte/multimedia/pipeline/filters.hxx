@@ -57,6 +57,7 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/visibility.h>
+#include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/pair.hxx>
 #include <StormByte/safe/pointers.hxx>
@@ -392,54 +393,30 @@ namespace StormByte {
 					bool Measuring() const noexcept;
 
 					/**
-					 * @brief Decoders and two-pass leaves have both drained.
-					 * @return true when FinishMeasure may run on the filter worker.
-					 *
-					 * Friend: Filter::FFmpeg::Wait. Leaves never call this.
-					 */
-					bool MeasureReadyToFinish() const noexcept;
-
-					/**
 					 * @brief Measure origin EoF. Friend: Demuxer::ReachedEof.
 					 *
 					 * Calls Decoder::MeasureSourceClosed on each measure-track
-					 * decoder and ProcessTwoPasses::MeasureSourceClosed on each
-					 * two-pass leaf. Does not LeaveMeasure.
+					 * decoder. Two-pass leaves leave measure in-band, on the
+					 * first second-pass frame they receive.
 					 */
 					void CloseMeasureSource() noexcept;
 
 					/**
 					 * @brief One measure-track decoder finished DrainMeasure.
-					 * @param track Origin index of that decoder.
 					 *
-					 * Friend: Decoder. Records the track and wakes two-pass
-					 * leaves. Does not FinishMeasure.
+					 * Friend: Decoder, on its worker. The last one to drain
+					 * runs FinishMeasure exactly once.
 					 */
-					void OnMeasureDrained(int track) noexcept;
-
-					/**
-					 * @brief One ProcessTwoPasses leaf finished its measure hopper.
-					 *
-					 * Friend: ProcessTwoPasses. May FinishMeasure on this
-					 * filter worker.
-					 */
-					void OnMeasureFilterDrained() noexcept;
-
-					/**
-					 * @brief FinishMeasure when decoders and two-pass leaves are drained.
-					 *
-					 * Friend: Filter::FFmpeg::Wait. Must run on a two-pass
-					 * filter worker, not on a decoder worker.
-					 */
-					void MaybeFinishMeasure() noexcept;
+					void OnMeasureDrained() noexcept;
 
 					/**
 					 * @brief Ends the measure pass.
 					 *
-					 * LeaveMeasure on each ProcessTwoPasses leaf (Eof then
-					 * Measured) and Demuxer::Rewind. Process continues on
-					 * the same tube. Decoder reset already ran on the
-					 * decode worker.
+					 * Demuxer::Rewind. Decoder reset already ran on the
+					 * decode worker, so every measure frame is already queued
+					 * ahead of the second pass. Each ProcessTwoPasses leaf
+					 * calls LeaveMeasure on its own worker when the first
+					 * second-pass frame arrives.
 					 */
 					void FinishMeasure() noexcept;
 
@@ -475,9 +452,7 @@ namespace StormByte {
 					StormByte::Safe::Vector<Attached> m_globals;		///< Global analytics.
 					StormByte::Safe::Vector<Attached> m_reports;		///< Leaves that may Report().
 					StormByte::Safe::Vector<int> m_measureTracks;		///< Tracks given to Demuxer::Measure.
-					StormByte::Safe::Vector<int> m_measureDrained;		///< Tracks that finished DrainMeasure
-					StormByte::Size m_measureFilterCount = 0;			///< ProcessTwoPasses leaves in this pass
-					StormByte::Size m_measureFiltersDrained = 0;			///< Those leaves that finished Measure
+					StormByte::Safe::Atomic<std::uint64_t> m_measureDrained{0};	///< Measure decoders that finished DrainMeasure
 					bool m_measuring = false;						///< After Close, before FinishMeasure
 					bool m_hasAnalytics = false;						///< At least one Analytics leaf
 					StormByte::Safe::Shared<class Progress> m_progress;	///< Shared tube clock

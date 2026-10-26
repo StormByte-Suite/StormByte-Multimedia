@@ -87,7 +87,8 @@ Frame::Frame(const Frame& other)
 	m_title(other.m_title),
 	m_attachments(other.m_attachments),
 	m_serial(other.m_serial),
-	m_part(other.m_part) {
+	m_part(other.m_part),
+	m_pass(other.m_pass) {
 	if (other.m_backend)
 		m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Frame>(*other.m_backend);
 }
@@ -105,6 +106,7 @@ Frame::Frame(Frame&& other) noexcept
 	m_attachments(std::move(other.m_attachments)),
 	m_serial(std::move(other.m_serial)),
 	m_part(other.m_part),
+	m_pass(other.m_pass),
 	m_backend(std::move(other.m_backend)) {
 	other.BecomeEmpty();
 }
@@ -133,6 +135,7 @@ Frame& Frame::operator=(Frame&& other) noexcept {
 	m_attachments = std::move(other.m_attachments);
 	m_serial = std::move(other.m_serial);
 	m_part = other.m_part;
+	m_pass = other.m_pass;
 	m_backend = std::move(other.m_backend);
 	other.BecomeEmpty();
 	return *this;
@@ -145,6 +148,7 @@ void Frame::BecomeEmpty() noexcept {
 	m_producer = Producer::Decoder;
 	m_payload = StormByte::Buffer::FIFO{};
 	m_part = 0;
+	m_pass = 0;
 	m_backend.reset();
 }
 

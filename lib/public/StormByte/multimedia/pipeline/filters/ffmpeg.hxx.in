@@ -946,36 +946,21 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 
 			/**
 			 * @brief Friend-only. Leave measure and call @ref Measured.
+			 *
+			 * Runs on this leaf's worker when the first second-pass frame
+			 * arrives, or at final EoF if none does. Lane order is FIFO, so
+			 * every measure frame has already been measured by then.
 			 */
 			void LeaveMeasure() noexcept;
 
 			/**
 			 * @brief Friend-only. Facade that owns this measure pass.
-			 * @param owner Filters facade. May be null.
+			 * @param owner Filters facade for measure progress. May be null.
 			 */
 			void BindMeasure(StormByte::Multimedia::Pipeline::Filters* owner) noexcept;
 
-			/**
-			 * @brief Friend-only. Origin of this leaf has no more measure units.
-			 *
-			 * Sets @ref m_measureClosed. That flag stays true until
-			 * @ref EnterMeasure or @ref LeaveMeasure. Wakes Wait.
-			 * Does not drain.
-			 */
-			void MeasureSourceClosed() noexcept;
-
-			/**
-			 * @brief Friend-only. Hopper empty after measure source closed.
-			 *
-			 * CAS on @ref m_measureDrained once, then
-			 * @ref Filters::OnMeasureFilterDrained.
-			 */
-			void DrainMeasure() noexcept;
-
 			bool m_measuring = false;	///< First pass
-			StormByte::Safe::Atomic<bool> m_measureClosed{false};	///< Origin will not send more measure units
-			StormByte::Safe::Atomic<bool> m_measureDrained{false};	///< OnMeasureFilterDrained already ran
-			StormByte::Multimedia::Pipeline::Filters* m_measureOwner = nullptr;	///< Facade for drain
+			StormByte::Multimedia::Pipeline::Filters* m_measureOwner = nullptr;	///< Facade for measure progress
 	};
 
 	/**

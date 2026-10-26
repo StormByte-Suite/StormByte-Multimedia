@@ -193,6 +193,7 @@ class Step::PrivateState {
 		StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper;	///< Worker driver owned through Base heap callbacks
 		StormByte::Safe::Mutex mutex;							///< Plan identity and local failure synchronization
 		std::vector<Step*> downstream;						///< Borrowed graph links; graph owners serialize assembly and teardown
+		std::vector<Step*> upstream;						///< Stages that list this one downstream; unlinked on destruction
 		std::vector<Step*> pendingWire;						///< Links waiting for a plan before track hoppers exist
 };
 
@@ -215,6 +216,24 @@ Step::Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 
 Step::~Step() noexcept {
 	Halt();
+	// Owners may release linked stages in any order; an upstream worker that is still
+	// finishing must never reach this stage through a stale downstream pointer.
+	std::vector<Step*> upstream;
+	std::vector<Step*> downstream;
+	{
+		StormByte::Safe::UniqueLock lock(m_state->mutex);
+		upstream.swap(m_state->upstream);
+		downstream.swap(m_state->downstream);
+	}
+	for (auto* stage : upstream) {
+		StormByte::Safe::UniqueLock lock(stage->m_state->mutex);
+		std::erase(stage->m_state->downstream, this);
+		std::erase(stage->m_state->pendingWire, this);
+	}
+	for (auto* stage : downstream) {
+		StormByte::Safe::UniqueLock lock(stage->m_state->mutex);
+		std::erase(stage->m_state->upstream, this);
+	}
 	if (const auto plan = Plan())
 		plan->Unobserve(*this);
 	delete m_state;
@@ -286,11 +305,18 @@ void Step::NotifyComplete(bool success) noexcept {
 }
 
 bool Step::Connect(Step& downstream) noexcept {
+	bool linked = false;
 	{
 		StormByte::Safe::UniqueLock lock(m_state->mutex);
 		auto& links = m_state->downstream;
-		if (std::find(links.begin(), links.end(), &downstream) == links.end())
+		if (std::find(links.begin(), links.end(), &downstream) == links.end()) {
 			links.push_back(&downstream);
+			linked = true;
+		}
+	}
+	if (linked) {
+		StormByte::Safe::UniqueLock lock(downstream.m_state->mutex);
+		downstream.m_state->upstream.push_back(this);
 	}
 	const auto sourcePlan = Plan();
 	const auto targetPlan = downstream.Plan();
@@ -401,12 +427,9 @@ void Step::Wake() noexcept {
 }
 
 void Step::WakeDownstream() noexcept {
-	std::vector<Step*> downstream;
-	{
-		StormByte::Safe::UniqueLock lock(m_state->mutex);
-		downstream = m_state->downstream;
-	}
-	for (auto* stage : downstream)
+	// Held across the wakes so a downstream stage cannot finish unlinking and free itself mid-loop.
+	StormByte::Safe::UniqueLock lock(m_state->mutex);
+	for (auto* stage : m_state->downstream)
 		stage->m_state->pipe.Wake();
 }
 

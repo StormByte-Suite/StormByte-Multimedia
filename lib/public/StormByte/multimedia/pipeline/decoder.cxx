@@ -180,6 +180,7 @@ void Decoder::StampLineage(Frame& frame) noexcept {
 	frame.m_serial = m_serial;
 	frame.m_part = m_part++;
 	frame.m_dts = m_inDts;
+	frame.m_pass = m_pass;
 }
 
 void Decoder::BindAnalytics(Filters& filters) noexcept {
@@ -258,7 +259,7 @@ void Decoder::DrainMeasure() noexcept {
 	if (!ResetAfterMeasure())
 		return;
 	if (m_origin && m_origin->m_filters)
-		m_origin->m_filters->OnMeasureDrained(m_index);
+		m_origin->m_filters->OnMeasureDrained();
 }
 
 bool Decoder::WakeNow() const noexcept {
@@ -296,6 +297,7 @@ bool Decoder::ResetAfterMeasure() noexcept {
 	m_serial.reset();
 	m_part = 0;
 	m_inDts.reset();
+	++m_pass;
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("reopen after measure t={}", m_index));
 	return true;
 }

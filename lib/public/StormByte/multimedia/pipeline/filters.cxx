@@ -287,34 +287,21 @@ void Filters::Close() noexcept {
 	if (!demuxer)
 		return;
 
-	m_measureFilterCount = 0;
-	m_measureFiltersDrained = 0;
 	for (auto& item : m_reports) {
 		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter)) {
 			two->EnterMeasure();
 			two->BindMeasure(this);
-			++m_measureFilterCount;
 		}
 	}
 
 	demuxer->Measure(StormByte::Safe::Vector<int>{m_measureTracks});
 	demuxer->m_filters = this;
 	m_measuring = true;
-	m_measureDrained.clear();
+	m_measureDrained.store(std::uint64_t{0}, StormByte::Safe::MemoryOrder::Release);
 }
 
 bool Filters::Measuring() const noexcept {
 	return m_measuring;
-}
-
-bool Filters::MeasureReadyToFinish() const noexcept {
-	if (!m_measuring)
-		return false;
-	if (m_measureDrained.size() < m_measureTracks.size())
-		return false;
-	if (m_measureFiltersDrained < m_measureFilterCount)
-		return false;
-	return true;
 }
 
 void Filters::CloseMeasureSource() noexcept {
@@ -329,44 +316,17 @@ void Filters::CloseMeasureSource() noexcept {
 			continue;
 		decoder->MeasureSourceClosed();
 	}
-
-	for (auto& item : m_reports) {
-		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter))
-			two->MeasureSourceClosed();
-	}
 }
 
-void Filters::OnMeasureDrained(int track) noexcept {
-	if (std::find(m_measureDrained.begin(), m_measureDrained.end(), track)
-			== m_measureDrained.end())
-		m_measureDrained.push_back(track);
-	for (auto& item : m_reports) {
-		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter))
-			two->Wake();
-	}
-}
-
-void Filters::OnMeasureFilterDrained() noexcept {
-	++m_measureFiltersDrained;
-	MaybeFinishMeasure();
-}
-
-void Filters::MaybeFinishMeasure() noexcept {
-	if (m_measureDrained.size() < m_measureTracks.size())
-		return;
-	if (m_measureFiltersDrained < m_measureFilterCount)
-		return;
-	FinishMeasure();
+void Filters::OnMeasureDrained() noexcept {
+	const std::uint64_t drained = m_measureDrained.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel) + 1;
+	if (drained == static_cast<std::uint64_t>(m_measureTracks.size()))
+		FinishMeasure();
 }
 
 void Filters::FinishMeasure() noexcept {
 	if (!m_measuring)
 		return;
-
-	for (auto& item : m_reports) {
-		if (auto two = StormByte::Safe::DynamicPointerCast<Filter::ProcessTwoPasses>(item.Filter))
-			two->LeaveMeasure();
-	}
 
 	Demuxer* demuxer = nullptr;
 	for (auto& stretch : m_stretches) {
@@ -387,8 +347,6 @@ void Filters::FinishMeasure() noexcept {
 	if (!demuxer->Rewind())
 		return;
 	m_measuring = false;
-	m_measureDrained.clear();
-	m_measureFiltersDrained = 0;
 }
 
 bool Filters::Idle() const noexcept {
