@@ -251,25 +251,14 @@ namespace {
 		return out;
 	}
 
-	std::string FormatAssTime(std::int64_t nanoseconds) noexcept {
-		if (nanoseconds < 0)
-			nanoseconds = 0;
-		const auto cs = static_cast<std::int64_t>(nanoseconds / 10000000);
-		const auto h = cs / 360000;
-		const auto m = (cs / 6000) % 60;
-		const auto s = (cs / 100) % 60;
-		const auto c = cs % 100;
-		char buf[32];
-		std::snprintf(buf, sizeof(buf), "%d:%02d:%02d.%02d",
-			static_cast<int>(h), static_cast<int>(m), static_cast<int>(s), static_cast<int>(c));
-		return buf;
-	}
-
-	std::string WrapAss(std::string text, std::int64_t startNs, std::int64_t endNs) noexcept {
-		if (text.find("Dialogue:") != std::string::npos)
-			return text;
-		return "Dialogue: 0," + FormatAssTime(startNs) + "," + FormatAssTime(endNs)
-			+ ",Default,NTP,0000,0000,0000,," + NewlinesToAss(std::move(text));
+	/**
+	 * @brief Builds the event that ASS-based encoders take in `AVSubtitleRect::ass`.
+	 *
+	 * FFmpeg stores ASS events as `ReadOrder,Layer,Style,Name,MarginL,MarginR,MarginV,Effect,Text`;
+	 * timing travels in the packet, so a full `Dialogue:` line would end up verbatim in the output.
+	 */
+	std::string PackAss(std::string text, std::uint64_t readOrder) noexcept {
+		return std::to_string(readOrder) + ",0,Default,,0,0,0,," + NewlinesToAss(std::move(text));
 	}
 
 	void StampSubtitlePacket(StormByte::Multimedia::FFmpeg::AVPacket& pkt,
@@ -293,6 +282,7 @@ Subtitle::Subtitle() noexcept
 	m_timeBase{1, AV_TIME_BASE},
 	m_index(0),
 	m_flushed(false),
+	m_readOrder(0),
 	m_heldStartNs(0),
 	m_heldPts(AV_NOPTS_VALUE) {}
 
@@ -375,9 +365,9 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 
 	else {
 		if (WantsAssRect(impl))
-			text = WrapAss(std::move(text), m_heldStartNs, m_heldStartNs + durationNs);
+			text = PackAss(std::move(text), m_readOrder++);
 		else if (impl == "mov_text")
-			text = "0,0,Default,,0,0,0,," + NewlinesToAss(std::move(text));
+			text = PackAss(std::move(text), 0);
 		StormByte::Multimedia::FFmpeg::AVSubtitle sub;
 		sub.FillText(StormByte::Safe::String(text), m_heldPts, durationMs, WantsAssRect(impl) || impl == "mov_text");
 		if (!m_encoder || m_encoder->EncodeSubtitle(sub, m_scratch)
