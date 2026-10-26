@@ -23,7 +23,7 @@ The automatic GitHub source zip of the tag does not contain the submodules.
 It is not, by itself, the complete corresponding source of this binary.
 The release page is:
 
-  https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.1
+  https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.0
 
 Rebuild that tag with the same switches this archive used:
 
@@ -46,7 +46,7 @@ LGPL terms for FFmpeg, LAME and (on Windows) pthreads-win32.
 Compiled into this shared library
 ---------------------------------
 
-Pinned by the gitlinks of tag 1.0.1. Copyright lines live in each tree.
+Pinned by the gitlinks of tag 1.0.0. Copyright lines live in each tree.
 
   - FFmpeg (meson port, LGPL build: gpl=disabled, nonfree=disabled,
     version3=disabled). LGPL-2.1-or-later. COPYING.LGPLv2.1.
