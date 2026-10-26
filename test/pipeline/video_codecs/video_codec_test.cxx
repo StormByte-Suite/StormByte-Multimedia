@@ -278,11 +278,13 @@ int test_hevc_feature_access_matches_available_encoders() {
 	const bool x265 = available("libx265");
 	const bool hdr10 = x265 || available("hevc_nvenc") || available("hevc_qsv")
 		|| available("hevc_vaapi");
+	// HDR10+ SEI is injected by Multimedia for every HEVC encoder.
+	const bool hdr10plus = hdr10 || available("hevc_videotoolbox");
 	const auto& codec = hevc->get();
 	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10) == hdr10);
 	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::TenBit) == hdr10);
 	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::DOVI) == x265);
-	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10Plus) == x265);
+	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10Plus) == hdr10plus);
 	TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::DOVI) == x265);
 	TEST_REQUIRE(alias->get().HasAccess(Operation::Write, Feature::HDR10) == hdr10);
 	if (available("libkvazaar")) {
