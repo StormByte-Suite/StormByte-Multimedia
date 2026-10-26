@@ -29,6 +29,7 @@ if(ENABLE_TEST)
 		pipeline/video_codecs/video_codec_test.cxx
 		pipeline/filters/content_video_test.cxx
 		pipeline/hdr10plus/hdr10plus_test.cxx
+		pipeline/interleave/interleave_test.cxx
 		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/file_avio.cxx"
 		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx"
 		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx"

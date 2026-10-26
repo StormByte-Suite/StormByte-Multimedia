@@ -97,6 +97,7 @@ namespace {
 	constexpr std::int64_t InterleaveSlotUs = 40LL * 1000;
 	constexpr std::int64_t InterleaveFloorUs = 250000;
 	constexpr std::int64_t InterleaveMixedUs = 60LL * 1000 * 1000;
+	constexpr std::int64_t InterleaveHoldNs = InterleaveMixedUs * 1000;
 
 	bool CopyFileTags(AVDictionary*& destination,
 		const StormByte::Multimedia::Metadata::File& source) noexcept {
@@ -543,11 +544,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			while (!m_queue.empty()) {
 				StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> leftover = std::move(m_queue.front());
 				m_queue.pop_front();
-				if (!leftover || !WritePacket(owner, *leftover))
+				if (!leftover || !Hold(owner, leftover))
 					return false;
 			}
 
-			return WritePacket(owner, *packet);
+			return Hold(owner, packet);
 		}
 
 		m_queue.push_back(packet);
@@ -726,6 +727,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			const FFmpeg::AVRational tb{stream->time_base.num, stream->time_base.den};
 			if (tb.num > 0 && tb.den > 0)
 				track.timeBase = tb;
+			const auto type = stream->codecpar ? stream->codecpar->codec_type : AVMEDIA_TYPE_UNKNOWN;
+			track.paced = (type == AVMEDIA_TYPE_VIDEO || type == AVMEDIA_TYPE_AUDIO)
+				&& (stream->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0;
 		}
 
 		m_header = true;
@@ -734,11 +738,66 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		while (!m_queue.empty()) {
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> queued = std::move(m_queue.front());
 			m_queue.pop_front();
-			if (!queued || !WritePacket(owner, *queued))
+			if (!queued || !Hold(owner, queued))
 				return false;
 		}
 
 		return true;
+	}
+
+	bool Container::Hold(StormByte::Multimedia::Pipeline::Muxer& owner,
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const auto it = m_tracks.find(Resolve(*packet));
+		if (it == m_tracks.end() || it->second.avIndex < 0) {
+			owner.Fail("packet stream index is not a mux track");
+			return false;
+		}
+
+		auto& track = it->second;
+		// Untimed packets ride with their predecessor; NoPts sorts first, so they never wait.
+		std::int64_t key = track.lastKeyNs;
+		if (packet->Dts())
+			key = packet->Dts()->Nanoseconds().count();
+		else if (packet->Pts())
+			key = packet->Pts()->Nanoseconds().count();
+		track.lastKeyNs = std::max(track.lastKeyNs, key);
+		track.held.push_back(packet);
+		track.heldKeys.push_back(key);
+		return Drain(owner, false);
+	}
+
+	bool Container::Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force) noexcept {
+		while (!owner.Failed()) {
+			Track* oldest = nullptr;
+			std::int64_t oldestKey = 0;
+			std::int64_t newestKey = StormByte::Multimedia::FFmpeg::NoPts;
+			bool starved = false;
+			for (auto& [index, track] : m_tracks) {
+				if (track.held.empty()) {
+					starved = starved || track.paced;
+					continue;
+				}
+				const std::int64_t head = track.heldKeys.front();
+				if (!oldest || head < oldestKey) {
+					oldest = &track;
+					oldestKey = head;
+				}
+				newestKey = std::max(newestKey, track.lastKeyNs);
+			}
+			if (!oldest)
+				return true;
+			if (starved && !force && oldestKey != StormByte::Multimedia::FFmpeg::NoPts
+				&& newestKey - oldestKey <= InterleaveHoldNs)
+				return true;
+
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> next = std::move(oldest->held.front());
+			oldest->held.pop_front();
+			oldest->heldKeys.pop_front();
+			if (!next || !WritePacket(owner, *next))
+				return false;
+		}
+
+		return false;
 	}
 
 	bool Container::WritePacket(StormByte::Multimedia::Pipeline::Muxer& owner,
@@ -842,10 +901,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> leftover = std::move(m_queue.front());
 			m_queue.pop_front();
 			if (m_header) {
-				if (!leftover || !WritePacket(owner, *leftover))
+				if (!leftover || !Hold(owner, leftover))
 					return;
 			}
 		}
+
+		if (m_header && !Drain(owner, true))
+			return;
 
 		if (!m_header)
 			WriteHeaderIfReady(owner);

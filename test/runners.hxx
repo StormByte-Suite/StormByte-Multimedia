@@ -99,3 +99,11 @@ STORMBYTE_MULTIMEDIA_TEST_PUBLIC int RunPipelineContentVideoTests(int argc, char
  * @return The selected case result, or the failure count when none is selected.
  */
 STORMBYTE_MULTIMEDIA_TEST_PUBLIC int RunPipelineHdr10PlusTests(int argc, char** argv);
+
+/**
+ * @brief Runs the audio/video interleave cases. @p argv[1] selects one case.
+ * @param argc Argument count from the test executable.
+ * @param argv Argument values from the test executable.
+ * @return The selected case result, or the failure count when none is selected.
+ */
+STORMBYTE_MULTIMEDIA_TEST_PUBLIC int RunPipelineInterleaveTests(int argc, char** argv);

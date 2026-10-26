@@ -1,0 +1,11 @@
+add_ffmpeg_test_executable(MultimediaPipelineInterleaveTests RunPipelineInterleaveTests)
+
+foreach(test_name IN ITEMS
+	test_interleave_encoded_video_and_audio
+	test_interleave_encoded_video_remuxed_audio
+	test_interleave_remuxed_video_loudnorm_audio
+	test_interleave_encoded_video_loudnorm_audio
+)
+	add_optional_pipeline_test(MultimediaPipelineInterleaveTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;interleave")
+endforeach()

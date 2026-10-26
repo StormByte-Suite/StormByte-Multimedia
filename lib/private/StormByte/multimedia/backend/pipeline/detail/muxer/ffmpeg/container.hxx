@@ -92,6 +92,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			std::int64_t lastDuration = 0;							///< Last written duration, 0 if unknown
 			StormByte::Safe::Optional<StormByte::Safe::String> language;	///< Header language
 			StormByte::Safe::Optional<StormByte::Safe::String> title;		///< Header title
+			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> held;	///< Packets awaiting interleave
+			StormByte::Safe::Deque<std::int64_t> heldKeys;				///< Interleave key (ns) of each held packet
+			std::int64_t lastKeyNs = StormByte::Multimedia::FFmpeg::NoPts;	///< Key of the newest held packet
+			bool paced = false;										///< Audio/video: gates writes until it has a packet
 	};
 }
 
@@ -244,6 +248,30 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 */
 			bool WritePacket(StormByte::Multimedia::Pipeline::Muxer& owner,
 				StormByte::Multimedia::Pipeline::Packet& packet) noexcept;
+
+			/**
+			 * @brief Holds one packet after the header and writes whatever is now in order.
+			 * @param owner Public muxer.
+			 * @param packet Source packet.
+			 * @return false if owner.Fail() was called.
+			 */
+			bool Hold(StormByte::Multimedia::Pipeline::Muxer& owner,
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept;
+
+			/**
+			 * @brief Writes held packets in global timestamp order.
+			 * @param owner Public muxer.
+			 * @param force Write everything, as at end of stream.
+			 * @return false if owner.Fail() was called.
+			 *
+			 * Encoders and filters add latency that differs per track (a video encoder can hold
+			 * seconds of lookahead while audio flows at once), so arrival order says nothing about
+			 * timeline order. The oldest held packet is written only once every audio/video track
+			 * holds a packet, so no track can still deliver an older one. Subtitles are sparse and
+			 * never gate. A track that stays silent past the hold limit (ended, or never started)
+			 * stops gating so memory stays bounded.
+			 */
+			bool Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force) noexcept;
 
 			/**
 			 * @brief Frees cloned remux codecpar.
