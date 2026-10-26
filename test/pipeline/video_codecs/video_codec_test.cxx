@@ -314,7 +314,7 @@ int test_feature_access_checks_each_direction_independently() {
 		== (avcodec_find_encoder_by_name("eac3") != nullptr));
 	for (const auto ref : {hevc.value(), eac3.value()}) {
 		const auto& codec = ref.get();
-		for (const auto need : {Features{Feature::HDR10}, Features{Feature::DOVI},
+		for (const auto& need : {Features{Feature::HDR10}, Features{Feature::DOVI},
 			Features{Feature::SurroundSound}, Features{Feature::HDR10 | Feature::TenBit}}) {
 			TEST_REQUIRE(codec.HasAccess(Operation::Read | Operation::Write, need)
 				== (codec.HasAccess(Operation::Read, need) && codec.HasAccess(Operation::Write, need)));

@@ -110,7 +110,7 @@ int test_empty_codec_features_preserve_generic_access() {
 	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
 		StormByte::Multimedia::Type::Subtitle, StormByte::Multimedia::Type::Attachment}) {
 		for (const auto codec : Registry::Instance().CodecList(type)) {
-			for (const auto access : {Access{}, Access{Operation::Read}, Access{Operation::Write},
+			for (const auto& access : {Access{}, Access{Operation::Read}, Access{Operation::Write},
 				Access{Operation::Read | Operation::Write}, Access{Operation::Attach}}) {
 				TEST_REQUIRE(codec.get().HasAccess(access, Features{})
 					== codec.get().HasAccess(access));
