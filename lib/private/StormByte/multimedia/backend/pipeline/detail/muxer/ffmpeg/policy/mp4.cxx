@@ -54,7 +54,9 @@
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <algorithm>
 #include <climits>
+#include <cstdint>
 #include <cstring>
 #include <span>
 
@@ -78,6 +80,21 @@ namespace {
 	class Mp4 final: public Policy {
 		public:
 			bool ZeroBasedTimeline() const noexcept override { return true; }
+
+			// movenc writes the dvcC/dvvC Dolby Vision configuration box only under
+			// FF_COMPLIANCE_UNOFFICIAL; relax compliance just for outputs carrying it.
+			void ConfigureHeader(const StormByte::Multimedia::Pipeline::Muxer&,
+				::AVFormatContext& context, std::int64_t, ::AVDictionary**) const noexcept override {
+				for (unsigned i = 0; i < context.nb_streams; ++i) {
+					const auto* par = context.streams[i]->codecpar;
+					if (par && av_packet_side_data_get(par->coded_side_data, par->nb_coded_side_data,
+						AV_PKT_DATA_DOVI_CONF)) {
+						context.strict_std_compliance = std::min(context.strict_std_compliance,
+							FF_COMPLIANCE_UNOFFICIAL);
+						return;
+					}
+				}
+			}
 
 			void PrepareStream(::AVStream& stream, bool& haveDefaultVideo,
 				bool& haveDefaultAudio) const noexcept override {

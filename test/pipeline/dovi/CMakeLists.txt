@@ -11,6 +11,7 @@ foreach(test_name IN ITEMS
 	test_remux_dovi_only
 	test_remux_hdr10_only
 	test_remux_dovi_hdr10
+	test_remux_dovi_to_mp4_keeps_configuration
 	test_video_and_frame_copy_move_preserve_dovi
 	test_dovi_owned_rpu_and_invalid_loads_preserve_configuration
 	test_dovi_metadata_rejects_invalid_extension_offsets

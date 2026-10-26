@@ -668,6 +668,29 @@ int test_remux_hdr10_only() { return check_pipeline(hdr10_only, Transform::Remux
 int test_remux_dovi_hdr10() { return check_pipeline(dovi_hdr10, Transform::Remux, "remux"); }
 int test_reencode_dovi_only() { return check_pipeline(dovi_only, Transform::Encode, "reencode"); }
 
+int test_remux_dovi_to_mp4_keeps_configuration() {
+	for (const auto* fixture : {&dovi_only, &dovi_hdr10}) {
+		const auto output = OutputPath("pipeline/dovi/" + std::string{fixture->name} + "-remux.mp4");
+		{
+			auto logger = MakeLogger();
+			TEST_PHASE("creating MP4 remux transcoder");
+			Transcoder job{TestLocation(FixturePath(fixture->path)), TestLocation(output), logger, 2000000000LL};
+			job.Video(0).Remux();
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		TEST_PHASE("checking MP4 Dolby Vision configuration");
+		auto encoded = File::Open(StormByte::Safe::String{output.string()});
+		TEST_REQUIRE(encoded);
+		TEST_REQUIRE(encoded.value().Streams().size() == 1);
+		const auto video = encoded.value().Streams()[0].Video();
+		TEST_REQUIRE(video && video.value().DOVI());
+		TEST_REQUIRE(check_dovi(video.value().DOVI().value(), *fixture) == 0);
+	}
+	return 0;
+}
+
 int test_reencoded_dovi_audit_and_vmaf_frame_counts() {
 	const auto output = OutputPath("pipeline/dovi/audit-vmaf-source.mkv");
 	auto before = StormByte::Safe::MakeShared<FrameAudit>();
@@ -979,6 +1002,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_remux_dovi_only", test_remux_dovi_only},
 		TestEntry{"test_remux_hdr10_only", test_remux_hdr10_only},
 		TestEntry{"test_remux_dovi_hdr10", test_remux_dovi_hdr10},
+		TestEntry{"test_remux_dovi_to_mp4_keeps_configuration", test_remux_dovi_to_mp4_keeps_configuration},
 		TestEntry{"test_reencode_dovi_only", test_reencode_dovi_only},
 		TestEntry{"test_reencoded_dovi_audit_and_vmaf_frame_counts", test_reencoded_dovi_audit_and_vmaf_frame_counts},
 		TestEntry{"test_reencode_hdr10_only", test_reencode_hdr10_only},
