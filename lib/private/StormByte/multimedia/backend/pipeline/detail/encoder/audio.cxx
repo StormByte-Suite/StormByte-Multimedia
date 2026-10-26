@@ -96,8 +96,6 @@ namespace {
 		if (frame.Audio()) {
 			const auto& audio = *frame.Audio();
 			params.SampleRate(static_cast<int>(audio.SampleRate()));
-			if (!bitRate)
-				params.BitRate(static_cast<std::int64_t>(audio.BitRate()));
 			int channels = static_cast<int>(audio.Channels());
 			if (channels <= 0)
 				channels = static_cast<int>(Property::ChannelCount(audio.Layout()));

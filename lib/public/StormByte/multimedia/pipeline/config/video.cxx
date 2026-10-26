@@ -74,7 +74,7 @@ Video::PointerType Video::Move() {
 	return MakePointer<Video>(std::move(*this));
 }
 
-void Video::CRF(int value) {
+void Video::CRF(double value) {
 	m_crf = value;
 	m_bitRate.reset();
 }

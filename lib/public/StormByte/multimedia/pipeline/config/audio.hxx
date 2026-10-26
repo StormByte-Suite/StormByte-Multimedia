@@ -166,15 +166,32 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			}
 
 			/**
+			 * @brief Constant quality in the encoder's native scale. Incompatible with BitRate.
+			 * @return Value, or empty.
+			 * @note libvorbis uses -1..10 and libmp3lame VBR uses 0..9 (lower is better).
+			 */
+			inline const StormByte::Safe::Optional<double>& CRF() const noexcept {
+				return m_crf;
+			}
+
+			/**
+			 * @brief Sets constant quality and clears BitRate.
+			 * @param value Quality in the encoder's native scale.
+			 * @note Safe optional assignment may throw on storage failure.
+			 */
+			void CRF(double value);
+
+			/**
 			 * @brief Target bitrate.
-			 * @return Bits per second, or empty.
+			 * @return Bits per second, or empty: the encoder picks its own default.
+			 * @note The source bitrate is never inherited.
 			 */
 			inline const StormByte::Safe::Optional<std::int64_t>& BitRate() const noexcept {
 				return m_bitRate;
 			}
 
 			/**
-			 * @brief Sets target bitrate.
+			 * @brief Sets target bitrate and clears CRF.
 			 * @param bits_per_second Bits per second.
 			 * @note Safe optional assignment may throw on storage failure.
 			 */
@@ -231,6 +248,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 
 		private:
 			const StormByte::Multimedia::Codec* m_codec;										///< Borrowed registry codec; nullptr = Remux
+			StormByte::Safe::Optional<double> m_crf;											///< Constant quality override
 			StormByte::Safe::Optional<std::int64_t> m_bitRate;									///< Target bitrate override
 			StormByte::Safe::Optional<std::int64_t> m_maxBitRate;								///< Maximum bitrate override
 			StormByte::Safe::Optional<StormByte::Safe::String> m_preset;						///< Encoder preset override

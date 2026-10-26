@@ -59,7 +59,11 @@
 #include <StormByte/multimedia/property/dovi.hxx>
 
 #include <algorithm>
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
+#include <mutex>
+#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -70,7 +74,9 @@ extern "C" {
 	#include <libavutil/dovi_meta.h>
 	#include <libavutil/frame.h>
 	#include <libavutil/hdr_dynamic_metadata.h>
+	#include <libavutil/dict.h>
 	#include <libavutil/hwcontext.h>
+	#include <libavutil/log.h>
 	#include <libavutil/mem.h>
 	#include <libavutil/opt.h>
 }
@@ -78,6 +84,74 @@ extern "C" {
 using namespace StormByte::Multimedia;
 
 namespace {
+	// Wrappers such as libx264, libx265 and libsvtav1 only warn about unknown keys or
+	// invalid values inside their packed parameter dictionaries, and that depends on the
+	// FFmpeg build (system or bundled). Capture what the encoder logs while it opens so a
+	// rejected parameter fails instead of being silently ignored.
+	struct OpenCapture {
+		const void* context = nullptr;
+		const void* priv = nullptr;
+		std::vector<std::string> lines;
+	};
+
+	thread_local OpenCapture* t_capture = nullptr;
+
+	void CaptureLog(void* avcl, int level, const char* fmt, va_list vl) {
+		if (t_capture && level <= AV_LOG_WARNING && avcl
+			&& (avcl == t_capture->context || avcl == t_capture->priv)) {
+			va_list copy;
+			va_copy(copy, vl);
+			char line[1024];
+			std::vsnprintf(line, sizeof(line), fmt, copy);
+			va_end(copy);
+			try {
+				t_capture->lines.emplace_back(line);
+			}
+			catch (...) {}
+		}
+		av_log_default_callback(avcl, level, fmt, vl);
+	}
+
+	void InstallCapture() noexcept {
+		static std::once_flag once;
+		std::call_once(once, [] { av_log_set_callback(CaptureLog); });
+	}
+
+	bool IsKeyChar(char c) noexcept {
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_';
+	}
+
+	bool MentionsKey(std::string_view line, std::string_view key) noexcept {
+		for (auto at = line.find(key); at != std::string_view::npos; at = line.find(key, at + 1)) {
+			const bool before = at == 0 || !IsKeyChar(line[at - 1]);
+			const bool after = at + key.size() >= line.size() || !IsKeyChar(line[at + key.size()]);
+			if (before && after)
+				return true;
+		}
+		return false;
+	}
+
+	// Keys of every dictionary-typed option (x265-params, x264-params, svtav1-params, ...).
+	std::set<std::string> PackedKeys(AVCodecContext* ctx,
+		const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options) {
+		std::set<std::string> keys;
+		for (const auto& [key, value] : options) {
+			if (key.empty() || value.empty())
+				continue;
+			const auto* option = av_opt_find(ctx, key.data(), nullptr, 0, AV_OPT_SEARCH_CHILDREN);
+			if (!option || option->type != AV_OPT_TYPE_DICT)
+				continue;
+			AVDictionary* parsed = nullptr;
+			if (av_dict_parse_string(&parsed, value.data(), "=", ":", 0) >= 0) {
+				const AVDictionaryEntry* entry = nullptr;
+				while ((entry = av_dict_iterate(parsed, entry)))
+					keys.emplace(entry->key);
+			}
+			av_dict_free(&parsed);
+		}
+		return keys;
+	}
+
 	bool ValidDoviMetadata(const AVFrameSideData* side) noexcept {
 		if (!side || !side->data || side->size < sizeof(AVDOVIMetadata))
 			return false;
@@ -507,11 +581,36 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		}
 	}
 
+	std::set<std::string> packed;
+	try {
+		packed = PackedKeys(ctx, options);
+	}
+	catch (...) {
+		avcodec_free_context(&ctx);
+		return Unexpected<FFmpeg::EncoderError>("Out of memory reading encoder parameters");
+	}
+	OpenCapture capture{ctx, ctx->priv_data, {}};
+	if (!packed.empty()) {
+		InstallCapture();
+		t_capture = &capture;
+	}
 	const int opened = avcodec_open2(ctx, codec, nullptr);
+	t_capture = nullptr;
 	if (opened < 0) {
 		const std::string why = AvError(opened);
 		avcodec_free_context(&ctx);
 		return Unexpected<FFmpeg::EncoderError>("Failed to open encoder: " + why);
+	}
+	for (const auto& line : capture.lines) {
+		for (const auto& key : packed) {
+			if (MentionsKey(line, key)) {
+				avcodec_free_context(&ctx);
+				std::string text = line;
+				while (!text.empty() && (text.back() == '\n' || text.back() == '\r'))
+					text.pop_back();
+				return Unexpected<FFmpeg::EncoderError>("encoder '{}' rejected parameter '{}': {}", codec_name, key, text);
+			}
+		}
 	}
 
 	if (ctx->time_base.num <= 0 || ctx->time_base.den <= 0) {

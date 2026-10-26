@@ -160,6 +160,8 @@ namespace {
 				encoder.CRF(*video->CRF());
 			if (video->BitRate())
 				encoder.BitRate(*video->BitRate());
+			if (video->MaxBitRate())
+				encoder.MaxBitRate(*video->MaxBitRate());
 			if (video->Preset())
 				encoder.Preset(*video->Preset());
 			if (video->Tune())
@@ -168,12 +170,20 @@ namespace {
 				encoder.FineTune(video->FineTune());
 		}
 		else if (const auto* audio = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Audio*>(&config)) {
+			if (audio->CRF())
+				encoder.CRF(*audio->CRF());
 			if (audio->BitRate())
 				encoder.BitRate(*audio->BitRate());
 			if (audio->MaxBitRate())
 				encoder.MaxBitRate(*audio->MaxBitRate());
 			if (audio->Preset())
 				encoder.Preset(audio->Preset().value());
+			if (!audio->FineTune().empty())
+				encoder.FineTune(audio->FineTune());
+		}
+		else if (const auto* subtitle = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Subtitle*>(&config)) {
+			if (!subtitle->FineTune().empty())
+				encoder.FineTune(subtitle->FineTune());
 		}
 	}
 

@@ -333,7 +333,7 @@ namespace StormByte {
 					 * @brief Constant quality (CRF/CQ). Incompatible with BitRate.
 					 * @param value Encoder quality value.
 					 */
-					inline void CRF(int value) noexcept {
+					inline void CRF(double value) noexcept {
 						m_crf = value;
 					}
 
@@ -341,7 +341,7 @@ namespace StormByte {
 					 * @brief CRF/CQ, if set.
 					 * @return Value, or empty.
 					 */
-					inline const StormByte::Safe::Optional<int>& CRF() const noexcept {
+					inline const StormByte::Safe::Optional<double>& CRF() const noexcept {
 						return m_crf;
 					}
 
@@ -545,7 +545,7 @@ namespace StormByte {
 					StormByte::Safe::Optional<StormByte::Safe::String> m_implementation;	///< Pinned encoder name
 					Features m_require;							///< Extra required bits
 					Features m_capabilities;							///< Opened capabilities
-					StormByte::Safe::Optional<int> m_crf;					///< CRF/CQ
+					StormByte::Safe::Optional<double> m_crf;					///< CRF/CQ
 					StormByte::Safe::Optional<std::int64_t> m_bitRate;			///< Target bitrate
 					StormByte::Safe::Optional<std::int64_t> m_maxBitRate;		///< VBV ceiling
 					StormByte::Safe::Optional<StormByte::Safe::String> m_preset;		///< Preset

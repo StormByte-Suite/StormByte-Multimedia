@@ -59,6 +59,8 @@
 #include <StormByte/multimedia/pipeline/side_data.hxx>
 #include <tables/encoder/table.hxx>
 
+#include <charconv>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <map>
@@ -76,6 +78,7 @@ extern "C" {
 	#include <libavutil/avutil.h>
 	#include <libavutil/channel_layout.h>
 	#include <libavutil/mathematics.h>
+	#include <libavutil/opt.h>
 	#include <libavutil/rational.h>
 }
 
@@ -138,6 +141,33 @@ namespace {
 
 	bool HasKey(const char* key) noexcept {
 		return key && key[0] != '\0';
+	}
+
+	// Locale-independent shortest round-trip text ("23", "18.5").
+	std::string Number(double value) {
+		char text[64];
+		const auto result = std::to_chars(text, text + sizeof(text), value);
+		return std::string(text, result.ptr);
+	}
+
+	const ::AVOption* FindOption(const ::AVCodec* codec, const char* key) noexcept {
+		if (codec->priv_class) {
+			const ::AVClass* priv = codec->priv_class;
+			if (const auto* option = av_opt_find(&priv, key, nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ))
+				return option;
+		}
+		const ::AVClass* generic = avcodec_get_class();
+		return av_opt_find(&generic, key, nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ);
+	}
+
+	bool IntegerOption(const ::AVOption* option) noexcept {
+		switch (option ? option->type : AV_OPT_TYPE_FLOAT) {
+			case AV_OPT_TYPE_INT: case AV_OPT_TYPE_INT64: case AV_OPT_TYPE_UINT64:
+			case AV_OPT_TYPE_UINT: case AV_OPT_TYPE_BOOL: case AV_OPT_TYPE_FLAGS:
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	std::int64_t BufSizeBits(const StormByte::Multimedia::Pipeline::Encoder& encoder) noexcept {
@@ -317,8 +347,25 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		for (auto& pair : SplitBlob(row->signal_hdr10 ? row->signal_hdr10 : ""))
 			blob.insert(std::move(pair));
 
-	if (owner.CRF() && row && HasKey(row->crf_key))
-		opts.emplace(row->crf_key, std::to_string(*owner.CRF()));
+	if (owner.CRF() && row && HasKey(row->crf_key)) {
+		const double quality = *owner.CRF();
+		if (!std::isfinite(quality)) {
+			owner.Fail("CRF must be a finite number");
+			return std::nullopt;
+		}
+		if (codec->type == AVMEDIA_TYPE_AUDIO) {
+			// Audio quality uses the encoder's native scale through qscale (libvorbis -q, libmp3lame -V).
+			opts.emplace("flags", "+qscale");
+			opts.emplace(row->crf_key, std::to_string(std::lround(quality * FF_QP2LAMBDA)));
+		}
+		else {
+			if (IntegerOption(FindOption(codec, row->crf_key)) && quality != std::floor(quality)) {
+				owner.Fail(std::string("encoder implementation needs an integer CRF for '") + row->crf_key + "'");
+				return std::nullopt;
+			}
+			opts.emplace(row->crf_key, Number(quality));
+		}
+	}
 	if (owner.BitRate() && row && HasKey(row->bitrate_key))
 		opts.emplace(row->bitrate_key, std::to_string(*owner.BitRate()));
 	else if (owner.CRF() && !owner.BitRate() && row && HasKey(row->bitrate_key)
@@ -379,6 +426,10 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		if (need.Has(Feature::DOVI) && (key == "dolbyvision" || key == "dolby-vision-profile" || key == "dolby-vision-rpu"
 			|| key == "vbv-maxrate" || key == "x265-params" || key == "svtav1-params")) {
 			owner.Fail("FineTune cannot override native Dolby Vision preservation");
+			return std::nullopt;
+		}
+		if (pack && key == row->tune_key) {
+			owner.Fail("FineTune takes individual '" + std::string(row->tune_key) + "' keys, not the packed option itself");
 			return std::nullopt;
 		}
 		if (blob.contains(key) && blob[key] != value) {

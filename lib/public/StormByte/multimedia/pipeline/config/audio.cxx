@@ -74,8 +74,14 @@ Audio::PointerType Audio::Move() {
 	return MakePointer<Audio>(std::move(*this));
 }
 
+void Audio::CRF(double value) {
+	m_crf = value;
+	m_bitRate.reset();
+}
+
 void Audio::BitRate(std::int64_t bits_per_second) {
 	m_bitRate = bits_per_second;
+	m_crf.reset();
 }
 
 void Audio::MaxBitRate(std::int64_t bits_per_second) {

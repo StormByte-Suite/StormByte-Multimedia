@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/encoder_info.hxx>
 #include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/optional.hxx>
@@ -181,6 +182,17 @@ namespace StormByte {
 				 * This does not probe hardware devices, settings or container compatibility.
 				 */
 				bool HasAccess(Access access, const Features& need) const noexcept;
+
+				/**
+				 * @brief Lists the available encoder implementations for this codec.
+				 * @param need Features each listed implementation must preserve; empty lists all.
+				 * @return Implementations ordered by preference. The first one is the
+				 * implementation Multimedia picks when no encoder is pinned and @p need
+				 * is the required feature set. Empty when the codec is not writable.
+				 * @note Availability means the linked FFmpeg provides the encoder; hardware
+				 * devices are not probed.
+				 */
+				StormByte::Safe::Vector<EncoderInfo> Encoders(const Features& need = {}) const;
 
 			private:
 				/**

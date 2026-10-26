@@ -163,7 +163,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief CRF/CQ. Incompatible with BitRate.
 			 * @return Value, or empty.
 			 */
-			inline const StormByte::Safe::Optional<int>& CRF() const noexcept {
+			inline const StormByte::Safe::Optional<double>& CRF() const noexcept {
 				return m_crf;
 			}
 
@@ -171,7 +171,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Sets CRF/CQ and clears BitRate.
 			 * @param value Quality value.
 			 */
-			void CRF(int value);
+			void CRF(double value);
 
 			/**
 			 * @brief Target bitrate.
@@ -249,7 +249,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 
 		private:
 			const StormByte::Multimedia::Codec* m_codec;										///< Destination codec; nullptr = Remux
-			StormByte::Safe::Optional<int> m_crf;												///< CRF/CQ
+			StormByte::Safe::Optional<double> m_crf;												///< CRF/CQ
 			StormByte::Safe::Optional<std::int64_t> m_bitRate;									///< Target bitrate
 			StormByte::Safe::Optional<std::int64_t> m_maxBitRate;								///< VBV ceiling
 			StormByte::Safe::Optional<StormByte::Safe::String> m_preset;						///< Preset

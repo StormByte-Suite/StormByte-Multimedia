@@ -238,7 +238,7 @@ namespace StormByte {
 					const Codec* Source = nullptr;						///< Borrowed registry origin codec
 					const Codec* Destination = nullptr;					///< Borrowed opened encoder codec, or null for remux
 					StormByte::Safe::Optional<StormByte::Safe::String> Implementation;		///< Opened encoder implementation pin
-					StormByte::Safe::Optional<int> Crf;					///< CRF/CQ actually used
+					StormByte::Safe::Optional<double> Crf;					///< CRF/CQ actually used
 					StormByte::Safe::Optional<std::int64_t> BitRate;				///< Bitrate actually used
 					StormByte::Safe::Optional<std::int64_t> MaxBitRate;				///< VBV bitrate actually used
 					StormByte::Safe::Optional<StormByte::Safe::String> Preset;			///< Preset actually used
@@ -394,7 +394,7 @@ namespace StormByte {
 							 * @param value Quality value.
 							 * @return *this.
 							 */
-							Track& CRF(int value);
+							Track& CRF(double value);
 
 							/**
 							 * @brief Sets target bitrate. Clears CRF.
@@ -426,6 +426,11 @@ namespace StormByte {
 
 							/**
 							 * @brief Replaces vendor leftovers.
+							 *
+							 * Pass individual keys. For encoders with a packed private
+							 * option (EncoderSetting::Params, e.g. x265-params), keys are
+							 * packed into it; passing the packed option itself fails.
+							 * Unknown keys fail the job when the encoder opens.
 							 * @param options Key / value map.
 							 * @return *this.
 							 */

@@ -53,7 +53,9 @@
 #include <tables/decoder/table.hxx>
 #include <tables/encoder/table.hxx>
 
+#include <algorithm>
 #include <initializer_list>
+#include <vector>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -123,4 +125,38 @@ bool Codec::HasAccess(Access access, const Features& need) const noexcept {
 		return false;
 	}
 	return true;
+}
+
+StormByte::Safe::Vector<EncoderInfo> Codec::Encoders(const Features& need) const {
+	StormByte::Safe::Vector<EncoderInfo> out;
+	if (!HasAccess(Operation::Write))
+		return out;
+	std::vector<const Tables::Encoder::EncoderDef*> rows;
+	for (const auto table : {Tables::Encoder::Video(), Tables::Encoder::Audio(), Tables::Encoder::Subtitle()}) {
+		for (const auto& row : table) {
+			if (m_name == row.codec && row.features.Has(need)
+				&& avcodec_find_encoder_by_name(row.name) != nullptr)
+				rows.push_back(&row);
+		}
+	}
+	std::stable_sort(rows.begin(), rows.end(), [](const auto* a, const auto* b) {
+		return a->preference < b->preference;
+	});
+	const auto key = [](const char* text) noexcept {
+		return text ? std::string_view{text} : std::string_view{};
+	};
+	for (const auto* row : rows) {
+		EncoderInfo info;
+		info.m_name = row->name;
+		info.m_description = row->description;
+		info.m_features = row->features;
+		info.m_keys[static_cast<std::size_t>(EncoderSetting::CRF)] = key(row->crf_key);
+		info.m_keys[static_cast<std::size_t>(EncoderSetting::BitRate)] = key(row->bitrate_key);
+		info.m_keys[static_cast<std::size_t>(EncoderSetting::MaxBitRate)] = key(row->maxrate_key);
+		info.m_keys[static_cast<std::size_t>(EncoderSetting::Preset)] = key(row->preset_key);
+		info.m_keys[static_cast<std::size_t>(EncoderSetting::Tune)] = key(row->style_key);
+		info.m_keys[static_cast<std::size_t>(EncoderSetting::Params)] = key(row->tune_key);
+		out.push_back(info);
+	}
+	return out;
 }

@@ -226,11 +226,16 @@ Transcoder::Track& Transcoder::Track::Implementation(ImplementationSide side, St
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::CRF(int value) {
+Transcoder::Track& Transcoder::Track::CRF(double value) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
-	if (auto* video = AsVideo(m_owner->m_backend->Mapped[m_slot].Config.get()))
+	auto* config = m_owner->m_backend->Mapped[m_slot].Config.get();
+	if (auto* video = AsVideo(config))
 		video->CRF(value);
+	else if (auto* audio = AsAudio(config))
+		audio->CRF(value);
+	else
+		m_owner->Fail("CRF applies only to video and audio tracks");
 	return *this;
 }
 
@@ -242,14 +247,21 @@ Transcoder::Track& Transcoder::Track::BitRate(std::int64_t bits_per_second) {
 		video->BitRate(bits_per_second);
 	else if (auto* audio = AsAudio(config))
 		audio->BitRate(bits_per_second);
+	else
+		m_owner->Fail("BitRate applies only to video and audio tracks");
 	return *this;
 }
 
 Transcoder::Track& Transcoder::Track::MaxBitRate(std::int64_t bits_per_second) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
-	if (auto* audio = AsAudio(m_owner->m_backend->Mapped[m_slot].Config.get()))
+	auto* config = m_owner->m_backend->Mapped[m_slot].Config.get();
+	if (auto* video = AsVideo(config))
+		video->MaxBitRate(bits_per_second);
+	else if (auto* audio = AsAudio(config))
 		audio->MaxBitRate(bits_per_second);
+	else
+		m_owner->Fail("MaxBitRate applies only to video and audio tracks");
 	return *this;
 }
 
@@ -261,6 +273,8 @@ Transcoder::Track& Transcoder::Track::Preset(StormByte::Safe::String name) {
 		video->Preset(std::move(name));
 	else if (auto* audio = AsAudio(config))
 		audio->Preset(std::move(name));
+	else
+		m_owner->Fail("Preset applies only to video and audio tracks");
 	return *this;
 }
 
@@ -269,14 +283,21 @@ Transcoder::Track& Transcoder::Track::Tune(StormByte::Safe::String name) {
 		return *this;
 	if (auto* video = AsVideo(m_owner->m_backend->Mapped[m_slot].Config.get()))
 		video->Tune(std::move(name));
+	else
+		m_owner->Fail("Tune applies only to video tracks");
 	return *this;
 }
 
 Transcoder::Track& Transcoder::Track::FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
-	if (auto* video = AsVideo(m_owner->m_backend->Mapped[m_slot].Config.get()))
+	auto* config = m_owner->m_backend->Mapped[m_slot].Config.get();
+	if (auto* video = AsVideo(config))
 		video->FineTune(std::move(options));
+	else if (auto* audio = AsAudio(config))
+		audio->FineTune(std::move(options));
+	else if (auto* subtitle = AsSubtitle(config))
+		subtitle->FineTune(std::move(options));
 	return *this;
 }
 
