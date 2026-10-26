@@ -52,6 +52,7 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - [Plan, items and the tube contract](#plan-items-and-the-tube-contract)
 - [DLL boundaries](#dll-boundaries)
 - [Filters and analytics](#filters-and-analytics)
+- [Progress](#progress)
 - [Logging](#logging)
 - [Build options and distribution](#build-options-and-distribution)
 - [Installation](#installation)
@@ -290,7 +291,7 @@ What that mapping means:
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
 
-When source duration is not supplied, `Progress` first displays `Calculating duration` with an activity indicator. Duration analysis happens before processing begins; after it completes, progress reports the scan and processing phases separately. `Progress::Snapshot()` gives applications a consistent phase, duration/analytics percentages, processing score and completion flags, so a UI does not need to parse the status string. Getters and snapshots are safe to read concurrently. Custom `EmptyPlan` factories can pass `DurationProgress()` to the observing `Plan` constructor to publish scan updates.
+`job.Progress()` reports the duration scan, the main job percent and the optional measure and analytics phases. See [Progress](#progress) for how to read the real transcode percent in a UI.
 
 Capture `job.Telemetry()` before `Run()` if the final snapshot must outlive the job. It retains each stage's origin, lifecycle, frame/packet input and output counts, setup and elapsed time, Process-call total/mean/min/max, and blocked-wait total/count/max. The coordinator also logs the final multi-line report at `Info`; converting the retained handle to `std::string` produces the same report. A hand-built `Step` or filter exposes its own retained `Telemetry()` handle.
 
@@ -449,6 +450,47 @@ The default VMAF thread count uses all cores. Memory depends on resolution, thre
 Write a new filter the same way `Scale` and `Watermark` are written. Do not add public friends so a coordinator can peek.
 
 Destroying a filter graph requests cancellation of its connected endpoints, filters and look decoders before joining workers. Explicit stage stop or failure aborts shared hoppers to wake blocked producers; normal producer EOF still drains queued media and respects the remaining writers.
+
+## Progress
+
+`Transcoder::Progress()` (or `Demuxer::Progress()` in a hand-built tube) returns a shared, read-only clock. Its getters and `Snapshot()` are safe to read from any thread while the job runs; `Snapshot()` captures every value under one lock, so a UI should prefer it to calling getters one by one.
+
+A job has up to four independent axes, all measured against the source duration:
+
+| Axis | Getter / `Values` field | Present when | What it measures |
+| --- | --- | --- | --- |
+| Duration scan | `DurationCalculation()` / `Duration` | No duration was supplied | Packet scan that finds the source duration. Empty during CPU-only preparation. |
+| Main | `Main()` / `Main`, `MainComplete()` / `MainComplete` | Always | How much of the destination has been written. Exactly 100 once the muxer writes the trailer. |
+| Measure | `Measure()` / `Measure`, `MeasureComplete` | A two-pass filter such as `Degrain` is mounted | The first pass over the source. |
+| Analytics | `Analytics()` / `Analytics`, `AnalyticsComplete` | An analytics filter such as `VMAF` is mounted | The decoded destination pictures scored so far. |
+
+`Main` is the real transcode percent: measure and analytics never add to it, it never goes backwards, and it is 0 while the duration scan runs. `Measure` and `Analytics` are empty when that phase is not mounted and report their own 0..100 otherwise.
+
+`All()` / `All` is a weighted mix for one-line displays: measure counts 5 %, analytics 10 % and the main job the rest. It stays below 100 until the main job and every mounted phase have finished, so it moves slowly while a first pass runs and can sit near 99 % while analytics drains. Use it, or `Current == Progress::Phase::Complete`, to know when everything has finished, not as the transcode percent. The `std::string` conversion of `Progress` (the CLI status line) uses `All`.
+
+`Current` tells which phase leads: `CalculatingDuration`, `Measure` (first pass running, `Main` still 0), `Processing` and `Complete`.
+
+Edge cases a UI should handle:
+
+- **Main is 100 but analytics is still running.** Analytics decodes and scores the destination on its own path, so it can finish after the muxer. `MainComplete` is true and `Main` is 100 while `AnalyticsComplete` is still false; show the main bar full and the analytics bar still moving.
+- **A measure pass is running.** `Main` stays at 0 until the first pass ends; show measure progress separately.
+- **The job finished.** When `Status()` is `Done`, `Main` and `All` are both 100, every mounted phase is complete and `Current` is `Complete`. Decide success from `Status()`, not from progress values.
+
+```cpp
+if (const auto progress = job.Progress()) {
+	const auto values = progress->Snapshot();
+	if (values.Current == Progress::Phase::CalculatingDuration)
+		ShowScan(values.Duration);                // empty while preparing
+	else
+		ShowMain(values.Main);                    // real transcode percent
+	ShowMeasure(values.Measure, values.MeasureComplete);
+	ShowAnalytics(values.Analytics, values.AnalyticsComplete);
+	if (values.MainComplete && !values.AnalyticsComplete)
+		ShowStatus("Finishing analysis...");
+}
+```
+
+Custom `EmptyPlan` factories can pass `DurationProgress()` to the observing `Plan` constructor to publish duration scan updates.
 
 ## Logging
 
