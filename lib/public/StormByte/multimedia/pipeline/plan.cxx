@@ -69,10 +69,12 @@
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/safe/condition_variable.hxx>
 #include <StormByte/safe/unique_lock.hxx>
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <optional>
 #include <span>
 #include <string>
@@ -98,6 +100,9 @@ class Plan::Observers {
 	public:
 		std::vector<Step*> Stages;	///< Stages whose owners serialize teardown with notification.
 		std::vector<Step*> Completed;
+		StormByte::Safe::Mutex HoldMutex;					///< Guards HoldCv waits.
+		StormByte::Safe::ConditionVariable HoldCv;			///< Wakes held stages.
+		StormByte::Safe::Atomic<bool> Held{false};			///< Stages pause before their next work unit.
 };
 
 namespace {
@@ -413,6 +418,36 @@ void Plan::Observe(Step& step) noexcept {
 	auto& stages = m_observers->Stages;
 	if (std::find(stages.begin(), stages.end(), &step) == stages.end())
 		stages.push_back(&step);
+}
+
+void Plan::Hold(bool held) noexcept {
+	Observers* observers = nullptr;
+	{
+		StormByte::Safe::UniqueLock lock(m_state_mutex);
+		if (!m_observers)
+			m_observers = StormByte::Safe::Unique<Observers>::MakePointer<Observers>();
+		observers = m_observers.get();
+	}
+	{
+		StormByte::Safe::UniqueLock lock(observers->HoldMutex);
+		observers->Held.store(held, StormByte::Safe::MemoryOrder::Release);
+	}
+	observers->HoldCv.notify_all();
+}
+
+void Plan::WaitWhileHeld(const Step& step) const noexcept {
+	Observers* observers = nullptr;
+	{
+		StormByte::Safe::UniqueLock lock(m_state_mutex);
+		observers = m_observers.get();
+	}
+	if (!observers)
+		return;
+	StormByte::Safe::UniqueLock lock(observers->HoldMutex);
+	// Timed so cancellation and failure, which do not signal HoldCv, still release the stage.
+	while (observers->Held.load(StormByte::Safe::MemoryOrder::Acquire) && !step.Stopping()
+		&& State() == State::Running)
+		observers->HoldCv.wait_for(lock, std::chrono::milliseconds(100));
 }
 
 void Plan::Unobserve(Step& step) noexcept {

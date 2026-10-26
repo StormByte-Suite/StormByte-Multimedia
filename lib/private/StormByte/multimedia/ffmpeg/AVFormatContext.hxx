@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/ffmpeg/AVBSF.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/ffmpeg/backend_typedefs.hxx>
+#include <StormByte/multimedia/metadata/file.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -150,6 +151,18 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @return Duration, or empty if unknown or result allocation fails.
 			 */
 			Safe::Optional<Property::Duration> Duration() const;
+
+			/**
+			 * @brief Container chapters converted to nanoseconds.
+			 * @return Chapters in container order; empty if none.
+			 */
+			Safe::Vector<Metadata::Chapter> Chapters() const;
+
+			/**
+			 * @brief Container start time in nanoseconds.
+			 * @return Earliest stream start, or zero if unknown.
+			 */
+			std::chrono::nanoseconds StartTime() const noexcept;
 
 			/**
 			 * @brief Reads the next packet.

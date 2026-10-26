@@ -409,6 +409,33 @@ FFmpeg::OperationResult FFmpeg::AVFormatContext::SeekStart() noexcept {
 	return OperationResult::Success;
 }
 
+StormByte::Safe::Vector<StormByte::Multimedia::Metadata::Chapter>
+FFmpeg::AVFormatContext::Chapters() const {
+	StormByte::Safe::Vector<StormByte::Multimedia::Metadata::Chapter> out;
+	if (!m_ptr)
+		return out;
+	constexpr ::AVRational ns{1, 1000000000};
+	for (unsigned i = 0; i < m_ptr->nb_chapters; ++i) {
+		const ::AVChapter* chapter = m_ptr->chapters[i];
+		if (!chapter || chapter->time_base.num <= 0 || chapter->time_base.den <= 0)
+			continue;
+		StormByte::Multimedia::Metadata::Chapter item;
+		item.Start = std::chrono::nanoseconds{av_rescale_q(chapter->start, chapter->time_base, ns)};
+		item.End = std::chrono::nanoseconds{av_rescale_q(chapter->end, chapter->time_base, ns)};
+		if (const AVDictionaryEntry* title = av_dict_get(chapter->metadata, "title", nullptr, 0);
+			title && title->value && *title->value)
+			item.Title = StormByte::Safe::String(title->value);
+		out.push_back(std::move(item));
+	}
+	return out;
+}
+
+std::chrono::nanoseconds FFmpeg::AVFormatContext::StartTime() const noexcept {
+	if (!m_ptr || m_ptr->start_time == AV_NOPTS_VALUE)
+		return std::chrono::nanoseconds{0};
+	return std::chrono::nanoseconds{av_rescale_q(m_ptr->start_time, AV_TIME_BASE_Q, ::AVRational{1, 1000000000})};
+}
+
 FFmpeg::Streams FFmpeg::AVFormatContext::Streams() const noexcept {
 	FFmpeg::Streams out;
 

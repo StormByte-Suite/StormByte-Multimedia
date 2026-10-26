@@ -54,6 +54,7 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
+#include <StormByte/multimedia/metadata/stream.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
@@ -354,6 +355,20 @@ namespace StormByte {
 					void Title(int output_index, StormByte::Safe::String title) noexcept;
 
 					/**
+					 * @brief Disposition for mux output @p output_index.
+					 * @param output_index Mux destination order key.
+					 * @return Flags, or empty to let the container policy choose.
+					 */
+					StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Disposition(int output_index) const noexcept;
+
+					/**
+					 * @brief Sets the disposition for mux output @p output_index.
+					 * @param output_index Mux destination order key.
+					 * @param disposition Flags written verbatim (default, forced, ...).
+					 */
+					void Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition) noexcept;
+
+					/**
 					 * @}
 					 */
 
@@ -500,6 +515,7 @@ namespace StormByte {
 					StormByte::Safe::Unique<Connections> m_connections;	///< Provider-owned borrowed encoder registry; stages must outlive this muxer.
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;	///< Per-output language
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;		///< Per-output title
+					StormByte::Safe::Map<int, StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition>> m_disposition;	///< Per-output disposition
 					StormByte::Safe::Atomic<bool> m_closed;				///< Set by Finish / Fail
 					StormByte::Safe::Atomic<std::uint64_t> m_reserved;			///< Reserved Video/Audio/Subtitle hoppers
 					StormByte::Safe::Atomic<std::int64_t> m_positionNs;			///< Last written Pts, or -1

@@ -89,6 +89,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			int avIndex = -1;										///< Index in AVFormatContext
 			AVRational timeBase{0, 1};									///< Mux time base
 			std::int64_t lastDts = StormByte::Multimedia::FFmpeg::NoPts;	///< Last written DTS
+			std::int64_t lastDuration = 0;							///< Last written duration, 0 if unknown
 			StormByte::Safe::Optional<StormByte::Safe::String> language;	///< Header language
 			StormByte::Safe::Optional<StormByte::Safe::String> title;		///< Header title
 	};
@@ -256,6 +257,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			StormByte::Safe::Map<int, int> m_inToOut; 								///< Source stream index → reserved output slot
 			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_queue;	///< Packets waiting for header
 			StormByte::Multimedia::Attachments m_attachments;			///< Header catalogue
+			std::int64_t m_shiftNs = 0;									///< Subtracted from every timestamp
 			bool m_header;												///< avformat_write_header done
 			bool m_trailer;												///< av_write_trailer done
 			bool m_customIo;											///< pb is FileAvio

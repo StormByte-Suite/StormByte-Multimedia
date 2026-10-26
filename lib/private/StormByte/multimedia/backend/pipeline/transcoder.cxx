@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
+#include <StormByte/multimedia/detail/locale.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/exception.hxx>
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
@@ -76,7 +77,7 @@ using namespace StormByte::Multimedia::Backend::Pipeline;
 using StormByte::Logger::Level;
 
 TranscoderSlot::TranscoderSlot(const TranscoderSlot& other)
-: In(other.In), Out(other.Out), Kind(other.Kind), Source(other.Source),
+: In(other.In), Out(other.Out), Kind(other.Kind), Source(other.Source), Origin(other.Origin),
 	Config(other.Config ? other.Config->Clone() : StormByte::Safe::Unique<StormByte::Multimedia::Pipeline::Config::Base>{}),
 	Filters(other.Filters), Settled(other.Settled) {}
 
@@ -177,11 +178,25 @@ namespace {
 	}
 
 	void StampMuxTags(StormByte::Multimedia::Pipeline::Muxer& mux, int out,
-		const StormByte::Multimedia::Pipeline::Config::Base& config) noexcept {
+		const StormByte::Multimedia::Pipeline::Config::Base& config,
+		const StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Stream>& origin) noexcept {
 		if (config.Language())
 			mux.Language(out, config.Language().value());
+		else if (origin && origin->Language())
+			mux.Language(out, origin->Language().value());
 		if (config.Title())
 			mux.Title(out, config.Title().value());
+		else if (origin && origin->Title())
+			mux.Title(out, origin->Title().value());
+		if (!origin)
+			return;
+		using StormByte::Multimedia::Metadata::DispositionFlag;
+		auto disposition = origin->Disposition();
+		if (config.Default())
+			*config.Default() ? disposition.Add(DispositionFlag::Default) : disposition.Remove(DispositionFlag::Default);
+		if (config.Forced())
+			*config.Forced() ? disposition.Add(DispositionFlag::Forced) : disposition.Remove(DispositionFlag::Forced);
+		mux.Disposition(out, std::move(disposition));
 	}
 
 	bool Stopping(const Transcoder& coordinator) noexcept {
@@ -216,6 +231,7 @@ void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcep
 	}
 	Status.store(StormByte::Multimedia::Pipeline::Status::Running, StormByte::Safe::MemoryOrder::Release);
 	m_worker = StormByte::Safe::Thread([this, &job]() {
+		StormByte::Multimedia::Detail::UseCNumericLocale();
 		Run(job);
 	});
 }
@@ -227,6 +243,12 @@ void Transcoder::RequestCancel() noexcept {
 		Paused.store(false, StormByte::Safe::MemoryOrder::Release);
 	}
 	PauseCv.notify_all();
+}
+
+void Transcoder::Hold(StormByte::Multimedia::Pipeline::Transcoder& job, bool held) noexcept {
+	StormByte::Safe::UniqueLock lock(Lock);
+	if (job.m_plan)
+		job.m_plan->Hold(held);
 }
 
 void Transcoder::Join() noexcept {
@@ -306,6 +328,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	{
 		StormByte::Safe::UniqueLock lock(Lock);
 		job.m_plan = built;
+		if (Paused.load(StormByte::Safe::MemoryOrder::Acquire))
+			built->Hold(true);
 		if (Status.load(StormByte::Safe::MemoryOrder::Acquire) == StormByte::Multimedia::Pipeline::Status::Error)
 			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed, Error);
 	}
@@ -420,7 +444,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		if (slot.Kind == StormByte::Multimedia::Type::Attachment)
 			continue;
 
-		StampMuxTags(*mux, muxIndex, *slot.Config);
+		StampMuxTags(*mux, muxIndex, *slot.Config, slot.Origin);
 		const StormByte::Multimedia::Codec* codec = LeafCodec(slot.Config.get());
 		if (!codec) {
 					auto remux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);

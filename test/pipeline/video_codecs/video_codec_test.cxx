@@ -250,15 +250,15 @@ int test_nvenc_feature_contract() {
 	TEST_REQUIRE(h264 != encoders.end());
 	TEST_REQUIRE(hevc != encoders.end());
 	TEST_REQUIRE(av1 != encoders.end());
-	TEST_REQUIRE(!h264->features.Has(Feature::TenBit));
+	TEST_REQUIRE(h264->features.Has(Feature::TenBit));
 	TEST_REQUIRE(!h264->features.Has(Feature::HDR10));
 	TEST_REQUIRE(hevc->features.Has(Feature::TenBit));
 	TEST_REQUIRE(hevc->features.Has(Feature::HDR10));
-	TEST_REQUIRE(!hevc->features.Has(Feature::HDR10Plus));
+	TEST_REQUIRE(hevc->features.Has(Feature::HDR10Plus));
 	TEST_REQUIRE(!hevc->features.Has(Feature::DOVI));
 	TEST_REQUIRE(av1->features.Has(Feature::TenBit));
 	TEST_REQUIRE(av1->features.Has(Feature::HDR10));
-	TEST_REQUIRE(!av1->features.Has(Feature::HDR10Plus));
+	TEST_REQUIRE(av1->features.Has(Feature::HDR10Plus));
 	TEST_REQUIRE(!av1->features.Has(Feature::DOVI));
 	for (const auto& row : Tables::Decoder::Video()) {
 		TEST_REQUIRE(std::string_view{row.name}.find("_nvdec") == std::string_view::npos);

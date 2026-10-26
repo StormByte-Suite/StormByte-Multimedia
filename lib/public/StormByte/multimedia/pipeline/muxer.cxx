@@ -218,6 +218,17 @@ void Muxer::Title(int output_index, StormByte::Safe::String title) noexcept {
 		m_title[output_index] = std::move(title);
 }
 
+StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Muxer::Disposition(int output_index) const noexcept {
+	if (!m_disposition.contains(output_index))
+		return std::nullopt;
+	return m_disposition.at(output_index);
+}
+
+void Muxer::Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition) noexcept {
+	m_disposition.erase(output_index);
+	m_disposition.insert({output_index, StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition>(std::move(disposition))});
+}
+
 void Muxer::WaitArmed() noexcept {
 	pipe().WaitWake(this, [](void* context) noexcept {
 		const auto& owner = *static_cast<Muxer*>(context);

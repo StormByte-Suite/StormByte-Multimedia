@@ -153,6 +153,8 @@ StormByte::Multimedia::Detail::Probe::File(const FFmpeg::AVFormatContext& ctx) n
 		meta.Track(*track);
 	if (const auto disc = ParseIndex(tag("disc")))
 		meta.Disc(*disc);
+	meta.Chapters(ctx.Chapters());
+	meta.StartTime(ctx.StartTime());
 	return meta;
 }
 

@@ -704,6 +704,18 @@ namespace StormByte {
 					void Unobserve(Step& step) noexcept;
 
 					/**
+					 * @brief Holds or releases every stage at its next work unit.
+					 * @param held True pauses the pipeline; false resumes it.
+					 */
+					void Hold(bool held) noexcept;
+
+					/**
+					 * @brief Blocks @p step while the plan is held.
+					 * @param step Stage about to process; returns early once it is stopping.
+					 */
+					void WaitWhileHeld(const Step& step) const noexcept;
+
+					/**
 					 * @brief Records completion of a stage participating in this plan.
 					 * @param step Participating stage whose execution has ended.
 					 * @param success Whether the stage completed successfully.

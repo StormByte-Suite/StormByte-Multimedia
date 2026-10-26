@@ -53,6 +53,9 @@
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/string.hxx>
+#include <StormByte/safe/vector.hxx>
+
+#include <chrono>
 
 /**
  * @namespace StormByte
@@ -87,6 +90,25 @@ namespace StormByte {
 		 * @brief Snapshot metadata for files and streams.
 		 */
 		namespace Metadata {
+			/**
+			 * @struct Chapter
+			 * @brief One container chapter captured at Open.
+			 */
+			struct STORMBYTE_MULTIMEDIA_PUBLIC Chapter {
+				std::chrono::nanoseconds Start{0};	///< Chapter start on the source timeline.
+				std::chrono::nanoseconds End{0};	///< Chapter end on the source timeline.
+				Safe::Optional<Safe::String> Title;	///< Chapter title, or empty.
+			};
+		}
+	}
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Metadata::Chapter);
+
+namespace StormByte {
+	namespace Multimedia {
+		namespace Metadata {
+
 			/**
 			 * @class File
 			 * @brief File tags and header fields captured at Open.
@@ -199,6 +221,21 @@ namespace StormByte {
 					 */
 					Safe::Optional<unsigned> Disc() const;
 
+					/**
+					 * @brief Chapter list in source order.
+					 * @return Chapters, empty when the container has none.
+					 */
+					const Safe::Vector<Chapter>& Chapters() const noexcept;
+
+					/**
+					 * @brief Start of the source timeline.
+					 * @return Earliest stream start, or zero when unknown.
+					 *
+					 * Stream and chapter times are on this timeline; formats that
+					 * start at zero report zero.
+					 */
+					std::chrono::nanoseconds StartTime() const noexcept;
+
 				private:
 					/**
 					 * @brief Public media file snapshot.
@@ -222,6 +259,8 @@ namespace StormByte {
 					Safe::Optional<Safe::String> m_date;			///< Date or year tag.
 					Safe::Optional<unsigned> m_track;				///< Track number.
 					Safe::Optional<unsigned> m_disc;				///< Disc number.
+					Safe::Vector<Chapter> m_chapters;				///< Chapter list.
+					std::chrono::nanoseconds m_startTime{0};		///< Source timeline start.
 
 					/**
 					 * @brief Empty metadata.
@@ -299,6 +338,18 @@ namespace StormByte {
 					 * @param disc Disc number.
 					 */
 					void Disc(unsigned disc);
+
+					/**
+					 * @brief Sets the chapter list.
+					 * @param chapters Chapters in source order.
+					 */
+					void Chapters(Safe::Vector<Chapter> chapters);
+
+					/**
+					 * @brief Sets the source timeline start.
+					 * @param start Earliest stream start.
+					 */
+					void StartTime(std::chrono::nanoseconds start) noexcept;
 			};
 		}
 	}

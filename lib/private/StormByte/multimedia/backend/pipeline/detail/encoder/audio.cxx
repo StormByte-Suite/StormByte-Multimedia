@@ -217,7 +217,7 @@ bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 	}
 
 	m_fifo = std::move(fifo);
-	m_nextPts = 0;
+	m_nextPts = AV_NOPTS_VALUE;
 	return true;
 }
 
@@ -227,6 +227,10 @@ bool Audio::Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
 		owner.Fail("audio ingest missing source or fifo");
 		return false;
 	}
+
+	// Start on the source timeline so encoded audio stays aligned with remuxed lanes.
+	if (m_nextPts == AV_NOPTS_VALUE)
+		m_nextPts = src.Pts() != AV_NOPTS_VALUE ? src.Pts() : 0;
 
 	StormByte::Multimedia::FFmpeg::AVFrame* ready = &src;
 	if (m_swr) {
@@ -487,13 +491,10 @@ void Audio::StampOutgoing() noexcept {
 	if (dur <= 0)
 		dur = m_frameSize > 0 ? m_frameSize : 1;
 
+	// Negative values are encoder priming; the container shifts or trims them.
 	if (pts == AV_NOPTS_VALUE)
 		pts = m_pktPts;
 	if (dts == AV_NOPTS_VALUE)
-		dts = pts;
-	if (pts < 0)
-		pts = m_pktPts;
-	if (dts < 0)
 		dts = pts;
 
 	m_pktPts = pts + dur;

@@ -262,13 +262,15 @@ int test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata() {
 }
 
 int test_transcoder_enforce_features_rejects_hdr10_loss() {
-	auto h264 = Registry::Instance().FindCodec("H.264");
-	TEST_REQUIRE(h264);
+	auto vp8 = Registry::Instance().FindCodec("VP8");
+	TEST_REQUIRE(vp8);
+	if (!vp8.value().get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
 	const auto output = OutputPath("pipeline/enforce-features-reject-hdr10.mkv");
 	auto logger = MakeLogger();
 	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath("video/hdr10_metadata_source.mkv")), TestLocation(output), logger, 2000000000LL};
-	job.Video(0).Codec(h264.value().get());
+	job.Video(0).Codec(vp8.value().get());
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	TEST_PHASE("starting transcoder run");
 	job.Run();

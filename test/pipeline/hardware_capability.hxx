@@ -130,6 +130,38 @@ inline bool RenderDeviceUnusable() {
 }
 
 /**
+ * @brief Checks Linux DRM render nodes for a device that can provide VAAPI encoding.
+ * @return True only when a complete readable inventory has no accessible non-NVIDIA render node. NVIDIA's VAAPI
+ * driver (nvidia-vaapi-driver) is decode-only, so NVIDIA nodes never provide VAAPI encoders.
+ */
+inline bool VaapiEncodeDeviceAbsent() {
+#ifdef __linux__
+	std::error_code error;
+	const std::filesystem::path root{"/sys/class/drm"};
+	if (!std::filesystem::exists(root, error))
+		return !error;
+	std::filesystem::directory_iterator entries(root, error);
+	if (error)
+		return false;
+	const std::filesystem::directory_iterator end;
+	for (; entries != end; entries.increment(error)) {
+		if (error)
+			return false;
+		const std::string name = entries->path().filename().string();
+		if (!name.starts_with("renderD") || !DeviceNodeUsable(std::filesystem::path{"/dev/dri"} / name))
+			continue;
+		std::ifstream vendor(entries->path() / "device/vendor");
+		unsigned identifier = 0;
+		if (!(vendor >> std::hex >> identifier) || identifier != 0x10de)
+			return false;
+	}
+	return !error;
+#else
+	return false;
+#endif
+}
+
+/**
  * @brief Independently proves that the backend's device cannot be reached by this process.
  * @param device Hardware backend selected from the concrete encoder configuration.
  * @return True when the platform inventory proves the device absent or inaccessible.
@@ -138,7 +170,7 @@ inline bool HardwareDeviceAbsent(AVHWDeviceType device) {
 	switch (device) {
 		case AV_HWDEVICE_TYPE_QSV:		return IntelRenderDeviceAbsent();
 		case AV_HWDEVICE_TYPE_CUDA:		return NvidiaDeviceInaccessible();
-		case AV_HWDEVICE_TYPE_VAAPI:
+		case AV_HWDEVICE_TYPE_VAAPI:	return VaapiEncodeDeviceAbsent();
 		case AV_HWDEVICE_TYPE_VULKAN:	return RenderDeviceUnusable();
 		default:						return false;
 	}

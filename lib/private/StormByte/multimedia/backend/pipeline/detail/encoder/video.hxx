@@ -187,7 +187,5 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			AVRational m_timeBase;														///< Encoder time base
 			int m_index;																///< Encoder::Index after Open
 			bool m_flushed;																///< EOF already signalled
-			std::int64_t m_tsOffset;													///< Added to pts/dts so the first PTS is 0
-			bool m_tsOffsetSet;															///< Offset taken from the first packet
 	};
 }

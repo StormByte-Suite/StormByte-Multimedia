@@ -77,6 +77,8 @@ namespace {
 
 	class Mp4 final: public Policy {
 		public:
+			bool ZeroBasedTimeline() const noexcept override { return true; }
+
 			void PrepareStream(::AVStream& stream, bool& haveDefaultVideo,
 				bool& haveDefaultAudio) const noexcept override {
 				MarkDefaultStream(stream, haveDefaultVideo, haveDefaultAudio);

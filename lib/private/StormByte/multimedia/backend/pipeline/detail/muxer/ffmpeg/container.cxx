@@ -68,7 +68,9 @@
 #include <StormByte/safe/string.hxx>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <span>
 #include <string>
@@ -117,6 +119,72 @@ namespace {
 			&& text("date", source.Date())
 			&& index("track", source.Track())
 			&& index("disc", source.Disc());
+	}
+
+	/**
+	 * @brief Stamps the output with the encode time, as an ISO 8601 UTC creation_time tag.
+	 * @param destination Output format metadata.
+	 * @return False only when the tag cannot be stored.
+	 */
+	bool StampCreationTime(AVDictionary*& destination) noexcept {
+		using namespace std::chrono;
+		const auto now = floor<microseconds>(system_clock::now());
+		const auto day = floor<days>(now);
+		const year_month_day date{day};
+		const hh_mm_ss time{now - day};
+		char text[32];
+		const int written = std::snprintf(text, sizeof(text), "%04d-%02u-%02uT%02d:%02d:%02d.%06lldZ",
+			static_cast<int>(date.year()), static_cast<unsigned>(date.month()), static_cast<unsigned>(date.day()),
+			static_cast<int>(time.hours().count()), static_cast<int>(time.minutes().count()),
+			static_cast<int>(time.seconds().count()), static_cast<long long>(time.subseconds().count()));
+		return written > 0 && written < static_cast<int>(sizeof(text))
+			&& av_dict_set(&destination, "creation_time", text, 0) >= 0;
+	}
+
+	bool CopyChapters(::AVFormatContext& context,
+		const StormByte::Safe::Vector<StormByte::Multimedia::Metadata::Chapter>& chapters, std::int64_t shiftNs) noexcept {
+		if (chapters.empty())
+			return true;
+		auto** grown = static_cast<::AVChapter**>(av_realloc_array(context.chapters,
+			context.nb_chapters + chapters.size(), sizeof(::AVChapter*)));
+		if (!grown)
+			return false;
+		context.chapters = grown;
+		for (const auto& chapter : chapters) {
+			auto* out = static_cast<::AVChapter*>(av_mallocz(sizeof(::AVChapter)));
+			if (!out)
+				return false;
+			out->id = static_cast<std::int64_t>(context.nb_chapters) + 1;
+			out->time_base = ::AVRational{1, 1000000000};
+			out->start = std::max<std::int64_t>(chapter.Start.count() - shiftNs, 0);
+			out->end = std::max<std::int64_t>(chapter.End.count() - shiftNs, out->start);
+			if (chapter.Title && av_dict_set(&out->metadata, "title", chapter.Title->data(), 0) < 0) {
+				av_dict_free(&out->metadata);
+				av_free(out);
+				return false;
+			}
+			context.chapters[context.nb_chapters++] = out;
+		}
+		return true;
+	}
+
+	int ToAVDisposition(const StormByte::Multimedia::Metadata::Disposition& disposition) noexcept {
+		using StormByte::Multimedia::Metadata::DispositionFlag;
+		int out = 0;
+		const auto map = [&](DispositionFlag flag, int av) {
+			if (disposition.Has(flag))
+				out |= av;
+		};
+		map(DispositionFlag::Default, AV_DISPOSITION_DEFAULT);
+		map(DispositionFlag::Dub, AV_DISPOSITION_DUB);
+		map(DispositionFlag::Original, AV_DISPOSITION_ORIGINAL);
+		map(DispositionFlag::Comment, AV_DISPOSITION_COMMENT);
+		map(DispositionFlag::Lyrics, AV_DISPOSITION_LYRICS);
+		map(DispositionFlag::Karaoke, AV_DISPOSITION_KARAOKE);
+		map(DispositionFlag::Forced, AV_DISPOSITION_FORCED);
+		map(DispositionFlag::HearingImpaired, AV_DISPOSITION_HEARING_IMPAIRED);
+		map(DispositionFlag::VisualImpaired, AV_DISPOSITION_VISUAL_IMPAIRED);
+		return out;
 	}
 
 	bool Encodes(const StormByte::Multimedia::Pipeline::Track& track) noexcept {
@@ -343,7 +411,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		m_ctx = ctx;
-		if (!CopyFileTags(m_ctx->metadata, owner.Plan()->Snapshot().Metadata())) {
+		const auto& source = owner.Plan()->Snapshot().Metadata();
+		m_shiftNs = m_policy->ZeroBasedTimeline() ? std::max<std::int64_t>(source.StartTime().count(), 0) : 0;
+		if (!CopyFileTags(m_ctx->metadata, source)
+			|| !StampCreationTime(m_ctx->metadata)
+			|| !CopyChapters(*m_ctx, source.Chapters(), m_shiftNs)) {
 			owner.Fail("failed to copy source file metadata");
 			return false;
 		}
@@ -580,7 +652,16 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				return false;
 			}
 
-			m_policy->PrepareStream(*stream, haveDefaultVideo, haveDefaultAudio);
+			if (const auto disposition = owner.Disposition(index)) {
+				stream->disposition = ToAVDisposition(*disposition);
+				if (stream->disposition & AV_DISPOSITION_DEFAULT) {
+					const auto type = stream->codecpar ? stream->codecpar->codec_type : AVMEDIA_TYPE_UNKNOWN;
+					haveDefaultVideo = haveDefaultVideo || type == AVMEDIA_TYPE_VIDEO;
+					haveDefaultAudio = haveDefaultAudio || type == AVMEDIA_TYPE_AUDIO;
+				}
+			}
+			else
+				m_policy->PrepareStream(*stream, haveDefaultVideo, haveDefaultAudio);
 
 			track.avIndex = stream->index;
 			track.timeBase = FFmpeg::AVRational{stream->time_base.num, stream->time_base.den};
@@ -591,18 +672,20 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				return false;
 		}
 
-		std::int64_t minPts = -1;
-		std::int64_t maxPts = -1;
+		bool havePts = false;
+		std::int64_t minPts = 0;
+		std::int64_t maxPts = 0;
 		for (const auto& queued : m_queue) {
 			if (!queued || !queued->Pts())
 				continue;
 			const std::int64_t ns = queued->Pts()->Nanoseconds().count();
-			if (minPts < 0 || ns < minPts)
+			if (!havePts || ns < minPts)
 				minPts = ns;
-			if (ns > maxPts)
+			if (!havePts || ns > maxPts)
 				maxPts = ns;
+			havePts = true;
 		}
-		const std::int64_t spanUs = minPts >= 0 && maxPts > minPts
+		const std::int64_t spanUs = havePts && maxPts > minPts
 			? (maxPts - minPts) / 1000 + InterleaveSlotUs : 0;
 		std::int64_t deltaUs = InterleaveDeltaUs(owner.Plan() ? &owner.Plan()->Tracks() : nullptr);
 		const auto capacity = owner.InputCeiling();
@@ -680,11 +763,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const FFmpeg::AVRational tb = track.timeBase;
 
 		if (packet.Pts())
-			raw->pts = NsToTicks(packet.Pts()->Nanoseconds().count(), tb);
+			raw->pts = NsToTicks(packet.Pts()->Nanoseconds().count() - m_shiftNs, tb);
 		else
 			raw->pts = AV_NOPTS_VALUE;
 		if (packet.Dts())
-			raw->dts = NsToTicks(packet.Dts()->Nanoseconds().count(), tb);
+			raw->dts = NsToTicks(packet.Dts()->Nanoseconds().count() - m_shiftNs, tb);
 		else
 			raw->dts = AV_NOPTS_VALUE;
 		if (packet.Duration()) {
@@ -700,19 +783,37 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 		else {
 			if (raw->dts == AV_NOPTS_VALUE) {
-				if (track.lastDts != AV_NOPTS_VALUE)
-					raw->dts = track.lastDts + 1;
-				else if (raw->pts != AV_NOPTS_VALUE)
-					raw->dts = raw->pts;
+				// Laced Matroska audio (e.g. TrueHD) only stamps the first frame of each block, and
+				// Matroska video omits DTS for reordered leading frames: never place DTS past the next slot.
+				if (raw->pts != AV_NOPTS_VALUE)
+					raw->dts = track.lastDts == AV_NOPTS_VALUE ? raw->pts
+						: std::min(raw->pts, track.lastDts + std::max<std::int64_t>(track.lastDuration, 1));
+				else if (track.lastDts != AV_NOPTS_VALUE)
+					raw->dts = track.lastDts + std::max<std::int64_t>(track.lastDuration, 1);
+				else
+					raw->dts = 0;
 			}
 
-			else if (track.lastDts != AV_NOPTS_VALUE && raw->dts <= track.lastDts)
-				raw->dts = track.lastDts + 1;
-			if (raw->pts != AV_NOPTS_VALUE && raw->dts != AV_NOPTS_VALUE && raw->pts < raw->dts)
+			// Equal DTS are legal where the muxer allows it; bumping them drifts coarse (1 ms) sources.
+			const bool nonStrict = m_ctx->oformat->flags & AVFMT_TS_NONSTRICT;
+			if (track.lastDts != AV_NOPTS_VALUE && raw->dts != AV_NOPTS_VALUE
+				&& (nonStrict ? raw->dts < track.lastDts : raw->dts <= track.lastDts))
+				raw->dts = nonStrict ? track.lastDts : track.lastDts + 1;
+			if (raw->dts != AV_NOPTS_VALUE && (raw->pts == AV_NOPTS_VALUE || raw->pts < raw->dts))
 				raw->pts = raw->dts;
-			if (raw->dts != AV_NOPTS_VALUE)
+			if (raw->dts != AV_NOPTS_VALUE) {
 				track.lastDts = raw->dts;
+				track.lastDuration = raw->duration > 0 ? raw->duration : track.lastDuration;
+			}
 		}
+
+		// libavformat's own guessing of missing timestamps is deprecated; always hand it both.
+		if (raw->pts == AV_NOPTS_VALUE && raw->dts == AV_NOPTS_VALUE)
+			raw->pts = raw->dts = track.lastDts != AV_NOPTS_VALUE ? track.lastDts : 0;
+		else if (raw->pts == AV_NOPTS_VALUE)
+			raw->pts = raw->dts;
+		else if (raw->dts == AV_NOPTS_VALUE)
+			raw->dts = raw->pts;
 
 		const int rc = av_interleaved_write_frame(m_ctx, raw);
 		av_packet_free(&raw);

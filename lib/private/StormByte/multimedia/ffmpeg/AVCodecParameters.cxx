@@ -171,6 +171,15 @@ void FFmpeg::AVCodecParameters::ColorRange(int range) noexcept {
 		m_ptr->color_range = static_cast<::AVColorRange>(range);
 }
 
+int FFmpeg::AVCodecParameters::ChromaLocation() const noexcept {
+	return m_ptr ? static_cast<int>(m_ptr->chroma_location) : static_cast<int>(AVCHROMA_LOC_UNSPECIFIED);
+}
+
+void FFmpeg::AVCodecParameters::ChromaLocation(int location) noexcept {
+	if (m_ptr)
+		m_ptr->chroma_location = static_cast<::AVChromaLocation>(location);
+}
+
 int FFmpeg::AVCodecParameters::ColorSpace() const noexcept {
 	return m_ptr ? static_cast<int>(m_ptr->color_space) : static_cast<int>(AVCOL_SPC_UNSPECIFIED);
 }

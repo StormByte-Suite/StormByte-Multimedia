@@ -739,7 +739,10 @@ namespace StormByte {
 					void Cancel() noexcept;
 
 					/**
-					 * @brief Pauses the coordinator.
+					 * @brief Pauses the job.
+					 * Every stage (demux, decode, filters, encode, mux) blocks before its
+					 * next work unit, so CPU use stops once in-flight units finish.
+					 * Cancel still works while paused.
 					 */
 					void Pause() noexcept;
 

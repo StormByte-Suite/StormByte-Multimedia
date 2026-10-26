@@ -924,8 +924,9 @@ int test_dovi_encoder_table_capabilities() {
 	constexpr std::array enabled{std::string_view{"libx265"}, std::string_view{"libsvtav1"}, std::string_view{"libaom-av1"}};
 	constexpr std::array hdr10_enabled{
 		std::string_view{"libx265"}, std::string_view{"libsvtav1"}, std::string_view{"libaom-av1"},
-		std::string_view{"libvpx-vp9"}, std::string_view{"hevc_nvenc"}, std::string_view{"av1_nvenc"},
-		std::string_view{"hevc_qsv"}, std::string_view{"hevc_vaapi"}
+		std::string_view{"libvpx-vp9"}, std::string_view{"libx264"}, std::string_view{"hevc_nvenc"},
+		std::string_view{"av1_nvenc"}, std::string_view{"hevc_qsv"}, std::string_view{"av1_qsv"},
+		std::string_view{"hevc_vaapi"}, std::string_view{"av1_vaapi"}
 	};
 	for (const auto name : hdr10_enabled) {
 		const auto found = std::ranges::find_if(table, [name](const auto& row) {

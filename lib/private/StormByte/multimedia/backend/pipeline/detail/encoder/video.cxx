@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <tables/encoder/table.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/property/color.hxx>
 #include <StormByte/multimedia/property/hdr10.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -219,6 +220,8 @@ namespace {
 			const auto sar = handle->SampleAspectRatio();
 			if (sar.Valid())
 				params.SampleAspectRatio(sar);
+			if (handle->ChromaLocation() != AVCHROMA_LOC_UNSPECIFIED)
+				params.ChromaLocation(handle->ChromaLocation());
 			if (!writeHdr10 && (keepHdrSignal || (handle->ColorTransfer() != AVCOL_TRC_SMPTE2084
 				&& handle->ColorTransfer() != AVCOL_TRC_ARIB_STD_B67))) {
 				if (handle->ColorRange() != AVCOL_RANGE_UNSPECIFIED)
@@ -235,10 +238,22 @@ namespace {
 		return params;
 	}
 
+	bool Enforcing(const StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+		const auto plan = owner.Plan();
+		return !plan || plan->Policies().Has(StormByte::Multimedia::Pipeline::Plan::Policy::EnforceFeatures);
+	}
+
 	bool RowKeeps(const StormByte::Multimedia::Pipeline::Encoder& owner, Feature feature) noexcept {
 		const auto codec = owner.Destination().Name();
 		const auto& pin = owner.Implementation();
 		const std::string_view wanted = pin ? std::string_view{*pin} : std::string_view{};
+		// Without EnforceFeatures, source metadata must not steer selection to a
+		// slower implementation: keep only what the preferred one can carry.
+		if (!Enforcing(owner)) {
+			const std::string name{codec};
+			const auto* preferred = StormByte::Multimedia::Tables::Encoder::PickEncoder(name, wanted, owner.Require());
+			return preferred && preferred->features.Has(feature);
+		}
 		for (const auto& row : StormByte::Multimedia::Tables::Encoder::Video()) {
 			if (!row.codec || codec != row.codec)
 				continue;
@@ -258,7 +273,7 @@ Video::Video(Video&& other) noexcept = default;
 Video& Video::operator=(Video&& other) noexcept = default;
 
 Video::Video() noexcept
-: m_owner(nullptr), m_timeBase{0, 1}, m_index(0), m_flushed(false), m_tsOffset(0), m_tsOffsetSet(false) {}
+: m_owner(nullptr), m_timeBase{0, 1}, m_index(0), m_flushed(false) {}
 
 bool Video::IsOpen() const noexcept {
 	return m_encoder.has_value();
@@ -277,16 +292,8 @@ void Video::StampOutgoing() noexcept {
 	std::int64_t dts = m_scratch.Dts();
 	std::int64_t dur = m_scratch.Duration();
 
-	if (!m_tsOffsetSet) {
-		m_tsOffset = (pts != AV_NOPTS_VALUE) ? -pts : 0;
-		m_tsOffsetSet = true;
-	}
-
-	if (pts != AV_NOPTS_VALUE)
-		pts += m_tsOffset;
-	if (dts != AV_NOPTS_VALUE)
-		dts += m_tsOffset;
-
+	// Keep the source timeline: remuxed lanes are not rebased, so shifting
+	// encoded video would desynchronise it from them.
 	if (dts == AV_NOPTS_VALUE)
 		dts = (pts != AV_NOPTS_VALUE) ? pts : 0;
 	if (pts == AV_NOPTS_VALUE)
@@ -316,7 +323,7 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const bool keepsDovi = RowKeeps(owner, Feature::DOVI);
 	if (keepsHdr && frame.Video() && frame.Video()->HDR10()) {
 		need.Add(Feature::HDR10);
-		if (frame.Video()->HDR10()->IsHDR10Plus())
+		if (frame.Video()->HDR10()->IsHDR10Plus() && RowKeeps(owner, Feature::HDR10Plus))
 			need.Add(Feature::HDR10Plus);
 	}
 	if (keepsDovi && ((frame.Video() && frame.Video()->DOVI() && frame.Video()->DOVI()->Present())

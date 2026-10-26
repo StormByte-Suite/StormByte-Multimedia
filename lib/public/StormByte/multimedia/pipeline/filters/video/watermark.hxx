@@ -128,8 +128,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Colour and alpha
 	 * Only the logo rectangle is rewritten. A fully transparent pixel is not
 	 * written, so the sample under it keeps its colour, depth and side data.
-	 * Partial alpha blends in linear light. On PQ and HLG, SDR white is placed
-	 * at 203 cd/m². Frame transfer, primaries and HDR metadata are not retagged.
+	 * Colour is converted through linear light; partial alpha and opacity mix
+	 * perceptually (PQ on HDR, 2.4 gamma on SDR), so 70 reads as 70 % on screen.
+	 * On PQ and HLG, SDR white is placed at 203 cd/m². Frame transfer, primaries
+	 * and HDR metadata are not retagged.
 	 *
 	 * @par Do not stack
 	 * One Watermark. Do not Hold-probe twice. Absolute

@@ -293,10 +293,16 @@ int test_file_hdr10plus_detection() {
 }
 
 int test_hdr10plus_capabilities() {
+	constexpr std::array enabled{
+		std::string_view{"libx265"}, std::string_view{"libsvtav1"}, std::string_view{"libaom-av1"},
+		std::string_view{"libvpx-vp9"}, std::string_view{"hevc_nvenc"}, std::string_view{"av1_nvenc"},
+		std::string_view{"hevc_qsv"}, std::string_view{"av1_qsv"}, std::string_view{"hevc_vaapi"},
+		std::string_view{"av1_vaapi"}, std::string_view{"hevc_videotoolbox"}
+	};
 	for (const auto& row : Tables::Encoder::Video()) {
 		const std::string_view name{row.name};
 		TEST_REQUIRE(row.features.Has(Feature::HDR10Plus)
-			== (name == "libx265" || name == "libaom-av1" || name == "libvpx-vp9"));
+			== (std::ranges::find(enabled, name) != enabled.end()));
 	}
 	for (const auto& row : Tables::Decoder::Video()) {
 		const std::string_view name{row.name};

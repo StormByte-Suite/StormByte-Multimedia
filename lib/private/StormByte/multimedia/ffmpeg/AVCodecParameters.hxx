@@ -197,6 +197,18 @@ namespace StormByte::Multimedia::FFmpeg {
 			void ColorRange(int range) noexcept;
 
 			/**
+			 * @brief Chroma sample location.
+			 * @return `AVChromaLocation` as int.
+			 */
+			int ChromaLocation() const noexcept;
+
+			/**
+			 * @brief Sets chroma sample location.
+			 * @param location `AVChromaLocation` as int.
+			 */
+			void ChromaLocation(int location) noexcept;
+
+			/**
 			 * @brief Matrix coefficients.
 			 * @return `AVColorSpace` as int.
 			 */

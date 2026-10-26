@@ -581,8 +581,33 @@ namespace {
 		}
 	}
 
+	float PqEncode(float linear) noexcept {
+		constexpr float m1 = 2610.f / 16384.f, m2 = 2523.f / 32.f;
+		constexpr float c1 = 3424.f / 4096.f, c2 = 2413.f / 128.f, c3 = 2392.f / 128.f;
+		const float y = std::pow(std::max(linear, 0.f), m1);
+		return std::pow((c1 + c2 * y) / (1.f + c3 * y), m2);
+	}
+
+	float PqDecode(float encoded) noexcept {
+		constexpr float m1 = 2610.f / 16384.f, m2 = 2523.f / 32.f;
+		constexpr float c1 = 3424.f / 4096.f, c2 = 2413.f / 128.f, c3 = 2392.f / 128.f;
+		const float e = std::pow(std::clamp(encoded, 0.f, 1.f), 1.f / m2);
+		return std::pow(std::max(e - c1, 0.f) / (c2 - c3 * e), 1.f / m1);
+	}
+
+	// Opacity is perceptual (as in image editors): mixing in linear light makes a
+	// bright logo over dark video look almost opaque, especially on PQ content.
+	float Mix(float under, float over, float a, bool hdr) noexcept {
+		if (hdr)
+			return PqDecode(PqEncode(under) * (1.f - a) + PqEncode(over) * a);
+		constexpr float gamma = 2.4f;
+		const float u = std::pow(std::max(under, 0.f), 1.f / gamma);
+		const float o = std::pow(std::max(over, 0.f), 1.f / gamma);
+		return std::pow(u * (1.f - a) + o * a, gamma);
+	}
+
 	void BlendLinear(FFrame& tile, const FFrame& logo, int placeX, int placeY, int tileX, int tileY,
-		const std::uint8_t* rgba, int logoW, int logoH, unsigned opacity) noexcept {
+		const std::uint8_t* rgba, int logoW, int logoH, unsigned opacity, bool hdr) noexcept {
 		if (!tile.Data(0) || !tile.Data(1) || !tile.Data(2) || !logo.Data(0) || !logo.Data(1) || !logo.Data(2))
 			return;
 		const float opacityScale = static_cast<float>(opacity) / 100.f;
@@ -606,10 +631,9 @@ namespace {
 				const float a = (static_cast<float>(alpha[col * 4 + 3]) / 255.f) * opacityScale;
 				if (a <= 0.f)
 					continue;
-				const float keep = 1.f - a;
-				tileG[tx] = tileG[tx] * keep + logoG[col] * a;
-				tileB[tx] = tileB[tx] * keep + logoB[col] * a;
-				tileR[tx] = tileR[tx] * keep + logoR[col] * a;
+				tileG[tx] = Mix(tileG[tx], logoG[col], a, hdr);
+				tileB[tx] = Mix(tileB[tx], logoB[col], a, hdr);
+				tileR[tx] = Mix(tileR[tx], logoR[col], a, hdr);
 			}
 		}
 	}
@@ -1084,7 +1108,7 @@ bool Watermark::Composite(const FFrame& src, int x, int y) noexcept {
 		|| !linear.Data(0) || !linear.Data(1) || !linear.Data(2))
 		return false;
 	const std::uint8_t* rgba = m_scaled.empty() ? m_rgba.data() : m_scaled.data();
-	BlendLinear(linear, *m_linear, x, y, box.x, box.y, rgba, m_paintW, m_paintH, m_opacity);
+	BlendLinear(linear, *m_linear, x, y, box.x, box.y, rgba, m_paintW, m_paintH, m_opacity, hdr);
 	linear.ColorTransfer(AVCOL_TRC_LINEAR);
 	linear.ColorPrimaries(primaries);
 	linear.ColorSpace(AVCOL_SPC_RGB);

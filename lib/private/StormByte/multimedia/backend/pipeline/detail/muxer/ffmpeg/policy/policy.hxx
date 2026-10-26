@@ -163,6 +163,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			virtual void ConfigureHeader(const StormByte::Multimedia::Pipeline::Muxer& owner,
 				::AVFormatContext& context, std::int64_t bufferedSpanUs, ::AVDictionary** options) const noexcept;
 
+			/**
+			 * @brief Whether output timestamps are rebased so the source start becomes zero.
+			 *
+			 * Needed where encoder priming is only trimmed when it lies before zero
+			 * (MP4 edit lists); formats that signal codec delay keep the source timeline.
+			 * @return true to subtract the source start time from every timestamp.
+			 */
+			virtual bool ZeroBasedTimeline() const noexcept { return false; }
+
 		protected:
 			/**
 			 * @brief Marks the first video and audio streams as defaults.

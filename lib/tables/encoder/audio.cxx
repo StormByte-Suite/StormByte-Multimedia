@@ -55,7 +55,7 @@ using namespace StormByte::Multimedia::Tables::Encoder;
 
 namespace {
 	constexpr EncoderDef table[] = {
-		{ "AAC", "aac", "Native AAC encoder", 0, Feature::LowDelay, "", "", "", "", "b", "", "", "", "" },
+		{ "AAC", "aac", "Native AAC encoder", 0, Feature::LowDelay | Feature::SurroundSound, "", "", "", "", "b", "", "", "", "" },
 		{ "AAC", "libfdk_aac", "Fraunhofer FDK AAC", 1, Feature::HighQuality | Feature::LowDelay | Feature::ProfileBased | Feature::SurroundSound, "", "", "", "", "b", "", "", "", "" },
 		{ "Vorbis", "libvorbis", "libvorbis encoder", 0, Feature::HighQuality | Feature::LowDelay | Feature::SurroundSound, "", "", "", "", "b", "", "", "", "" },
 		{ "Opus", "libopus", "libopus encoder", 0, Feature::HighQuality | Feature::LowDelay | Feature::SurroundSound, "", "", "", "", "b", "", "", "", "" },

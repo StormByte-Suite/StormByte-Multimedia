@@ -91,8 +91,7 @@ namespace {
 		if (ticks == AV_NOPTS_VALUE || !timeBase.Valid())
 			return std::nullopt;
 		const std::int64_t ns = timeBase.Rescale(ticks, FFmpeg::Nanosecond);
-		if (ns < 0)
-			return std::nullopt;
+		// B-frame reordering yields negative DTS ahead of the first PTS; keep them.
 		return Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 
@@ -456,6 +455,22 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 						}
 
 						params.CopyChannelLayout(FFmpeg::FromRaw(*best));
+					}
+				}
+				else if (codec->id == AV_CODEC_ID_OPUS) {
+					// libopus accepts only the Vorbis channel order (mapping family 1) without publishing it.
+					static constexpr const char* vorbis[] = {
+						"mono", "stereo", "3.0", "quad", "5.0", "5.1", "6.1", "7.1"};
+					const int n = params.Channels();
+					if (n >= 1 && n <= 8) {
+						::AVChannelLayout wanted{};
+						if (av_channel_layout_from_string(&wanted, vorbis[n - 1]) == 0) {
+							const auto have = params.ChannelLayout();
+							const auto* haveRaw = have ? FFmpeg::ToRaw(have) : nullptr;
+							if (!haveRaw || av_channel_layout_compare(haveRaw, &wanted) != 0)
+								params.CopyChannelLayout(FFmpeg::FromRaw(wanted));
+							av_channel_layout_uninit(&wanted);
+						}
 					}
 				}
 			}

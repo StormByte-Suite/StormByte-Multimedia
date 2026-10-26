@@ -480,8 +480,10 @@ Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 	slot.In = in;
 	slot.Out = static_cast<int>(m_backend->Mapped.size());
 	slot.Kind = kind;
-	if (stream)
+	if (stream) {
 		slot.Source = &stream->Codec();
+		slot.Origin = stream->Metadata();
+	}
 	if (kind == Type::Video)
 		slot.Config = StormByte::Safe::Unique<Config::Base>::MakePointer<Config::Video>();
 	else if (kind == Type::Audio)
@@ -590,6 +592,7 @@ void Transcoder::Pause() noexcept {
 		return;
 	m_backend->Paused.store(true, StormByte::Safe::MemoryOrder::Release);
 	m_backend->Status.store(Status::Paused, StormByte::Safe::MemoryOrder::Release);
+	m_backend->Hold(*this, true);
 	JobLog(m_logger, Level::Notice, "paused");
 }
 
@@ -602,6 +605,7 @@ void Transcoder::Resume() noexcept {
 		StormByte::Safe::UniqueLock lock(m_backend->PauseMutex);
 		m_backend->Paused.store(false, StormByte::Safe::MemoryOrder::Release);
 	}
+	m_backend->Hold(*this, false);
 	m_backend->Status.store(Status::Running, StormByte::Safe::MemoryOrder::Release);
 	m_backend->PauseCv.notify_all();
 	JobLog(m_logger, Level::Notice, "resumed");

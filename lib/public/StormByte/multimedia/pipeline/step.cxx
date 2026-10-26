@@ -114,6 +114,11 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 			return m_step.Stopping();
 		}
 
+		void WaitWhileHeld() noexcept override {
+			if (const auto plan = m_step.Plan())
+				plan->WaitWhileHeld(m_step);
+		}
+
 		void Fail(std::string_view reason) noexcept override {
 			m_step.Fail(StormByte::Safe::String(reason));
 		}

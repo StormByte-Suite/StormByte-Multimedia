@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/pumper.hxx>
+#include <StormByte/multimedia/detail/locale.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/safe/memory_order.hxx>
 
@@ -88,6 +89,7 @@ void Pumper::Launch() noexcept {
 	if (m_thread.joinable() || !m_worker || Stopping())
 		return;
 	m_thread = StormByte::Safe::Thread([this]() {
+		StormByte::Multimedia::Detail::UseCNumericLocale();
 		auto& telemetry = m_host.Telemetry();
 		telemetry.Start();
 		const auto setup_started = std::chrono::steady_clock::now();
@@ -191,6 +193,9 @@ void Pumper::PumpSource() noexcept {
 	for (;;) {
 		if (Stopping() || m_host.Exhausted())
 			break;
+		m_host.WaitWhileHeld();
+		if (Stopping())
+			break;
 		const auto started = std::chrono::steady_clock::now();
 		m_worker->Process({});
 		m_host.RecordWork(Elapsed(started));
@@ -234,6 +239,9 @@ void Pumper::PumpPop() noexcept {
 			break;
 		}
 
+		m_host.WaitWhileHeld();
+		if (Stopping())
+			break;
 		const auto started = std::chrono::steady_clock::now();
 		m_worker->Process(std::move(item));
 		m_host.RecordWork(Elapsed(started));

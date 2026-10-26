@@ -58,6 +58,7 @@
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <StormByte/multimedia/property/dovi.hxx>
 
+#include <algorithm>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -83,6 +84,68 @@ namespace {
 
 		Property::DOVI validated;
 		return validated.LoadMetadata(std::as_bytes(std::span{side->data, side->size}));
+	}
+
+	bool HasEnhancementLayer(const AVDOVIMetadata* metadata) noexcept {
+		const auto* header = av_dovi_get_header(metadata);
+		const auto* mapping = av_dovi_get_mapping(metadata);
+		return !header->disable_residual_flag || header->el_spatial_resampling_filter_flag
+			|| mapping->nlq_method_idc != AV_DOVI_NLQ_NONE;
+	}
+
+	// Same rewrite as dovi_tool mode 2 (profile 7 -> 8.1): the enhancement layer cannot follow a
+	// re-encoded base layer, so the RPU is marked single-layer and its dynamic metadata kept.
+	void ToSingleLayer(AVDOVIMetadata* metadata) noexcept {
+		auto* header = av_dovi_get_header(metadata);
+		auto* mapping = av_dovi_get_mapping(metadata);
+		auto* color = av_dovi_get_color(metadata);
+		const std::int64_t one = std::int64_t{1} << header->coef_log2_denom;
+		bool mel = mapping->nlq_method_idc != AV_DOVI_NLQ_NONE;
+		for (const auto& nlq : mapping->nlq)
+			mel = mel && nlq.nlq_offset == 0 && nlq.vdr_in_max == static_cast<std::uint64_t>(one)
+				&& nlq.linear_deadzone_slope == 0 && nlq.linear_deadzone_threshold == 0;
+		const bool fel = mapping->nlq_method_idc != AV_DOVI_NLQ_NONE && !mel;
+
+		header->el_spatial_resampling_filter_flag = 0;
+		header->disable_residual_flag = 1;
+		mapping->nlq_method_idc = AV_DOVI_NLQ_NONE;
+		mapping->num_x_partitions = 1;
+		mapping->num_y_partitions = 1;
+		std::memset(mapping->nlq, 0, sizeof(mapping->nlq));
+		std::memset(mapping->nlq_pivots, 0, sizeof(mapping->nlq_pivots));
+
+		// FEL reshaping only makes sense together with its residual: use the identity curve.
+		if (fel) {
+			for (auto& curve : mapping->curves) {
+				curve = {};
+				curve.num_pivots = 2;
+				curve.pivots[0] = 0;
+				curve.pivots[1] = static_cast<std::uint16_t>((1u << header->bl_bit_depth) - 1);
+				curve.mapping_idc[0] = AV_DOVI_MAPPING_POLYNOMIAL;
+				curve.poly_order[0] = 1;
+				curve.poly_coef[0][1] = one;
+			}
+		}
+
+		constexpr int YccToRgb[9] = {9574, 0, 13802, 9574, -1540, -5348, 9574, 17610, 0};
+		constexpr int RgbToLms[9] = {7222, 8771, 390, 2654, 12430, 1300, 0, 422, 15962};
+		for (int i = 0; i < 9; ++i) {
+			color->ycc_to_rgb_matrix[i] = av_make_q(YccToRgb[i], 1 << 13);
+			color->rgb_to_lms_matrix[i] = av_make_q(RgbToLms[i], 1 << 14);
+		}
+		color->ycc_to_rgb_offset[0] = av_make_q(1, 16);
+		color->ycc_to_rgb_offset[1] = av_make_q(1, 2);
+		color->ycc_to_rgb_offset[2] = av_make_q(1, 2);
+		color->signal_color_space = 0;
+	}
+
+	AVBufferRef* SingleLayerCopy(const AVFrameSideData* side) noexcept {
+		AVBufferRef* copy = av_buffer_alloc(side->size);
+		if (!copy)
+			return nullptr;
+		std::memcpy(copy->data, side->data, side->size);
+		ToSingleLayer(reinterpret_cast<AVDOVIMetadata*>(copy->data));
+		return copy;
 	}
 
 	constexpr const char DefaultAssHeader[] =
@@ -228,6 +291,83 @@ namespace {
 		return true;
 	}
 
+	void PushLeb128(std::vector<std::uint8_t>& out, std::size_t value) noexcept {
+		do {
+			std::uint8_t byte = static_cast<std::uint8_t>(value & 0x7F);
+			value >>= 7;
+			if (value)
+				byte |= 0x80;
+			out.push_back(byte);
+		} while (value);
+	}
+
+	bool ReadLeb128(const std::uint8_t* data, std::size_t size, std::size_t& pos, std::uint64_t& value) noexcept {
+		value = 0;
+		for (int i = 0; i < 8; ++i) {
+			if (pos >= size)
+				return false;
+			const std::uint8_t byte = data[pos++];
+			value |= static_cast<std::uint64_t>(byte & 0x7F) << (7 * i);
+			if (!(byte & 0x80))
+				return true;
+		}
+		return false;
+	}
+
+	// Inserts an ITU-T T.35 metadata OBU after the temporal delimiter and any
+	// sequence header, which is where AV1 requires metadata to precede frames.
+	bool InsertAv1Metadata(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) noexcept {
+		const auto* src = pkt.Data();
+		const int srcSize = pkt.Size();
+		if (!src || srcSize <= 0 || t35.empty())
+			return true;
+		const auto size = static_cast<std::size_t>(srcSize);
+		std::size_t insert = 0;
+		while (insert < size) {
+			std::size_t pos = insert;
+			const std::uint8_t header = src[pos++];
+			const int type = (header >> 3) & 0x0F;
+			if (type != 1 && type != 2)
+				break;
+			if (header & 0x04)
+				++pos;
+			std::uint64_t length = 0;
+			if (!(header & 0x02) || !ReadLeb128(src, size, pos, length) || length > size - std::min(pos, size))
+				return true;
+			insert = pos + static_cast<std::size_t>(length);
+		}
+
+		std::vector<std::uint8_t> payload;
+		PushLeb128(payload, 4);
+		payload.insert(payload.end(), t35.begin(), t35.end());
+		payload.push_back(0x80);
+		std::vector<std::uint8_t> out(src, src + insert);
+		out.push_back(0x2A);
+		PushLeb128(out, payload.size());
+		out.insert(out.end(), payload.begin(), payload.end());
+		out.insert(out.end(), src + insert, src + size);
+
+		const int stream = pkt.StreamIndex() >= 0 ? pkt.StreamIndex() : 0;
+		const bool key = (pkt.Flags() & AV_PKT_FLAG_KEY) != 0;
+		const std::int64_t pts = pkt.Pts();
+		const std::int64_t dts = pkt.Dts();
+		const std::int64_t duration = pkt.Duration();
+		if (!pkt.Load(out.data(), static_cast<int>(out.size()), stream, key))
+			return false;
+		pkt.Timestamps(pts, dts, duration);
+		return true;
+	}
+
+	// libaom forwards HDR10+ itself; every other HEVC/AV1 encoder relies on us.
+	bool InjectsHdrPlus(const ::AVCodecContext* ctx) noexcept {
+		if (!ctx)
+			return false;
+		if (ctx->codec_id == AV_CODEC_ID_HEVC)
+			return true;
+		return ctx->codec_id == AV_CODEC_ID_AV1
+			&& !(ctx->codec && ctx->codec->name && std::string_view{ctx->codec->name} == "libaom-av1");
+	}
+
 	std::vector<std::uint8_t> T35FromFrame(const FFmpeg::AVFrame& frame) noexcept {
 		std::vector<std::uint8_t> out;
 		const AVFrameSideData* sd = frame.SideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
@@ -301,17 +441,20 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 			avcodec_free_context(&ctx);
 			return Unexpected<FFmpeg::EncoderError>("native Dolby Vision encoding requires parsed frame metadata");
 		}
-		if (av_frame_side_data_clone(&ctx->decoded_side_data, &ctx->nb_decoded_side_data, metadata, 0) < 0) {
+		const bool layered = HasEnhancementLayer(reinterpret_cast<const AVDOVIMetadata*>(metadata->data));
+		AVBufferRef* single = layered ? SingleLayerCopy(metadata) : nullptr;
+		const bool kept = layered
+			? single && av_frame_side_data_add(&ctx->decoded_side_data, &ctx->nb_decoded_side_data,
+				AV_FRAME_DATA_DOVI_METADATA, &single, 0)
+			: av_frame_side_data_clone(&ctx->decoded_side_data, &ctx->nb_decoded_side_data, metadata, 0) >= 0;
+		av_buffer_unref(&single);
+		if (!kept) {
 			avcodec_free_context(&ctx);
 			return Unexpected<FFmpeg::EncoderError>("failed to preserve parsed Dolby Vision encoder metadata");
 		}
 		if (!ctx->priv_data || !av_opt_find(ctx->priv_data, "dolbyvision", nullptr, 0, 0)) {
 			avcodec_free_context(&ctx);
 			return Unexpected<FFmpeg::EncoderError>("encoder '{}' does not support native Dolby Vision", codec_name);
-		}
-		if (reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(dovi->data)->el_present_flag) {
-			avcodec_free_context(&ctx);
-			return Unexpected<FFmpeg::EncoderError>("Dolby Vision enhancement-layer encoding is unsupported");
 		}
 	}
 
@@ -444,8 +587,15 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
 		const bool metadata = parsed != nullptr;
 		if ((configured && !metadata) || (!configured && (metadata || frame.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER))))
 			return OperationResult::Error;
+		auto* side = av_frame_get_side_data(frame.Get(), AV_FRAME_DATA_DOVI_METADATA);
+		if (side && HasEnhancementLayer(reinterpret_cast<const AVDOVIMetadata*>(side->data))) {
+			if (av_buffer_make_writable(&side->buf) < 0)
+				return OperationResult::Error;
+			side->data = side->buf->data;
+			ToSingleLayer(reinterpret_cast<AVDOVIMetadata*>(side->data));
+		}
 	}
-	if (m_ptr && m_ptr->codec_id == AV_CODEC_ID_HEVC) {
+	if (InjectsHdrPlus(m_ptr)) {
 		auto t35 = T35FromFrame(frame);
 		if (!t35.empty()) {
 			const std::int64_t pts = frame.Pts();
@@ -522,7 +672,7 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept
 			return filtered;
 	}
 
-	if (m_ptr && m_ptr->codec_id == AV_CODEC_ID_HEVC && tmp) {
+	if (InjectsHdrPlus(m_ptr) && tmp) {
 		const std::int64_t pts = tmp.Pts();
 		auto found = m_hdrPlusT35.find(pts);
 		if (found != m_hdrPlusT35.end()) {
@@ -530,7 +680,9 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept
 			t35.reserve(static_cast<std::size_t>(found->second.size()));
 			for (const std::byte value : found->second)
 				t35.push_back(std::to_integer<std::uint8_t>(value));
-			if (!PrependHevcSei(tmp, t35))
+			const bool injected = m_ptr->codec_id == AV_CODEC_ID_HEVC
+				? PrependHevcSei(tmp, t35) : InsertAv1Metadata(tmp, t35);
+			if (!injected)
 				return OperationResult::Error;
 			m_hdrPlusT35.erase(found);
 		}

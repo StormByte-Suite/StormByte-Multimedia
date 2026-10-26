@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/metadata/stream.hxx>
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
@@ -121,6 +122,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			int Out = -1;								///< Mux destination order
 			StormByte::Multimedia::Type Kind = StormByte::Multimedia::Type::Unknown;	///< Media kind
 			const StormByte::Multimedia::Codec* Source = nullptr;	///< Origin codec from consultation
+			StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Stream> Origin;	///< Origin tags and disposition from consultation
 			StormByte::Safe::Unique<StormByte::Multimedia::Pipeline::Config::Base> Config;	///< Track intention
 			StormByte::Safe::Vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Filters;	///< Stretch leaves
 			bool Settled = false;						///< OnSettled already fired
@@ -205,6 +207,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Blocks while the job is paused.
 			 */
 			void WaitIfPaused() noexcept;
+
+			/**
+			 * @brief Holds or releases every pipeline stage of @p job.
+			 * @param job Public job owning the shared plan.
+			 * @param held True pauses stage work; false resumes it.
+			 */
+			void Hold(StormByte::Multimedia::Pipeline::Transcoder& job, bool held) noexcept;
 
 			mutable StormByte::Safe::Mutex Lock;	///< Status / Error
 			StormByte::Safe::Mutex PauseMutex;		///< PauseCv

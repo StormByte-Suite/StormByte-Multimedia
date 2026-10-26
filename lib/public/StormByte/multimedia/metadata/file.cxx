@@ -112,3 +112,11 @@ void File::Date(Safe::String date) { m_date = std::move(date); }
 void File::Track(unsigned track) { m_track = track; }
 
 void File::Disc(unsigned disc) { m_disc = disc; }
+
+const Safe::Vector<Chapter>& File::Chapters() const noexcept { return m_chapters; }
+
+void File::Chapters(Safe::Vector<Chapter> chapters) { m_chapters = std::move(chapters); }
+
+std::chrono::nanoseconds File::StartTime() const noexcept { return m_startTime; }
+
+void File::StartTime(std::chrono::nanoseconds start) noexcept { m_startTime = start; }
