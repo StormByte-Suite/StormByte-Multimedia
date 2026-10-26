@@ -52,6 +52,7 @@
 
 #include <StormByte/logger/threaded_log.hxx>
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
@@ -78,8 +79,16 @@ constexpr auto TestDeadline = std::chrono::seconds{STORMBYTE_MM_TEST_DEADLINE_SE
 	int WaitForTranscoder(Transcoder& job) {
 		TEST_PHASE("waiting for transcoder completion");
 		const auto deadline = std::chrono::steady_clock::now() + TestDeadline;
-		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline)
+		double lastMain = 0.0;
+		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline) {
+			if (const auto progress = job.Progress()) {
+				const auto values = progress->Snapshot();
+				TEST_REQUIRE(values.Main >= lastMain);
+				TEST_REQUIRE(values.Main <= 100.0);
+				lastMain = values.Main;
+			}
 			std::this_thread::sleep_for(10ms);
+		}
 		if (!IsTerminal(job.Status())) {
 			std::cerr << "[DETAIL] Transcoder timeout: "
 				<< static_cast<StormByte::Safe::String>(*job.Telemetry()) << std::endl;
@@ -95,6 +104,15 @@ constexpr auto TestDeadline = std::chrono::seconds{STORMBYTE_MM_TEST_DEADLINE_SE
 		TEST_REQUIRE(job.Plan());
 		TEST_REQUIRE(job.Plan()->State() == Plan::State::Finished);
 		TEST_REQUIRE(!job.Plan()->Error());
+		const auto progress = job.Progress();
+		TEST_REQUIRE(progress);
+		const auto values = progress->Snapshot();
+		TEST_REQUIRE(values.MainComplete);
+		TEST_REQUIRE(values.Main == 100.0);
+		TEST_REQUIRE(values.MeasureComplete);
+		TEST_REQUIRE(values.AnalyticsComplete);
+		TEST_REQUIRE(values.All == 100.0);
+		TEST_REQUIRE(values.Current == Progress::Phase::Complete);
 		return 0;
 	}
 

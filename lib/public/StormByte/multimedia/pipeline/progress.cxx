@@ -109,23 +109,18 @@ Progress::Values Progress::Snapshot() const noexcept {
 	const Phase phase = m_calculatingDuration ? Phase::CalculatingDuration
 		: all == 100.0 ? Phase::Complete
 		: m_hasMeasure && !m_measureDone ? Phase::Measure : Phase::Processing;
-	return {phase, m_durationCalculation, Measure(), Analytics(), Processing(), all,
-		MeasureComplete(), AnalyticsComplete(), ProcessingComplete(), MuxComplete()};
+	return {phase, m_durationCalculation, Measure(), Analytics(), Main(), all,
+		MeasureComplete(), AnalyticsComplete(), MainComplete()};
 }
 
-double Progress::Processing() const noexcept {
+double Progress::Main() const noexcept {
 	ProgressLock lock(m_reentrantLock, m_lock, m_lockDepth);
 	if (m_calculatingDuration)
 		return 0.0;
-	return m_passDone || m_muxDone ? 100.0 : Axis(m_passNs, m_durationNs);
+	return m_muxDone ? 100.0 : Axis(m_passNs, m_durationNs);
 }
 
-bool Progress::ProcessingComplete() const noexcept {
-	ProgressLock lock(m_reentrantLock, m_lock, m_lockDepth);
-	return m_passDone;
-}
-
-bool Progress::MuxComplete() const noexcept {
+bool Progress::MainComplete() const noexcept {
 	ProgressLock lock(m_reentrantLock, m_lock, m_lockDepth);
 	return m_muxDone;
 }
@@ -322,17 +317,9 @@ void Progress::MeasureDone() noexcept {
 		m_measureNs = m_durationNs;
 }
 
-void Progress::PassDone() noexcept {
-	ProgressLock lock(m_reentrantLock, m_lock, m_lockDepth);
-	m_passDone = true;
-	if (m_durationNs > 0)
-		m_passNs = m_durationNs;
-}
-
 void Progress::MuxDone() noexcept {
 	ProgressLock lock(m_reentrantLock, m_lock, m_lockDepth);
 	m_muxDone = true;
-	m_analyticsAtMux = m_analyticsNs;
 }
 
 void Progress::AnalyticsDone() noexcept {

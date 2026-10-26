@@ -169,12 +169,11 @@ namespace StormByte {
 						StormByte::Safe::Optional<double> Duration;			///< Duration scan percent; empty during CPU-only preparation.
 						StormByte::Safe::Optional<double> Measure;			///< Mounted measure percent, hidden during duration.
 						StormByte::Safe::Optional<double> Analytics;			///< Mounted analytics percent, hidden during duration.
-						double Processing;									///< Ordinary processing percent; zero during duration calculation.
-						double All;											///< Processing percent; zero during duration calculation.
+						double Main;										///< Main job percent (written output), without measure or analytics.
+						double All;											///< Weighted job percent; only reaches 100 once every axis is closed.
 						bool MeasureComplete;								///< Whether the optional measure axis is closed.
 						bool AnalyticsComplete;								///< Whether the optional analytics axis is closed.
-						bool ProcessingComplete;								///< Whether the source processing pass has reached EOF.
-						bool MuxComplete;									///< Whether the destination trailer has been written.
+						bool MainComplete;									///< Whether the destination trailer has been written.
 					};
 
 					/**
@@ -196,22 +195,23 @@ namespace StormByte {
 					bool CalculatingDuration() const noexcept;
 
 					/**
-					 * @brief Ordinary processing percent, independent of weighted All.
-					 * @return 0..100; zero during duration.
+					 * @brief Main job percent: how much of the destination is written.
+					 *
+					 * Follows the muxer's written position and is exactly 100
+					 * once the destination trailer is written. Measure and
+					 * analytics never contribute; read them from @ref Measure
+					 * and @ref Analytics. Analytics may still be draining while
+					 * Main is already 100.
+					 *
+					 * @return 0..100, monotone; zero during duration calculation.
 					 */
-					double Processing() const noexcept;
+					double Main() const noexcept;
 
 					/**
-					 * @brief Whether source processing reached EOF.
-					 * @return true after PassDone.
+					 * @brief Whether the main job finished writing the destination.
+					 * @return true after the muxer wrote the trailer.
 					 */
-					bool ProcessingComplete() const noexcept;
-
-					/**
-					 * @brief Whether destination writing finished.
-					 * @return true after MuxDone.
-					 */
-					bool MuxComplete() const noexcept;
+					bool MainComplete() const noexcept;
 
 					/**
 					 * @brief User-facing handle. Const, shared. Not a raw pointer.
@@ -299,7 +299,9 @@ namespace StormByte {
 					 * Analytics stays in the sum while measure is live;
 					 * the status line only hides the analytics label then.
 					 * All is monotone and stays below 100 until the Muxer
-					 * finished and every mounted phase is closed.
+					 * finished and every mounted phase is closed. Use it to
+					 * tell when the whole job is complete; use @ref Main for
+					 * the main job percent.
 					 *
 					 * @return 0..100; zero while duration calculation is active.
 					 */
@@ -404,11 +406,6 @@ namespace StormByte {
 					void MeasureDone() noexcept;
 
 					/**
-					 * @brief Ordinary Process pass hit source EoF. Freezes that Pts at duration.
-					 */
-					void PassDone() noexcept;
-
-					/**
 					 * @brief Muxer finished writing the destination.
 					 */
 					void MuxDone() noexcept;
@@ -429,14 +426,12 @@ namespace StormByte {
 					bool m_hasMeasure = false;					///< Tube mounted a 2-pass leaf.
 					bool m_hasAnalytics = false;					///< Tube mounted dest-look taps.
 					bool m_measureDone = false;					///< Measure pass closed.
-					bool m_passDone = false;						///< Ordinary Process pass at source EoF.
 					bool m_muxDone = false;						///< Muxer wrote trailer.
 					bool m_analyticsDone = false;				///< Analytics taps idle.
 					std::int64_t m_durationNs = 0;				///< Origin duration in nanoseconds.
 					std::int64_t m_measureNs = 0;					///< Measure position in nanoseconds.
 					std::int64_t m_passNs = 0;					///< Ordinary Process position in nanoseconds.
 					std::int64_t m_analyticsNs = 0;				///< Analytics position in nanoseconds.
-					std::int64_t m_analyticsAtMux = 0;			///< Analytics nanoseconds when MuxDone ran.
 					mutable double m_all = 0.0;					///< Last published All, kept monotone.
 			};
 		}
