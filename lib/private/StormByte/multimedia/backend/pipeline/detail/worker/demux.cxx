@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
@@ -124,6 +125,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				return true;
 		}
 		return false;
+	}
+
+	StormByte::Size Demux::ParkCeiling(int track) const noexcept {
+		const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = m_owner.Plan();
+		if (!plan || plan->Tracks().empty())
+			return ParkFallback;
+		const auto* found = TrackByIn(plan, track);
+		if (!found)
+			return ParkFallback;
+		const Ceiling cap{plan, StormByte::Multimedia::Pipeline::Producer::Demuxer, *found};
+		return cap.Park() != 0 ? cap.Park() : ParkFallback;
 	}
 
 	void Demux::FeedTrack(int track) noexcept {
@@ -217,12 +229,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			PacketDigest(packet->Payload())));
 
 		const int track = packet->Track();
+		const StormByte::Size ceiling = ParkCeiling(track);
 		{
 			StormByte::Safe::UniqueLock lock(m_parkMutex);
 			EnsureFeed(track);
-			m_parkCv.wait(lock, [this, track]() {
+			m_parkCv.wait(lock, [this, track, ceiling]() {
 				return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
-					|| m_park[track].size() < ParkCeiling;
+					|| m_park[track].size() < ceiling;
 			});
 			if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire))
 				return;

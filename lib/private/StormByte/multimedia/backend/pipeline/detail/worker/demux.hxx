@@ -141,7 +141,9 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 	 *
 	 * Read never Emits. A per-track feeder thread Pushes parked
 	 * packets (that call may block). Read waits only if that track's
-	 * park hits @ref ParkCeiling.
+	 * park hits @ref ParkCeiling. The Plan keeps that cap small so a
+	 * stalled track (video encode) holds back the reader instead of
+	 * letting other tracks race ahead of it in the output.
 	 *
 	 * @ingroup multimedia_pipeline
 	 */
@@ -200,7 +202,14 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			 */
 			bool ParkPending() const noexcept;
 
-			static constexpr StormByte::Size ParkCeiling = 2048;	///< Per-track compressed park
+			/**
+			 * @brief Park cap for @p track from the Plan's demuxer ceiling.
+			 * @param track Origin stream index.
+			 * @return Packets; @ref ParkFallback when the Plan has no cap for it.
+			 */
+			StormByte::Size ParkCeiling(int track) const noexcept;
+
+			static constexpr StormByte::Size ParkFallback = 2048;	///< Park cap for tracks outside the Plan
 
 			StormByte::Multimedia::Pipeline::Demuxer& m_owner;	///< Public demuxer
 			StormByte::Safe::Map<int, StormByte::Safe::List<StormByte::Multimedia::Pipeline::Packet::PointerType>> m_park;
