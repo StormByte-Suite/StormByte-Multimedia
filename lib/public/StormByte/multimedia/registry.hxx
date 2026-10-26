@@ -227,11 +227,19 @@ namespace StormByte {
 				void Add(const Tables::Container::ContainerDef& def) noexcept;
 
 				/**
-				 * @brief Probes demuxer and muxer for @p def.
+				 * @brief Probes the demuxer and attachment support of @p def.
 				 * @param def Identity row.
-				 * @return Read and optional Write.
+				 * @return Optional Read and Attach; Resolve adds Write.
 				 */
 				Access ProbeContainer(const Tables::Container::ContainerDef& def) const noexcept;
+
+				/**
+				 * @brief Sets Write access and the compatibility set once all containers are indexed.
+				 * @param def Table row of @p container.
+				 * @param container Registered container.
+				 * @note Write and the compatibility set follow the muxer the pipeline opens.
+				 */
+				void Resolve(const Tables::Container::ContainerDef& def, Container& container) noexcept;
 
 				StormByte::Safe::Vector<StormByte::Safe::Shared<Codec>> m_codecs;					///< Stable, Base-owned codec instances.
 				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_by_name;	///< Owned codec key to index.

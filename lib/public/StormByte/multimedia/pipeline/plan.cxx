@@ -57,6 +57,7 @@
 
 #include <StormByte/expected.hxx>
 #include <StormByte/multimedia/backend/local_file_reader.hxx>
+#include <StormByte/multimedia/backend/muxer_format.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/cover.hxx>
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/pipeline/config/attachment.hxx>
@@ -139,85 +140,13 @@ namespace {
 		return &found.value().get();
 	}
 
-	const StormByte::Multimedia::Container* FormatIdentity(const AVOutputFormat& format) noexcept {
-		const std::string_view all{format.name ? format.name : ""};
-		const StormByte::Multimedia::Container* best = nullptr;
-		int bestScore = -1;
-		std::string_view names = all;
-		while (!names.empty()) {
-			const auto separator = names.find(',');
-			const auto token = names.substr(0, separator);
-			const auto found = StormByte::Multimedia::Registry::Instance().FindContainer(token);
-			if (found) {
-				const auto& container = found.value().get();
-				int score = token == container.Extension() ? 10 : 0;
-				std::string_view rest = all;
-				while (!rest.empty()) {
-					const auto next = rest.find(',');
-					const auto piece = rest.substr(0, next);
-					const auto same = StormByte::Multimedia::Registry::Instance().FindContainer(piece);
-					if (same && same.value().get().Name() == container.Name())
-						++score;
-					if (next == std::string_view::npos)
-						break;
-					rest.remove_prefix(next + 1);
-				}
-				if (score > bestScore) {
-					best = &container;
-					bestScore = score;
-				}
-			}
-			if (separator == std::string_view::npos)
-				break;
-			names.remove_prefix(separator + 1);
-		}
-		return best;
-	}
-
-	bool FormatServes(const AVOutputFormat& format,
-		const StormByte::Multimedia::Container& container) noexcept {
-		std::string_view names{format.name ? format.name : ""};
-		while (!names.empty()) {
-			const auto separator = names.find(',');
-			const auto token = names.substr(0, separator);
-			if (token == container.Extension())
-				return true;
-			const auto found = StormByte::Multimedia::Registry::Instance().FindContainer(token);
-			if (found && found.value().get().Name() == container.Name())
-				return true;
-			if (separator == std::string_view::npos)
-				break;
-			names.remove_prefix(separator + 1);
-		}
-		return false;
-	}
-
-	const AVOutputFormat* IdentityFormat(const StormByte::Multimedia::Container& container) noexcept {
-		const auto registered = StormByte::Multimedia::Registry::Instance().FindContainer(container.Name());
+	StormByte::Multimedia::Backend::MuxerChoice IdentityFormat(const StormByte::Multimedia::Container& container) noexcept {
+		const auto& registry = StormByte::Multimedia::Registry::Instance();
+		const auto registered = registry.FindContainer(container.Name());
 		if (!registered || registered.value().get().Name() != container.Name()
 			|| !container.HasAccess(StormByte::Multimedia::Operation::Write))
-			return nullptr;
-
-		// extensions[0] / the first FFmpeg id is the muxer we mean to open.
-		if (!container.Extension().empty()) {
-			const std::string intended{container.Extension()};
-			if (const auto* format = av_guess_format(intended.c_str(), nullptr, nullptr)) {
-				if (!(format->flags & AVFMT_NOFILE) && FormatServes(*format, container))
-					return format;
-			}
-		}
-
-		const AVOutputFormat* fallback = nullptr;
-		void* cursor = nullptr;
-		while (const auto* format = av_muxer_iterate(&cursor)) {
-			if (!format->name || (format->flags & AVFMT_NOFILE) || !FormatServes(*format, container))
-				continue;
-			if (std::string_view{format->name}.find(',') == std::string_view::npos)
-				return format;
-			if (!fallback)
-				fallback = format;
-		}
-		return fallback;
+			return {};
+		return StormByte::Multimedia::Backend::ResolveMuxer(registry, container);
 	}
 
 	const StormByte::Multimedia::Codec* DestinationCodec(
@@ -342,22 +271,16 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)),
 	m_writer(std::move(writer)) {
-	const AVOutputFormat* format = nullptr;
+	StormByte::Multimedia::Backend::MuxerChoice muxer;
 	if (container)
-		format = IdentityFormat(*container);
+		muxer = IdentityFormat(*container);
 	else if (m_writer)
 		container = ContainerFromWriter(*m_writer);
-	if (container && !format)
-		format = IdentityFormat(*container);
-	if (container && format && !(format->flags & AVFMT_NOFILE)) {
+	if (container && !muxer.format)
+		muxer = IdentityFormat(*container);
+	if (container && muxer.format) {
 		m_container = container;
-		// Keep the intended id, not FFmpeg's first alias in a comma-separated name.
-		if (format->name && std::string_view{format->name}.find(',') == std::string_view::npos)
-			m_format = format->name;
-		else if (!container->Extension().empty())
-			m_format = container->Extension().data();
-		else
-			m_format = format->name;
+		m_format = muxer.name;
 	}
 	else if (container)
 		m_container = container;

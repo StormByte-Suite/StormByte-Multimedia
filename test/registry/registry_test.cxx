@@ -199,6 +199,48 @@ int test_subtitle_kind_distinguishes_unknown_from_not_applicable() {
 	return 0;
 }
 
+int test_codec_access_matches_pipeline_implementations() {
+	auto& registry = Registry::Instance();
+	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+		StormByte::Multimedia::Type::Subtitle}) {
+		for (const auto codec : registry.CodecList(type))
+			TEST_REQUIRE(codec.get().HasAccess(Operation::Write) == !codec.get().Encoders().empty());
+	}
+	// FFmpeg ships a DTS encoder, but the pipeline has no encoder row for it.
+	auto dts = registry.FindCodec("DTS");
+	// FFmpeg ships a TTML encoder but no TTML decoder.
+	auto ttml = registry.FindCodec("TTML");
+	auto h265 = registry.FindCodec("H.265");
+	TEST_REQUIRE(dts && ttml && h265);
+	TEST_REQUIRE(dts->get().HasAccess(Operation::Read));
+	TEST_REQUIRE(!dts->get().HasAccess(Operation::Write));
+	TEST_REQUIRE(!ttml->get().HasAccess(Operation::Read));
+	TEST_REQUIRE(h265->get().HasAccess(Operation::Read));
+	return 0;
+}
+
+int test_container_compatibility_follows_its_muxer() {
+	auto& registry = Registry::Instance();
+	auto mp4 = registry.FindContainer("MP4");
+	auto mkv = registry.FindContainer("Matroska");
+	auto vp8 = registry.FindCodec("VP8");
+	auto webvtt = registry.FindCodec("WebVTT");
+	auto ttml = registry.FindCodec("TTML");
+	auto timedText = registry.FindCodec("3GPP Timed Text");
+	auto h265 = registry.FindCodec("H.265");
+	auto pgs = registry.FindCodec("PGS");
+	TEST_REQUIRE(mp4 && mkv && vp8 && webvtt && ttml && timedText && h265 && pgs);
+	TEST_REQUIRE(mp4->get().HasAccess(Operation::Write));
+	TEST_REQUIRE(mkv->get().HasAccess(Operation::Write));
+	TEST_REQUIRE(!mp4->get().Allows({vp8.value()}));
+	TEST_REQUIRE(!mp4->get().Allows({webvtt.value()}));
+	TEST_REQUIRE(!mkv->get().Allows({ttml.value()}));
+	TEST_REQUIRE(!mkv->get().Allows({timedText.value()}));
+	TEST_REQUIRE(mp4->get().Allows({h265.value(), timedText.value()}));
+	TEST_REQUIRE(mkv->get().Allows({h265.value(), vp8.value(), webvtt.value(), pgs.value()}));
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_subtitle_kind_classifies_text_and_bitmap", test_subtitle_kind_classifies_text_and_bitmap},
@@ -212,6 +254,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_codec_features_do_not_combine_unrelated_capabilities", test_codec_features_do_not_combine_unrelated_capabilities},
 		TestEntry{"test_eac3_encoder_features_preserve_surround_sound", test_eac3_encoder_features_preserve_surround_sound},
 		TestEntry{"test_codec_without_implementation_rows_keeps_only_generic_access", test_codec_without_implementation_rows_keeps_only_generic_access},
+		TestEntry{"test_codec_access_matches_pipeline_implementations", test_codec_access_matches_pipeline_implementations},
+		TestEntry{"test_container_compatibility_follows_its_muxer", test_container_compatibility_follows_its_muxer},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

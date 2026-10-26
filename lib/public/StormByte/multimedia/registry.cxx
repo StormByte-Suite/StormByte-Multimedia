@@ -49,7 +49,9 @@
  */
 
 #include <StormByte/multimedia/registry.hxx>
+#include <StormByte/multimedia/backend/muxer_format.hxx>
 #include <tables/codec/catalog.hxx>
+#include <tables/encoder/table.hxx>
 #include <tables/container/catalog.hxx>
 #include <tables/container/table.hxx>
 
@@ -64,24 +66,26 @@ extern "C" {
 using namespace StormByte::Multimedia;
 
 namespace {
-	Access ProbeAccess(const StormByte::Multimedia::Tables::Codec::CodecDef& def) noexcept {
-		Access access(Operation::Read);
+	// Access describes what the pipeline can do, not what FFmpeg has built in:
+	// Read needs a decoder for one of the codec ids (the pipeline decodes by id),
+	// and Write needs an encoder table row with a built-in implementation, since
+	// the pipeline only encodes through those rows. Attachments are copied as-is.
+	Access ProbeAccess(StormByte::Multimedia::Type type, const Tables::Codec::CodecDef& def) noexcept {
+		if (type == StormByte::Multimedia::Type::Attachment)
+			return Access(Operation::Read);
+		Access access;
 		for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
 			const char* id = def.FfmpegId(i);
 			if (!id)
 				continue;
-			if (avcodec_find_encoder_by_name(id) != nullptr) {
-				access |= Access(Operation::Write);
-				break;
-			}
-
-			const AVCodecDescriptor* desc = avcodec_descriptor_get_by_name(id);
-			if (desc && avcodec_find_encoder(desc->id) != nullptr) {
-				access |= Access(Operation::Write);
+			const AVCodecDescriptor* descriptor = avcodec_descriptor_get_by_name(id);
+			if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+				access |= Access(Operation::Read);
 				break;
 			}
 		}
-
+		if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+			access |= Access(Operation::Write);
 		return access;
 	}
 }
@@ -138,7 +142,7 @@ ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept 
 
 void Registry::Add(Type type, const Tables::Codec::CodecDef& def) noexcept {
 	const std::size_t i = m_codecs.size();
-	Codec codec(type, def.name, def.description, ProbeAccess(def));
+	Codec codec(type, def.name, def.description, ProbeAccess(type, def));
 	auto stored = StormByte::Safe::Shared<Codec>::MakePointer<Codec>(std::move(codec));
 	m_codecs.push_back(stored);
 	const Codec& storedCodec = *m_codecs[i];
@@ -181,8 +185,6 @@ Access Registry::ProbeContainer(const Tables::Container::ContainerDef& def) cons
 			break;
 		if (av_find_input_format(id) != nullptr)
 			access |= Access(Operation::Read);
-		if (av_guess_format(id, nullptr, nullptr) != nullptr)
-			access |= Access(Operation::Write);
 	}
 
 	if (def.attachments)
@@ -213,9 +215,16 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 	}
 	for (std::size_t n = 0; n < def.FfmpegIdCount(); ++n)
 		m_container_by_name.emplace(StormByte::Safe::String(def.FfmpegId(n)), StormByte::Size{i});
+}
+
+void Registry::Resolve(const Tables::Container::ContainerDef& def, Container& container) noexcept {
+	// Every container is indexed now, so muxer names resolve like they do when muxing.
+	const auto muxer = Backend::ResolveMuxer(*this, container);
+	if (muxer.format)
+		container.m_access |= Access(Operation::Write);
 
 	const auto rows = Tables::Container::Catalog::Instance().Compat(def);
-	storedContainer.m_allowed.reserve(rows.size());
+	container.m_allowed.reserve(rows.size());
 	for (const auto& row : rows) {
 		if (!row.codec)
 			continue;
@@ -223,8 +232,10 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 		if (!found.has_value())
 			continue;
 		const Codec& codec = found.value().get();
+		if (muxer.format && !Backend::MuxerAccepts(*muxer.format, codec))
+			continue;
 		bool dup = false;
-		for (const CodecRef existing : std::as_const(storedContainer.m_allowed)) {
+		for (const CodecRef existing : std::as_const(container.m_allowed)) {
 			if (existing.get() == codec) {
 				dup = true;
 				break;
@@ -232,7 +243,7 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 		}
 
 		if (!dup)
-			storedContainer.m_allowed.emplace_back(codec);
+			container.m_allowed.emplace_back(codec);
 	}
 }
 
@@ -243,6 +254,8 @@ void Registry::LoadContainers() noexcept {
 	m_container_by_name.reserve(all.size() * 3);
 	for (const auto& def : all)
 		Add(def);
+	for (std::size_t i = 0; i < all.size(); ++i)
+		Resolve(all[i], *m_containers[i]);
 }
 
 void Registry::Load() noexcept {
