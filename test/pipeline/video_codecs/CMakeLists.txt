@@ -13,6 +13,8 @@ foreach(test_name IN ITEMS
 	test_libvpx_encodes_vp8_webm
 	test_libvpx_encodes_vp9_webm
 	test_openh264_encodes_h264_matroska
+	test_openh264_rejects_ten_bit_input
+	test_openh264_encodes_ten_bit_after_format
 	test_kvazaar_encodes_hevc_matroska
 	test_vaapi_encodes_hevc_main_matroska
 	test_libwebp_anim_encodes_webp

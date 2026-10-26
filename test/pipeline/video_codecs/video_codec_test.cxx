@@ -229,6 +229,51 @@ int test_openh264_encodes_h264_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/openh264.mkv", "Matroska", "H.264", "libopenh264");
 }
 
+namespace {
+	int CheckOpenH264TenBit(std::string_view destination, bool convert) {
+		const auto* concrete = avcodec_find_encoder_by_name("libopenh264");
+		if (!concrete)
+			return TEST_SKIP;
+		auto codec = Registry::Instance().FindCodec("H.264");
+		TEST_REQUIRE(codec);
+		if (!codec.value().get().HasAccess(Access{Operation::Write}))
+			return TEST_SKIP;
+		// SDR 8-bit source lifted to 10-bit, so the depth comes from the filtered frame.
+		const auto input = FixturePath("video/bluray_like_hdr10.mp4");
+		const auto output = OutputPath(destination);
+		auto logger = MakeLogger();
+		{
+			TEST_PHASE("creating transcoder");
+			Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+			auto track = job.Video(0);
+			track.Codec(codec.value().get())
+				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libopenh264"})
+				.BitRate(500000);
+			track.Filter<Filter::Video::Scale>(logger, 320u, 192u);
+			track.Filter<Filter::Video::Format>(logger, Property::PixelFormat::YUV420P10);
+			if (convert)
+				track.Filter<Filter::Video::Format>(logger, Property::PixelFormat::YUV420P);
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			TEST_PHASE("starting transcoder run");
+			job.Run();
+			if (!convert)
+				return WaitForTranscoderFailure(job, "bit depth");
+			const int result = WaitForOptionalCodec(job);
+			if (result != 0)
+				return result;
+		}
+		return CheckVideoOutput(output, "Matroska", "H.264");
+	}
+}
+
+int test_openh264_rejects_ten_bit_input() {
+	return CheckOpenH264TenBit("pipeline/video-codecs/openh264_10bit_rejected.mkv", false);
+}
+
+int test_openh264_encodes_ten_bit_after_format() {
+	return CheckOpenH264TenBit("pipeline/video-codecs/openh264_10bit_format.mkv", true);
+}
+
 int test_kvazaar_encodes_hevc_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/kvazaar.mkv", "Matroska", "H.265", "libkvazaar");
 }
@@ -405,6 +450,8 @@ int RunPipelineVideoCodecTests(int argc, char** argv) {
 		TestEntry{"test_libvpx_encodes_vp9_webm", test_libvpx_encodes_vp9_webm},
 		TestEntry{"test_x264_encodes_h264_mp4", test_x264_encodes_h264_mp4},
 		TestEntry{"test_openh264_encodes_h264_matroska", test_openh264_encodes_h264_matroska},
+		TestEntry{"test_openh264_rejects_ten_bit_input", test_openh264_rejects_ten_bit_input},
+		TestEntry{"test_openh264_encodes_ten_bit_after_format", test_openh264_encodes_ten_bit_after_format},
 		TestEntry{"test_kvazaar_encodes_hevc_matroska", test_kvazaar_encodes_hevc_matroska},
 		TestEntry{"test_x265_encodes_hevc_matroska", test_x265_encodes_hevc_matroska},
 		TestEntry{"test_nvenc_feature_contract", test_nvenc_feature_contract},

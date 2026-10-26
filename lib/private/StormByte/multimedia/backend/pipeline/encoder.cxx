@@ -288,7 +288,9 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 
 		const auto* listed = Tables::Encoder::FindRow(stormName, pin);
 		if (!listed || !listed->features.Has(need)) {
+			const Features depth = need & (Features{Feature::TenBit} | Feature::TwelveBit);
 			owner.Fail(need.Has(Feature::DOVI) ? "encoder implementation lacks required Dolby Vision support"
+				: listed && !listed->features.Has(depth) ? "encoder implementation does not support the input bit depth"
 				: "encoder implementation lacks required features");
 			return std::nullopt;
 		}
@@ -300,6 +302,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		codec = avcodec_find_encoder_by_name(row->name);
 	if (!codec) {
 		owner.Fail(need.Has(Feature::DOVI) ? "no native Dolby Vision encoder for destination codec"
+			: need.HasAny(Features{Feature::TenBit} | Feature::TwelveBit) ? "no encoder for destination codec supports the input bit depth"
 			: "no encoder for destination codec");
 		return std::nullopt;
 	}

@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
+#include <StormByte/multimedia/ffmpeg/pixel_format.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/format.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -64,6 +65,9 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 Format::Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt) noexcept
 	: Filter::Process(std::move(log), Safe::String("format")),
 	m_pixFmt(pixFmt) {}
+
+Format::Format(Safe::Shared<StormByte::Logger::Log> log, Property::PixelFormat format) noexcept
+	: Format(std::move(log), StormByte::Multimedia::FFmpeg::ToAVPixelFormat(format)) {}
 
 Format::~Format() noexcept = default;
 

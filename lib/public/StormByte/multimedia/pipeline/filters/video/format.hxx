@@ -52,6 +52,7 @@
 
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
+#include <StormByte/multimedia/property/pixel_format.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
@@ -65,7 +66,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @class Format
 	 * @brief Convert pixel format, same geometry. Process leaf.
 	 *
-	 * Attach with @c job.Video(in).Filter<Format>(log, pix_fmt).
+	 * Attach with @c job.Video(in).Filter<Format>(log, Property::PixelFormat::YUV420P)
+	 * or a raw @c AVPixelFormat int.
 	 *
 	 * @par What it is for
 	 * Hand the encoder a layout it accepts: 10-bit → 8-bit
@@ -96,6 +98,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param pixFmt Destination pixel format.
 			 */
 			Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt) noexcept;
+
+			/**
+			 * @brief Convert to the public pixel format @p format.
+			 * @param log Shared logger. Empty pointer means no log.
+			 * @param format Destination pixel format. Unmapped values Fail at Process.
+			 */
+			Format(Safe::Shared<StormByte::Logger::Log> log, Property::PixelFormat format) noexcept;
 
 			/**
 			 * @brief Copy construction is disabled.

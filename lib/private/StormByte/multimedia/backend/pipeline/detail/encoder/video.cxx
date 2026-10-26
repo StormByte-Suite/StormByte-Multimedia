@@ -52,12 +52,14 @@
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/video.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/features.hxx>
+#include <StormByte/multimedia/ffmpeg/pixel_format.hxx>
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <tables/encoder/table.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/property/color.hxx>
 #include <StormByte/multimedia/property/hdr10.hxx>
+#include <StormByte/multimedia/property/pixel_format.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -81,31 +83,6 @@ using namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder;
 namespace FFmpeg = StormByte::Multimedia::FFmpeg;
 
 namespace {
-	int ToAVPixelFormat(Property::PixelFormat format) noexcept {
-		switch (format) {
-			case Property::PixelFormat::YUV420P:	return AV_PIX_FMT_YUV420P;
-			case Property::PixelFormat::YUV422P:	return AV_PIX_FMT_YUV422P;
-			case Property::PixelFormat::YUV444P:	return AV_PIX_FMT_YUV444P;
-			case Property::PixelFormat::YUV420P10:	return AV_PIX_FMT_YUV420P10LE;
-			case Property::PixelFormat::YUV422P10:	return AV_PIX_FMT_YUV422P10LE;
-			case Property::PixelFormat::YUV444P10:	return AV_PIX_FMT_YUV444P10LE;
-			case Property::PixelFormat::YUV420P12:	return AV_PIX_FMT_YUV420P12LE;
-			case Property::PixelFormat::YUV422P12:	return AV_PIX_FMT_YUV422P12LE;
-			case Property::PixelFormat::YUV444P12:	return AV_PIX_FMT_YUV444P12LE;
-			case Property::PixelFormat::NV12:		return AV_PIX_FMT_NV12;
-			case Property::PixelFormat::NV21:		return AV_PIX_FMT_NV21;
-			case Property::PixelFormat::P010:		return AV_PIX_FMT_P010LE;
-			case Property::PixelFormat::RGB24:		return AV_PIX_FMT_RGB24;
-			case Property::PixelFormat::BGR24:		return AV_PIX_FMT_BGR24;
-			case Property::PixelFormat::RGBA:		return AV_PIX_FMT_RGBA;
-			case Property::PixelFormat::BGRA:		return AV_PIX_FMT_BGRA;
-			case Property::PixelFormat::GRAY8:		return AV_PIX_FMT_GRAY8;
-			case Property::PixelFormat::GRAY10:		return AV_PIX_FMT_GRAY10LE;
-			case Property::PixelFormat::GRAY16:		return AV_PIX_FMT_GRAY16LE;
-			default:								return AV_PIX_FMT_NONE;
-		}
-	}
-
 	int ToAVRange(Property::Range range) noexcept {
 		switch (range) {
 			case Property::Range::TV:	return AVCOL_RANGE_MPEG;
@@ -194,7 +171,7 @@ namespace {
 			const auto& video = *frame.Video();
 			params.Width(static_cast<int>(video.Resolution().Width()));
 			params.Height(static_cast<int>(video.Resolution().Height()));
-			params.Format(ToAVPixelFormat(video.Color().PixelFormat()));
+			params.Format(StormByte::Multimedia::FFmpeg::ToAVPixelFormat(video.Color().PixelFormat()));
 			params.ColorRange(ToAVRange(video.Color().Range()));
 			params.ColorSpace(ToAVSpace(video.Color().Space()));
 			params.ColorPrimaries(ToAVPrimaries(video.Color().Primaries()));
@@ -266,6 +243,24 @@ namespace {
 	}
 }
 
+namespace {
+	// Encoders never reduce bit depth on their own, so the frame depth is a hard requirement.
+	Features DepthNeed(const StormByte::Multimedia::Pipeline::Frame& frame,
+		const StormByte::Multimedia::FFmpeg::AVFrame& handle) noexcept {
+		int depth = 0;
+		if (!handle.Hardware())
+			depth = handle.BitsPerComponent();
+		else if (frame.Video())
+			depth = Property::BitDepth(frame.Video()->Color().PixelFormat());
+		Features need;
+		if (depth >= 12)
+			need.Add(Feature::TwelveBit);
+		else if (depth >= 10)
+			need.Add(Feature::TenBit);
+		return need;
+	}
+}
+
 Video::~Video() noexcept = default;
 
 Video::Video(Video&& other) noexcept = default;
@@ -319,6 +314,7 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	}
 
 	Features need = owner.Require();
+	need |= DepthNeed(frame, *handle);
 	const bool keepsHdr = RowKeeps(owner, Feature::HDR10);
 	const bool keepsDovi = RowKeeps(owner, Feature::DOVI);
 	if (keepsHdr && frame.Video() && frame.Video()->HDR10()) {
