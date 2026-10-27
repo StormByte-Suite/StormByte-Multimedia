@@ -24,6 +24,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Fixed
 
 - Duration calculation now honours `Transcoder::Pause()`, `Resume()` and `Cancel()`, including cancellation while paused and scans of readers with an unknown size. Interrupted scans rewind the input buffer before returning and are not cached as completed durations, so they can be retried.
+- Bundled zlib now follows the requested FFmpeg library type. zlib 1.3.2 ignored `BUILD_SHARED_LIBS` and named its Windows static archive `zs.lib`, so static builds linked FFmpeg against the `z.lib` import library and `StormByte-Multimedia.dll` required an undistributed `z.dll`.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
