@@ -58,12 +58,17 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <algorithm>
+#include <vector>
 
 namespace StormByte::Multimedia {
 	namespace {
-		std::once_flag g_moduleOnce;
 		std::mutex g_moduleMutex;
-		StormByte::Safe::Shared<StormByte::Logger::Log> g_module;
+		struct ModuleEntry {
+			std::vector<StormByte::Safe::Weak<StormByte::Logger::Log>> Facades;
+			StormByte::Safe::Shared<StormByte::Logger::Log> Module;
+		};
+		std::vector<ModuleEntry> g_modules;
 
 		void ConfigureModule(StormByte::Logger::Log& mm) {
 			mm.Format("[%L] %T %c");
@@ -81,23 +86,36 @@ namespace StormByte::Multimedia {
 			mm.Throttle(StormByte::Logger::Level::Notice, 4.0, 8);
 		}
 
-		StormByte::Safe::Shared<StormByte::Logger::Log> ModuleRoot(
-			StormByte::Safe::Shared<StormByte::Logger::Log> log) {
-			std::lock_guard<std::mutex> lock(g_moduleMutex);
-			if (!g_module)
-				g_module = log->Scope("StormByte/Multimedia");
-			return g_module;
-		}
 	}
 
 	StormByte::Safe::Shared<StormByte::Logger::Log> UseLog(
 		StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view leaf) noexcept {
 		if (!log)
 			return {};
-		auto mm = ModuleRoot(std::move(log));
-		std::call_once(g_moduleOnce, [&]() { ConfigureModule(*mm); });
+		std::lock_guard<std::mutex> lock(g_moduleMutex);
+		for (auto& entry : g_modules)
+			std::erase_if(entry.Facades, [](const auto& facade) { return facade.expired(); });
+		std::erase_if(g_modules, [](const auto& entry) {
+			return entry.Facades.empty() && entry.Module.use_count() == 1;
+		});
+		ModuleEntry* module = nullptr;
+		for (auto& entry : g_modules) {
+			if (entry.Module.get() == log.get() || std::any_of(entry.Facades.begin(), entry.Facades.end(),
+				[&log](const auto& facade) { return facade.lock().get() == log.get(); })) {
+				module = &entry;
+				break;
+			}
+		}
+		if (!module) {
+			auto mm = log->Scope("StormByte/Multimedia");
+			ConfigureModule(*mm);
+			g_modules.push_back({{StormByte::Safe::Weak<StormByte::Logger::Log>{log}}, std::move(mm)});
+			module = &g_modules.back();
+		}
 		if (leaf.empty())
-			return mm;
-		return mm->Scope(std::string(leaf));
+			return module->Module;
+		auto scoped = module->Module->Scope(std::string(leaf));
+		module->Facades.emplace_back(scoped);
+		return scoped;
 	}
 }

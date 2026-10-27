@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Fixed
+
+- Pipeline logging now keeps a separate Multimedia scope for each application logger instead of sending later jobs to the first job's destination. Duration scanning and encoding retain their job's destination, and scoped stage loggers keep their sibling component paths.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-27

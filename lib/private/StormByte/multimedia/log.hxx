@@ -67,12 +67,12 @@ namespace StormByte::Multimedia {
 	 * @param leaf Last path segment (`Demuxer`, `Filters/Video/vmaf`).
 	 * @return Facade rooted at StormByte/Multimedia/<leaf>, or empty if @p log is empty.
 	 *
-	 * The module node is created once, from the first non-null @p log.
-	 * Later calls reuse that node even if @p log is already a leaf, so
+	 * Each application logger has its own module node and output destination.
+	 * Later calls reuse its node even if @p log is already a leaf, so
 	 * Encoder then Decoder stays StormByte/Multimedia/Decoder, not
 	 * Encoder/StormByte/Multimedia/Decoder. Throttle is per leaf.
 	 *
-	 * First call also sets format (`[%L] %T %c`) and throttle on
+	 * Creating a module node also sets format (`[%L] %T %c`) and throttle on
 	 * StormByte/Multimedia. Warning, Error and Fatal stay unthrottled.
 	 */
 	STORMBYTE_MULTIMEDIA_PRIVATE StormByte::Safe::Shared<StormByte::Logger::Log> UseLog(

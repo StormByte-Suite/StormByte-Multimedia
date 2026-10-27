@@ -16,6 +16,14 @@ if(ENABLE_TEST)
 		"${PROJECT_BINARY_DIR}/test-output/pipeline"
 	)
 
+	add_executable(MultimediaLogTests log_test.cxx
+		"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/log.cxx")
+	target_include_directories(MultimediaLogTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
+	target_link_libraries(MultimediaLogTests PRIVATE multimedia_test_support)
+	add_test(NAME logging.test_independent_job_destinations COMMAND MultimediaLogTests)
+	set_tests_properties(logging.test_independent_job_destinations
+		PROPERTIES TIMEOUT 15 LABELS "multimedia;logging")
+
 	# One shared library absorbs every private translation unit and test
 	# body that calls FFmpeg. On Linux, bfd rescans the six static
 	# archives here and inside StormByte-Multimedia, not once per
