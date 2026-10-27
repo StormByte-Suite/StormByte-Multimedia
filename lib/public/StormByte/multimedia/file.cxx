@@ -97,13 +97,15 @@ namespace {
 		return StormByte::Multimedia::Backend::MakeLocalFileReader(path);
 	}
 
-	void ReportProgress(const File::DurationProgress* progress, double percent) noexcept {
+	bool ReportProgress(const File::DurationProgress* progress, double percent) noexcept {
 		if (!progress || !progress->HasValue())
-			return;
+			return true;
 		try {
-			static_cast<void>(progress->Call(percent));
+			return progress->Call(percent) == StormByte::Safe::Status::Success;
 		}
-		catch (...) {}
+		catch (const StormByte::Exception&) {
+			return false;
+		}
 	}
 
 	ExpectedFile FailOpen(std::string_view label, std::string_view reason) noexcept {
@@ -292,21 +294,26 @@ ExpectedFile File::Open(BufferedLocationReader& reader,
 	return Probe(reader, std::move(duration), {}, &reader);
 }
 
-void File::ScanWithReader(BufferedLocationReader& reader, StormByte::Safe::Vector<Stream>& streams,
+bool File::ScanWithReader(BufferedLocationReader& reader, StormByte::Safe::Vector<Stream>& streams,
 	StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress) noexcept {
 	double percent = 0.0;
+	if (!ReportProgress(progress, percent)) {
+		static_cast<void>(reader.Rewind());
+		return false;
+	}
 	Backend::FileAvio avio(reader);
 	::AVFormatContext* raw = nullptr;
 	if (!OpenAvio(reader, raw, avio)) {
 		static_cast<void>(reader.Rewind());
-		return;
+		return false;
 	}
 	auto wrapped = FFmpeg::AVFormatContext::WrapBorrowed(raw, false);
 	raw = nullptr;
-	ReportProgress(progress, percent);
 	const bool complete = ScanDurations(wrapped, streams, duration, reader, progress, percent);
 	const bool rewound = reader.Rewind();
-	ReportProgress(progress, complete && rewound ? 100.0 : percent);
+	if (!complete || !rewound)
+		return false;
+	return ReportProgress(progress, 100.0);
 }
 
 void File::MarkHdr10Plus(Stream& stream) {
@@ -453,6 +460,12 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 	FFmpeg::AVPacket packet;
 	bool complete = false;
 	for (;;) {
+		const auto now = std::chrono::steady_clock::now();
+		if (progress && now - published >= std::chrono::milliseconds(20)) {
+			published = now;
+			if (!ReportProgress(progress, percent))
+				return false;
+		}
 		const auto result = ctx.ReadPacket(packet);
 		if (result == FFmpeg::OperationResult::EndOfFile) {
 			complete = true;
@@ -476,7 +489,8 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 				if (next - percent >= 1.0 || now - published >= std::chrono::milliseconds(20)) {
 					percent = next;
 					published = now;
-					ReportProgress(progress, percent);
+					if (!ReportProgress(progress, percent))
+						return false;
 				}
 			}
 		}
@@ -494,6 +508,8 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 			end = pts;
 	}
 
+	if (!complete)
+		return false;
 	StormByte::Safe::Optional<Property::Duration> longest;
 	for (std::size_t n = 0; n < endTick.size(); ++n) {
 		auto ns = TicksToNs(endTick[n], timeBase[n]);
@@ -617,11 +633,10 @@ const StormByte::Safe::Optional<Property::Duration>& File::Duration(const Durati
 }
 
 void File::ResolveDuration(const DurationProgress* progress) const noexcept {
-	m_durationResolved = true;
 	if (m_reader)
-		ScanWithReader(*m_reader, m_streams, m_duration, progress);
+		m_durationResolved = ScanWithReader(*m_reader, m_streams, m_duration, progress);
 	else {
 		auto reader = LocalReader(m_path);
-		ScanWithReader(*reader, m_streams, m_duration, progress);
+		m_durationResolved = ScanWithReader(*reader, m_streams, m_duration, progress);
 	}
 }

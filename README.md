@@ -492,6 +492,11 @@ if (const auto progress = job.Progress()) {
 ```
 
 Custom `EmptyPlan` factories can pass `DurationProgress()` to the observing `Plan` constructor to publish duration scan updates.
+That observer also honours `Pause()`, `Resume()` and `Cancel()` during duration calculation,
+including cancellation while paused. `File::Duration(observer)` stops scanning when the
+callback returns a status other than `Safe::Status::Success`. Completed and interrupted
+scans rewind the input reader before returning; interrupted scans are not cached and
+can be retried. Observers receive periodic updates even when the source size is unknown.
 
 ## Logging
 

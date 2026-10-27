@@ -699,11 +699,16 @@ StormByte::Safe::Function<void(double)> Transcoder::DurationProgress() const noe
 	StormByte::Safe::Function<void(double)> observer(context.get(),
 		[](void* state, double percent) {
 			const auto* owner = *static_cast<const Transcoder**>(state);
+			owner->m_backend->WaitIfPaused();
+			if (owner->m_backend->Cancel.load(StormByte::Safe::MemoryOrder::Acquire))
+				return StormByte::Safe::Status::Failure;
 			if (auto clock = StormByte::Safe::ConstPointerCast<class Progress>(owner->Progress())) {
 				clock->SetDurationCalculation(percent);
 				const_cast<Transcoder*>(owner)->OnProgress();
 			}
-			return StormByte::Safe::Status::Success;
+			owner->m_backend->WaitIfPaused();
+			return owner->m_backend->Cancel.load(StormByte::Safe::MemoryOrder::Acquire)
+				? StormByte::Safe::Status::Failure : StormByte::Safe::Status::Success;
 		},
 		[](const void* state) noexcept -> void* {
 			try {

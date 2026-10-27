@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Fixed
+
+- Duration calculation now honours `Transcoder::Pause()`, `Resume()` and `Cancel()`, including cancellation while paused and scans of readers with an unknown size. Interrupted scans rewind the input buffer before returning and are not cached as completed durations, so they can be retried.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-27

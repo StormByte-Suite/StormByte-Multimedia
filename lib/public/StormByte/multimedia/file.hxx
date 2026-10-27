@@ -228,6 +228,11 @@ namespace StormByte {
 				 * @brief Resolve duration while reporting packet scan progress.
 				 * @param progress Byte-position observer; not called for a cached or supplied duration.
 				 * @return Resolved duration, or empty if unavailable.
+				 *
+				 * Return Safe::Status::Success to continue. Any other callback status
+				 * or exception interrupts the scan. The reader is rewound on completion
+				 * or interruption; an interrupted scan is not cached and may be retried.
+				 * Updates also arrive periodically when the source size is unknown.
 				 */
 				const StormByte::Safe::Optional<Property::Duration>& Duration(const DurationProgress& progress) const noexcept;
 
@@ -302,8 +307,9 @@ namespace StormByte {
 				 * @param streams Streams to update.
 				 * @param duration Container duration to fill if empty.
 				 * @param progress Borrowed packet scan observer, or nullptr.
+				 * @return True only after a completed scan and successful rewind.
 				 */
-				static void ScanWithReader(StormByte::Buffer::IO::BufferedLocationReader& reader,
+				static bool ScanWithReader(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					StormByte::Safe::Vector<Stream>& streams,
 					StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress) noexcept;
 
@@ -329,7 +335,7 @@ namespace StormByte {
 				 * @param reader Borrowed source used to determine byte-based progress.
 				 * @param progress Borrowed scan observer, or nullptr.
 				 * @param percent Last published monotone percentage.
-				 * @return true only if packet reading reached EOF rather than a read error.
+				 * @return true only if packet reading reached EOF without interruption.
 				 */
 				static bool ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams,
 					StormByte::Safe::Optional<Property::Duration>& container,

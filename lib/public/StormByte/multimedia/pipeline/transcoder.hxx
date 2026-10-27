@@ -748,6 +748,7 @@ namespace StormByte {
 					 * Every stage (demux, decode, filters, encode, mux) blocks before its
 					 * next work unit, so CPU use stops once in-flight units finish.
 					 * Cancel still works while paused.
+					 * Duration scans also wait at their next progress checkpoint.
 					 */
 					void Pause() noexcept;
 
@@ -882,6 +883,8 @@ namespace StormByte {
 					 * @brief Observer for duration resolution in custom EmptyPlan implementations.
 					 * @return Provider-owned observer to borrow during Plan construction.
 					 * @note The callback borrows this job; it must not outlive the Transcoder.
+					 * It waits while paused and returns Failure on cancellation, causing
+					 * File::Duration to stop scanning and rewind its reader.
 					 */
 					StormByte::Safe::Function<void(double)> DurationProgress() const noexcept;
 
