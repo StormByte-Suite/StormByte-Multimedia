@@ -66,6 +66,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -202,7 +203,7 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 	const int size = raw.Size();
 	if (data && size > 0) {
 		const auto* rawBytes = reinterpret_cast<const std::byte*>(data);
-		bytes.assign(rawBytes, rawBytes + size);
+		bytes.assign(std::span<const std::byte>{rawBytes, static_cast<std::size_t>(size)});
 	}
 
 	StormByte::Safe::Vector<SideData> attachments;
@@ -219,10 +220,10 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePa
 			&& type != AV_PKT_DATA_CONTENT_LIGHT_LEVEL)
 			continue;
 		StormByte::Safe::Binary blob;
-		blob.assign(
+		blob.assign(std::span<const std::byte>{
 			reinterpret_cast<const std::byte*>(data),
-			reinterpret_cast<const std::byte*>(data) + size
-		);
+			static_cast<std::size_t>(size)
+		});
 		switch (type) {
 			case AV_PKT_DATA_DYNAMIC_HDR10_PLUS:
 				attachments.emplace_back(SideDataKind::HdrPlus,

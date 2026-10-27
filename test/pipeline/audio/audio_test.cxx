@@ -397,8 +397,55 @@ int test_transcoder_measures_both_duplicate_encodes() {
 	return CheckRepeatedAudioMapping(false, true, true, false, true);
 }
 
+int test_transcoder_remuxes_video_with_two_original_and_encoded_audios() {
+	const auto eac3 = Registry::Instance().FindCodec("E-AC3");
+	TEST_REQUIRE(eac3);
+	if (!eac3->get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+	const auto output = OutputPath("pipeline/video-remux-duplicate-surround.mkv");
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mkv")),
+		TestLocation(output), logger, 2000000000LL};
+	job.Video(0).Remux();
+	for (const int origin : {1, 2}) {
+		job.Audio(origin).Remux();
+		job.Audio(origin).Codec(eac3->get()).BitRate(384000);
+	}
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	const auto opened = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(opened && opened->Streams().size() == 5);
+	constexpr std::array codecs{"H.265"sv, "AC-3"sv, "E-AC3"sv, "AAC"sv, "E-AC3"sv};
+	for (std::size_t index = 0; index < codecs.size(); ++index) {
+		const auto stream = opened->Streams()[index];
+		TEST_REQUIRE(stream.Codec().Name() == codecs[index]);
+		if (index != 0) {
+			const auto audio = stream.Audio();
+			TEST_REQUIRE(audio && audio->Channels() == 6 && audio->SampleRate() == 48000);
+		}
+	}
+	std::size_t decoders = 0;
+	std::size_t encoders = 0;
+	std::size_t remuxers = 0;
+	for (const auto& stage : job.Telemetry()->Stages()) {
+		const auto name = TestView(stage.Name);
+		if (name.starts_with("Decoder(")) {
+			TEST_REQUIRE(name != "Decoder(t=0)"sv);
+			++decoders;
+		}
+		if (name.starts_with("Encoder("))
+			++encoders;
+		if (name.starts_with("Remuxer("))
+			++remuxers;
+	}
+	TEST_REQUIRE(decoders == 2 && encoders == 2 && remuxers == 3);
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_remuxes_video_with_two_original_and_encoded_audios", test_transcoder_remuxes_video_with_two_original_and_encoded_audios},
 		TestEntry{"test_transcoder_remuxes_and_encodes_same_audio", test_transcoder_remuxes_and_encodes_same_audio},
 		TestEntry{"test_transcoder_encodes_and_remuxes_same_audio", test_transcoder_encodes_and_remuxes_same_audio},
 		TestEntry{"test_transcoder_encodes_same_audio_twice_with_remux", test_transcoder_encodes_same_audio_twice_with_remux},

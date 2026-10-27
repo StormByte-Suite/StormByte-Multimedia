@@ -73,6 +73,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <span>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -281,7 +282,7 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 		const int size = m_ctx->scratch.Size();
 		if (data && size > 0) {
 			const auto* rawb = reinterpret_cast<const std::byte*>(data);
-			bytes.assign(rawb, rawb + size);
+			bytes.assign(std::span<const std::byte>{rawb, static_cast<std::size_t>(size)});
 		}
 
 		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Packet>();

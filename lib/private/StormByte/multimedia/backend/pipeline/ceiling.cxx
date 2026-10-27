@@ -161,7 +161,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		const bool encode = Encodes(track);
 		const bool video = track.Type() == Type::Video;
 		const bool audio = track.Type() == Type::Audio;
-		const std::size_t raw = VideoFrames();
 		const std::size_t cheap = CheapPackets();
 		const std::size_t remux = RemuxPackets();
 		switch (producer) {
@@ -174,8 +173,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				break;
 			case Producer::Decoder:
 				if (video) {
-					m_frames = raw;
-					m_packets = raw;
+					m_frames = VideoFrames();
+					m_packets = m_frames;
 				}
 				else {
 					m_packets = cheap;
@@ -190,7 +189,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					// Raw in = lookahead. Encoded out is cheap; keep it on the
 					// remux budget so the muxer does not buffer a second of
 					// compressed video while waiting on other tracks.
-					m_frames = raw;
+					m_frames = VideoFrames();
 					m_packets = remux;
 				}
 				else {
@@ -209,7 +208,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				if (!encode)
 					break;
 				if (video)
-					m_frames = raw;
+					m_frames = VideoFrames();
 				else
 					m_packets = cheap;
 				break;

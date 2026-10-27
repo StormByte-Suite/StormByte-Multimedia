@@ -20,12 +20,19 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
 ## [Unreleased]
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
-## [1.0.0] - 2026-10-27
+## [1.0.0] - 2026-10-28
 
 First public release. The entries below describe the initial API, supported workflows
 and their build, lifecycle and media-preservation guarantees.
+
+### Fixed
+
+- Demuxed and encoded packet payloads use bulk byte copies instead of appending one byte at a time through the Safe binary iterator overload, reducing CPU overhead on high-bitrate remuxes.
+- Mixed remux/audio-encode jobs no longer query available system memory for every demuxed packet. RAM-based queue sizing is only evaluated for stages that actually buffer decoded video frames; bounded packet queue capacities are unchanged.
+- Pipeline packet diagnostics skip payload hashes and string formatting when low-level logging is disabled. Worker thread names are assigned during setup instead of once per packet.
 
 ### Added
 

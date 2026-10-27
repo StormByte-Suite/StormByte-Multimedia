@@ -275,11 +275,13 @@ Packet::PointerType Encoder::Wrap(
 		return {};
 	}
 
-	const auto payloadLength = static_cast<StormByte::Safe::String>(payload.Available());
-	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={} key={} bytes={} raw={} fnv1a={:016x}",
-		index, *m_serial, m_part, Ns(pts), Ns(dts), Ns(duration), keyFrame ? 1 : 0,
-		std::string_view{payloadLength}, static_cast<std::size_t>(payload.Available()),
-		StormByte::Multimedia::Backend::Pipeline::Detail::PacketDigest(payload)));
+	if (m_log && m_log->Enabled(Level::LowLevel)) {
+		const auto payloadLength = static_cast<StormByte::Safe::String>(payload.Available());
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={} key={} bytes={} raw={} fnv1a={:016x}",
+			index, *m_serial, m_part, Ns(pts), Ns(dts), Ns(duration), keyFrame ? 1 : 0,
+			std::string_view{payloadLength}, static_cast<std::size_t>(payload.Available()),
+			StormByte::Multimedia::Backend::Pipeline::Detail::PacketDigest(payload)));
+	}
 	auto packet = Packet::PointerType::MakePointer<Packet>(
 		index, type, Producer::Encoder,
 		std::move(payload),

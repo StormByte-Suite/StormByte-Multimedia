@@ -78,6 +78,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Remux::Setup() noexcept {
+		NameThread("STMM:Remuxer:" + std::to_string(m_owner.m_index));
 		if (!m_owner.WaitForPlan())
 			return;
 		m_owner.SetupPlan();
@@ -97,7 +98,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		NameThread("STMM:Remuxer:" + std::to_string(m_owner.m_index));
 		if (m_owner.Failed())
 			return;
 		auto packet = StormByte::Safe::DynamicPointerCast<Packet>(item);
@@ -113,12 +113,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
-		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("fwd t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
-			packet->Track(), *packet->Serial(), packet->Part(),
-			Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
-			static_cast<std::size_t>(packet->Payload().Available()),
-			PacketDigest(packet->Payload())));
+		if (m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel)) {
+			const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("fwd t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
+				packet->Track(), *packet->Serial(), packet->Part(),
+				Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
+				static_cast<std::size_t>(packet->Payload().Available()),
+				PacketDigest(packet->Payload())));
+		}
 		m_owner.Emit(std::move(packet));
 	}
 

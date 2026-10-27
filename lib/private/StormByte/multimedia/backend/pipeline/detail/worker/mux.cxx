@@ -84,6 +84,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Mux::Setup() noexcept {
+		NameThread("STMM:Muxer");
 		static_cast<void>(m_owner.SetupPlan());
 	}
 
@@ -92,8 +93,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			Flush();
 			return;
 		}
-
-		NameThread("STMM:Muxer");
 
 		if (m_owner.Failed() || !m_owner.m_backend)
 			return;
@@ -109,9 +108,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			Fail("muxer expected a packet");
 			return;
 		}
-		const auto payloadBytes = static_cast<std::size_t>(packet->Payload().Available());
-		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
-		const auto payloadDigest = PacketDigest(packet->Payload());
+		const bool trace = m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel);
+		const auto payloadBytes = trace ? static_cast<std::size_t>(packet->Payload().Available()) : 0;
+		const auto payloadDigest = trace ? PacketDigest(packet->Payload()) : 0;
+		const auto payloadLength = trace ? static_cast<StormByte::Safe::String>(packet->Payload().Available()) : StormByte::Safe::String{};
 
 		while (!m_owner.m_backend->Push(m_owner, packet)) {
 			if (Stopping())
@@ -140,10 +140,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		if (pos >= 0)
 			m_owner.ClockPass(pos);
 
-		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("written t={} {}:{} pts={} dts={} pos={} bytes={} raw={} fnv1a={:016x}",
-			track, packet->Serial().value_or(0), packet->Part(),
-			Ns(packet->Pts()), Ns(packet->Dts()),
-			pos, std::string_view{payloadLength}, payloadBytes, payloadDigest));
+		if (trace)
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("written t={} {}:{} pts={} dts={} pos={} bytes={} raw={} fnv1a={:016x}",
+				track, packet->Serial().value_or(0), packet->Part(),
+				Ns(packet->Pts()), Ns(packet->Dts()),
+				pos, std::string_view{payloadLength}, payloadBytes, payloadDigest));
 	}
 
 	void Mux::Flush() noexcept {

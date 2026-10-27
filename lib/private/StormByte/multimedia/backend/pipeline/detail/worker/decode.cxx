@@ -135,7 +135,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		NameThread("STMM:Decode:" + std::to_string(m_owner.m_index));
 		if (m_owner.Failed())
 			return;
 		auto packet = StormByte::Safe::DynamicPointerCast<Packet>(item);
@@ -170,21 +169,24 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				m_owner.m_inDts.reset();
 		}
 
-		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
-		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
-			packet->Track(), *packet->Serial(), packet->Part(),
-			Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
-			static_cast<std::size_t>(packet->Payload().Available()),
-			PacketDigest(packet->Payload())));
+		if (m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel)) {
+			const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{} pts={} dts={} bytes={} raw={} fnv1a={:016x}",
+				packet->Track(), *packet->Serial(), packet->Part(),
+				Ns(packet->Pts()), Ns(packet->Dts()), std::string_view{payloadLength},
+				static_cast<std::size_t>(packet->Payload().Available()),
+				PacketDigest(packet->Payload())));
+		}
 
 		const auto started = std::chrono::steady_clock::now();
 		unsigned emitted = 0;
 		auto emit = [this, &started, &emitted](Frame::PointerType frame) {
 			m_owner.StampLineage(*frame);
 			m_owner.StampLook(*frame);
-			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
-				frame->Track(), frame->Serial().value_or(0), frame->Part(),
-				Ns(frame->Pts()), Ns(frame->Dts()), Ns(frame->Duration())));
+			if (m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel))
+				Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
+					frame->Track(), frame->Serial().value_or(0), frame->Part(),
+					Ns(frame->Pts()), Ns(frame->Dts()), Ns(frame->Duration())));
 			Emit(std::move(frame));
 			++emitted;
 			m_owner.RecordWork(ElapsedUs(started));

@@ -80,6 +80,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner(owner) {}
 
 	void Encode::Setup() noexcept {
+		NameThread("STMM:Encode:" + std::to_string(m_owner.m_index));
 		if (!m_owner.WaitForPlan())
 			return;
 		static_cast<void>(m_owner.SetupPlan());
@@ -91,7 +92,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			return;
 		}
 
-		NameThread("STMM:Encode:" + std::to_string(m_owner.m_index));
 		if (m_owner.Failed() || !m_owner.m_backend)
 			return;
 		auto frame = StormByte::Safe::DynamicPointerCast<Frame>(item);
@@ -113,9 +113,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				m_owner.m_index, std::string(m_owner.m_codec->Name()),
 				std::string_view{m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})}));
 
-		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{} pts={} dts={}",
-			m_owner.m_index, *frame->Serial(), frame->Part(),
-			Ns(frame->Pts()), Ns(frame->Dts())));
+		if (m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel))
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("in t={} {}:{} pts={} dts={}",
+				m_owner.m_index, *frame->Serial(), frame->Part(),
+				Ns(frame->Pts()), Ns(frame->Dts())));
 		m_owner.m_serial = *frame->Serial();
 		m_owner.m_part = frame->Part();
 

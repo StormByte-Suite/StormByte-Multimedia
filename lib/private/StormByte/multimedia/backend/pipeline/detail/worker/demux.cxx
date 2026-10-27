@@ -244,12 +244,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 		if (const auto& pts = packet->Pts(); pts)
 			m_owner.m_positionNs.store(pts->Nanoseconds().count(), StormByte::Safe::MemoryOrder::Release);
-		const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
-		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("read t={} {}:{} bytes={} raw={} fnv1a={:016x}",
-			packet->Track(), packet->Serial().value_or(0), packet->Part(),
-			std::string_view{payloadLength},
-			static_cast<std::size_t>(packet->Payload().Available()),
-			PacketDigest(packet->Payload())));
+		if (m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel)) {
+			const auto payloadLength = static_cast<StormByte::Safe::String>(packet->Payload().Available());
+			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("read t={} {}:{} bytes={} raw={} fnv1a={:016x}",
+				packet->Track(), packet->Serial().value_or(0), packet->Part(),
+				std::string_view{payloadLength},
+				static_cast<std::size_t>(packet->Payload().Available()),
+				PacketDigest(packet->Payload())));
+		}
 
 		const int track = packet->Track();
 		const StormByte::Size ceiling = ParkCeiling(track);
