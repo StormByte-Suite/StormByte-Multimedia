@@ -60,6 +60,7 @@
 #include <limits>
 
 extern "C" {
+	#include <ebur128.h>
 	#include <libavutil/samplefmt.h>
 }
 
@@ -162,6 +163,38 @@ namespace {
 	}
 }
 
+/**
+ * @brief Owns the external meter entirely inside Multimedia.
+ */
+class Loudnorm::Meter final {
+	public:
+		/**
+		 * @brief Opens a meter for the source audio layout and rate.
+		 * @param channels Layout width.
+		 * @param rate Sample rate in Hz.
+		 */
+		Meter(int channels, int rate) noexcept
+			: state(ebur128_init(static_cast<unsigned>(channels),
+				static_cast<unsigned long>(rate),
+				EBUR128_MODE_I | EBUR128_MODE_LRA | EBUR128_MODE_TRUE_PEAK)) {}
+
+		Meter(const Meter&) = delete;
+		Meter(Meter&&) = delete;
+
+		/**
+		 * @brief Releases the external state in the owning provider.
+		 */
+		~Meter() noexcept {
+			if (state)
+				ebur128_destroy(&state);
+		}
+
+		Meter& operator=(const Meter&) = delete;
+		Meter& operator=(Meter&&) = delete;
+
+		ebur128_state* state;	///< External meter, or nullptr if opening failed.
+};
+
 Loudnorm::Loudnorm(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<double> integrated, StormByte::Safe::Optional<double> truePeak) noexcept
 	: Filter::ProcessTwoPasses(std::move(log), "loudnorm"),
@@ -180,9 +213,7 @@ enum Type Loudnorm::Media() const noexcept {
 }
 
 void Loudnorm::Clean() noexcept {
-	if (m_st)
-		ebur128_destroy(&m_st);
-	m_st = nullptr;
+	m_st.reset();
 	m_channels = 0;
 	m_rate = 0;
 	m_measuredI = 0.0;
@@ -196,9 +227,7 @@ void Loudnorm::Clean() noexcept {
 }
 
 void Loudnorm::Setup() noexcept {
-	if (m_st)
-		ebur128_destroy(&m_st);
-	m_st = nullptr;
+	m_st.reset();
 	m_channels = 0;
 	m_rate = 0;
 	m_frames = 0;
@@ -232,16 +261,16 @@ int Loudnorm::MapChannel(int i, int channels) noexcept {
 bool Loudnorm::OpenMeter(int channels, int rate) noexcept {
 	if (channels <= 0 || rate <= 0)
 		return false;
-	m_st = ebur128_init(static_cast<unsigned>(channels),
-		static_cast<unsigned long>(rate),
-		EBUR128_MODE_I | EBUR128_MODE_LRA | EBUR128_MODE_TRUE_PEAK);
-	if (!m_st)
+	m_st = StormByte::Safe::MakeUnique<Meter>(channels, rate);
+	if (!m_st->state) {
+		m_st.reset();
 		return false;
+	}
 	m_channels = channels;
 	m_rate = rate;
 	m_tp = StormByte::Safe::Vector<double>(static_cast<std::size_t>(channels), 0.0);
 	for (int i = 0; i < channels; ++i)
-		ebur128_set_channel(m_st, static_cast<unsigned>(i), MapChannel(i, channels));
+		ebur128_set_channel(m_st->state, static_cast<unsigned>(i), MapChannel(i, channels));
 	return true;
 }
 
@@ -259,29 +288,27 @@ bool Loudnorm::Add(const FFrame& src) noexcept {
 			interleaved[static_cast<std::size_t>(i) * static_cast<std::size_t>(ch) + static_cast<std::size_t>(c)]
 				= SampleAt(src, c, i, fmt);
 	}
-	return ebur128_add_frames_float(m_st, interleaved.data(),
+	return ebur128_add_frames_float(m_st->state, interleaved.data(),
 		static_cast<std::size_t>(n)) == EBUR128_SUCCESS;
 }
 
 void Loudnorm::CloseMeter() noexcept {
 	if (!m_st || m_ready)
 		return;
-	if (ebur128_loudness_global(m_st, &m_measuredI) != EBUR128_SUCCESS
+	if (ebur128_loudness_global(m_st->state, &m_measuredI) != EBUR128_SUCCESS
 		|| !std::isfinite(m_measuredI)) {
 		Log(Level::Warning, "loudnorm: integrated loudness unavailable");
-		ebur128_destroy(&m_st);
-		m_st = nullptr;
+		m_st.reset();
 		return;
 	}
-	if (ebur128_loudness_range(m_st, &m_measuredLra) != EBUR128_SUCCESS)
+	if (ebur128_loudness_range(m_st->state, &m_measuredLra) != EBUR128_SUCCESS)
 		m_measuredLra = 0.0;
 	for (int c = 0; c < m_channels; ++c) {
 		double tp = 0.0;
-		if (ebur128_true_peak(m_st, static_cast<unsigned>(c), &tp) == EBUR128_SUCCESS)
+		if (ebur128_true_peak(m_st->state, static_cast<unsigned>(c), &tp) == EBUR128_SUCCESS)
 			m_tp[static_cast<std::size_t>(c)] = tp;
 	}
-	ebur128_destroy(&m_st);
-	m_st = nullptr;
+	m_st.reset();
 
 	const double gainDb = m_targetI - m_measuredI;
 	m_gain = std::pow(10.0, gainDb / 20.0);

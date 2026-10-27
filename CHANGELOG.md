@@ -23,7 +23,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
-## [1.0.0] - 2026-10-26
+## [1.0.0] - 2026-10-27
 
 ### Added
 

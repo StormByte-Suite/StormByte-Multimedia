@@ -63,7 +63,7 @@ extern "C" {
  * @file convert.hxx
  * @brief cxx-only bridge between RAII wrappers and libav value types.
  *
- * Include from .cxx after the FFmpeg C headers. Not installed.
+ * Include only from implementation files. Kept in the private tree, not installed.
  */
 
 /**

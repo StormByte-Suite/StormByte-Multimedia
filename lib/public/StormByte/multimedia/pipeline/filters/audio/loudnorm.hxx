@@ -59,8 +59,6 @@
 #include <StormByte/safe/string.hxx>
 #include <StormByte/safe/vector.hxx>
 
-#include <ebur128.h>
-
 /**
  * @namespace StormByte::Multimedia::Pipeline::Filter::Audio
  * @brief Audio process filters.
@@ -189,6 +187,11 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 		private:
 			/**
+			 * @brief Provider-owned meter; its external types stay in the implementation.
+			 */
+			class Meter;
+
+			/**
 			 * @brief Opens ebur128 for @p channels at @p rate.
 			 * @param channels Layout channel count.
 			 * @param rate Sample rate in Hz.
@@ -226,7 +229,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 
 			double m_targetI;			///< Target integrated LUFS
 			double m_targetTp;			///< Target true-peak dBTP
-			ebur128_state* m_st;			///< Provider-owned meter, or nullptr
+			StormByte::Safe::Unique<Meter> m_st;	///< Provider-owned meter, or empty
 			int m_channels;				///< Latched channel count
 			int m_rate;				///< Latched sample rate
 			double m_measuredI;			///< Program integrated LUFS
