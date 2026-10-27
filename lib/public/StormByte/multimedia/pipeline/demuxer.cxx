@@ -124,7 +124,7 @@ void Demuxer::WaitForPlan() noexcept {
 void Demuxer::LatchDuration() noexcept {
 	if (!m_progress || !m_plan || !static_cast<bool>(*m_plan))
 		return;
-	if (const auto& duration = m_plan->Snapshot().Duration(); duration)
+	if (const auto& duration = m_plan->Snapshot().DurationHint(); duration)
 		m_progress->SetDurationNs(duration->Nanoseconds().count());
 }
 

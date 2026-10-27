@@ -25,6 +25,9 @@ foreach(test_name IN ITEMS
 	test_duration_cancel_while_paused
 	test_duration_cancel_while_running
 	test_supplied_duration_skips_scan_control
+	test_duration_hint_does_not_scan
+	test_progress_duration_hint_skips_scan
+	test_missing_container_duration_scans
 )
 	add_test(NAME "file.${test_name}" COMMAND MultimediaDurationTests "${test_name}")
 	set_tests_properties("file.${test_name}" PROPERTIES TIMEOUT 20 LABELS "multimedia;file;pipeline")

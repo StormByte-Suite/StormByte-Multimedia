@@ -211,6 +211,16 @@ namespace StormByte {
 				const Metadata::File& Metadata() const noexcept { return m_metadata; }
 
 				/**
+				 * @brief Best available duration without scanning the source.
+				 * @return Supplied duration, container estimate, or cached scan result.
+				 *
+				 * Intended for progress estimates. An empty or non-positive value
+				 * is not a usable estimate. This never resolves missing stream
+				 * durations; use Duration() when a full packet scan is wanted.
+				 */
+				const StormByte::Safe::Optional<Property::Duration>& DurationHint() const noexcept { return m_duration; }
+
+				/**
 				 * @brief Container duration.
 				 * @return Duration, or empty if it cannot be determined.
 				 *
@@ -305,7 +315,7 @@ namespace StormByte {
 				 * @brief Opens AVIO on @p reader and scans durations.
 				 * @param reader Origin.
 				 * @param streams Streams to update.
-				 * @param duration Container duration to fill if empty.
+				 * @param duration Container duration to fill if empty or non-positive.
 				 * @param progress Borrowed packet scan observer, or nullptr.
 				 * @return True only after a completed scan and successful rewind.
 				 */
@@ -331,7 +341,7 @@ namespace StormByte {
 				 * @brief Fills missing durations from packet timestamps.
 				 * @param ctx Open probe context.
 				 * @param streams Streams to update.
-				 * @param container Container duration to fill if empty.
+				 * @param container Container duration to fill if empty or non-positive.
 				 * @param reader Borrowed source used to determine byte-based progress.
 				 * @param progress Borrowed scan observer, or nullptr.
 				 * @param percent Last published monotone percentage.

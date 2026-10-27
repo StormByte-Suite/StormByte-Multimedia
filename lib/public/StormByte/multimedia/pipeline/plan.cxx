@@ -293,7 +293,8 @@ Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	auto opened = StormByte::Multimedia::File::Open(*m_reader, duration);
 	if (opened) {
 		m_snapshot = StormByte::Safe::Unique<StormByte::Multimedia::File>::MakePointer<StormByte::Multimedia::File>(std::move(*opened));
-		if (!duration) {
+		const auto& hint = m_snapshot->DurationHint();
+		if (!duration && (!hint || hint->Nanoseconds().count() <= 0)) {
 			if (progress)
 				static_cast<void>(m_snapshot->Duration(*progress));
 			else

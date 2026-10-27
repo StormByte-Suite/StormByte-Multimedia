@@ -173,9 +173,10 @@ namespace StormByte {
 			 * their dynamic types without slicing. The constructor probes the
 			 * reader once into a consultation File snapshot
 			 * (streams, attachments, metadata). That File is not the
-			 * octet origin. The source duration is resolved here: an
-			 * explicit duration avoids scanning; otherwise the full source
-			 * is scanned before pipeline stages are created.
+			 * octet origin. Progress uses a positive explicit duration or the
+			 * container estimate. Only when neither is usable is the full
+			 * source scanned before pipeline stages are created. Explicit
+			 * File::Duration() queries retain their full-scan behavior.
 			 *
 			 * Destination container is an owned copy of an explicit identity,
 			 * or the registry identity matched to FFmpeg's filename guess.
@@ -319,7 +320,7 @@ namespace StormByte {
 					 * @brief Builds reader and writer from paths.
 					 * @param source Input path.
 					 * @param destination Output path.
-					 * @param duration Authoritative source nanoseconds; empty scans the full source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(const StormByte::Safe::String& source,
 						const StormByte::Safe::String& destination,
@@ -329,7 +330,7 @@ namespace StormByte {
 					 * @brief Builds a local reader and takes @p writer.
 					 * @param source Input path.
 					 * @param writer Owned output location (moved).
-					 * @param duration Authoritative source nanoseconds; empty scans the full source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -339,7 +340,7 @@ namespace StormByte {
 					 * @brief Takes @p reader and builds a local writer.
 					 * @param reader Owned input location (moved).
 					 * @param destination Output path.
-					 * @param duration Authoritative source nanoseconds; empty scans the full source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						const StormByte::Safe::String& destination,
@@ -349,7 +350,7 @@ namespace StormByte {
 					 * @brief Takes both location owners without slicing.
 					 * @param reader Owned input location (moved).
 					 * @param writer Owned output location (moved).
-					 * @param duration Authoritative source nanoseconds; empty scans the full source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -359,7 +360,7 @@ namespace StormByte {
 					 * @brief Takes both owners and observes automatic duration resolution.
 					 * @param reader Owned input location.
 					 * @param writer Owned output location.
-					 * @param duration Authoritative nanoseconds; absent or non-positive scans the source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 * @param progress Borrowed observer for this call only; null disables updates.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
@@ -372,7 +373,7 @@ namespace StormByte {
 					 * @param source Input path.
 					 * @param destination Output path; its suffix does not select the format.
 					 * @param container Registered writable destination identity to copy.
-					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(const StormByte::Safe::String& source,
 						const StormByte::Safe::String& destination,
@@ -384,7 +385,7 @@ namespace StormByte {
 					 * @param source Input path.
 					 * @param writer Owned output location.
 					 * @param container Registered writable destination identity to copy.
-					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -396,7 +397,7 @@ namespace StormByte {
 					 * @param reader Owned input location.
 					 * @param destination Output path; its suffix does not select the format.
 					 * @param container Registered writable destination identity to copy.
-					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						const StormByte::Safe::String& destination,
@@ -408,7 +409,7 @@ namespace StormByte {
 					 * @param reader Owned input location.
 					 * @param writer Owned output location.
 					 * @param container Registered writable destination identity to copy.
-					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -420,7 +421,7 @@ namespace StormByte {
 					 * @param reader Owned input location.
 					 * @param writer Owned output location.
 					 * @param container Registered writable destination identity to copy.
-					 * @param duration Authoritative nanoseconds; absent or non-positive scans.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 * @param progress Borrowed duration observer; null disables updates.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
@@ -732,7 +733,7 @@ namespace StormByte {
 					 * @param reader Owned input location.
 					 * @param writer Owned output location.
 					 * @param container Explicit identity to copy; null guesses from the filename.
-					 * @param duration Authoritative source duration or automatic scan.
+					 * @param duration Authoritative duration, or container estimate with scan fallback.
 					 * @param progress Borrowed duration observer.
 					 */
 					Plan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,

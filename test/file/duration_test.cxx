@@ -74,12 +74,12 @@ using namespace std::chrono_literals;
 namespace {
 	class ScanReader final: public BufferedLocationReader {
 		public:
-			explicit ScanReader(bool knownSize)
+			explicit ScanReader(bool knownSize, bool hasDuration = true)
 			: BufferedLocationReader("test://duration.wav", Location::Remote,
 				Parameters{StormByte::Buffer::IO::ReadAhead{0}, StormByte::Buffer::IO::MaxMemory{0}}), m_known_size(knownSize) {
 				std::ifstream input(FixturePath("audio/noise_stereo.wav"), std::ios::binary);
 				m_bytes.assign(std::istreambuf_iterator<char>{input}, std::istreambuf_iterator<char>{});
-				if (!knownSize && m_bytes.size() >= 12) {
+				if (m_bytes.size() >= 12) {
 					for (std::size_t offset = 12; offset + 8 <= m_bytes.size();) {
 						const auto chunk = static_cast<std::uint32_t>(static_cast<unsigned char>(m_bytes[offset + 4]))
 							| (static_cast<std::uint32_t>(static_cast<unsigned char>(m_bytes[offset + 5])) << 8)
@@ -89,8 +89,10 @@ namespace {
 							// Exceed FFmpeg's probe window so packet scanning must read the source.
 							m_bytes.resize(16 * 1024 * 1024);
 							for (unsigned byte = 0; byte < 4; ++byte) {
-								m_bytes[4 + byte] = static_cast<char>((m_bytes.size() - 8) >> (8 * byte));
-								m_bytes[offset + 4 + byte] = static_cast<char>((m_bytes.size() - offset - 8) >> (8 * byte));
+								m_bytes[4 + byte] = hasDuration
+									? static_cast<char>((m_bytes.size() - 8) >> (8 * byte)) : 0;
+								m_bytes[offset + 4 + byte] = hasDuration
+									? static_cast<char>((m_bytes.size() - offset - 8) >> (8 * byte)) : 0;
 							}
 							break;
 						}
@@ -212,7 +214,7 @@ namespace {
 			void OnProgress() noexcept override {
 				const auto clock = Progress();
 				if (clock && clock->CalculatingDuration() && clock->DurationCalculation()
-					&& clock->DurationCalculation().value() > 0.0
+					&& ++m_scan_updates > 1
 					&& clock->DurationCalculation().value() < 100.0 && !ScanPaused.exchange(true)) {
 					if (CancelScan)
 						Cancel();
@@ -223,6 +225,23 @@ namespace {
 
 			void OnAborted() noexcept override { ++Aborted; }
 			void OnError(const StormByte::Safe::String&) noexcept override { ++Errors; }
+
+		private:
+			unsigned m_scan_updates = 0;
+	};
+
+	class HintTranscoder final: public Pipeline::Transcoder {
+		public:
+			using Pipeline::Transcoder::Transcoder;
+
+			bool Scanned = false;
+
+		protected:
+			void OnProgress() noexcept override {
+				const auto clock = Progress();
+				if (clock && clock->CalculatingDuration() && clock->DurationCalculation())
+					Scanned = true;
+			}
 	};
 
 	template<typename Predicate>
@@ -237,7 +256,7 @@ namespace {
 	}
 
 	int CheckPausedScan(bool cancel) {
-		auto reader = StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<ScanReader>(true);
+		auto reader = StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<ScanReader>(false, false);
 		auto* source = static_cast<ScanReader*>(reader.get());
 		auto writer = StormByte::Safe::Unique<BufferedLocationWriter>::MakePointer<BufferedFileWriter>(
 			TestLocation(OutputPath(cancel ? "cancelled-duration.mkv" : "resumed-duration.mkv")));
@@ -289,7 +308,8 @@ int test_duration_cancel_while_paused() {
 }
 
 int test_duration_cancel_while_running() {
-	PausingTranscoder job{TestLocation(FixturePath("audio/noise_stereo.wav")),
+	auto reader = StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<ScanReader>(false, false);
+	PausingTranscoder job{std::move(reader),
 		TestLocation(OutputPath("cancelled-running-duration.mkv")), MakeLogger()};
 	job.CancelScan = true;
 	job.Audio(0).Remux();
@@ -310,8 +330,73 @@ int test_supplied_duration_skips_scan_control() {
 	auto observer = Observe(state);
 	const auto pulls = reader.Pulls.load();
 	TEST_REQUIRE(opened->Duration(observer));
+	TEST_REQUIRE(opened->DurationHint()->Nanoseconds().count() == 2000000000LL);
 	TEST_REQUIRE(state.Calls == 0);
 	TEST_REQUIRE(reader.Pulls.load() == pulls);
+	return 0;
+}
+
+int test_duration_hint_does_not_scan() {
+	ScanReader reader{true};
+	auto opened = File::Open(reader);
+	TEST_REQUIRE(opened);
+	const auto pulls = reader.Pulls.load();
+	TEST_REQUIRE(opened->DurationHint());
+	TEST_REQUIRE(opened->DurationHint()->Nanoseconds().count() > 0);
+	TEST_REQUIRE(reader.Pulls.load() == pulls);
+	ScanObserver state;
+	state.Cancel = false;
+	auto observer = Observe(state);
+	TEST_REQUIRE(opened->Duration(observer));
+	TEST_REQUIRE(state.Complete);
+	TEST_REQUIRE(reader.Pulls.load() > pulls);
+	return 0;
+}
+
+int test_progress_duration_hint_skips_scan() {
+	unsigned finalPulls = 0;
+	for (const std::int64_t supplied : {0LL, -1LL, 500000000LL}) {
+		auto reader = StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<ScanReader>(true);
+		auto* source = static_cast<ScanReader*>(reader.get());
+		auto opened = File::Open(*source);
+		TEST_REQUIRE(opened);
+		TEST_REQUIRE(opened->DurationHint());
+		auto writer = StormByte::Safe::Unique<BufferedLocationWriter>::MakePointer<BufferedFileWriter>(
+			TestLocation(OutputPath("hint-duration-" + std::to_string(supplied) + ".mkv")));
+		HintTranscoder job{std::move(reader), std::move(writer), MakeLogger(),
+			supplied == 0 ? StormByte::Safe::Optional<std::int64_t>{}
+				: StormByte::Safe::Optional<std::int64_t>{supplied}};
+		job.Audio(0).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		TEST_REQUIRE(!job.Scanned);
+		if (finalPulls == 0)
+			finalPulls = source->Pulls.load();
+		TEST_REQUIRE(source->Pulls.load() == finalPulls);
+		TEST_REQUIRE(job.Progress()->Main() == 100.0);
+		auto output = File::Open(TestLocation(OutputPath("hint-duration-" + std::to_string(supplied) + ".mkv")));
+		TEST_REQUIRE(output);
+		TEST_REQUIRE(output->Duration());
+		TEST_REQUIRE(output->Duration()->Nanoseconds().count() > 1000000000LL);
+	}
+	return 0;
+}
+
+int test_missing_container_duration_scans() {
+	auto reader = StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<ScanReader>(false, false);
+	auto* source = static_cast<ScanReader*>(reader.get());
+	auto opened = File::Open(*source);
+	TEST_REQUIRE(opened);
+	TEST_REQUIRE(!opened->DurationHint());
+	auto writer = StormByte::Safe::Unique<BufferedLocationWriter>::MakePointer<BufferedFileWriter>(
+		TestLocation(OutputPath("missing-duration.mkv")));
+	HintTranscoder job{std::move(reader), std::move(writer), MakeLogger()};
+	job.Audio(0).Remux();
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	TEST_REQUIRE(job.Scanned);
 	return 0;
 }
 
@@ -323,6 +408,9 @@ int main(int argc, char** argv) {
 		TestEntry{"test_duration_cancel_while_paused", test_duration_cancel_while_paused},
 		TestEntry{"test_duration_cancel_while_running", test_duration_cancel_while_running},
 		TestEntry{"test_supplied_duration_skips_scan_control", test_supplied_duration_skips_scan_control},
+		TestEntry{"test_duration_hint_does_not_scan", test_duration_hint_does_not_scan},
+		TestEntry{"test_progress_duration_hint_skips_scan", test_progress_duration_hint_skips_scan},
+		TestEntry{"test_missing_container_duration_scans", test_missing_container_duration_scans},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

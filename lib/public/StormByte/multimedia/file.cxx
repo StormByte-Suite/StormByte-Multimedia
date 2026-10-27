@@ -526,7 +526,7 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 		if (!longest.has_value() || measured.Nanoseconds() > longest->Nanoseconds())
 			longest = measured;
 	}
-	if (!container.has_value())
+	if (!container.has_value() || container->Nanoseconds().count() <= 0)
 		container = longest;
 	return complete;
 }

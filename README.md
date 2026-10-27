@@ -471,11 +471,19 @@ Destroying a filter graph requests cancellation of its connected endpoints, filt
 
 `Transcoder::Progress()` (or `Demuxer::Progress()` in a hand-built tube) returns a shared, read-only clock. Its getters and `Snapshot()` are safe to read from any thread while the job runs; `Snapshot()` captures every value under one lock, so a UI should prefer it to calling getters one by one.
 
+For progress, a positive caller-supplied duration takes precedence. Otherwise, `Plan`
+uses the duration reported by the container when it is positive, avoiding a full
+packet scan before transcoding. Only when neither is available does it scan the
+source. Container durations are estimates and may be inaccurate; they do not
+limit how much media is processed. `File::DurationHint()` exposes the available
+value without scanning. `File::Duration()` and `File::Duration(observer)` retain
+their full-scan behavior, including filling missing stream durations.
+
 A job has up to four independent axes, all measured against the source duration:
 
 | Axis | Getter / `Values` field | Present when | What it measures |
 | --- | --- | --- | --- |
-| Duration scan | `DurationCalculation()` / `Duration` | No duration was supplied | Packet scan that finds the source duration. Empty during CPU-only preparation. |
+| Duration scan | `DurationCalculation()` / `Duration` | Neither a positive supplied duration nor a usable container duration is available | Packet scan that finds the source duration. Empty during CPU-only preparation. |
 | Main | `Main()` / `Main`, `MainComplete()` / `MainComplete` | Always | How much of the destination has been written. Exactly 100 once the muxer writes the trailer. |
 | Measure | `Measure()` / `Measure`, `MeasureComplete` | A two-pass filter such as `Degrain` is mounted | The first pass over the source. |
 | Analytics | `Analytics()` / `Analytics`, `AnalyticsComplete` | An analytics filter such as `VMAF` is mounted | The decoded destination pictures scored so far. |

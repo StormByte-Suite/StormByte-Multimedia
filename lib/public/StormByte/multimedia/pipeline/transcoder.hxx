@@ -496,7 +496,7 @@ namespace StormByte {
 					 * @param source Input path.
 					 * @param destination Output path.
 					 * @param logger Shared log for the job and the tube.
-					 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 *
 					 * Stores @p logger as-is. @ref InstallLog runs at the end
 					 * of this constructor.
@@ -511,7 +511,7 @@ namespace StormByte {
 					 * @param source Input path.
 					 * @param writer Owned output location (moved).
 					 * @param logger Shared log for the job and the tube.
-					 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -523,7 +523,7 @@ namespace StormByte {
 					 * @param reader Owned input location (moved).
 					 * @param destination Output path.
 					 * @param logger Shared log for the job and the tube.
-					 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						const StormByte::Safe::String& destination,
@@ -535,7 +535,7 @@ namespace StormByte {
 					 * @param reader Owned input location (moved).
 					 * @param writer Owned output location (moved).
 					 * @param logger Shared log for the job and the tube.
-					 * @param duration Authoritative source nanoseconds. When omitted, the source is scanned before pipeline stages start.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -548,7 +548,7 @@ namespace StormByte {
 					 * @param destination Output path; its suffix does not select the muxer.
 					 * @param container Registered identity, borrowed through job and Plan destruction.
 					 * @param logger Shared application log.
-					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(const StormByte::Safe::String& source,
 						const StormByte::Safe::String& destination,
@@ -562,7 +562,7 @@ namespace StormByte {
 					 * @param writer Owned output location.
 					 * @param container Registered identity, borrowed through job and Plan destruction.
 					 * @param logger Shared application log.
-					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -576,7 +576,7 @@ namespace StormByte {
 					 * @param destination Output path; its suffix does not select the muxer.
 					 * @param container Registered identity, borrowed through job and Plan destruction.
 					 * @param logger Shared application log.
-					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						const StormByte::Safe::String& destination,
@@ -590,7 +590,7 @@ namespace StormByte {
 					 * @param writer Owned output location.
 					 * @param container Registered identity; its registry must outlive the job and Plan.
 					 * @param logger Shared application log.
-					 * @param duration Authoritative nanoseconds; empty scans the source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 */
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
@@ -865,7 +865,7 @@ namespace StormByte {
 					 * @brief Allocates the Plan type for this job.
 					 * @param reader Owned origin location, transferred from this Transcoder.
 					 * @param writer Owned destination location, transferred from this Transcoder.
-					 * @param duration Authoritative source nanoseconds; absent or non-positive scans the source.
+					 * @param duration Authoritative nanoseconds; otherwise use the container estimate, scanning only if unavailable.
 					 * @param container Borrowed authoritative registry identity; null guesses from the writer path.
 					 * @return Plan of the desired dynamic type, with no tracks yet.
 					 *
