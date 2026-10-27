@@ -19,20 +19,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Original-source license: [LICENSE](LICENSE) and [COPYING.LGPLv3](COPYING.LGPLv3)
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
-## [Unreleased]
-
-### Fixed
-
-- Pipeline logging now keeps a separate Multimedia scope for each application logger instead of sending later jobs to the first job's destination. Duration scanning and encoding retain their job's destination, and scoped stage loggers keep their sibling component paths.
-
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
-
 ## [1.0.0] - 2026-10-27
 
-### Fixed
-
-- Duration calculation now honours `Transcoder::Pause()`, `Resume()` and `Cancel()`, including cancellation while paused and scans of readers with an unknown size. Interrupted scans rewind the input buffer before returning and are not cached as completed durations, so they can be retried.
-- Bundled zlib now follows the requested FFmpeg library type. zlib 1.3.2 ignored `BUILD_SHARED_LIBS` and named its Windows static archive `zs.lib`, so static builds linked FFmpeg against the `z.lib` import library and `StormByte-Multimedia.dll` required an undistributed `z.dll`.
+First public release. The entries below describe the initial API, supported workflows
+and their build, lifecycle and media-preservation guarantees.
 
 ### Added
 
@@ -48,7 +38,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Codec queries:
 	- Public, DLL-exported `Codec::SubtitleKind()` returns an optional `Text`, `Bitmap` or `Unknown` classification from FFmpeg codec descriptors, independently of encoder/decoder availability. Non-subtitle codecs return an empty optional; binary-packed text such as `mov_text` remains `Text`.
 	- Public, DLL-exported `Codec::HasAccess(Access, Features)` checks whether an available encoder or decoder preserves all requested features. Read and Write are checked independently against private implementation tables and actual FFmpeg implementation availability. Encoder queries share the pipeline selector, so an H.265 build with only Kvazaar does not appear HDR10- or Dolby Vision-capable. An empty feature mask matches the generic access query.
-	- Registry access mirrors what the pipeline can actually do. Codec `Read` requires an FFmpeg decoder and `Write` requires an encoder row the pipeline selector can open, so a codec FFmpeg can only encode outside the pipeline tables (for example DTS) is no longer writable. Container `Write` requires a file-capable muxer resolved the same way the Plan resolves it, and `Container::Allows()` only lists codecs that muxer accepts at normal compliance (MP4 rejects VP8 and WebVTT, Matroska rejects TTML and 3GPP Timed Text). Applications building codec pickers from `HasAccess(Write)` and `Allows()` no longer offer combinations that fail at job start.
+	- Registry access mirrors what the pipeline can actually do. Codec `Read` requires an FFmpeg decoder and `Write` requires an encoder row the pipeline selector can open; codecs FFmpeg can only encode outside the pipeline tables (for example DTS) are not advertised as writable. Container `Write` requires a file-capable muxer resolved the same way the Plan resolves it, and `Container::Allows()` only lists codecs that muxer accepts at normal compliance (MP4 rejects VP8 and WebVTT, Matroska rejects TTML and 3GPP Timed Text).
 	- Encoder feature tables audited against upstream FFmpeg (n9.0.2) for software (x264, x265, libaom-av1, libvpx, libvpx-vp9, SVT-AV1, AAC) and hardware (NVENC, QSV, VAAPI, VideoToolbox) encoders. With `EnforceFeatures` disabled, first-frame HDR needs only consider the preferred encoder row.
 	- Matroska's compatibility catalog includes its native video codecs, including H.264, H.265, H.266, AV1, VP8, VP9 and FFV1.
 - HDR and Dolby Vision:
@@ -68,11 +58,13 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Encoded video and audio keep the source timeline, including negative B-frame DTS and audio encoder priming. MP4 output rebases the timeline to the source start time, as the FFmpeg CLI does, so priming is trimmed by the edit list; chapters follow. Matroska keeps the source timeline and signals priming with `CodecDelay`.
 	- Remuxed packets without timestamps (laced Matroska audio such as TrueHD) are given PTS and DTS by the muxer. Equal consecutive DTS are kept where the output format allows them (`AVFMT_TS_NONSTRICT`), and a filled-in DTS never exceeds the next decode slot.
 	- `Transcoder::Pause()` halts every pipeline stage at a shared gate; `Resume()` releases it and `Cancel()` ends a paused job immediately. A plan built while the job is paused starts held.
-	- Muxed packets are interleaved by timeline, not arrival order: the container holds packets per track and writes the oldest once every audio and video track has one queued, so encoder lookahead (for example SVT-AV1 at 4K) no longer separates audio from its video. Subtitles never gate, and a track silent for more than 60 s of timeline stops gating. The demuxer park follows the Plan's ceiling, so remuxed tracks cannot run ahead of a slow encode.
-	- `Progress::Main` is the real transcode percent: it follows the muxer's written position and is exactly 100 once the trailer is written. Measure and analytics never contribute to it; `All` keeps the weighted sum of every mounted phase. `Main`/`MainComplete` replace `Processing`, `ProcessingComplete` and `MuxComplete`.
+	- Duration calculation honours pause, resume and cancellation, including cancellation while paused and scans of readers with an unknown size. Interrupted scans rewind the input buffer and are not cached as completed durations, so they can be retried.
+	- Muxed packets are interleaved by timeline, not arrival order: the container holds packets per track and writes the oldest once every audio and video track has one queued, keeping audio and video together despite encoder lookahead (for example SVT-AV1 at 4K). Subtitles never gate, and a track silent for more than 60 s of timeline stops gating. The demuxer park follows the Plan's ceiling, so remuxed tracks cannot run ahead of a slow encode.
+	- `Progress::Main` is the real transcode percent: it follows the muxer's written position and is exactly 100 once the trailer is written. Measure and analytics never contribute to it; `All` keeps the weighted sum of every mounted phase. `MainComplete` marks completion of the main phase.
 	- Two-pass filters (for example loudnorm) switch from measuring to processing on the first frame of the second read, not when the demuxer reaches EOF. Frames still parked in the demuxer, queued in the decoder or held by slower upstream filters are measured before processing starts, so audio is neither shifted nor duplicated.
-	- Cancelling a job with analytics routes no longer touches destroyed stages during teardown.
+	- Cancellation preserves analytics-stage lifetimes through teardown. SVT-AV1 encoders receive EOS before teardown even when cancellation skips the normal pipeline flush. Pending packets are discarded if needed to accept EOS; the codec's close routine still owns draining and releasing its resources.
 	- Pipeline threads format and parse numbers with the "C" locale, independently of the host application's locale.
+	- Pipeline logging keeps a separate Multimedia scope for each application logger. Duration scanning and encoding retain their job's destination, and scoped stage loggers keep their sibling component paths.
 	- Opus encodes of 3–8 channel sources with a non-Vorbis channel order (e.g. 5.1(side)) are converted to the matching Vorbis order with the resampler; channel content is unchanged.
 - Build and release:
 	- `ENABLE_PGO` and `ENABLE_LTO`. Profile-guided optimization trains in `pgo-instr` and installs this build; link-time optimization follows `ENABLE_LTO` (default ON) for every build type. Release builds append `-O2` / `/O2` and the CPU baseline only when the caller did not set flags (`-stdlib=` alone does not count), and never pass `/fp:fast`. Windows Release uses `/arch:AVX`.
@@ -80,7 +72,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Requires [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.1) 2.2.1, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.4) 2.0.4, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.4) 2.0.4 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.1) 2.1.1, each as a release archive linked with `BACKEND=binary`. BuildMaster is >= 2.1.0.
 	- Multimedia exceptions, logs, filter graphs, durations and reports format through `Safe::String::ReplaceToken`. Exception paths are segments: `StormByte.Multimedia`, then `File`, `Codec`, `Plan`, `AV`, `AV.Decoder` and `OCR`.
 	- Bundled dependencies build with Clang, clang-cl, GCC, MSVC and Apple Clang, with LTO and PGO. Bundled static FFmpeg archives are linked directly (Linux wraps them in a rescan group). CI builds with `ENABLE_LTO=ON` and `ENABLE_TEST=ON` and runs ctest.
-- Fixed synthetic-noise MP3 and Opus fixtures with placeholder music tags, documented authoring commands and checksums.
+	- Bundled zlib follows the requested FFmpeg library type. Windows static builds link the static zlib archive without introducing a runtime `z.dll` dependency.
 
 - Media inspection and processing API:
 	- Add codec/container registries with names, aliases, extensions, operations and compatibility data. `File` inspects streams, languages, titles, attachments, duration, audio layouts and video properties, including HDR10 and signaled HDR10-like metadata.
@@ -101,12 +93,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Add `Drop`, `EmitFrame` and `EmitGraph` for custom buffering frame filters while keeping `Save` as a one-for-one replacement. Graph adapters expose non-closing `Receive`; native frames expose their timestamp timebase.
 
 - Add the manual pipeline Plan API and lifecycle:
-	- Make `Plan` noncopyable/nonmovable and retain it through `Safe::Shared<Plan>`; remove value binding and derived-Plan `Clone`/`Move` requirements. Keep configuration, `Check()` and `Tracks()` public while making snapshot/container/location/path accessors private; state, error and I/O telemetry remain observable. There is no public state setter.
+	- `Plan` is noncopyable/nonmovable and retained through `Safe::Shared<Plan>`. Configuration, `Check()` and `Tracks()` are public; snapshot/container/location/path accessors are private. State, error and I/O telemetry remain observable, with no public state setter.
 	- Add shared `Created -> Running -> Finished` state with terminal `Failed`, first-failure preservation and no failure after `Finished`. Constructors still start workers; configure and wire the graph, then close filters before binding the Plan to publish `Running`. Finish only after all stages and analytics complete.
 	- Require stages to outlive execution, propagation and notifications; stop peers before joins and serialize state publication with teardown.
 	- Accept registered `const Container&` overrides for Plan and Transcoder, independent of the output suffix. The Plan borrows the registry identity, which must outlive it.
 - Select muxers from the output path through FFmpeg's format support, with explicit policies for Matroska, WebM and MOV/MP4 and clear failures for unsupported combinations.
-- Keep optional codec, HDR/Dolby Vision and Japanese OCR cases registered across dependency/license configurations. Skip missing write support or unavailable pinned implementations; skip bundled FDK-AAC cases before pipeline startup when nonfree support is disabled. Run Japanese OCR recognition checks with both bundled and system OCR. Remove the bundled FDK-AAC availability requirement.
+- Keep optional codec, HDR/Dolby Vision and Japanese OCR cases registered across dependency/license configurations. Skip missing write support or unavailable pinned implementations; skip bundled FDK-AAC cases before pipeline startup when nonfree support is disabled. Run Japanese OCR recognition checks with both bundled and system OCR; FDK-AAC availability is optional.
 - Exclude GPL-dependent filters from compilation and header installation when `WITH_GPL=OFF`; Rubberband and VagueDenoiser require GPL. The current filter set has no nonfree-dependent filters; keep the independent Hqdn3d implementation available without GPL.
 
 - Build and dependency consistency:
@@ -116,7 +108,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Align `WITH_VMAF` with `WITH_FFMPEG` before dependency selection and report cache overrides, preventing mixed bundled/system ABIs. Disable IPO for all x265 bit-depth variants; keep x264 outside GCC LTO to preserve stack realignment for dependent SIMD code.
 	- Use default pthread attributes for bundled Kvazaar workers on MSVC.
 - VMAF and media metadata:
-	- Compile bundled VMAF against headers matching its library, avoiding `VmafPicture` layout mismatches, first-pair `EINVAL` and memory corruption. Add 8-bit/10-bit allocation, pool, read, flush and scoring API coverage for both dependency modes.
+	- Compile bundled VMAF against headers matching its library. Cover 8-bit/10-bit allocation, pool, read, flush and scoring APIs for both dependency modes.
 	- Treat VMAF picture preparation, read, flush and score-pooling errors as terminal; stop draining after failure and report runtime version and picture diagnostics. Allow muxer encoder-readiness waits to finish when input reaches EOF.
 	- Preserve native demuxed packet properties for ordinary and look decoders; detect native decoded HDR10+ in `File`. Preserve buffered raw-stream packets when restoring metadata without timestamp seeking, and rewind before opening demux input.
 	- Require HDR10+ when selecting an HDR-preserving encoder for HDR10+ input. Declare libaom's native AV1 HDR10+ path and the container-conditional libvpx/native VP9 Matroska side-data path without claiming VP9 bitstream support. Add a fixed 48-frame fixture and per-frame T.35, timing, static HDR and HEVC -> AV1 -> HEVC round-trip checks, including native decoding of final elementary HEVC without container metadata; require all 48 canonical payloads and exact color/static metadata without packet-level HDR10+ injection.
@@ -125,7 +117,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Muxing, codecs and packet flow:
 	- Implement buffered AVIO backpressure handling: preserve temporary reader unavailability as EAGAIN rather than EOF and rearm retained AVIO EAGAIN before the next packet read. Flush pending writer bytes and split oversized output blocks within the callback without loss or duplication, while preserving terminal I/O errors.
 	- Keep remux input indices separate from encoder output indices during reservation/routing; respect reservation failures before publishing connections. Preserve packet properties and side data, including late libaom AV1 extradata and audio skip samples, by copying after payload allocation. Clone remux codec parameters after short sources reach EOF so subtitle-only outputs can write headers.
-	- Prepare subtitle encoders during mux reservation so real codec parameters/extradata exist before the first cue. Remove flush-time substitution of unopened encoders with SubRip, preserve audio/video decoder errors, support delayed subtitle tracks, and supply MOV timed-text encoders with ASS rectangles while retaining cue timing.
+	- Prepare subtitle encoders during mux reservation so real codec parameters/extradata exist before the first cue, without substituting unopened encoders with SubRip at flush time. Preserve audio/video decoder errors, support delayed subtitle tracks, and supply MOV timed-text encoders with ASS rectangles while retaining cue timing.
 	- Adapt JPEG/PNG/BMP attachments to MOV/MP4 cover-art packets, retain Matroska serialization and existing `File` classification, and reject unsupported MP4 attachments. Implement Watermark setup for path and binary overlays.
 	- Prevent Demuxer setup from missing a bound Plan; allow decoder initialization after short-source EOF while context and queued packets remain available. Create planned per-track hopper connections before generic transfer, reserve manual encoder mux streams through typed `Encoder >> Muxer`, propagate errors at mux close, and apply interleave limits consistently to MP4 and generic muxers.
 	- Honor explicit decoder pins from Transcoder and manual Plans; missing or mismatched implementations fail rather than falling back. Format implementation labels and encoder/muxer errors as text; require an initialized private opened-encoder result.
@@ -137,10 +129,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 	- Keep frame metadata compatible with transformed colorimetry: inherit unspecified tags for pixel-only replacements, let explicit output tags win, and retain/restore HDR10/HDR10+ only for compatible output and Dolby Vision only while source color encoding remains unchanged. Remove incompatible native/wrapper metadata and attachments so encoders cannot restore stale tags; keep SDR color signaling even on encoders without HDR support.
 	- Return genuinely empty `AVFrame`s on graph `EAGAIN`/EOF; consume retained inputs instead of passing them through; drain all available outputs and emit delayed EOF frames with retained input lineage. Carry decoder/source/sink timebases and end timestamps through graph processing while preserving output timing and unique parts.
 	- Use valid BM3D block size. Resolve Decimate cadence from stream metadata or a timestamp/duration first pass without caller FPS, and propagate the negotiated output cadence. Initialize delayed Yadif/Bwdif frames as empty and emit buffered output at EOF.
-	- Translate FFmpeg chroma-position enums to zimg values and include input range, matrix, transfer, primaries and chroma position in cached-conversion keys. Replace thread-local scaling owners with reusable per-filter `AVFrame::ScaleContext` caches, released during ordinary teardown; retain explicit contexts for direct repeated scaling.
+	- Translate FFmpeg chroma-position enums to zimg values and include input range, matrix, transfer, primaries and chroma position in cached-conversion keys. Use reusable per-filter `AVFrame::ScaleContext` caches, released during ordinary teardown, and explicit contexts for direct repeated scaling.
 	- Reuse rolling integer patch sums in NlMeans without changing search, borders, strength, weights, rounding or thread count. Preserve Degrain's documented heuristic limitations.
 	- Patch FFmpeg's MOV/MP4 track-name reader to accept raw UTF-8 and avoid false UDTA length warnings; system FFmpeg is unchanged. Drop remaining HEVC slices when a picture's first slice is skipped to avoid stale reference-list errors in frame-threaded decode.
-	- Strengthen filter regressions with output properties, bounded EOF/sample conservation, FPS frame counts/timestamps, zimg cache comparisons and SDR color tags. Replace invalid TTML/Matroska success coverage with TTML/MP4 and explicit Matroska rejection.
+	- Cover filter output properties, bounded EOF/sample conservation, FPS frame counts/timestamps, zimg cache comparisons and SDR color tags. Verify TTML/MP4 support and explicit TTML/Matroska rejection.
 	- Keep optional Rubberband/VagueDenoiser tests free of omitted class references and use VP9 instead of GPL-only x264 for general filter tests when GPL/nonfree features are disabled.
 
 - Register CTest cases by build/dependency/license configuration, with category-specific executables sharing compiled helpers and bounded waits. Cover registries, `File`, facade/manual pipelines, remux/transcode, attachments, HDR, OCR, analytics, codec combinations, filters and invalid input/configuration.
@@ -148,5 +140,6 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Check VP9/HEVC remux analytics against all 48 fixture frames; cover HDR10/HDR10+ metadata across software and available hardware encoders, Dolby Vision transforms, OCR and exact fixture provenance.
 - Hardware tests preflight device/profile availability. Skip proven absent devices or unsupported backend capability, but keep invalid formats, allocation failures and generic encoder failures as failures. Test VAAPI SDR HEVC Main independently of Main10.
 - Exercise Watermark from both path and `#embed` bytes; `File` verifies generated streams while visual appearance remains a manual check. Tests use Multimedia APIs in-process, do not invoke external FFmpeg programs, and document synthetic fixture/font provenance separately.
+- Include synthetic-noise MP3 and Opus fixtures with placeholder music tags, documented authoring commands and checksums.
 
 [1.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.0

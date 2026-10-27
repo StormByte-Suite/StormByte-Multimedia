@@ -874,6 +874,31 @@ const ::AVCodecContext* FFmpeg::AVEncoder::Context() const noexcept {
 
 void FFmpeg::AVEncoder::Free() noexcept {
 	if (m_ptr) {
+		// Cancellation skips the pipeline flush. SVT still requires EOS before
+		// deinit; its close routine drains the remaining encoder work itself.
+		if (avcodec_is_open(m_ptr) && m_ptr->codec
+			&& std::strcmp(m_ptr->codec->name, "libsvtav1") == 0) {
+			int result = avcodec_send_frame(m_ptr, nullptr);
+			if (result == AVERROR(EAGAIN)) {
+				auto* packet = av_packet_alloc();
+				if (!packet)
+					av_log(m_ptr, AV_LOG_ERROR, "Cannot allocate a packet while closing SVT-AV1.\n");
+				else {
+					while (result == AVERROR(EAGAIN)) {
+						const int received = avcodec_receive_packet(m_ptr, packet);
+						av_packet_unref(packet);
+						if (received < 0) {
+							av_log(m_ptr, AV_LOG_ERROR, "Cannot drain SVT-AV1 before EOS: %d.\n", received);
+							break;
+						}
+						result = avcodec_send_frame(m_ptr, nullptr);
+					}
+					av_packet_free(&packet);
+				}
+			}
+			if (result < 0 && result != AVERROR_EOF)
+				av_log(m_ptr, AV_LOG_ERROR, "Cannot signal EOS while closing SVT-AV1: %d.\n", result);
+		}
 		avcodec_free_context(&m_ptr);
 		m_ptr = nullptr;
 	}

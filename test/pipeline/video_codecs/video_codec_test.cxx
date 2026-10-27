@@ -68,7 +68,9 @@ extern "C" {
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <string_view>
+#include <thread>
 #include <utility>
 
 using namespace StormByte::Multimedia;
@@ -439,8 +441,43 @@ int test_libwebp_decodes_animated_webp() {
 		"WebM", "VP9", "libvpx-vp9", "webp");
 }
 
+int test_svt_av1_cancel_repeated() {
+	if (!avcodec_find_encoder_by_name("libsvtav1"))
+		return TEST_SKIP;
+	const auto codec = Registry::Instance().FindCodec("AV1");
+	TEST_REQUIRE(codec);
+	for (int round = 0; round < 3; ++round) {
+		auto logger = MakeLogger();
+		{
+			Transcoder job{TestLocation(FixturePath("video/interleave_long.mkv")),
+				TestLocation(OutputPath("pipeline/video-codecs/svt-cancel-" + std::to_string(round) + ".mkv")),
+				logger, 12012000000LL};
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+			options.emplace(StormByte::Safe::String{"lp"}, StormByte::Safe::String{"2"});
+			job.Video(0).Codec(codec.value().get())
+				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libsvtav1"})
+				.Preset(StormByte::Safe::String{"8"}).CRF(35).FineTune(std::move(options))
+				.Filter<Filter::Video::Scale>(logger, 1280u, 720u);
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			if (round != 2) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(800));
+				TEST_REQUIRE(job.Status() == Status::Running);
+				if (round == 1) {
+					job.Pause();
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					TEST_REQUIRE(job.Status() == Status::Paused);
+				}
+			}
+			job.Cancel();
+		}
+	}
+	return 0;
+}
+
 int RunPipelineVideoCodecTests(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_svt_av1_cancel_repeated", test_svt_av1_cancel_repeated},
 		TestEntry{"test_svt_av1_encodes_matroska", test_svt_av1_encodes_matroska},
 		TestEntry{"test_svt_av1_encodes_mp4", test_svt_av1_encodes_mp4},
 		TestEntry{"test_aom_av1_encodes_webm", test_aom_av1_encodes_webm},

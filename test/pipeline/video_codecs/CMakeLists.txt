@@ -7,6 +7,7 @@ add_pipeline_test(MultimediaPipelineVideoCodecTests test_feature_access_checks_e
 foreach(test_name IN ITEMS
 	test_svt_av1_encodes_matroska
 	test_svt_av1_encodes_mp4
+	test_svt_av1_cancel_repeated
 	test_aom_av1_encodes_webm
 	test_dav1d_decodes_svt_av1
 	test_aom_decodes_svt_av1
@@ -23,6 +24,9 @@ foreach(test_name IN ITEMS
 	add_optional_pipeline_test(MultimediaPipelineVideoCodecTests ${test_name})
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;video-codecs")
 endforeach()
+
+set_tests_properties(pipeline.test_svt_av1_cancel_repeated
+	PROPERTIES FAIL_REGULAR_EXPRESSION "deinit called without sending EOS")
 
 foreach(test_name IN ITEMS
 		test_nvenc_encodes_h264_mp4
