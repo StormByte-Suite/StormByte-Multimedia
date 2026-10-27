@@ -2,6 +2,7 @@ add_executable(MultimediaPipelineSubtitleCodecTests subtitle_codec_test.cxx)
 target_link_libraries(MultimediaPipelineSubtitleCodecTests PRIVATE multimedia_pipeline_test_support)
 
 foreach(test_name IN ITEMS
+	test_transcoder_remuxes_and_encodes_same_subtitle
 	test_srt_encodes_srt
 	test_ass_encodes_matroska
 	test_webvtt_encodes_vtt

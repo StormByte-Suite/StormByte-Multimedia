@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
@@ -174,19 +175,44 @@ void Pipe::Abort() noexcept {
 }
 
 Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
+	return CloneTo(track, dest, track);
+}
+
+Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) noexcept {
 	dest.Listen();
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
-	m_forks.emplace_back(track, std::move(hopper));
+	if (m_forkDestinations.contains({track, &dest, output}))
+		return dest;
+	m_forkDestinations.emplace(std::make_tuple(track, &dest, output), m_forks.size());
+	m_forks.emplace_back(output, std::move(hopper));
 	auto& fork = m_forks.back();
-	if (dest.m_inTracks.contains(track))
-		dest.In().To(track) >> *fork.second;
+	if (dest.m_inTracks.contains(output))
+		dest.In().To(output) >> *fork.second;
 	else
-		fork.second->To(track) >> dest.In();
-	dest.m_inTracks.insert(track);
+		fork.second->To(output) >> dest.In();
+	dest.m_inTracks.insert(output);
 	if (m_closed)
 		fork.second->Eof();
 	return dest;
+}
+
+bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
+	dest.Listen();
+	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
+	StormByte::Safe::UniqueLock lock(m_forkMutex);
+	const auto found = m_forkDestinations.find({track, &previous, track});
+	if (found == m_forkDestinations.end() || m_forkDestinations.contains({track, &dest, track}))
+		return false;
+	const auto index = found->second;
+	hopper->To(track) >> dest.In();
+	dest.m_inTracks.insert(track);
+	if (m_closed)
+		hopper->Eof();
+	m_forks[index].second = std::move(hopper);
+	m_forkDestinations.erase(found);
+	m_forkDestinations.emplace(std::make_tuple(track, &dest, track), index);
+	return true;
 }
 
 void Pipe::Drain() noexcept {
@@ -258,16 +284,21 @@ Pipe& Pipe::operator<<(Item::PointerType item) noexcept {
 	if (!item)
 		return *this;
 	const int key = item->Track();
+	const auto packet = StormByte::Safe::DynamicPointerCast<StormByte::Multimedia::Pipeline::Packet>(item);
+	const bool measuring = packet && StormByte::Multimedia::Backend::Pipeline::Packet::Measuring(*packet);
 	StormByte::Safe::Deque<Fork> forks;
 	{
 		StormByte::Safe::UniqueLock lock(m_forkMutex);
-		forks = m_forks;
+		for (const auto& [destination, index] : m_forkDestinations) {
+			if (std::get<0>(destination) == key && (!measuring || std::get<1>(destination)->MeasuresInput()))
+				forks.push_back(m_forks[index]);
+		}
 	}
 	for (auto& fork : forks) {
-		if (fork.first != key)
-			continue;
-		if (auto copy = item->Clone())
-			fork.second->Push(key, std::move(copy));
+		if (auto copy = item->Clone()) {
+			copy->m_track = fork.first;
+			fork.second->Push(fork.first, std::move(copy));
+		}
 	}
 	m_out.Push(key, std::move(item));
 	return *this;

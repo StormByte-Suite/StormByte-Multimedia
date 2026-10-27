@@ -279,7 +279,8 @@ namespace StormByte::Multimedia::Pipeline {
 
 			/**
 			 * @brief Pins an FFmpeg decoder name (before demuxer >> decoder).
-			 * @param name Table name. Empty clears the pin.
+			 * @param name Table name. Empty explicitly selects automatic decoding,
+			 *             without inheriting a pin from the Plan.
 			 */
 			void Implementation(StormByte::Safe::String name) noexcept;
 
@@ -511,10 +512,12 @@ namespace StormByte::Multimedia::Pipeline {
 			void AfterWait() noexcept override;
 
 			int m_index;											///< Origin stream index
+			int m_sourceIndex = -1;								///< Source metadata identity for an output-indexed analytics look.
 			DecoderFlags m_flags;									///< Heuristic bits
 			StormByte::Safe::Optional<StormByte::Safe::String> m_language;			///< Origin language tag
 			StormByte::Safe::Optional<StormByte::Safe::String> m_title;				///< Origin title tag
 			StormByte::Safe::Optional<StormByte::Safe::String> m_implementation;	///< Pinned decoder name
+			bool m_implementationConfigured = false;	///< Explicit selection, including automatic decoding.
 			Features m_require;										///< Extra required bits
 			Features m_capabilities;								///< Opened row bits
 			Demuxer* m_origin = nullptr;							///< Origin demuxer, origin mode

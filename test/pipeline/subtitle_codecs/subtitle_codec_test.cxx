@@ -153,8 +153,29 @@ int test_pgssub_remuxes_sup() {
 	return 0;
 }
 
+int test_transcoder_remuxes_and_encodes_same_subtitle() {
+	const auto ass = Registry::Instance().FindCodec("ASS");
+	TEST_REQUIRE(ass);
+	if (!ass->get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+	const auto output = OutputPath("pipeline/subtitle-codecs/duplicate-srt-ass.mkv");
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("subtitles/anime_eng.srt")), TestLocation(output), logger};
+	job.Subtitle(0).Remux();
+	job.Subtitle(0).Codec(ass->get());
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	const auto opened = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(opened && opened->Streams().size() == 2);
+	TEST_REQUIRE(opened->Streams()[0].Codec().Name() == "SRT");
+	TEST_REQUIRE(opened->Streams()[1].Codec().Name() == "ASS");
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_remuxes_and_encodes_same_subtitle", test_transcoder_remuxes_and_encodes_same_subtitle},
 		TestEntry{"test_srt_encodes_srt", test_srt_encodes_srt},
 		TestEntry{"test_ass_encodes_matroska", test_ass_encodes_matroska},
 		TestEntry{"test_webvtt_encodes_vtt", test_webvtt_encodes_vtt},

@@ -54,6 +54,8 @@
 #include <StormByte/multimedia/pipeline/config/attachment.hxx>
 #include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
+#include <StormByte/multimedia/pipeline/filters/analytics/frames.hxx>
+#include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
@@ -229,8 +231,98 @@ int test_transcoder_explicit_container_overrides_filename() {
 	return 0;
 }
 
+namespace {
+int CheckRepeatedVideoMapping(bool encode) {
+	const auto vp9 = Registry::Instance().FindCodec("VP9");
+	TEST_REQUIRE(vp9);
+	if (encode && !vp9->get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+	const auto input = FixturePath("video/anime_like.mkv");
+	const auto output = OutputPath("pipeline/duplicate-video-remux.mkv");
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+	job.Video(0).Remux().Title(StormByte::Safe::String{"first"})
+		.Filter<Filter::Video::CountFrames>(logger);
+	auto second = job.Video(0);
+	second.Title(StormByte::Safe::String{"second"}).Filter<Filter::Video::CountFrames>(logger);
+	if (encode)
+		second.Codec(vp9->get());
+	else
+		second.Remux();
+	job.Filter<Filter::Video::CountFrames>(logger);
+	job.Filter<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"},
+		static_cast<unsigned short>(2));
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	const auto reports = job.Reports();
+	TEST_REQUIRE(reports.size() == 4);
+	for (const auto& entry : reports) {
+		const auto& report = entry.second;
+		TEST_REQUIRE(report.Kind() == Filter::Report::Status::Ok);
+		const auto& data = report.Data();
+		if (TestView(entry.first).find("general") != std::string_view::npos) {
+			TEST_REQUIRE(data.at(StormByte::Safe::String{"0.frames"}) == "48");
+			TEST_REQUIRE(data.at(StormByte::Safe::String{"1.frames"}) == "48");
+			if (TestView(entry.first).starts_with("vmaf[")) {
+				TEST_REQUIRE(data.contains(StormByte::Safe::String{"0.vmaf_mean"}));
+				TEST_REQUIRE(data.contains(StormByte::Safe::String{"1.vmaf_mean"}));
+				TEST_REQUIRE(std::stod(std::string{TestView(data.at(
+					StormByte::Safe::String{"0.vmaf_mean"}))}) == 100.0);
+				const auto score = std::stod(std::string{TestView(data.at(
+					StormByte::Safe::String{"1.vmaf_mean"}))});
+				TEST_REQUIRE(score >= 0.0 && score <= 100.0);
+				if (!encode)
+					TEST_REQUIRE(score == 100.0);
+			}
+		}
+		else
+			TEST_REQUIRE(data.at(StormByte::Safe::String{"frames"}) == "48");
+	}
+	const auto source = File::Open(StormByte::Safe::String{input.string()});
+	const auto opened = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(source && opened);
+	TEST_REQUIRE(opened->Streams().size() == 2);
+	for (std::size_t index = 0; index < 2; ++index) {
+		const auto stream = opened->Streams()[index];
+		TEST_REQUIRE(stream.Type() == StormByte::Multimedia::Type::Video);
+		TEST_REQUIRE(stream.Codec().Name() == (encode && index == 1
+			? "VP9"sv : source->Streams()[0].Codec().Name()));
+		TEST_REQUIRE(stream.Metadata().Title());
+		TEST_REQUIRE(TestView(stream.Metadata().Title().value()) == (index == 0 ? "first"sv : "second"sv));
+		Transcoder extract{TestLocation(output),
+			TestLocation(OutputPath("pipeline/duplicate-video-" + std::to_string(index) + ".mkv")),
+			logger, 2000000000LL};
+		extract.Video(static_cast<int>(index)).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(extract) == 0);
+		extract.Run();
+		TEST_REQUIRE(WaitForTranscoder(extract) == 0);
+		bool counted = false;
+		for (const auto& stage : extract.Telemetry()->Stages()) {
+			if (TestView(stage.Name).starts_with("Remuxer(")) {
+				TEST_REQUIRE(stage.Metrics->InputPackets() == 48);
+				TEST_REQUIRE(stage.Metrics->OutputPackets() == 48);
+				counted = true;
+			}
+		}
+		TEST_REQUIRE(counted);
+	}
+	return 0;
+}
+}
+
+int test_transcoder_remuxes_same_video_twice() {
+	return CheckRepeatedVideoMapping(false);
+}
+
+int test_transcoder_remuxes_and_encodes_same_video() {
+	return CheckRepeatedVideoMapping(true);
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_remuxes_same_video_twice", test_transcoder_remuxes_same_video_twice},
+		TestEntry{"test_transcoder_remuxes_and_encodes_same_video", test_transcoder_remuxes_and_encodes_same_video},
 		TestEntry{"test_transcoder_remux_preserves_pgs_and_attachments", test_transcoder_remux_preserves_pgs_and_attachments},
 		TestEntry{"test_transcoder_remux_omits_unselected_attachments", test_transcoder_remux_omits_unselected_attachments},
 		TestEntry{"test_hand_built_pipe_remux_preserves_pgs_and_attachments", test_hand_built_pipe_remux_preserves_pgs_and_attachments},

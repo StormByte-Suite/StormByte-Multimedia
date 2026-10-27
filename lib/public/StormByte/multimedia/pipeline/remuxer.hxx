@@ -145,6 +145,14 @@ namespace StormByte {
 					explicit Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept;
 
 					/**
+					 * @brief Remuxes one origin into an explicit destination slot.
+					 * @param log Shared logger.
+					 * @param in Origin stream index.
+					 * @param out Mux output slot, independent of @p in.
+					 */
+					Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in, int out) noexcept;
+
+					/**
 					 * @brief Copy constructor.
 					 * @param other Source remuxer.
 					 */
@@ -266,6 +274,7 @@ namespace StormByte {
 					bool ConnectOrigin(Demuxer& demuxer) noexcept;
 
 					int m_index;		///< Origin stream index.
+					int m_output = -1;	///< Explicit mux slot, or legacy source-index routing.
 					Demuxer* m_origin = nullptr;	///< Borrowed origin; must outlive this stage.
 					Join m_join{*this};	///< Halt before other members die
 			};

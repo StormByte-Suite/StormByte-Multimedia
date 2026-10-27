@@ -68,8 +68,11 @@ using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
 Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept
+: Remuxer(std::move(log), in, -1) {}
+
+Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in, int out) noexcept
 :	Step(std::move(log), Producer::Remuxer, Kinds{Kind::Packet}, Kinds{Kind::Packet}),
-	m_index(in) {
+	m_index(in), m_output(out) {
 	Mount(StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face()),
 		StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Remux>(*this));
 	Launch();
@@ -121,6 +124,8 @@ StormByte::Size Remuxer::InputCeiling() const noexcept {
 }
 
 void Remuxer::Emit(Packet::PointerType packet) noexcept {
+	if (packet)
+		packet->m_muxTrack = m_output;
 	Step::Emit(std::move(packet));
 }
 
@@ -134,7 +139,8 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& 
 		return remuxer;
 	}
 
-	demuxer.pipe().To(remuxer.In()) >> remuxer.pipe();
+	demuxer.pipe().CloneTo(remuxer.In(), remuxer.pipe());
+	demuxer.pipe().Drain();
 	remuxer.Wake();
 	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind remuxer t={}", remuxer.In()));
 	return remuxer;

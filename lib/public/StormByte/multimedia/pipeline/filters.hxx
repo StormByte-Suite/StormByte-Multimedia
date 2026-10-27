@@ -395,14 +395,14 @@ namespace StormByte {
 					/**
 					 * @brief Measure origin EoF. Friend: Demuxer::ReachedEof.
 					 *
-					 * Calls Decoder::MeasureSourceClosed on each measure-track
+					 * Calls Decoder::MeasureSourceClosed on each measuring
 					 * decoder. Two-pass leaves leave measure in-band, on the
 					 * first second-pass frame they receive.
 					 */
 					void CloseMeasureSource() noexcept;
 
 					/**
-					 * @brief One measure-track decoder finished DrainMeasure.
+					 * @brief One measuring decoder branch finished DrainMeasure.
 					 *
 					 * Friend: Decoder, on its worker. The last one to drain
 					 * runs FinishMeasure exactly once.
@@ -452,6 +452,7 @@ namespace StormByte {
 					StormByte::Safe::Vector<Attached> m_globals;		///< Global analytics.
 					StormByte::Safe::Vector<Attached> m_reports;		///< Leaves that may Report().
 					StormByte::Safe::Vector<int> m_measureTracks;		///< Tracks given to Demuxer::Measure.
+					std::uint64_t m_measureSources = 0;				///< Distinct decoder branches participating in measurement.
 					StormByte::Safe::Atomic<std::uint64_t> m_measureDrained{0};	///< Measure decoders that finished DrainMeasure
 					bool m_measuring = false;						///< After Close, before FinishMeasure
 					bool m_hasAnalytics = false;						///< At least one Analytics leaf

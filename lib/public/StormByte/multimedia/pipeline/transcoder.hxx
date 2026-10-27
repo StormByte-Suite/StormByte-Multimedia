@@ -658,6 +658,7 @@ namespace StormByte {
 
 					/**
 					 * @brief Maps a video origin stream. Mux order is Add order.
+					 * @note Each call adds an independent output, even for the same origin.
 					 * @param in Origin stream index.
 					 * @return Fluent handle.
 					 */
@@ -665,6 +666,7 @@ namespace StormByte {
 
 					/**
 					 * @brief Maps an audio origin stream. Mux order is Add order.
+					 * @note Each call adds an independent output, even for the same origin.
 					 * @param in Origin stream index.
 					 * @return Fluent handle.
 					 */
@@ -672,6 +674,7 @@ namespace StormByte {
 
 					/**
 					 * @brief Maps a subtitle origin stream. Mux order is Add order.
+					 * @note Each call adds an independent output, even for the same origin.
 					 * @param in Origin stream index.
 					 * @return Fluent handle.
 					 */
@@ -1003,10 +1006,10 @@ namespace StormByte {
 
 					/**
 					 * @brief Records encoder open into a TrackSettled and fires OnSettled.
-					 * @param in Origin stream index of the lane.
+					 * @param out Mapped output slot of the lane.
 					 * @param encoder Encoder that just opened.
 					 */
-					void MarkSettled(int in, Encoder& encoder) noexcept;
+					void MarkSettled(int out, Encoder& encoder) noexcept;
 
 					/**
 					 * @brief Whether @p slot is a mapped track.

@@ -158,14 +158,7 @@ bool Demuxer::WakeNow() const noexcept {
 }
 
 bool Demuxer::Rewind() noexcept {
-	if (m_plan) {
-		auto& reader = Origin();
-		if (reader.IsOpen() && !reader.Rewind()) {
-			Fail("reader rewind failed");
-			return false;
-		}
-	}
-
+	// FFmpeg owns seeking so its AVIO buffer and the underlying reader stay synchronized.
 	if (!m_backend || !m_backend->Rewind(*this))
 		return false;
 	m_eof = false;
@@ -229,6 +222,7 @@ Packet::PointerType Demuxer::Wrap(
 		nullptr,
 		serial,
 		0);
+	packet->m_measuring = m_measuring;
 	if (backend)
 		packet->Bind(std::move(backend));
 	return packet;
@@ -245,7 +239,7 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	}
 	if (const auto plan = decoder.Plan(); plan) {
 		try {
-			if (!decoder.Implementation()) {
+			if (!decoder.m_implementationConfigured) {
 				for (const auto& track : plan->Tracks()) {
 					if (!track || track->In() != decoder.Index() || !track->Config())
 						continue;
@@ -264,7 +258,8 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	}
 
 	decoder.AttachOrigin(demuxer);
-	demuxer.pipe().To(decoder.Index()) >> decoder.pipe();
+	demuxer.pipe().CloneTo(decoder.Index(), decoder.pipe());
+	demuxer.pipe().Drain();
 	if (const std::size_t cap = decoder.InputCeiling(); cap > 0)
 		decoder.pipe().Capacity(decoder.Index(), cap);
 	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind decoder t={}", decoder.Index()));

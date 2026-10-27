@@ -36,6 +36,14 @@ buildmaster_component(
 buildmaster_link(StormByte-Multimedia StormByte-Base StormByte-Buffer StormByte-Logger StormByte-System)
 
 if(BUILD_SHARED_LIBS)
+	# BuildMaster flattens implementation dependencies into the public link
+	# interface. Keep them inside the shared library after graph materialization.
+	function(_stormbyte_multimedia_public_links)
+		set_property(TARGET StormByte-Multimedia PROPERTY INTERFACE_LINK_LIBRARIES
+			StormByte-Base StormByte-Buffer StormByte-Logger StormByte-System)
+	endfunction()
+	buildmaster_hook_graph(_stormbyte_multimedia_public_links zzz-multimedia-public-links)
+
 	target_compile_definitions(StormByte-Multimedia
 		PRIVATE StormByte_Multimedia_EXPORTS
 		PUBLIC STORMBYTE_MULTIMEDIA_SHARED

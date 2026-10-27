@@ -79,6 +79,20 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	class STORMBYTE_MULTIMEDIA_PRIVATE Packet {
 		public:
 			/**
+			 * @brief Explicit remux output slot, or -1 for source-index routing.
+			 * @param packet Public packet retaining its original track identity.
+			 * @return Destination mux slot.
+			 */
+			static int MuxTrack(const StormByte::Multimedia::Pipeline::Packet& packet) noexcept;
+
+			/**
+			 * @brief Whether a packet belongs to the source measurement pass.
+			 * @param packet Public packet.
+			 * @return true for measurement-only input.
+			 */
+			static bool Measuring(const StormByte::Multimedia::Pipeline::Packet& packet) noexcept;
+
+			/**
 			 * @name Lifecycle
 			 * @{
 			 */
@@ -198,7 +212,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void BindProperties(StormByte::Multimedia::Pipeline::Packet& packet) noexcept;
 
 			/**
-			 * @brief Copies original FFmpeg packet metadata without replacing the facade payload.
+			 * @brief Copies original FFmpeg packet metadata, preserving the destination stream index and facade payload.
 			 * @param packet Public unit that owns the original packet holder.
 			 * @param destination FFmpeg packet receiving properties and side data.
 			 * @return True when copied or no original holder exists, false on allocation failure.

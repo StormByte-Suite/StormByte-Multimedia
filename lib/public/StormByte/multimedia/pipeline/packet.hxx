@@ -357,6 +357,7 @@ namespace StormByte {
 					 * @brief Allows the muxer to access the compressed backend packet.
 					 */
 					friend class Muxer;
+					friend class Remuxer;
 
 					/**
 					 * @brief Adopts a backend packet.
@@ -398,6 +399,8 @@ namespace StormByte {
 					const StormByte::Multimedia::Codec* m_codec;			///< Non-owning codec pointer; its Registry must outlive the packet.
 					StormByte::Safe::Optional<std::uint64_t> m_serial;			///< Lineage identifier, empty on the sentinel.
 					std::uint64_t m_part;						///< Sub-identifier within the lineage, zero on the sentinel.
+					int m_muxTrack = -1;						///< Explicit remux destination, independent of source lineage.
+					bool m_measuring = false;					///< Source packet belongs to the measurement pass.
 					StormByte::Safe::Unique<Backend::Pipeline::Packet> m_backend;	///< Multimedia-private FFmpeg packet holder.
 			};
 		}

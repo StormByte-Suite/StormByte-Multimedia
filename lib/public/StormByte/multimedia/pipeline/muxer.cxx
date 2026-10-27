@@ -111,6 +111,7 @@ namespace {
 class Muxer::Connections final {
 	public:
 		std::map<int, Encoder*> encoders;	///< Borrowed encoders indexed by destination slot.
+		std::map<int, int> remuxes;	///< Explicit remux slots mapped to origin indices.
 };
 
 Muxer::Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
@@ -238,7 +239,8 @@ void Muxer::WaitArmed() noexcept {
 			return false;
 		if (owner.Plan()->State() != Plan::State::Running)
 			return true;
-		return owner.Armed() && (owner.m_wired.empty() || owner.m_origin);
+		return owner.Armed() && ((owner.m_wired.empty() && owner.m_connections->remuxes.empty())
+			|| owner.m_origin);
 	});
 }
 
@@ -296,7 +298,10 @@ bool Muxer::SetupPlan() noexcept {
 				return false;
 		}
 		else {
-			if (encoder != m_connections->encoders.end() || !m_wired.contains(track.In())) {
+			const auto remux = m_connections->remuxes.find(slot);
+			const bool connected = remux != m_connections->remuxes.end()
+				? remux->second == track.In() : m_wired.contains(track.In());
+			if (encoder != m_connections->encoders.end() || !connected) {
 				Fail("plan remux track has no matching connection");
 				return false;
 			}
@@ -426,7 +431,8 @@ void Muxer::ClockPass(std::int64_t ns) noexcept {
 Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& muxer) noexcept {
 	if (!muxer.ConnectInput(encoder))
 		return encoder;
-	if (encoder.Index() < 0 || muxer.m_connections->encoders.contains(encoder.Index())) {
+	if (encoder.Index() < 0 || muxer.m_connections->encoders.contains(encoder.Index())
+		|| muxer.m_connections->remuxes.contains(encoder.Index())) {
 		muxer.Fail("duplicate or invalid mux encoder output index");
 		return encoder;
 	}
@@ -441,11 +447,17 @@ Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& mu
 Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& muxer) noexcept {
 	if (!muxer.ConnectInput(remuxer))
 		return remuxer;
-	if (remuxer.In() < 0 || muxer.m_wired.contains(remuxer.In())) {
+	if (remuxer.In() < 0 || remuxer.m_output < -1
+		|| (remuxer.m_output < 0 && muxer.m_wired.contains(remuxer.In()))
+		|| (remuxer.m_output >= 0 && (muxer.m_connections->remuxes.contains(remuxer.m_output)
+			|| muxer.m_connections->encoders.contains(remuxer.m_output)))) {
 		muxer.Fail("duplicate or invalid mux remux input index");
 		return remuxer;
 	}
-	muxer.m_wired.insert(remuxer.In());
+	if (remuxer.m_output >= 0)
+		muxer.m_connections->remuxes.emplace(remuxer.m_output, remuxer.In());
+	else
+		muxer.m_wired.insert(remuxer.In());
 	remuxer.pipe().To(remuxer.In()) >> muxer.pipe();
 	muxer.m_reserved.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel);
 	muxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind remux t={}", remuxer.In()));

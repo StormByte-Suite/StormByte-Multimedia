@@ -173,14 +173,6 @@ int test_transcoder_rejects_wrong_codec_type() {
 		"codec 'MP3'", [&](Transcoder& job) { job.Video(0).Codec(mp3.value().get()); }, true);
 }
 
-int test_transcoder_rejects_duplicate_mapping() {
-	return CheckRejectedJob("video/anime_like.mkv", OutputPath("pipeline/rejected-duplicate.mkv"),
-		"origin 0 is already mapped", [](Transcoder& job) {
-			job.Video(0).Remux();
-			job.Video(0).Remux();
-		}, true);
-}
-
 int test_transcoder_rejects_invalid_attachment_pattern() {
 	return CheckRejectedJob("video/anime_like.mkv", OutputPath("pipeline/rejected-mime.mkv"),
 		"attachment MIME pattern", [](Transcoder& job) { job.Attachments("application/**"); }, true);
@@ -256,7 +248,6 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_rejects_missing_stream_index", test_transcoder_rejects_missing_stream_index},
 		TestEntry{"test_transcoder_rejects_wrong_stream_type", test_transcoder_rejects_wrong_stream_type},
 		TestEntry{"test_transcoder_rejects_wrong_codec_type", test_transcoder_rejects_wrong_codec_type},
-		TestEntry{"test_transcoder_rejects_duplicate_mapping", test_transcoder_rejects_duplicate_mapping},
 		TestEntry{"test_transcoder_rejects_invalid_attachment_pattern", test_transcoder_rejects_invalid_attachment_pattern},
 		TestEntry{"test_transcoder_rejects_missing_logger", test_transcoder_rejects_missing_logger},
 		TestEntry{"test_transcoder_rejects_empty_mapping", test_transcoder_rejects_empty_mapping},

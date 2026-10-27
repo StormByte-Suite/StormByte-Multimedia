@@ -125,7 +125,7 @@ bool Decoder::WaitForPlan() noexcept {
 
 bool Decoder::SetupPlan() noexcept {
 	try {
-		if (!m_implementation && !m_look) {
+		if (!m_implementationConfigured && !m_look) {
 			for (const auto& track : Plan()->Tracks()) {
 				if (!track || track->In() != m_index || !track->Config())
 					continue;
@@ -152,7 +152,7 @@ Decoder::operator bool() const noexcept {
 
 StormByte::Size Decoder::InputCeiling() const noexcept {
 	const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::Plan> plan = Plan();
-	const auto* track = Backend::Pipeline::TrackByIn(plan, m_index);
+	const auto* track = Backend::Pipeline::TrackByIn(plan, m_sourceIndex >= 0 ? m_sourceIndex : m_index);
 	if (!track)
 		return 0;
 	const Backend::Pipeline::Ceiling cap{plan, Producer::Decoder, *track};
@@ -160,6 +160,7 @@ StormByte::Size Decoder::InputCeiling() const noexcept {
 }
 
 void Decoder::Implementation(StormByte::Safe::String name) noexcept {
+	m_implementationConfigured = true;
 	if (name.empty())
 		m_implementation.reset();
 	else
@@ -327,7 +328,7 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 		StormByte::Safe::Optional<Property::Video> video;
 		if (const auto& plan = Plan(); plan && static_cast<bool>(*plan)) {
 			for (const auto& stream : plan->Snapshot().Streams()) {
-				if (stream.Index() == m_index) {
+				if (stream.Index() == (m_sourceIndex >= 0 ? m_sourceIndex : m_index)) {
 					video = stream.Video();
 					break;
 				}

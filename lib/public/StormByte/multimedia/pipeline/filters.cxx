@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
@@ -135,6 +136,7 @@ Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> fi
 			return *this;
 		}
 		if (stretch.Track >= 0) {
+			stretch.Origin->pipe().MeasureInput(true);
 			auto& tracks = m_owner->m_measureTracks;
 			if (std::find(tracks.begin(), tracks.end(), stretch.Track) == tracks.end())
 				tracks.push_back(stretch.Track);
@@ -165,6 +167,8 @@ Filters::Handle Filters::Between(StormByte::Safe::Shared<Step> origin,
 		else
 			stretch.Lane = StormByte::Safe::Shared<Route>::MakePointer<Route>(stretch.Track,
 				stretch.Origin, stretch.Destination);
+		if (stretch.Lane)
+			stretch.Scope = stretch.Lane->OutputTrack();
 	}
 
 	m_stretches.push_back(std::move(stretch));
@@ -295,6 +299,14 @@ void Filters::Close() noexcept {
 	}
 
 	demuxer->Measure(StormByte::Safe::Vector<int>{m_measureTracks});
+	std::vector<Decoder*> measuring;
+	for (const auto& stretch : m_stretches) {
+		auto* decoder = dynamic_cast<Decoder*>(stretch.Origin.get());
+		if (decoder && decoder->pipe().MeasuresInput()
+			&& std::find(measuring.begin(), measuring.end(), decoder) == measuring.end())
+			measuring.push_back(decoder);
+	}
+	m_measureSources = measuring.size();
 	demuxer->m_filters = this;
 	m_measuring = true;
 	m_measureDrained.store(std::uint64_t{0}, StormByte::Safe::MemoryOrder::Release);
@@ -311,8 +323,7 @@ void Filters::CloseMeasureSource() noexcept {
 		auto* decoder = dynamic_cast<Decoder*>(stretch.Origin.get());
 		if (!decoder)
 			continue;
-		if (std::find(m_measureTracks.begin(), m_measureTracks.end(),
-				decoder->Index()) == m_measureTracks.end())
+		if (!decoder->pipe().MeasuresInput())
 			continue;
 		decoder->MeasureSourceClosed();
 	}
@@ -320,7 +331,7 @@ void Filters::CloseMeasureSource() noexcept {
 
 void Filters::OnMeasureDrained() noexcept {
 	const std::uint64_t drained = m_measureDrained.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::AcqRel) + 1;
-	if (drained == static_cast<std::uint64_t>(m_measureTracks.size()))
+	if (drained == m_measureSources)
 		FinishMeasure();
 }
 

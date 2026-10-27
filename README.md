@@ -247,7 +247,7 @@ int main(int argc, char** argv) {
 			Anchor::BottomRight, 25)
 		.Filter<Scale>(logger, 0u, 1080u);
 	job.Audio(1).Remux();          // compressed copy, adapted to the destination
-	job.Audio(2).Codec(eac3->get());
+	job.Audio(1).Codec(eac3->get()); // second output from the same origin
 	job.Subtitle(3).Remux();
 	job.Attachments();             // keep attachments; omit this call to drop them
 
@@ -281,15 +281,30 @@ What that mapping means:
 | `Video(0).Codec(hevc->get()).Implementation(String{"libx265"})` | Decode origin video 0, encode HEVC with that encoder pin. |
 | `.Filter<Watermark>(…)` / `.Filter<Scale>(…)` | Frame filters on that encode lane, in registration order. |
 | `Audio(1).Remux()` | Keep the compressed stream. Remux is copy **plus** destination adaptation. There is no separate “Copy” stage. |
-| `Audio(2).Codec(eac3->get())` | Recode that origin audio. |
+| `Audio(1).Codec(eac3->get())` after `Audio(1).Remux()` | Add an E-AC3 encode of the same origin alongside the compressed original. |
 | `.Implementation(ImplementationSide::Decoder, String{"libdav1d"})` | Pin the source decoder on a recode track; unavailable or codec-mismatched names fail without fallback. |
-| `Ignore(n)` | Drop origin stream `n`. |
+| `Ignore(n)` | Drop every mapped output of origin stream `n`. |
 | `Attachments()` / `Attachments("image/png")` | Keep all attachments, or only a MIME. Default without a call is drop. |
 | `Transcoder(source, destination, logger)` | Supplies locations before mapping; the writer path determines the container. |
 | `Transcoder(source, destination, container, logger)` | Uses the borrowed registered container identity regardless of the writer suffix. |
 | `Filter<Analytics>(…)` on the **job** | Global analytics on matching encode or remux lanes; `Track::Filter` also accepts track-scoped analytics. |
 
 `Run()` is asynchronous. `Pause()` / `Resume()` / `Cancel()` talk to the coordinator. After `Done`, `Reports()` holds analytics snapshots (VMAF mean/min and anything else you attached). Mux close is not analytics EOF: `Transcoder` waits for the route to go idle before `OnDone` / `Reports`.
+
+Each `Video(n)`, `Audio(n)` or `Subtitle(n)` call appends a new output, not a lookup
+of an existing mapping. Repeating an origin supports remux plus encode, several
+encodes with different settings, or several remux copies. Each output has its own
+codec settings, decoder pin, filters and metadata overrides; source metadata is
+inherited independently. Save the returned `Track` handle to keep configuring that
+output. Output order follows mapping order, and `OnSettled` identifies each encode
+by its distinct `Out` slot even when several rows share the same `In`.
+Analytics pair reference and destination frames by output slot, so per-track and
+global reports keep duplicated outputs separate.
+
+For example, with a DTS-HD MA source at stream 1 and a compatible destination such
+as Matroska, the two audio calls above preserve the DTS-HD MA bitstream and add an
+E-AC3 compatibility track. The configured build still needs a decoder for the source
+and an E-AC3 encoder. Container restrictions apply to every output.
 
 `job.Progress()` reports the duration scan, the main job percent and the optional measure and analytics phases. See [Progress](#progress) for how to read the real transcode percent in a UI.
 
@@ -579,7 +594,7 @@ The mux-policy batch covers direct FLAC, FLAC in OGA, ALAC in CAF and direct E-A
 
 Additional MP4 cases cover mixed video/audio/timed-text tracks, language and track ordering, `.m4a`/`.m4b` aliases, mixed remux/encode, image cover-art roundtrips and rejection of unsupported font attachments. Cover tests compare payloads and verify that `File::Streams()` and `File::Attachments()` report the expected items. Subtitle cases cover empty tracks and late first cues; container formats may differ in whether an entirely empty track appears in the final file.
 
-Pipeline cases are split into remux, analytics, video, audio, audio-codec, video-codec, watermark, mux-policy, interleave, OCR, negative-input/configuration and decoder-implementation executables under `test/pipeline`. Common helpers are compiled once in a static test support library; category-local edits rebuild only the affected executable. Individual CTest names remain `pipeline.test_*`.
+Pipeline cases are split into remux, analytics, video, audio, audio-codec, video-codec, watermark, mux-policy, interleave, OCR, negative-input/configuration and decoder-implementation executables under `test/pipeline`. Common helpers are compiled once in a static test support library. Test bodies that call private FFmpeg code share `StormByte-Multimedia-Test`; their executables are lightweight runners. With `BUILD_SHARED_LIBS=ON`, FFmpeg and its codec archives stay inside Multimedia and this single test library, rather than being linked again into every executable. Static Multimedia builds retain their transitive implementation dependencies. Individual CTest names remain `pipeline.test_*`.
 
 Configure with `-DENABLE_TEST=ON`, build, then run CTest from the test registration root:
 

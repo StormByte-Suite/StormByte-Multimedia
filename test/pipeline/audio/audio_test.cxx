@@ -51,10 +51,14 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/filters/audio/downmix.hxx>
+#include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
 #include <array>
+#include <atomic>
+#include <vector>
 
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
@@ -62,6 +66,122 @@ using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
 namespace {
+class AudioPacketCounter final: public Filter::Packet {
+	public:
+		AudioPacketCounter(StormByte::Safe::Shared<StormByte::Logger::Log> log,
+			std::atomic<std::uint64_t>* packets) noexcept
+		: Filter::Packet(std::move(log), "audio-packet-counter"), m_packets(packets) {}
+
+		enum StormByte::Multimedia::Type Media() const noexcept override {
+			return StormByte::Multimedia::Type::Audio;
+		}
+		void Clean() noexcept override {}
+		void Setup() noexcept override {}
+		void Process(const Pipeline::Packet&) noexcept override {
+			m_packets->fetch_add(1);
+		}
+
+	private:
+		std::atomic<std::uint64_t>* m_packets;
+};
+
+class SettledTranscoder final: public Transcoder {
+	public:
+		using Transcoder::Transcoder;
+		std::vector<TrackSettled> Settled;
+
+	protected:
+		void OnSettled(const TrackSettled& row) noexcept override {
+			Settled.push_back(row);
+		}
+};
+
+int CheckRepeatedAudioMapping(bool encodeFirst, bool multipleEncodes, bool twoPass = false,
+	bool embedded = false, bool measureBoth = false) {
+	const auto eac3 = Registry::Instance().FindCodec("E-AC3");
+	const auto ac3 = Registry::Instance().FindCodec("AC-3");
+	TEST_REQUIRE(eac3 && ac3);
+	if (!eac3->get().HasAccess(Access{Operation::Write})
+		|| (multipleEncodes && !ac3->get().HasAccess(Access{Operation::Write})))
+		return TEST_SKIP;
+	const int origin = embedded ? 1 : 0;
+	const auto input = FixturePath(embedded ? "video/bluray_like_hdr10.mkv" : "audio/noise_51.opus");
+	const auto output = OutputPath(embedded ? "pipeline/duplicate-audio-embedded.mka"
+		: twoPass ? "pipeline/duplicate-audio-two-pass.mka"
+		: encodeFirst ? "pipeline/duplicate-audio-encode-first.mka"
+		: multipleEncodes ? "pipeline/duplicate-audio-multi-encode.mka"
+		: "pipeline/duplicate-audio-remux-first.mka");
+	auto logger = MakeLogger();
+	std::atomic<std::uint64_t> packets{0};
+	SettledTranscoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+	const auto remux = [&] {
+		job.Audio(origin).Remux().Title(StormByte::Safe::String{"original"})
+			.Language(StormByte::Safe::String{"eng"})
+			.Filter<AudioPacketCounter>(logger, &packets);
+	};
+	if (!encodeFirst)
+		remux();
+	auto compatibility = job.Audio(origin);
+	compatibility.Codec(eac3->get()).BitRate(384000).Title(StormByte::Safe::String{"compatibility"})
+		.Language(StormByte::Safe::String{"spa"});
+	if (twoPass)
+		compatibility.Filter<Filter::Audio::Loudnorm>(logger);
+	if (encodeFirst)
+		remux();
+	if (multipleEncodes) {
+		auto second = job.Audio(origin);
+		second.Codec(ac3->get()).BitRate(448000).Title(StormByte::Safe::String{"second encode"})
+			.Language(StormByte::Safe::String{"fra"})
+			.Filter<Filter::Audio::Downmix>(logger, Property::ChannelLayout::Stereo);
+		if (measureBoth)
+			second.Filter<Filter::Audio::Loudnorm>(logger);
+	}
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	TEST_REQUIRE(embedded ? packets.load() > 0 : packets.load() == 101);
+	const std::size_t encodedCount = multipleEncodes ? 2 : 1;
+	TEST_REQUIRE(job.Settled.size() == encodedCount);
+	for (const auto& row : job.Settled) {
+		TEST_REQUIRE(row.In == origin);
+		TEST_REQUIRE(row.Destination);
+		TEST_REQUIRE(row.Out == (row.Destination->Name() == "E-AC3" ? (encodeFirst ? 0 : 1) : 2));
+		TEST_REQUIRE(row.BitRate && row.BitRate.value() == (row.Out == 2 ? 448000 : 384000));
+	}
+	const auto opened = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(opened);
+	TEST_REQUIRE(opened->Streams().size() == encodedCount + 1);
+	for (std::size_t index = 0; index < opened->Streams().size(); ++index) {
+		const auto stream = opened->Streams()[index];
+		const bool remux = index == (encodeFirst ? 1u : 0u);
+		TEST_REQUIRE(stream.Codec().Name() == (remux ? (embedded ? "AC-3"sv : "Opus"sv)
+			: index == 2 ? "AC-3"sv : "E-AC3"sv));
+		const auto metadata = stream.Metadata();
+		TEST_REQUIRE(metadata.Title());
+		TEST_REQUIRE(TestView(metadata.Title().value()) == (remux ? "original"sv
+			: index == 2 ? "second encode"sv : "compatibility"sv));
+		TEST_REQUIRE(metadata.Language());
+		TEST_REQUIRE(TestView(metadata.Language().value()) == (remux ? "eng"sv : index == 2 ? "fra"sv : "spa"sv));
+		const auto audio = stream.Audio();
+		TEST_REQUIRE(audio && audio->Channels() == (index == 2 ? 2 : 6) && audio->SampleRate() == 48000);
+
+		const auto extracted = OutputPath("pipeline/duplicate-audio-decoded-" + std::to_string(encodeFirst)
+			+ "-" + std::to_string(multipleEncodes) + "-" + std::to_string(index) + ".mka");
+		const auto flac = Registry::Instance().FindCodec("FLAC");
+		TEST_REQUIRE(flac && flac->get().HasAccess(Access{Operation::Write}));
+		Transcoder decode{TestLocation(output), TestLocation(extracted), logger};
+		decode.Audio(static_cast<int>(index)).Codec(flac->get());
+		TEST_REQUIRE(CheckTranscoderConfigured(decode) == 0);
+		decode.Run();
+		TEST_REQUIRE(WaitForTranscoder(decode) == 0);
+		const auto decoded = File::Open(StormByte::Safe::String{extracted.string()});
+		TEST_REQUIRE(decoded && decoded->Duration());
+		const auto ns = decoded->Duration()->Nanoseconds().count();
+		TEST_REQUIRE(ns >= 1900000000LL && ns <= 2100000000LL);
+	}
+	return 0;
+}
+
 static int CheckAutomaticSurroundConversion(std::string_view codecName, std::string_view destination) {
 	const auto input = FixturePath("audio/noise_71.wav");
 	TEST_PHASE("opening media file for inspection");
@@ -249,8 +369,43 @@ int test_transcoder_encodes_stereo_audio_to_mp3() {
 	return CheckSingleAudioOutput(output, "MP3", "MP3", 2, 48000);
 }
 
+int test_transcoder_remuxes_and_encodes_same_audio() {
+	return CheckRepeatedAudioMapping(false, false);
+}
+
+int test_transcoder_encodes_and_remuxes_same_audio() {
+	return CheckRepeatedAudioMapping(true, false);
+}
+
+int test_transcoder_encodes_same_audio_twice_with_remux() {
+	return CheckRepeatedAudioMapping(false, true);
+}
+
+int test_transcoder_remuxes_audio_while_measuring_encode() {
+	return CheckRepeatedAudioMapping(false, false, true);
+}
+
+int test_transcoder_duplicates_nonzero_audio_origin() {
+	return CheckRepeatedAudioMapping(false, false, false, true);
+}
+
+int test_transcoder_measures_only_one_duplicate_encode() {
+	return CheckRepeatedAudioMapping(false, true, true);
+}
+
+int test_transcoder_measures_both_duplicate_encodes() {
+	return CheckRepeatedAudioMapping(false, true, true, false, true);
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_remuxes_and_encodes_same_audio", test_transcoder_remuxes_and_encodes_same_audio},
+		TestEntry{"test_transcoder_encodes_and_remuxes_same_audio", test_transcoder_encodes_and_remuxes_same_audio},
+		TestEntry{"test_transcoder_encodes_same_audio_twice_with_remux", test_transcoder_encodes_same_audio_twice_with_remux},
+		TestEntry{"test_transcoder_remuxes_audio_while_measuring_encode", test_transcoder_remuxes_audio_while_measuring_encode},
+		TestEntry{"test_transcoder_duplicates_nonzero_audio_origin", test_transcoder_duplicates_nonzero_audio_origin},
+		TestEntry{"test_transcoder_measures_only_one_duplicate_encode", test_transcoder_measures_only_one_duplicate_encode},
+		TestEntry{"test_transcoder_measures_both_duplicate_encodes", test_transcoder_measures_both_duplicate_encodes},
 		TestEntry{"test_transcoder_extracts_single_ac3_track_from_bluray_mkv", test_transcoder_extracts_single_ac3_track_from_bluray_mkv},
 		TestEntry{"test_transcoder_extracts_single_aac_track_from_bluray_mkv", test_transcoder_extracts_single_aac_track_from_bluray_mkv},
 		TestEntry{"test_transcoder_remuxes_single_opus_file_to_mka", test_transcoder_remuxes_single_opus_file_to_mka},

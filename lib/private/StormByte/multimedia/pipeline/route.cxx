@@ -51,9 +51,12 @@
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
+#include <StormByte/multimedia/pipeline/demuxer.hxx>
+#include <StormByte/multimedia/pipeline/encoder.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
+#include <StormByte/multimedia/pipeline/remuxer.hxx>
 #include <StormByte/multimedia/pipeline/route.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/stream.hxx>
@@ -162,6 +165,15 @@ enum StormByte::Multimedia::Type Route::SourceMedia() const noexcept {
 	return StormByte::Multimedia::Type::Unknown;
 }
 
+int Route::OutputTrack() const noexcept {
+	if (const auto* encoder = dynamic_cast<const Encoder*>(m_destination.get()))
+		return encoder->Index();
+	if (const auto* remuxer = dynamic_cast<const Remuxer*>(m_destination.get());
+		remuxer && remuxer->m_output >= 0)
+		return remuxer->m_output;
+	return m_track;
+}
+
 void Route::Close() noexcept {
 	if (!m_origin || !m_destination)
 		return;
@@ -211,18 +223,30 @@ void Route::Close() noexcept {
 		if (analytics->Leaf() != "frames")
 			TapDecode(origin, *analytics);
 		TapEncode(destination, *analytics);
-		Cap(analytics->pipe(), m_track, analytics->InputCeiling());
+		Cap(analytics->pipe(), OutputTrack(), analytics->InputCeiling());
 		analytics->pipe().Drain();
 	}
 
 	if (first == nullptr) {
-		origin.pipe().To(m_track) >> destination.pipe();
+		if (dynamic_cast<Demuxer*>(&origin)) {
+			origin.pipe().CloneTo(m_track, destination.pipe());
+			origin.pipe().Drain();
+		}
+		else
+			origin.pipe().To(m_track) >> destination.pipe();
 		Cap(destination.pipe(), m_track, destination.InputCeiling());
 	}
 	else {
 		last->pipe().To(m_track) >> destination.pipe();
 		Cap(destination.pipe(), m_track, destination.InputCeiling());
-		origin.pipe().To(m_track) >> first->pipe();
+		if (dynamic_cast<Demuxer*>(&origin)) {
+			if (!origin.pipe().RedirectCloneTo(m_track, destination.pipe(), first->pipe())) {
+				destination.Fail("cannot redirect demux clone through filters");
+				return;
+			}
+		}
+		else
+			origin.pipe().To(m_track) >> first->pipe();
 		Cap(first->pipe(), m_track, first->InputCeiling());
 	}
 }
@@ -261,9 +285,10 @@ void Route::Hook(Lane& lane, Filter::FFmpeg& filter) noexcept {
 }
 
 void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
+	const int output = OutputTrack();
 	if (origin.Produces().Has(Kind::Frame)) {
-		origin.pipe().CloneTo(m_track, analytics.pipe());
-		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+		origin.pipe().CloneTo(m_track, analytics.pipe(), output);
+		Cap(analytics.pipe(), output, analytics.InputCeiling());
 		return;
 	}
 
@@ -272,18 +297,18 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 	for (const auto& look : m_looks) {
 		if (look->m_lookStamp)
 			continue;
-		look->pipe().CloneTo(m_track, analytics.pipe());
-		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+		look->pipe().CloneTo(m_track, analytics.pipe(), output);
+		Cap(analytics.pipe(), output, analytics.InputCeiling());
 		return;
 	}
 	StormByte::Safe::Shared<Decoder> look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
 		origin.m_log, m_track, Decoder::SourceLook{});
 	if (!origin.Connect(*look))
 		return;
-	look->pipe().CloneTo(m_track, analytics.pipe());
+	look->pipe().CloneTo(m_track, analytics.pipe(), output);
 	look->pipe().Drain();
 	Cap(look->pipe(), m_track, look->InputCeiling());
-	Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+	Cap(analytics.pipe(), output, analytics.InputCeiling());
 	origin.pipe().CloneTo(m_track, look->pipe());
 	m_looks.push_back(std::move(look));
 }
@@ -291,11 +316,13 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 	if (destination.m_name != Producer::Remuxer && destination.m_name != Producer::Encoder)
 		return;
+	const int output = OutputTrack();
+	const int packetTrack = destination.m_name == Producer::Encoder ? output : m_track;
 	for (const auto& held : m_looks) {
 		if (held->m_lookStamp != destination.m_name)
 			continue;
-		held->pipe().CloneTo(m_track, analytics.pipe());
-		Cap(analytics.pipe(), m_track, analytics.InputCeiling());
+		held->pipe().CloneTo(packetTrack, analytics.pipe(), output);
+		Cap(analytics.pipe(), output, analytics.InputCeiling());
 		return;
 	}
 	StormByte::Safe::Shared<Decoder> look;
@@ -304,16 +331,17 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 			destination.m_log, m_track, Decoder::RemuxLook{});
 	else if (destination.m_name == Producer::Encoder)
 		look = StormByte::Safe::Shared<Decoder>::MakePointer<Decoder>(
-			destination.m_log, m_track, Decoder::EncodeLook{});
+			destination.m_log, packetTrack, Decoder::EncodeLook{});
 	else
 		return;
 	if (!destination.Connect(*look))
 		return;
+	look->m_sourceIndex = m_track;
 	look->pipe().Listen();
-	look->pipe().CloneTo(m_track, analytics.pipe());
+	look->pipe().CloneTo(packetTrack, analytics.pipe(), output);
 	look->pipe().Drain();
-	Cap(look->pipe(), m_track, look->InputCeiling());
-	Cap(analytics.pipe(), m_track, analytics.InputCeiling());
-	destination.pipe().CloneTo(m_track, look->pipe());
+	Cap(look->pipe(), packetTrack, look->InputCeiling());
+	Cap(analytics.pipe(), output, analytics.InputCeiling());
+	destination.pipe().CloneTo(packetTrack, look->pipe());
 	m_looks.push_back(std::move(look));
 }

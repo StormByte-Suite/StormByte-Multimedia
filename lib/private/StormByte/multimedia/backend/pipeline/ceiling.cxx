@@ -173,8 +173,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				m_park = remux;
 				break;
 			case Producer::Decoder:
-				if (!encode)
-					break;
 				if (video) {
 					m_frames = raw;
 					m_packets = raw;
@@ -202,8 +200,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				}
 				break;
 			case Producer::Remuxer:
-				if (!encode)
-					m_packets = remux;
+				m_packets = remux;
 				break;
 			case Producer::Muxer:
 				m_packets = remux;

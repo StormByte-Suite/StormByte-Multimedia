@@ -59,6 +59,14 @@ extern "C" {
 
 using namespace StormByte::Multimedia::Backend::Pipeline;
 
+int Packet::MuxTrack(const StormByte::Multimedia::Pipeline::Packet& packet) noexcept {
+	return packet.m_muxTrack;
+}
+
+bool Packet::Measuring(const StormByte::Multimedia::Pipeline::Packet& packet) noexcept {
+	return packet.m_measuring;
+}
+
 Packet::Packet(const Packet& other) noexcept
 : m_handle(other.m_handle), m_params(other.m_params) {}
 
@@ -82,5 +90,8 @@ bool Packet::CopyProperties(const StormByte::Multimedia::Pipeline::Packet& packe
 	::AVPacket* destination) noexcept {
 	if (!packet.m_backend || !packet.m_backend->m_handle)
 		return true;
-	return av_packet_copy_props(destination, packet.m_backend->m_handle.Get()) >= 0;
+	const int track = destination->stream_index;
+	const bool copied = av_packet_copy_props(destination, packet.m_backend->m_handle.Get()) >= 0;
+	destination->stream_index = track;
+	return copied;
 }

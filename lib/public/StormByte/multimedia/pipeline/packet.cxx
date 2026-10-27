@@ -88,7 +88,9 @@ Packet::Packet(const Packet& other)
 	m_attachments(other.m_attachments),
 	m_codec(other.m_codec),
 	m_serial(other.m_serial),
-	m_part(other.m_part) {
+	m_part(other.m_part),
+	m_muxTrack(other.m_muxTrack),
+	m_measuring(other.m_measuring) {
 	if (other.m_backend)
 		m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Packet>(*other.m_backend);
 }
@@ -104,6 +106,8 @@ Packet::Packet(Packet&& other) noexcept
 	m_codec(other.m_codec),
 	m_serial(std::move(other.m_serial)),
 	m_part(other.m_part),
+	m_muxTrack(other.m_muxTrack),
+	m_measuring(other.m_measuring),
 	m_backend(std::move(other.m_backend)) {
 	other.BecomeEmpty();
 }
@@ -130,6 +134,8 @@ Packet& Packet::operator=(Packet&& other) noexcept {
 	m_codec = other.m_codec;
 	m_serial = std::move(other.m_serial);
 	m_part = other.m_part;
+	m_muxTrack = other.m_muxTrack;
+	m_measuring = other.m_measuring;
 	m_backend = std::move(other.m_backend);
 	other.BecomeEmpty();
 	return *this;
@@ -144,6 +150,8 @@ void Packet::BecomeEmpty() noexcept {
 	m_keyFrame = false;
 	m_codec = nullptr;
 	m_part = 0;
+	m_muxTrack = -1;
+	m_measuring = false;
 	m_backend.reset();
 }
 

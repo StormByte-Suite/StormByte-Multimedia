@@ -425,7 +425,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	StormByte::Multimedia::Pipeline::Filters graph;
 
 	struct EncodeLane {
-		int In = -1;
+		int Out = -1;
 		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Decoder> Decoder;
 		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Encoder> Encoder;
 	};
@@ -457,7 +457,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		StampMuxTags(*mux, muxIndex, *slot.Config, slot.Origin);
 		const StormByte::Multimedia::Codec* codec = LeafCodec(slot.Config.get());
 		if (!codec) {
-					auto remux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In);
+			auto remux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Remuxer>(tube, slot.In, muxIndex);
 			RegisterStage(*Metrics, *remux);
 			*demux >> *remux;
 			*remux >> *mux;
@@ -477,8 +477,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			RegisterStage(*Metrics, *decoder);
 			RegisterStage(*Metrics, *encoder);
 			ConfigureEncoder(*encoder, *slot.Config);
-			if (slot.Config->Implementation().Decoder)
-				decoder->Implementation(slot.Config->Implementation().Decoder.value());
+			decoder->Implementation(slot.Config->Implementation().Decoder.value_or(StormByte::Safe::String{}));
 			*demux >> *decoder;
 			*encoder >> *mux;
 			if (decoder->Failed() || encoder->Failed() || mux->Failed()) {
@@ -491,7 +490,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			for (const auto& filter : slot.Filters)
 				stretch.Add(filter);
 			EncodeLane lane;
-			lane.In = slot.In;
+			lane.Out = slot.Out;
 			lane.Decoder = std::move(decoder);
 			lane.Encoder = std::move(encoder);
 			lanes.push_back(std::move(lane));
@@ -603,7 +602,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 				break;
 			}
 			if (lane.Encoder && *lane.Encoder)
-				job.MarkSettled(lane.In, *lane.Encoder);
+				job.MarkSettled(lane.Out, *lane.Encoder);
 		}
 		if (!dead) {
 			for (auto& remux : remuxes) {
@@ -691,6 +690,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		return;
 	}
 
+	for (auto& lane : lanes)
+		job.MarkSettled(lane.Out, *lane.Encoder);
 	Reports = graph.Reports();
 	TickHooks(job, graph);
 	captureStageFailure();

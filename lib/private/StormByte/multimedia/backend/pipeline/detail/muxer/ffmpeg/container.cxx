@@ -364,6 +364,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	int Container::Resolve(const StormByte::Multimedia::Pipeline::Packet& packet) const noexcept {
+		const int destination = StormByte::Multimedia::Backend::Pipeline::Packet::MuxTrack(packet);
+		if (destination >= 0)
+			return m_tracks.contains(destination) ? destination : -1;
 		const int track = packet.Track();
 		if (packet.Producer() == StormByte::Multimedia::Pipeline::Producer::Encoder)
 			return m_tracks.contains(track) ? track : -1;

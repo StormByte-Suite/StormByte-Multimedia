@@ -221,6 +221,12 @@ namespace StormByte::Multimedia::Pipeline {
 			enum StormByte::Multimedia::Type SourceMedia() const noexcept;
 
 			/**
+			 * @brief Destination identity shared by both analytics looks.
+			 * @return Explicit mux output slot, or the legacy source index.
+			 */
+			int OutputTrack() const noexcept;
+
+			/**
 			 * @brief Wires this track from the stored origin to destination.
 			 *
 			 * Private: @ref Filters is the only caller. O(1) at the

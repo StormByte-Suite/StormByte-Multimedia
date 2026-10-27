@@ -62,7 +62,10 @@
 
 #include <chrono>
 #include <cstddef>
+#include <map>
 #include <string_view>
+#include <tuple>
+#include <utility>
 #include <StormByte/safe/deque.hxx>
 #include <StormByte/safe/unordered_set.hxx>
 
@@ -247,6 +250,36 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			Pipe& CloneTo(int track, Pipe& dest) noexcept;
 
 			/**
+			 * @brief Clones one source track under a consumer-specific identity.
+			 * @param track Source hopper key.
+			 * @param dest Consumer pipe.
+			 * @param output Consumer hopper key.
+			 * @return Consumer pipe.
+			 */
+			Pipe& CloneTo(int track, Pipe& dest, int output) noexcept;
+
+			/**
+			 * @brief Inserts a filter chain before an existing clone destination.
+			 * @param track Source hopper key.
+			 * @param previous Previously connected consumer.
+			 * @param dest First consumer of the replacement chain.
+			 * @return false if the original clone connection does not exist.
+			 */
+			bool RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept;
+
+			/**
+			 * @brief Allows this consumer to receive measurement-pass packet clones.
+			 * @param enabled Whether this branch needs a measurement pass.
+			 */
+			void MeasureInput(bool enabled) noexcept { m_measureInput = enabled; }
+
+			/**
+			 * @brief Whether this consumer requires measurement-pass packets.
+			 * @return Configured branch selection.
+			 */
+			bool MeasuresInput() const noexcept { return m_measureInput; }
+
+			/**
 			 * @brief Drain Out until a consumer Binds.
 			 */
 			void Drain() noexcept;
@@ -365,8 +398,10 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			using Fork = StormByte::Safe::Pair<int, StormByte::Safe::Shared<ItemSink>>;
 
 			StormByte::Safe::Deque<Fork> m_forks;	///< CloneTo destinations.
+			std::map<std::tuple<int, Pipe*, int>, std::size_t> m_forkDestinations;	///< Stable clone slots by source, consumer and output.
 			StormByte::Safe::Mutex m_forkMutex;	///< Guards clone registration and snapshots.
 			bool m_closed = false;			///< Output and clone destinations have reached EOF.
+			bool m_measureInput = false;		///< Only measuring decoder branches receive first-pass packets.
 			StormByte::Safe::UnorderedSet<int> m_inTracks;	///< Keys already wired on In
 	};
 

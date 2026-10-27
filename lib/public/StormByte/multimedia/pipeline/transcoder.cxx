@@ -492,7 +492,7 @@ Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 		}
 	}
 
-	if (AlreadyMapped(m_backend->Mapped, in, kind)) {
+	if (kind == Type::Attachment && AlreadyMapped(m_backend->Mapped, in, kind)) {
 		Fail("origin " + std::to_string(in) + " is already mapped");
 		return Track(*this, InvalidSlot);
 	}
@@ -752,11 +752,11 @@ void Transcoder::OnError(const StormByte::Safe::String&) noexcept {}
 
 void Transcoder::OnAborted() noexcept {}
 
-void Transcoder::MarkSettled(int in, Encoder& encoder) noexcept {
+void Transcoder::MarkSettled(int out, Encoder& encoder) noexcept {
 	if (!m_backend)
 		return;
 	for (auto& slot : m_backend->Mapped) {
-		if (slot.In != in || slot.Settled)
+		if (slot.Out != out || slot.Settled)
 			continue;
 		slot.Settled = true;
 		auto row = EmptySettled();
