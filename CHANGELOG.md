@@ -19,6 +19,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Original-source license: [LICENSE](LICENSE) and [COPYING.LGPLv3](COPYING.LGPLv3)
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
+## [Unreleased]
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
+
 ## [1.0.0] - 2026-10-27
 
 First public release. The entries below describe the initial API, supported workflows
