@@ -263,6 +263,8 @@ namespace {
 		PausingTranscoder job{std::move(reader), std::move(writer), MakeLogger()};
 		job.Audio(0).Remux();
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		// Unknown-size scans publish progress every 20 ms; keep the scan alive until that heartbeat.
+		source->Slow = true;
 		job.Run();
 		TEST_REQUIRE(WaitUntil([&] { return job.Status() == Pipeline::Status::Paused; }));
 		std::this_thread::sleep_for(50ms);
@@ -309,11 +311,13 @@ int test_duration_cancel_while_paused() {
 
 int test_duration_cancel_while_running() {
 	auto reader = StormByte::Safe::Unique<BufferedLocationReader>::MakePointer<ScanReader>(false, false);
+	auto* source = static_cast<ScanReader*>(reader.get());
 	PausingTranscoder job{std::move(reader),
 		TestLocation(OutputPath("cancelled-running-duration.mkv")), MakeLogger()};
 	job.CancelScan = true;
 	job.Audio(0).Remux();
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	source->Slow = true;
 	job.Run();
 	TEST_REQUIRE(WaitUntil([&] { return job.Aborted.load() == 1; }));
 	TEST_REQUIRE(job.Status() == Pipeline::Status::Aborted);

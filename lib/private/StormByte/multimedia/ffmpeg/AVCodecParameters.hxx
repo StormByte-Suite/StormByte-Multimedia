@@ -65,6 +65,8 @@
  * @brief Private RAII wrappers over libav*.
  */
 namespace StormByte::Multimedia::FFmpeg {
+	class AVFormatContext;
+
 	/**
 	 * @class AVCodecParameters
 	 * @brief Deep-copying RAII wrapper for ::AVCodecParameters.
@@ -73,7 +75,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		friend class AVBSF;
 		friend class AVDecoder;
 		friend class AVEncoder;
-		friend class AVFormatContext;
+		friend class StormByte::Multimedia::FFmpeg::AVFormatContext;
 		public:
 			/**
 			 * @brief Allocates and optionally copies from @p par.

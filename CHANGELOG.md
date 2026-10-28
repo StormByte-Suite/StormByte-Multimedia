@@ -21,10 +21,6 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### Changed
-
-- Bundled builds use Base 2.2.2, Buffer 2.0.5, Logger 2.0.5 and System 2.1.2. The Multimedia release version remains 1.0.0.
-
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-28
@@ -32,8 +28,14 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 First public release. The entries below describe the initial API, supported workflows
 and their build, lifecycle and media-preservation guarantees.
 
+### Changed
+
+- Bundled builds use Base 2.2.2, Buffer 2.0.5, Logger 2.0.5 and System 2.1.2.
+
 ### Fixed
 
+- The codec-parameters wrapper explicitly befriends the private FFmpeg format-context wrapper, avoiding Microsoft's unqualified-friend extension and accidental lookup of the global C type.
+- Duration-scan pause, resume and cancellation tests use the throttled test reader so unknown-size scans cannot finish before their progress heartbeat and bypass the operation under test.
 - BuildMaster is pinned to 2.1.3 and external installations require at least that version. Reconfiguring Release after Debug now refreshes the nested toolchain and builds bundled dependencies in the intended mode; Meson Release builds disable debug assertions.
 - The default VP9 encoder worker count is bounded by the filtered output height and CPU availability, avoiding excessive worker synchronization and memory on smaller frames. Explicit `FineTune` thread counts are unchanged.
 - Buffered FFmpeg input copies directly from the reader's unread FIFO bytes, avoiding an intermediate extraction buffer while retaining reader caching, telemetry, seek, retry and error behavior.
