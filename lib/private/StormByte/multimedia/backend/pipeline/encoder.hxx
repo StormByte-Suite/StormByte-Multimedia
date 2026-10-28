@@ -63,6 +63,7 @@
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <algorithm>
 #include <cstdint>
 #include <utility>
 
@@ -91,6 +92,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 */
 	class STORMBYTE_MULTIMEDIA_PRIVATE Encoder {
 		public:
+			/**
+			 * @brief Default VP9 row workers, bounded by two 64-pixel rows per worker.
+			 */
+			static constexpr unsigned Vp9Workers(unsigned height, unsigned available) noexcept {
+				const unsigned rows = height / 128 + (height % 128 != 0);
+				return std::min(std::max(available, 1u), std::max(rows, 1u));
+			}
+
 			/**
 			 * @class Opened
 			 * @brief Result of a successful table lookup and avcodec_open2.

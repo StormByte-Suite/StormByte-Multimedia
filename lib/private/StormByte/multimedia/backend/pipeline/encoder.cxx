@@ -403,6 +403,8 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 			workers = 1;
 		if (implementationName == "libx265" && workers >= 16)
 			workers = 15;
+		if (implementationName == "libvpx-vp9")
+			workers = Encoder::Vp9Workers(static_cast<unsigned>(std::max(params.Height(), 0)), workers);
 		opts.emplace("threads", std::to_string(workers));
 	}
 

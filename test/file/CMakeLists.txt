@@ -38,6 +38,7 @@ foreach(test_name IN ITEMS
 	test_file_avio_read_retry_before_data
 	test_file_avio_read_retry_between_blocks
 	test_file_avio_read_error_is_not_retry
+	test_file_avio_read_seek_and_invalid_buffer
 	test_file_avio_write_backpressure_and_seek
 	test_file_avio_write_flush_error
 	test_file_avio_write_origin_error

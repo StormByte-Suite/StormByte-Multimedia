@@ -99,7 +99,7 @@ namespace {
 
 	int CheckVideoCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
-		std::string_view decoder = {}, AVPixelFormat sourceFormat = AV_PIX_FMT_NONE) {
+		std::string_view decoder = {}, AVPixelFormat sourceFormat = AV_PIX_FMT_NONE, int threads = 0) {
 		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
@@ -137,6 +137,8 @@ namespace {
 			else if (encoder == "libaom-av1" || encoder == "libvpx" || encoder == "libvpx-vp9") {
 				StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
 				options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+				if (threads > 0)
+					options.emplace(StormByte::Safe::String{"threads"}, StormByte::Safe::String{std::to_string(threads)});
 				if (encoder != "libaom-av1")
 					options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
 				track.FineTune(std::move(options)).BitRate(500000);
@@ -221,6 +223,12 @@ int test_libvpx_encodes_vp8_webm() {
 
 int test_libvpx_encodes_vp9_webm() {
 	return CheckVideoEncode("pipeline/video-codecs/vp9.webm", "WebM", "VP9", "libvpx-vp9");
+}
+
+int test_libvpx_vp9_honors_explicit_threads() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/vp9-explicit-threads.webm"),
+		"WebM", "VP9", "libvpx-vp9", {}, AV_PIX_FMT_NONE, 1);
 }
 
 int test_x264_encodes_h264_mp4() {
@@ -485,6 +493,7 @@ int RunPipelineVideoCodecTests(int argc, char** argv) {
 		TestEntry{"test_aom_decodes_svt_av1", test_aom_decodes_svt_av1},
 		TestEntry{"test_libvpx_encodes_vp8_webm", test_libvpx_encodes_vp8_webm},
 		TestEntry{"test_libvpx_encodes_vp9_webm", test_libvpx_encodes_vp9_webm},
+		TestEntry{"test_libvpx_vp9_honors_explicit_threads", test_libvpx_vp9_honors_explicit_threads},
 		TestEntry{"test_x264_encodes_h264_mp4", test_x264_encodes_h264_mp4},
 		TestEntry{"test_openh264_encodes_h264_matroska", test_openh264_encodes_h264_matroska},
 		TestEntry{"test_openh264_rejects_ten_bit_input", test_openh264_rejects_ten_bit_input},

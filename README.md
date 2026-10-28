@@ -314,6 +314,8 @@ Capture `job.Telemetry()` before `Run()` if the final snapshot must outlive the 
 
 Quality knobs on a recode track are the obvious ones: `CRF`, `BitRate`, `MaxBitRate`, `Preset`, `Tune`, `FineTune`, plus `Language` / `Title` overrides. A knob the track type or the selected encoder cannot apply fails the job instead of being ignored. `CRF` is a `double`; encoders whose quality option is an integer reject fractional values. On audio, `CRF` selects quality-based VBR (Vorbis, LAME MP3) and replaces `BitRate`; without either, the encoder's own default applies, never the source bitrate. `FineTune` takes individual keys: for encoders with a packed option (`x265-params`, `x264-params`, `svtav1-params`, ...) they are packed into it, and unknown keys fail when the encoder opens.
 
+The default `libvpx-vp9` worker count follows the output resolution after filters: one worker per 128 rows, rounded up and bounded by the available CPU threads (at least one). This avoids oversubscribing small frames. An explicit `FineTune` entry for `threads` overrides that default; other encoders keep their own thread policies.
+
 `Codec::Encoders(features)` lists the available encoder implementations in selection order. Each `EncoderInfo` tells which knobs it supports and through which FFmpeg option, and `Option(name)` describes that option's type, range, default and choices, so a UI can offer only settings that will be applied.
 
 `Implementation(ImplementationSide::Encoder, String{"libsvtav1"})` selects the encoder; `Implementation(ImplementationSide::Decoder, String{"libdav1d"})` independently selects the decoder. The one-argument `Implementation(name)` remains shorthand for the encoder. An empty name restores default selection for that side. Pins must match the destination and source codecs respectively. A manual pipeline can set `Config::Implementation::Decoder` on the Plan track or call `Decoder::Implementation` before wiring; an explicit stage pin takes precedence over the Plan pin. Remux does not open an origin decoder and ignores these pins.
@@ -585,7 +587,7 @@ cmake -S . -B build \
 
 ## Installation
 
-Building from source requires a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and [StormByte-BuildMaster](https://github.com/StormByte-Suite/StormByte-BuildMaster) 2.1.0 or newer (the `buildmaster` pin). Base, Buffer, Logger and System are not submodules: BuildMaster downloads the release archive for this OS and C++ runtime. A bundled media build still needs the codec submodules (`git clone --recursive`) and, on x86, NASM.
+Building from source requires a C++26-capable compiler and standard library, CMake with `CXX_STANDARD 26` support (3.25 or newer), and [StormByte-BuildMaster](https://github.com/StormByte-Suite/StormByte-BuildMaster) 2.1.3 or newer (the `buildmaster` pin). Base, Buffer, Logger and System are not submodules: BuildMaster downloads the release archive for this OS and C++ runtime. A bundled media build still needs the codec submodules (`git clone --recursive`) and, on x86, NASM.
 
 ```sh
 git clone --recursive https://github.com/StormBytePP/StormByte-Multimedia.git

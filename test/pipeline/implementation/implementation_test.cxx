@@ -49,6 +49,7 @@
  */
 
 #include "../helpers.hxx"
+#include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
@@ -240,8 +241,22 @@ int test_manual_rejects_mismatched_decoder_implementation() {
 		"decoder implementation does not match source codec");
 }
 
+int test_vp9_workers_follow_output_resolution() {
+	using BackendEncoder = StormByte::Multimedia::Backend::Pipeline::Encoder;
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(0, 0) == 1);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(64, 32) == 1);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(360, 32) == 3);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(720, 32) == 6);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(1080, 32) == 9);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(2160, 32) == 17);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(4320, 32) == 32);
+	TEST_REQUIRE(BackendEncoder::Vp9Workers(2160, 4) == 4);
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_vp9_workers_follow_output_resolution", test_vp9_workers_follow_output_resolution},
 		TestEntry{"test_transcoder_selects_decoder_implementation", test_transcoder_selects_decoder_implementation},
 		TestEntry{"test_transcoder_rejects_missing_decoder_implementation", test_transcoder_rejects_missing_decoder_implementation},
 		TestEntry{"test_transcoder_rejects_mismatched_decoder_implementation", test_transcoder_rejects_mismatched_decoder_implementation},

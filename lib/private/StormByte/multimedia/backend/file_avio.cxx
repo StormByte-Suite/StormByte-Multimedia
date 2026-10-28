@@ -53,6 +53,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <span>
 
 extern "C" {
@@ -152,19 +153,24 @@ namespace StormByte::Multimedia::Backend {
 
 	int FileAvio::Read(void* opaque, std::uint8_t* buf, int bufSize) noexcept {
 		auto* self = static_cast<FileAvio*>(opaque);
-		if (!self || bufSize <= 0)
+		if (!self || !buf || bufSize <= 0)
 			return AVERROR(EINVAL);
 		if (!self->m_reader)
 			return AVERROR(EINVAL);
 
-		const auto got = self->m_reader->Read(std::span<std::byte>(
-			reinterpret_cast<std::byte*>(buf), static_cast<std::size_t>(bufSize)));
+		StormByte::Buffer::FIFO bytes;
+		const auto got = self->m_reader->Read(StormByte::ByteSize{static_cast<std::size_t>(bufSize)}, bytes);
 		if (got.status == Status::Error || got.status == Status::Failed)
 			return AVERROR(EIO);
 		if (got.status == Status::TryAgain)
 			return AVERROR(EAGAIN);
 		if (got.count == 0)
 			return AVERROR_EOF;
+		const auto available = bytes.Available();
+		const auto& stored = bytes.Data();
+		if (got.count > static_cast<std::size_t>(bufSize) || got.count > available || available > stored.size())
+			return AVERROR(EIO);
+		std::memcpy(buf, stored.data() + (stored.size() - available), static_cast<std::size_t>(got.count));
 		return static_cast<int>(got.count);
 	}
 

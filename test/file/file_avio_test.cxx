@@ -211,6 +211,24 @@ int test_file_avio_read_error_is_not_retry() {
 	return 0;
 }
 
+int test_file_avio_read_seek_and_invalid_buffer() {
+	DelayedReader reader{payload.size()};
+	TEST_REQUIRE(reader.Open());
+	reader.ReadAhead(0);
+	FileAvio bridge{reader};
+	TEST_REQUIRE(bridge.Arm());
+	auto* context = bridge.Context();
+	std::array<unsigned char, 8> bytes{};
+	TEST_REQUIRE(context->read_packet(context->opaque, nullptr, bytes.size()) == AVERROR(EINVAL));
+	TEST_REQUIRE(reader.Tell() == StormByte::ByteSize{0});
+	TEST_REQUIRE(context->read_packet(context->opaque, bytes.data(), bytes.size()) == 8);
+	TEST_REQUIRE((std::string_view{reinterpret_cast<const char*>(bytes.data()), bytes.size()} == payload.substr(0, 8)));
+	TEST_REQUIRE(context->seek(context->opaque, 4, SEEK_SET) == 4);
+	TEST_REQUIRE(context->read_packet(context->opaque, bytes.data(), bytes.size()) == 8);
+	TEST_REQUIRE((std::string_view{reinterpret_cast<const char*>(bytes.data()), bytes.size()} == payload.substr(4, 8)));
+	return 0;
+}
+
 int test_file_avio_write_backpressure_and_seek() {
 	SmallWriter writer;
 	TEST_REQUIRE(writer.Open());
@@ -265,6 +283,7 @@ int RunFileAvioTests(int argc, char** argv) {
 		TestEntry{"test_file_avio_read_retry_before_data", test_file_avio_read_retry_before_data},
 		TestEntry{"test_file_avio_read_retry_between_blocks", test_file_avio_read_retry_between_blocks},
 		TestEntry{"test_file_avio_read_error_is_not_retry", test_file_avio_read_error_is_not_retry},
+		TestEntry{"test_file_avio_read_seek_and_invalid_buffer", test_file_avio_read_seek_and_invalid_buffer},
 		TestEntry{"test_file_avio_write_backpressure_and_seek", test_file_avio_write_backpressure_and_seek},
 		TestEntry{"test_file_avio_write_flush_error", test_file_avio_write_flush_error},
 		TestEntry{"test_file_avio_write_origin_error", test_file_avio_write_origin_error},
