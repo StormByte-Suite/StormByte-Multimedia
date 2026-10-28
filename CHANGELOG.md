@@ -11,7 +11,7 @@ StormByte Multimedia turns media files into checked, asynchronous C++ jobs. Its 
 
 The C++26 API includes codec and container registries, `File` inspection, owned `Plan`s, pipeline stages, filters, analytics, progress and telemetry. Backend codec and format contexts remain private; filter-facing frame, packet and graph adapters are available when needed. Cross-module values and lifetimes use StormByte Base's `Safe` APIs and require compatible provider/consumer ABIs.
 
-The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.1) 2.2.1, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.4) 2.0.4, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.4) 2.0.4 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.1) 2.1.1, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
+The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.2) 2.2.2, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.5) 2.0.5, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.5) 2.0.5 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.2) 2.1.2, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
 
 Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. Third-party dependencies and redistributed fixtures keep their own licenses; neither option grants codec patent rights. GPL/nonfree FFmpeg build options affect the resulting binary's redistribution requirements, not the license of the original Multimedia source.
 
@@ -23,7 +23,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Changed
 
-- Bundled builds use Base 2.2.2.
+- Bundled builds use Base 2.2.2, Buffer 2.0.5, Logger 2.0.5 and System 2.1.2. The Multimedia release version remains 1.0.0.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
