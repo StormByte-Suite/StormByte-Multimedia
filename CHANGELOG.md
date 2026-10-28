@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Changed
+
+- Bundled builds use Base 2.2.2.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
 
 ## [1.0.0] - 2026-10-28
