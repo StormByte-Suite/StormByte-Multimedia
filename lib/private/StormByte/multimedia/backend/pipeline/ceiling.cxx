@@ -189,6 +189,22 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		return StageThreads(plan.Resources(), available, lanes * 2);
 	}
 
+	unsigned Ceiling::SvtParallelismLevel(unsigned threads) noexcept {
+		// SVT-AV1 4.2 selects levels from processor-count ranges
+		// 1, 2, 5, 11, 23 and >23. These are levels, not worker counts.
+		if (threads <= 1)
+			return 1;
+		if (threads <= 2)
+			return 2;
+		if (threads <= 5)
+			return 3;
+		if (threads <= 11)
+			return 4;
+		if (threads <= 23)
+			return 5;
+		return 6;
+	}
+
 	std::size_t Ceiling::ResourceFrames(Multimedia::Pipeline::ResourceUsage usage,
 		std::size_t fullFrames) noexcept {
 		switch (usage) {

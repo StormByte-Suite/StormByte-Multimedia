@@ -467,7 +467,12 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 
 	if (threadCount > 0 && implementationName == "libsvtav1"
 		&& row && HasKey(row->tune_key) && FindOption(codec, row->tune_key)) {
-		blob.insert_or_assign("lp", std::to_string(threadCount));
+		// SVT-AV1's "lp" is a level (0-6), not a logical-processor count.
+		// Map the stage target to the level SVT would select for a comparable
+		// processor count; this reduces its parallelism/buffering tier but is
+		// deliberately not represented as a hard thread limit. Full leaves
+		// the default auto level untouched.
+		blob.insert_or_assign("lp", std::to_string(Ceiling::SvtParallelismLevel(threadCount)));
 	}
 
 	if (threadCount > 0 && implementationName == "libkvazaar"

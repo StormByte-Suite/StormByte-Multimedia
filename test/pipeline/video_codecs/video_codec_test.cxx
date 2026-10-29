@@ -205,10 +205,16 @@ int test_svt_av1_encodes_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/svt-av1.mkv", "Matroska", "AV1", "libsvtav1");
 }
 
-int test_low_resources_converts_with_svt_threads_bounded() {
+int test_low_resources_converts_with_svt_parallelism_level() {
 	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
 		OutputPath("pipeline/video-codecs/svt-av1-low.mkv"),
 		"Matroska", "AV1", "libsvtav1", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Low);
+}
+
+int test_medium_resources_converts_with_svt_parallelism_level() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/svt-av1-medium.mkv"),
+		"Matroska", "AV1", "libsvtav1", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Medium);
 }
 
 int test_medium_resources_converts_with_aom_threads_bounded() {
@@ -612,7 +618,8 @@ int test_svt_av1_cancel_repeated() {
 
 int RunPipelineVideoCodecTests(int argc, char** argv) {
 	static constexpr std::array tests{
-		TestEntry{"test_low_resources_converts_with_svt_threads_bounded", test_low_resources_converts_with_svt_threads_bounded},
+		TestEntry{"test_low_resources_converts_with_svt_parallelism_level", test_low_resources_converts_with_svt_parallelism_level},
+		TestEntry{"test_medium_resources_converts_with_svt_parallelism_level", test_medium_resources_converts_with_svt_parallelism_level},
 		TestEntry{"test_medium_resources_converts_with_aom_threads_bounded", test_medium_resources_converts_with_aom_threads_bounded},
 		TestEntry{"test_low_resources_converts_with_vpx_threads_bounded", test_low_resources_converts_with_vpx_threads_bounded},
 		TestEntry{"test_low_resources_converts_with_x264_thread_options", test_low_resources_converts_with_x264_thread_options},

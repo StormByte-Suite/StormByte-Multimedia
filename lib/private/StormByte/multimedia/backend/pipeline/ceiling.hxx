@@ -165,6 +165,18 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				unsigned available) noexcept;
 
 			/**
+			 * @brief Translate a thread target to SVT-AV1's parallelism level.
+			 * @param threads Per-stage best-effort thread target.
+			 * @return SVT-AV1 parallelism level in the range [1, 6].
+			 *
+			 * SVT-AV1 levels are not thread counts or hard CPU limits. The
+			 * thresholds mirror SVT-AV1 4.2's default level selection for a
+			 * given processor count; they select a comparable parallelism and
+			 * buffering level only.
+			 */
+			static unsigned SvtParallelismLevel(unsigned threads) noexcept;
+
+			/**
 			 * @brief Scale a video-frame queue while retaining its safe minimum.
 			 * @param usage Resource policy.
 			 * @param fullFrames Existing full-policy capacity.

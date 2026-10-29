@@ -32,6 +32,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
   or Low (up to two) before `Run()`. Reduced modes distribute a best-effort
   thread budget across active decode/encode lanes, pass codec thread limits and
   reduce decoded-video frame queues while retaining a two-frame minimum.
+  SVT-AV1 receives a corresponding supported parallelism level rather than a
+  thread count; that level is not a hard CPU limit.
   Native thread settings are selected only when FFmpeg exposes the relevant
   option; x265 uses one frame thread with a bounded worker pool, and Kvazaar
   receives its supported `threads` parameter.
@@ -53,6 +55,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported
+  `lp` parallelism level instead of passing the thread count as the level.
+  SVT-AV1 documents `lp` as a parallelism/buffering tier, not a processor
+  count or hard thread limit; Full retains SVT's historical automatic level.
 - Decoder discovery rejects video implementations whose advertised pixel formats
   are hardware-only, including FFmpeg's native `av1` decoder, which requires
   hardware acceleration despite not advertising the hardware capability flag.

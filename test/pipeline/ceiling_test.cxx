@@ -80,6 +80,16 @@ namespace {
 		TEST_REQUIRE(Ceiling::StageThreads(Usage::Medium, 8, 4) == 1);
 		TEST_REQUIRE(Ceiling::StageThreads(Usage::Low, 16, 2) == 1);
 		TEST_REQUIRE(Ceiling::StageThreads(Usage::Low, 16, 0) == 2);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(0) == 1);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(1) == 1);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(2) == 2);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(3) == 3);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(5) == 3);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(6) == 4);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(11) == 4);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(12) == 5);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(23) == 5);
+		TEST_REQUIRE(Ceiling::SvtParallelismLevel(24) == 6);
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Full, 27) == 27);
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Medium, 27) == 14);
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 27) == 7);

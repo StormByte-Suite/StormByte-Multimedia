@@ -25,6 +25,7 @@ add_executable(MultimediaPipelineCeilingTests ceiling_test.cxx
 target_include_directories(MultimediaPipelineCeilingTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
 target_link_libraries(MultimediaPipelineCeilingTests PRIVATE multimedia_pipeline_test_support)
 add_pipeline_test(MultimediaPipelineCeilingTests test_packet_ceilings_do_not_query_memory)
+add_pipeline_test(MultimediaPipelineCeilingTests test_resource_budget_resolution_and_minima)
 
 add_subdirectory(remux)
 add_subdirectory(analytics)
