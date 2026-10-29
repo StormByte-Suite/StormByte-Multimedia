@@ -385,6 +385,26 @@ int test_flac_encodes_surround_matroska() {
 		"Matroska", "FLAC", "flac", 6);
 }
 
+int test_discovered_surround_flac_decoders_preserve_channels() {
+	const auto encoded = OutputPath("pipeline/audio-codecs/discovered-surround.flac");
+	const int result = CheckAudioCodec(FixturePath("audio/noise_51.m4a"), encoded,
+		"FLAC", "FLAC", "flac", 6);
+	if (result != 0)
+		return result;
+	auto codec = Registry::Instance().FindCodec("FLAC");
+	TEST_REQUIRE(codec);
+	const auto decoders = codec->get().Decoders(Feature::SurroundSound | Feature::Lossless);
+	TEST_REQUIRE(!decoders.empty());
+	for (const auto& decoder : decoders) {
+		const int decoded = CheckAudioCodec(encoded,
+			OutputPath("pipeline/audio-codecs/discovered-surround-decoded.mka"),
+			"Matroska", "FLAC", "flac", 6, decoder.Name());
+		if (decoded != 0)
+			return decoded;
+	}
+	return 0;
+}
+
 int test_flac_decode_roundtrip() {
 	return CheckAudioRoundtrip("FLAC", "flac", "flac",
 		"pipeline/audio-codecs/flac-roundtrip.mka", "pipeline/audio-codecs/flac-decoded.mka", "Matroska");
@@ -459,6 +479,7 @@ int test_rubberband_stretches_stereo_wav() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_discovered_surround_flac_decoders_preserve_channels", test_discovered_surround_flac_decoders_preserve_channels},
 		TestEntry{"test_tagged_mp3_fixture_metadata", test_tagged_mp3_fixture_metadata},
 		TestEntry{"test_tagged_opus_fixture_metadata", test_tagged_opus_fixture_metadata},
 		TestEntry{"test_opus_tags_preserved_in_vorbis", test_opus_tags_preserved_in_vorbis},

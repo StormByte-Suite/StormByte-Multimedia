@@ -54,6 +54,7 @@
 
 #include <array>
 #include <string_view>
+#include <utility>
 
 using namespace StormByte::Multimedia;
 using namespace std::string_view_literals;
@@ -103,6 +104,89 @@ int test_codec_names_resolve_by_public_identity() {
 	TEST_REQUIRE(ffmpegName);
 	TEST_REQUIRE(&canonical.value().get() == &ffmpegName.value().get());
 	TEST_REQUIRE(canonical.value().get().Type() == StormByte::Multimedia::Type::Video);
+	return 0;
+}
+
+int test_decoder_info_is_a_safe_read_only_value() {
+	constexpr DecoderInfo empty;
+	static_assert(empty.Name().empty());
+	static_assert(empty.Description().empty());
+	static_assert(empty.Features() == Features{});
+	StormByte::Safe::Optional<DecoderInfo> optional{empty};
+	TEST_REQUIRE(optional);
+	auto codec = Registry::Instance().FindCodec("H.265");
+	TEST_REQUIRE(codec);
+	const auto decoders = codec->get().Decoders();
+	TEST_REQUIRE(!decoders.empty());
+	TEST_REQUIRE(decoders[0].Name() == "hevc");
+	TEST_REQUIRE(!decoders[0].Description().empty());
+	TEST_REQUIRE(decoders[0].Features().Has(Feature::TenBit | Feature::HDR10));
+	DecoderInfo copy{decoders[0]};
+	DecoderInfo moved{std::move(copy)};
+	optional = moved;
+	TEST_REQUIRE(optional->Name() == decoders[0].Name());
+	return 0;
+}
+
+int test_decoders_filter_each_implementation_without_combining_features() {
+	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+		StormByte::Multimedia::Type::Subtitle, StormByte::Multimedia::Type::Attachment}) {
+		for (const auto codec : Registry::Instance().CodecList(type)) {
+			const auto all = codec.get().Decoders();
+			for (std::size_t i = 0; i < all.size(); ++i) {
+				TEST_REQUIRE(!all[i].Name().empty());
+				TEST_REQUIRE(!all[i].Description().empty());
+				for (std::size_t j = 0; j < i; ++j)
+					TEST_REQUIRE(all[i].Name() != all[j].Name());
+			}
+			for (const auto need : {Features{Feature::SideData}, Features{Feature::TenBit | Feature::HDR10},
+				Features{Feature::SurroundSound}, Features{Feature::DOVI | Feature::HardwareAcceleration}}) {
+				const auto filtered = codec.get().Decoders(need);
+				TEST_REQUIRE(!filtered.empty() == codec.get().HasAccess(Operation::Read, need));
+				std::size_t index = 0;
+				for (const auto& info : all) {
+					if (!info.Features().Has(need))
+						continue;
+					TEST_REQUIRE(index < filtered.size());
+					TEST_REQUIRE(filtered[index].Name() == info.Name());
+					TEST_REQUIRE(filtered[index].Features().Has(need));
+					++index;
+				}
+				TEST_REQUIRE(index == filtered.size());
+			}
+		}
+	}
+	return 0;
+}
+
+int test_decoders_preserve_generic_and_subtitle_fallbacks() {
+	for (const auto name : {"PCM S16 LE", "SRT", "SubRip"}) {
+		auto codec = Registry::Instance().FindCodec(name);
+		TEST_REQUIRE(codec);
+		const auto decoders = codec->get().Decoders();
+		TEST_REQUIRE(decoders.size() == 1);
+		TEST_REQUIRE(decoders[0].Name() == (name == "PCM S16 LE"sv ? "pcm_s16le"sv : "srt"sv));
+		TEST_REQUIRE(decoders[0].Features() == Features{});
+		TEST_REQUIRE(codec->get().Decoders(Feature::SideData).empty());
+		TEST_REQUIRE(codec->get().Decoders(Feature::Lossless).empty());
+	}
+	for (const auto codec : Registry::Instance().CodecList(StormByte::Multimedia::Type::Attachment))
+		TEST_REQUIRE(codec.get().Decoders().empty());
+	return 0;
+}
+
+int test_surround_decoder_features_describe_input_channels() {
+	for (const auto name : {"AAC", "Vorbis", "Opus", "FLAC", "ALAC"}) {
+		auto codec = Registry::Instance().FindCodec(name);
+		TEST_REQUIRE(codec);
+		const auto decoders = codec->get().Decoders(Feature::SurroundSound);
+		TEST_REQUIRE(!decoders.empty());
+		for (const auto& decoder : decoders)
+			TEST_REQUIRE(decoder.Features().Has(Feature::SurroundSound));
+	}
+	auto mp3 = Registry::Instance().FindCodec("MP3");
+	TEST_REQUIRE(mp3);
+	TEST_REQUIRE(mp3->get().Decoders(Feature::SurroundSound).empty());
 	return 0;
 }
 
@@ -243,6 +327,10 @@ int test_container_compatibility_follows_its_muxer() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_decoder_info_is_a_safe_read_only_value", test_decoder_info_is_a_safe_read_only_value},
+		TestEntry{"test_decoders_filter_each_implementation_without_combining_features", test_decoders_filter_each_implementation_without_combining_features},
+		TestEntry{"test_decoders_preserve_generic_and_subtitle_fallbacks", test_decoders_preserve_generic_and_subtitle_fallbacks},
+		TestEntry{"test_surround_decoder_features_describe_input_channels", test_surround_decoder_features_describe_input_channels},
 		TestEntry{"test_subtitle_kind_classifies_text_and_bitmap", test_subtitle_kind_classifies_text_and_bitmap},
 		TestEntry{"test_subtitle_kind_distinguishes_unknown_from_not_applicable", test_subtitle_kind_distinguishes_unknown_from_not_applicable},
 		TestEntry{"test_matroska_extensions_resolve_to_same_container", test_matroska_extensions_resolve_to_same_container},

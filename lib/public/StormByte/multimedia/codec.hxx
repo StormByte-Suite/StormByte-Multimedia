@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/decoder_info.hxx>
 #include <StormByte/multimedia/encoder_info.hxx>
 #include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -193,6 +194,22 @@ namespace StormByte {
 				 * devices are not probed.
 				 */
 				StormByte::Safe::Vector<EncoderInfo> Encoders(const Features& need = {}) const;
+
+				/**
+				 * @brief Lists decoder implementations usable by this codec's backend.
+				 * @param need Input capabilities required from each implementation; empty lists all.
+				 * @return Matching implementations with FFmpeg's unpinned default first,
+				 * followed by table alternatives in stable preference order. Empty when
+				 * no matching decoder is available.
+				 * @note Names can pin the decoder, not the encoder. Each pin must match
+				 * the source stream's codec id. Hardware-only and experimental decoders
+				 * are excluded because the backend does not configure their prerequisites.
+				 * Unclassified generic and subtitle defaults have empty features and only
+				 * satisfy empty requirements. Filtering never changes the unpinned backend
+				 * default: pin the returned name to select a filtered alternative.
+				 * Availability does not guarantee that damaged or unsupported input opens.
+				 */
+				StormByte::Safe::Vector<DecoderInfo> Decoders(const Features& need = {}) const;
 
 			private:
 				/**

@@ -71,7 +71,12 @@ namespace {
 		auto logger = MakeLogger();
 		TEST_PHASE("creating transcoder");
 		Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger};
+		auto input = Registry::Instance().FindCodec("SRT");
+		TEST_REQUIRE(input);
+		const auto decoders = input->get().Decoders();
+		TEST_REQUIRE(!decoders.empty());
 		job.Subtitle(0).Codec(codec.value().get())
+			.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{decoders[0].Name()})
 			.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 		TEST_PHASE("starting transcoder run");

@@ -25,6 +25,17 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [1.0.1] - 2026-10-29
 
+### Added
+
+- Read-only, Safe-compatible `DecoderInfo` and `Codec::Decoders(need)` expose
+  decoder names, descriptions and known input capabilities. Lists keep FFmpeg's
+  backend default first, followed by available table-ranked alternatives;
+  generic and subtitle defaults advertise no unverified features. Pins with
+  mismatched codec ids, hardware-only prerequisites or experimental requirements
+  are not advertised. Feature-aware read access uses the same eligibility checks.
+- Decoder capability rows correctly advertise multichannel AAC, Vorbis, Opus,
+  FLAC and ALAC input support, and use the actual `libfdk_aac` decoder pin.
+
 ### Fixed
 
 - Windows Release builds no longer override the shared AVX baseline with a

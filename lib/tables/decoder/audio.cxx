@@ -55,20 +55,20 @@ using namespace StormByte::Multimedia::Tables::Decoder;
 
 namespace {
 	constexpr DecoderDef table[] = {
-		{ "AAC", "aac", "Native AAC decoder", 0, Feature::LowDelay | Feature::SideData },
-		{ "AAC", "fdk_aac", "Fraunhofer FDK AAC decoder", 1, Feature::HighQuality | Feature::LowDelay },
+		{ "AAC", "aac", "Native AAC decoder", 0, Feature::LowDelay | Feature::SurroundSound | Feature::SideData },
+		{ "AAC", "libfdk_aac", "Fraunhofer FDK AAC decoder", 1, Feature::HighQuality | Feature::LowDelay | Feature::SurroundSound },
 		{ "AC-3", "ac3", "Native AC-3 decoder", 0, Feature::HighQuality | Feature::SurroundSound | Feature::SideData },
 		{ "E-AC3", "eac3", "Native E-AC3 decoder", 0, Feature::HighQuality | Feature::SurroundSound | Feature::SideData },
-		{ "Vorbis", "vorbis", "Native Vorbis decoder", 0, Feature::LowDelay | Feature::SideData },
-		{ "Vorbis", "libvorbis", "libvorbis decoder", 1, Feature::HighQuality | Feature::LowDelay },
-		{ "Opus", "opus", "Native Opus decoder", 0, Feature::LowDelay | Feature::SideData },
-		{ "Opus", "libopus", "libopus decoder", 1, Feature::HighQuality | Feature::LowDelay },
+		{ "Vorbis", "vorbis", "Native Vorbis decoder", 0, Feature::LowDelay | Feature::SurroundSound | Feature::SideData },
+		{ "Vorbis", "libvorbis", "libvorbis decoder", 1, Feature::HighQuality | Feature::LowDelay | Feature::SurroundSound },
+		{ "Opus", "opus", "Native Opus decoder", 0, Feature::LowDelay | Feature::SurroundSound | Feature::SideData },
+		{ "Opus", "libopus", "libopus decoder", 1, Feature::HighQuality | Feature::LowDelay | Feature::SurroundSound },
 		{ "MP3", "mp3", "Native MP3 decoder", 0, Feature::LowDelay | Feature::SideData },
 		{ "MP3", "libmp3lame", "LAME MP3 decoder", 1, Feature::HighQuality | Feature::LowDelay },
-		{ "FLAC", "flac", "Native FLAC decoder", 0, Feature::HighQuality | Feature::Lossless | Feature::SideData },
+		{ "FLAC", "flac", "Native FLAC decoder", 0, Feature::HighQuality | Feature::Lossless | Feature::SurroundSound | Feature::SideData },
 		{ "DTS", "dca", "Native DTS decoder", 0, Feature::HighQuality | Feature::SurroundSound | Feature::SideData },
 		{ "TrueHD", "truehd", "Native TrueHD decoder", 0, Feature::HighQuality | Feature::Lossless | Feature::SurroundSound | Feature::SideData },
-		{ "ALAC", "alac", "Native ALAC decoder", 0, Feature::HighQuality | Feature::Lossless | Feature::SideData },
+		{ "ALAC", "alac", "Native ALAC decoder", 0, Feature::HighQuality | Feature::Lossless | Feature::SurroundSound | Feature::SideData },
 	};
 }
 

@@ -63,6 +63,23 @@ extern "C" {
 
 using namespace StormByte::Multimedia;
 
+namespace {
+	bool UsableDecoder(const AVCodec* decoder) noexcept {
+		return decoder && (decoder->capabilities & (AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_EXPERIMENTAL)) == 0;
+	}
+
+	bool MatchesCodec(const AVCodec* decoder, const Tables::Codec::CodecDef& identity) noexcept {
+		if (!UsableDecoder(decoder))
+			return false;
+		for (std::size_t i = 0; i < identity.FfmpegIdCount(); ++i) {
+			const auto* descriptor = avcodec_descriptor_get_by_name(identity.FfmpegId(i));
+			if (descriptor && descriptor->id == decoder->id)
+				return true;
+		}
+		return false;
+	}
+}
+
 Codec::Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept
 : m_type(type), m_name(name), m_description(description), m_access(access) {}
 
@@ -115,16 +132,71 @@ bool Codec::HasAccess(Access access, const Features& need) const noexcept {
 	if (access.Has(Operation::Write) && !Tables::Encoder::PickEncoder(m_name, {}, need))
 		return false;
 	if (access.Has(Operation::Read)) {
-		for (const auto rows : {Tables::Decoder::Video(), Tables::Decoder::Audio()}) {
-			for (const auto& row : rows) {
-				if (m_name == row.codec && row.features.Has(need)
-					&& avcodec_find_decoder_by_name(row.name) != nullptr)
-					return true;
+		for (const auto& identity : Tables::Codec::Identity(m_type)) {
+			if (m_name != identity.name)
+				continue;
+			for (const auto rows : {Tables::Decoder::Video(), Tables::Decoder::Audio()}) {
+				for (const auto& row : rows) {
+					if (m_name == row.codec && row.features.Has(need)
+						&& MatchesCodec(avcodec_find_decoder_by_name(row.name), identity))
+						return true;
+				}
 			}
 		}
 		return false;
 	}
+
 	return true;
+}
+
+StormByte::Safe::Vector<DecoderInfo> Codec::Decoders(const Features& need) const {
+	StormByte::Safe::Vector<DecoderInfo> out;
+	if (!HasAccess(Operation::Read) || m_type == Type::Attachment)
+		return out;
+
+	for (const auto& identity : Tables::Codec::Identity(m_type)) {
+		if (m_name != identity.name)
+			continue;
+		std::vector<const Tables::Decoder::DecoderDef*> rows;
+		for (const auto table : {Tables::Decoder::Video(), Tables::Decoder::Audio()}) {
+			for (const auto& row : table) {
+				if (m_name == row.codec && MatchesCodec(avcodec_find_decoder_by_name(row.name), identity))
+					rows.push_back(&row);
+			}
+		}
+		std::stable_sort(rows.begin(), rows.end(), [](const auto* a, const auto* b) {
+			return a->preference < b->preference;
+		});
+		const auto append = [&](const AVCodec* decoder, const Tables::Decoder::DecoderDef* row) {
+			const auto features = row ? row->features : Features{};
+			if (!features.Has(need))
+				return;
+			for (const auto& info : out) {
+				if (info.Name() == decoder->name)
+					return;
+			}
+			DecoderInfo info;
+			info.m_name = decoder->name;
+			info.m_description = row ? row->description
+				: (decoder->long_name ? decoder->long_name : decoder->name);
+			info.m_features = features;
+			out.push_back(info);
+		};
+		for (std::size_t i = 0; i < identity.FfmpegIdCount(); ++i) {
+			const auto* descriptor = avcodec_descriptor_get_by_name(identity.FfmpegId(i));
+			const auto* decoder = descriptor ? avcodec_find_decoder(descriptor->id) : nullptr;
+			if (!MatchesCodec(decoder, identity))
+				continue;
+			const auto row = std::find_if(rows.begin(), rows.end(), [&](const auto* candidate) {
+				return std::string_view{candidate->name} == decoder->name;
+			});
+			append(decoder, row == rows.end() ? nullptr : *row);
+		}
+		for (const auto* row : rows)
+			append(avcodec_find_decoder_by_name(row->name), row);
+		break;
+	}
+	return out;
 }
 
 StormByte::Safe::Vector<EncoderInfo> Codec::Encoders(const Features& need) const {

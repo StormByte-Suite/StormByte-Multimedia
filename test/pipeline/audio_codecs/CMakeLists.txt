@@ -39,6 +39,7 @@ foreach(test_name IN ITEMS
 	test_flac_encodes_stereo_matroska
 	test_flac_encodes_surround_matroska
 	test_flac_decode_roundtrip
+	test_discovered_surround_flac_decoders_preserve_channels
 	test_alac_encodes_stereo_mp4
 	test_alac_encodes_surround_mp4
 	test_alac_decode_roundtrip

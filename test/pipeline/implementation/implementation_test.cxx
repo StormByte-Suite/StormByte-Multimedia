@@ -210,7 +210,11 @@ static int CheckManualDecoderPin(std::string_view pin, std::string_view destinat
 }
 
 int test_transcoder_selects_decoder_implementation() {
-	return CheckTranscoderDecoderPin("pcm_s16le", "pipeline/pinned-decoder.mka");
+	auto codec = Registry::Instance().FindCodec("PCM S16 LE");
+	TEST_REQUIRE(codec);
+	const auto decoders = codec->get().Decoders();
+	TEST_REQUIRE(!decoders.empty());
+	return CheckTranscoderDecoderPin(decoders[0].Name(), "pipeline/pinned-decoder.mka");
 }
 
 int test_transcoder_rejects_missing_decoder_implementation() {
@@ -228,7 +232,11 @@ int test_transcoder_rejects_mismatched_decoder_implementation() {
 }
 
 int test_manual_selects_plan_decoder_implementation() {
-	return CheckManualDecoderPin("pcm_s16le", "pipeline/manual-pinned-decoder.mka");
+	auto codec = Registry::Instance().FindCodec("PCM S16 LE");
+	TEST_REQUIRE(codec);
+	const auto decoders = codec->get().Decoders();
+	TEST_REQUIRE(!decoders.empty());
+	return CheckManualDecoderPin(decoders[0].Name(), "pipeline/manual-pinned-decoder.mka");
 }
 
 int test_manual_rejects_missing_decoder_implementation() {
