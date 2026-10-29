@@ -27,6 +27,21 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Added
 
+- `Pipeline::Transcoder::Resources(ResourceUsage)` configures Full (the
+  historical default), Medium (about half the CPUs available to the process)
+  or Low (up to two) before `Run()`. Reduced modes distribute a best-effort
+  thread budget across active decode/encode lanes, pass codec thread limits and
+  reduce decoded-video frame queues while retaining a two-frame minimum.
+  Native thread settings are selected only when FFmpeg exposes the relevant
+  option; x265 uses one frame thread with a bounded worker pool, and Kvazaar
+  receives its supported `threads` parameter.
+  FFmpeg libraries, filters, drivers and encoders without usable controls may
+  use additional resources; this is not a hard CPU or RSS limit. `FineTune`
+  thread-control keys conflict with Medium/Low and fail instead of bypassing
+  the policy.
+- `EncoderInfo::Hardware()` identifies implementations registered as
+  hardware-only using their existing feature metadata. Optional hardware
+  configurations do not make a software encoder hardware-only.
 - Read-only, Safe-compatible `DecoderInfo` and `Codec::Decoders(need)` expose
   decoder names, descriptions and known input capabilities. Lists keep FFmpeg's
   backend default first, followed by available table-ranked alternatives;
@@ -37,6 +52,11 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
   FLAC and ALAC input support, and use the actual `libfdk_aac` decoder pin.
 
 ### Fixed
+
+- Decoder discovery rejects video implementations whose advertised pixel formats
+  are hardware-only, including FFmpeg's native `av1` decoder, which requires
+  hardware acceleration despite not advertising the hardware capability flag.
+  Software AV1 alternatives remain selectable and covered by real decoding tests.
 
 - Windows Release builds no longer override the shared AVX baseline with a
   target-local `/arch:AVX2`. The override allowed clang-cl to emit Haswell-only

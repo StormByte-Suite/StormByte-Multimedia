@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/multimedia/pipeline/resource_usage.hxx>
 
 #include <cstddef>
 #include <memory>
@@ -134,6 +135,43 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return Cached `std::thread::hardware_concurrency()`.
 			 */
 			static unsigned MaxThreads() noexcept;
+
+			/**
+			 * @brief Resolve a requested level against available process CPUs.
+			 * @param usage Resource policy.
+			 * @param available Process-available CPU count; zero is treated as one.
+			 * @return Full count, half rounded down (minimum one), or at most two.
+			 */
+			static unsigned ResourceThreads(Multimedia::Pipeline::ResourceUsage usage,
+				unsigned available) noexcept;
+
+			/**
+			 * @brief Divide a policy budget across concurrently active decode/encode stages.
+			 * @param usage Resource policy.
+			 * @param available Process-available CPU count.
+			 * @param stages Number of concurrently active codec stages.
+			 * @return Zero for Full (keep historical FFmpeg defaults), otherwise at least one.
+			 */
+			static unsigned StageThreads(Multimedia::Pipeline::ResourceUsage usage,
+				unsigned available, std::size_t stages) noexcept;
+
+			/**
+			 * @brief Resolve the per-stage thread target from a complete plan.
+			 * @param plan Closed job intention.
+			 * @param available Process-available CPU count.
+			 * @return Zero for Full; otherwise the budget divided across encode lanes.
+			 */
+			static unsigned StageThreads(const Multimedia::Pipeline::Plan& plan,
+				unsigned available) noexcept;
+
+			/**
+			 * @brief Scale a video-frame queue while retaining its safe minimum.
+			 * @param usage Resource policy.
+			 * @param fullFrames Existing full-policy capacity.
+			 * @return Full capacity, half for Medium, or one quarter for Low; never below two.
+			 */
+			static std::size_t ResourceFrames(Multimedia::Pipeline::ResourceUsage usage,
+				std::size_t fullFrames) noexcept;
 
 			/**
 			 * @brief Finds a track in the plan's published track list.

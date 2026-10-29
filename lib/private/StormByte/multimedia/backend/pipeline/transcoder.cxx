@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/detail/locale.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/exception.hxx>
@@ -335,6 +336,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		job.OnError(job.Error().value());
 		return;
 	}
+	built->Resources(job.Resources());
 	{
 		StormByte::Safe::UniqueLock lock(Lock);
 		job.m_plan = built;

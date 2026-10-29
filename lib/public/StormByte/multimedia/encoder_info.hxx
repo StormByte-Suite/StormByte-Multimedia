@@ -208,6 +208,18 @@ namespace StormByte::Multimedia {
 			constexpr std::string_view Description() const noexcept { return m_description; }
 
 			/**
+			 * @brief Whether the registered implementation is hardware-only.
+			 * @return true when existing implementation feature metadata marks it
+			 *         as hardware-accelerated.
+			 *
+			 * Software encoders with optional hardware configurations are not
+			 * classified as hardware-only.
+			 */
+			constexpr bool Hardware() const noexcept {
+				return m_features.Has(StormByte::Multimedia::Feature::HardwareAcceleration);
+			}
+
+			/**
 			 * @brief Features this implementation preserves or offers.
 			 * @return Feature set.
 			 */

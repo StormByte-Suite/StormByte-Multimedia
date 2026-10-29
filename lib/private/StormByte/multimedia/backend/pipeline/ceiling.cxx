@@ -60,6 +60,10 @@
 #include <string>
 #include <thread>
 
+extern "C" {
+	#include <libavutil/cpu.h>
+}
+
 using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Producer;
 using StormByte::Multimedia::Pipeline::Track;
@@ -144,10 +148,58 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 	unsigned Ceiling::MaxThreads() noexcept {
 		static const unsigned cached = [] {
-			unsigned n = std::thread::hardware_concurrency();
+			unsigned n = static_cast<unsigned>(std::max(av_cpu_count(), 0));
 			return n < 1 ? 1u : n;
 		}();
 		return cached;
+	}
+
+	unsigned Ceiling::ResourceThreads(Multimedia::Pipeline::ResourceUsage usage,
+		unsigned available) noexcept {
+		if (available < 1)
+			available = 1;
+		switch (usage) {
+			case Multimedia::Pipeline::ResourceUsage::Full:
+				return available;
+			case Multimedia::Pipeline::ResourceUsage::Medium:
+				return std::max(available / 2, 1u);
+			case Multimedia::Pipeline::ResourceUsage::Low:
+				return std::min(available, 2u);
+		}
+		return available;
+	}
+
+	unsigned Ceiling::StageThreads(Multimedia::Pipeline::ResourceUsage usage,
+		unsigned available, std::size_t stages) noexcept {
+		if (usage == Multimedia::Pipeline::ResourceUsage::Full)
+			return 0;
+		const unsigned budget = ResourceThreads(usage, available);
+		if (stages == 0)
+			return budget;
+		return std::max(static_cast<unsigned>(budget / stages), 1u);
+	}
+
+	unsigned Ceiling::StageThreads(const Multimedia::Pipeline::Plan& plan,
+		unsigned available) noexcept {
+		std::size_t lanes = 0;
+		for (const auto& track : plan.Tracks()) {
+			if (track && Encodes(*track))
+				++lanes;
+		}
+		return StageThreads(plan.Resources(), available, lanes * 2);
+	}
+
+	std::size_t Ceiling::ResourceFrames(Multimedia::Pipeline::ResourceUsage usage,
+		std::size_t fullFrames) noexcept {
+		switch (usage) {
+			case Multimedia::Pipeline::ResourceUsage::Full:
+				return fullFrames;
+			case Multimedia::Pipeline::ResourceUsage::Medium:
+				return std::max<std::size_t>((fullFrames + 1) / 2, 2);
+			case Multimedia::Pipeline::ResourceUsage::Low:
+				return std::max<std::size_t>((fullFrames + 3) / 4, 2);
+		}
+		return fullFrames;
 	}
 
 	Ceiling::Ceiling(StormByte::Safe::Shared<const Multimedia::Pipeline::Plan> plan,
@@ -173,7 +225,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				break;
 			case Producer::Decoder:
 				if (video) {
-					m_frames = VideoFrames();
+					m_frames = ResourceFrames(plan->Resources(), VideoFrames());
 					m_packets = m_frames;
 				}
 				else {
@@ -189,7 +241,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					// Raw in = lookahead. Encoded out is cheap; keep it on the
 					// remux budget so the muxer does not buffer a second of
 					// compressed video while waiting on other tracks.
-					m_frames = VideoFrames();
+					m_frames = ResourceFrames(plan->Resources(), VideoFrames());
 					m_packets = remux;
 				}
 				else {

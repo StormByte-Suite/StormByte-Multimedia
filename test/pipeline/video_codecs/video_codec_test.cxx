@@ -64,6 +64,7 @@
 
 extern "C" {
 	#include <libavformat/avformat.h>
+	#include <libavutil/pixdesc.h>
 }
 
 #include <algorithm>
@@ -99,7 +100,8 @@ namespace {
 
 	int CheckVideoCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
-		std::string_view decoder = {}, AVPixelFormat sourceFormat = AV_PIX_FMT_NONE, int threads = 0) {
+		std::string_view decoder = {}, AVPixelFormat sourceFormat = AV_PIX_FMT_NONE, int threads = 0,
+		ResourceUsage resources = ResourceUsage::Full) {
 		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
@@ -120,7 +122,8 @@ namespace {
 		{
 					TEST_PHASE("creating transcoder");
 					Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
-			auto track = job.Video(0);
+					job.Resources(resources);
+					auto track = job.Video(0);
 			track.Codec(codec.value().get())
 				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});
 			if (!decoder.empty())
@@ -151,6 +154,9 @@ namespace {
 			const int result = WaitForOptionalCodec(job);
 			if (result != 0)
 				return result;
+			TEST_REQUIRE(job.Resources() == resources);
+			TEST_REQUIRE(job.Plan());
+			TEST_REQUIRE(job.Plan()->Resources() == resources);
 		}
 		return CheckVideoOutput(output, containerName, codecName);
 	}
@@ -199,6 +205,83 @@ int test_svt_av1_encodes_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/svt-av1.mkv", "Matroska", "AV1", "libsvtav1");
 }
 
+int test_low_resources_converts_with_svt_threads_bounded() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/svt-av1-low.mkv"),
+		"Matroska", "AV1", "libsvtav1", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Low);
+}
+
+int test_medium_resources_converts_with_aom_threads_bounded() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/aom-av1-medium.webm"),
+		"WebM", "AV1", "libaom-av1", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Medium);
+}
+
+int test_low_resources_converts_with_vpx_threads_bounded() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/vpx-vp9-low.webm"),
+		"WebM", "VP9", "libvpx-vp9", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Low);
+}
+
+int test_low_resources_converts_with_x264_thread_options() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/x264-low.mp4"),
+		"MP4", "H.264", "libx264", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Low);
+}
+
+int test_low_resources_converts_with_x265_thread_options() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/x265-low.mkv"),
+		"Matroska", "H.265", "libx265", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Low);
+}
+
+int test_low_resources_converts_with_kvazaar_threads_bounded() {
+	return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"),
+		OutputPath("pipeline/video-codecs/kvazaar-low.mkv"),
+		"Matroska", "H.265", "libkvazaar", {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Low);
+}
+
+int test_resource_policy_rejects_finetune_thread_override() {
+	if (!avcodec_find_encoder_by_name("libsvtav1"))
+		return TEST_SKIP;
+	const auto codec = Registry::Instance().FindCodec("AV1");
+	TEST_REQUIRE(codec);
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mp4")),
+		TestLocation(OutputPath("pipeline/video-codecs/svt-av1-thread-conflict.mkv")),
+		logger, 2000000000LL};
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+	options.emplace(StormByte::Safe::String{"lp"}, StormByte::Safe::String{"12"});
+	job.Resources(ResourceUsage::Low);
+	job.Video(0).Codec(codec.value().get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libsvtav1"})
+		.Preset(StormByte::Safe::String{"12"}).CRF(40).FineTune(std::move(options));
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	return WaitForTranscoderFailure(job, "FineTune cannot override the Transcoder resource thread policy");
+}
+
+int test_resource_policy_rejects_kvazaar_thread_override() {
+	if (!avcodec_find_encoder_by_name("libkvazaar"))
+		return TEST_SKIP;
+	const auto codec = Registry::Instance().FindCodec("H.265");
+	TEST_REQUIRE(codec);
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mp4")),
+		TestLocation(OutputPath("pipeline/video-codecs/kvazaar-thread-conflict.mkv")),
+		logger, 2000000000LL};
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+	options.emplace(StormByte::Safe::String{"kvazaar-params"},
+		StormByte::Safe::String{"threads=12"});
+	job.Resources(ResourceUsage::Low);
+	job.Video(0).Codec(codec.value().get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libkvazaar"})
+		.FineTune(std::move(options));
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	return WaitForTranscoderFailure(job, "FineTune cannot override the Transcoder resource thread policy");
+}
+
 int test_svt_av1_encodes_mp4() {
 	return CheckVideoEncode("pipeline/video-codecs/svt-av1.mp4", "MP4", "AV1", "libsvtav1");
 }
@@ -210,6 +293,50 @@ int test_aom_av1_encodes_webm() {
 int test_dav1d_decodes_svt_av1() {
 	return CheckAv1Decode("libdav1d", "pipeline/video-codecs/dav1d-source.mkv",
 		"pipeline/video-codecs/dav1d-decoded.webm");
+}
+
+int test_discovered_video_decoders_have_software_formats() {
+	for (const auto codec : Registry::Instance().CodecList(StormByte::Multimedia::Type::Video)) {
+		for (const auto& info : codec.get().Decoders()) {
+			const auto* decoder = avcodec_find_decoder_by_name(info.Name().data());
+			TEST_REQUIRE(decoder);
+			TEST_REQUIRE((decoder->capabilities & (AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_EXPERIMENTAL)) == 0);
+			// Some legacy catalog entries are grouped as video despite their
+			// backend media kind (for example on2avc is audio).
+			if (decoder->type != AVMEDIA_TYPE_VIDEO)
+				continue;
+			const void* formats = nullptr;
+			int count = 0;
+			TEST_REQUIRE(avcodec_get_supported_config(nullptr, decoder, AV_CODEC_CONFIG_PIX_FORMAT,
+				0, &formats, &count) >= 0);
+			if (!formats)
+				continue;
+			bool software = false;
+			const auto* pixels = static_cast<const AVPixelFormat*>(formats);
+			for (int i = 0; i < count; ++i) {
+				const auto* descriptor = av_pix_fmt_desc_get(pixels[i]);
+				software |= descriptor && (descriptor->flags & AV_PIX_FMT_FLAG_HWACCEL) == 0;
+			}
+			TEST_REQUIRE(software);
+		}
+	}
+	return 0;
+}
+
+int test_discovered_av1_decoders_convert_without_hardware() {
+	auto codec = Registry::Instance().FindCodec("AV1");
+	TEST_REQUIRE(codec);
+	const auto decoders = codec->get().Decoders(Feature::TenBit | Feature::HDR10);
+	TEST_REQUIRE(!decoders.empty());
+	for (const auto& decoder : decoders) {
+		TEST_REQUIRE(decoder.Name() != "av1");
+		const int result = CheckAv1Decode(decoder.Name(),
+			"pipeline/video-codecs/discovered-av1-source.mkv",
+			"pipeline/video-codecs/discovered-av1-decoded.webm");
+		if (result != 0)
+			return result;
+	}
+	return 0;
 }
 
 int test_aom_decodes_svt_av1() {
@@ -485,6 +612,16 @@ int test_svt_av1_cancel_repeated() {
 
 int RunPipelineVideoCodecTests(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_low_resources_converts_with_svt_threads_bounded", test_low_resources_converts_with_svt_threads_bounded},
+		TestEntry{"test_medium_resources_converts_with_aom_threads_bounded", test_medium_resources_converts_with_aom_threads_bounded},
+		TestEntry{"test_low_resources_converts_with_vpx_threads_bounded", test_low_resources_converts_with_vpx_threads_bounded},
+		TestEntry{"test_low_resources_converts_with_x264_thread_options", test_low_resources_converts_with_x264_thread_options},
+		TestEntry{"test_low_resources_converts_with_x265_thread_options", test_low_resources_converts_with_x265_thread_options},
+		TestEntry{"test_low_resources_converts_with_kvazaar_threads_bounded", test_low_resources_converts_with_kvazaar_threads_bounded},
+		TestEntry{"test_resource_policy_rejects_finetune_thread_override", test_resource_policy_rejects_finetune_thread_override},
+		TestEntry{"test_resource_policy_rejects_kvazaar_thread_override", test_resource_policy_rejects_kvazaar_thread_override},
+		TestEntry{"test_discovered_video_decoders_have_software_formats", test_discovered_video_decoders_have_software_formats},
+		TestEntry{"test_discovered_av1_decoders_convert_without_hardware", test_discovered_av1_decoders_convert_without_hardware},
 		TestEntry{"test_svt_av1_cancel_repeated", test_svt_av1_cancel_repeated},
 		TestEntry{"test_svt_av1_encodes_matroska", test_svt_av1_encodes_matroska},
 		TestEntry{"test_svt_av1_encodes_mp4", test_svt_av1_encodes_mp4},

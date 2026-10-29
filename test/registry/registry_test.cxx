@@ -51,6 +51,8 @@
 #include "../test_helpers.hxx"
 
 #include <StormByte/multimedia/registry.hxx>
+#include <StormByte/multimedia/pipeline/resource_usage.hxx>
+#include <StormByte/type_traits.hxx>
 
 #include <array>
 #include <string_view>
@@ -58,6 +60,8 @@
 
 using namespace StormByte::Multimedia;
 using namespace std::string_view_literals;
+
+static_assert(StormByte::Type::SafeComponent<Pipeline::ResourceUsage>);
 
 namespace {
 	int CheckContainerAliases(std::string_view canonical, std::span<const std::string_view> aliases) {
@@ -125,6 +129,43 @@ int test_decoder_info_is_a_safe_read_only_value() {
 	DecoderInfo moved{std::move(copy)};
 	optional = moved;
 	TEST_REQUIRE(optional->Name() == decoders[0].Name());
+	return 0;
+}
+
+int test_encoder_hardware_metadata_matches_ffmpeg_and_copies() {
+	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+		StormByte::Multimedia::Type::Subtitle}) {
+		for (const auto codec : Registry::Instance().CodecList(type)) {
+			for (const auto& info : codec.get().Encoders()) {
+				const bool expected = info.Features().Has(Feature::HardwareAcceleration);
+				TEST_REQUIRE(info.Hardware() == expected);
+				EncoderInfo copied{info};
+				TEST_REQUIRE(copied.Hardware() == info.Hardware());
+				EncoderInfo moved{std::move(copied)};
+				TEST_REQUIRE(moved.Hardware() == info.Hardware());
+			}
+		}
+	}
+	for (const auto name : {"H.264", "H.265", "AV1"}) {
+		auto codec = Registry::Instance().FindCodec(name);
+		TEST_REQUIRE(codec);
+		for (const auto& info : codec->get().Encoders()) {
+			if (info.Name().starts_with("lib"))
+				TEST_REQUIRE(!info.Hardware());
+		}
+	}
+	return 0;
+}
+
+int test_decoders_exclude_native_hardware_only_av1() {
+	auto codec = Registry::Instance().FindCodec("AV1");
+	TEST_REQUIRE(codec);
+	for (const auto need : {Features{}, Features{Feature::TenBit | Feature::HDR10}}) {
+		const auto decoders = codec->get().Decoders(need);
+		TEST_REQUIRE(!decoders.empty());
+		for (const auto& decoder : decoders)
+			TEST_REQUIRE(decoder.Name() != "av1");
+	}
 	return 0;
 }
 
@@ -327,6 +368,8 @@ int test_container_compatibility_follows_its_muxer() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_encoder_hardware_metadata_matches_ffmpeg_and_copies", test_encoder_hardware_metadata_matches_ffmpeg_and_copies},
+		TestEntry{"test_decoders_exclude_native_hardware_only_av1", test_decoders_exclude_native_hardware_only_av1},
 		TestEntry{"test_decoder_info_is_a_safe_read_only_value", test_decoder_info_is_a_safe_read_only_value},
 		TestEntry{"test_decoders_filter_each_implementation_without_combining_features", test_decoders_filter_each_implementation_without_combining_features},
 		TestEntry{"test_decoders_preserve_generic_and_subtitle_fallbacks", test_decoders_preserve_generic_and_subtitle_fallbacks},

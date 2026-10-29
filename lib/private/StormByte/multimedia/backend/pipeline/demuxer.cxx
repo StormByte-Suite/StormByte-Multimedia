@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/ffmpeg/AVStream.hxx>
 #include <StormByte/multimedia/ffmpeg/property.hxx>
 #include <StormByte/multimedia/backend/file_avio.hxx>
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/audio.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/video.hxx>
@@ -374,8 +375,11 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 		decoder.Fail("decoder implementation does not match source codec");
 		return {};
 	}
+	const auto plan = decoder.Plan();
+	const unsigned threadCount = plan ? Ceiling::StageThreads(*plan, Ceiling::MaxThreads()) : 0;
 	auto opened = FFmpeg::AVDecoder::Open(
-		const_cast<::AVCodec*>(codec), *params, *m_ctx->format, decoder.Index());
+		const_cast<::AVCodec*>(codec), *params, *m_ctx->format, decoder.Index(),
+		static_cast<int>(threadCount));
 	if (!opened.has_value()) {
 		decoder.Fail(opened.error()->what());
 		return {};

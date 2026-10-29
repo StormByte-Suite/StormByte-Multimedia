@@ -55,12 +55,43 @@ namespace {
 		TEST_REQUIRE(decodedVideo.Packets() == decodedVideo.Frames());
 		const Ceiling decodedAudio{plan, Producer::Decoder, plan->Tracks()[1]};
 		TEST_REQUIRE(decodedAudio.Frames() == 8 && decodedAudio.Packets() == 8);
+		const auto fullFrames = decodedVideo.Frames();
+		plan->Resources(ResourceUsage::Medium);
+		const Ceiling mediumVideo{plan, Producer::Decoder, plan->Tracks()[0]};
+		TEST_REQUIRE(mediumVideo.Frames() >= 2 && mediumVideo.Frames() <= fullFrames);
+		TEST_REQUIRE(mediumVideo.Packets() == mediumVideo.Frames());
+		plan->Resources(ResourceUsage::Low);
+		const Ceiling lowVideo{plan, Producer::Decoder, plan->Tracks()[0]};
+		TEST_REQUIRE(lowVideo.Frames() >= 2 && lowVideo.Frames() <= mediumVideo.Frames());
+		TEST_REQUIRE(lowVideo.Packets() == lowVideo.Frames());
+		return 0;
+	}
+
+	int test_resource_budget_resolution_and_minima() {
+		using Usage = ResourceUsage;
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Full, 0) == 1);
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Full, 16) == 16);
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 1) == 1);
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 8) == 4);
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 9) == 4);
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Low, 1) == 1);
+		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Low, 8) == 2);
+		TEST_REQUIRE(Ceiling::StageThreads(Usage::Full, 8, 4) == 0);
+		TEST_REQUIRE(Ceiling::StageThreads(Usage::Medium, 8, 4) == 1);
+		TEST_REQUIRE(Ceiling::StageThreads(Usage::Low, 16, 2) == 1);
+		TEST_REQUIRE(Ceiling::StageThreads(Usage::Low, 16, 0) == 2);
+		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Full, 27) == 27);
+		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Medium, 27) == 14);
+		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 27) == 7);
+		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Medium, 2) == 2);
+		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 0) == 2);
 		return 0;
 	}
 }
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_resource_budget_resolution_and_minima", test_resource_budget_resolution_and_minima},
 		TestEntry{"test_packet_ceilings_do_not_query_memory", test_packet_ceilings_do_not_query_memory},
 	};
 	return RunSelectedTest(argc, argv, tests);

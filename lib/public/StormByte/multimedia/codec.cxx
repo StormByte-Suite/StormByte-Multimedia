@@ -59,13 +59,39 @@
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
+	#include <libavutil/pixdesc.h>
 }
 
 using namespace StormByte::Multimedia;
 
 namespace {
 	bool UsableDecoder(const AVCodec* decoder) noexcept {
-		return decoder && (decoder->capabilities & (AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_EXPERIMENTAL)) == 0;
+		if (!decoder || (decoder->capabilities & (AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_EXPERIMENTAL)) != 0)
+			return false;
+		if (decoder->type != AVMEDIA_TYPE_VIDEO)
+			return true;
+
+		// FFmpeg's native AV1 decoder requires hwaccel at frame negotiation,
+		// despite CAP_DR1 and an unspecified public pixel-format list. Other
+		// AV1 implementations (dav1d, libaom) do implement software decoding.
+		if (decoder->id == AV_CODEC_ID_AV1 && std::string_view{decoder->name} == "av1")
+			return false;
+
+		const void* formats = nullptr;
+		int count = 0;
+		if (avcodec_get_supported_config(nullptr, decoder, AV_CODEC_CONFIG_PIX_FORMAT, 0, &formats, &count) < 0)
+			return false;
+		// A null list is dynamic/unspecified, not an empty set. Software H.264
+		// and HEVC also use this; hardware configurations alone cannot reject it.
+		if (!formats)
+			return true;
+		const auto* pixels = static_cast<const AVPixelFormat*>(formats);
+		for (int i = 0; i < count; ++i) {
+			const auto* descriptor = av_pix_fmt_desc_get(pixels[i]);
+			if (descriptor && (descriptor->flags & AV_PIX_FMT_FLAG_HWACCEL) == 0)
+				return true;
+		}
+		return false;
 	}
 
 	bool MatchesCodec(const AVCodec* decoder, const Tables::Codec::CodecDef& identity) noexcept {
@@ -78,6 +104,7 @@ namespace {
 		}
 		return false;
 	}
+
 }
 
 Codec::Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept

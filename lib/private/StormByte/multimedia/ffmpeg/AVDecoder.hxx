@@ -109,7 +109,8 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param stream_index Stream index this decoder serves.
 			 * @return Decoder or DecoderError.
 			 */
-			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params, const AVFormatContext& fmt, int stream_index) noexcept;
+			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
+				const AVFormatContext& fmt, int stream_index, int thread_count = 0) noexcept;
 
 			/**
 			 * @brief Opens a decoder from codec and parameters. No BSF.
@@ -123,7 +124,8 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * Encoder, so mp4→Annex-B is not applied. Use the
 			 * four-argument Open when the parent format is known.
 			 */
-			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params, int stream_index) noexcept;
+			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
+				int stream_index, int thread_count = 0) noexcept;
 
 			/**
 			 * @brief Sends a packet (after BSF) to the decoder.
@@ -193,7 +195,8 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param stream_index Bound stream index.
 			 * @return Decoder or DecoderError. BSF is empty.
 			 */
-			static ExpectedAVDecoder OpenRaw(AVCodec* codec, const AVCodecParameters& params, int stream_index) noexcept;
+			static ExpectedAVDecoder OpenRaw(AVCodec* codec, const AVCodecParameters& params,
+				int stream_index, int thread_count) noexcept;
 
 			/**
 			 * @brief Frees the codec context.

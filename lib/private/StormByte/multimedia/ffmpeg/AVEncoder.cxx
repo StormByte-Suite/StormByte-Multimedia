@@ -477,7 +477,7 @@ FFmpeg::AVEncoder::~AVEncoder() noexcept {
 
 FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base,
-	const AVFrame* firstFrame) noexcept {
+	const AVFrame* firstFrame, int thread_count) noexcept {
 	const std::string codec_name_copy{codec_name};
 	const AVCodec* codec = avcodec_find_encoder_by_name(codec_name_copy.c_str());
 	if (!codec || !params.Get())
@@ -532,7 +532,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		}
 	}
 
-	ctx->thread_count = 0;
+	ctx->thread_count = thread_count;
 	ctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
 	ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 

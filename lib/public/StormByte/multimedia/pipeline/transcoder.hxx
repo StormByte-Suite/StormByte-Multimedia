@@ -61,6 +61,7 @@
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
+#include <StormByte/multimedia/pipeline/resource_usage.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
@@ -696,6 +697,27 @@ namespace StormByte {
 					 * @return *this.
 					 */
 					Transcoder& Attachments(std::string_view pattern) noexcept;
+
+					/**
+					 * @brief Resource policy selected for this job.
+					 * @return Policy, defaulting to @ref ResourceUsage::Full.
+					 */
+					ResourceUsage Resources() const noexcept;
+
+					/**
+					 * @brief Selects a resource policy before @ref Run.
+					 * @param usage Full, approximately half of available process CPUs,
+					 *        or at most two CPUs, with smaller frame queues for reduced modes.
+					 *
+					 * Full preserves the historical defaults. Medium and Low distribute
+					 * a best-effort thread budget across decode/encode lanes and reduce
+					 * queued video frames. Encoder options are applied only when supported.
+					 * Explicit FineTune values that control threading conflict with Medium
+					 * or Low and fail the job rather than bypassing the selected policy.
+					 * This is not a hard CPU or RSS limit; codec libraries, filters and
+					 * drivers may use additional resources.
+					 */
+					void Resources(ResourceUsage usage) noexcept;
 
 					/**
 					 * @brief Drops an origin stream (omit from the Plan).

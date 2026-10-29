@@ -130,7 +130,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 */
 			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 				const Safe::Map<Safe::String, Safe::String>& options, AVRational time_base,
-				const AVFrame* firstFrame = nullptr) noexcept;
+				const AVFrame* firstFrame = nullptr, int thread_count = 0) noexcept;
 
 			/**
 			 * @brief Prepares exact CPU input or transfers through validated hardware frame contexts.

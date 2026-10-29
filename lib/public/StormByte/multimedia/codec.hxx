@@ -204,6 +204,8 @@ namespace StormByte {
 				 * @note Names can pin the decoder, not the encoder. Each pin must match
 				 * the source stream's codec id. Hardware-only and experimental decoders
 				 * are excluded because the backend does not configure their prerequisites.
+				 * This includes FFmpeg's native hardware-only `av1` decoder even when
+				 * its capability flags do not identify the hardware requirement.
 				 * Unclassified generic and subtitle defaults have empty features and only
 				 * satisfy empty requirements. Filtering never changes the unpinned backend
 				 * default: pin the returned name to select a filtered alternative.

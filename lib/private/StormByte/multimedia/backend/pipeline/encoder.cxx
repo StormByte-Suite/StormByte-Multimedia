@@ -50,6 +50,7 @@
 
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
@@ -60,6 +61,7 @@
 #include <tables/encoder/table.hxx>
 
 #include <charconv>
+#include <cctype>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -142,6 +144,22 @@ namespace {
 
 	bool HasKey(const char* key) noexcept {
 		return key && key[0] != '\0';
+	}
+
+	bool IsResourceThreadKey(std::string_view key) noexcept {
+		std::string normalized;
+		normalized.reserve(key.size());
+		for (const char c : key) {
+			if (c == '-' || c == '_')
+				continue;
+			normalized.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+		}
+		return normalized == "threads" || normalized == "threadcount"
+			|| normalized == "logicalprocessors" || normalized == "lp"
+			|| normalized == "pools" || normalized == "numapools"
+			|| normalized == "framethreads" || normalized == "lookaheadthreads"
+			|| normalized == "rowmt" || normalized == "wpp"
+			|| normalized == "kvazaarparams";
 	}
 
 	// Locale-independent shortest round-trip text ("23", "18.5").
@@ -307,6 +325,8 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 			: "no encoder for destination codec");
 		return std::nullopt;
 	}
+	const auto plan = owner.Plan();
+	const unsigned threadCount = plan ? Ceiling::StageThreads(*plan, Ceiling::MaxThreads()) : 0;
 
 	if (owner.CRF() && (!row || !HasKey(row->crf_key))) {
 		owner.Fail("encoder implementation does not support CRF");
@@ -337,6 +357,15 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 	std::map<std::string, std::string> fine;
 	for (const auto& [key, value] : fineSnapshot)
 		fine.emplace(std::string{key}, std::string{value});
+	if (threadCount > 0) {
+		for (const auto& [key, value] : fine) {
+			(void)value;
+			if (IsResourceThreadKey(key)) {
+				owner.Fail("FineTune cannot override the Transcoder resource thread policy");
+				return std::nullopt;
+			}
+		}
+	}
 	for (const auto& [key, value] : fine) {
 		(void)value;
 		if (key == "bufsize" || key == "vbv-bufsize") {
@@ -397,7 +426,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 	const bool explicitThreadCount = implementationName == "libx264" || implementationName == "libx265"
 		|| implementationName == "libopenh264" || implementationName == "libaom-av1"
 		|| implementationName == "libvpx" || implementationName == "libvpx-vp9";
-	if (explicitThreadCount && !fine.contains("threads")) {
+	if (threadCount == 0 && explicitThreadCount && !fine.contains("threads")) {
 		unsigned workers = std::thread::hardware_concurrency();
 		if (workers < 1)
 			workers = 1;
@@ -407,12 +436,22 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 			workers = Encoder::Vp9Workers(static_cast<unsigned>(std::max(params.Height(), 0)), workers);
 		opts.emplace("threads", std::to_string(workers));
 	}
+	else if (threadCount > 0 && FindOption(codec, "threads"))
+		opts.insert_or_assign("threads", std::to_string(threadCount));
 
 	const bool pack = row && HasKey(row->tune_key);
 	if (implementationName == "libx265") {
 		if (!blob.contains("wpp") && !fine.contains("wpp"))
 			blob.emplace("wpp", "1");
-		if (!blob.contains("pools") && !blob.contains("numa-pools")
+		if (threadCount > 0 && row && HasKey(row->tune_key)) {
+			if (FindOption(codec, row->tune_key)) {
+				blob.insert_or_assign("pools", std::to_string(threadCount));
+				// Keep frame-level parallelism at one so each frame shares the
+				// bounded x265 worker pool instead of multiplying it.
+				blob.insert_or_assign("frame-threads", "1");
+			}
+		}
+		else if (!blob.contains("pools") && !blob.contains("numa-pools")
 			&& !fine.contains("pools") && !fine.contains("numa-pools")) {
 			unsigned workers = std::thread::hardware_concurrency();
 			if (workers < 1)
@@ -421,8 +460,28 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		}
 	}
 
+	if (threadCount > 0 && implementationName == "libx264"
+		&& row && HasKey(row->tune_key) && FindOption(codec, row->tune_key)) {
+		blob.insert_or_assign("lookahead-threads", "1");
+	}
+
+	if (threadCount > 0 && implementationName == "libsvtav1"
+		&& row && HasKey(row->tune_key) && FindOption(codec, row->tune_key)) {
+		blob.insert_or_assign("lp", std::to_string(threadCount));
+	}
+
+	if (threadCount > 0 && implementationName == "libkvazaar"
+		&& FindOption(codec, "kvazaar-params")) {
+		opts.insert_or_assign("kvazaar-params",
+			"threads=" + std::to_string(threadCount));
+	}
+
 	if (implementationName == "libaom-av1" || implementationName == "libvpx-vp9") {
-		if (!opts.contains("row-mt") && !fine.contains("row-mt"))
+		if (threadCount > 0) {
+			if (FindOption(codec, "row-mt"))
+				opts.insert_or_assign("row-mt", threadCount > 1 ? "1" : "0");
+		}
+		else if (!opts.contains("row-mt") && !fine.contains("row-mt"))
 			opts.emplace("row-mt", "1");
 	}
 
@@ -538,7 +597,8 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 	for (const auto& [key, value] : opts)
 		options.emplace(StormByte::Safe::String{key}, StormByte::Safe::String{value});
 	auto opened = StormByte::Multimedia::FFmpeg::AVEncoder::Open(
-		row->name, params, owner.Index(), options, timeBase, firstFrame);
+		row->name, params, owner.Index(), options, timeBase, firstFrame,
+		static_cast<int>(threadCount));
 	if (!opened.has_value()) {
 		owner.Fail(opened.error() ? opened.error()->what() : "Failed to open encoder");
 		return std::nullopt;

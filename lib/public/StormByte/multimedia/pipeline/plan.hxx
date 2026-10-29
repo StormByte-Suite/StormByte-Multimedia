@@ -58,6 +58,7 @@
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/multimedia/pipeline/resource_usage.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/function.hxx>
@@ -537,9 +538,43 @@ namespace StormByte {
 								m_policies.Add(policy);
 							return;
 						}
+
 						const auto clear = defined & ~bits;
 						if (clear != 0)
 							m_policies.Remove(static_cast<enum Policy>(clear));
+					}
+
+					/**
+					 * @brief Resource policy carried by this plan.
+					 * @return Best-effort policy, defaulting to @ref ResourceUsage::Full.
+					 */
+					constexpr ResourceUsage Resources() const noexcept {
+						// Keep the installed Plan layout stable by encoding this internal
+						// policy in reserved bits of its existing Policy mask.
+						if (m_policies.Has(static_cast<Policy>(1u << 30)))
+							return ResourceUsage::Low;
+						if (m_policies.Has(static_cast<Policy>(1u << 29)))
+							return ResourceUsage::Medium;
+						return ResourceUsage::Full;
+					}
+
+					/**
+					 * @brief Sets the resource policy before pipeline stages bind.
+					 * @param usage Best-effort CPU and in-memory frame queue policy.
+					 */
+					inline void Resources(ResourceUsage usage) noexcept {
+						const auto resourceBits = static_cast<Policy>((1u << 30) | (1u << 29));
+						m_policies.Remove(resourceBits);
+						switch (usage) {
+							case ResourceUsage::Medium:
+								m_policies.Add(static_cast<Policy>(1u << 29));
+								break;
+							case ResourceUsage::Low:
+								m_policies.Add(static_cast<Policy>(1u << 30));
+								break;
+							case ResourceUsage::Full:
+								break;
+						}
 					}
 
 					/**

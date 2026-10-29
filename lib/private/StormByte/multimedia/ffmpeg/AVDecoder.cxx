@@ -71,7 +71,8 @@ FFmpeg::AVDecoder::~AVDecoder() noexcept {
 	Free();
 }
 
-FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCodecParameters& params, int stream_index) noexcept {
+FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCodecParameters& params,
+	int stream_index, int thread_count) noexcept {
 	if (!codec || !params.Get())
 		return Unexpected<DecoderError>("Invalid codec or parameters");
 
@@ -84,7 +85,7 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCod
 		return Unexpected<DecoderError>("Failed to copy codec parameters");
 	}
 
-	ctx->thread_count = 0;
+	ctx->thread_count = thread_count;
 	ctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
 
 	if (Backend::FFmpeg::AVPool::Attach(*ctx) < 0) {
@@ -102,12 +103,14 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCod
 	return dec;
 }
 
-FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params, const AVFormatContext&, int stream_index) noexcept {
-	return OpenRaw(codec, params, stream_index);
+FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
+	const AVFormatContext&, int stream_index, int thread_count) noexcept {
+	return OpenRaw(codec, params, stream_index, thread_count);
 }
 
-FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params, int stream_index) noexcept {
-	return OpenRaw(codec, params, stream_index);
+FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
+	int stream_index, int thread_count) noexcept {
+	return OpenRaw(codec, params, stream_index, thread_count);
 }
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::SendPacket(AVPacket& pkt) noexcept {

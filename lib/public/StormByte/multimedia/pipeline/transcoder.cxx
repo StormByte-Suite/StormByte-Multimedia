@@ -462,6 +462,28 @@ const StormByte::Safe::Shared<StormByte::Logger::Log>& Transcoder::Logger() cons
 	return m_logger;
 }
 
+ResourceUsage Transcoder::Resources() const noexcept {
+	return m_backend ? m_backend->Resources : ResourceUsage::Full;
+}
+
+void Transcoder::Resources(ResourceUsage usage) noexcept {
+	if (!m_backend)
+		return;
+	const auto current = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
+	if (m_armed || current != Status::Stopped) {
+		Fail("resource policy must be configured before Run");
+		return;
+	}
+	switch (usage) {
+		case ResourceUsage::Full:
+		case ResourceUsage::Medium:
+		case ResourceUsage::Low:
+			m_backend->Resources = usage;
+			return;
+	}
+	Fail("unknown resource policy");
+}
+
 Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 	JobLog(m_logger, Level::LowLevel, "add-track in=" + std::to_string(in));
 	if (!m_consult && !ProbeSource())

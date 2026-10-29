@@ -223,6 +223,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			};											///< Public job lifecycle
 			StormByte::Safe::Atomic<bool> Cancel { false };	///< Cancel requested
 			StormByte::Safe::Atomic<bool> Paused { false };	///< Coordinator is paused
+			StormByte::Multimedia::Pipeline::ResourceUsage Resources = StormByte::Multimedia::Pipeline::ResourceUsage::Full;	///< Job resource policy
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Progress> Clock;	///< Demuxer clock
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;	///< Retained stage and process metrics
 			StormByte::Safe::Optional<StormByte::Safe::String> Error;			///< Failure text
