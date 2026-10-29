@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/safe/string.hxx>
@@ -59,7 +60,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
 
 extern "C" {
@@ -87,6 +87,7 @@ struct StormByte::Multimedia::Pipeline::Filter::Video::Detail::VMAF::Lane {
 	int height = 0;				///< Latched height
 	unsigned index = 0;			///< Next accepted libvmaf index
 	unsigned scored = 0;		///< Accepted pairs
+	unsigned threads = 0;		///< Effective libvmaf workers for this context
 	std::size_t peakRef = 0;		///< Peak parked refs
 	std::size_t peakDist = 0;		///< Peak parked dists
 	std::optional<double> mean;	///< Pooled mean
@@ -172,6 +173,7 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 	VmafConfiguration cfg{};
 	cfg.log_level = VMAF_LOG_LEVEL_WARNING;
 	cfg.n_threads = Threads();
+	lane.threads = cfg.n_threads;
 	cfg.n_subsample = 1;
 	if (vmaf_init(&lane.vmaf, cfg) != 0) {
 		lane.vmaf = nullptr;
@@ -353,12 +355,24 @@ unsigned VMAF::Threads() const noexcept {
 	// instrumented, so it keeps the hardware pool.
 	return 1;
 #else
-	if (m_threads)
-		return std::max<unsigned>(1u, *m_threads);
-	if (const unsigned hw = std::thread::hardware_concurrency(); hw > 0)
-		return hw;
-	return 1;
+	using Ceiling = StormByte::Multimedia::Backend::Pipeline::Ceiling;
+	const unsigned available = Ceiling::MaxThreads();
+	const unsigned requested = m_threads ? std::max<unsigned>(1u, *m_threads) : available;
+	const auto& plan = m_plan;
+	if (!plan || plan->Resources() == ResourceUsage::Full)
+		return requested;
+	std::size_t videos = 0;
+	for (const auto& track : plan->Tracks())
+		if (track && track->Type() == Type::Video)
+			++videos;
+	const auto budget = Ceiling::StageThreads(plan->Resources(), available, std::max<std::size_t>(videos, 1) * 3);
+	const unsigned memoryWorkers = plan->Resources() == ResourceUsage::Low ? 1u : 4u;
+	return std::min({requested, budget, memoryWorkers});
 #endif
+}
+
+StormByte::Size VMAF::InputCeiling() const noexcept {
+	return PendingCeiling(Ceiling);
 }
 
 void VMAF::Process(const Pipeline::Frame& frame) noexcept {
@@ -472,6 +486,7 @@ void VMAF::Eof() noexcept {
 class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexcept {
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	data.emplace(StormByte::Safe::String("model"), m_modelName);
+	data.emplace(StormByte::Safe::String("input_ceiling"), std::to_string(InputCeiling()));
 	bool failed = Failed() || m_lanes.empty();
 	unsigned ok = 0;
 	for (const auto& [track, lanePointer] : m_lanes) {
@@ -499,6 +514,7 @@ class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexc
 		data.emplace(key(track, "frames"), std::to_string(lane.scored));
 		data.emplace(key(track, "width"), std::to_string(lane.width));
 		data.emplace(key(track, "height"), std::to_string(lane.height));
+		data.emplace(key(track, "threads"), std::to_string(lane.threads));
 	}
 
 	if (failed || ok == 0)

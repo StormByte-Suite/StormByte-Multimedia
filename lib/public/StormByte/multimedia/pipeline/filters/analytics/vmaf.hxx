@@ -118,17 +118,22 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Memory
 	 * Unpaired frames may be retained to accommodate encoder delay.
 	 * @ref Eof waits for outstanding measurements.
-	 * @ref InputCeiling (512) limits pending input, not frames awaiting
+	 * @ref InputCeiling limits pending input, not frames awaiting
 	 * a matching look. Measurement memory scales with thread count
 	 * and resolution, not duration.
-	 * Default n_threads is
-	 * @c std::thread::hardware_concurrency() (all cores).
+	 * Full uses the available process CPUs unless an explicit worker count is supplied.
+	 * Medium and Low also constrain libvmaf, even with an explicit worker count:
+	 * the job CPU target is shared across video lanes and codec/analytics stages,
+	 * with a memory-conscious maximum of four workers for Medium and one for Low.
+	 * Input hoppers shrink from 512 looks to eight for Medium and two for Low.
 	 * 4K 10-bit (`vmaf_4k_v0.6.1`, subsample 1) at 32
 	 * threads holds ~18.5 GiB for the extractors (massif
 	 * plateau; peak ~20.5 GiB at init). RSS is the same
 	 * order. A second video track opens another context of
 	 * that size. Pass a smaller thread count in the
-	 * constructor to cap it.
+	 * constructor or select a reduced resource policy to reduce it.
+	 * Unpaired references required by encoder latency and native codec allocations
+	 * still contribute to RSS; these policies are not a hard process-memory ceiling.
 	 *
 	 * @par When to read the report
 	 * Muxer closed is not Eof on this node. Wait until the
@@ -146,8 +151,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief VMAF with a built-in libvmaf model version.
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param model libvmaf version key (`vmaf_4k_v0.6.1`).
-			 * @param threads libvmaf worker count. Empty uses all
-			 *        cores (`std::thread::hardware_concurrency()`).
+			 * @param threads libvmaf worker count. Empty uses process-available CPUs in Full.
+			 *        Medium/Low clamp this count to their CPU and analytics memory targets.
 			 *
 			 * RAM follows threads × resolution, not duration. 4K
 			 * 10-bit (`vmaf_4k_v0.6.1`, subsample 1) at 32 threads
@@ -191,14 +196,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Ceiling of the analytics input hopper.
-			 * @return Max items in the hopper. Never 0.
+			 * @return 512 in Full, eight in Medium, two in Low. Never zero.
 			 *
-			 * Must exceed encoder delay or the first distorted
-			 * look cannot arrive. Does not cap the park FIFOs.
+			 * The worker drains unpaired input into separate park FIFOs,
+			 * allowing the other look to arrive even with encoder delay.
+			 * This cap does not limit those park FIFOs.
 			 */
-			StormByte::Size InputCeiling() const noexcept override {
-				return Ceiling;
-			}
+			StormByte::Size InputCeiling() const noexcept override;
 
 			/**
 			 * @brief Pooled VMAF after EoF.
@@ -206,7 +210,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 *
 			 * One scored track: `vmaf_mean` / `vmaf_min` / `frames`.
 			 * Several: `0.vmaf_mean`, `1.vmaf_mean` (origin index).
-			 * No mean of means.
+			 * No mean of means. `threads` reports effective workers per track;
+			 * `input_ceiling` reports the shared pending-input cap.
 			 */
 			class Filter::Report Report() const noexcept override;
 

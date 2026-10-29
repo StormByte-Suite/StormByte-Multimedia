@@ -502,6 +502,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 
 	for (const auto& filter : Analytics)
 		graph.Add(filter);
+	graph.BindPlan(built);
 	graph.Close();
 	built >> *demux;
 	if (built->State(StormByte::Multimedia::Pipeline::Plan::State::Running)

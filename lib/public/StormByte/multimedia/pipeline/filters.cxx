@@ -312,6 +312,14 @@ void Filters::Close() noexcept {
 	m_measureDrained.store(std::uint64_t{0}, StormByte::Safe::MemoryOrder::Release);
 }
 
+void Filters::BindPlan(StormByte::Safe::Shared<const class Plan> plan) noexcept {
+	for (const auto& item : m_reports) {
+		if (!item.Filter)
+			continue;
+		item.Filter->m_plan = plan;
+	}
+}
+
 bool Filters::Measuring() const noexcept {
 	return m_measuring;
 }

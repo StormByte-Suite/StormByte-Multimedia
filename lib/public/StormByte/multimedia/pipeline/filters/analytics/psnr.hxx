@@ -122,8 +122,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @par Memory
 	 * Unpaired frames may be retained to accommodate encoder delay.
-	 * @ref InputCeiling (512) limits pending input, not frames awaiting
-	 * a matching look. @ref Eof completes end-of-input processing.
+	 * @ref InputCeiling limits pending input, not frames awaiting a matching
+	 * look: 512 in Full, eight in Medium, two in Low.
+	 * @ref Eof completes end-of-input processing.
 	 *
 	 * @par When to read the report
 	 * Muxer closed is not Eof on this node. Wait until the
@@ -182,7 +183,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * look cannot arrive. Does not cap the park FIFOs.
 			 */
 			StormByte::Size InputCeiling() const noexcept override {
-				return Ceiling;
+				return PendingCeiling(Ceiling);
 			}
 
 			/**

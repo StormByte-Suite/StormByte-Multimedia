@@ -55,6 +55,16 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Reduced resource policies now apply to VMAF workers and its pending-input
+  hopper, including when a larger worker count was explicitly supplied.
+  Medium uses at most four libvmaf workers per video context and Low one,
+  additionally sharing the job CPU target across video lanes and analysis.
+  This substantially reduces libvmaf's resolution-dependent extractor memory
+  without subsampling frames or changing the selected model. Reports expose
+  the effective `threads` count. Filter frame caps, audio queues and compressed
+  packet caps now also follow the selected resource policy, as do the PSNR,
+  SSIM and XPSNR pending-input hoppers. Filter routes now receive the job Plan
+  before their capacities and resource-sensitive operations are configured.
 - Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported
   `lp` parallelism level instead of passing the thread count as the level.
   SVT-AV1 documents `lp` as a parallelism/buffering tier, not a processor

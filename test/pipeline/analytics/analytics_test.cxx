@@ -62,14 +62,20 @@ using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
 namespace {
-static int CheckVmafRemux(std::string_view source, std::string_view destination) {
+static int CheckVmafRemux(std::string_view source, std::string_view destination,
+	ResourceUsage resources = ResourceUsage::Full, unsigned short workers = 2) {
 	const auto output = OutputPath(destination);
 	auto logger = MakeLogger();
 	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger, 2000000000LL};
 	job.Video(0).Remux();
-	job.Filter<StormByte::Multimedia::Pipeline::Filter::Video::VMAF>(
-		logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"}, static_cast<unsigned short>(2));
+	job.Resources(resources);
+	if (workers == 0)
+		job.Filter<StormByte::Multimedia::Pipeline::Filter::Video::VMAF>(
+			logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"});
+	else
+		job.Filter<StormByte::Multimedia::Pipeline::Filter::Video::VMAF>(
+			logger, StormByte::Safe::String{"vmaf_4k_v0.6.1"}, workers);
 	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 	TEST_PHASE("starting transcoder run");
 	job.Run();
@@ -89,6 +95,15 @@ static int CheckVmafRemux(std::string_view source, std::string_view destination)
 	TEST_REQUIRE(score == 100.0);
 	TEST_REQUIRE(minimum == 100.0);
 	TEST_REQUIRE(frames == 48);
+	const auto threads = std::stoul(std::string{TestView(data.at(StormByte::Safe::String{"threads"}))});
+	const auto ceiling = std::stoul(std::string{TestView(data.at(StormByte::Safe::String{"input_ceiling"}))});
+	TEST_REQUIRE(ceiling == (resources == ResourceUsage::Low ? 2 : resources == ResourceUsage::Medium ? 8 : 512));
+	if (resources == ResourceUsage::Low)
+		TEST_REQUIRE(threads == 1);
+	else if (resources == ResourceUsage::Medium)
+		TEST_REQUIRE(threads >= 1 && threads <= 4 && threads <= workers);
+	else
+		TEST_REQUIRE(threads >= 1 && threads <= workers);
 	return 0;
 }
 }
@@ -104,10 +119,21 @@ int test_transcoder_vmaf_hevc_remux_matches_source_at_100() {
 	return CheckVmafRemux("video/anime_like.mkv", "pipeline/vmaf-hevc-remux.mkv");
 }
 
+int test_transcoder_vmaf_reduced_resources_clamp_explicit_workers() {
+	const int low = CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-low.mkv", ResourceUsage::Low, 32);
+	if (low != 0)
+		return low;
+	const int automatic = CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-low-automatic.mkv", ResourceUsage::Low, 0);
+	if (automatic != 0)
+		return automatic;
+	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-medium.mkv", ResourceUsage::Medium, 32);
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_transcoder_vmaf_remux_matches_source_at_100", test_transcoder_vmaf_remux_matches_source_at_100},
 		TestEntry{"test_transcoder_vmaf_hevc_remux_matches_source_at_100", test_transcoder_vmaf_hevc_remux_matches_source_at_100},
+		TestEntry{"test_transcoder_vmaf_reduced_resources_clamp_explicit_workers", test_transcoder_vmaf_reduced_resources_clamp_explicit_workers},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

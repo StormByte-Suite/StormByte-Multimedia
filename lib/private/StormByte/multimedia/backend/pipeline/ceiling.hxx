@@ -131,8 +131,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			~Ceiling() noexcept = default;
 
 			/**
-			 * @brief Hardware thread count, at least `1`.
-			 * @return Cached `std::thread::hardware_concurrency()`.
+			 * @brief Process-available CPU count, at least one.
+			 * @return Cached FFmpeg CPU count, respecting process CPU affinity.
 			 */
 			static unsigned MaxThreads() noexcept;
 

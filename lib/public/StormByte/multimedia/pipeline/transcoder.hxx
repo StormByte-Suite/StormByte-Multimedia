@@ -711,7 +711,10 @@ namespace StormByte {
 					 *
 					 * Full preserves the historical defaults. Medium and Low distribute
 					 * a best-effort thread budget across decode/encode lanes and reduce
-					 * queued video frames. Encoder options are applied only when supported.
+					 * queued frames and packets, including filter and analytics input.
+					 * VMAF also reduces its memory-intensive extractor pool (at most four
+					 * workers in Medium and one in Low, even with an explicit worker count).
+					 * Encoder options are applied only when supported.
 					 * Explicit FineTune values that control threading conflict with Medium
 					 * or Low and fail the job rather than bypassing the selected policy.
 					 * This is not a hard CPU or RSS limit; codec libraries, filters and

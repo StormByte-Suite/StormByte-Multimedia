@@ -117,8 +117,11 @@ int Route::Track() const noexcept {
 }
 
 void Route::Observe(StormByte::Safe::Shared<Filter::FFmpeg> analytics) noexcept {
-	if (analytics)
+	if (analytics) {
+		if (m_origin && m_origin->Plan())
+			analytics->m_plan = m_origin->Plan();
 		m_analytics.push_back(std::move(analytics));
+	}
 }
 
 Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
@@ -137,6 +140,9 @@ Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
 	const bool packet = receives.Has(Kind::Packet);
 
 	Filter::FFmpeg& node = *filter;
+	if (m_origin)
+		node.m_plan = m_origin->Plan();
+	node.m_origin = m_track;
 	const bool analytics = static_cast<bool>(StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter));
 	if (analytics)
 		m_analytics.push_back(filter);
@@ -198,6 +204,7 @@ void Route::Close() noexcept {
 			destination.Fail(StormByte::Safe::String::ReplaceToken("{} media does not match this stretch", filter->Name()));
 			return;
 		}
+		Cap(filter->pipe(), m_track, filter->InputCeiling());
 	}
 
 	if (!origin.Connect(destination))

@@ -229,8 +229,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		const bool encode = Encodes(track);
 		const bool video = track.Type() == Type::Video;
 		const bool audio = track.Type() == Type::Audio;
-		const std::size_t cheap = CheapPackets();
-		const std::size_t remux = RemuxPackets();
+		const std::size_t cheap = ResourceFrames(plan->Resources(), CheapPackets());
+		const std::size_t remux = ResourceFrames(plan->Resources(), RemuxPackets());
 		switch (producer) {
 			case Producer::Demuxer:
 				// Park + out hopper share the remux budget so the file reader
@@ -276,7 +276,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				if (!encode)
 					break;
 				if (video)
-					m_frames = VideoFrames();
+					m_frames = ResourceFrames(plan->Resources(), VideoFrames());
 				else
 					m_packets = cheap;
 				break;

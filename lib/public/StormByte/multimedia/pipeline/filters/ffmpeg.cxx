@@ -53,6 +53,7 @@
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/backend/pipeline/host.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/log.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
@@ -256,11 +257,19 @@ const StormByte::Safe::Optional<StormByte::Safe::String>& FFmpeg::Error() const 
 }
 
 StormByte::Size FFmpeg::InputCeiling() const noexcept {
+	const auto usage = m_plan ? m_plan->Resources() : ResourceUsage::Full;
 	if (Media() == StormByte::Multimedia::Type::Video && m_receives.Has(Kind::Frame))
-		return 27;
+		return StormByte::Multimedia::Backend::Pipeline::Ceiling::ResourceFrames(usage, 27);
 	if (m_receives.Has(Kind::Frame) || m_receives.Has(Kind::Packet))
-		return 32;
+		return StormByte::Multimedia::Backend::Pipeline::Ceiling::ResourceFrames(usage, 32);
 	return 0;
+}
+
+StormByte::Size Analytics::PendingCeiling(StormByte::Size full) const noexcept {
+	if (!m_plan || m_plan->Resources() == ResourceUsage::Full)
+		return full;
+	const StormByte::Size reduced = m_plan->Resources() == ResourceUsage::Low ? 2 : 8;
+	return std::min(full, reduced);
 }
 
 void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexcept {

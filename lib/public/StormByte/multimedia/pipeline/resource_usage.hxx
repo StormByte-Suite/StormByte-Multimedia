@@ -63,7 +63,8 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @enum ResourceUsage
 	 * @brief Relative CPU and buffering policy for a Transcoder job.
 	 *
-	 * These settings guide thread counts and in-memory frame queue limits.
+	 * These settings guide thread counts and in-memory frame/packet queue limits,
+	 * including filter queues and VMAF's memory-intensive analysis worker pool.
 	 * They are best-effort hints: FFmpeg, encoder libraries, filters and
 	 * hardware drivers may create workers outside Multimedia's control.
 	 *

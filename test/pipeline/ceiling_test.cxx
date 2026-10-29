@@ -1,8 +1,10 @@
 #include "helpers.hxx"
 
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
+#include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
+#include <StormByte/multimedia/registry.hxx>
 
 #include <array>
 #include <cstdint>
@@ -64,6 +66,26 @@ namespace {
 		const Ceiling lowVideo{plan, Producer::Decoder, plan->Tracks()[0]};
 		TEST_REQUIRE(lowVideo.Frames() >= 2 && lowVideo.Frames() <= mediumVideo.Frames());
 		TEST_REQUIRE(lowVideo.Packets() == lowVideo.Frames());
+		const auto codec = Registry::Instance().FindCodec("VP9");
+		TEST_REQUIRE(codec);
+		Config::Video video;
+		video.Codec(codec->get());
+		Track encoded{2, std::move(video)};
+		for (const auto usage : {ResourceUsage::Full, ResourceUsage::Medium, ResourceUsage::Low}) {
+			plan->Resources(usage);
+			const auto expected = Ceiling::ResourceFrames(usage, fullFrames);
+			const auto packets = Ceiling::ResourceFrames(usage, 8);
+			for (const auto producer : {Producer::Decoder, Producer::Encoder, Producer::Filter}) {
+				const Ceiling cap{plan, producer, encoded};
+				TEST_REQUIRE(cap.Frames() == expected);
+			}
+			for (const auto producer : {Producer::Demuxer, Producer::Remuxer, Producer::Muxer}) {
+				const Ceiling cap{plan, producer, encoded};
+				TEST_REQUIRE(cap.Packets() == packets);
+			}
+			const Ceiling audio{plan, Producer::Decoder, plan->Tracks()[1]};
+			TEST_REQUIRE(audio.Frames() == packets);
+		}
 		return 0;
 	}
 

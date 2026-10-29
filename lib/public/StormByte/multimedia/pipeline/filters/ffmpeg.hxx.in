@@ -1092,6 +1092,14 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
 
 			/**
+			 * @brief Constrains pending analytics looks for the selected resource policy.
+			 * @param full Maximum pending looks in Full.
+			 * @return Full capacity, at most eight in Medium, or at most two in Low.
+			 * @note Unpaired looks needed by encoder delay are parked separately.
+			 */
+			StormByte::Size PendingCeiling(StormByte::Size full) const noexcept;
+
+			/**
 			 * @brief Deleted. Analytics must not rewrite the current frame.
 			 * @param incoming Ignored.
 			 */

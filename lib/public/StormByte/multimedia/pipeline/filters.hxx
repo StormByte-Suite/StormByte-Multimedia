@@ -426,6 +426,12 @@ namespace StormByte {
 					void BindClock() noexcept;
 
 					/**
+					 * @brief Publishes the job resource policy to leaves before routes close.
+					 * @param plan Complete job intention; no stage is started by this operation.
+					 */
+					void BindPlan(StormByte::Safe::Shared<const class Plan> plan) noexcept;
+
+					/**
 					 * @brief Marks analytics complete on the shared clock if Idle.
 					 *
 					 * Friend: Backend::Pipeline::Transcoder. Not a user hook.
