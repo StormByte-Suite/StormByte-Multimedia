@@ -144,10 +144,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		raw.Timestamps(NsToTicks(packet->Pts(), m_timeBase), NsToTicks(packet->Dts(), m_timeBase), duration);
 
 		const auto result = m_decoder.SendPacket(raw);
-		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Error) {
-			owner.Fail("failed to send packet");
-			return false;
-		}
+		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Error)
+			return RejectedPacket(owner, *packet, m_decoder.PacketError());
 
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
 			return false;

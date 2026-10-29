@@ -100,7 +100,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Sends one compressed packet.
 			 * @param owner Public decoder.
 			 * @param packet Compressed packet. Not empty.
-			 * @return true if libav accepted it. false if the codec is full.
+			 * @return true if consumed, including invalid data skipped with a warning.
+			 * false if the codec is full or the stage failed.
 			 */
 			virtual bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
 				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
@@ -147,6 +148,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return *this.
 			 */
 			Decoder& operator=(Decoder&& other) noexcept = default;
+
+			/**
+			 * @brief Warns and consumes invalid input; other submission errors fail the stage.
+			 * @return true only for recoverable invalid packet data.
+			 */
+			bool RejectedPacket(StormByte::Multimedia::Pipeline::Decoder& owner,
+				const StormByte::Multimedia::Pipeline::Packet& packet, int error) noexcept;
 
 			/**
 			 * @brief Binds a decoded handle onto @p frame through the public decoder.

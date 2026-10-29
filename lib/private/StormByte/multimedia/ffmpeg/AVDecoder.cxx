@@ -114,15 +114,19 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecP
 }
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::SendPacket(AVPacket& pkt) noexcept {
-	if (pkt.StreamIndex() != m_stream_index)
+	m_packet_error = 0;
+	if (pkt.StreamIndex() != m_stream_index) {
+		m_packet_error = AVERROR(EINVAL);
 		return OperationResult::Error;
+	}
 
 	AVPacket filtered_pkt = pkt.Ref();
-	int ret = m_bsf_pipeline.Process(filtered_pkt);
-	if (ret < 0)
-		return OperationResult::Error;
+	const auto filtered = m_bsf_pipeline.Process(filtered_pkt);
+	if (filtered != OperationResult::Success)
+		return filtered;
 
-	ret = avcodec_send_packet(m_ptr, filtered_pkt.Get());
+	const int ret = avcodec_send_packet(m_ptr, filtered_pkt.Get());
+	m_packet_error = ret < 0 ? ret : 0;
 	if (ret == AVERROR(EAGAIN))
 		return OperationResult::TryAgain;
 	if (ret == AVERROR_EOF)
@@ -130,6 +134,10 @@ FFmpeg::OperationResult FFmpeg::AVDecoder::SendPacket(AVPacket& pkt) noexcept {
 	if (ret < 0)
 		return OperationResult::Error;
 	return OperationResult::Success;
+}
+
+int FFmpeg::AVDecoder::PacketError() const noexcept {
+	return m_packet_error;
 }
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::ReceiveFrame(AVFrame& frame) noexcept {

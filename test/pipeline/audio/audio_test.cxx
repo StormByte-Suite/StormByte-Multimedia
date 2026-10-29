@@ -56,8 +56,11 @@
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
+#include <algorithm>
 #include <array>
 #include <atomic>
+#include <fstream>
+#include <iterator>
 #include <vector>
 
 using namespace StormByte::Multimedia;
@@ -66,6 +69,81 @@ using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
 namespace {
+int CheckRejectedAviPacket(std::string_view chunk, unsigned rejectedIndex, bool loudnorm) {
+	const auto opus = Registry::Instance().FindCodec("Opus");
+	const auto h264 = Registry::Instance().FindCodec("H.264");
+	TEST_REQUIRE(opus && h264);
+	if (!opus->get().HasAccess(Access{Operation::Write})
+		|| !h264->get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+	const auto input = OutputPath("pipeline/rejected-packet.avi");
+	const auto output = OutputPath("pipeline/recovered-packet.mkv");
+	{
+		std::ifstream source(FixturePath("video/xvid_mp3_stereo.avi"), std::ios::binary);
+		TEST_REQUIRE(source);
+		std::vector<char> bytes{std::istreambuf_iterator<char>{source}, std::istreambuf_iterator<char>{}};
+		const auto marker = std::string_view{bytes.data(), bytes.size()}.find("movi");
+		TEST_REQUIRE(marker != std::string_view::npos);
+		bool replaced = false;
+		unsigned index = 0;
+		for (std::size_t offset = marker + 4; offset + 8 <= bytes.size();) {
+			std::uint32_t size = 0;
+			for (unsigned byte = 0; byte < 4; ++byte)
+				size |= static_cast<std::uint32_t>(static_cast<unsigned char>(bytes[offset + 4 + byte])) << (8 * byte);
+			TEST_REQUIRE(size <= bytes.size() - offset - 8);
+			if (std::string_view{bytes.data() + offset, 4} == chunk && index++ == rejectedIndex) {
+				TEST_REQUIRE(size > 19);
+				const auto first = bytes.begin() + offset + 8;
+				if (chunk == "01wb") {
+					// Keep an MP3 sync word after a partial-frame prefix, as in cut legacy AVIs.
+					std::move_backward(first, first + size - 19, first + size);
+					std::fill_n(first, 19, '\x11');
+				}
+				else
+					std::fill_n(first, size, '\0');
+				replaced = true;
+				break;
+			}
+			offset += 8 + size + (size & 1);
+		}
+		TEST_REQUIRE(replaced);
+		std::ofstream destination(input, std::ios::binary);
+		destination.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+		TEST_REQUIRE(destination.good());
+	}
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(input), TestLocation(output), logger};
+	job.Video(0).Codec(h264->get());
+	auto audio = job.Audio(1);
+	audio.Codec(opus->get());
+	if (loudnorm)
+		audio.Filter<Filter::Audio::Loudnorm>(logger);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	const auto opened = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(opened && opened->Streams().size() == 2);
+	TEST_REQUIRE(opened->Streams()[0].Codec().Name() == "H.264"sv);
+	const auto stream = opened->Streams()[1];
+	TEST_REQUIRE(stream.Codec().Name() == "Opus"sv);
+	TEST_REQUIRE(stream.Audio() && stream.Audio()->Channels() == 2);
+	TEST_REQUIRE(opened->Duration() && opened->Duration()->Nanoseconds().count() >= 1900000000LL);
+	unsigned decodedTracks = 0;
+	for (const auto& stage : job.Telemetry()->Stages()) {
+		TEST_REQUIRE(!stage.Metrics->Error());
+		if (TestView(stage.Name) == "Decoder(t=1)"sv) {
+			TEST_REQUIRE(stage.Metrics->OutputFrames() >= 70);
+			++decodedTracks;
+		}
+		if (TestView(stage.Name) == "Decoder(t=0)"sv) {
+			TEST_REQUIRE(stage.Metrics->OutputFrames() >= 24);
+			++decodedTracks;
+		}
+	}
+	TEST_REQUIRE(decodedTracks == 2);
+	return 0;
+}
+
 class AudioPacketCounter final: public Filter::Packet {
 	public:
 		AudioPacketCounter(StormByte::Safe::Shared<StormByte::Logger::Log> log,
@@ -443,8 +521,23 @@ int test_transcoder_remuxes_video_with_two_original_and_encoded_audios() {
 	return 0;
 }
 
+int test_transcoder_recovers_rejected_initial_avi_mp3_packet() {
+	return CheckRejectedAviPacket("01wb", 0, false);
+}
+
+int test_transcoder_recovers_rejected_avi_mp3_packet_with_loudnorm() {
+	return CheckRejectedAviPacket("01wb", 30, true);
+}
+
+int test_transcoder_recovers_rejected_avi_video_packet() {
+	return CheckRejectedAviPacket("00dc", 0, false);
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_recovers_rejected_initial_avi_mp3_packet", test_transcoder_recovers_rejected_initial_avi_mp3_packet},
+		TestEntry{"test_transcoder_recovers_rejected_avi_mp3_packet_with_loudnorm", test_transcoder_recovers_rejected_avi_mp3_packet_with_loudnorm},
+		TestEntry{"test_transcoder_recovers_rejected_avi_video_packet", test_transcoder_recovers_rejected_avi_video_packet},
 		TestEntry{"test_transcoder_remuxes_video_with_two_original_and_encoded_audios", test_transcoder_remuxes_video_with_two_original_and_encoded_audios},
 		TestEntry{"test_transcoder_remuxes_and_encodes_same_audio", test_transcoder_remuxes_and_encodes_same_audio},
 		TestEntry{"test_transcoder_encodes_and_remuxes_same_audio", test_transcoder_encodes_and_remuxes_same_audio},

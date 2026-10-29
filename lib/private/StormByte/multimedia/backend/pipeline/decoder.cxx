@@ -50,13 +50,35 @@
 
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
+
+extern "C" {
+	#include <libavutil/error.h>
+}
 
 using StormByte::Multimedia::Backend::Pipeline::Decoder;
 using StormByte::Multimedia::Backend::Pipeline::Frame;
 using PublicDecoder = StormByte::Multimedia::Pipeline::Decoder;
 using PublicFrame = StormByte::Multimedia::Pipeline::Frame;
+
+bool Decoder::RejectedPacket(PublicDecoder& owner,
+	const StormByte::Multimedia::Pipeline::Packet& packet, int error) noexcept {
+	const auto reason = error != 0 ? StormByte::Multimedia::FFmpeg::ErrorToString(error)
+		: StormByte::Safe::String{"bitstream filter failed"};
+	const auto message = StormByte::Safe::String::ReplaceToken(
+		"packet rejected t={} serial={} bytes={}: {}",
+		packet.Track(), packet.Serial().value_or(0),
+		static_cast<std::size_t>(packet.Payload().Available()), std::string_view{reason});
+	if (error == AVERROR_INVALIDDATA) {
+		owner.Log(StormByte::Logger::Level::Warning,
+			StormByte::Safe::String::ReplaceToken("{}; skipping packet and continuing decoding", std::string_view{message}));
+		return true;
+	}
+	owner.Fail(message);
+	return false;
+}
 
 void Decoder::BindFrame(PublicDecoder& owner, PublicFrame& frame,
 	StormByte::Safe::Unique<Frame> holder) noexcept {

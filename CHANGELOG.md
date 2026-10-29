@@ -55,6 +55,11 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Audio and video decoders now warn and continue after a packet submission
+  returns FFmpeg's recoverable `AVERROR_INVALIDDATA`, instead of cancelling the
+  entire job. This handles rejected MP3 packets in older DivX/Xvid AVI files,
+  including loudness measurement passes. Packet warnings identify the track,
+  serial, size and FFmpeg error; other submission errors remain fatal.
 - Reduced resource policies now apply to VMAF workers and its pending-input
   hopper, including when a larger worker count was explicitly supplied.
   Medium uses at most four libvmaf workers per video context and Low one,

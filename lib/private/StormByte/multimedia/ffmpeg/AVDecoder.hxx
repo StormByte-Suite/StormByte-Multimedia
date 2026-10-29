@@ -135,6 +135,11 @@ namespace StormByte::Multimedia::FFmpeg {
 			FFmpeg::OperationResult SendPacket(AVPacket& pkt) noexcept;
 
 			/**
+			 * @brief FFmpeg error from the last SendPacket call, or zero.
+			 */
+			int PacketError() const noexcept;
+
+			/**
 			 * @brief Receives a decoded frame.
 			 * @param frame Destination frame.
 			 * @return Operation result.
@@ -180,6 +185,7 @@ namespace StormByte::Multimedia::FFmpeg {
 
 		private:
 			int m_stream_index = -1;		///< Bound stream index
+			int m_packet_error = 0;		///< Last packet submission error.
 			AVBSFPipeline m_bsf_pipeline;	///< Optional BSF chain
 
 			/**
