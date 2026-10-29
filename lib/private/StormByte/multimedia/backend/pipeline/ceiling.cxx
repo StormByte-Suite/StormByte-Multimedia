@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/pipeline/config/audio.hxx>
 #include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/multimedia/pipeline/config/video.hxx>
+#include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/type.hxx>
 
 #include <algorithm>
@@ -83,7 +84,7 @@ namespace {
 		return false;
 	}
 
-	std::size_t AvailableRam() noexcept {
+	std::size_t HostAvailableRam() noexcept {
 		std::ifstream in("/proc/meminfo");
 		if (!in)
 			return 8ull * 1024ull * 1024ull * 1024ull;
@@ -96,26 +97,6 @@ namespace {
 			std::getline(in, rest);
 		}
 		return 8ull * 1024ull * 1024ull * 1024ull;
-	}
-
-	// Decoded video is the expensive unit (~16 MiB per 4K P010 frame). Packets
-	// and remux audio are cheap. The encoder lookahead (x265 default 20 + frame
-	// threads + one in flight) must stay filled or the encode thread stalls and
-	// the rest of the pipe goes idle. Cap at 32 so a second raw queue cannot
-	// double RSS. Floor at 2 so a bind with a live plan never opens an unbounded
-	// hopper. RAM/8/frame-size is a machine-wide clamp, not a per-track budget.
-	std::size_t VideoFrames() noexcept {
-		constexpr std::size_t look = 20 + 6 + 1;
-		constexpr std::size_t bytes = 16ull * 1024ull * 1024ull;
-		const std::size_t ram = AvailableRam() / 8ull / bytes;
-		std::size_t n = look;
-		if (ram < n)
-			n = ram;
-		if (n < 2)
-			n = 2;
-		if (n > 32)
-			n = 32;
-		return n;
 	}
 
 	// Compressed packets and remux audio. Measured on mixed encode+remux jobs:
@@ -135,6 +116,56 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline {
+	std::size_t Ceiling::AvailableRam() noexcept {
+		return HostAvailableRam();
+	}
+
+	std::size_t Ceiling::MemoryFrames(Multimedia::Pipeline::ResourceUsage usage,
+		std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+		std::size_t fullFrames) noexcept {
+		using Usage = Multimedia::Pipeline::ResourceUsage;
+		const std::size_t mib = 1024ull * 1024ull;
+		const std::size_t maximum = (usage == Usage::Low ? 256 : usage == Usage::Medium ? 1024 : 4096) * mib;
+		const auto reservation = std::min(availableRam / 8, maximum);
+		const auto capacity = reservation / std::max<std::size_t>(queues, 1)
+			/ std::max<std::size_t>(frameBytes, 1);
+		return std::max<std::size_t>(2, std::min(ResourceFrames(usage, fullFrames), capacity));
+	}
+
+	std::size_t Ceiling::VideoFrames(const Multimedia::Pipeline::Plan& plan,
+		std::size_t fullFrames) noexcept {
+		std::size_t lanes = 0;
+		std::size_t frameBytes = 64ull * 1024ull * 1024ull;
+		for (const auto& track : plan.Tracks())
+			if (track && track->Type() == Type::Video)
+				++lanes;
+		for (const auto& stream : plan.Snapshot().Streams()) {
+			const auto video = stream.Video();
+			if (!video)
+				continue;
+			const auto& resolution = video->Resolution();
+			// Eight bytes/pixel covers common high-depth planar RGB/YUV plus padding.
+			frameBytes = std::max(frameBytes,
+				static_cast<std::size_t>(resolution.Width()) * resolution.Height() * 8);
+		}
+		return MemoryFrames(plan.Resources(), AvailableRam(), frameBytes,
+			std::max<std::size_t>(lanes, 1) * 3, fullFrames);
+	}
+
+	unsigned Ceiling::VmafThreads(Multimedia::Pipeline::ResourceUsage usage,
+		unsigned requested, std::size_t availableRam, std::size_t pixels,
+		std::size_t lanes) noexcept {
+		using Usage = Multimedia::Pipeline::ResourceUsage;
+		const std::size_t mib = 1024ull * 1024ull;
+		// 4K 10-bit measurements reserve about 640 MiB per extractor worker.
+		const std::size_t perWorker = std::max<std::size_t>(32 * mib, pixels * 80);
+		const std::size_t fraction = usage == Usage::Low ? 16 : usage == Usage::Medium ? 8 : 4;
+		const auto memory = availableRam / fraction / std::max<std::size_t>(lanes, 1) / perWorker;
+		const unsigned maximum = usage == Usage::Low ? 1 : usage == Usage::Medium ? 4 : 16;
+		return static_cast<unsigned>(std::max<std::size_t>(1,
+			std::min<std::size_t>({std::max(requested, 1u), maximum, memory})));
+	}
+
 	const Multimedia::Pipeline::Track* Ceiling::TrackByIn(
 		const StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>& plan, int origin) noexcept {
 		if (!plan)
@@ -241,7 +272,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				break;
 			case Producer::Decoder:
 				if (video) {
-					m_frames = ResourceFrames(plan->Resources(), VideoFrames());
+					m_frames = VideoFrames(*plan);
 					m_packets = m_frames;
 				}
 				else {
@@ -257,7 +288,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					// Raw in = lookahead. Encoded out is cheap; keep it on the
 					// remux budget so the muxer does not buffer a second of
 					// compressed video while waiting on other tracks.
-					m_frames = ResourceFrames(plan->Resources(), VideoFrames());
+					m_frames = VideoFrames(*plan);
 					m_packets = remux;
 				}
 				else {
@@ -276,7 +307,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				if (!encode)
 					break;
 				if (video)
-					m_frames = ResourceFrames(plan->Resources(), VideoFrames());
+					m_frames = VideoFrames(*plan);
 				else
 					m_packets = cheap;
 				break;

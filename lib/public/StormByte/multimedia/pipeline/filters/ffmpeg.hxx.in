@@ -1094,7 +1094,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Constrains pending analytics looks for the selected resource policy.
 			 * @param full Maximum pending looks in Full.
-			 * @return Full capacity, at most eight in Medium, or at most two in Low.
+			 * @return At most 32 in Full, eight in Medium, two in Low; at least two.
+			 *        Available RAM, source geometry and lane count may reduce this further.
 			 * @note Unpaired looks needed by encoder delay are parked separately.
 			 */
 			StormByte::Size PendingCeiling(StormByte::Size full) const noexcept;

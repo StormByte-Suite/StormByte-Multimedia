@@ -123,7 +123,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Memory
 	 * Unpaired frames may be retained to accommodate encoder delay.
 	 * @ref InputCeiling limits pending input, not frames awaiting a matching
-	 * look: 512 in Full, eight in Medium, two in Low.
+	 * look: at most 32 in Full, eight in Medium, two in Low, additionally
+	 * reduced by the job's RAM-aware queue budget (minimum two).
 	 * @ref Eof completes end-of-input processing.
 	 *
 	 * @par When to read the report
@@ -179,8 +180,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Ceiling of the analytics input hopper.
 			 * @return Max items in the hopper. Never 0.
 			 *
-			 * Must exceed encoder delay or the first distorted
-			 * look cannot arrive. Does not cap the park FIFOs.
+			 * The worker parks unpaired looks separately, allowing counterparts
+			 * to arrive even with encoder delay. Does not cap the park FIFOs.
 			 */
 			StormByte::Size InputCeiling() const noexcept override {
 				return PendingCeiling(Ceiling);
@@ -261,7 +262,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Analytics input hopper ceiling.
 			 */
-			static constexpr StormByte::Size Ceiling = 512;
+			static constexpr StormByte::Size Ceiling = 32;
 
 			/**
 			 * @brief Finite PSNR when MSE is zero.

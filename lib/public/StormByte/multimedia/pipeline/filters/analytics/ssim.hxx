@@ -123,8 +123,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Memory
 	 * Unpaired frames may be retained to accommodate encoder delay.
 	 * @ref Eof warns about unmatched frames. @ref InputCeiling limits
-	 * pending input, not frames awaiting a matching look: 512 in Full,
-	 * eight in Medium, two in Low.
+	 * pending input, not frames awaiting a matching look: at most 32 in Full,
+	 * eight in Medium, two in Low, additionally reduced by the job's RAM-aware
+	 * queue budget (minimum two).
 	 *
 	 * @par When to read the report
 	 * Wait until the job is Done. A low score is not Fail.
@@ -250,7 +251,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Analytics hopper.
 			 */
-			static constexpr StormByte::Size Ceiling = 512;
+			static constexpr StormByte::Size Ceiling = 32;
 
 			/**
 			 * @brief SSIM window edge.

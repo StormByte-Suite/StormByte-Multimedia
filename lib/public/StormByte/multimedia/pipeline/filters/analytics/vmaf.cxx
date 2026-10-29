@@ -357,17 +357,23 @@ unsigned VMAF::Threads() const noexcept {
 #else
 	using Ceiling = StormByte::Multimedia::Backend::Pipeline::Ceiling;
 	const unsigned available = Ceiling::MaxThreads();
-	const unsigned requested = m_threads ? std::max<unsigned>(1u, *m_threads) : available;
+	unsigned requested = m_threads ? std::max<unsigned>(1u, *m_threads) : available;
 	const auto& plan = m_plan;
-	if (!plan || plan->Resources() == ResourceUsage::Full)
-		return requested;
+	const auto usage = plan ? plan->Resources() : ResourceUsage::Full;
 	std::size_t videos = 0;
-	for (const auto& track : plan->Tracks())
-		if (track && track->Type() == Type::Video)
-			++videos;
-	const auto budget = Ceiling::StageThreads(plan->Resources(), available, std::max<std::size_t>(videos, 1) * 3);
-	const unsigned memoryWorkers = plan->Resources() == ResourceUsage::Low ? 1u : 4u;
-	return std::min({requested, budget, memoryWorkers});
+	std::size_t pixels = 3840ull * 2160ull;
+	if (plan) {
+		for (const auto& track : plan->Tracks())
+			if (track && track->Type() == Type::Video)
+				++videos;
+	}
+	const auto& raw = AVFrame();
+	if (raw)
+		pixels = std::max(pixels, static_cast<std::size_t>(raw.Width()) * raw.Height());
+	if (usage != ResourceUsage::Full)
+		requested = std::min(requested, Ceiling::StageThreads(usage, available,
+			std::max<std::size_t>(videos, 1) * 3));
+	return Ceiling::VmafThreads(usage, requested, Ceiling::AvailableRam(), pixels, videos);
 #endif
 }
 

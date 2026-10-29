@@ -186,6 +186,48 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				std::size_t fullFrames) noexcept;
 
 			/**
+			 * @brief Available RAM visible to the host process.
+			 * @return Available bytes, or a conservative fallback when unavailable.
+			 */
+			static std::size_t AvailableRam() noexcept;
+
+			/**
+			 * @brief Clamp a queue by policy, available RAM and concurrent queues.
+			 * @param usage Resource policy.
+			 * @param availableRam Available bytes.
+			 * @param frameBytes Conservative bytes per raw frame.
+			 * @param queues Concurrent raw queues sharing the reservation.
+			 * @param fullFrames Full-policy item ceiling.
+			 * @return Policy-scaled capacity, additionally memory-clamped; at least two.
+			 */
+			static std::size_t MemoryFrames(Multimedia::Pipeline::ResourceUsage usage,
+				std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+				std::size_t fullFrames) noexcept;
+
+			/**
+			 * @brief Resolve video queue capacity against the job's source geometry and RAM.
+			 * @param plan Job intention.
+			 * @param fullFrames Full-policy item ceiling.
+			 * @return Memory- and policy-clamped capacity; at least two.
+			 */
+			static std::size_t VideoFrames(const Multimedia::Pipeline::Plan& plan,
+				std::size_t fullFrames = 27) noexcept;
+
+			/**
+			 * @brief Bound libvmaf workers by policy and a conservative extractor reservation.
+			 * @param usage Resource policy.
+			 * @param requested CPU-constrained worker target.
+			 * @param availableRam Available bytes.
+			 * @param pixels Largest expected video frame area.
+			 * @param lanes Concurrent video contexts.
+			 * @return At least one worker; at most 16 in Full, four in Medium, one in Low.
+			 * @note One worker is a minimum, not a hard RSS guarantee.
+			 */
+			static unsigned VmafThreads(Multimedia::Pipeline::ResourceUsage usage,
+				unsigned requested, std::size_t availableRam, std::size_t pixels,
+				std::size_t lanes) noexcept;
+
+			/**
 			 * @brief Finds a track in the plan's published track list.
 			 * @param plan Shared plan. May be empty.
 			 * @param origin Origin stream index.

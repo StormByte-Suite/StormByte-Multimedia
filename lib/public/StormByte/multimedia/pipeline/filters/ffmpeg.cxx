@@ -259,17 +259,19 @@ const StormByte::Safe::Optional<StormByte::Safe::String>& FFmpeg::Error() const 
 StormByte::Size FFmpeg::InputCeiling() const noexcept {
 	const auto usage = m_plan ? m_plan->Resources() : ResourceUsage::Full;
 	if (Media() == StormByte::Multimedia::Type::Video && m_receives.Has(Kind::Frame))
-		return StormByte::Multimedia::Backend::Pipeline::Ceiling::ResourceFrames(usage, 27);
+		return m_plan ? StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan) : 27;
 	if (m_receives.Has(Kind::Frame) || m_receives.Has(Kind::Packet))
 		return StormByte::Multimedia::Backend::Pipeline::Ceiling::ResourceFrames(usage, 32);
 	return 0;
 }
 
 StormByte::Size Analytics::PendingCeiling(StormByte::Size full) const noexcept {
-	if (!m_plan || m_plan->Resources() == ResourceUsage::Full)
-		return full;
-	const StormByte::Size reduced = m_plan->Resources() == ResourceUsage::Low ? 2 : 8;
-	return std::min(full, reduced);
+	const auto usage = m_plan ? m_plan->Resources() : ResourceUsage::Full;
+	const StormByte::Size maximum = usage == ResourceUsage::Low ? 2 : usage == ResourceUsage::Medium ? 8 : 32;
+	const auto requested = std::min(full, maximum);
+	if (m_plan)
+		return StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan, requested);
+	return requested;
 }
 
 void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexcept {

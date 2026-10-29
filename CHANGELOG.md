@@ -65,6 +65,16 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
   packet caps now also follow the selected resource policy, as do the PSNR,
   SSIM and XPSNR pending-input hoppers. Filter routes now receive the job Plan
   before their capacities and resource-sensitive operations are configured.
+  Raw-video queues share a RAM-aware reservation across active video lanes
+  and three codec/filter queues per lane, with conservative high-depth frame
+  sizing and a two-frame minimum. The reservation is at most one eighth of
+  available RAM, additionally capped to 4 GiB in Full, 1 GiB in Medium and
+  256 MiB in Low. Analytics input no longer allows a 512-frame burst in Full:
+  its maximum is 32 and is additionally memory-clamped. VMAF's extractor pool
+  now has RAM- and resolution-aware limits in Full as well (at most 16 workers),
+  with more conservative memory reservations in reduced modes.
+  These are queue/extractor targets, not a hard RSS cap on native codecs or
+  unpaired looks required by encoder latency.
 - Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported
   `lp` parallelism level instead of passing the thread count as the level.
   SVT-AV1 documents `lp` as a parallelism/buffering tier, not a processor

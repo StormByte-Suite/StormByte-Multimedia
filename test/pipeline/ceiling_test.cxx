@@ -73,7 +73,7 @@ namespace {
 		Track encoded{2, std::move(video)};
 		for (const auto usage : {ResourceUsage::Full, ResourceUsage::Medium, ResourceUsage::Low}) {
 			plan->Resources(usage);
-			const auto expected = Ceiling::ResourceFrames(usage, fullFrames);
+			const auto expected = Ceiling::VideoFrames(*plan);
 			const auto packets = Ceiling::ResourceFrames(usage, 8);
 			for (const auto producer : {Producer::Decoder, Producer::Encoder, Producer::Filter}) {
 				const Ceiling cap{plan, producer, encoded};
@@ -117,6 +117,23 @@ namespace {
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 27) == 7);
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Medium, 2) == 2);
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 0) == 2);
+		constexpr std::size_t gib = 1024ull * 1024ull * 1024ull;
+		constexpr std::size_t mib = 1024ull * 1024ull;
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 3, 27) == 21);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Medium, 64 * gib, 64 * mib, 3, 27) == 5);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Low, 64 * gib, 64 * mib, 3, 27) == 2);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, gib, 64 * mib, 3, 27) == 2);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 6, 27) == 10);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 0, 0, 0, 0) == 2);
+		constexpr std::size_t pixels = 3840ull * 2160ull;
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 64 * gib, pixels, 1) == 16);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 64 * gib, pixels, 1) == 4);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Low, 64, 64 * gib, pixels, 1) == 1);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 4 * gib, pixels, 1) == 1);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 8 * gib, pixels, 1) == 1);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels, 2) == 1);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels * 4, 1) == 1);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 0, 0, 0, 0) == 1);
 		return 0;
 	}
 }

@@ -709,12 +709,16 @@ namespace StormByte {
 					 * @param usage Full, approximately half of available process CPUs,
 					 *        or at most two CPUs, with smaller frame queues for reduced modes.
 					 *
-					 * Full preserves the historical defaults. Medium and Low distribute
+					 * Full keeps native codec threading defaults, with RAM-aware queue
+					 * and analytics limits. Medium and Low distribute
 					 * a best-effort thread budget across decode/encode lanes and reduce
 					 * queued frames and packets, including filter and analytics input.
 					 * VMAF also reduces its memory-intensive extractor pool (at most four
 					 * workers in Medium and one in Low, even with an explicit worker count).
 					 * Encoder options are applied only when supported.
+					 * Raw-video queues share a RAM-aware reservation with conservative frame
+					 * sizing and a two-frame floor. Full also applies RAM-aware VMAF safety
+					 * limits instead of creating an unrestricted extractor pool.
 					 * Explicit FineTune values that control threading conflict with Medium
 					 * or Low and fail the job rather than bypassing the selected policy.
 					 * This is not a hard CPU or RSS limit; codec libraries, filters and

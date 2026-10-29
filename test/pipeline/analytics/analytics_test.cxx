@@ -97,7 +97,7 @@ static int CheckVmafRemux(std::string_view source, std::string_view destination,
 	TEST_REQUIRE(frames == 48);
 	const auto threads = std::stoul(std::string{TestView(data.at(StormByte::Safe::String{"threads"}))});
 	const auto ceiling = std::stoul(std::string{TestView(data.at(StormByte::Safe::String{"input_ceiling"}))});
-	TEST_REQUIRE(ceiling == (resources == ResourceUsage::Low ? 2 : resources == ResourceUsage::Medium ? 8 : 512));
+	TEST_REQUIRE(ceiling >= 2 && ceiling <= (resources == ResourceUsage::Low ? 2 : resources == ResourceUsage::Medium ? 8 : 32));
 	if (resources == ResourceUsage::Low)
 		TEST_REQUIRE(threads == 1);
 	else if (resources == ResourceUsage::Medium)
@@ -120,12 +120,14 @@ int test_transcoder_vmaf_hevc_remux_matches_source_at_100() {
 }
 
 int test_transcoder_vmaf_reduced_resources_clamp_explicit_workers() {
-	const int low = CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-low.mkv", ResourceUsage::Low, 32);
-	if (low != 0)
-		return low;
-	const int automatic = CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-low-automatic.mkv", ResourceUsage::Low, 0);
-	if (automatic != 0)
-		return automatic;
+	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-low.mkv", ResourceUsage::Low, 32);
+}
+
+int test_transcoder_vmaf_low_resources_clamp_automatic_workers() {
+	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-low-automatic.mkv", ResourceUsage::Low, 0);
+}
+
+int test_transcoder_vmaf_medium_resources_clamp_explicit_workers() {
 	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-medium.mkv", ResourceUsage::Medium, 32);
 }
 
@@ -134,6 +136,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_vmaf_remux_matches_source_at_100", test_transcoder_vmaf_remux_matches_source_at_100},
 		TestEntry{"test_transcoder_vmaf_hevc_remux_matches_source_at_100", test_transcoder_vmaf_hevc_remux_matches_source_at_100},
 		TestEntry{"test_transcoder_vmaf_reduced_resources_clamp_explicit_workers", test_transcoder_vmaf_reduced_resources_clamp_explicit_workers},
+		TestEntry{"test_transcoder_vmaf_low_resources_clamp_automatic_workers", test_transcoder_vmaf_low_resources_clamp_automatic_workers},
+		TestEntry{"test_transcoder_vmaf_medium_resources_clamp_explicit_workers", test_transcoder_vmaf_medium_resources_clamp_explicit_workers},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

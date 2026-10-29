@@ -119,18 +119,23 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Unpaired frames may be retained to accommodate encoder delay.
 	 * @ref Eof waits for outstanding measurements.
 	 * @ref InputCeiling limits pending input, not frames awaiting
-	 * a matching look. Measurement memory scales with thread count
-	 * and resolution, not duration.
-	 * Full uses the available process CPUs unless an explicit worker count is supplied.
+	 * a matching look. Extractor memory primarily scales with thread count
+	 * and resolution; unmatched frames and score storage are additional.
+	 * Full uses process-available CPUs, bounded to 16 workers and an estimated
+	 * extractor reservation of at most one quarter of available RAM across video
+	 * contexts. Explicit worker counts are subject to the same safety bound.
 	 * Medium and Low also constrain libvmaf, even with an explicit worker count:
 	 * the job CPU target is shared across video lanes and codec/analytics stages,
 	 * with a memory-conscious maximum of four workers for Medium and one for Low.
-	 * Input hoppers shrink from 512 looks to eight for Medium and two for Low.
-	 * 4K 10-bit (`vmaf_4k_v0.6.1`, subsample 1) at 32
-	 * threads holds ~18.5 GiB for the extractors (massif
-	 * plateau; peak ~20.5 GiB at init). RSS is the same
-	 * order. A second video track opens another context of
-	 * that size. Pass a smaller thread count in the
+	 * Their estimated extractor reservations are at most one eighth and one
+	 * sixteenth of available RAM respectively, shared across video contexts.
+	 * One worker remains the minimum even when its estimate exceeds the reservation.
+	 * Pending input is capped at 32 looks in Full, eight in Medium and two in Low,
+	 * additionally reduced by the job's RAM-aware raw-frame queue budget.
+	 * Historical measurements before these bounds showed about 18.5 GiB for
+	 * 32 extractor workers on 4K 10-bit (`vmaf_4k_v0.6.1`, subsample 1),
+	 * with an initialization peak of about 20.5 GiB. Each video track opens
+	 * a separate context. Pass a smaller thread count in the
 	 * constructor or select a reduced resource policy to reduce it.
 	 * Unpaired references required by encoder latency and native codec allocations
 	 * still contribute to RSS; these policies are not a hard process-memory ceiling.
@@ -151,14 +156,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief VMAF with a built-in libvmaf model version.
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param model libvmaf version key (`vmaf_4k_v0.6.1`).
-			 * @param threads libvmaf worker count. Empty uses process-available CPUs in Full.
-			 *        Medium/Low clamp this count to their CPU and analytics memory targets.
+			 * @param threads Requested libvmaf worker count. Empty uses process-available CPUs.
+			 *        All modes apply RAM-aware safety bounds; Medium/Low also apply CPU targets.
 			 *
-			 * RAM follows threads × resolution, not duration. 4K
-			 * 10-bit (`vmaf_4k_v0.6.1`, subsample 1) at 32 threads
-			 * holds ~18.5 GiB for the job (peak ~20.5 GiB). A
-			 * second video track opens another context of the
-			 * same size.
+			 * Extractor RAM follows workers and resolution. A separate context
+			 * is opened per video track. Worker limits reserve memory
+			 * conservatively without changing the model or skipping frames;
+			 * they do not enforce a hard process RSS ceiling.
 			 */
 			VMAF(StormByte::Safe::Shared<StormByte::Logger::Log> log, StormByte::Safe::String model,
 				StormByte::Safe::Optional<unsigned short> threads = {}) noexcept;
@@ -196,7 +200,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 
 			/**
 			 * @brief Ceiling of the analytics input hopper.
-			 * @return 512 in Full, eight in Medium, two in Low. Never zero.
+			 * @return At most 32 in Full, eight in Medium, two in Low; at least two.
 			 *
 			 * The worker drains unpaired input into separate park FIFOs,
 			 * allowing the other look to arrive even with encoder delay.
@@ -311,10 +315,10 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Analytics hopper.
 			 */
-			static constexpr StormByte::Size Ceiling = 512;
+			static constexpr StormByte::Size Ceiling = 32;
 
 			StormByte::Safe::String m_modelName;			///< libvmaf built-in version
-			StormByte::Safe::Optional<unsigned short> m_threads;	///< Empty: all cores
+			StormByte::Safe::Optional<unsigned short> m_threads;	///< Requested workers, subject to resource and RAM targets
 			StormByte::Safe::Map<int, StormByte::Safe::Shared<Lane>> m_lanes;	///< One context per Frame::Track
 	};
 }
