@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/zimg/zimg.hxx>
+#include <StormByte/system/host.hxx>
 
 #include <algorithm>
 #include <cstddef>
@@ -221,7 +222,7 @@ namespace StormByte::Multimedia::Backend {
 		}
 
 		unsigned StripCount(int dstH) noexcept {
-			unsigned hc = std::thread::hardware_concurrency();
+			unsigned hc = StormByte::System::Host::CPU().LogicalProcessors();
 			if (hc < 1)
 				hc = 1;
 			if (hc > 16)

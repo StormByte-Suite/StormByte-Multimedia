@@ -54,16 +54,9 @@
 #include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/stream.hxx>
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/system/host.hxx>
 
 #include <algorithm>
-#include <cstdlib>
-#include <fstream>
-#include <string>
-#include <thread>
-
-extern "C" {
-	#include <libavutil/cpu.h>
-}
 
 using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Producer;
@@ -85,22 +78,13 @@ namespace {
 	}
 
 	std::size_t HostAvailableRam() noexcept {
-		std::ifstream in("/proc/meminfo");
-		if (!in)
-			return 8ull * 1024ull * 1024ull * 1024ull;
-		std::string key;
-		unsigned long long kb = 0;
-		while (in >> key >> kb) {
-			if (key == "MemAvailable:")
-				return kb * 1024ull;
-			std::string rest;
-			std::getline(in, rest);
-		}
-		return 8ull * 1024ull * 1024ull * 1024ull;
+		const auto available = static_cast<std::size_t>(
+			StormByte::System::Host::AvailableMemory());
+		return available == 0 ? 8ull * 1024ull * 1024ull * 1024ull : available;
 	}
 
 	// Compressed packets and remux audio. Measured on mixed encode+remux jobs:
-	// a cap of 32 (hardware_concurrency on a 32-thread box) lets remux tracks
+	// a cap of 32 (32 OS-visible logical processors) lets remux tracks
 	// run tens of seconds of PTS ahead of the video encode and dump 16–32
 	// packets into the muxer between two encoder outputs. A cap of 4 cuts the
 	// dump but multiplies Remuxer/Muxer wait/wake with no RSS or CPU gain.
@@ -179,7 +163,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 	unsigned Ceiling::MaxThreads() noexcept {
 		static const unsigned cached = [] {
-			unsigned n = static_cast<unsigned>(std::max(av_cpu_count(), 0));
+			const unsigned n = StormByte::System::Host::CPU().LogicalProcessors();
 			return n < 1 ? 1u : n;
 		}();
 		return cached;

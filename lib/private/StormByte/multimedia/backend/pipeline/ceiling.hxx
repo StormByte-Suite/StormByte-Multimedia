@@ -131,15 +131,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			~Ceiling() noexcept = default;
 
 			/**
-			 * @brief Process-available CPU count, at least one.
-			 * @return Cached FFmpeg CPU count, respecting process CPU affinity.
+			 * @brief OS-visible logical processor count, at least one.
+			 * @return Cached count from StormByte-System.
 			 */
 			static unsigned MaxThreads() noexcept;
 
 			/**
-			 * @brief Resolve a requested level against available process CPUs.
+			 * @brief Resolve a requested level against OS-visible logical processors.
 			 * @param usage Resource policy.
-			 * @param available Process-available CPU count; zero is treated as one.
+			 * @param available Logical processor count; zero is treated as one.
 			 * @return Full count, half rounded down (minimum one), or at most two.
 			 */
 			static unsigned ResourceThreads(Multimedia::Pipeline::ResourceUsage usage,
@@ -148,7 +148,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			/**
 			 * @brief Divide a policy budget across concurrently active decode/encode stages.
 			 * @param usage Resource policy.
-			 * @param available Process-available CPU count.
+			 * @param available OS-visible logical processor count.
 			 * @param stages Number of concurrently active codec stages.
 			 * @return Zero for Full (keep historical FFmpeg defaults), otherwise at least one.
 			 */
@@ -158,7 +158,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			/**
 			 * @brief Resolve the per-stage thread target from a complete plan.
 			 * @param plan Closed job intention.
-			 * @param available Process-available CPU count.
+			 * @param available OS-visible logical processor count.
 			 * @return Zero for Full; otherwise the budget divided across encode lanes.
 			 */
 			static unsigned StageThreads(const Multimedia::Pipeline::Plan& plan,

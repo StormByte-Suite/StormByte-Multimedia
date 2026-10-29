@@ -91,6 +91,8 @@ namespace {
 
 	int test_resource_budget_resolution_and_minima() {
 		using Usage = ResourceUsage;
+		TEST_REQUIRE(Ceiling::MaxThreads() >= 1);
+		TEST_REQUIRE(Ceiling::AvailableRam() > 0);
 		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Full, 0) == 1);
 		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Full, 16) == 16);
 		TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 1) == 1);

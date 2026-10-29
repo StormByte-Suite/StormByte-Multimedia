@@ -71,7 +71,6 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -427,9 +426,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		|| implementationName == "libopenh264" || implementationName == "libaom-av1"
 		|| implementationName == "libvpx" || implementationName == "libvpx-vp9";
 	if (threadCount == 0 && explicitThreadCount && !fine.contains("threads")) {
-		unsigned workers = std::thread::hardware_concurrency();
-		if (workers < 1)
-			workers = 1;
+		unsigned workers = Ceiling::MaxThreads();
 		if (implementationName == "libx265" && workers >= 16)
 			workers = 15;
 		if (implementationName == "libvpx-vp9")
@@ -453,9 +450,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		}
 		else if (!blob.contains("pools") && !blob.contains("numa-pools")
 			&& !fine.contains("pools") && !fine.contains("numa-pools")) {
-			unsigned workers = std::thread::hardware_concurrency();
-			if (workers < 1)
-				workers = 1;
+			unsigned workers = Ceiling::MaxThreads();
 			blob.emplace("pools", std::to_string(workers));
 		}
 	}
