@@ -200,6 +200,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			void Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) noexcept;
 
+			void Put(StormByte::Multimedia::Pipeline::Frame& owner,
+				StormByte::Multimedia::FFmpeg::AVFrame&& frame) noexcept {
+				Put(owner, frame.Detach());
+			}
+
 			/**
 			 * @brief Why Content dropped extras on the last @ref Put.
 			 * @return Empty when extras were kept or remapped.

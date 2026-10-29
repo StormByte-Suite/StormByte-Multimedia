@@ -491,6 +491,8 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		avcodec_free_context(&ctx);
 		return Unexpected<FFmpeg::EncoderError>("Failed to copy codec parameters to encoder context");
 	}
+	const int inputWidth = ctx->width;
+	const int inputHeight = ctx->height;
 
 	PromoteCodedSideData(ctx);
 	if (firstFrame) {
@@ -579,6 +581,10 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 			avcodec_free_context(&ctx);
 			return Unexpected<FFmpeg::EncoderError>("encoder '{}' input: {}", codec_name, error);
 		}
+		if (!VideoInput::Align(ctx, codec, error)) {
+			avcodec_free_context(&ctx);
+			return Unexpected<FFmpeg::EncoderError>("encoder '{}' geometry: {}", codec_name, error);
+		}
 	}
 
 	std::set<std::string> packed;
@@ -630,6 +636,8 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	}
 
 	AVEncoder enc(ctx);
+	enc.m_inputWidth = inputWidth;
+	enc.m_inputHeight = inputHeight;
 	enc.m_stream_index = stream_index;
 	return enc;
 }
@@ -646,7 +654,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 
 bool FFmpeg::AVEncoder::PrepareFrame(const AVFrame& source, AVFrame& destination) const noexcept {
 	if (!m_ptr || m_ptr->codec_type != AVMEDIA_TYPE_VIDEO || &source == &destination
-		|| !source || !destination || source.Width() != m_ptr->width || source.Height() != m_ptr->height)
+		|| !source || !destination || source.Width() != m_inputWidth || source.Height() != m_inputHeight)
 		return false;
 	const auto* sourceFrames = VideoInput::Frames(source.Get());
 	if (VideoInput::Hardware(source.Format()) && !sourceFrames)
@@ -662,8 +670,12 @@ bool FFmpeg::AVEncoder::PrepareFrame(const AVFrame& source, AVFrame& destination
 			return false;
 		input = &downloaded;
 	}
-	if (!VideoInput::Hardware(m_ptr->pix_fmt))
-		return VideoInput::Prepare(*input, m_ptr->pix_fmt, destination);
+	if (!VideoInput::Hardware(m_ptr->pix_fmt)) {
+		AVFrame prepared;
+		if (!VideoInput::Prepare(*input, m_ptr->pix_fmt, prepared))
+			return false;
+		return VideoInput::Pad(prepared, m_ptr->width, m_ptr->height, destination);
+	}
 	if (!m_ptr->hw_frames_ctx || !m_ptr->hw_frames_ctx->data)
 		return false;
 	const auto* pool = reinterpret_cast<const AVHWFramesContext*>(m_ptr->hw_frames_ctx->data);
@@ -671,6 +683,16 @@ bool FFmpeg::AVEncoder::PrepareFrame(const AVFrame& source, AVFrame& destination
 	if (!VideoInput::Prepare(*input, pool->sw_format, upload))
 		return false;
 	return VideoInput::Upload(m_ptr, upload.Get(), destination.Get());
+}
+
+bool FFmpeg::AVEncoder::RestoreLook(AVFrame& frame) const noexcept {
+	if (!m_ptr)
+		return false;
+	if (m_ptr->width == m_inputWidth && m_ptr->height == m_inputHeight)
+		return true;
+	if (frame.Width() != m_ptr->width || frame.Height() != m_ptr->height)
+		return false;
+	return VideoInput::Crop(frame.Get(), m_inputWidth, m_inputHeight);
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {

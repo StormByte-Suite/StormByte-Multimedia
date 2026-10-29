@@ -141,6 +141,15 @@ namespace StormByte::Multimedia::FFmpeg {
 			bool PrepareFrame(const AVFrame& source, AVFrame& destination) const noexcept;
 
 			/**
+			 * @brief Restores original input geometry for analytics, removing only automatic padding.
+			 */
+			bool RestoreLook(AVFrame& frame) const noexcept;
+
+			/// Input geometry before automatic alignment.
+			int InputWidth() const noexcept { return m_inputWidth; }
+			int InputHeight() const noexcept { return m_inputHeight; }
+
+			/**
 			 * @brief Sends a frame to the encoder.
 			 * @param frame Source frame.
 			 * @return Operation result.
@@ -263,6 +272,8 @@ namespace StormByte::Multimedia::FFmpeg {
 			const ::AVCodecContext* Context() const noexcept;
 
 		private:
+			int m_inputWidth = 0;
+			int m_inputHeight = 0;
 			int m_stream_index = -1;										///< Output track
 			FFmpeg::AVBSFPipeline m_bsf_pipeline;							///< Optional annex-B filter
 			Safe::Map<std::int64_t, Safe::Binary> m_hdrPlusT35;	///< PTS → ST 2094-40 T.35 bytes

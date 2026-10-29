@@ -205,6 +205,11 @@ bool Encoder::PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) noe
 	return owner.m_backend && owner.m_backend->PrepareForHeader(owner);
 }
 
+bool Encoder::RestoreLook(const StormByte::Multimedia::Pipeline::Encoder& owner,
+	StormByte::Multimedia::FFmpeg::AVFrame& frame) noexcept {
+	return owner.m_backend && owner.m_backend->RestoreLook(frame);
+}
+
 std::int64_t Encoder::NsToTicks(std::int64_t ns, FFmpeg::AVRational timeBase) noexcept {
 	if (ns < 0 || !timeBase.Valid())
 		return FFmpeg::NoPts;
@@ -631,6 +636,13 @@ const StormByte::Multimedia::FFmpeg::AVFrame* Encoder::FrameHandle(
 
 void Encoder::CommitOpen(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const Opened& opened) noexcept {
+	const auto& handle = opened.Handle();
+	if (const auto* context = handle.Context(); context && context->codec_type == AVMEDIA_TYPE_VIDEO
+		&& (context->width != handle.InputWidth() || context->height != handle.InputHeight())) {
+		owner.Log(StormByte::Logger::Level::Notice, StormByte::Safe::String::ReplaceToken(
+			"encoder '{}' adds centered, chroma-aligned black padding {}x{} -> {}x{} without scaling",
+			opened.Implementation(), handle.InputWidth(), handle.InputHeight(), context->width, context->height));
+	}
 	if (!opened.Implementation().empty())
 		owner.Implementation(StormByte::Safe::String{opened.Implementation()});
 	owner.m_capabilities = opened.Capabilities();

@@ -11,6 +11,21 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
 - `video/hdr10_metadata_source.mkv`: HEVC Main 10 source with BT.2020/PQ, mastering-display and content-light metadata.
 - `video/hdr_without_mastering_metadata.mkv`: BT.2020/PQ HEVC Main 10 with mastering-display and content-light side-data intentionally absent. `File` is expected to classify it as HDR10-like and report `HDR10::Source::Heuristics` from the signaled primaries/transfer, rather than treating it as SDR.
 - `video/xvid_mp3_stereo.avi`: Xvid/MPEG-4 Part 2 video with stereo MP3 audio.
+- `video/kvazaar_unaligned_704x396.avi`: synthetic MPEG-4 Part 2, YUV420P, square
+  pixels, 704x396, 24 frames at 24 fps and no audio. Its height deliberately
+  violates Kvazaar's multiple-of-eight requirement. The regression requires
+  successful HEVC encoding at 704x400; automatic padding adds two black rows
+  above and below, without scaling. VMAF also processes all 24 output frames.
+  Authored once with FFmpeg 9.0.2; tests never regenerate the fixture.
+  SHA-256: `8b8b595938d061cf2f2a64c1fd07deee65c7a0609f49696d95c6c3e67560b37f`
+  (246,386 bytes).
+
+  ```sh
+  ffmpeg -hide_banner -loglevel error -n -f lavfi \
+    -i 'testsrc2=size=704x396:rate=24:duration=1' -an \
+    -c:v mpeg4 -q:v 5 -bf 0 -pix_fmt yuv420p -map_metadata -1 \
+    -fflags +bitexact -flags:v +bitexact test/files/video/kvazaar_unaligned_704x396.avi
+  ```
 - `video/interleave_long.mkv`: twelve seconds, longer than any encoder lookahead the interleave tests configure, so a video encoder lagging audio by seconds shows up in file order. H.264 High 320x180 at 24000/1001 fps from the `testsrc2` pattern, GOP 24 with three B-frames; English AC-3 stereo pink noise, seed `20261026`. Authored with FFmpeg 9.0.2 on 2026-10-26. SHA-256: `7ed06e6575e3794c94e4a8e1a69fe6b002962ccde00c7d2414b0df888f5e08af` (327,078 bytes).
 
   ```sh

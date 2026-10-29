@@ -21,17 +21,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### Fixed
-
-- Duration pause/resume tests stop throttling the synthetic reader after verifying
-  the pause, avoiding artificial delays during the remaining scan and remux that
-  could exceed the macOS CI timeout.
-- Removed an unused Matroska muxer helper and avoided copying feature values in
-  registry tests, clearing the corresponding Clang build warnings.
-
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
 
-## [1.0.1] - 2026-10-29
+## [1.0.1] - 2026-10-30
 
 ### Added
 
@@ -63,6 +55,22 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Video encoding adds minimal, centered, chroma-aligned black padding for verified
+  concrete encoder restrictions: Kvazaar (multiples of eight), x264/x265
+  (chroma subsampling), native H.263/H.263+/RV20 (multiples of four) and
+  WMV1/WMV2 (even width). No scaling or cropping changes the input picture or
+  sample aspect ratio. Already compatible inputs, remux and unrelated encoders
+  keep their geometry; other restrictions, such as baseline H.263's fixed
+  picture sizes and hardware capabilities, remain explicit errors.
+  Encoded metadata and logs report the padded size. Analytics remove only the
+  borders recorded by their own encoder, avoiding artificial VMAF/PSNR/SSIM
+  scaling while preserving intentional user transforms. A fixed synthetic
+  704x396 MPEG-4 fixture covers Kvazaar encoding to 704x400 and VMAF completion.
+- Duration pause/resume tests stop throttling the synthetic reader after verifying
+  the pause, avoiding artificial delays during the remaining scan and remux that
+  could exceed the macOS CI timeout.
+- Removed an unused Matroska muxer helper and avoided copying feature values in
+  registry tests, clearing the corresponding Clang build warnings.
 - Audio and video decoders now warn and continue after a packet submission
   returns FFmpeg's recoverable `AVERROR_INVALIDDATA`, instead of cancelling the
   entire job. This handles rejected MP3 packets in older DivX/Xvid AVI files,

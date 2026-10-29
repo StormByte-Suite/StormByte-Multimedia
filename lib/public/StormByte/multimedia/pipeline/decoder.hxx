@@ -90,6 +90,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 namespace StormByte::Multimedia::Pipeline {
 	class Decoder;
 	class Demuxer;
+	class Encoder;
 	class Filters;
 	class Frame;
 	class Packet;
@@ -513,6 +514,7 @@ namespace StormByte::Multimedia::Pipeline {
 
 			int m_index;											///< Origin stream index
 			int m_sourceIndex = -1;								///< Source metadata identity for an output-indexed analytics look.
+			Encoder* m_encodeSource = nullptr;						///< Route-owned encoder providing automatic padding geometry.
 			DecoderFlags m_flags;									///< Heuristic bits
 			StormByte::Safe::Optional<StormByte::Safe::String> m_language;			///< Origin language tag
 			StormByte::Safe::Optional<StormByte::Safe::String> m_title;				///< Origin title tag

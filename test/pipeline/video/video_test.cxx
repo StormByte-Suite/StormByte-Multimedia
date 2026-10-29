@@ -233,6 +233,36 @@ int test_transcoder_hevc_encode_output_file_properties() {
 	return CheckEncodedVideoOutput(output, "H.265");
 }
 
+int test_transcoder_kvazaar_pads_unaligned_video() {
+	if (!avcodec_find_encoder_by_name("libkvazaar"))
+		return TEST_SKIP;
+	const auto codec = Registry::Instance().FindCodec("H.265");
+	TEST_REQUIRE(codec);
+	const auto input = FixturePath("video/kvazaar_unaligned_704x396.avi");
+	const auto output = OutputPath("pipeline/kvazaar-padded.mkv");
+	auto source = File::Open(StormByte::Safe::String{input.string()});
+	TEST_REQUIRE(source && source->Streams().size() == 1);
+	const auto original = source->Streams()[0].Video();
+	TEST_REQUIRE(original);
+	TEST_REQUIRE(original->Resolution().Width() == 704 && original->Resolution().Height() == 396);
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+	job.Resources(ResourceUsage::Low);
+	job.Video(0).Codec(codec->get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libkvazaar"});
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	auto encoded = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(encoded && encoded->Streams().size() == 1);
+	TEST_REQUIRE(encoded->Streams()[0].Codec().Name() == "H.265");
+	const auto video = encoded->Streams()[0].Video();
+	TEST_REQUIRE(video);
+	TEST_REQUIRE(video->Resolution().Width() == 704 && video->Resolution().Height() == 400);
+	TEST_REQUIRE(video->SampleAspectRatio() == original->SampleAspectRatio());
+	return 0;
+}
+
 int test_transcoder_hevc_encode_preserves_hdr10_metadata() {
 	return CheckHdr10Encode("pipeline/encoded-hevc-hdr10.mkv", "H.265", "libx265");
 }
@@ -326,6 +356,7 @@ int test_transcoder_without_enforce_features_drops_hdr10() {
 
 int RunPipelineVideoTests(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_kvazaar_pads_unaligned_video", test_transcoder_kvazaar_pads_unaligned_video},
 		TestEntry{"test_transcoder_hevc_encode_output_file_properties", test_transcoder_hevc_encode_output_file_properties},
 		TestEntry{"test_transcoder_hevc_encode_preserves_hdr10_metadata", test_transcoder_hevc_encode_preserves_hdr10_metadata},
 		TestEntry{"test_transcoder_svt_av1_encode_preserves_hdr10_metadata", test_transcoder_svt_av1_encode_preserves_hdr10_metadata},

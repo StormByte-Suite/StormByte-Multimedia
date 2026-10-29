@@ -5,7 +5,9 @@
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 
 #include <array>
+#include <algorithm>
 #include <cstring>
+#include <limits>
 #include <memory>
 #include <set>
 #include <string>
@@ -633,6 +635,119 @@ int test_supported_input_shares_pixels() {
 	return 0;
 }
 
+int test_encoder_dimension_alignment() {
+	struct Case {
+		const char* name;
+		AVPixelFormat format;
+		int width, height, expectedWidth, expectedHeight;
+	};
+	constexpr std::array cases{
+		Case{"libkvazaar", AV_PIX_FMT_YUV420P, 704, 396, 704, 400},
+		Case{"libkvazaar", AV_PIX_FMT_YUV420P, 704, 400, 704, 400},
+		Case{"libkvazaar", AV_PIX_FMT_YUV420P, 705, 397, 712, 400},
+		Case{"libx264", AV_PIX_FMT_YUV420P, 705, 397, 706, 398},
+		Case{"libx264", AV_PIX_FMT_YUV444P, 705, 397, 705, 397},
+		Case{"libx265", AV_PIX_FMT_YUV422P10LE, 705, 397, 706, 397},
+		Case{"libx265", AV_PIX_FMT_YUV420P10LE, 704, 396, 704, 396},
+		Case{"h263p", AV_PIX_FMT_YUV420P, 705, 397, 708, 400},
+		Case{"rv20", AV_PIX_FMT_YUV420P, 705, 397, 708, 400},
+		Case{"wmv1", AV_PIX_FMT_YUV420P, 705, 397, 706, 397},
+		Case{"wmv2", AV_PIX_FMT_YUV420P, 705, 397, 706, 397},
+		Case{"libaom-av1", AV_PIX_FMT_YUV420P, 705, 397, 705, 397},
+		Case{"libopenh264", AV_PIX_FMT_YUV420P, 704, 396, 704, 396},
+		Case{"hevc_nvenc", AV_PIX_FMT_YUV420P, 704, 396, 704, 396},
+		Case{"rawvideo", AV_PIX_FMT_YUV420P, 705, 397, 705, 397}
+	};
+	for (const auto& test : cases) {
+		::AVCodec codec{};
+		codec.name = test.name;
+		::AVCodecContext context{};
+		context.width = test.width;
+		context.height = test.height;
+		context.pix_fmt = test.format;
+		std::string error;
+		TEST_REQUIRE(Input::Align(&context, &codec, error));
+		TEST_REQUIRE(error.empty());
+		TEST_REQUIRE(context.width == test.expectedWidth && context.height == test.expectedHeight);
+	}
+	::AVCodec codec{};
+	codec.name = "libkvazaar";
+	::AVCodecContext context{};
+	context.width = std::numeric_limits<int>::max();
+	context.height = 396;
+	context.pix_fmt = AV_PIX_FMT_YUV420P;
+	std::string error;
+	TEST_REQUIRE(!Input::Align(&context, &codec, error) && !error.empty());
+	return 0;
+}
+
+int test_encoder_black_padding_is_sample_exact() {
+	{
+		TestFrame source, padded;
+		TEST_REQUIRE(source.AllocVideo(704, 396, AV_PIX_FMT_YUV420P, 64));
+		source.ColorRange(AVCOL_RANGE_MPEG);
+		source.SampleAspectRatio({4, 3});
+		for (int plane = 0; plane < 3; ++plane) {
+			for (int row = 0; row < source.PlaneHeight(plane); ++row)
+				std::memset(source.Data(plane) + static_cast<std::ptrdiff_t>(row) * source.Linesize(plane),
+					plane == 0 ? 81 : 90 + plane * 30, source.PlaneWidth(plane));
+		}
+		TEST_REQUIRE(Input::Pad(source, 704, 400, padded));
+		TEST_REQUIRE(padded.SampleAspectRatio() == source.SampleAspectRatio());
+		for (int plane = 0; plane < 3; ++plane) {
+			const int top = plane == 0 ? 2 : 1;
+			for (int row = 0; row < padded.PlaneHeight(plane); ++row) {
+				const auto* pixels = padded.Data(plane) + static_cast<std::ptrdiff_t>(row) * padded.Linesize(plane);
+				if (row >= top && row < top + source.PlaneHeight(plane))
+					TEST_REQUIRE(std::memcmp(pixels, source.Data(plane)
+						+ static_cast<std::ptrdiff_t>(row - top) * source.Linesize(plane), source.PlaneWidth(plane)) == 0);
+				else
+					TEST_REQUIRE(std::all_of(pixels, pixels + padded.PlaneWidth(plane),
+						[plane](std::uint8_t sample) { return sample == (plane == 0 ? 16 : 128); }));
+			}
+		}
+	}
+	for (const auto format : {AV_PIX_FMT_YUV420P10LE, AV_PIX_FMT_P010LE}) {
+		for (const auto range : {AVCOL_RANGE_MPEG, AVCOL_RANGE_JPEG}) {
+			for (const bool negative : {false, true}) {
+				TestFrame source, padded;
+				TEST_REQUIRE(source.AllocVideo(5, 3, format, 64));
+				if (negative)
+					source.NegativeStride();
+				TEST_REQUIRE(Samples(source, true) && Metadata(source));
+				source.ColorRange(range);
+				const auto* original = source.Data(0);
+				TEST_REQUIRE(Input::Pad(source, 8, 8, padded));
+				TEST_REQUIRE(padded.Width() == 8 && padded.Height() == 8 && padded.Data(0) != original);
+				for (int component = 0; component < 3; ++component) {
+					const bool planar = format == AV_PIX_FMT_YUV420P10LE;
+					const int plane = planar || component == 0 ? component : 1;
+					const int step = planar || component == 0 ? 2 : 4;
+					const int offset = !planar && component == 2 ? 2 : 0;
+					const unsigned black = (component == 0 ? (range == AVCOL_RANGE_JPEG ? 0u : 64u) : 512u)
+						<< (planar ? 0 : 6);
+					for (const int row : {0, padded.PlaneHeight(plane) - 1}) {
+						const auto* bytes = padded.Data(plane) + static_cast<std::ptrdiff_t>(row) * padded.Linesize(plane)
+							+ (padded.PlaneWidth(plane) - 1) * step + offset;
+						TEST_REQUIRE(bytes[0] == static_cast<std::uint8_t>(black)
+							&& bytes[1] == static_cast<std::uint8_t>(black >> 8));
+					}
+				}
+				TEST_REQUIRE(Input::Crop(padded.Raw(), 5, 3));
+				TEST_REQUIRE(Samples(padded, false) && SameMetadata(source, padded));
+				TEST_REQUIRE(source.Data(0) == original && Samples(source, false));
+				FFmpeg::AVFrame unchanged;
+				TEST_REQUIRE(Input::Pad(source, 5, 3, unchanged));
+				TEST_REQUIRE(unchanged.Data(0) == original && SameMetadata(source, unchanged));
+				TEST_REQUIRE(!Input::Pad(source, 4, 3, unchanged));
+				TEST_REQUIRE(!Input::Pad(source, 8, 8, source));
+				TEST_REQUIRE(!Input::Crop(padded.Raw(), 9, 3));
+			}
+		}
+	}
+	return 0;
+}
+
 int test_wrapper_attachments() {
 	using StormByte::Multimedia::Pipeline::SideData;
 	using StormByte::Multimedia::Pipeline::SideDataKind;
@@ -687,6 +802,8 @@ int RunPipelineVideoInputTests(int argc, char** argv) {
 	// Input
 	// -------------------
 	constexpr TestEntry tests[] = {
+		{"test_encoder_dimension_alignment", test_encoder_dimension_alignment},
+		{"test_encoder_black_padding_is_sample_exact", test_encoder_black_padding_is_sample_exact},
 		{"test_encoder_configs", test_encoder_configs},
 		{"test_hardware_capability_classifier", test_hardware_capability_classifier},
 				{"test_hardware_h264_nvenc_capability", test_hardware_h264_nvenc_capability},

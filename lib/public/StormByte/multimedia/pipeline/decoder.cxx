@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/ffmpeg/AVDecoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
+#include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/audio.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/video.hxx>
@@ -189,6 +190,16 @@ void Decoder::BindAnalytics(Filters& filters) noexcept {
 }
 
 void Decoder::StampLook(Frame& frame) noexcept {
+	if (m_encodeSource && frame.Type() == Type::Video && frame.m_backend) {
+		FFmpeg::AVFrame restored;
+		const auto& raw = frame.m_backend->Handle();
+		if (!restored.Ref(raw) || !Backend::Pipeline::Encoder::RestoreLook(*m_encodeSource, restored)) {
+			Fail("failed to remove automatic encoder padding from analytics input");
+			return;
+		}
+		if (restored.Width() != raw.Width() || restored.Height() != raw.Height())
+			frame.m_backend->Put(frame, std::move(restored));
+	}
 	if (m_lookStamp)
 		frame.m_producer = *m_lookStamp;
 	if (!m_lookStamp || !m_analytics)

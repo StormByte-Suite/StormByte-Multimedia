@@ -183,6 +183,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		auto emit = [this, &started, &emitted](Frame::PointerType frame) {
 			m_owner.StampLineage(*frame);
 			m_owner.StampLook(*frame);
+			if (m_owner.Failed())
+				return;
 			if (m_owner.m_log && m_owner.m_log->Enabled(Level::LowLevel))
 				Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
 					frame->Track(), frame->Serial().value_or(0), frame->Part(),
@@ -241,6 +243,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				break;
 			m_owner.StampLineage(*frame);
 			m_owner.StampLook(*frame);
+			if (m_owner.Failed())
+				return;
 			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("out t={} {}:{} pts={} dts={} dur={}",
 				frame->Track(), frame->Serial().value_or(0), frame->Part(),
 				Ns(frame->Pts()), Ns(frame->Dts()), Ns(frame->Duration())));

@@ -381,7 +381,7 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const int ctxH = ctx ? ctx->height : 0;
 	const int ctxFmt = ctx ? static_cast<int>(ctx->pix_fmt) : -1;
 
-	if (ctx && (source->Width() != ctxW || source->Height() != ctxH)) {
+	if (ctx && (source->Width() != m_encoder->InputWidth() || source->Height() != m_encoder->InputHeight())) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"encoder frame mismatch ctx={}x{} fmt={} in={}x{} fmt={}",
 			ctxW, ctxH, ctxFmt,

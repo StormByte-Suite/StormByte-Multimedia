@@ -52,8 +52,10 @@
 
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
+#include <StormByte/multimedia/registry.hxx>
 
 #include <array>
+#include <cmath>
 #include <string>
 
 using namespace StormByte::Multimedia;
@@ -131,8 +133,38 @@ int test_transcoder_vmaf_medium_resources_clamp_explicit_workers() {
 	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-medium.mkv", ResourceUsage::Medium, 32);
 }
 
+int test_transcoder_vmaf_kvazaar_padding() {
+	const auto codec = Registry::Instance().FindCodec("H.265");
+	TEST_REQUIRE(codec);
+	bool available = false;
+	for (const auto& encoder : codec->get().Encoders())
+		available |= encoder.Name() == "libkvazaar";
+	if (!available)
+		return TEST_SKIP;
+	const auto output = OutputPath("pipeline/vmaf-kvazaar-padding.mkv");
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("video/kvazaar_unaligned_704x396.avi")),
+		TestLocation(output), logger, 2000000000LL};
+	job.Resources(ResourceUsage::Low);
+	job.Video(0).Codec(codec->get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libkvazaar"});
+	job.Filter<Filter::Video::VMAF>(logger, StormByte::Safe::String{"vmaf_v0.6.1"}, 1u);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	const auto reports = job.Reports();
+	TEST_REQUIRE(reports.size() == 1);
+	const auto& report = reports[0].second;
+	TEST_REQUIRE(report.Kind() == Filter::Report::Status::Ok);
+	TEST_REQUIRE(std::stoul(std::string{TestView(report.Data().at(StormByte::Safe::String{"frames"}))}) == 24);
+	const double score = std::stod(std::string{TestView(report.Data().at(StormByte::Safe::String{"vmaf_mean"}))});
+	TEST_REQUIRE(std::isfinite(score) && score > 80.0 && score <= 100.0);
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_transcoder_vmaf_kvazaar_padding", test_transcoder_vmaf_kvazaar_padding},
 		TestEntry{"test_transcoder_vmaf_remux_matches_source_at_100", test_transcoder_vmaf_remux_matches_source_at_100},
 		TestEntry{"test_transcoder_vmaf_hevc_remux_matches_source_at_100", test_transcoder_vmaf_hevc_remux_matches_source_at_100},
 		TestEntry{"test_transcoder_vmaf_reduced_resources_clamp_explicit_workers", test_transcoder_vmaf_reduced_resources_clamp_explicit_workers},

@@ -236,6 +236,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			static bool PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
 
+			static bool RestoreLook(const StormByte::Multimedia::Pipeline::Encoder& owner,
+				StormByte::Multimedia::FFmpeg::AVFrame& frame) noexcept;
+
+			virtual bool RestoreLook(StormByte::Multimedia::FFmpeg::AVFrame&) const noexcept { return true; }
+
 			/**
 			 * @brief Picks the table row and opens the FFmpeg encoder from leaf parameters.
 			 * @param owner Public encoder.

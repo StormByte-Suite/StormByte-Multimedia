@@ -123,6 +123,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 */
 			bool IsOpen() const noexcept override;
 
+			bool RestoreLook(StormByte::Multimedia::FFmpeg::AVFrame& frame) const noexcept override {
+				return m_encoder && m_encoder->RestoreLook(frame);
+			}
+
 			/**
 			 * @brief Opens the video encoder from the first frame.
 			 * @param owner Public encoder.

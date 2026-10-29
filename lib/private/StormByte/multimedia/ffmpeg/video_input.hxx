@@ -22,6 +22,18 @@ extern "C" {
  */
 namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	/**
+	 * @brief Rounds dimensions up only for verified concrete encoder restrictions.
+	 */
+	bool Align(::AVCodecContext* context, const AVCodec* codec, std::string& error) noexcept;
+	/**
+	 * @brief Centers unchanged samples on a chroma-aligned black canvas, or shares compatible input.
+	 */
+	bool Pad(const AVFrame& source, int width, int height, AVFrame& destination) noexcept;
+	/**
+	 * @brief Removes the same automatic borders from an analytics frame without copying samples.
+	 */
+	bool Crop(::AVFrame* frame, int width, int height) noexcept;
+	/**
 	 * @brief Validates the software representation and geometry of a hardware source.
 	 * @param source Borrowed immutable hardware frame.
 	 * @return Borrowed frames context, or nullptr when invalid.

@@ -343,6 +343,7 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 		return;
 	if (!destination.Connect(*look))
 		return;
+	look->m_encodeSource = dynamic_cast<Encoder*>(&destination);
 	look->m_sourceIndex = m_track;
 	look->pipe().Listen();
 	look->pipe().CloneTo(packetTrack, analytics.pipe(), output);

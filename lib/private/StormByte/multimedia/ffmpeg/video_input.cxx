@@ -1,10 +1,15 @@
 #include <StormByte/multimedia/ffmpeg/video_input.hxx>
 
 #include <memory>
+#include <algorithm>
+#include <array>
+#include <limits>
+#include <string_view>
 
 extern "C" {
 	#include <libavutil/error.h>
 	#include <libavutil/mem.h>
+	#include <libavutil/imgutils.h>
 }
 
 namespace Input = StormByte::Multimedia::FFmpeg::VideoInput;
@@ -45,6 +50,101 @@ namespace {
 		av_strerror(error, message, sizeof(message));
 		return message;
 	}
+
+	int Offset(int extra, int shift) noexcept {
+		const int unit = 1 << shift;
+		return (extra / 2 / unit) * unit;
+	}
+}
+
+bool Input::Align(::AVCodecContext* context, const AVCodec* codec, std::string& error) noexcept {
+	if (!context || !codec || context->width <= 0 || context->height <= 0) {
+		error = "invalid encoder dimensions";
+		return false;
+	}
+	const auto format = Hardware(context->pix_fmt) ? context->sw_pix_fmt : context->pix_fmt;
+	const auto* descriptor = av_pix_fmt_desc_get(format);
+	if (!descriptor) {
+		error = "invalid encoder pixel format";
+		return false;
+	}
+	const std::string_view name = codec->name ? codec->name : "";
+	int horizontal = 1, vertical = 1;
+	if (name == "libkvazaar")
+		horizontal = vertical = 8;
+	else if (name == "libx264" || name == "libx265") {
+		horizontal = 1 << descriptor->log2_chroma_w;
+		vertical = 1 << descriptor->log2_chroma_h;
+		if (name == "libx264" && (context->flags & AV_CODEC_FLAG_INTERLACED_DCT))
+			vertical *= 2;
+	}
+	else if (name == "h263" || name == "h263p" || name == "rv20")
+		horizontal = vertical = 4;
+	else if (name == "wmv1" || name == "wmv2")
+		horizontal = 2;
+	if (context->width > std::numeric_limits<int>::max() - (horizontal - 1)
+		|| context->height > std::numeric_limits<int>::max() - (vertical - 1)) {
+		error = "aligned encoder dimensions overflow";
+		return false;
+	}
+	context->width = (context->width + horizontal - 1) / horizontal * horizontal;
+	context->height = (context->height + vertical - 1) / vertical * vertical;
+	return true;
+}
+
+bool Input::Pad(const AVFrame& source, int width, int height, AVFrame& destination) noexcept {
+	if (&source == &destination || !source || width < source.Width() || height < source.Height())
+		return false;
+	if (width == source.Width() && height == source.Height())
+		return destination.Ref(source);
+	const auto format = static_cast<AVPixelFormat>(source.Format());
+	const auto* descriptor = av_pix_fmt_desc_get(format);
+	if (!descriptor || Hardware(format) || !destination.AllocVideo(width, height, format, 64)
+		|| !destination.CopyProps(source))
+		return false;
+	std::array<std::uint8_t*, 4> output{};
+	std::array<const std::uint8_t*, 4> input{};
+	std::array<std::ptrdiff_t, 4> strides{};
+	std::array<int, 4> outputStrides{}, inputStrides{}, steps{};
+	av_image_fill_max_pixsteps(steps.data(), nullptr, descriptor);
+	for (int plane = 0; plane < 4; ++plane) {
+		output[plane] = destination.Data(plane);
+		input[plane] = source.Data(plane);
+		strides[plane] = outputStrides[plane] = destination.Linesize(plane);
+		inputStrides[plane] = source.Linesize(plane);
+	}
+	if (av_image_fill_black(output.data(), strides.data(), format,
+		source.ColorRange() == AVCOL_RANGE_JPEG ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG, width, height) < 0)
+		return false;
+	const int left = Offset(width - source.Width(), descriptor->log2_chroma_w);
+	const int top = Offset(height - source.Height(), descriptor->log2_chroma_h);
+	for (int plane = 0; plane < 4; ++plane) {
+		if (!output[plane])
+			continue;
+		const bool chroma = descriptor->nb_components > 1 && plane != descriptor->comp[0].plane
+			&& (plane == descriptor->comp[1].plane || plane == descriptor->comp[2].plane);
+		output[plane] += static_cast<std::ptrdiff_t>(top >> (chroma ? descriptor->log2_chroma_h : 0)) * strides[plane]
+			+ (left >> (chroma ? descriptor->log2_chroma_w : 0)) * steps[plane];
+	}
+	av_image_copy(output.data(), outputStrides.data(), input.data(), inputStrides.data(),
+		format, source.Width(), source.Height());
+	return true;
+}
+
+bool Input::Crop(::AVFrame* frame, int width, int height) noexcept {
+	if (!frame || width <= 0 || height <= 0 || frame->width < width || frame->height < height)
+		return false;
+	if (frame->width == width && frame->height == height)
+		return true;
+	const auto* descriptor = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(frame->format));
+	if (!descriptor || Hardware(frame->format))
+		return false;
+	frame->crop_left = Offset(frame->width - width, descriptor->log2_chroma_w);
+	frame->crop_top = Offset(frame->height - height, descriptor->log2_chroma_h);
+	frame->crop_right = frame->width - width - frame->crop_left;
+	frame->crop_bottom = frame->height - height - frame->crop_top;
+	return av_frame_apply_cropping(frame, AV_FRAME_CROP_UNALIGNED) >= 0
+		&& frame->width == width && frame->height == height;
 }
 
 const AVHWFramesContext* Input::Frames(const ::AVFrame* source) noexcept {
