@@ -160,7 +160,7 @@ int test_encoder_hardware_metadata_matches_ffmpeg_and_copies() {
 int test_decoders_exclude_native_hardware_only_av1() {
 	auto codec = Registry::Instance().FindCodec("AV1");
 	TEST_REQUIRE(codec);
-	for (const auto need : {Features{}, Features{Feature::TenBit | Feature::HDR10}}) {
+	for (const auto& need : {Features{}, Features{Feature::TenBit | Feature::HDR10}}) {
 		const auto decoders = codec->get().Decoders(need);
 		TEST_REQUIRE(!decoders.empty());
 		for (const auto& decoder : decoders)
@@ -180,7 +180,7 @@ int test_decoders_filter_each_implementation_without_combining_features() {
 				for (std::size_t j = 0; j < i; ++j)
 					TEST_REQUIRE(all[i].Name() != all[j].Name());
 			}
-			for (const auto need : {Features{Feature::SideData}, Features{Feature::TenBit | Feature::HDR10},
+			for (const auto& need : {Features{Feature::SideData}, Features{Feature::TenBit | Feature::HDR10},
 				Features{Feature::SurroundSound}, Features{Feature::DOVI | Feature::HardwareAcceleration}}) {
 				const auto filtered = codec.get().Decoders(need);
 				TEST_REQUIRE(!filtered.empty() == codec.get().HasAccess(Operation::Read, need));

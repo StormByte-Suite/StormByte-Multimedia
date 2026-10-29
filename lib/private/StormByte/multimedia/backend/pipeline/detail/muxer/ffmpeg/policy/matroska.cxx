@@ -49,9 +49,6 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/policy.hxx>
-#include <StormByte/multimedia/pipeline/config/audio.hxx>
-#include <StormByte/multimedia/pipeline/config/subtitle.hxx>
-#include <StormByte/multimedia/pipeline/config/video.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
@@ -64,17 +61,6 @@ extern "C" {
 using namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg;
 
 namespace {
-	bool Encodes(const StormByte::Multimedia::Pipeline::Track& track) noexcept {
-		const auto* config = track.Config();
-		if (const auto* video = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Video*>(config))
-			return video->Codec() != nullptr;
-		if (const auto* audio = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Audio*>(config))
-			return audio->Codec() != nullptr;
-		if (const auto* subtitle = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Subtitle*>(config))
-			return subtitle->Codec() != nullptr;
-		return false;
-	}
-
 	class Matroska final: public Policy {
 		public:
 			void PrepareStream(::AVStream& stream, bool& haveDefaultVideo,

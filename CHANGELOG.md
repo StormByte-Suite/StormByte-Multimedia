@@ -21,6 +21,11 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Fixed
+
+- Removed an unused Matroska muxer helper and avoided copying feature values in
+  registry tests, clearing the corresponding Clang build warnings.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
 
 ## [1.0.1] - 2026-10-29
