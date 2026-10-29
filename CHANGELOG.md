@@ -23,6 +23,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Duration pause/resume tests stop throttling the synthetic reader after verifying
+  the pause, avoiding artificial delays during the remaining scan and remux that
+  could exceed the macOS CI timeout.
 - Removed an unused Matroska muxer helper and avoided copying feature values in
   registry tests, clearing the corresponding Clang build warnings.
 

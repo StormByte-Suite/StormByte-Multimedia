@@ -284,6 +284,8 @@ namespace {
 			TEST_REQUIRE(!std::filesystem::exists(OutputPath("cancelled-duration.mkv")));
 		}
 		else {
+			// Only throttle until pause is verified, not the remaining scan and remux.
+			source->Slow = false;
 			job.Resume();
 			TEST_REQUIRE(WaitForTranscoder(job) == 0);
 			TEST_REQUIRE(job.Aborted.load() == 0);
