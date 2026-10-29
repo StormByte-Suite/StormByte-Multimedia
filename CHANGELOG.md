@@ -21,7 +21,17 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
+
+## [1.0.1] - 2026-10-29
+
+### Fixed
+
+- Windows Release builds no longer override the shared AVX baseline with a
+  target-local `/arch:AVX2`. The override allowed clang-cl to emit Haswell-only
+  instructions, including BMI1 `ANDN` in codec capability queries, causing
+  `STATUS_ILLEGAL_INSTRUCTION` on Sandy Bridge and Ivy Bridge CPUs. Specialized
+  dependency kernels retain their runtime CPU dispatch.
 
 ## [1.0.0] - 2026-10-28
 
@@ -166,4 +176,5 @@ and their build, lifecycle and media-preservation guarantees.
 - Exercise Watermark from both path and `#embed` bytes; `File` verifies generated streams while visual appearance remains a manual check. Tests use Multimedia APIs in-process, do not invoke external FFmpeg programs, and document synthetic fixture/font provenance separately.
 - Include synthetic-noise MP3 and Opus fixtures with placeholder music tags, documented authoring commands and checksums.
 
+[1.0.1]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.0
