@@ -53,6 +53,7 @@
 
 extern "C" {
 	#include <libavformat/avformat.h>
+	#include <libavutil/opt.h>
 }
 
 using namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg;
@@ -91,5 +92,47 @@ void Policy::MarkDefaultStream(::AVStream& stream, bool& haveDefaultVideo,
 
 const Policy& StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg::GenericPolicy() noexcept {
 	static const Policy policy;
+	return policy;
+}
+
+namespace {
+	class AudioPicture final: public Policy {
+		public:
+			bool CopiesCoverMetadata() const noexcept override { return true; }
+
+			bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
+				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept override {
+				if (std::string_view{context.oformat->name} == "aiff"
+					&& av_opt_set_int(context.priv_data, "write_id3v2", 1, 0) < 0) {
+					owner.Fail("could not enable AIFF ID3 cover metadata");
+					return false;
+				}
+				return Attachment::WriteCovers(owner, context, attachments, "Audio");
+			}
+
+			bool WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
+				::AVFormatContext& context) const noexcept override {
+				return Attachment::WriteCoverPackets(owner, context);
+			}
+	};
+
+	class OggPicture final: public Policy {
+		public:
+			bool CopiesCoverMetadata() const noexcept override { return true; }
+
+			bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
+				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept override {
+				return Attachment::WritePictureComments(owner, context, attachments);
+			}
+	};
+}
+
+const Policy& StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg::AudioPicturePolicy() noexcept {
+	static const AudioPicture policy;
+	return policy;
+}
+
+const Policy& StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg::OggPicturePolicy() noexcept {
+	static const OggPicture policy;
 	return policy;
 }

@@ -55,6 +55,18 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Audio-only conversion and remux preserve embedded PNG/JPEG/BMP album artwork
+  with ordinary file metadata, without requiring `Attachments()`. MP3 and AIFF
+  use ID3 pictures (AIFF ID3 writing is explicitly enabled), native FLAC uses
+  PICTURE blocks, Ogg Opus/Vorbis/FLAC use `METADATA_BLOCK_PICTURE` comments,
+  M4A uses MP4 cover metadata and Matroska retains image attachments. Original
+  image bytes and multiple pictures survive repeated remux without duplication;
+  unnamed ID3 covers receive generated filenames only when Matroska requires them.
+  pictures never become ordinary video tracks or enter video encoders/filters.
+  General attachments remain opt-in, video-output attachment policy is unchanged,
+  and muxers without a native artwork route do not receive invented video streams.
+  Fixed synthetic tagged 44.1 kHz MP3 and AIFF fixtures cover these paths, including
+  Opus encoding at 48 kHz, explicit attachment selection and unsupported fonts.
 - Video encoding adds minimal, centered, chroma-aligned black padding for verified
   concrete encoder restrictions: Kvazaar (multiples of eight), x264/x265
   (chroma subsampling), native H.263/H.263+/RV20 (multiples of four) and

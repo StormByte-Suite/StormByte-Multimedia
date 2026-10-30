@@ -50,19 +50,26 @@
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/type.hxx>
 
 #include <cstdint>
+#include <climits>
 #include <cstring>
 #include <span>
+#include <string>
+#include <vector>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
 	#include <libavutil/dict.h>
+	#include <libavutil/base64.h>
 	#include <libavutil/mem.h>
+	#include <libavutil/pixdesc.h>
 }
 
 namespace {
@@ -81,27 +88,154 @@ namespace {
 			return AV_CODEC_ID_MJPEG;
 		if (*mime == "image/png")
 			return AV_CODEC_ID_PNG;
+		if (*mime == "image/bmp")
+			return AV_CODEC_ID_BMP;
 		return AV_CODEC_ID_NONE;
 	}
 
-	bool PlanWantsAttachments(const StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
-		const auto& plan = owner.Plan();
-		if (!plan)
-			return false;
-		for (const auto& track : plan->Tracks()) {
-			if (track && track->Type() == StormByte::Multimedia::Type::Attachment)
-				return true;
-		}
-		return false;
+	const char* ImageHint(AVCodecID codec) noexcept {
+		return codec == AV_CODEC_ID_PNG ? ".png" : codec == AV_CODEC_ID_BMP ? ".bmp" : ".jpg";
 	}
+
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
+	bool Attachment::WriteCovers(StormByte::Multimedia::Pipeline::Muxer& owner,
+		AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments,
+		std::string_view format) noexcept {
+		unsigned picture = 0;
+		for (const auto& attachment : attachments) {
+			const auto mime = attachment.MimeType();
+			const auto codec = AttachmentCodecId(mime);
+			if (codec == AV_CODEC_ID_NONE) {
+				owner.Fail(StormByte::Safe::String::ReplaceToken("{} attachment cannot be represented as cover art: {}",
+					format, mime ? static_cast<std::string_view>(*mime) : std::string_view{}));
+				return false;
+			}
+			const auto bytes = UnreadSpan(attachment.Payload());
+			if (bytes.empty() || bytes.size() > static_cast<std::size_t>(INT_MAX - AV_INPUT_BUFFER_PADDING_SIZE)) {
+				owner.Fail("cover image payload is empty or too large");
+				return false;
+			}
+			const auto image = StormByte::Multimedia::FFmpeg::AVFrame::DecodeImage(
+				reinterpret_cast<const std::uint8_t*>(bytes.data()), bytes.size(), ImageHint(codec));
+			if (!image) {
+				owner.Fail("cover image could not be decoded");
+				return false;
+			}
+			auto* stream = avformat_new_stream(&context, nullptr);
+			if (!stream || av_new_packet(&stream->attached_pic, static_cast<int>(bytes.size())) < 0) {
+				owner.Fail("could not allocate cover stream or packet");
+				return false;
+			}
+			stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+			stream->codecpar->codec_id = codec;
+			stream->codecpar->width = image.Width();
+			stream->codecpar->height = image.Height();
+			stream->disposition = AV_DISPOSITION_ATTACHED_PIC;
+			stream->time_base = ::AVRational{1, 1000};
+			std::memcpy(stream->attached_pic.data, bytes.data(), bytes.size());
+			stream->attached_pic.stream_index = stream->index;
+			stream->attached_pic.pts = 0;
+			stream->attached_pic.dts = 0;
+			stream->attached_pic.flags |= AV_PKT_FLAG_KEY;
+			if ((attachment.FileName()
+				&& av_dict_set(&stream->metadata, "title", attachment.FileName()->data(), 0) < 0)
+				|| av_dict_set(&stream->metadata, "comment", picture++ == 0 ? "Cover (front)" : "Other", 0) < 0) {
+				owner.Fail("could not copy cover image metadata");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool Attachment::WriteCoverPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
+		AVFormatContext& context) noexcept {
+		for (unsigned index = 0; index < context.nb_streams; ++index) {
+			const auto* stream = context.streams[index];
+			if (!(stream->disposition & AV_DISPOSITION_ATTACHED_PIC))
+				continue;
+			auto* packet = av_packet_clone(&stream->attached_pic);
+			if (!packet) {
+				owner.Fail("could not allocate cover output packet");
+				return false;
+			}
+			packet->stream_index = static_cast<int>(index);
+			const int result = av_interleaved_write_frame(&context, packet);
+			av_packet_free(&packet);
+			if (result < 0) {
+				owner.Fail(StormByte::Safe::String::ReplaceToken("cover write failed: {}",
+					static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(result))));
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool Attachment::WritePictureComments(StormByte::Multimedia::Pipeline::Muxer& owner,
+		AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) noexcept {
+		unsigned picture = 0;
+		for (const auto& attachment : attachments) {
+			const auto mime = attachment.MimeType();
+			const auto codec = AttachmentCodecId(mime);
+			const auto bytes = UnreadSpan(attachment.Payload());
+			const auto description = attachment.FileName() ? static_cast<std::string_view>(*attachment.FileName()) : std::string_view{};
+			if (codec == AV_CODEC_ID_NONE || bytes.empty() || bytes.size() > 0xffffff - 32
+				|| description.size() > 0xffffff - 32 - bytes.size()
+				|| mime->size() > 0xffffff - 32 - bytes.size() - description.size()) {
+				owner.Fail("Ogg cover must be a non-empty PNG, JPEG or BMP image smaller than 16 MiB");
+				return false;
+			}
+			const auto image = StormByte::Multimedia::FFmpeg::AVFrame::DecodeImage(
+				reinterpret_cast<const std::uint8_t*>(bytes.data()), bytes.size(), ImageHint(codec));
+			if (!image) {
+				owner.Fail("Ogg cover image could not be decoded");
+				return false;
+			}
+			std::vector<std::uint8_t> block;
+			const auto integer = [&](std::uint32_t value) {
+				for (int shift = 24; shift >= 0; shift -= 8)
+					block.push_back(static_cast<std::uint8_t>(value >> shift));
+			};
+			const auto text = [&](std::string_view value) {
+				integer(static_cast<std::uint32_t>(value.size()));
+				block.insert(block.end(), value.begin(), value.end());
+			};
+			integer(picture++ == 0 ? 3 : 0);
+			text(static_cast<std::string_view>(*mime));
+			text(description);
+			integer(static_cast<std::uint32_t>(image.Width()));
+			integer(static_cast<std::uint32_t>(image.Height()));
+			const auto* format = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(image.Format()));
+			integer(format ? static_cast<std::uint32_t>(av_get_bits_per_pixel(format)) : 0);
+			integer(0);
+			integer(static_cast<std::uint32_t>(bytes.size()));
+			const auto* data = reinterpret_cast<const std::uint8_t*>(bytes.data());
+			block.insert(block.end(), data, data + bytes.size());
+			std::string encoded(AV_BASE64_SIZE(block.size()), '\0');
+			if (!av_base64_encode(encoded.data(), static_cast<int>(encoded.size()), block.data(), static_cast<int>(block.size()))) {
+				owner.Fail("could not write Ogg cover metadata");
+				return false;
+			}
+			// oggenc merges global tags with DONT_OVERWRITE, which would discard all
+			// but the first picture. Store each picture directly on every audio stream.
+			for (unsigned index = 0; index < context.nb_streams; ++index) {
+				auto* stream = context.streams[index];
+				if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO
+					&& av_dict_set(&stream->metadata, "METADATA_BLOCK_PICTURE", encoded.c_str(), AV_DICT_MULTIKEY) < 0) {
+					owner.Fail("could not write Ogg cover metadata");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	bool Attachment::Write(StormByte::Multimedia::Pipeline::Muxer& owner,
 		AVFormatContext* ctx, const StormByte::Multimedia::Attachments& attachments) noexcept {
 		if (!ctx)
 			return true;
-		if (!PlanWantsAttachments(owner) || attachments.empty())
+		if (attachments.empty())
 			return true;
 		for (const auto& attachment : attachments) {
 			AVStream* stream = avformat_new_stream(ctx, nullptr);
@@ -112,8 +246,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 
 			stream->codecpar->codec_type = AVMEDIA_TYPE_ATTACHMENT;
 			stream->codecpar->codec_id = AttachmentCodecId(attachment.MimeType());
-			if (attachment.FileName())
+			if (attachment.FileName() && !attachment.FileName()->empty())
 				av_dict_set(&stream->metadata, "filename", attachment.FileName()->data(), 0);
+			else if (stream->codecpar->codec_id != AV_CODEC_ID_NONE) {
+				// ID3 pictures need no filename, but Matroska attachments do.
+				const auto name = StormByte::Safe::String::ReplaceToken("cover-{}{}",
+					stream->index, ImageHint(stream->codecpar->codec_id));
+				if (av_dict_set(&stream->metadata, "filename", name.data(), 0) < 0) {
+					owner.Fail("could not name embedded cover attachment");
+					return false;
+				}
+			}
 			if (attachment.MimeType())
 				av_dict_set(&stream->metadata, "mimetype", attachment.MimeType()->data(), 0);
 

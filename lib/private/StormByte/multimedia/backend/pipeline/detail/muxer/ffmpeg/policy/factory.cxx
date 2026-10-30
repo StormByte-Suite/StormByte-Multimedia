@@ -58,6 +58,10 @@ const Policy& StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg::S
 		return MatroskaPolicy();
 	if (formatName == "webm")
 		return WebmPolicy();
+	if (formatName == "ogg" || formatName == "opus" || formatName == "spx" || formatName == "oga" || formatName == "ogv")
+		return OggPicturePolicy();
+	if (formatName == "mp3" || formatName == "flac" || formatName == "aiff")
+		return AudioPicturePolicy();
 	if (formatName == "mp4" || formatName == "mov" || formatName == "ipod"
 		|| formatName == "3gp" || formatName == "3g2" || formatName == "psp" || formatName == "ismv")
 		return Mp4Policy();

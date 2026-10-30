@@ -84,5 +84,18 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 */
 			static bool Write(StormByte::Multimedia::Pipeline::Muxer& owner,
 				AVFormatContext* ctx, const StormByte::Multimedia::Attachments& attachments) noexcept;
+
+			/** @brief Adds image-only cover resources, represented by native picture streams. */
+			static bool WriteCovers(StormByte::Multimedia::Pipeline::Muxer& owner,
+				AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments,
+				std::string_view format) noexcept;
+
+			/** @brief Publishes static cover packets once the output header is initialized. */
+			static bool WriteCoverPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
+				AVFormatContext& context) noexcept;
+
+			/** @brief Writes lossless FLAC-picture blocks as Ogg METADATA_BLOCK_PICTURE comments. */
+			static bool WritePictureComments(StormByte::Multimedia::Pipeline::Muxer& owner,
+				AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) noexcept;
 	};
 }

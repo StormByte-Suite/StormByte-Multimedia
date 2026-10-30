@@ -509,13 +509,38 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			return false;
 		}
 
-		if (!PlanWantsAttachments(owner.Plan() ? &owner.Plan()->Tracks() : nullptr)) {
-			m_attachments.clear();
-			return true;
-		}
 		m_attachments.clear();
-		m_attachments.reserve(attachments.size());
-		for (const auto& item : attachments) {
+		const auto& plan = owner.Plan();
+		if (!plan || !plan->m_format) {
+			owner.Fail("cannot bind cover metadata without a resolved output format");
+			return false;
+		}
+		const auto* output = av_guess_format(plan->m_format, nullptr, nullptr);
+		if (!output) {
+			owner.Fail("cannot resolve cover metadata output format");
+			return false;
+		}
+		m_policy = &SelectPolicy(output->name);
+		const bool selected = PlanWantsAttachments(&plan->Tracks());
+		bool audioOnly = false;
+		for (const auto& track : plan->Tracks()) {
+			if (!track || track->Type() == StormByte::Multimedia::Type::Attachment)
+				continue;
+			if (track->Type() != StormByte::Multimedia::Type::Audio) {
+				audioOnly = false;
+				break;
+			}
+			audioOnly = true;
+		}
+		const bool coverMetadata = audioOnly && m_policy->CopiesCoverMetadata();
+		if (!selected && !coverMetadata)
+			return true;
+		const auto& source = selected ? attachments : plan->Snapshot().Attachments();
+		m_attachments.reserve(source.size());
+		for (const auto& item : source) {
+			if (!selected && (!item.MimeType()
+				|| !static_cast<std::string_view>(*item.MimeType()).starts_with("image/")))
+				continue;
 			m_attachments.emplace_back(
 				item.FileName(),
 				item.MimeType(),

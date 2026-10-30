@@ -63,6 +63,8 @@ using namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg;
 namespace {
 	class Matroska final: public Policy {
 		public:
+			bool CopiesCoverMetadata() const noexcept override { return true; }
+
 			void PrepareStream(::AVStream& stream, bool& haveDefaultVideo,
 				bool& haveDefaultAudio) const noexcept override {
 				MarkDefaultStream(stream, haveDefaultVideo, haveDefaultAudio);

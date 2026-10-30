@@ -51,15 +51,103 @@
 #include "../helpers.hxx"
 
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/pipeline/filters/audio/resample.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
+#include <algorithm>
 #include <array>
 
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
 
 namespace {
+	int CheckCoverMetadata(const File& source, const File& output) {
+		TEST_REQUIRE(output.Streams().size() == 1);
+		TEST_REQUIRE(output.Streams()[0].Type() == StormByte::Multimedia::Type::Audio);
+		const auto& before = source.Metadata();
+		const auto& after = output.Metadata();
+		TEST_REQUIRE(before.Title() && after.Title() && *before.Title() == *after.Title());
+		TEST_REQUIRE(before.Artist() && after.Artist() && *before.Artist() == *after.Artist());
+		TEST_REQUIRE(before.Album() && after.Album() && *before.Album() == *after.Album());
+		TEST_REQUIRE(before.AlbumArtist() == after.AlbumArtist());
+		TEST_REQUIRE(before.Composer() == after.Composer());
+		TEST_REQUIRE(before.Genre() == after.Genre());
+		TEST_REQUIRE(before.Comment() == after.Comment());
+		TEST_REQUIRE(before.Date() == after.Date());
+		TEST_REQUIRE(before.Track() == after.Track());
+		TEST_REQUIRE(before.Disc() == after.Disc());
+		TEST_REQUIRE(source.Attachments().size() == 2);
+		TEST_REQUIRE(output.Attachments().size() == source.Attachments().size());
+		for (const auto& cover : source.Attachments()) {
+			bool found = false;
+			for (const auto& copy : output.Attachments()) {
+				const auto& original = cover.Payload().Data();
+				const auto& bytes = copy.Payload().Data();
+				found = found || (cover.MimeType() == copy.MimeType() && original.size() == bytes.size()
+					&& std::equal(original.begin(), original.end(), bytes.begin(), bytes.end()));
+			}
+			TEST_REQUIRE(found);
+		}
+		return 0;
+	}
+
+	int CheckAudioCovers(std::string_view suffix, std::string_view codecName, std::string_view implementation) {
+		const bool remuxOnly = implementation.empty();
+		const auto input = FixturePath(remuxOnly ? "audio/noise_tagged_covers.aiff" : "audio/noise_tagged_covers.mp3");
+		auto source = File::Open(StormByte::Safe::String{input.string()});
+		TEST_REQUIRE(source);
+		TEST_REQUIRE(source->Attachments().size() == 2);
+		TEST_REQUIRE(!source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty());
+		auto codec = Registry::Instance().FindCodec(codecName);
+		TEST_REQUIRE(codec);
+		if (!remuxOnly && !codec->get().HasAccess(Access{Operation::Write}))
+			return TEST_SKIP;
+		const auto output = OutputPath(std::string{"pipeline/mux-policy/covered."} + std::string{suffix});
+		{
+			Transcoder job{TestLocation(input), TestLocation(output), MakeLogger(), 2000000000LL};
+			auto track = job.Audio(0);
+			if (remuxOnly)
+				track.Remux();
+			else
+				track.Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{implementation});
+			if (codecName == "Opus") {
+				track.Filter<Filter::Audio::Resample>(MakeLogger(), 48000);
+				track.BitRate(192000);
+			}
+			if (codecName == "Vorbis")
+				track.BitRate(192000);
+			// No Attachments() call: artwork travels with the ordinary file tags.
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		auto opened = File::Open(StormByte::Safe::String{output.string()});
+		TEST_REQUIRE(opened);
+		TEST_REQUIRE(CheckCoverMetadata(*source, *opened) == 0);
+		const auto remuxed = OutputPath(std::string{"pipeline/mux-policy/remuxed."} + std::string{suffix});
+		{
+			Transcoder job{TestLocation(output), TestLocation(remuxed), MakeLogger(), 2000000000LL};
+			job.Audio(0).Remux();
+			job.Attachments("image/*");
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		auto copy = File::Open(StormByte::Safe::String{remuxed.string()});
+		TEST_REQUIRE(copy);
+		TEST_REQUIRE(CheckCoverMetadata(*source, *copy) == 0);
+		const auto repeated = OutputPath(std::string{"pipeline/mux-policy/repeated."} + std::string{suffix});
+		{
+			Transcoder job{TestLocation(remuxed), TestLocation(repeated), MakeLogger(), 2000000000LL};
+			job.Audio(0).Remux();
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		auto final = File::Open(StormByte::Safe::String{repeated.string()});
+		TEST_REQUIRE(final);
+		return CheckCoverMetadata(*source, *final);
+	}
+
 	int CheckSimpleOutput(std::string_view destination, std::string_view containerName,
 		std::string_view codecName) {
 		auto codec = Registry::Instance().FindCodec(codecName);
@@ -84,6 +172,7 @@ namespace {
 		TEST_PHASE("opening media file for inspection");
 		auto opened = File::Open(StormByte::Safe::String{output.string()});
 		TEST_REQUIRE(opened);
+		TEST_REQUIRE(opened->Attachments().empty());
 		const auto& duration = opened.value().Duration();
 		TEST_REQUIRE(duration && duration.value().Nanoseconds().count() > 0);
 		return 0;
@@ -93,6 +182,16 @@ namespace {
 int test_generic_muxer_writes_flac() {
 	return CheckSimpleOutput("pipeline/mux-policy/native.flac", "FLAC", "FLAC");
 }
+
+int test_audio_cover_opus() { return CheckAudioCovers("opus", "Opus", "libopus"); }
+int test_audio_cover_vorbis() { return CheckAudioCovers("ogg", "Vorbis", "libvorbis"); }
+int test_audio_cover_ogg_flac() { return CheckAudioCovers("oga", "FLAC", "flac"); }
+int test_audio_cover_flac() { return CheckAudioCovers("flac", "FLAC", "flac"); }
+int test_audio_cover_mp3() { return CheckAudioCovers("mp3", "MP3", "libmp3lame"); }
+int test_audio_cover_aiff() { return CheckAudioCovers("aiff", "PCM S16 BE", ""); }
+int test_audio_cover_aac_m4a() { return CheckAudioCovers("m4a", "AAC", "aac"); }
+int test_audio_cover_alac_m4a() { return CheckAudioCovers("m4a", "ALAC", "alac"); }
+int test_audio_cover_matroska() { return CheckAudioCovers("mka", "FLAC", "flac"); }
 
 int test_generic_muxer_writes_flac_in_oga() {
 	return CheckSimpleOutput("pipeline/mux-policy/audio.oga", "Ogg", "FLAC");
@@ -126,6 +225,31 @@ int test_generic_flac_rejects_aac_remux() {
 	return WaitForTranscoderFailure(job);
 }
 
+int test_audio_cover_unsupported_caf() {
+	auto codec = Registry::Instance().FindCodec("ALAC");
+	TEST_REQUIRE(codec);
+	const auto output = OutputPath("pipeline/mux-policy/no-picture-support.caf");
+	Transcoder job{TestLocation(FixturePath("audio/noise_tagged_covers.mp3")), TestLocation(output), MakeLogger(), 2000000000LL};
+	job.Audio(0).Codec(codec->get());
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	auto file = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(file);
+	TEST_REQUIRE(file->Streams().size() == 1);
+	TEST_REQUIRE(file->Streams()[0].Codec().Name() == "ALAC");
+	TEST_REQUIRE(file->Attachments().empty());
+	return 0;
+}
+
+int test_ogg_policy_rejects_non_image_attachments() {
+	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
+		TestLocation(OutputPath("pipeline/mux-policy/rejected-font.opus")), MakeLogger(), 2000000000LL};
+	job.Audio(1).Remux();
+	job.Attachments();
+	job.Run();
+	return WaitForTranscoderFailure(job, "Ogg cover must be");
+}
+
 int test_webm_policy_rejects_attachments() {
 	auto codec = Registry::Instance().FindCodec("VP9");
 	TEST_REQUIRE(codec);
@@ -145,6 +269,17 @@ int test_webm_policy_rejects_attachments() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_audio_cover_unsupported_caf", test_audio_cover_unsupported_caf},
+		TestEntry{"test_ogg_policy_rejects_non_image_attachments", test_ogg_policy_rejects_non_image_attachments},
+		TestEntry{"test_audio_cover_opus", test_audio_cover_opus},
+		TestEntry{"test_audio_cover_vorbis", test_audio_cover_vorbis},
+		TestEntry{"test_audio_cover_ogg_flac", test_audio_cover_ogg_flac},
+		TestEntry{"test_audio_cover_flac", test_audio_cover_flac},
+		TestEntry{"test_audio_cover_mp3", test_audio_cover_mp3},
+		TestEntry{"test_audio_cover_aiff", test_audio_cover_aiff},
+		TestEntry{"test_audio_cover_aac_m4a", test_audio_cover_aac_m4a},
+		TestEntry{"test_audio_cover_alac_m4a", test_audio_cover_alac_m4a},
+		TestEntry{"test_audio_cover_matroska", test_audio_cover_matroska},
 		TestEntry{"test_generic_muxer_writes_flac", test_generic_muxer_writes_flac},
 		TestEntry{"test_generic_muxer_writes_flac_in_oga", test_generic_muxer_writes_flac_in_oga},
 		TestEntry{"test_generic_muxer_writes_vorbis_in_ogg", test_generic_muxer_writes_vorbis_in_ogg},

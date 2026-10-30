@@ -57,6 +57,40 @@ The in-process HDR10+ suite checks public `File` detection against the static-on
 
 ## Audio
 
+- `audio/noise_tagged_covers.mp3`: the placeholder tagged MP3 below, re-encoded
+  once at 44.1 kHz with two different, 64x64 synthetic pictures (PNG front and
+  JPEG back). Picture descriptions/filenames are deliberately empty, as with
+  common ID3 covers. No real music or artwork. SHA-256:
+  `45d94dc09e2495c20089636b5baef24bc8048fb1a442f287bdbcc147bd81ed28`
+  (72,026 bytes).
+- `audio/noise_tagged_covers.aiff`: the first 0.1 seconds of that covered MP3,
+  PCM S16 big-endian with ID3 tags and the same two image payloads. Used to
+  exercise AIFF remux independently of PCM encoder discovery. SHA-256:
+  `b47e4a807d7832cdf80797fb19b613516ff81d8ff8522cc1c1368f4ba1909297`.
+  Authored once with FFmpeg 9.0.2; tests never regenerate either fixture:
+
+  ```sh
+  ffmpeg -hide_banner -loglevel error -n -i test/files/attachments/synthetic-cover.png \
+    -vf scale=64:64 -frames:v 1 cover-front.png
+  ffmpeg -hide_banner -loglevel error -n -i cover-front.png -frames:v 1 cover-back.jpg
+  ffmpeg -hide_banner -loglevel error -n -i test/files/audio/noise_tagged.mp3 \
+    -i cover-front.png -i cover-back.jpg -map 0:a -map 1:v -map 2:v \
+    -map_metadata 0 -ar 44100 -c:a libmp3lame -b:a 192k -c:v copy \
+    -disposition:v attached_pic -metadata:s:v:0 comment='Cover (front)' \
+    -metadata:s:v:1 comment='Cover (back)' -id3v2_version 3 -write_id3v1 0 \
+    test/files/audio/noise_tagged_covers.mp3
+  ffmpeg -hide_banner -loglevel error -n -i test/files/audio/noise_tagged_covers.mp3 \
+    -map 0 -t 0.1 -c:a pcm_s16be -c:v copy -write_id3v2 1 \
+    test/files/audio/noise_tagged_covers.aiff
+  ```
+
+  Mux-policy regressions convert audio while automatically copying both pictures
+  and all ten placeholder tags, then remux with explicit image selection and
+  again without it. All hops require exactly one audio stream, exactly two
+  byte-identical pictures and no ordinary video streams. They cover Opus, Vorbis,
+  Ogg FLAC, native FLAC, MP3, AAC/ALAC M4A, AIFF and Matroska audio. A covered
+  source can still become CAF audio without inventing image support; selecting a
+  font for Opus fails explicitly.
 - `audio/noise_stereo.wav` and `audio/noise_stereo.mp3`: stereo PCM and MP3 sources.
 - `audio/noise_tagged.mp3`: independently generated white noise, seed `20261025`, amplitude `0.1`, two seconds before MP3 encoder padding, 48 kHz, two identical channels, LAME 192 kbit/s. Authored with FFmpeg 9.0.2 on 2026-10-25, with ID3v2.3 and no ID3v1, artwork, lyrics or copyright tag. All descriptive values are placeholders, not references to artists or recordings.
 

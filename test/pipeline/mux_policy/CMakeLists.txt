@@ -2,6 +2,17 @@ add_executable(MultimediaPipelineMuxPolicyTests mux_policy_test.cxx)
 target_link_libraries(MultimediaPipelineMuxPolicyTests PRIVATE multimedia_pipeline_test_support)
 
 foreach(test_name IN ITEMS
+	test_audio_cover_unsupported_caf
+	test_ogg_policy_rejects_non_image_attachments
+	test_audio_cover_opus
+	test_audio_cover_vorbis
+	test_audio_cover_ogg_flac
+	test_audio_cover_flac
+	test_audio_cover_mp3
+	test_audio_cover_aiff
+	test_audio_cover_aac_m4a
+	test_audio_cover_alac_m4a
+	test_audio_cover_matroska
 	test_generic_muxer_writes_flac
 	test_generic_muxer_writes_flac_in_oga
 	test_generic_muxer_writes_vorbis_in_ogg

@@ -25,6 +25,42 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - **Discover available capabilities** — the registry reports the codecs, containers and operations available in the configured build. Use it to select implementations and check read/write access; availability depends on the chosen dependencies and build options, and a codec/container combination may still be rejected during job setup.
 - **Integrate with application logging** — pipeline stages accept a shared StormByte Logger instance (prefer `ThreadedLog` when several workers can write). `Transcoder` exposes hooks and status so the application can own its UI, scheduling and error handling.
 
+## Embedded audio artwork
+
+For audio-only outputs, embedded album artwork is copied alongside the ordinary
+file tags, even when the application does not call `Transcoder::Attachments()`.
+`File::Attachments()` exposes source pictures separately from `File::Streams()`;
+they are not normal video tracks and do not pass through video encoders or filters.
+The original PNG, JPEG or BMP bytes are retained without recompression.
+
+| Output | Native artwork representation |
+| --- | --- |
+| MP3 | ID3 APIC pictures |
+| FLAC | FLAC PICTURE blocks |
+| Ogg Opus, Vorbis, FLAC and Speex | Base64 FLAC picture blocks in `METADATA_BLOCK_PICTURE` comments |
+| M4A / audio-only MP4 | MP4 cover metadata |
+| AIFF / AIFC | ID3 pictures; ID3 writing is enabled |
+| Matroska audio | Image attachments |
+
+Multiple pictures are retained; remuxing an already covered file does not add
+duplicates. The public attachment snapshot does not retain the original picture
+type: when the destination needs one, the first picture is marked front cover and
+the others other. Ogg picture blocks are limited to less than 16 MiB including
+their MIME type and description. Unsupported image types, undecodable pictures
+and impossible explicitly selected attachments fail visibly rather than becoming
+dummy video tracks.
+
+This is not a claim that every audio container can store artwork. The current
+FFmpeg muxers have no implemented native picture-writing route here for WAV, CAF,
+ASF/WMA, WavPack, AU or raw AAC/AC-3/E-AC-3 streams. Automatic picture copying is
+not enabled for them; ordinary audio output still works. APE is not writable by
+the bundled FFmpeg muxer. Choose a supported container when embedded artwork is
+required. Codec availability remains build-dependent.
+
+`Attachments()` still controls general attachments such as subtitle fonts.
+Requesting those for an image-only audio metadata route is an error. Attachment
+selection for video outputs and WebM's attachment rejection are unchanged.
+
 ## The rest of the suite
 
 | Module | Role | API |
@@ -46,6 +82,7 @@ The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, N
 - [The rest of the suite](#the-rest-of-the-suite)
 - [Documentation](#documentation)
 - [Codec compatibility](#codec-compatibility)
+- [Embedded audio artwork](#embedded-audio-artwork)
 - [Two ways to work](#two-ways-to-work)
   - [1. Transcoder (File → File)](#1-transcoder-file--file)
   - [2. The tube by hand](#2-the-tube-by-hand)

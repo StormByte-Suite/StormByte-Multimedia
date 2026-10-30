@@ -172,6 +172,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 */
 			virtual bool ZeroBasedTimeline() const noexcept { return false; }
 
+			/** @brief Whether audio-only output preserves image covers as file metadata by default. */
+			virtual bool CopiesCoverMetadata() const noexcept { return false; }
+
 		protected:
 			/**
 			 * @brief Marks the first video and audio streams as defaults.
@@ -213,4 +216,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	 * @return Process-lifetime immutable policy.
 	 */
 	const Policy& Mp4Policy() noexcept;
+
+	/** @brief Returns ID3/FLAC picture-stream adaptations for audio containers. */
+	const Policy& AudioPicturePolicy() noexcept;
+
+	/** @brief Returns Vorbis-comment picture metadata adaptations for Ogg audio. */
+	const Policy& OggPicturePolicy() noexcept;
 }
