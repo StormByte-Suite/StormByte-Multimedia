@@ -1,5 +1,9 @@
 set(SVTAV1_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SVTAV1_COMPONENT "SVT-AV1")
+set(SVTAV1_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-shallow-version.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-subpel-variance-unaligned-reference.patch"
+)
 
 set(SVTAV1_OPTIONS
 	"-DCOMPILE_C_ONLY=OFF"
@@ -26,7 +30,7 @@ buildmaster_component(
 	"${SVTAV1_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"SvtAv1Enc"
-	"GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-shallow-version.patch;TITLE=SVT-AV1 shallow version}"
+	"GIT={RESET;PATCH={${SVTAV1_PATCHES}};TITLE=SVT-AV1 compatibility patches}"
 )
 buildmaster_group_add(ff-video svt-av1)
 register_plugin(svt-av1 "libsvtav1=enabled")
