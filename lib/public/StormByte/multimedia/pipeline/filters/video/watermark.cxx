@@ -51,13 +51,18 @@
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <lunasvg.h>
+
 #include <algorithm>
 #include <array>
+#include <charconv>
 #include <climits>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <locale>
+#include <sstream>
 #include <utility>
 
 extern "C" {
@@ -341,11 +346,67 @@ namespace {
 		return color;
 	}
 
-	int ScaledDim(int n, double factor) noexcept {
-		const double value = static_cast<double>(n) * factor;
+	int ScaledDim(double n, double factor) noexcept {
+		const double value = n * factor;
 		if (!std::isfinite(value) || value >= static_cast<double>(MaxLogoEdge))
 			return MaxLogoEdge;
 		return std::max(1, static_cast<int>(std::lround(value)));
+	}
+
+	bool DeclaredSvgSize(const lunasvg::Element& root) {
+		bool viewBox = false;
+		if (root.hasAttribute("viewBox")) {
+			auto text = root.getAttribute("viewBox");
+			std::replace(text.begin(), text.end(), ',', ' ');
+			std::istringstream input(text);
+			input.imbue(std::locale::classic());
+			double x, y, width, height;
+			if (!(input >> x >> y >> width >> height) || !(input >> std::ws).eof()
+				|| !std::isfinite(x) || !std::isfinite(y)
+				|| !std::isfinite(width) || !std::isfinite(height) || width <= 0 || height <= 0)
+				return false;
+			viewBox = true;
+		}
+		for (const auto* name : {"width", "height"}) {
+			if (!root.hasAttribute(name)) {
+				if (!viewBox)
+					return false;
+				continue;
+			}
+			const auto& text = root.getAttribute(name);
+			std::string_view value(text);
+			const auto start = value.find_first_not_of(" \t\r\n");
+			if (start == std::string_view::npos)
+				return false;
+			value.remove_prefix(start);
+			if (value.front() == '+')
+				value.remove_prefix(1);
+			double number = 0;
+			const auto parsed = std::from_chars(value.data(), value.data() + value.size(), number);
+			if (parsed.ec != std::errc{} || !std::isfinite(number) || number <= 0)
+				return false;
+			std::string_view unit(parsed.ptr, value.data() + value.size());
+			const auto end = unit.find_last_not_of(" \t\r\n");
+			unit = end == std::string_view::npos ? std::string_view{} : unit.substr(0, end + 1);
+			if (unit != "" && unit != "px" && unit != "pt" && unit != "pc" && unit != "in"
+				&& unit != "cm" && unit != "mm" && unit != "em" && unit != "ex" && unit != "%")
+				return false;
+			if (!viewBox && unit == "%")
+				return false;
+		}
+		return true;
+	}
+
+	void RestrictSvgResources(lunasvg::Element element) {
+		// LunaSVG 3.5 otherwise opens image hrefs as local paths, even for buffer input.
+		for (const auto* name : {"href", "xlink:href"}) {
+			const auto& href = element.getAttribute(name);
+			if (!href.empty() && href.front() != '#' && !href.starts_with("data:"))
+				element.setAttribute(name, "");
+		}
+		for (const auto& child : element.children())
+			if (child.isElement())
+				RestrictSvgResources(child.toElement());
 	}
 
 	void TagSrgb(FFrame& frame) noexcept {
@@ -637,6 +698,12 @@ namespace {
 	}
 }
 
+struct Watermark::Svg {
+	std::unique_ptr<lunasvg::Document> Document;
+	double Width;
+	double Height;
+};
+
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::String logo, Anchor anchor, unsigned opacity, int margin,
 	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept
@@ -705,6 +772,7 @@ void Watermark::DropScale() noexcept {
 }
 
 void Watermark::Clean() noexcept {
+	m_svg.reset();
 	m_rgba.clear();
 	m_scaled.clear();
 	m_linear.reset();
@@ -739,6 +807,7 @@ void Watermark::Setup() noexcept {
 void Watermark::DisableLogo(std::string_view why) noexcept {
 	Log(Level::Warning, StormByte::Safe::String::ReplaceToken("disabled: {}", why));
 	m_opacity = 0;
+	m_svg.reset();
 	m_rgba.clear();
 	m_scaled.clear();
 	m_linear.reset();
@@ -784,13 +853,40 @@ bool Watermark::LoadFile(const StormByte::Safe::String& path) noexcept {
 
 bool Watermark::DecodeLogo() noexcept {
 	if (m_decoded)
-		return !m_rgba.empty();
+		return m_svg || !m_rgba.empty();
 	m_decoded = true;
 	if (m_logo.empty()) {
 		DisableLogo("empty logo");
 		return false;
 	}
 	const std::string hint{ImageHint(m_logo)};
+	if (hint.empty()) {
+		std::string_view text(reinterpret_cast<const char*>(m_logo.data()), static_cast<std::size_t>(m_logo.size()));
+		if (text.starts_with("\xef\xbb\xbf"))
+			text.remove_prefix(3);
+		auto document = lunasvg::Document::loadFromData(text.data(), text.size());
+		if (document) {
+			auto root = document->documentElement();
+			if (!DeclaredSvgSize(root)) {
+				DisableLogo("SVG needs positive width/height or viewBox dimensions");
+				return false;
+			}
+			RestrictSvgResources(root);
+			const double width = document->width();
+			const double height = document->height();
+			if (!std::isfinite(width) || !std::isfinite(height) || width <= 0 || height <= 0) {
+				DisableLogo("invalid SVG dimensions");
+				return false;
+			}
+			m_svg = StormByte::Safe::MakeUnique<Svg>();
+			m_svg->Document = std::move(document);
+			m_svg->Width = width;
+			m_svg->Height = height;
+			m_logoWidth = ScaledDim(width, 1.0);
+			m_logoHeight = ScaledDim(height, 1.0);
+			return true;
+		}
+	}
 	FFrame decoded = FFrame::DecodeImage(
 		reinterpret_cast<const std::uint8_t*>(m_logo.data()),
 		static_cast<std::size_t>(m_logo.size()), hint);
@@ -1017,14 +1113,14 @@ bool Watermark::Prepare(int frameW, int frameH) noexcept {
 			DisableLogo("design resolution is invalid");
 			return false;
 		}
-		m_paintW = ScaledDim(m_logoWidth, factor);
-		m_paintH = ScaledDim(m_logoHeight, factor);
+		m_paintW = ScaledDim(m_svg ? m_svg->Width : m_logoWidth, factor);
+		m_paintH = ScaledDim(m_svg ? m_svg->Height : m_logoHeight, factor);
 		if (!m_point) {
 			const auto margin = std::llround(static_cast<double>(m_margin) * factor);
 			m_scaledMargin = static_cast<int>(std::clamp(margin,
 				static_cast<long long>(INT_MIN), static_cast<long long>(INT_MAX)));
 		}
-		if ((m_paintW != m_logoWidth || m_paintH != m_logoHeight)
+		if (!m_svg && (m_paintW != m_logoWidth || m_paintH != m_logoHeight)
 			&& !ResizeRgba(ScalingContext(), m_rgba.data(), m_logoWidth, m_logoHeight,
 				m_paintW, m_paintH, m_scaled)) {
 			DisableLogo("failed to scale logo");
@@ -1032,6 +1128,23 @@ bool Watermark::Prepare(int frameW, int frameH) noexcept {
 		}
 		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("logo {}x{} frame {}x{} -> {}x{} margin {}",
 			m_logoWidth, m_logoHeight, frameW, frameH, m_paintW, m_paintH, m_scaledMargin));
+	}
+	if (m_svg) {
+		if (m_paintW > frameW || m_paintH > frameH) {
+			DisableLogo("logo does not fit in the video picture");
+			return false;
+		}
+		auto bitmap = m_svg->Document->renderToBitmap(m_paintW, m_paintH);
+		if (bitmap.isNull()) {
+			DisableLogo("failed to rasterize SVG logo");
+			return false;
+		}
+		// PlutoVG converts premultiplied native ARGB to straight sRGB RGBA here.
+		bitmap.convertToRGBA();
+		m_scaled.resize(static_cast<std::size_t>(m_paintW) * static_cast<std::size_t>(m_paintH) * 4);
+		for (int row = 0; row < m_paintH; ++row)
+			std::copy_n(bitmap.data() + row * bitmap.stride(), static_cast<std::size_t>(m_paintW) * 4,
+				m_scaled.data() + static_cast<std::size_t>(row) * static_cast<std::size_t>(m_paintW) * 4);
 	}
 	m_prepared = true;
 	m_preparedW = frameW;

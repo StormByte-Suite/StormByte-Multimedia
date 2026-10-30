@@ -61,6 +61,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstring>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -83,12 +84,17 @@ namespace {
 	constexpr unsigned char AlphaLogoBytes[] = {
 #embed "../../files/logo/watermark-alpha.png"
 	};
+	constexpr unsigned char SvgLogoBytes[] = {
+#embed "../../files/logo/watermark-vector.svg"
+	};
 
 	struct CompositeResult {
 		VideoFrame Before;
 		VideoFrame After;
 		std::vector<float> Linear;
 		bool Captured = false;
+		bool RepeatedMatches = true;
+		unsigned Frames = 0;
 	};
 
 	class SeedPicture final: public Filter::Process {
@@ -156,7 +162,15 @@ namespace {
 			void Clean() noexcept override {}
 			void Setup() noexcept override {}
 			void Process(const Frame&) noexcept override {
+				++m_result.Frames;
 				if (m_result.Captured) {
+					if (AVFrame().Format() == AV_PIX_FMT_GBRPF32LE)
+						for (int plane = 0; plane != 3; ++plane)
+							for (int row = 0; row != PictureSize; ++row)
+								m_result.RepeatedMatches &= std::memcmp(
+									AVFrame().Data(plane) + row * AVFrame().Linesize(plane),
+									m_result.After.Data(plane) + row * m_result.After.Linesize(plane),
+									PictureSize * sizeof(float)) == 0;
 					EncodePicture();
 					return;
 				}
@@ -212,7 +226,9 @@ namespace {
 			CompositeResult& m_result;
 	};
 
-	int RenderComposite(int transfer, int format, unsigned opacity, CompositeResult& result) {
+	int RenderComposite(int transfer, int format, unsigned opacity, CompositeResult& result,
+		const StormByte::Safe::Binary* svg = nullptr,
+		StormByte::Safe::Optional<Property::Resolution> designed = {}, bool fileInput = false) {
 		auto codec = Registry::Instance().FindCodec("VP9");
 		TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
 		auto logger = MakeLogger();
@@ -225,9 +241,12 @@ namespace {
 		options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
 		track.FineTune(std::move(options));
 		track.Filter<SeedPicture>(transfer, format, result);
-		track.Filter<Filter::Video::Watermark>(logger,
-			StormByte::Safe::String{FixturePath("logo/watermark-alpha.png").string()},
-			Property::Point{Origin, Origin}, opacity);
+		if (svg && !fileInput)
+			track.Filter<Filter::Video::Watermark>(logger, *svg, Property::Point{Origin, Origin}, opacity, designed);
+		else
+			track.Filter<Filter::Video::Watermark>(logger,
+				StormByte::Safe::String{FixturePath(svg ? "logo/watermark-vector.svg" : "logo/watermark-alpha.png").string()},
+				Property::Point{Origin, Origin}, opacity, designed);
 		track.Filter<CapturePicture>(result);
 		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
 		job.Run();
@@ -235,6 +254,20 @@ namespace {
 		TEST_REQUIRE(result.Captured);
 		TEST_REQUIRE(result.After.ColorTransfer() == transfer);
 		TEST_REQUIRE(result.After.Format() == format);
+		return 0;
+	}
+
+	StormByte::Safe::Binary SvgBytes(std::string_view text) {
+		StormByte::Safe::Binary bytes;
+		const auto* begin = reinterpret_cast<const std::byte*>(text.data());
+		bytes.assign(begin, begin + text.size());
+		return bytes;
+	}
+
+	int CheckSamePicture(const CompositeResult& a, const CompositeResult& b) {
+		TEST_REQUIRE(a.Linear == b.Linear);
+		TEST_REQUIRE(a.RepeatedMatches && b.RepeatedMatches);
+		TEST_REQUIRE(a.Frames > 1 && b.Frames > 1);
 		return 0;
 	}
 
@@ -372,8 +405,103 @@ int test_watermark_preserves_uncovered_samples() {
 	return 0;
 }
 
+int test_watermark_svg_path_buffer_and_scaling() {
+	const std::string text(reinterpret_cast<const char*>(SvgLogoBytes), sizeof(SvgLogoBytes));
+	const auto svg = SvgBytes(text);
+	for (const auto design : {Property::Resolution{16, 16}, Property::Resolution{16, 0},
+		Property::Resolution{0, 16}, Property::Resolution{16, 32}}) {
+		const int edge = design.Height() == 32 ? 32 : 64;
+		auto native = text;
+		native.replace(native.find("width=\"8\" height=\"8\""), 20,
+			"width=\"" + std::to_string(edge) + "\" height=\"" + std::to_string(edge) + "\"");
+		const auto expected = SvgBytes(native);
+		CompositeResult buffer, path, direct;
+		TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, buffer, &svg, design) == 0);
+		TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, path, &svg, design, true) == 0);
+		TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, direct, &expected) == 0);
+		TEST_REQUIRE(CheckSamePicture(buffer, path) == 0);
+		TEST_REQUIRE(CheckSamePicture(buffer, direct) == 0);
+		bool changed = false;
+		bool untouched = true;
+		for (int plane = 0; plane != 3; ++plane)
+			for (int y = 0; y != PictureSize; ++y)
+				for (int x = 0; x != PictureSize; ++x) {
+					const auto* before = buffer.Before.Data(plane) + y * buffer.Before.Linesize(plane) + x * 4;
+					const auto* after = buffer.After.Data(plane) + y * buffer.After.Linesize(plane) + x * 4;
+					if (x < Origin || y < Origin || x >= Origin + edge || y >= Origin + edge)
+						untouched &= std::memcmp(before, after, 4) == 0;
+					else
+						changed |= std::memcmp(before, after, 4) != 0;
+				}
+		TEST_REQUIRE(changed);
+		TEST_REQUIRE(untouched);
+	}
+	auto viewBoxOnly = text;
+	viewBoxOnly.erase(viewBoxOnly.find("width=\"8\" height=\"8\""), 21);
+	const auto viewBox = SvgBytes("\xef\xbb\xbf" + viewBoxOnly);
+	CompositeResult native, inferred;
+	TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, native, &svg) == 0);
+	TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, inferred, &viewBox) == 0);
+	TEST_REQUIRE(CheckSamePicture(native, inferred) == 0);
+	return 0;
+}
+
+int test_watermark_svg_alpha_and_hdr() {
+	const auto svg = SvgBytes("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\">"
+		"<rect width=\"8\" height=\"8\" fill=\"#00ff00\" fill-opacity=\".5\"/></svg>");
+	CompositeResult sdr;
+	TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 100u, sdr, &svg) == 0);
+	const int x = Origin + 4, y = Origin + 4;
+	const auto* before = reinterpret_cast<const float*>(sdr.Before.Data(0) + y * sdr.Before.Linesize(0));
+	const auto* after = reinterpret_cast<const float*>(sdr.After.Data(0) + y * sdr.After.Linesize(0));
+	TEST_REQUIRE(after[x] > before[x] + 0.1f);
+	TEST_REQUIRE(after[x] < 0.99f);
+	const auto solid = SvgBytes("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\">"
+		"<rect width=\"8\" height=\"8\" fill=\"#00ff00\"/></svg>");
+	CompositeResult weighted;
+	TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 50u, weighted, &solid) == 0);
+	float alphaError = 0;
+	for (std::size_t i = 0; i != sdr.Linear.size(); ++i)
+		alphaError = std::max(alphaError, std::abs(sdr.Linear[i] - weighted.Linear[i]));
+	TEST_REQUIRE(alphaError < 0.004f);
+	for (const int transfer : {AVCOL_TRC_SMPTE2084, AVCOL_TRC_ARIB_STD_B67}) {
+		CompositeResult hdr;
+		TEST_REQUIRE(RenderComposite(transfer, AV_PIX_FMT_GBRPF32LE, 100u, hdr, &svg) == 0);
+		float worst = 0;
+		for (std::size_t i = 0; i != sdr.Linear.size(); ++i)
+			worst = std::max(worst, std::abs(sdr.Linear[i] - hdr.Linear[i]));
+		TEST_REQUIRE(worst < 0.002f);
+	}
+	return 0;
+}
+
+int test_watermark_svg_invalid_passthrough() {
+	for (const auto* text : {
+		"<svg",
+		"<svg xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"8\" height=\"8\"/></svg>",
+		"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"8\" viewBox=\"0 0 8 8\"/>",
+		"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"-8\" height=\"8\"/>",
+		"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 0 8\"/>",
+		"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"999999\" height=\"999999\"/>",
+		"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"8\" height=\"8\"><image width=\"8\" height=\"8\" href=\"test/files/logo/watermark-alpha.png\"/></svg>"}) {
+		const auto svg = SvgBytes(text);
+		CompositeResult result;
+		TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 100u, result, &svg) == 0);
+		bool identical = true;
+		for (int plane = 0; plane != 3; ++plane)
+			for (int row = 0; row != PictureSize; ++row)
+				identical &= std::memcmp(result.Before.Data(plane) + row * result.Before.Linesize(plane),
+					result.After.Data(plane) + row * result.After.Linesize(plane), PictureSize * sizeof(float)) == 0;
+		TEST_REQUIRE(identical);
+	}
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_watermark_svg_path_buffer_and_scaling", test_watermark_svg_path_buffer_and_scaling},
+		TestEntry{"test_watermark_svg_alpha_and_hdr", test_watermark_svg_alpha_and_hdr},
+		TestEntry{"test_watermark_svg_invalid_passthrough", test_watermark_svg_invalid_passthrough},
 		TestEntry{"test_watermark_sdr_hdr_opacity_matches", test_watermark_sdr_hdr_opacity_matches},
 		TestEntry{"test_watermark_preserves_uncovered_samples", test_watermark_preserves_uncovered_samples},
 		TestEntry{"test_watermark_path_and_embedded_binary", test_watermark_path_and_embedded_binary},

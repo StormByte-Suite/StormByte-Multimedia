@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original synthetic StormByte-Multimedia regression fixture. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+  <defs>
+    <linearGradient id="ink">
+      <stop stop-color="#ff0000"/>
+      <stop offset="1" stop-color="#0000ff"/>
+    </linearGradient>
+    <clipPath id="window"><rect x=".25" y=".25" width="7.5" height="7.5" rx=".5"/></clipPath>
+  </defs>
+  <g clip-path="url(#window)">
+    <path d="M.25 .25H3.75V7.75H.25Z" fill="url(#ink)"/>
+    <circle cx="6" cy="2" r="1.5" fill="#00ff00" fill-opacity=".5"/>
+    <path d="M4.25 6.75L7.75 4.25" fill="none" stroke="#fff" stroke-width=".125"/>
+  </g>
+</svg>

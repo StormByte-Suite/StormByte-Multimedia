@@ -1,6 +1,37 @@
 This file is a notice for the binary archive of StormByte-Multimedia. It is not a
 license and it does not change LICENSE.
 
+SVG renderer notices
+--------------------
+
+The binary includes LunaSVG 3.5.0, pinned at commit
+83c58df8103dc7dca423dfd824992af94d49bed6 in thirdparty/lunasvg/src
+(https://github.com/sammycage/lunasvg), and its bundled PlutoVG 1.3.1
+in thirdparty/lunasvg/src/plutovg. Both are MIT-licensed by Samuel Ugochukwu.
+COPYING.LunaSVG contains their actual copyright and MIT permission notices.
+
+PlutoVG also incorporates:
+
+- plutovg-stb-image.h, plutovg-stb-image-write.h and plutovg-stb-truetype.h,
+  copyright (c) 2017 Sean Barrett. We elect each header's MIT alternative;
+  COPYING.LunaSVG reproduces its notice. Original source notices and credits
+  are retained.
+- FreeType-derived math, raster, stroker and type code (plutovg-ft-math.c/.h,
+  plutovg-ft-raster.c/.h, plutovg-ft-stroker.c/.h and plutovg-ft-types.h).
+  These portions are under the FreeType Project License, not PlutoVG's MIT
+  grant. The full, unaltered plutovg/source/FTL.TXT is supplied as COPYING.FTL.
+  This software is based in part on the work of the FreeType Team.
+  Portions are copyright the FreeType Project (https://www.freetype.org);
+  the original files retain their individual copyright years and author notices.
+
+These are statically linked private implementation dependencies; this adds no
+Qt, Rust, Cairo, GLib or external FreeType runtime requirement. System-font
+loading is disabled and SVG image hrefs are restricted to data/internal
+references before layout. No renderer source is modified.
+Redistributions must retain these notices and COPYING.LunaSVG/COPYING.FTL;
+downstream applications bundling this binary must ship them too.
+The release workflow's existing COPYING.* packaging glob includes both files.
+
 Original source of StormByte-Multimedia is dual-licensed. LICENSE is that grant:
 GNU Lesser General Public License v3.0 or later, or a commercial license
 from the copyright holder. COPYING.LGPLv3 is the LGPL-3 text. The commercial

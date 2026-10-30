@@ -88,3 +88,7 @@
 [submodule "NVIDIA codec headers"]
 	path = thirdparty/ffmpeg/plugins/deps/ffnvcodec/src
 	url = https://github.com/FFmpeg/nv-codec-headers.git
+[submodule "thirdparty/lunasvg/src"]
+	path = thirdparty/lunasvg/src
+	url = https://github.com/sammycage/lunasvg.git
+	shallow = true

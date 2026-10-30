@@ -27,6 +27,14 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Added
 
+- `Video::Watermark` accepts self-contained SVG logos from UTF-8 file paths and
+  `Safe::Binary` buffers using pinned LunaSVG 3.5.0 and bundled PlutoVG 1.3.1.
+  Logical width/height or viewBox dimensions follow the existing `designedFor`
+  video-reference scaling; vectors rasterize directly at final paint resolution
+  and reuse the pixel cache. Invalid geometry warns and passes frames through.
+  External image paths and automatic system-font loading are disabled.
+  Binary redistribution notices include the renderer's MIT, embedded STB MIT
+  and incorporated FreeType Project License notices.
 - `Pipeline::Transcoder::Resources(ResourceUsage)` configures Full (the
   historical default), Medium (about half the CPUs available to the process)
   or Low (up to two) before `Run()`. Reduced modes distribute a best-effort

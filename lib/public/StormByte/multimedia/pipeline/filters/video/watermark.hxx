@@ -96,7 +96,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @brief Overlays a still image on decoded video from a path or encoded bytes.
 	 *
 	 * Supply either an owned UTF-8 file path or an owned @ref StormByte::Safe::Binary
-	 * containing an encoded PNG, JPEG, WebP or BMP image. File contents are read once
+	 * containing an encoded PNG, JPEG, WebP, BMP or SVG image. File contents are read once
 	 * into the filter's provider-owned binary storage; binary input is copied there
 	 * when the filter is constructed. The stored source bytes survive @ref Clean so
 	 * the filter can be replayed without reopening or retaining the caller's buffer.
@@ -117,13 +117,24 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *
 	 * @par Design size
 	 * Optional @ref Property::Resolution is the video size the still was drawn
-	 * for. Empty keeps the decoded pixels. One axis may be zero: `0x1080`
+	 * for. Empty keeps raster pixels or the SVG logical size. One axis may be zero: `0x1080`
 	 * follows the frame height and `3840x0` the frame width, with one factor
 	 * so the still is not stretched. `0x0` disables the overlay. Anchor margins
 	 * use that factor. Absolute @ref Property::Point values stay in destination
 	 * pixels. The encoded source is kept; @ref Clean drops only the scaled cache.
 	 * The first frame of a run selects the size. Later frames reuse it until
 	 * the picture size changes or @ref Clean runs.
+	 *
+	 * @par SVG
+	 * SVG bytes are detected independently of the filename. Positive root width/height
+	 * or a positive viewBox determines logical dimensions; missing or invalid geometry
+	 * logs a Warning and becomes passthrough. LunaSVG renders directly at the final
+	 * design-scaled paint size, not at native size followed by raster enlargement.
+	 * Parsed geometry and final straight-alpha sRGB pixels are cached until the
+	 * picture size changes or @ref Clean. SVGs must be self-contained: external hrefs
+	 * are ignored, system fonts are disabled, and text should be converted to paths.
+	 * Embedded data images and internal fragment references are supported. LunaSVG
+	 * implements a subset of SVG; in particular, CSS paint-order is not supported.
 	 *
 	 * @par Colour and alpha
 	 * Only the logo rectangle is rewritten. A fully transparent pixel is not
@@ -353,7 +364,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			static constexpr std::uint8_t ProbeMax = 200;
 
 			/**
-			 * @brief Decodes the provider-owned bytes into RGBA on first use.
+			 * @brief Decodes raster bytes or parses SVG geometry on first use.
 			 * @return false if the logo was disabled.
 			 */
 			bool DecodeLogo() noexcept;
@@ -397,7 +408,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Paint() noexcept;
 
 			/**
-			 * @brief Scales the decoded still once for @p frameW x @p frameH.
+			 * @brief Scales raster pixels or renders SVG at the final paint size.
 			 * @param frameW Picture width of this run.
 			 * @param frameH Picture height of this run.
 			 * @return false if the logo was disabled.
@@ -435,6 +446,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
 
 			StormByte::Safe::Binary m_logo;			///< Persistent encoded source; retained across Clean and replays.
+			struct Svg;
+			StormByte::Safe::Unique<Svg> m_svg;		///< Private parsed vector source; no public renderer dependency.
 			StormByte::Safe::Vector<std::uint8_t> m_rgba;	///< Decoded RGBA8888 pixels.
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_luma;	///< Cached GRAY8 view.
 			StormByte::Safe::Optional<Anchor> m_anchor;	///< Relative placement

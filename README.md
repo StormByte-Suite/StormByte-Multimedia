@@ -484,6 +484,25 @@ Container output is selected from the destination path unless an explicit regist
 
 Filters are leaves, not a second pipeline language. `Scale` is resize (that is the name). `Watermark` is a still image on decoded video, with Hold so a black slate at the start does not pin the letterbox probe too early.
 
+`Watermark` accepts PNG, JPEG, WebP, BMP and self-contained SVG from either a UTF-8
+file path or copied `Safe::Binary` bytes, detected from contents rather than the
+extension. SVG root width/height or viewBox supplies its logical size. The
+optional `designedFor` resolution is the **video reference size**, not the desired
+logo size: both dimensions use the smaller frame/reference ratio; a zero axis
+selects the other ratio. Without it, the logical SVG size is the paint size.
+SVG geometry is rendered directly at that final resolution and cached until
+frame dimensions change or the filter is cleaned. Existing region-only
+scatter, alpha, opacity and SDR/HDR colour handling are shared with raster logos.
+Invalid/missing SVG dimensions warn and pass frames through without a logo.
+SVG external hrefs are ignored and system-font discovery is disabled; convert
+text to paths and embed required images as data URLs. LunaSVG is not a full
+browser SVG engine (notably, `paint-order` is unsupported); check artwork visually.
+The statically linked private renderer is LunaSVG 3.5.0 with bundled PlutoVG 1.3.1.
+Its submodule is pinned and marked shallow; upstream CMake declares versions
+directly, so recursive depth-one checkout needs no Git history or tag workaround.
+Binary packages must retain `THIRD-PARTY`, `COPYING.LunaSVG` and `COPYING.FTL`
+alongside the existing notices.
+
 Filters retain reusable scaling graphs and workers in their own provider-owned cache on every platform. For repeated direct frame scaling outside a filter, retain an `FFmpeg::AVFrame::ScaleContext` and call `source.ScaleTo(context, destination, width, height, filter, scaler)`. Use a context from only one thread at a time and destroy it during ordinary application teardown, not from a thread-local destructor or DLL detach callback. The original `ScaleTo` overload remains available for one-off calls but does not retain a cache across calls.
 
 Custom frame filters use `Save` for a one-for-one replacement that retains the input's wrapper timing. Buffering or rate-changing filters use `Drop` when input is accepted without output, `EmitGraph` to emit a graph's first result and drain its available outputs, and `EmitFrame` for individually prepared outputs, including those produced during `Eof`. Emitted frames carry the output's native timebase and timestamps; their lineage comes from the current input, or the last input at EOF, with distinct parts for multiple outputs. Analytics cannot use these mutation methods. For direct graph use, set `AVFrame::TimeBase` consistently with its PTS and duration, call `Receive` to drain without closing, and stop `Flush` when it returns an empty frame.
@@ -659,7 +678,7 @@ Optional cases remain registered across bundled/system and GPL/nonfree configura
 
 HDR10 metadata cases explicitly select x265, SVT-AV1, libaom, VP9 and the listed HEVC NVENC/QSV/VAAPI implementations. Hardware tests preflight the device and required encoding profile: proven device absence or unsupported backend encoding capability skips, while invalid formats, allocation failures and generic encoding errors remain failures. An independent VAAPI SDR HEVC Main test checks 8-bit encoding even when Main10 is unavailable. Dolby Vision transform cases cover x265, SVT-AV1 and libaom independently, including DOVI-only and DOVI with HDR10. AV1 outputs use regenerated Dolby Vision profile 10. Libaom's HDR10 capability covers color signaling and static metadata preservation through the pipeline and Matroska container; it does not promise static mastering/content-light OBUs in a raw AV1 bitstream.
 
-The watermark case creates `test-output/pipeline/watermark/watermark-logo-path.webm` and `watermark-logo-binary.webm`, using the same logo from a file path and from `#embed` bytes. It prints both paths for manual inspection; the automated checks validate video generation, not the overlay's appearance. Run the `MultimediaPipelineWatermarkTests` executable directly or use `ctest --test-dir build-tests/test -R watermark -V` to see the paths on success. Both outputs use VP9 and do not require GPL/nonfree codecs.
+The watermark case creates `test-output/pipeline/watermark/watermark-logo-path.webm` and `watermark-logo-binary.webm`, using the same PNG from a file path and from `#embed` bytes. It prints both paths for manual inspection. Additional pixel regressions cover SVG file/buffer parity, direct final-resolution rendering, two-axis and one-axis reference scaling, viewBox-only/BOM input, half-alpha colour, SDR/PQ/HLG parity, cached-frame consistency, invalid geometry and unchanged uncovered samples. Run the `MultimediaPipelineWatermarkTests` executable directly or use `ctest --test-dir build-tests/test -R watermark -V` to see the paths on success. These cases use VP9 without VMAF or GPL/nonfree codecs.
 
 ## Contributing
 
