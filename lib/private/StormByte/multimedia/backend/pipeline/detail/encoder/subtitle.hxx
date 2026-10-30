@@ -175,6 +175,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 */
 			AVRational TimeBase() const noexcept override;
 
+			/**
+			 * @brief Clamps a watermark to text still awaiting an end time.
+			 */
+			std::int64_t ProgressBoundary(std::int64_t boundary) const noexcept;
+
 		private:
 			/**
 			 * @brief Writes the held show cue ending at @p endNs.

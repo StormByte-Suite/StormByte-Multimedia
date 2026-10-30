@@ -49,7 +49,9 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/encode.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.hxx>
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/encoder.hxx>
@@ -94,6 +96,16 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 		if (m_owner.Failed() || !m_owner.m_backend)
 			return;
+		if (const auto* progress = dynamic_cast<const SubtitleFrameProgress*>(item.get())) {
+			const auto* subtitle = dynamic_cast<const Detail::Encoder::Subtitle*>(m_owner.m_backend.get());
+			if (!subtitle) {
+				Fail("subtitle watermark reached a non-subtitle encoder");
+				return;
+			}
+			m_owner.Emit(Packet::PointerType::MakePointer<SubtitlePacketProgress>(m_owner.m_index,
+				StormByte::Multimedia::Pipeline::Producer::Encoder, subtitle->ProgressBoundary(progress->Boundary())));
+			return;
+		}
 		auto frame = StormByte::Safe::DynamicPointerCast<Frame>(item);
 		if (!frame) {
 			Fail("encoder expected a frame");
@@ -153,6 +165,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 					break;
 				m_owner.Emit(std::move(packet));
 			}
+			if (!m_owner.Failed() && dynamic_cast<const Detail::Encoder::Subtitle*>(m_owner.m_backend.get()))
+				m_owner.Emit(Packet::PointerType::MakePointer<SubtitlePacketProgress>(m_owner.m_index,
+					StormByte::Multimedia::Pipeline::Producer::Encoder, SubtitleProgress::End));
 		}
 	}
 }

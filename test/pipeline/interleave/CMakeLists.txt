@@ -1,6 +1,9 @@
 add_ffmpeg_test_executable(MultimediaPipelineInterleaveTests RunPipelineInterleaveTests)
 
 foreach(test_name IN ITEMS
+	test_interleave_sparse_ocr_with_remux
+	test_interleave_empty_ocr_with_remux
+	test_interleave_cancel_pending_ocr
 	test_interleave_encoded_video_and_audio
 	test_interleave_encoded_video_remuxed_audio
 	test_interleave_remuxed_video_loudnorm_audio

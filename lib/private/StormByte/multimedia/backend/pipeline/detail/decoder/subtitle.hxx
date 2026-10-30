@@ -155,6 +155,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 */
 			bool Reset(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
 
+			/**
+			 * @brief Clamps a watermark to a cue still awaiting its end packet.
+			 */
+			std::int64_t ProgressBoundary(std::int64_t boundary) const noexcept;
+
 		private:
 			StormByte::Multimedia::FFmpeg::AVDecoder m_decoder;							///< Opened decoder
 			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVSubtitle> m_pendingSub;	///< Pending AVSubtitle

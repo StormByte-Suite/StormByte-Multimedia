@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/worker/mux.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/muxer.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
@@ -118,6 +119,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				return;
 			Wait();
 		}
+		if (dynamic_cast<const SubtitleProgress*>(packet.get()))
+			return;
 
 		const int track = packet->Track();
 		const auto type = packet->Type();

@@ -328,6 +328,10 @@ bool Subtitle::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner)
 	return true;
 }
 
+std::int64_t Subtitle::ProgressBoundary(std::int64_t boundary) const noexcept {
+	return m_heldText.empty() ? boundary : std::min(boundary, m_heldStartNs);
+}
+
 void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 	std::int64_t endNs) noexcept {
 	if (m_heldText.empty() || m_heldPts == AV_NOPTS_VALUE)

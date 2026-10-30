@@ -184,6 +184,8 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			 */
 			void EnsureFeed(int track) noexcept;
 
+			void Park(StormByte::Multimedia::Pipeline::Packet::PointerType packet) noexcept;
+
 			/**
 			 * @brief Blocking Emit of parked packets for one track.
 			 * @param track Origin stream index.
@@ -227,5 +229,7 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			StormByte::Safe::ConditionVariable m_parkCv;	///< Read / feeder rendezvous.
 			StormByte::Safe::Atomic<bool> m_feedStop{false};	///< Feeder halt.
 			std::uint32_t m_feeding = 0;	///< Packets popped from a park but still in Emit; guarded by @ref m_parkMutex.
+			StormByte::Safe::Vector<int> m_subtitles;	///< Encoded subtitle source tracks receiving ordered watermarks.
+			StormByte::Safe::Optional<std::int64_t> m_subtitleBoundary;
 	};
 }

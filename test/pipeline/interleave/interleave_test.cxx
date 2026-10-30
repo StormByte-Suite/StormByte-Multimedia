@@ -52,11 +52,13 @@
 #include "runners.hxx"
 
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
+#include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <filesystem>
 #include <iostream>
@@ -64,6 +66,7 @@
 #include <map>
 #include <memory>
 #include <string_view>
+#include <thread>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -95,6 +98,159 @@ namespace {
 			av_packet_free(&packet);
 		}
 	};
+
+	bool Paced(const AVStream& stream) noexcept;
+	double Seconds(std::int64_t ticks, AVRational base) noexcept;
+
+	class SlowSubtitles final: public Filter::Process {
+		public:
+			SlowSubtitles(): Filter::Process({}, "slow-subtitle-test") {}
+
+			StormByte::Multimedia::Type Media() const noexcept override {
+				return StormByte::Multimedia::Type::Subtitle;
+			}
+
+			void Clean() noexcept override {}
+
+			void Setup() noexcept override {}
+
+			void Process(const Frame&) noexcept override {
+				std::this_thread::sleep_for(std::chrono::milliseconds{150});
+			}
+	};
+
+	class EmptySubtitles final: public Filter::Process {
+		public:
+			EmptySubtitles(): Filter::Process({}, "empty-subtitle-test") {}
+
+			StormByte::Multimedia::Type Media() const noexcept override {
+				return StormByte::Multimedia::Type::Subtitle;
+			}
+
+			void Clean() noexcept override {}
+
+			void Setup() noexcept override {}
+
+			void Process(const Frame& frame) noexcept override {
+				auto& payload = const_cast<Frame&>(frame).Payload();
+				static_cast<void>(payload.Drop(payload.Available()));
+			}
+	};
+
+	int MakeSubtitleInput(const std::filesystem::path& output) {
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, FixturePath(Fixture).string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> media{raw};
+		TEST_REQUIRE(avformat_find_stream_info(media.get(), nullptr) >= 0);
+		raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, FixturePath("video/anime_like.mkv").string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> subtitles{raw};
+		TEST_REQUIRE(avformat_find_stream_info(subtitles.get(), nullptr) >= 0);
+		AVFormatContext* mux = nullptr;
+		TEST_REQUIRE(avformat_alloc_output_context2(&mux, nullptr, "matroska", output.string().c_str()) >= 0);
+		const auto close = [](AVFormatContext* context) {
+			avio_closep(&context->pb);
+			avformat_free_context(context);
+		};
+		std::unique_ptr<AVFormatContext, decltype(close)> destination{mux, close};
+		for (int index = 0; index != 4; ++index) {
+			const AVStream* source = index < 2 ? media->streams[index] : subtitles->streams[2];
+			auto* stream = avformat_new_stream(mux, nullptr);
+			TEST_REQUIRE(stream && avcodec_parameters_copy(stream->codecpar, source->codecpar) >= 0);
+			stream->time_base = source->time_base;
+			if (index >= 2)
+				TEST_REQUIRE(av_dict_set(&stream->metadata, "language", "eng", 0) >= 0);
+		}
+		TEST_REQUIRE(avio_open(&mux->pb, output.string().c_str(), AVIO_FLAG_WRITE) >= 0);
+		TEST_REQUIRE(avformat_write_header(mux, nullptr) >= 0);
+		std::vector<std::unique_ptr<AVPacket, PacketFree>> packets;
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		TEST_REQUIRE(packet);
+		int result = 0;
+		while ((result = av_read_frame(media.get(), packet.get())) == 0) {
+			const int index = packet->stream_index;
+			if (index < 2) {
+				av_packet_rescale_ts(packet.get(), media->streams[index]->time_base, mux->streams[index]->time_base);
+				packets.emplace_back(av_packet_clone(packet.get()));
+				TEST_REQUIRE(packets.back());
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		while ((result = av_read_frame(subtitles.get(), packet.get())) == 0) {
+			if (packet->stream_index == 2) {
+				for (const int index : {2, 3}) {
+					const std::array offsets = index == 2
+						? std::array{2000, 6000, 10000} : std::array{1000, 9000, 11800};
+					for (const int offset : offsets) {
+						// The last show has no clear packet: EOF must deliver the held cue.
+						if (offset == 11800 && packet->pts != 0)
+							continue;
+						std::unique_ptr<AVPacket, PacketFree> copy{av_packet_clone(packet.get())};
+						TEST_REQUIRE(copy);
+						av_packet_rescale_ts(copy.get(), subtitles->streams[2]->time_base, mux->streams[index]->time_base);
+						const auto shift = av_rescale_q(offset, AVRational{1, 1000}, mux->streams[index]->time_base);
+						copy->pts += shift;
+						copy->dts = copy->pts;
+						copy->stream_index = index;
+						packets.push_back(std::move(copy));
+					}
+				}
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		std::stable_sort(packets.begin(), packets.end(), [mux](const auto& a, const auto& b) {
+			return av_compare_ts(a->dts, mux->streams[a->stream_index]->time_base,
+				b->dts, mux->streams[b->stream_index]->time_base) < 0;
+		});
+		for (auto& pending : packets)
+			TEST_REQUIRE(av_interleaved_write_frame(mux, pending.get()) >= 0);
+		TEST_REQUIRE(av_write_trailer(mux) >= 0);
+		return 0;
+	}
+
+	int CheckSubtitles(const std::filesystem::path& output, bool empty) {
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, output.string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+		TEST_REQUIRE(avformat_find_stream_info(input.get(), nullptr) >= 0);
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		TEST_REQUIRE(packet);
+		std::map<int, std::vector<double>> starts;
+		double finalDuration = 0;
+		double latestMedia = -1;
+		double worstLate = 0;
+		int result = 0;
+		while ((result = av_read_frame(input.get(), packet.get())) == 0) {
+			const auto& stream = *input->streams[packet->stream_index];
+			if (packet->pts != AV_NOPTS_VALUE) {
+				const double time = Seconds(packet->pts, stream.time_base);
+				if (Paced(stream))
+					latestMedia = std::max(latestMedia, time);
+				else if (stream.codecpar->codec_id == AV_CODEC_ID_ASS) {
+					TEST_REQUIRE(packet->size > 0 && packet->duration > 0);
+					worstLate = std::max(worstLate, latestMedia - time);
+					starts[packet->stream_index].push_back(time);
+					if (packet->stream_index == 2 && std::abs(time - 11.8) < 0.01)
+						finalDuration = Seconds(packet->duration, stream.time_base);
+				}
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		std::cout << "[Test] worst subtitle arrival delay: " << worstLate << " s\n";
+		TEST_REQUIRE(worstLate <= MaxSpreadSeconds);
+		TEST_REQUIRE(starts[2].size() == (empty ? 0u : 3u));
+		TEST_REQUIRE(starts[3].size() == 3);
+		for (std::size_t i = 0; i != 3; ++i)
+			TEST_REQUIRE(std::abs(starts[3][i] - (2.0 + 4.0 * i)) < 0.01);
+		if (!empty) {
+			TEST_REQUIRE(std::abs(starts[2].back() - 11.8) < 0.01);
+			TEST_REQUIRE(std::abs(finalDuration - 2.0) < 0.01);
+		}
+		return 0;
+	}
 
 	bool Paced(const AVStream& stream) noexcept {
 		const auto type = stream.codecpar->codec_type;
@@ -248,8 +404,64 @@ int test_interleave_encoded_video_loudnorm_audio() {
 	return Run(job, output);
 }
 
+namespace {
+	int RunSubtitleInterleave(bool empty, bool cancel = false) {
+		const auto ass = Registry::Instance().FindCodec("ASS");
+		TEST_REQUIRE(ass && ass->get().HasAccess(Access{Operation::Write}));
+		const auto input = OutputPath("pipeline/interleave/sparse-pgs-input.mkv");
+		const auto output = OutputPath("pipeline/interleave/sparse-pgs-output.mkv");
+		TEST_REQUIRE(MakeSubtitleInput(input) == 0);
+		auto logger = MakeLogger();
+		Transcoder job{TestLocation(input), TestLocation(output), logger, 12012000000LL};
+		job.Video(0).Remux();
+		job.Audio(1).Remux();
+		auto sparse = job.Subtitle(3);
+		sparse.Codec(ass->get()).Filter<SlowSubtitles>();
+		if (empty)
+			sparse.Filter<EmptySubtitles>();
+		job.Subtitle(2).Codec(ass->get()).Filter<SlowSubtitles>();
+		job.Subtitle(2).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		if (cancel) {
+			std::this_thread::sleep_for(std::chrono::milliseconds{20});
+			job.Cancel();
+			const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{5};
+			while (job.Status() != Status::Aborted && job.Status() != Status::Error
+				&& std::chrono::steady_clock::now() < deadline)
+				std::this_thread::sleep_for(std::chrono::milliseconds{10});
+			// A running plan can report its explicit cancellation as an error.
+			if (job.Status() == Status::Error) {
+				const auto error = job.Error();
+				TEST_REQUIRE(error && TestView(*error) == "transcode cancelled");
+			}
+			else
+				TEST_REQUIRE(job.Status() == Status::Aborted);
+			return 0;
+		}
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		TEST_REQUIRE(CheckInterleave(output) == 0);
+		return CheckSubtitles(output, empty);
+	}
+}
+
+int test_interleave_sparse_ocr_with_remux() {
+	return RunSubtitleInterleave(false);
+}
+
+int test_interleave_empty_ocr_with_remux() {
+	return RunSubtitleInterleave(true);
+}
+
+int test_interleave_cancel_pending_ocr() {
+	return RunSubtitleInterleave(false, true);
+}
+
 int RunPipelineInterleaveTests(int argc, char** argv) {
 	const std::array tests{
+		TestEntry{"test_interleave_sparse_ocr_with_remux", test_interleave_sparse_ocr_with_remux},
+		TestEntry{"test_interleave_empty_ocr_with_remux", test_interleave_empty_ocr_with_remux},
+		TestEntry{"test_interleave_cancel_pending_ocr", test_interleave_cancel_pending_ocr},
 		TestEntry{"test_interleave_encoded_video_and_audio", test_interleave_encoded_video_and_audio},
 		TestEntry{"test_interleave_encoded_video_remuxed_audio", test_interleave_encoded_video_remuxed_audio},
 		TestEntry{"test_interleave_remuxed_video_loudnorm_audio", test_interleave_remuxed_video_loudnorm_audio},

@@ -61,6 +61,7 @@
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/optional.hxx>
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <optional>
@@ -153,8 +154,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Subtitle::Receive(
 		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
-		if (!m_pendingSub.has_value())
+		if (!m_pendingSub.has_value()) {
+			if (m_flushed && m_heldSubtitle)
+				return std::move(m_heldSubtitle);
 			return {};
+		}
 
 		auto sub = std::move(*m_pendingSub);
 		m_pendingSub.reset();
@@ -237,6 +241,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 
 	void Subtitle::Flush(StormByte::Multimedia::Pipeline::Decoder&) noexcept {
 		m_flushed = true;
+	}
+
+	std::int64_t Subtitle::ProgressBoundary(std::int64_t boundary) const noexcept {
+		if (m_heldSubtitle && m_heldSubtitle->Pts())
+			return std::min<std::int64_t>(boundary, m_heldSubtitle->Pts()->Nanoseconds().count());
+		return boundary;
 	}
 
 	bool Subtitle::Reset(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {

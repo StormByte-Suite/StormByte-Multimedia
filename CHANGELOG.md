@@ -55,6 +55,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- OCR subtitle conversion no longer lets remuxed video/audio overtake pending
+  subtitle cues. Ordered sparse-track watermarks keep empty intervals moving
+  without waiting for the next forced subtitle, and the muxer waits for OCR
+  work before advancing past its timeline. Encoder input ceilings now apply to
+  source track identities, retaining bounded queues when output indices differ.
+  The final subtitle awaiting a clear packet is also delivered at EOF.
 - SVT-AV1 no longer crashes with an access violation in the 16-wide SSE2/SSSE3
   sub-pixel variance kernels when the reference block is not 16-byte aligned
   (full-pel `x_offset == 0 && y_offset == 0` path used an aligned load).

@@ -49,9 +49,11 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/decode.hxx>
+#include <StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
@@ -137,6 +139,18 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 		if (m_owner.Failed())
 			return;
+		if (const auto* progress = dynamic_cast<const SubtitlePacketProgress*>(item.get())) {
+			if (m_owner.m_look)
+				return;
+			const auto* subtitle = dynamic_cast<const Detail::Decoder::Subtitle*>(m_owner.m_backend.get());
+			if (!subtitle) {
+				Fail("subtitle watermark reached a non-subtitle decoder");
+				return;
+			}
+			Emit(Item::PointerType::MakePointer<SubtitleFrameProgress>(m_owner.m_index,
+				subtitle->ProgressBoundary(progress->Boundary())));
+			return;
+		}
 		auto packet = StormByte::Safe::DynamicPointerCast<Packet>(item);
 		if (!packet) {
 			Fail("decoder expected a packet");

@@ -51,6 +51,8 @@
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
+#include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/demuxer.hxx>
@@ -198,6 +200,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_eof = false;
 		m_owner.m_positionNs.store(-1, StormByte::Safe::MemoryOrder::Release);
 		m_owner.m_nextSerial.clear();
+		for (const auto& track : m_owner.Plan()->Tracks()) {
+			const auto* config = track ? dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Subtitle*>(track->Config()) : nullptr;
+			if (config && config->Codec()
+				&& std::find(m_subtitles.begin(), m_subtitles.end(), track->In()) == m_subtitles.end())
+				m_subtitles.push_back(track->In());
+		}
 		m_feedStop.store(false, StormByte::Safe::MemoryOrder::Release);
 			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open {}", std::string_view{m_owner.Origin().Path()}));
 	}
@@ -253,6 +261,22 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				PacketDigest(packet->Payload())));
 		}
 
+		if (!measure && !m_subtitles.empty()) {
+			const auto& time = packet->Dts() ? packet->Dts() : packet->Pts();
+			if (time) {
+				const auto boundary = time->Nanoseconds().count() - SubtitleProgress::SourceLead;
+				if (!m_subtitleBoundary || boundary - *m_subtitleBoundary >= SubtitleProgress::Interval) {
+					m_subtitleBoundary = boundary;
+					for (const int track : m_subtitles)
+						Park(Packet::PointerType::MakePointer<SubtitlePacketProgress>(
+							track, StormByte::Multimedia::Pipeline::Producer::Demuxer, boundary));
+				}
+			}
+		}
+		Park(std::move(packet));
+	}
+
+	void Demux::Park(Packet::PointerType packet) noexcept {
 		const int track = packet->Track();
 		const StormByte::Size ceiling = ParkCeiling(track);
 		{

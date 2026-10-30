@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
 #include <StormByte/multimedia/log.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
@@ -594,6 +595,20 @@ void FFmpeg::CallLastChance() noexcept {
 }
 
 void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
+	if (const auto* progress = dynamic_cast<const Backend::Pipeline::SubtitleProgress*>(item.get())) {
+		auto boundary = progress->Boundary();
+		for (const auto& held : m_state->queue) {
+			const auto& pts = held->Kind() == Kind::Frame
+				? static_cast<const Pipeline::Frame&>(*held).Pts() : static_cast<const Pipeline::Packet&>(*held).Pts();
+			boundary = std::min<std::int64_t>(boundary, pts
+				? pts->Nanoseconds().count() : std::numeric_limits<std::int64_t>::min());
+		}
+		if (item->Kind() == Kind::Frame)
+			Emit(Item::PointerType::MakePointer<Backend::Pipeline::SubtitleFrameProgress>(item->Track(), boundary));
+		else
+			Emit(Item::PointerType::MakePointer<Backend::Pipeline::SubtitlePacketProgress>(item->Track(), item->Producer(), boundary));
+		return;
+	}
 	m_current = std::move(item);
 	m_state->drop = false;
 	m_state->nextPart = m_state->lastFrame

@@ -148,7 +148,7 @@ bool Encoder::SetupPlan() noexcept {
 	}
 
 	if (const std::size_t capacity = InputCeiling(); capacity > 0)
-		pipe().Capacity(m_index, capacity);
+		pipe().Capacity(track.In(), capacity);
 	return Backend::Pipeline::Encoder::PrepareForMux(*this);
 }
 

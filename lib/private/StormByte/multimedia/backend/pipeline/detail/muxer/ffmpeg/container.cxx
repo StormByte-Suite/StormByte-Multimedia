@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/file.hxx>
@@ -714,7 +715,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		std::int64_t minPts = 0;
 		std::int64_t maxPts = 0;
 		for (const auto& queued : m_queue) {
-			if (!queued || !queued->Pts())
+			if (!queued || dynamic_cast<const SubtitleProgress*>(queued.get()) || !queued->Pts())
 				continue;
 			const std::int64_t ns = queued->Pts()->Nanoseconds().count();
 			if (!havePts || ns < minPts)
@@ -767,6 +768,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			const auto type = stream->codecpar ? stream->codecpar->codec_type : AVMEDIA_TYPE_UNKNOWN;
 			track.paced = (type == AVMEDIA_TYPE_VIDEO || type == AVMEDIA_TYPE_AUDIO)
 				&& (stream->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0;
+			track.subtitle = type == AVMEDIA_TYPE_SUBTITLE && track.encoder;
 		}
 
 		m_header = true;
@@ -791,6 +793,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 
 		auto& track = it->second;
+		if (const auto* progress = dynamic_cast<const SubtitlePacketProgress*>(packet.get())) {
+			track.boundaryNs = std::max(track.boundaryNs, progress->Boundary());
+			return Drain(owner, false);
+		}
 		// Untimed packets ride with their predecessor; NoPts sorts first, so they never wait.
 		std::int64_t key = track.lastKeyNs;
 		if (packet->Dts())
@@ -823,6 +829,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			}
 			if (!oldest)
 				return true;
+			if (!force) {
+				for (const auto& [index, track] : m_tracks) {
+					if (track.subtitle && track.held.empty() && oldestKey >= track.boundaryNs)
+						return true;
+				}
+			}
 			if (starved && !force && oldestKey != StormByte::Multimedia::FFmpeg::NoPts
 				&& newestKey - oldestKey <= InterleaveHoldNs)
 				return true;

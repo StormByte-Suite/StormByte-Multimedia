@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/remux.hxx>
+#include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
@@ -93,6 +94,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	}
 
 	void Remux::Process(Item::PointerType item) noexcept {
+		if (dynamic_cast<const SubtitleProgress*>(item.get()))
+			return;
 		if (!item) {
 			Flush();
 			return;

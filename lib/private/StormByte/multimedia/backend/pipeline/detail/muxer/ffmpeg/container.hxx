@@ -96,6 +96,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			StormByte::Safe::Deque<std::int64_t> heldKeys;				///< Interleave key (ns) of each held packet
 			std::int64_t lastKeyNs = StormByte::Multimedia::FFmpeg::NoPts;	///< Key of the newest held packet
 			bool paced = false;										///< Audio/video: gates writes until it has a packet
+			bool subtitle = false;									///< Encoded sparse track gated by ordered watermarks.
+			std::int64_t boundaryNs = StormByte::Multimedia::FFmpeg::NoPts;
 	};
 }
 
