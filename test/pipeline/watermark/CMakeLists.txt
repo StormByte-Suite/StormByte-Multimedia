@@ -6,5 +6,7 @@ set_source_files_properties(watermark_test.cxx PROPERTIES
 )
 
 add_optional_pipeline_test(MultimediaPipelineWatermarkTests test_watermark_path_and_embedded_binary)
+add_pipeline_test(MultimediaPipelineWatermarkTests test_watermark_sdr_hdr_opacity_matches)
+add_pipeline_test(MultimediaPipelineWatermarkTests test_watermark_preserves_uncovered_samples)
 set_tests_properties(pipeline.test_watermark_path_and_embedded_binary PROPERTIES
 	TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;watermark")

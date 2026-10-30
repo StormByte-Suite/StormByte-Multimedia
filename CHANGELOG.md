@@ -55,6 +55,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Watermark opacity uses one BT.2020 graphics-white-normalized perceptual curve for
+  SDR, PQ and HLG instead of separate SDR gamma and HDR PQ blends. Existing HDR
+  graphics-white mapping is retained; only covered samples and their shared
+  chroma samples are rewritten, leaving uncovered pixels and metadata intact.
 - Bundled FFmpeg preserves sparse MP4/MOV timed-text subtitle timestamps across
   long empty intervals. Gaps are split into bounded empty samples instead of
   overflowing the muxer's signed 32-bit sample-duration limit (about 36 minutes

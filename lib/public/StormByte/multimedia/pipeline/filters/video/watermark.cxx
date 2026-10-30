@@ -595,15 +595,13 @@ namespace {
 		return std::pow(std::max(e - c1, 0.f) / (c2 - c3 * e), 1.f / m1);
 	}
 
-	// Opacity is perceptual (as in image editors): mixing in linear light makes a
-	// bright logo over dark video look almost opaque, especially on PQ content.
+	// Use the same perceptual curve at the same graphics-white reference.
+	// SDR linear white is 1; HDR linear white is GraphicsWhite / HdrPeak.
 	float Mix(float under, float over, float a, bool hdr) noexcept {
-		if (hdr)
-			return PqDecode(PqEncode(under) * (1.f - a) + PqEncode(over) * a);
-		constexpr float gamma = 2.4f;
-		const float u = std::pow(std::max(under, 0.f), 1.f / gamma);
-		const float o = std::pow(std::max(over, 0.f), 1.f / gamma);
-		return std::pow(u * (1.f - a) + o * a, gamma);
+		if (a >= 1.f)
+			return over;
+		const float scale = hdr ? 1.f : static_cast<float>(GraphicsWhite / HdrPeak);
+		return PqDecode(PqEncode(under * scale) * (1.f - a) + PqEncode(over * scale) * a) / scale;
 	}
 
 	void BlendLinear(FFrame& tile, const FFrame& logo, int placeX, int placeY, int tileX, int tileY,
@@ -1043,7 +1041,7 @@ bool Watermark::Prepare(int frameW, int frameH) noexcept {
 
 bool Watermark::EnsureLinear(const FFrame& src) noexcept {
 	const bool hdr = HdrTransfer(src.ColorTransfer());
-	const int primaries = WorkingPrimaries(src);
+	const int primaries = AVCOL_PRI_BT2020;
 	const int matrix = src.ColorSpace();
 	const int range = src.ColorRange();
 	const int transfer = src.ColorTransfer();
@@ -1104,13 +1102,13 @@ bool Watermark::Composite(const FFrame& src, int x, int y) noexcept {
 	FFrame linear;
 	linear.Format(AV_PIX_FMT_GBRPF32LE);
 	if (!tile.ScaleTo(ScalingContext(), linear, box.w, box.h,
-			FFrame::Resample::Point, FFrame::Scaler::Zimg, LinearTarget(primaries, hdr))
+			FFrame::Resample::Point, FFrame::Scaler::Zimg, LinearTarget(AVCOL_PRI_BT2020, hdr))
 		|| !linear.Data(0) || !linear.Data(1) || !linear.Data(2))
 		return false;
 	const std::uint8_t* rgba = m_scaled.empty() ? m_rgba.data() : m_scaled.data();
 	BlendLinear(linear, *m_linear, x, y, box.x, box.y, rgba, m_paintW, m_paintH, m_opacity, hdr);
 	linear.ColorTransfer(AVCOL_TRC_LINEAR);
-	linear.ColorPrimaries(primaries);
+	linear.ColorPrimaries(AVCOL_PRI_BT2020);
 	linear.ColorSpace(AVCOL_SPC_RGB);
 	linear.ColorRange(AVCOL_RANGE_JPEG);
 	FFrame::ColorTarget back;
