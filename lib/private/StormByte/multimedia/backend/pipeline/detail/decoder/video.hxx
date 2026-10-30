@@ -166,6 +166,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			StormByte::Multimedia::FFmpeg::AVFrame m_scratch;				///< Receive scratch
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Video> m_video;	///< Stream video properties.
 			AVRational m_timeBase;											///< Stream time base
+			std::optional<std::int64_t> m_nextPts;							///< Next presentation tick from the last timed frame.
 			bool m_draining;												///< EOF requested
 			bool m_flushed;													///< EOF already signalled
 	};

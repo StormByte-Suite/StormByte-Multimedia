@@ -1,6 +1,7 @@
 add_ffmpeg_test_executable(MultimediaPipelineInterleaveTests RunPipelineInterleaveTests)
 
 foreach(test_name IN ITEMS
+	test_avi_missing_pts_preserves_timeline_and_progress
 	test_mov_text_preserves_long_gaps
 	test_mov_text_preserves_long_gaps_mixed_time_bases
 	test_mov_text_preserves_long_gaps_fragmented

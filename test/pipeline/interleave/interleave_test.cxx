@@ -53,11 +53,13 @@
 
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
+#include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -405,6 +407,31 @@ int test_interleave_encoded_video_loudnorm_audio() {
 }
 
 namespace {
+	struct DecodedTiming {
+		std::atomic<unsigned> Count{0};
+		std::atomic<bool> Valid{true};
+		std::int64_t Previous = -1;
+	};
+
+	class CheckPresentationTimes final: public Filter::Process {
+		public:
+			explicit CheckPresentationTimes(DecodedTiming& timing):
+				Filter::Process({}, "check-presentation-times"), m_timing(timing) {}
+			StormByte::Multimedia::Type Media() const noexcept override { return StormByte::Multimedia::Type::Video; }
+			void Clean() noexcept override {}
+			void Setup() noexcept override {}
+			void Process(const Frame& frame) noexcept override {
+				if (!frame.Pts() || frame.Pts()->Nanoseconds().count() <= m_timing.Previous)
+					m_timing.Valid.store(false);
+				if (frame.Pts())
+					m_timing.Previous = frame.Pts()->Nanoseconds().count();
+				m_timing.Count.fetch_add(1);
+				std::this_thread::sleep_for(std::chrono::milliseconds{5});
+			}
+		private:
+			DecodedTiming& m_timing;
+	};
+
 	int CheckLongMovTextGaps(bool fragmented, bool mixedTimeBases) {
 		const auto output = OutputPath("pipeline/interleave/long-mov-text-gaps.mp4");
 		AVFormatContext* raw = nullptr;
@@ -547,8 +574,62 @@ int test_mov_text_preserves_long_gaps_fragmented() {
 	return CheckLongMovTextGaps(true, false);
 }
 
+int test_avi_missing_pts_preserves_timeline_and_progress() {
+	const auto output = OutputPath("pipeline/interleave/missing-pts.mkv");
+	auto codec = Registry::Instance().FindCodec("VP9");
+	TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+	auto logger = MakeLogger();
+	DecodedTiming timing;
+	Transcoder job{TestLocation(FixturePath("video/missing_pts_bframes.avi")), TestLocation(output), logger};
+	auto track = job.Video(0);
+	track.Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libvpx-vp9"});
+	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+	options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+	options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
+	track.FineTune(std::move(options));
+	track.Filter<CheckPresentationTimes>(timing);
+	job.Audio(1).Remux();
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	bool advanced = false;
+	const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{10};
+	while (job.Status() != Status::Done && job.Status() != Status::Error
+		&& std::chrono::steady_clock::now() < deadline) {
+		if (const auto progress = job.Progress())
+			advanced |= progress->Main() > 0 && progress->Main() < 100;
+		std::this_thread::sleep_for(std::chrono::milliseconds{2});
+	}
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	TEST_REQUIRE(timing.Valid.load());
+	TEST_REQUIRE(timing.Count.load() == 50);
+	TEST_REQUIRE(advanced);
+	AVFormatContext* raw = nullptr;
+	TEST_REQUIRE(avformat_open_input(&raw, output.string().c_str(), nullptr, nullptr) == 0);
+	std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+	TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+	TEST_REQUIRE(raw->duration > 1900000 && raw->duration < 2200000);
+	std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+	TEST_REQUIRE(packet);
+	double previous = -1;
+	unsigned count = 0;
+	int result = 0;
+	while ((result = av_read_frame(raw, packet.get())) == 0) {
+		if (packet->stream_index == 0) {
+			TEST_REQUIRE(packet->pts != AV_NOPTS_VALUE && packet->dts != AV_NOPTS_VALUE);
+			const double pts = Seconds(packet->pts, raw->streams[0]->time_base);
+			TEST_REQUIRE(pts > previous && pts >= 0 && pts < 2.2);
+			previous = pts;
+			++count;
+		}
+		av_packet_unref(packet.get());
+	}
+	TEST_REQUIRE(result == AVERROR_EOF && count == 50);
+	return 0;
+}
+
 int RunPipelineInterleaveTests(int argc, char** argv) {
 	const std::array tests{
+		TestEntry{"test_avi_missing_pts_preserves_timeline_and_progress", test_avi_missing_pts_preserves_timeline_and_progress},
 		TestEntry{"test_mov_text_preserves_long_gaps", test_mov_text_preserves_long_gaps},
 		TestEntry{"test_mov_text_preserves_long_gaps_mixed_time_bases", test_mov_text_preserves_long_gaps_mixed_time_bases},
 		TestEntry{"test_mov_text_preserves_long_gaps_fragmented", test_mov_text_preserves_long_gaps_fragmented},

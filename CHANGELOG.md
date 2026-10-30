@@ -55,6 +55,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Video decoding uses FFmpeg's reconstructed presentation timestamp when the
+  decoded frame has no original PTS, as with reordered MPEG-4 video in AVI.
+  Delayed frames lacking both timestamps continue from the preceding timed
+  frame's duration, including the final frame delivered during decoder drain.
+  The recovered timing is retained on both the public frame and its native
+  buffer, restoring encode progress and preventing invalid output timelines.
 - Watermark opacity uses one BT.2020 graphics-white-normalized perceptual curve for
   SDR, PQ and HLG instead of separate SDR gamma and HDR PQ blends. Existing HDR
   graphics-white mapping is retained; only covered samples and their shared

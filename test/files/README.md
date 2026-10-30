@@ -37,6 +37,17 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
     -fflags +bitexact -flags:v +bitexact -flags:a +bitexact interleave_long.mkv
   ```
 
+- `video/missing_pts_bframes.avi`: synthetic two-second 96x64 MPEG-4/AC-3
+  fixture with reordered frames and missing video packet PTS. Its regression
+  verifies all 50 decoded/output video timestamps, intermediate encode progress
+  and a two-second output timeline, including the final delayed frame.
+
+  ```sh
+  ffmpeg -f lavfi -i testsrc2=size=96x64:rate=25:duration=2 \
+    -f lavfi -i sine=frequency=440:sample_rate=48000:duration=2 \
+    -c:v mpeg4 -bf 2 -q:v 5 -c:a ac3 -b:a 192k -shortest missing_pts_bframes.avi
+  ```
+
 ### Dolby Vision
 
 - `video/dovi_only.mkv`: synthetic Profile 5, compatibility ID 0; IPT-PQ-C2 matrix, full range, BT.2020 primaries and PQ transfer are explicitly signaled. It has no static HDR10 mastering-display/content-light SEI or HDR10-compatible VUI; DOVI RPU Level 6 metadata is present.

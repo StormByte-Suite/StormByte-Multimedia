@@ -65,6 +65,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -316,6 +317,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				video->SampleAspectRatio(), video->DOVI());
 		}
 
+		if (holder->Handle().Pts() == AV_NOPTS_VALUE)
+			holder->Handle().Pts(holder->Handle().BestEffortTimestamp());
+		// A delayed final AVI frame can lack both PTS and a best-effort timestamp.
+		if (holder->Handle().Pts() == AV_NOPTS_VALUE && m_nextPts)
+			holder->Handle().Pts(*m_nextPts);
+		const auto pts = holder->Handle().Pts();
+		const auto duration = holder->Handle().DurationTicks();
+		m_nextPts.reset();
+		if (pts != AV_NOPTS_VALUE && duration > 0
+			&& pts <= std::numeric_limits<std::int64_t>::max() - duration)
+			m_nextPts = pts + duration;
 		holder->Handle().TimeBase(m_timeBase);
 		auto frame = StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>::MakePointer<
 			StormByte::Multimedia::Pipeline::Frame>(
@@ -356,6 +368,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		m_scratch.Unref();
 		m_draining = false;
 		m_flushed = false;
+		m_nextPts.reset();
 		return true;
 	}
 }
