@@ -55,6 +55,11 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FFmpeg preserves sparse MP4/MOV timed-text subtitle timestamps across
+  long empty intervals. Gaps are split into bounded empty samples instead of
+  overflowing the muxer's signed 32-bit sample-duration limit (about 36 minutes
+  at a microsecond timescale), without reducing timestamp precision. Subtitle
+  clearing also compares timestamps in each subtitle track's own time base.
 - OCR subtitle conversion no longer lets remuxed video/audio overtake pending
   subtitle cues. Ordered sparse-track watermarks keep empty intervals moving
   without waiting for the next forced subtitle, and the muxer waits for OCR

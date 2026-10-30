@@ -1,0 +1,95 @@
+From 5af2801182d493352e990f5031da9eac6b3f9f71 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Fri, 30 Oct 2026 15:19:32 +0100
+Subject: [PATCH] avformat/movenc: preserve long gaps between timed-text
+ subtitles
+
+check_pkt() rejects DTS deltas greater than or equal to INT_MAX and
+replaces the incoming DTS with the previous sample's DTS plus one,
+discarding its PTS. With a 1/1000000 subtitle time base, an empty interval
+of 2147.483647 seconds is sufficient to trigger this recovery path.
+Sparse mov_text subtitles can therefore appear thousands of seconds
+before their intended presentation time, even when the incoming packets
+have valid, monotonically increasing timestamps.
+
+The empty sample inserted at the end of a cue does not prevent this:
+its duration is determined by the next sample, which may be hours later.
+Relaxing check_pkt() alone is not sufficient because the sample-duration
+helpers also require signed 32-bit durations.
+
+Split long empty intervals by inserting additional two-byte empty
+mov_text samples at steps of INT_MAX - 1 track ticks. This keeps every
+generated sample duration below the existing validation limit while
+preserving cue timestamps, durations, text and the original timescale.
+Apply the same handling to leading empty intervals.
+
+Rescale the triggering packet's DTS into each subtitle track's time base
+before comparing it with that track's duration. Packets from other tracks
+may use different time bases and must not be compared as raw integers.
+Ignore packets without a DTS for this subtitle-end insertion pass.
+
+A minimal reproducer uses an SRT file containing:
+
+  1
+  00:00:01,000 --> 00:00:02,000
+  First cue
+
+  2
+  01:53:17,916 --> 01:53:26,425
+  Second cue
+
+Encode with:
+
+  ffmpeg -i sparse.srt -c:s mov_text sparse.mp4
+  ffmpeg -i sparse.mp4 -map 0:s:0 -c:s srt roundtrip.srt
+
+Before this change the second cue starts at approximately 2.000001
+seconds instead of 6797.916 seconds. After this change both cues retain
+their intended start times and durations.
+
+Verified with signed-duration boundary cases, gaps requiring multiple
+empty samples, mixed track time bases and fragmented MP4 output.
+---
+ libavformat/movenc.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/libavformat/movenc.c b/libavformat/movenc.c
+index 6f93eb3e36..4aea51737e 100644
+--- a/libavformat/movenc.c
++++ b/libavformat/movenc.c
+@@ -7643,15 +7643,31 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
+          *
+          * 3) See mov_write_trailer for how the final end sample is
+          * handled.
++         *
++         * 4) Split long empty intervals before check_pkt's signed duration
++         * limit. At a microsecond timescale, sparse subtitles can exceed
++         * this limit after only about 36 minutes without a new cue.
+          */
+         for (i = 0; i < mov->nb_tracks; i++) {
+             MOVTrack *trk = &mov->tracks[i];
++            int64_t dts, end;
+             int ret;
+ 
+-            if (trk->par->codec_id == AV_CODEC_ID_MOV_TEXT &&
+-                trk->track_duration < pkt->dts &&
+-                (trk->entry == 0 || !trk->last_sample_is_subtitle_end)) {
+-                ret = mov_write_subtitle_end_packet(s, i, trk->track_duration);
++            if (trk->par->codec_id != AV_CODEC_ID_MOV_TEXT ||
++                pkt->dts == AV_NOPTS_VALUE)
++                continue;
++
++            dts = av_rescale_q(pkt->dts, s->streams[pkt->stream_index]->time_base,
++                              (AVRational){1, trk->timescale});
++            while (trk->track_duration < dts) {
++                if (trk->entry == 0 || !trk->last_sample_is_subtitle_end)
++                    end = trk->track_duration;
++                else if (dts - trk->track_duration >= INT_MAX)
++                    end = trk->track_duration + INT_MAX - 1;
++                else
++                    break;
++
++                ret = mov_write_subtitle_end_packet(s, i, end);
+                 if (ret < 0) return ret;
+                 trk->last_sample_is_subtitle_end = 1;
+             }

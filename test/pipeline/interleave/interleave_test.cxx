@@ -405,6 +405,84 @@ int test_interleave_encoded_video_loudnorm_audio() {
 }
 
 namespace {
+	int CheckLongMovTextGaps(bool fragmented, bool mixedTimeBases) {
+		const auto output = OutputPath("pipeline/interleave/long-mov-text-gaps.mp4");
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_alloc_output_context2(&raw, nullptr, "mp4", output.string().c_str()) >= 0);
+		raw->avoid_negative_ts = AVFMT_AVOID_NEG_TS_DISABLED;
+		const auto close = [](AVFormatContext* context) {
+			avio_closep(&context->pb);
+			avformat_free_context(context);
+		};
+		std::unique_ptr<AVFormatContext, decltype(close)> destination{raw, close};
+		for (int index = 0; index != (mixedTimeBases ? 2 : 1); ++index) {
+			auto* stream = avformat_new_stream(raw, nullptr);
+			TEST_REQUIRE(stream);
+			stream->codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
+			stream->codecpar->codec_id = AV_CODEC_ID_MOV_TEXT;
+			stream->time_base = AVRational{1, index == 0 ? 1000000 : 1000};
+		}
+		TEST_REQUIRE(avio_open(&raw->pb, output.string().c_str(), AVIO_FLAG_WRITE) >= 0);
+		AVDictionary* options = nullptr;
+		if (fragmented)
+			TEST_REQUIRE(av_dict_set(&options, "movflags", "frag_custom+empty_moov", 0) >= 0);
+		const int header = avformat_write_header(raw, &options);
+		av_dict_free(&options);
+		TEST_REQUIRE(header >= 0);
+
+		// Just below, exactly at, and above the signed 32-bit delta limit,
+		// followed by a gap requiring more than one empty sample.
+		constexpr std::int64_t Limit = std::numeric_limits<int>::max();
+		const std::array<std::int64_t, 5> times{
+			1000000, 1500000 + Limit - 1, 2000000 + 2 * Limit - 1,
+			2500000 + 3 * Limit, 3000000 + 6 * Limit};
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		TEST_REQUIRE(packet);
+		for (std::size_t cue = 0; cue != times.size(); ++cue) {
+			for (unsigned index = 0; index != raw->nb_streams; ++index) {
+				TEST_REQUIRE(av_new_packet(packet.get(), 3) >= 0);
+				packet->data[0] = 0;
+				packet->data[1] = 1;
+				packet->data[2] = static_cast<std::uint8_t>('A' + cue);
+				packet->pts = packet->dts = av_rescale_q(times[cue], AVRational{1, 1000000},
+					raw->streams[index]->time_base);
+				packet->duration = av_rescale_q(500000, AVRational{1, 1000000}, raw->streams[index]->time_base);
+				packet->stream_index = static_cast<int>(index);
+				TEST_REQUIRE(av_write_frame(raw, packet.get()) >= 0);
+				av_packet_unref(packet.get());
+			}
+			if (fragmented)
+				TEST_REQUIRE(av_write_frame(raw, nullptr) >= 0);
+		}
+		TEST_REQUIRE(av_write_trailer(raw) >= 0);
+		destination.reset();
+
+		AVFormatContext* source = nullptr;
+		TEST_REQUIRE(avformat_open_input(&source, output.string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> input{source};
+		TEST_REQUIRE(avformat_find_stream_info(source, nullptr) >= 0);
+		std::map<int, std::size_t> counts;
+		int result = 0;
+		while ((result = av_read_frame(source, packet.get())) == 0) {
+			if (packet->size > 2) {
+				const auto index = packet->stream_index;
+				const auto cue = counts[index]++;
+				TEST_REQUIRE(cue < times.size());
+				const auto base = source->streams[index]->time_base;
+				const auto expected = av_rescale_q(times[cue], AVRational{1, 1000000}, base);
+				TEST_REQUIRE(packet->pts == expected && packet->dts == expected);
+				TEST_REQUIRE(packet->duration == av_rescale_q(500000, AVRational{1, 1000000}, base));
+				TEST_REQUIRE(packet->size == 3 && packet->data[2] == 'A' + cue);
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		TEST_REQUIRE(counts.size() == (mixedTimeBases ? 2u : 1u));
+		for (const auto& [index, count] : counts)
+			TEST_REQUIRE(count == times.size());
+		return 0;
+	}
+
 	int RunSubtitleInterleave(bool empty, bool cancel = false) {
 		const auto ass = Registry::Instance().FindCodec("ASS");
 		TEST_REQUIRE(ass && ass->get().HasAccess(Access{Operation::Write}));
@@ -457,8 +535,23 @@ int test_interleave_cancel_pending_ocr() {
 	return RunSubtitleInterleave(false, true);
 }
 
+int test_mov_text_preserves_long_gaps() {
+	return CheckLongMovTextGaps(false, false);
+}
+
+int test_mov_text_preserves_long_gaps_mixed_time_bases() {
+	return CheckLongMovTextGaps(false, true);
+}
+
+int test_mov_text_preserves_long_gaps_fragmented() {
+	return CheckLongMovTextGaps(true, false);
+}
+
 int RunPipelineInterleaveTests(int argc, char** argv) {
 	const std::array tests{
+		TestEntry{"test_mov_text_preserves_long_gaps", test_mov_text_preserves_long_gaps},
+		TestEntry{"test_mov_text_preserves_long_gaps_mixed_time_bases", test_mov_text_preserves_long_gaps_mixed_time_bases},
+		TestEntry{"test_mov_text_preserves_long_gaps_fragmented", test_mov_text_preserves_long_gaps_fragmented},
 		TestEntry{"test_interleave_sparse_ocr_with_remux", test_interleave_sparse_ocr_with_remux},
 		TestEntry{"test_interleave_empty_ocr_with_remux", test_interleave_empty_ocr_with_remux},
 		TestEntry{"test_interleave_cancel_pending_ocr", test_interleave_cancel_pending_ocr},

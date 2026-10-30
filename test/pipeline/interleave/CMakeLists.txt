@@ -1,6 +1,9 @@
 add_ffmpeg_test_executable(MultimediaPipelineInterleaveTests RunPipelineInterleaveTests)
 
 foreach(test_name IN ITEMS
+	test_mov_text_preserves_long_gaps
+	test_mov_text_preserves_long_gaps_mixed_time_bases
+	test_mov_text_preserves_long_gaps_fragmented
 	test_interleave_sparse_ocr_with_remux
 	test_interleave_empty_ocr_with_remux
 	test_interleave_cancel_pending_ocr

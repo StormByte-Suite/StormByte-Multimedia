@@ -234,6 +234,7 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0002-clang-cl-no-options-strict.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0003-clang-cl-no-nonlocal-asm-labels.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0004-avcodec-apv-parser-rename-close.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0005-movenc-preserve-long-subtitle-gaps.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"
