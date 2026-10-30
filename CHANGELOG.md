@@ -55,6 +55,13 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- SVT-AV1 no longer crashes with an access violation in the 16-wide SSE2/SSSE3
+  sub-pixel variance kernels when the reference block is not 16-byte aligned
+  (full-pel `x_offset == 0 && y_offset == 0` path used an aligned load).
+- Remuxing a track into a container that does not understand the source codec
+  tag (for example MP4 `mp4a` AAC into Matroska) no longer fails with
+  `avformat_init_output failed: Invalid data found when processing input`; the
+  muxer now drops an incompatible source tag, as FFmpeg does for stream copy.
 - Restore Full-mode VMAF throughput: automatic analysis uses all process-available
   CPUs, and explicit worker counts are no longer reduced by a 16-worker or
   available-RAM cap. Full raw-video queues retain their 27-frame capacity and

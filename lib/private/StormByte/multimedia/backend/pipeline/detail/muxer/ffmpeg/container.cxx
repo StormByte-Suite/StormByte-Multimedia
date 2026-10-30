@@ -652,6 +652,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 					return false;
 				}
 
+				// A source container tag (for example MP4 'mp4a') is not valid in every
+				// destination; keep it only where the destination maps it to the same codec.
+				if (const auto* const* tags = m_ctx->oformat->codec_tag) {
+					unsigned int destinationTag = 0;
+					if (av_codec_get_id(tags, stream->codecpar->codec_tag) != stream->codecpar->codec_id
+						&& av_codec_get_tag2(tags, stream->codecpar->codec_id, &destinationTag))
+						stream->codecpar->codec_tag = 0;
+				}
+
 				if (track.srcTb.num > 0 && track.srcTb.den > 0)
 					stream->time_base = ::AVRational{track.srcTb.num, track.srcTb.den};
 				if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO

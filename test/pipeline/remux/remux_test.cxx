@@ -142,6 +142,33 @@ int test_transcoder_remux_omits_unselected_attachments() {
 	return CheckRemuxOutput(output, 0);
 }
 
+int test_transcoder_remuxes_mp4_audio_into_matroska() {
+	const auto output = OutputPath("pipeline/transcoder-remux-mp4-audio.mkv");
+	auto logger = MakeLogger();
+	TEST_PHASE("creating transcoder");
+	Transcoder job{TestLocation(FixturePath("video/bluray_like_hdr10.mp4")), TestLocation(output), logger, 2000000000LL};
+	job.Video(0).Remux();
+	job.Audio(1).Remux();
+	job.Audio(2).Remux();
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	TEST_PHASE("starting transcoder run");
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+
+	TEST_PHASE("opening media file for inspection");
+	auto opened = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(opened);
+	std::size_t audios = 0;
+	for (const auto& stream : opened.value().Streams()) {
+		if (stream.Type() == StormByte::Multimedia::Type::Audio) {
+			TEST_REQUIRE(stream.Codec().Name() == "AAC"sv);
+			++audios;
+		}
+	}
+	TEST_REQUIRE(audios == 2);
+	return 0;
+}
+
 int test_hand_built_pipe_remux_preserves_pgs_and_attachments() {
 	const auto input = FixturePath("video/anime_like.mkv");
 	const auto output = OutputPath("pipeline/manual-remux.mkv");
@@ -325,6 +352,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_remuxes_and_encodes_same_video", test_transcoder_remuxes_and_encodes_same_video},
 		TestEntry{"test_transcoder_remux_preserves_pgs_and_attachments", test_transcoder_remux_preserves_pgs_and_attachments},
 		TestEntry{"test_transcoder_remux_omits_unselected_attachments", test_transcoder_remux_omits_unselected_attachments},
+		TestEntry{"test_transcoder_remuxes_mp4_audio_into_matroska", test_transcoder_remuxes_mp4_audio_into_matroska},
 		TestEntry{"test_hand_built_pipe_remux_preserves_pgs_and_attachments", test_hand_built_pipe_remux_preserves_pgs_and_attachments},
 		TestEntry{"test_manual_explicit_container_overrides_filename", test_manual_explicit_container_overrides_filename},
 		TestEntry{"test_transcoder_explicit_container_overrides_filename", test_transcoder_explicit_container_overrides_filename},
