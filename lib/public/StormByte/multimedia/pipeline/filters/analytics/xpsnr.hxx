@@ -129,7 +129,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref Eof warns about unmatched frames. @ref InputCeiling limits
 	 * pending input, not frames awaiting a matching look: at most 32 in Full,
 	 * eight in Medium, two in Low, additionally reduced by the job's RAM-aware
-	 * queue budget (minimum two).
+	 * queue budget in Medium/Low (minimum two).
 	 *
 	 * @par When to read the report
 	 * Wait until the job is Done. A low score is not Fail.

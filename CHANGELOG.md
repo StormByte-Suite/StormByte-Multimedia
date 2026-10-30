@@ -55,6 +55,18 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Restore Full-mode VMAF throughput: automatic analysis uses all process-available
+  CPUs, and explicit worker counts are no longer reduced by a 16-worker or
+  available-RAM cap. Full raw-video queues retain their 27-frame capacity and
+  analytics input remains bounded to 32 looks, without RAM-based shrinking to
+  just a few frames. Full prioritizes throughput rather than enforcing a
+  process-memory cap.
+- Restore balanced-mode throughput: Medium shares its half-CPU VMAF target
+  across video contexts without a fixed four-worker limit or an additional
+  codec-stage division. Its extractor estimate uses at most one quarter of
+  available RAM, and raw queues retain their one-eighth RAM reservation with
+  a 2 GiB maximum. Analytics input is capped at eight looks without halving
+  the capacity twice. Low's CPU, worker, memory and queue policies are unchanged.
 - Audio-only conversion and remux preserve embedded PNG/JPEG/BMP album artwork
   with ordinary file metadata, without requiring `Attachments()`. MP3 and AIFF
   use ID3 pictures (AIFF ID3 writing is explicitly enabled), native FLAC uses
@@ -90,22 +102,22 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
   serial, size and FFmpeg error; other submission errors remain fatal.
 - Reduced resource policies now apply to VMAF workers and its pending-input
   hopper, including when a larger worker count was explicitly supplied.
-  Medium uses at most four libvmaf workers per video context and Low one,
-  additionally sharing the job CPU target across video lanes and analysis.
+  Medium shares its half-CPU libvmaf target across video contexts and Low
+  retains one worker, additionally constrained by extractor-memory estimates.
   This substantially reduces libvmaf's resolution-dependent extractor memory
   without subsampling frames or changing the selected model. Reports expose
   the effective `threads` count. Filter frame caps, audio queues and compressed
   packet caps now also follow the selected resource policy, as do the PSNR,
   SSIM and XPSNR pending-input hoppers. Filter routes now receive the job Plan
   before their capacities and resource-sensitive operations are configured.
-  Raw-video queues share a RAM-aware reservation across active video lanes
+  In Medium and Low, raw-video queues share a RAM-aware reservation across active video lanes
   and three codec/filter queues per lane, with conservative high-depth frame
   sizing and a two-frame minimum. The reservation is at most one eighth of
-  available RAM, additionally capped to 4 GiB in Full, 1 GiB in Medium and
+  available RAM, additionally capped to 2 GiB in Medium and
   256 MiB in Low. Analytics input no longer allows a 512-frame burst in Full:
-  its maximum is 32 and is additionally memory-clamped. VMAF's extractor pool
-  now has RAM- and resolution-aware limits in Full as well (at most 16 workers),
-  with more conservative memory reservations in reduced modes.
+  its maximum is 32 without RAM-based shrinking. VMAF's extractor pool
+  has RAM- and resolution-aware limits only in reduced modes; Full keeps
+  all requested workers.
   These are queue/extractor targets, not a hard RSS cap on native codecs or
   unpaired looks required by encoder latency.
 - Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported

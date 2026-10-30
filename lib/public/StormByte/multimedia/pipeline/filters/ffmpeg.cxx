@@ -268,10 +268,12 @@ StormByte::Size FFmpeg::InputCeiling() const noexcept {
 StormByte::Size Analytics::PendingCeiling(StormByte::Size full) const noexcept {
 	const auto usage = m_plan ? m_plan->Resources() : ResourceUsage::Full;
 	const StormByte::Size maximum = usage == ResourceUsage::Low ? 2 : usage == ResourceUsage::Medium ? 8 : 32;
-	const auto requested = std::min(full, maximum);
-	if (m_plan)
-		return StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan, requested);
-	return requested;
+	if (m_plan) {
+		const StormByte::Size capacity =
+			StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan, full);
+		return std::min(maximum, capacity);
+	}
+	return std::min(full, maximum);
 }
 
 void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexcept {

@@ -121,17 +121,18 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @ref InputCeiling limits pending input, not frames awaiting
 	 * a matching look. Extractor memory primarily scales with thread count
 	 * and resolution; unmatched frames and score storage are additional.
-	 * Full uses process-available CPUs, bounded to 16 workers and an estimated
-	 * extractor reservation of at most one quarter of available RAM across video
-	 * contexts. Explicit worker counts are subject to the same safety bound.
+	 * Full uses all process-available CPUs, or the explicit worker count, without
+	 * reducing that count by available RAM. This prioritizes throughput and can
+	 * require substantial extractor memory, especially for concurrent video contexts.
 	 * Medium and Low also constrain libvmaf, even with an explicit worker count:
-	 * the job CPU target is shared across video lanes and codec/analytics stages,
-	 * with a memory-conscious maximum of four workers for Medium and one for Low.
-	 * Their estimated extractor reservations are at most one eighth and one
+	 * Medium shares its half-CPU target across video contexts without a fixed
+	 * four-worker cap; Low retains one worker and its codec/analytics stage budget.
+	 * Their estimated extractor reservations are at most one quarter and one
 	 * sixteenth of available RAM respectively, shared across video contexts.
 	 * One worker remains the minimum even when its estimate exceeds the reservation.
 	 * Pending input is capped at 32 looks in Full, eight in Medium and two in Low,
-	 * additionally reduced by the job's RAM-aware raw-frame queue budget.
+	 * additionally reduced by the job's RAM-aware raw-frame queue budget only in
+	 * Medium and Low. Full retains 32 pending looks regardless of available RAM.
 	 * Historical measurements before these bounds showed about 18.5 GiB for
 	 * 32 extractor workers on 4K 10-bit (`vmaf_4k_v0.6.1`, subsample 1),
 	 * with an initialization peak of about 20.5 GiB. Each video track opens
@@ -157,7 +158,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param model libvmaf version key (`vmaf_4k_v0.6.1`).
 			 * @param threads Requested libvmaf worker count. Empty uses process-available CPUs.
-			 *        All modes apply RAM-aware safety bounds; Medium/Low also apply CPU targets.
+			 *        Full honors the request; Medium/Low apply RAM-aware bounds and CPU targets.
 			 *
 			 * Extractor RAM follows workers and resolution. A separate context
 			 * is opened per video track. Worker limits reserve memory

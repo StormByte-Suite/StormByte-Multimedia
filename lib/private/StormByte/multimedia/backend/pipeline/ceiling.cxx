@@ -108,8 +108,10 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
 		std::size_t fullFrames) noexcept {
 		using Usage = Multimedia::Pipeline::ResourceUsage;
+		if (usage == Usage::Full)
+			return std::max<std::size_t>(2, fullFrames);
 		const std::size_t mib = 1024ull * 1024ull;
-		const std::size_t maximum = (usage == Usage::Low ? 256 : usage == Usage::Medium ? 1024 : 4096) * mib;
+		const std::size_t maximum = (usage == Usage::Low ? 256 : 2048) * mib;
 		const auto reservation = std::min(availableRam / 8, maximum);
 		const auto capacity = reservation / std::max<std::size_t>(queues, 1)
 			/ std::max<std::size_t>(frameBytes, 1);
@@ -118,6 +120,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 	std::size_t Ceiling::VideoFrames(const Multimedia::Pipeline::Plan& plan,
 		std::size_t fullFrames) noexcept {
+		if (plan.Resources() == Multimedia::Pipeline::ResourceUsage::Full)
+			return std::max<std::size_t>(2, fullFrames);
 		std::size_t lanes = 0;
 		std::size_t frameBytes = 64ull * 1024ull * 1024ull;
 		for (const auto& track : plan.Tracks())
@@ -140,12 +144,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		unsigned requested, std::size_t availableRam, std::size_t pixels,
 		std::size_t lanes) noexcept {
 		using Usage = Multimedia::Pipeline::ResourceUsage;
+		if (usage == Usage::Full)
+			return std::max(requested, 1u);
 		const std::size_t mib = 1024ull * 1024ull;
 		// 4K 10-bit measurements reserve about 640 MiB per extractor worker.
 		const std::size_t perWorker = std::max<std::size_t>(32 * mib, pixels * 80);
-		const std::size_t fraction = usage == Usage::Low ? 16 : usage == Usage::Medium ? 8 : 4;
+		const std::size_t fraction = usage == Usage::Low ? 16 : 4;
 		const auto memory = availableRam / fraction / std::max<std::size_t>(lanes, 1) / perWorker;
-		const unsigned maximum = usage == Usage::Low ? 1 : usage == Usage::Medium ? 4 : 16;
+		const unsigned maximum = usage == Usage::Low ? 1 : std::max(requested, 1u);
 		return static_cast<unsigned>(std::max<std::size_t>(1,
 			std::min<std::size_t>({std::max(requested, 1u), maximum, memory})));
 	}

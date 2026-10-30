@@ -121,21 +121,53 @@ namespace {
 		TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 0) == 2);
 		constexpr std::size_t gib = 1024ull * 1024ull * 1024ull;
 		constexpr std::size_t mib = 1024ull * 1024ull;
-		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 3, 27) == 21);
-		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Medium, 64 * gib, 64 * mib, 3, 27) == 5);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 3, 27) == 27);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Medium, 64 * gib, 64 * mib, 3, 27) == 10);
 		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Low, 64 * gib, 64 * mib, 3, 27) == 2);
-		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, gib, 64 * mib, 3, 27) == 2);
-		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 6, 27) == 10);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, gib, 64 * mib, 3, 27) == 27);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 6, 27) == 27);
 		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 0, 0, 0, 0) == 2);
 		constexpr std::size_t pixels = 3840ull * 2160ull;
-		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 64 * gib, pixels, 1) == 16);
-		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 64 * gib, pixels, 1) == 4);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 64 * gib, pixels, 1) == 64);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 64 * gib, pixels, 1) == 25);
 		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Low, 64, 64 * gib, pixels, 1) == 1);
-		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 4 * gib, pixels, 1) == 1);
-		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 8 * gib, pixels, 1) == 1);
-		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels, 2) == 1);
-		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels * 4, 1) == 1);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 4 * gib, pixels, 1) == 64);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 8 * gib, pixels, 1) == 3);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 2, 64 * gib, pixels, 1) == 2);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 16, 64 * gib, pixels, 2) == 12);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 16, 0, pixels, 1) == 1);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Medium, 8 * gib, 64 * mib, 3, 32) == 5);
+		TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Low, 8 * gib, 64 * mib, 3, 32) == 2);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels, 2) == 64);
+		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels * 4, 1) == 64);
 		TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 0, 0, 0, 0) == 1);
+		return 0;
+	}
+
+	int test_full_resources_keep_bounded_video_capacity() {
+		using Usage = ResourceUsage;
+		auto plan = StormByte::Safe::MakeShared<Plan>(
+			TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath("pipeline/full-ceiling-unused.mkv")), 2000000000LL);
+		plan->add(Track{0, StormByte::Multimedia::Type::Video});
+		plan->add(Track{0, StormByte::Multimedia::Type::Video});
+#ifdef __linux__
+		const auto before = ReadCalls();
+#endif
+		for (int iteration = 0; iteration < 1000; ++iteration) {
+			TEST_REQUIRE(Ceiling::VideoFrames(*plan) == 27);
+			TEST_REQUIRE(Ceiling::VideoFrames(*plan, 32) == 32);
+			TEST_REQUIRE(Ceiling::VideoFrames(*plan, 0) == 2);
+		}
+#ifdef __linux__
+		TEST_REQUIRE(ReadCalls() - before < 10);
+#endif
+		for (const std::size_t ram : {0ull, 1024ull * 1024ull * 1024ull}) {
+			TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 27) == 27);
+			TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 32) == 32);
+			TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 32, ram, 7680 * 4320, 4) == 32);
+			TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 2, ram, 7680 * 4320, 4) == 2);
+		}
 		return 0;
 	}
 }
@@ -144,6 +176,7 @@ int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_resource_budget_resolution_and_minima", test_resource_budget_resolution_and_minima},
 		TestEntry{"test_packet_ceilings_do_not_query_memory", test_packet_ceilings_do_not_query_memory},
+		TestEntry{"test_full_resources_keep_bounded_video_capacity", test_full_resources_keep_bounded_video_capacity},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

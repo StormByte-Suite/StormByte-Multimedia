@@ -50,11 +50,13 @@
 
 #include "../helpers.hxx"
 
+#include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
 #include <array>
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -67,6 +69,7 @@ namespace {
 static int CheckVmafRemux(std::string_view source, std::string_view destination,
 	ResourceUsage resources = ResourceUsage::Full, unsigned short workers = 2) {
 	const auto output = OutputPath(destination);
+	const auto availableBefore = StormByte::Multimedia::Backend::Pipeline::Ceiling::AvailableRam();
 	auto logger = MakeLogger();
 	TEST_PHASE("creating transcoder");
 	Transcoder job{TestLocation(FixturePath(source)), TestLocation(output), logger, 2000000000LL};
@@ -102,10 +105,21 @@ static int CheckVmafRemux(std::string_view source, std::string_view destination,
 	TEST_REQUIRE(ceiling >= 2 && ceiling <= (resources == ResourceUsage::Low ? 2 : resources == ResourceUsage::Medium ? 8 : 32));
 	if (resources == ResourceUsage::Low)
 		TEST_REQUIRE(threads == 1);
-	else if (resources == ResourceUsage::Medium)
-		TEST_REQUIRE(threads >= 1 && threads <= 4 && threads <= workers);
-	else
-		TEST_REQUIRE(threads >= 1 && threads <= workers);
+	else if (resources == ResourceUsage::Medium) {
+		using StormByte::Multimedia::Backend::Pipeline::Ceiling;
+		const auto budget = Ceiling::ResourceThreads(resources, Ceiling::MaxThreads());
+		TEST_REQUIRE(threads >= 1 && threads <= budget && (workers == 0 || threads <= workers));
+		if (std::min(availableBefore, Ceiling::AvailableRam()) >= 12ull * 1024 * 1024 * 1024)
+			TEST_REQUIRE(ceiling == 8);
+	}
+	else {
+		TEST_REQUIRE(ceiling == 32);
+#if defined(__LLVM_INSTR_PROFILE_GENERATE)
+		TEST_REQUIRE(threads == 1);
+#else
+		TEST_REQUIRE(threads == workers);
+#endif
+	}
 	return 0;
 }
 }
@@ -131,6 +145,14 @@ int test_transcoder_vmaf_low_resources_clamp_automatic_workers() {
 
 int test_transcoder_vmaf_medium_resources_clamp_explicit_workers() {
 	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-medium.mkv", ResourceUsage::Medium, 32);
+}
+
+int test_transcoder_vmaf_medium_resources_clamp_automatic_workers() {
+	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-medium-automatic.mkv", ResourceUsage::Medium, 0);
+}
+
+int test_transcoder_vmaf_full_resources_honor_explicit_workers() {
+	return CheckVmafRemux("video/bluray_like_vp9.mkv", "pipeline/vmaf-full-workers.mkv", ResourceUsage::Full, 17);
 }
 
 int test_transcoder_vmaf_kvazaar_padding() {
@@ -170,6 +192,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_vmaf_reduced_resources_clamp_explicit_workers", test_transcoder_vmaf_reduced_resources_clamp_explicit_workers},
 		TestEntry{"test_transcoder_vmaf_low_resources_clamp_automatic_workers", test_transcoder_vmaf_low_resources_clamp_automatic_workers},
 		TestEntry{"test_transcoder_vmaf_medium_resources_clamp_explicit_workers", test_transcoder_vmaf_medium_resources_clamp_explicit_workers},
+		TestEntry{"test_transcoder_vmaf_medium_resources_clamp_automatic_workers", test_transcoder_vmaf_medium_resources_clamp_automatic_workers},
+		TestEntry{"test_transcoder_vmaf_full_resources_honor_explicit_workers", test_transcoder_vmaf_full_resources_honor_explicit_workers},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

@@ -360,6 +360,8 @@ unsigned VMAF::Threads() const noexcept {
 	unsigned requested = m_threads ? std::max<unsigned>(1u, *m_threads) : available;
 	const auto& plan = m_plan;
 	const auto usage = plan ? plan->Resources() : ResourceUsage::Full;
+	if (usage == ResourceUsage::Full)
+		return requested;
 	std::size_t videos = 0;
 	std::size_t pixels = 3840ull * 2160ull;
 	if (plan) {
@@ -370,9 +372,9 @@ unsigned VMAF::Threads() const noexcept {
 	const auto& raw = AVFrame();
 	if (raw)
 		pixels = std::max(pixels, static_cast<std::size_t>(raw.Width()) * raw.Height());
-	if (usage != ResourceUsage::Full)
-		requested = std::min(requested, Ceiling::StageThreads(usage, available,
-			std::max<std::size_t>(videos, 1) * 3));
+	const auto stages = std::max<std::size_t>(videos, 1)
+		* (usage == ResourceUsage::Low ? 3 : 1);
+	requested = std::min(requested, Ceiling::StageThreads(usage, available, stages));
 	return Ceiling::VmafThreads(usage, requested, Ceiling::AvailableRam(), pixels, videos);
 #endif
 }

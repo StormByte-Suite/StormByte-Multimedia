@@ -124,7 +124,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Unpaired frames may be retained to accommodate encoder delay.
 	 * @ref InputCeiling limits pending input, not frames awaiting a matching
 	 * look: at most 32 in Full, eight in Medium, two in Low, additionally
-	 * reduced by the job's RAM-aware queue budget (minimum two).
+	 * reduced by the job's RAM-aware queue budget in Medium/Low (minimum two).
 	 * @ref Eof completes end-of-input processing.
 	 *
 	 * @par When to read the report

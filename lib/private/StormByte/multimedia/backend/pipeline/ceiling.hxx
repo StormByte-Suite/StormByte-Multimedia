@@ -192,13 +192,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			static std::size_t AvailableRam() noexcept;
 
 			/**
-			 * @brief Clamp a queue by policy, available RAM and concurrent queues.
+			 * @brief Keep Full capacity; memory-clamp reduced policies across concurrent queues.
 			 * @param usage Resource policy.
 			 * @param availableRam Available bytes.
 			 * @param frameBytes Conservative bytes per raw frame.
 			 * @param queues Concurrent raw queues sharing the reservation.
 			 * @param fullFrames Full-policy item ceiling.
-			 * @return Policy-scaled capacity, additionally memory-clamped; at least two.
+			 * @return Full capacity or memory-clamped reduced capacity; at least two.
 			 */
 			static std::size_t MemoryFrames(Multimedia::Pipeline::ResourceUsage usage,
 				std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
@@ -208,19 +208,19 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Resolve video queue capacity against the job's source geometry and RAM.
 			 * @param plan Job intention.
 			 * @param fullFrames Full-policy item ceiling.
-			 * @return Memory- and policy-clamped capacity; at least two.
+			 * @return Full capacity or memory- and policy-clamped reduced capacity; at least two.
 			 */
 			static std::size_t VideoFrames(const Multimedia::Pipeline::Plan& plan,
 				std::size_t fullFrames = 27) noexcept;
 
 			/**
-			 * @brief Bound libvmaf workers by policy and a conservative extractor reservation.
+			 * @brief Keep Full workers; bound reduced policies by an extractor reservation.
 			 * @param usage Resource policy.
 			 * @param requested CPU-constrained worker target.
 			 * @param availableRam Available bytes.
 			 * @param pixels Largest expected video frame area.
 			 * @param lanes Concurrent video contexts.
-			 * @return At least one worker; at most 16 in Full, four in Medium, one in Low.
+			 * @return Requested workers in Full; memory-clamped target in Medium; one in Low.
 			 * @note One worker is a minimum, not a hard RSS guarantee.
 			 */
 			static unsigned VmafThreads(Multimedia::Pipeline::ResourceUsage usage,

@@ -71,7 +71,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 * @ingroup multimedia_pipeline
 	 */
 	enum class STORMBYTE_MULTIMEDIA_PUBLIC ResourceUsage: unsigned char {
-		Full,		///< Use available processing resources with RAM-aware queue and analytics limits.
+		Full,		///< Keep native codec threading and all requested VMAF workers, with bounded queues.
 		Medium,		///< Target approximately half of available process CPUs.
 		Low			///< Target at most two available process CPUs.
 	};
