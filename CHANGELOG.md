@@ -23,153 +23,35 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
 
-## [1.0.1] - 2026-10-30
+## [1.0.1] - 2026-10-31
 
 ### Added
 
-- `Video::Watermark` accepts self-contained SVG logos from UTF-8 file paths and
-  `Safe::Binary` buffers using pinned LunaSVG 3.5.0 and bundled PlutoVG 1.3.1.
-  Logical width/height or viewBox dimensions follow the existing `designedFor`
-  video-reference scaling; vectors rasterize directly at final paint resolution
-  and reuse the pixel cache. Invalid geometry warns and passes frames through.
-  External image paths and automatic system-font loading are disabled.
-  Binary redistribution notices include the renderer's MIT, embedded STB MIT
-  and incorporated FreeType Project License notices.
-- `Pipeline::Transcoder::Resources(ResourceUsage)` configures Full (the
-  historical default), Medium (about half the CPUs available to the process)
-  or Low (up to two) before `Run()`. Reduced modes distribute a best-effort
-  thread budget across active decode/encode lanes, pass codec thread limits and
-  reduce decoded-video frame queues while retaining a two-frame minimum.
-  SVT-AV1 receives a corresponding supported parallelism level rather than a
-  thread count; that level is not a hard CPU limit.
-  Native thread settings are selected only when FFmpeg exposes the relevant
-  option; x265 uses one frame thread with a bounded worker pool, and Kvazaar
-  receives its supported `threads` parameter.
-  FFmpeg libraries, filters, drivers and encoders without usable controls may
-  use additional resources; this is not a hard CPU or RSS limit. `FineTune`
-  thread-control keys conflict with Medium/Low and fail instead of bypassing
-  the policy.
-- `EncoderInfo::Hardware()` identifies implementations registered as
-  hardware-only using their existing feature metadata. Optional hardware
-  configurations do not make a software encoder hardware-only.
-- Read-only, Safe-compatible `DecoderInfo` and `Codec::Decoders(need)` expose
-  decoder names, descriptions and known input capabilities. Lists keep FFmpeg's
-  backend default first, followed by available table-ranked alternatives;
-  generic and subtitle defaults advertise no unverified features. Pins with
-  mismatched codec ids, hardware-only prerequisites or experimental requirements
-  are not advertised. Feature-aware read access uses the same eligibility checks.
-- Decoder capability rows correctly advertise multichannel AAC, Vorbis, Opus,
-  FLAC and ALAC input support, and use the actual `libfdk_aac` decoder pin.
+- `Video::Watermark` accepts self-contained SVG logos from UTF-8 file paths and `Safe::Binary` buffers using pinned LunaSVG 3.5.0 and bundled PlutoVG 1.3.1. Logical width/height or viewBox dimensions follow the existing `designedFor` video-reference scaling; vectors rasterize directly at final paint resolution and reuse the pixel cache. Invalid geometry warns and passes frames through. External image paths and automatic system-font loading are disabled. Binary redistribution notices include the renderer's MIT, embedded STB MIT and incorporated FreeType Project License notices.
+- `Pipeline::Transcoder::Resources(ResourceUsage)` configures Full (the historical default), Medium (about half the CPUs available to the process) or Low (up to two) before `Run()`. Reduced modes distribute a best-effort thread budget across active decode/encode lanes, pass codec thread limits and reduce decoded-video frame queues while retaining a two-frame minimum. SVT-AV1 receives a corresponding supported parallelism level rather than a thread count; that level is not a hard CPU limit. Native thread settings are selected only when FFmpeg exposes the relevant option; x265 uses one frame thread with a bounded worker pool, and Kvazaar receives its supported `threads` parameter. FFmpeg libraries, filters, drivers and encoders without usable controls may use additional resources; this is not a hard CPU or RSS limit. `FineTune` thread-control keys conflict with Medium/Low and fail instead of bypassing the policy.
+- `EncoderInfo::Hardware()` identifies implementations registered as hardware-only using their existing feature metadata. Optional hardware configurations do not make a software encoder hardware-only.
+- Read-only, Safe-compatible `DecoderInfo` and `Codec::Decoders(need)` expose decoder names, descriptions and known input capabilities. Lists keep FFmpeg's backend default first, followed by available table-ranked alternatives; generic and subtitle defaults advertise no unverified features. Pins with mismatched codec ids, hardware-only prerequisites or experimental requirements are not advertised. Feature-aware read access uses the same eligibility checks.
+- Decoder capability rows correctly advertise multichannel AAC, Vorbis, Opus, FLAC and ALAC input support, and use the actual `libfdk_aac` decoder pin.
 
 ### Fixed
 
-- Video decoding uses FFmpeg's reconstructed presentation timestamp when the
-  decoded frame has no original PTS, as with reordered MPEG-4 video in AVI.
-  Delayed frames lacking both timestamps continue from the preceding timed
-  frame's duration, including the final frame delivered during decoder drain.
-  The recovered timing is retained on both the public frame and its native
-  buffer, restoring encode progress and preventing invalid output timelines.
-- Watermark opacity uses one BT.2020 graphics-white-normalized perceptual curve for
-  SDR, PQ and HLG instead of separate SDR gamma and HDR PQ blends. Existing HDR
-  graphics-white mapping is retained; only covered samples and their shared
-  chroma samples are rewritten, leaving uncovered pixels and metadata intact.
-- Bundled FFmpeg preserves sparse MP4/MOV timed-text subtitle timestamps across
-  long empty intervals. Gaps are split into bounded empty samples instead of
-  overflowing the muxer's signed 32-bit sample-duration limit (about 36 minutes
-  at a microsecond timescale), without reducing timestamp precision. Subtitle
-  clearing also compares timestamps in each subtitle track's own time base.
-- OCR subtitle conversion no longer lets remuxed video/audio overtake pending
-  subtitle cues. Ordered sparse-track watermarks keep empty intervals moving
-  without waiting for the next forced subtitle, and the muxer waits for OCR
-  work before advancing past its timeline. Encoder input ceilings now apply to
-  source track identities, retaining bounded queues when output indices differ.
-  The final subtitle awaiting a clear packet is also delivered at EOF.
-- SVT-AV1 no longer crashes with an access violation in the 16-wide SSE2/SSSE3
-  sub-pixel variance kernels when the reference block is not 16-byte aligned
-  (full-pel `x_offset == 0 && y_offset == 0` path used an aligned load).
-- Remuxing a track into a container that does not understand the source codec
-  tag (for example MP4 `mp4a` AAC into Matroska) no longer fails with
-  `avformat_init_output failed: Invalid data found when processing input`; the
-  muxer now drops an incompatible source tag, as FFmpeg does for stream copy.
-- Restore Full-mode VMAF throughput: automatic analysis uses all process-available
-  CPUs, and explicit worker counts are no longer reduced by a 16-worker or
-  available-RAM cap. Full raw-video queues retain their 27-frame capacity and
-  analytics input remains bounded to 32 looks, without RAM-based shrinking to
-  just a few frames. Full prioritizes throughput rather than enforcing a
-  process-memory cap.
-- Restore balanced-mode throughput: Medium shares its half-CPU VMAF target
-  across video contexts without a fixed four-worker limit or an additional
-  codec-stage division. Its extractor estimate uses at most one quarter of
-  available RAM, and raw queues retain their one-eighth RAM reservation with
-  a 2 GiB maximum. Analytics input is capped at eight looks without halving
-  the capacity twice. Low's CPU, worker, memory and queue policies are unchanged.
-- Audio-only conversion and remux preserve embedded PNG/JPEG/BMP album artwork
-  with ordinary file metadata, without requiring `Attachments()`. MP3 and AIFF
-  use ID3 pictures (AIFF ID3 writing is explicitly enabled), native FLAC uses
-  PICTURE blocks, Ogg Opus/Vorbis/FLAC use `METADATA_BLOCK_PICTURE` comments,
-  M4A uses MP4 cover metadata and Matroska retains image attachments. Original
-  image bytes and multiple pictures survive repeated remux without duplication;
-  unnamed ID3 covers receive generated filenames only when Matroska requires them.
-  pictures never become ordinary video tracks or enter video encoders/filters.
-  General attachments remain opt-in, video-output attachment policy is unchanged,
-  and muxers without a native artwork route do not receive invented video streams.
-  Fixed synthetic tagged 44.1 kHz MP3 and AIFF fixtures cover these paths, including
-  Opus encoding at 48 kHz, explicit attachment selection and unsupported fonts.
-- Video encoding adds minimal, centered, chroma-aligned black padding for verified
-  concrete encoder restrictions: Kvazaar (multiples of eight), x264/x265
-  (chroma subsampling), native H.263/H.263+/RV20 (multiples of four) and
-  WMV1/WMV2 (even width). No scaling or cropping changes the input picture or
-  sample aspect ratio. Already compatible inputs, remux and unrelated encoders
-  keep their geometry; other restrictions, such as baseline H.263's fixed
-  picture sizes and hardware capabilities, remain explicit errors.
-  Encoded metadata and logs report the padded size. Analytics remove only the
-  borders recorded by their own encoder, avoiding artificial VMAF/PSNR/SSIM
-  scaling while preserving intentional user transforms. A fixed synthetic
-  704x396 MPEG-4 fixture covers Kvazaar encoding to 704x400 and VMAF completion.
-- Duration pause/resume tests stop throttling the synthetic reader after verifying
-  the pause, avoiding artificial delays during the remaining scan and remux that
-  could exceed the macOS CI timeout.
-- Removed an unused Matroska muxer helper and avoided copying feature values in
-  registry tests, clearing the corresponding Clang build warnings.
-- Audio and video decoders now warn and continue after a packet submission
-  returns FFmpeg's recoverable `AVERROR_INVALIDDATA`, instead of cancelling the
-  entire job. This handles rejected MP3 packets in older DivX/Xvid AVI files,
-  including loudness measurement passes. Packet warnings identify the track,
-  serial, size and FFmpeg error; other submission errors remain fatal.
-- Reduced resource policies now apply to VMAF workers and its pending-input
-  hopper, including when a larger worker count was explicitly supplied.
-  Medium shares its half-CPU libvmaf target across video contexts and Low
-  retains one worker, additionally constrained by extractor-memory estimates.
-  This substantially reduces libvmaf's resolution-dependent extractor memory
-  without subsampling frames or changing the selected model. Reports expose
-  the effective `threads` count. Filter frame caps, audio queues and compressed
-  packet caps now also follow the selected resource policy, as do the PSNR,
-  SSIM and XPSNR pending-input hoppers. Filter routes now receive the job Plan
-  before their capacities and resource-sensitive operations are configured.
-  In Medium and Low, raw-video queues share a RAM-aware reservation across active video lanes
-  and three codec/filter queues per lane, with conservative high-depth frame
-  sizing and a two-frame minimum. The reservation is at most one eighth of
-  available RAM, additionally capped to 2 GiB in Medium and
-  256 MiB in Low. Analytics input no longer allows a 512-frame burst in Full:
-  its maximum is 32 without RAM-based shrinking. VMAF's extractor pool
-  has RAM- and resolution-aware limits only in reduced modes; Full keeps
-  all requested workers.
-  These are queue/extractor targets, not a hard RSS cap on native codecs or
-  unpaired looks required by encoder latency.
-- Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported
-  `lp` parallelism level instead of passing the thread count as the level.
-  SVT-AV1 documents `lp` as a parallelism/buffering tier, not a processor
-  count or hard thread limit; Full retains SVT's historical automatic level.
-- Decoder discovery rejects video implementations whose advertised pixel formats
-  are hardware-only, including FFmpeg's native `av1` decoder, which requires
-  hardware acceleration despite not advertising the hardware capability flag.
-  Software AV1 alternatives remain selectable and covered by real decoding tests.
-
-- Windows Release builds no longer override the shared AVX baseline with a
-  target-local `/arch:AVX2`. The override allowed clang-cl to emit Haswell-only
-  instructions, including BMI1 `ANDN` in codec capability queries, causing
-  `STATUS_ILLEGAL_INSTRUCTION` on Sandy Bridge and Ivy Bridge CPUs. Specialized
-  dependency kernels retain their runtime CPU dispatch.
+- Video decoding uses FFmpeg's reconstructed presentation timestamp when the decoded frame has no original PTS, as with reordered MPEG-4 video in AVI. Delayed frames lacking both timestamps continue from the preceding timed frame's duration, including the final frame delivered during decoder drain. The recovered timing is retained on both the public frame and its native buffer, restoring encode progress and preventing invalid output timelines.
+- Watermark opacity uses one BT.2020 graphics-white-normalized perceptual curve for SDR, PQ and HLG instead of separate SDR gamma and HDR PQ blends. Existing HDR graphics-white mapping is retained; only covered samples and their shared chroma samples are rewritten, leaving uncovered pixels and metadata intact.
+- Bundled FFmpeg preserves sparse MP4/MOV `mov_text` subtitle timing across long empty intervals by splitting gaps into empty samples below the signed 32-bit duration limit (about 36 minutes at a microsecond timescale), without reducing timestamp precision. Subtitle clearing compares timestamps in each track's own time base and uses the absolute track end across fragment flushes; gap splitting only follows packets from that subtitle track, preserving other tracks' fragment timing. DTS validation accounts for `negative_cts_offsets`, detects non-advancing gap splits and propagates write errors. The final clearing sample uses the absolute track end, and `mov_text` sample durations stay aligned when applying edit lists to negative-start tracks, without changing other codecs. FATE regressions cover long gaps, negative starts, shifted DTS and fragmented audio with a different time base.
+- OCR subtitle conversion no longer lets remuxed video/audio overtake pending subtitle cues. Ordered sparse-track watermarks keep empty intervals moving without waiting for the next forced subtitle, and the muxer waits for OCR work before advancing past its timeline. Encoder input ceilings now apply to source track identities, retaining bounded queues when output indices differ. The final subtitle awaiting a clear packet is also delivered at EOF.
+- SVT-AV1 no longer crashes with an access violation in the 16-wide SSE2/SSSE3 sub-pixel variance kernels when the reference block is not 16-byte aligned (full-pel `x_offset == 0 && y_offset == 0` path used an aligned load).
+- Remuxing a track into a container that does not understand the source codec tag (for example MP4 `mp4a` AAC into Matroska) no longer fails with `avformat_init_output failed: Invalid data found when processing input`; the muxer now drops an incompatible source tag, as FFmpeg does for stream copy.
+- Restore Full-mode VMAF throughput: automatic analysis uses all process-available CPUs, and explicit worker counts are no longer reduced by a 16-worker or available-RAM cap. Full raw-video queues retain their 27-frame capacity and analytics input remains bounded to 32 looks, without RAM-based shrinking to just a few frames. Full prioritizes throughput rather than enforcing a process-memory cap.
+- Restore balanced-mode throughput: Medium shares its half-CPU VMAF target across video contexts without a fixed four-worker limit or an additional codec-stage division. Its extractor estimate uses at most one quarter of available RAM, and raw queues retain their one-eighth RAM reservation with a 2 GiB maximum. Analytics input is capped at eight looks without halving the capacity twice. Low's CPU, worker, memory and queue policies are unchanged.
+- Audio-only conversion and remux preserve embedded PNG/JPEG/BMP album artwork with ordinary file metadata, without requiring `Attachments()`. MP3 and AIFF use ID3 pictures (AIFF ID3 writing is explicitly enabled), native FLAC uses PICTURE blocks, Ogg Opus/Vorbis/FLAC use `METADATA_BLOCK_PICTURE` comments, M4A uses MP4 cover metadata and Matroska retains image attachments. Original image bytes and multiple pictures survive repeated remux without duplication; unnamed ID3 covers receive generated filenames only when Matroska requires them. Pictures never become ordinary video tracks or enter video encoders/filters. General attachments remain opt-in, video-output attachment policy is unchanged, and muxers without a native artwork route do not receive invented video streams. Fixed synthetic tagged 44.1 kHz MP3 and AIFF fixtures cover these paths, including Opus encoding at 48 kHz, explicit attachment selection and unsupported fonts.
+- Video encoding adds minimal, centered, chroma-aligned black padding for verified concrete encoder restrictions: Kvazaar (multiples of eight), x264/x265 (chroma subsampling), native H.263/H.263+/RV20 (multiples of four) and WMV1/WMV2 (even width). No scaling or cropping changes the input picture or sample aspect ratio. Already compatible inputs, remux and unrelated encoders keep their geometry; other restrictions, such as baseline H.263's fixed picture sizes and hardware capabilities, remain explicit errors. Encoded metadata and logs report the padded size. Analytics remove only the borders recorded by their own encoder, avoiding artificial VMAF/PSNR/SSIM scaling while preserving intentional user transforms. A fixed synthetic 704x396 MPEG-4 fixture covers Kvazaar encoding to 704x400 and VMAF completion.
+- Duration pause/resume tests stop throttling the synthetic reader after verifying the pause, avoiding artificial delays during the remaining scan and remux that could exceed the macOS CI timeout.
+- Removed an unused Matroska muxer helper and avoided copying feature values in registry tests, clearing the corresponding Clang build warnings.
+- Audio and video decoders now warn and continue after a packet submission returns FFmpeg's recoverable `AVERROR_INVALIDDATA`, instead of cancelling the entire job. This handles rejected MP3 packets in older DivX/Xvid AVI files, including loudness measurement passes. Packet warnings identify the track, serial, size and FFmpeg error; other submission errors remain fatal.
+- Reduced resource policies now apply to VMAF workers and its pending-input hopper, including when a larger worker count was explicitly supplied. Medium shares its half-CPU libvmaf target across video contexts and Low retains one worker, additionally constrained by extractor-memory estimates. This substantially reduces libvmaf's resolution-dependent extractor memory without subsampling frames or changing the selected model. Reports expose the effective `threads` count. Filter frame caps, audio queues and compressed packet caps now also follow the selected resource policy, as do the PSNR, SSIM and XPSNR pending-input hoppers. Filter routes now receive the job Plan before their capacities and resource-sensitive operations are configured. In Medium and Low, raw-video queues share a RAM-aware reservation across active video lanes and three codec/filter queues per lane, with conservative high-depth frame sizing and a two-frame minimum. The reservation is at most one eighth of available RAM, additionally capped to 2 GiB in Medium and 256 MiB in Low. Analytics input no longer allows a 512-frame burst in Full: its maximum is 32 without RAM-based shrinking. VMAF's extractor pool has RAM- and resolution-aware limits only in reduced modes; Full keeps all requested workers. These are queue/extractor targets, not a hard RSS cap on native codecs or unpaired looks required by encoder latency.
+- Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported `lp` parallelism level instead of passing the thread count as the level. SVT-AV1 documents `lp` as a parallelism/buffering tier, not a processor count or hard thread limit; Full retains SVT's historical automatic level.
+- Decoder discovery rejects video implementations whose advertised pixel formats are hardware-only, including FFmpeg's native `av1` decoder, which requires hardware acceleration despite not advertising the hardware capability flag. Software AV1 alternatives remain selectable and covered by real decoding tests.
+- Windows Release builds no longer override the shared AVX baseline with a target-local `/arch:AVX2`. The override allowed clang-cl to emit Haswell-only instructions, including BMI1 `ANDN` in codec capability queries, causing `STATUS_ILLEGAL_INSTRUCTION` on Sandy Bridge and Ivy Bridge CPUs. Specialized dependency kernels retain their runtime CPU dispatch.
 
 ## [1.0.0] - 2026-10-28
 

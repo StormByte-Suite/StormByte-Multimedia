@@ -1,7 +1,7 @@
-From 5af2801182d493352e990f5031da9eac6b3f9f71 Mon Sep 17 00:00:00 2001
+From 3aa1311d97986892562bf9d9668aa99a547f61c3 Mon Sep 17 00:00:00 2001
 From: "David C. Manuelda" <StormByte@gmail.com>
 Date: Fri, 30 Oct 2026 15:19:32 +0100
-Subject: [PATCH] avformat/movenc: preserve long gaps between timed-text
+Subject: [PATCH 1/3] avformat/movenc: preserve long gaps between timed-text
  subtitles
 
 check_pkt() rejects DTS deltas greater than or equal to INT_MAX and
@@ -9,67 +9,117 @@ replaces the incoming DTS with the previous sample's DTS plus one,
 discarding its PTS. With a 1/1000000 subtitle time base, an empty interval
 of 2147.483647 seconds is sufficient to trigger this recovery path.
 Sparse mov_text subtitles can therefore appear thousands of seconds
-before their intended presentation time, even when the incoming packets
-have valid, monotonically increasing timestamps.
+before their intended presentation time.
 
 The empty sample inserted at the end of a cue does not prevent this:
 its duration is determined by the next sample, which may be hours later.
-Relaxing check_pkt() alone is not sufficient because the sample-duration
-helpers also require signed 32-bit durations.
+The sample-duration helpers also require signed 32-bit durations.
 
-Split long empty intervals by inserting additional two-byte empty
-mov_text samples at steps of INT_MAX - 1 track ticks. This keeps every
-generated sample duration below the existing validation limit while
-preserving cue timestamps, durations, text and the original timescale.
-Apply the same handling to leading empty intervals.
+Split long empty intervals by inserting two-byte empty mov_text samples
+at steps of INT_MAX - 1 track ticks, preserving cue timestamps, durations,
+text and the original timescale. Only split for a packet belonging to
+the subtitle track, since intermediate samples triggered by another
+track can alter fragment timing. Rescale other tracks' DTS before
+comparing timestamps, and ignore packets without a DTS.
 
-Rescale the triggering packet's DTS into each subtitle track's time base
-before comparing it with that track's duration. Packets from other tracks
-may use different time bases and must not be compared as raw integers.
-Ignore packets without a DTS for this subtitle-end insertion pass.
+Use start_dts plus track_duration as the absolute subtitle end even
+after a fragment flush clears entry, and refresh it after each insertion.
+Insert the initial end sample at most once per pass; subsequent gap
+splits must advance the absolute end or report an error.
 
-A minimal reproducer uses an SRT file containing:
+Validate packets in consistent timestamp coordinates before and after
+applying negative_cts_offsets. Only undo the track's DTS shift when
+checking an unshifted packet. Otherwise a valid INT_MAX - 1 split with
+a 100-tick shift is rejected on the second check, moves the subtitle end
+backward, and causes sustained sample generation.
 
-  1
-  00:00:01,000 --> 00:00:02,000
-  First cue
+Add FATE coverage for long gaps, negative starts, fragmented audio with
+different track time bases, and the shifted-DTS trigger. Require the null
+muxer and the SRT and native-endian PCM decoders where the test commands
+use them.
 
-  2
-  01:53:17,916 --> 01:53:26,425
-  Second cue
+Discovered while testing transcoding fixtures in StormByte-Multimedia
+and subsequently reproduced with real-world videos.
 
-Encode with:
-
-  ffmpeg -i sparse.srt -c:s mov_text sparse.mp4
-  ffmpeg -i sparse.mp4 -map 0:s:0 -c:s srt roundtrip.srt
-
-Before this change the second cue starts at approximately 2.000001
-seconds instead of 6797.916 seconds. After this change both cues retain
-their intended start times and durations.
-
-Verified with signed-duration boundary cases, gaps requiring multiple
-empty samples, mixed track time bases and fragmented MP4 output.
+Fixes: incorrect mov_text timestamps after long subtitle gaps
+Found-by: https://github.com/StormByte-Suite/StormByte-Multimedia
+Signed-off-by: David C. Manuelda <StormByte@gmail.com>
 ---
- libavformat/movenc.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+ libavformat/movenc.c                          | 61 +++++++++++++++----
+ tests/fate/mov.mak                            | 12 ++++
+ tests/mov-subtitle-audio-fragment.srt         |  3 +
+ tests/mov-subtitle-long-gap.srt               |  7 +++
+ tests/ref/fate/mov-subtitle-audio-fragment    |  6 ++
+ tests/ref/fate/mov-subtitle-long-gap          | 21 +++++++
+ .../ref/fate/mov-subtitle-long-gap-dts-shift  |  9 +++
+ .../fate/mov-subtitle-long-gap-negative-start |  8 +++
+ 8 files changed, 116 insertions(+), 11 deletions(-)
+ create mode 100644 tests/mov-subtitle-audio-fragment.srt
+ create mode 100644 tests/mov-subtitle-long-gap.srt
+ create mode 100644 tests/ref/fate/mov-subtitle-audio-fragment
+ create mode 100644 tests/ref/fate/mov-subtitle-long-gap
+ create mode 100644 tests/ref/fate/mov-subtitle-long-gap-dts-shift
+ create mode 100644 tests/ref/fate/mov-subtitle-long-gap-negative-start
 
 diff --git a/libavformat/movenc.c b/libavformat/movenc.c
-index 6f93eb3e36..4aea51737e 100644
+index debe1acb7e0..da85c298d2c 100644
 --- a/libavformat/movenc.c
 +++ b/libavformat/movenc.c
-@@ -7643,15 +7643,31 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
+@@ -7032,7 +7032,8 @@ static int mov_auto_flush_fragment(AVFormatContext *s, int force)
+     return ret;
+ }
+ 
+-static int check_pkt(AVFormatContext *s, MOVTrack *trk, AVPacket *pkt)
++static int check_pkt(AVFormatContext *s, MOVTrack *trk, AVPacket *pkt,
++                     int dts_shifted)
+ {
+     int64_t ref;
+     uint64_t duration;
+@@ -7045,9 +7046,9 @@ static int check_pkt(AVFormatContext *s, MOVTrack *trk, AVPacket *pkt)
+     } else
+         ref = pkt->dts; // Skip tests for the first packet
+ 
+-    if (trk->dts_shift != AV_NOPTS_VALUE) {
+-        /* With negative CTS offsets we have set an offset to the DTS,
+-         * reverse this for the check. */
++    if (!dts_shifted && trk->dts_shift != AV_NOPTS_VALUE) {
++        /* Track timestamps include the DTS shift, but packets passed to
++         * mov_write_single_packet() do not yet include it. */
+         ref -= trk->dts_shift;
+     }
+ 
+@@ -7128,7 +7129,7 @@ int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt)
+         trk = &mov->tracks[pkt->stream_index];
+     par = trk->par;
+ 
+-    ret = check_pkt(s, trk, pkt);
++    ret = check_pkt(s, trk, pkt, 1);
+     if (ret < 0)
+         return ret;
+ 
+@@ -7576,7 +7577,7 @@ static int mov_write_single_packet(AVFormatContext *s, AVPacket *pkt)
+     int64_t frag_duration = 0;
+     int size = pkt->size;
+ 
+-    int ret = check_pkt(s, trk, pkt);
++    int ret = check_pkt(s, trk, pkt, 0);
+     if (ret < 0)
+         return ret;
+ 
+@@ -7824,17 +7825,55 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
           *
           * 3) See mov_write_trailer for how the final end sample is
           * handled.
 +         *
 +         * 4) Split long empty intervals before check_pkt's signed duration
-+         * limit. At a microsecond timescale, sparse subtitles can exceed
-+         * this limit after only about 36 minutes without a new cue.
++         * limit when the next packet belongs to this subtitle track. Adding
++         * intermediate samples for another track can alter fragment timing.
           */
          for (i = 0; i < mov->nb_tracks; i++) {
              MOVTrack *trk = &mov->tracks[i];
+-            int ret;
 +            int64_t dts, end;
-             int ret;
++            int ret, end_written = 0;
  
 -            if (trk->par->codec_id == AV_CODEC_ID_MOV_TEXT &&
 -                trk->track_duration < pkt->dts &&
@@ -80,16 +130,310 @@ index 6f93eb3e36..4aea51737e 100644
 +                continue;
 +
 +            dts = av_rescale_q(pkt->dts, s->streams[pkt->stream_index]->time_base,
-+                              (AVRational){1, trk->timescale});
-+            while (trk->track_duration < dts) {
-+                if (trk->entry == 0 || !trk->last_sample_is_subtitle_end)
-+                    end = trk->track_duration;
-+                else if (dts - trk->track_duration >= INT_MAX)
-+                    end = trk->track_duration + INT_MAX - 1;
-+                else
-+                    break;
++                               (AVRational){1, trk->timescale});
++            if (trk->dts_shift != AV_NOPTS_VALUE)
++                dts = av_sat_add64(dts, trk->dts_shift);
++            end = trk->start_dts != AV_NOPTS_VALUE
++                ? av_sat_add64(trk->start_dts, trk->track_duration) : 0;
++            while (end < dts) {
++                int64_t previous_end = end;
++                int splitting = 0;
 +
-+                ret = mov_write_subtitle_end_packet(s, i, end);
++                if (!end_written &&
++                    (trk->entry == 0 || !trk->last_sample_is_subtitle_end)) {
++                    if (trk->start_dts != AV_NOPTS_VALUE)
++                        end = av_sat_add64(trk->start_dts, trk->track_duration);
++                } else if (pkt->stream_index == trk->st->index &&
++                           av_sat_sub64(dts, end) >= INT_MAX) {
++                    end += INT_MAX - 1;
++                    splitting = 1;
++                } else {
++                    break;
++                }
++
++                ret = mov_write_subtitle_end_packet(s, i,
++                    trk->dts_shift != AV_NOPTS_VALUE ? av_sat_sub64(end, trk->dts_shift) : end);
                  if (ret < 0) return ret;
                  trk->last_sample_is_subtitle_end = 1;
++                end_written = 1;
++                if (trk->start_dts != AV_NOPTS_VALUE)
++                    end = av_sat_add64(trk->start_dts, trk->track_duration);
++                if (splitting && end <= previous_end) {
++                    av_log(s, AV_LOG_ERROR,
++                           "Subtitle gap splitting did not advance DTS in stream %d\n",
++                           trk->st->index);
++                    return AVERROR_INVALIDDATA;
++                }
              }
+         }
+ 
+diff --git a/tests/fate/mov.mak b/tests/fate/mov.mak
+index e467acdafbd..638e9867504 100644
+--- a/tests/fate/mov.mak
++++ b/tests/fate/mov.mak
+@@ -211,6 +211,18 @@ FATE_MOV_FFMPEG_FFPROBE_SAMPLES-$(call TRANSCODE, TTML SUBRIP, MP4 MOV, SRT_DEMU
+ fate-mov-mp4-ttml-stpp: CMD = transcode srt $(TARGET_SAMPLES)/sub/SubRip_capability_tester.srt mp4 "-map 0:s -c:s ttml -time_base:s 1:1000" "-map 0 -c copy" "-of json -show_entries packet:stream=index,codec_type,codec_tag_string,codec_tag,codec_name,time_base,start_time,duration_ts,duration,nb_frames,nb_read_packets:stream_tags"
+ fate-mov-mp4-ttml-dfxp: CMD = transcode srt $(TARGET_SAMPLES)/sub/SubRip_capability_tester.srt mp4 "-map 0:s -c:s ttml -time_base:s 1:1000 -tag:s dfxp -strict unofficial" "-map 0 -c copy" "-of json -show_entries packet:stream=index,codec_type,codec_tag_string,codec_tag,codec_name,time_base,start_time,duration_ts,duration,nb_frames,nb_read_packets:stream_tags"
+ 
++FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER) += fate-mov-subtitle-long-gap
++fate-mov-subtitle-long-gap: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact"
++
++FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER NULL_MUXER) += fate-mov-subtitle-long-gap-negative-start
++fate-mov-subtitle-long-gap-negative-start: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -avoid_negative_ts disabled" "-map 0:s -c:s copy" "-show_entries packet=pts,dts:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-itsoffset -2" null
++
++FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER NULL_MUXER SETTS_BSF) += fate-mov-subtitle-long-gap-dts-shift
++fate-mov-subtitle-long-gap-dts-shift: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -bsf:s setts=pts=PTS+100 -movflags +negative_cts_offsets" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-copyts -itsoffset -1" null
++
++FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT PCM_S16LE, MP4 MOV, SRT_DEMUXER LAVFI_INDEV ANULLSRC_FILTER AFORMAT_FILTER ASETNSAMPLES_FILTER NULL_MUXER SRT_DECODER PCM_S16$(if $(filter yes,$(HAVE_BIGENDIAN)),BE,LE)_DECODER) += fate-mov-subtitle-audio-fragment
++fate-mov-subtitle-audio-fragment: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-audio-fragment.srt mp4 "-map 0:s -map 1:a -c:s mov_text -time_base:s 1:1000000 -c:a pcm_s16le -movflags +empty_moov+default_base_moof -frag_duration 1000000" "-map 0:a -c:a copy" "-select_streams a -show_entries packet=pts,dts,duration -of compact -read_intervals 2147%+4" "-itsoffset 2100 -f lavfi -i anullsrc=r=48000:cl=mono:d=65,aformat=sample_fmts=s16,asetnsamples=n=48000" "-ss 2147" "" null
++
+ FATE_MOV_FFMPEG_FFPROBE_SAMPLES-$(call TRANSCODE, TTML SUBRIP, MP4 MOV, LAVFI_INDEV SMPTEHDBARS_FILTER SRT_DEMUXER MPEG2VIDEO_ENCODER TTML_MUXER RAWVIDEO_MUXER) += fate-mov-mp4-fragmented-ttml-stpp
+ fate-mov-mp4-fragmented-ttml-stpp: CMD = transcode srt $(TARGET_SAMPLES)/sub/SubRip_capability_tester.srt mp4 \
+   "-map 1:v -map 0:s \
+diff --git a/tests/mov-subtitle-audio-fragment.srt b/tests/mov-subtitle-audio-fragment.srt
+new file mode 100644
+index 00000000000..5dcb786cdab
+--- /dev/null
++++ b/tests/mov-subtitle-audio-fragment.srt
+@@ -0,0 +1,3 @@
++1
++00:00:00,000 --> 00:00:01,000
++Subtitle
+diff --git a/tests/mov-subtitle-long-gap.srt b/tests/mov-subtitle-long-gap.srt
+new file mode 100644
+index 00000000000..25937d59930
+--- /dev/null
++++ b/tests/mov-subtitle-long-gap.srt
+@@ -0,0 +1,7 @@
++1
++00:00:01,000 --> 00:00:02,000
++First cue
++
++2
++02:00:00,000 --> 02:00:01,000
++Second cue
+diff --git a/tests/ref/fate/mov-subtitle-audio-fragment b/tests/ref/fate/mov-subtitle-audio-fragment
+new file mode 100644
+index 00000000000..5bf5236f24e
+--- /dev/null
++++ b/tests/ref/fate/mov-subtitle-audio-fragment
+@@ -0,0 +1,6 @@
++5f7c4c35922e02f4f028927e8f7b8005 *tests/data/fate/mov-subtitle-audio-fragment.mp4
++6256020 tests/data/fate/mov-subtitle-audio-fragment.mp4
++packet|pts=103056000|dts=103056000|duration=48000
++packet|pts=103104000|dts=103104000|duration=48000
++packet|pts=103152000|dts=103152000|duration=48000
++packet|pts=103200000|dts=103200000|duration=48000
+diff --git a/tests/ref/fate/mov-subtitle-long-gap b/tests/ref/fate/mov-subtitle-long-gap
+new file mode 100644
+index 00000000000..72bc0c99009
+--- /dev/null
++++ b/tests/ref/fate/mov-subtitle-long-gap
+@@ -0,0 +1,21 @@
++34f949abdfe11472a731ad2352f015d9 *tests/data/fate/mov-subtitle-long-gap.mp4
++824 tests/data/fate/mov-subtitle-long-gap.mp4
++#extradata 0:       48, 0xbffd09ab
++#tb 0: 1/1000000
++#media_type 0: subtitle
++#codec_id 0: mov_text
++0,          0,          0,  1000000,        2, 0x00000000
++0,    1000000,    1000000,  1000000,       11, 0x1124036e
++0,    2000000,    2000000, 2147483646,        2, 0x00000000
++0, 2149483646, 2149483646, 2147483646,        2, 0x00000000
++0, 4296967292, 4296967292, 2147483646,        2, 0x00000000
++0, 6444450938, 6444450938, 755549062,        2, 0x00000000
++0, 7200000000, 7200000000,  1000000,       12, 0x14da03c3
++packet|pts=0|dts=0|duration=1000000
++packet|pts=1000000|dts=1000000|duration=1000000
++packet|pts=2000000|dts=2000000|duration=2147483646
++packet|pts=2149483646|dts=2149483646|duration=2147483646
++packet|pts=4296967292|dts=4296967292|duration=2147483646
++packet|pts=6444450938|dts=6444450938|duration=755549062
++packet|pts=7200000000|dts=7200000000|duration=1000000
++stream|index=0|codec_name=mov_text|time_base=1/1000000|start_time=0.000000|duration_ts=7201000000|duration=7201.000000
+diff --git a/tests/ref/fate/mov-subtitle-long-gap-dts-shift b/tests/ref/fate/mov-subtitle-long-gap-dts-shift
+new file mode 100644
+index 00000000000..a6580656974
+--- /dev/null
++++ b/tests/ref/fate/mov-subtitle-long-gap-dts-shift
+@@ -0,0 +1,9 @@
++833d6818da99bacf7097fd0bdb2e278e *tests/data/fate/mov-subtitle-long-gap-dts-shift.mp4
++842 tests/data/fate/mov-subtitle-long-gap-dts-shift.mp4
++packet|pts=100|dts=100|duration=1000000
++packet|pts=1000100|dts=1000100|duration=2147483646
++packet|pts=2148483746|dts=2148483746|duration=2147483646
++packet|pts=4295967392|dts=4295967392|duration=2147483646
++packet|pts=6443451038|dts=6443451038|duration=755549062
++packet|pts=7199000100|dts=7199000100|duration=1000000
++stream|index=0|codec_name=mov_text|time_base=1/1000000|start_time=0.000100|duration_ts=7200000000|duration=7200.000000
+diff --git a/tests/ref/fate/mov-subtitle-long-gap-negative-start b/tests/ref/fate/mov-subtitle-long-gap-negative-start
+new file mode 100644
+index 00000000000..b810cfe0f29
+--- /dev/null
++++ b/tests/ref/fate/mov-subtitle-long-gap-negative-start
+@@ -0,0 +1,8 @@
++b554a9a4aeb4caedc408b9bea526e5ec *tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
++818 tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
++packet|pts=0|dts=0
++packet|pts=2147483646|dts=2147483646
++packet|pts=4294967292|dts=4294967292
++packet|pts=6442450938|dts=6442450938
++packet|pts=7198000000|dts=7198000000
++stream|index=0|codec_name=mov_text|time_base=1/1000000|start_time=0.000000|duration_ts=7200000000|duration=7200.000000
+-- 
+2.54.0
+
+
+From c610c7c7eb70d85dacaca4cd4008820c0b482a31 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Fri, 30 Oct 2026 20:54:06 +0100
+Subject: [PATCH 2/3] avformat/movenc: fix final mov_text sample timestamp
+
+The trailer passed track_duration directly as the final subtitle sample DTS, although track_duration is relative to start_dts. This placed the terminating empty sample too late for tracks with a nonzero or negative start timestamp.
+
+Write the final sample at the absolute track end, undoing dts_shift when necessary, and propagate write errors. Extend the negative-start FATE test to check sample durations on the media timeline.
+
+Signed-off-by: David C. Manuelda <StormByte@gmail.com>
+---
+ libavformat/movenc.c                               |  8 +++++++-
+ tests/fate/mov.mak                                 |  2 +-
+ .../ref/fate/mov-subtitle-long-gap-negative-start  | 14 ++++++++------
+ 3 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/libavformat/movenc.c b/libavformat/movenc.c
+index da85c298d2c..9bdc36b73ee 100644
+--- a/libavformat/movenc.c
++++ b/libavformat/movenc.c
+@@ -9271,7 +9271,13 @@ static int mov_write_trailer(AVFormatContext *s)
+         MOVTrack *trk = &mov->tracks[i];
+         if (trk->par->codec_id == AV_CODEC_ID_MOV_TEXT &&
+             !trk->last_sample_is_subtitle_end) {
+-            mov_write_subtitle_end_packet(s, i, trk->track_duration);
++            int64_t end = trk->start_dts != AV_NOPTS_VALUE
++                ? av_sat_add64(trk->start_dts, trk->track_duration)
++                : trk->track_duration;
++            if (trk->dts_shift != AV_NOPTS_VALUE)
++                end = av_sat_sub64(end, trk->dts_shift);
++            if ((res = mov_write_subtitle_end_packet(s, i, end)) < 0)
++                return res;
+             trk->last_sample_is_subtitle_end = 1;
+         }
+     }
+diff --git a/tests/fate/mov.mak b/tests/fate/mov.mak
+index 638e9867504..f9829e0e353 100644
+--- a/tests/fate/mov.mak
++++ b/tests/fate/mov.mak
+@@ -215,7 +215,7 @@ FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER) +=
+ fate-mov-subtitle-long-gap: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact"
+ 
+ FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER NULL_MUXER) += fate-mov-subtitle-long-gap-negative-start
+-fate-mov-subtitle-long-gap-negative-start: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -avoid_negative_ts disabled" "-map 0:s -c:s copy" "-show_entries packet=pts,dts:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-itsoffset -2" null
++fate-mov-subtitle-long-gap-negative-start: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -avoid_negative_ts disabled" "-map 0:s -c:s copy" "-ignore_editlist 1 -show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-itsoffset -2" null
+ 
+ FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER NULL_MUXER SETTS_BSF) += fate-mov-subtitle-long-gap-dts-shift
+ fate-mov-subtitle-long-gap-dts-shift: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -bsf:s setts=pts=PTS+100 -movflags +negative_cts_offsets" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-copyts -itsoffset -1" null
+diff --git a/tests/ref/fate/mov-subtitle-long-gap-negative-start b/tests/ref/fate/mov-subtitle-long-gap-negative-start
+index b810cfe0f29..961a5386da9 100644
+--- a/tests/ref/fate/mov-subtitle-long-gap-negative-start
++++ b/tests/ref/fate/mov-subtitle-long-gap-negative-start
+@@ -1,8 +1,10 @@
+-b554a9a4aeb4caedc408b9bea526e5ec *tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
++c1c82e4f43c4a327f37ef2eba48d1f1c *tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
+ 818 tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
+-packet|pts=0|dts=0
+-packet|pts=2147483646|dts=2147483646
+-packet|pts=4294967292|dts=4294967292
+-packet|pts=6442450938|dts=6442450938
+-packet|pts=7198000000|dts=7198000000
++packet|pts=0|dts=0|duration=1000000
++packet|pts=1000000|dts=1000000|duration=2147483646
++packet|pts=2148483646|dts=2148483646|duration=2147483646
++packet|pts=4295967292|dts=4295967292|duration=2147483646
++packet|pts=6443450938|dts=6443450938|duration=755549062
++packet|pts=7199000000|dts=7199000000|duration=1000000
++packet|pts=7200000000|dts=7200000000|duration=N/A
+ stream|index=0|codec_name=mov_text|time_base=1/1000000|start_time=0.000000|duration_ts=7200000000|duration=7200.000000
+-- 
+2.54.0
+
+
+From f43722a20a6748c8d28f720caa5ca31d7a517486 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Fri, 30 Oct 2026 20:59:48 +0100
+Subject: [PATCH 3/3] avformat/mov: align durations after subtitle edit lists
+
+When applying an edit list without CTTS, find_prev_closest_index left
+the time-to-sample index at zero even when the selected sample started
+later in the track. The rebuilt index then assigned samples durations
+from the wrong entries, extending the final mov_text cue across the
+preceding gap.
+
+Initialize the time-to-sample cursor from the selected sample for
+MOV_TEXT only. An unrestricted change also alters the duration alignment
+of other codecs: fate-quickdraw loses an expected two-tick frame duration,
+replacing it with one tick. Keep their existing cursor handling unchanged.
+
+Verify the negative-start long-gap round trip with edit-list handling
+enabled. This fixes duration alignment, not the pre-existing loss of the
+remaining gap when an edit starts inside an empty subtitle sample; that
+boundary case requires a separate change.
+
+Signed-off-by: David C. Manuelda <StormByte@gmail.com>
+---
+ libavformat/mov.c                                  |  4 ++++
+ tests/fate/mov.mak                                 |  2 +-
+ .../ref/fate/mov-subtitle-long-gap-negative-start  | 14 ++++++--------
+ 3 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/libavformat/mov.c b/libavformat/mov.c
+index 83bf9fa8d4f..6eb78818eb8 100644
+--- a/libavformat/mov.c
++++ b/libavformat/mov.c
+@@ -4312,6 +4312,10 @@ static int find_prev_closest_index(AVStream *st,
+                 (*tts_sample)--;
+             }
+         }
++    } else if (st->codecpar->codec_id == AV_CODEC_ID_MOV_TEXT &&
++               tts_index && tts_sample && tts_data && *index >= 0) {
++        *tts_index = FFMIN(*index, tts_count);
++        *tts_sample = 0;
+     }
+ 
+     /* restore AVStream state*/
+diff --git a/tests/fate/mov.mak b/tests/fate/mov.mak
+index f9829e0e353..97a502a9b19 100644
+--- a/tests/fate/mov.mak
++++ b/tests/fate/mov.mak
+@@ -215,7 +215,7 @@ FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER) +=
+ fate-mov-subtitle-long-gap: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact"
+ 
+ FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER NULL_MUXER) += fate-mov-subtitle-long-gap-negative-start
+-fate-mov-subtitle-long-gap-negative-start: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -avoid_negative_ts disabled" "-map 0:s -c:s copy" "-ignore_editlist 1 -show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-itsoffset -2" null
++fate-mov-subtitle-long-gap-negative-start: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -avoid_negative_ts disabled" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-itsoffset -2" null
+ 
+ FATE_MOV_FFMPEG_FFPROBE-$(call TRANSCODE, MOVTEXT SRT, MP4 MOV, SRT_DEMUXER NULL_MUXER SETTS_BSF) += fate-mov-subtitle-long-gap-dts-shift
+ fate-mov-subtitle-long-gap-dts-shift: CMD = transcode srt $(SRC_PATH)/tests/mov-subtitle-long-gap.srt mp4 "-map 0:s -c:s mov_text -time_base:s 1:1000000 -bsf:s setts=pts=PTS+100 -movflags +negative_cts_offsets" "-map 0:s -c:s copy" "-show_entries packet=pts,dts,duration:stream=index,codec_name,time_base,start_time,duration_ts,duration -of compact" "" "" "-copyts -itsoffset -1" null
+diff --git a/tests/ref/fate/mov-subtitle-long-gap-negative-start b/tests/ref/fate/mov-subtitle-long-gap-negative-start
+index 961a5386da9..7f064af8425 100644
+--- a/tests/ref/fate/mov-subtitle-long-gap-negative-start
++++ b/tests/ref/fate/mov-subtitle-long-gap-negative-start
+@@ -1,10 +1,8 @@
+ c1c82e4f43c4a327f37ef2eba48d1f1c *tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
+ 818 tests/data/fate/mov-subtitle-long-gap-negative-start.mp4
+-packet|pts=0|dts=0|duration=1000000
+-packet|pts=1000000|dts=1000000|duration=2147483646
+-packet|pts=2148483646|dts=2148483646|duration=2147483646
+-packet|pts=4295967292|dts=4295967292|duration=2147483646
+-packet|pts=6443450938|dts=6443450938|duration=755549062
+-packet|pts=7199000000|dts=7199000000|duration=1000000
+-packet|pts=7200000000|dts=7200000000|duration=N/A
+-stream|index=0|codec_name=mov_text|time_base=1/1000000|start_time=0.000000|duration_ts=7200000000|duration=7200.000000
++packet|pts=0|dts=0|duration=2147483646
++packet|pts=2147483646|dts=2147483646|duration=2147483646
++packet|pts=4294967292|dts=4294967292|duration=2147483646
++packet|pts=6442450938|dts=6442450938|duration=755549062
++packet|pts=7198000000|dts=7198000000|duration=1000000
++stream|index=0|codec_name=mov_text|time_base=1/1000000|start_time=0.000000|duration_ts=7199000000|duration=7199.000000
+-- 
+2.54.0
+
