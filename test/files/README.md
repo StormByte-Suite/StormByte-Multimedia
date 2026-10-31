@@ -11,6 +11,32 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
 - `video/hdr10_metadata_source.mkv`: HEVC Main 10 source with BT.2020/PQ, mastering-display and content-light metadata.
 - `video/hdr_without_mastering_metadata.mkv`: BT.2020/PQ HEVC Main 10 with mastering-display and content-light side-data intentionally absent. `File` is expected to classify it as HDR10-like and report `HDR10::Source::Heuristics` from the signaled primaries/transfer, rather than treating it as SDR.
 - `video/xvid_mp3_stereo.avi`: Xvid/MPEG-4 Part 2 video with stereo MP3 audio.
+- `video/packed_ac3_seek.avi`: eight seconds of 96x64/25 fps synthetic `testsrc2`
+  packed Xvid B-frames (`libxvid -bf 2 -g 25`) and six distinct sine tones,
+  AC-3 5.1(side), 48 kHz, 448 kb/s. Audio is deliberately stored in 2,240-byte
+  AVI chunks (40 ms), not aligned to its 1,792-byte AC-3 frames (32 ms).
+  Its audio stream uses scale 1, rate 56,000, sample size/block align 1 and
+  byte-count length; video keeps its 1/25 timebase. RIFF sizes and `idx1`
+  offsets/flags are rebuilt after rechunking, preserving video packet order
+  and keyframe flags. The first audio packet after a 4-second seek is a
+  1,344-byte unsynchronized fragment; the next is a full frame. This reproduces
+  the demux/parser seek-framing failure independently of any copyrighted movie.
+  Tests check paused images, changed pixels, resumed position, source-native
+  planar float surround samples, sample continuity and bounded audio lead.
+  SHA-256: `7ade8119ae1a37fb564b122d4743cc024b4f154e18c50336b23410aa2d4f9216`
+  (652,758 bytes).
+- `video/unknown_duration.webm`: 130 seconds of synthetic 96x64 VP8 at 5 fps,
+  no audio, no container duration and no bitrate-derived duration estimate.
+  Both ffprobe and SimplePlayer report unknown (`N/A` and `0`, respectively).
+  Tests seek to absolute 30, 120 and 10 seconds while paused and resume from
+  each target; this is not a known-duration file with its value overridden.
+  SHA-256: `da9a6016fa7bb3febbe19c5d37bcd0b79eacf54e2d5602feab93ce7c06f75cf5`
+  (651,299 bytes). Authored once with:
+
+  ```sh
+  ffmpeg -v error -f lavfi -i 'testsrc2=size=96x64:rate=5:duration=130' \
+    -an -c:v libvpx -b:v 0 -crf 20 -g 5 -live 1 unknown_duration.webm
+  ```
 - `video/kvazaar_unaligned_704x396.avi`: synthetic MPEG-4 Part 2, YUV420P, square
   pixels, 704x396, 24 frames at 24 fps and no audio. Its height deliberately
   violates Kvazaar's multiple-of-eight requirement. The regression requires

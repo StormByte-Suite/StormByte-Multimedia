@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Summary]
 
-StormByte Multimedia turns media files into checked, asynchronous C++ jobs. Its fluent `Transcoder` API maps streams, remuxes or re-encodes them, applies typed filters and reports progress without requiring application code to call FFmpeg directly. When a workflow needs more control, the same pipeline stages can be connected manually.
+StormByte Multimedia provides checked asynchronous media processing and real-time preview. Its fluent `Transcoder` API maps streams, remuxes or re-encodes them, applies typed filters and reports progress without requiring application code to call FFmpeg directly. When a workflow needs more control, the same pipeline stages can be connected manually. `SimplePlayer` handles preview decoding and timing through an application-supplied `Display`.
 
 The C++26 API includes codec and container registries, `File` inspection, owned `Plan`s, pipeline stages, filters, analytics, progress and telemetry. Backend codec and format contexts remain private; filter-facing frame, packet and graph adapters are available when needed. Cross-module values and lifetimes use StormByte Base's `Safe` APIs and require compatible provider/consumer ABIs.
 
@@ -21,20 +21,28 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
-## [1.0.1] - 2026-10-31
+## [1.1.0] - 2026-10-31
 
 ### Added
 
+- `Multimedia::SimplePlayer` provides asynchronous media preview through a consumer-implemented `Display` for video, audio and subtitles, with play, pause, seek and track selection. Buffered inputs retain their dynamic type; `Stop()` rewinds the reader and `ReleaseReader()` transfers it still open for subsequent jobs, while `Close()` and destruction close owned input. Public preview contracts expose no FFmpeg, GUI-toolkit or operating-system types. This is preview support, not a replacement for a professional media player.
+- Preview audio retains its actual decoded sample format, sample rate, planar/interleaved representation and ordered channel identities without resampling or downmixing; `Display` owns device conversion and speaker mapping. Presentation generations invalidate stale deliveries, device feedback supplies the audible clock, paused seeks reconstruct images and cues without playing audio, and EOF waits for presentation to drain.
+- Optional `MultimediaPreviewDemo` implements a consumer-side SDL2 display with real video and source-channel-count audio, playback/track controls, automatic seek exercises and bounded PCM diagnostics. `ENABLE_PREVIEW_DEMO` defaults to OFF; `--smoke` uses three-second segments and `--listen` uses thirty-second segments. Synthetic preview regressions cover native audio, seeks with genuinely unknown duration, AVI AC-3 framing, subtitles, lifecycle failures and reader transfer into `Transcoder`.
 - `Video::Watermark` accepts self-contained SVG logos from UTF-8 file paths and `Safe::Binary` buffers using pinned LunaSVG 3.5.0 and bundled PlutoVG 1.3.1. Logical width/height or viewBox dimensions follow the existing `designedFor` video-reference scaling; vectors rasterize directly at final paint resolution and reuse the pixel cache. Invalid geometry warns and passes frames through. External image paths and automatic system-font loading are disabled. Binary redistribution notices include the renderer's MIT, embedded STB MIT and incorporated FreeType Project License notices.
 - `Pipeline::Transcoder::Resources(ResourceUsage)` configures Full (the historical default), Medium (about half the CPUs available to the process) or Low (up to two) before `Run()`. Reduced modes distribute a best-effort thread budget across active decode/encode lanes, pass codec thread limits and reduce decoded-video frame queues while retaining a two-frame minimum. SVT-AV1 receives a corresponding supported parallelism level rather than a thread count; that level is not a hard CPU limit. Native thread settings are selected only when FFmpeg exposes the relevant option; x265 uses one frame thread with a bounded worker pool, and Kvazaar receives its supported `threads` parameter. FFmpeg libraries, filters, drivers and encoders without usable controls may use additional resources; this is not a hard CPU or RSS limit. `FineTune` thread-control keys conflict with Medium/Low and fail instead of bypassing the policy.
 - `EncoderInfo::Hardware()` identifies implementations registered as hardware-only using their existing feature metadata. Optional hardware configurations do not make a software encoder hardware-only.
 - Read-only, Safe-compatible `DecoderInfo` and `Codec::Decoders(need)` expose decoder names, descriptions and known input capabilities. Lists keep FFmpeg's backend default first, followed by available table-ranked alternatives; generic and subtitle defaults advertise no unverified features. Pins with mismatched codec ids, hardware-only prerequisites or experimental requirements are not advertised. Feature-aware read access uses the same eligibility checks.
 - Decoder capability rows correctly advertise multichannel AAC, Vorbis, Opus, FLAC and ALAC input support, and use the actual `libfdk_aac` decoder pin.
 
+### Changed
+
+- Reorganize the README around separate media-processing and preview workflows, distinguish the `Transcoder` facade from advanced pipeline wiring, and explain how to build a `Display` adapter, including threading, invalidation, audio negotiation, subtitle rendering, clocks, draining and reader ownership.
+
 ### Fixed
 
+- AVI byte-clock AC-3 preview seeks verify and withhold a bounded incomplete preroll fragment before decoding the following complete frame, avoiding seek-time decoder failure without ignoring arbitrary invalid packets. Rounded audio timestamps follow the continuous decoded sample timeline rather than introducing false gaps; real discontinuities remain explicit. Preview callback failures are reported and contained during destruction.
 - Video decoding uses FFmpeg's reconstructed presentation timestamp when the decoded frame has no original PTS, as with reordered MPEG-4 video in AVI. Delayed frames lacking both timestamps continue from the preceding timed frame's duration, including the final frame delivered during decoder drain. The recovered timing is retained on both the public frame and its native buffer, restoring encode progress and preventing invalid output timelines.
 - Watermark opacity uses one BT.2020 graphics-white-normalized perceptual curve for SDR, PQ and HLG instead of separate SDR gamma and HDR PQ blends. Existing HDR graphics-white mapping is retained; only covered samples and their shared chroma samples are rewritten, leaving uncovered pixels and metadata intact.
 - Bundled FFmpeg preserves sparse MP4/MOV `mov_text` subtitle timing across long empty intervals by splitting gaps into empty samples below the signed 32-bit duration limit (about 36 minutes at a microsecond timescale), without reducing timestamp precision. Subtitle clearing compares timestamps in each track's own time base and uses the absolute track end across fragment flushes; gap splitting only follows packets from that subtitle track, preserving other tracks' fragment timing. DTS validation accounts for `negative_cts_offsets`, detects non-advancing gap splits and propagates write errors. The final clearing sample uses the absolute track end, and `mov_text` sample durations stay aligned when applying edit lists to negative-start tracks, without changing other codecs. FATE regressions cover long gaps, negative starts, shifted DTS and fragmented audio with a different time base.
@@ -196,5 +204,5 @@ and their build, lifecycle and media-preservation guarantees.
 - Exercise Watermark from both path and `#embed` bytes; `File` verifies generated streams while visual appearance remains a manual check. Tests use Multimedia APIs in-process, do not invoke external FFmpeg programs, and document synthetic fixture/font provenance separately.
 - Include synthetic-noise MP3 and Opus fixtures with placeholder music tags, documented authoring commands and checksums.
 
-[1.0.1]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...1.0.1
+[1.1.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.0

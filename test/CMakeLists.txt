@@ -1,4 +1,11 @@
 option(ENABLE_TEST "Enable Unit Tests" OFF)
+option(ENABLE_PREVIEW_DEMO "Build the optional SDL2 interactive preview demo" OFF)
+if(ENABLE_PREVIEW_DEMO)
+	find_package(SDL2 CONFIG REQUIRED)
+	add_executable(MultimediaPreviewDemo preview_demo.cxx)
+	target_link_libraries(MultimediaPreviewDemo PRIVATE StormByte::Multimedia SDL2::SDL2)
+endif()
+
 if(ENABLE_TEST)
 	enable_testing()
 	add_library(multimedia_test_support INTERFACE)
@@ -23,6 +30,35 @@ if(ENABLE_TEST)
 	add_test(NAME logging.test_independent_job_destinations COMMAND MultimediaLogTests)
 	set_tests_properties(logging.test_independent_job_destinations
 		PROPERTIES TIMEOUT 15 LABELS "multimedia;logging")
+
+	add_executable(MultimediaSimplePlayerTests simple_player_test.cxx)
+	target_link_libraries(MultimediaSimplePlayerTests PRIVATE multimedia_test_support)
+	foreach(test_name IN ITEMS
+		test_empty_display
+		test_audio_adapter_mapping
+		test_audio_adapter_samples
+		test_audio_native_51
+		test_audio_native_mono
+		test_audio_native_opus
+		test_audio_native_stereo
+		test_audio_pacing_pause_drain
+		test_audio_paused_seek
+		test_av_seek_switch_epochs
+		test_av_seek_within_frame
+		test_explicit_errors
+		test_long_subtitle_duration
+		test_opus_without_video
+		test_packed_avi_seek
+		test_subtitle_decode
+		test_subtitle_paused_seek
+		test_unknown_duration_seek
+		test_faulted_reader_retained
+		test_preview_to_transcoder
+		test_rewind_close_failures
+		test_stop_transfer_destructor)
+		add_test(NAME "preview.${test_name}" COMMAND MultimediaSimplePlayerTests "${test_name}")
+		set_tests_properties("preview.${test_name}" PROPERTIES TIMEOUT 20 LABELS "multimedia;preview")
+	endforeach()
 
 	# One shared library absorbs every private translation unit and test
 	# body that calls FFmpeg. On Linux, bfd rescans the six static
