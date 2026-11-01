@@ -253,6 +253,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			class Filter::Report Report() const noexcept override;
 
 		private:
+			friend struct DegrainMeasurementTest;
+
 			/**
 			 * @cond INTERNAL
 			 */

@@ -100,6 +100,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -117,6 +118,12 @@ using namespace StormByte::Multimedia::Pipeline;
 using namespace std::string_view_literals;
 
 namespace StormByte::Multimedia::Pipeline::Filter::Video {
+	struct DegrainMeasurementTest {
+		static void Observe(Degrain& filter, const StormByte::Multimedia::FFmpeg::AVFrame& source) {
+			filter.PushFrame(source);
+		}
+	};
+
 	/**
 	 * @brief Exercises cadence resolution without mounting a pipeline.
 	 */
@@ -615,6 +622,26 @@ int test_filter_degrain() {
 	});
 }
 
+int test_filter_degrain_extreme_aspect_ratios() {
+	for (const auto& shape : {std::array{192, 128}, std::array{100000, 64}, std::array{64, 100000}}) {
+		FFmpeg::AVFrame source;
+		TEST_REQUIRE(source.AllocVideo(shape[0], shape[1], AV_PIX_FMT_YUV420P));
+		source.Pts(0);
+		for (int plane = 0; plane < source.PlaneCount(); ++plane)
+			for (int row = 0; row < source.PlaneHeight(plane); ++row)
+				std::memset(source.Data(plane) + static_cast<std::ptrdiff_t>(row) * source.Linesize(plane),
+					128, source.PlaneWidth(plane));
+		Filter::Video::Degrain filter{{}};
+		Filter::Video::DegrainMeasurementTest::Observe(filter, source);
+		filter.Eof();
+		const auto report = filter.Report();
+		TEST_REQUIRE(TestView(report.Data().at(StormByte::Safe::String{"frames"})) == "1"sv);
+		TEST_REQUIRE(TestView(report.Data().at(StormByte::Safe::String{"rejected"})) == "0"sv);
+		TEST_REQUIRE(TestView(report.Data().at(StormByte::Safe::String{"ran"})) == "0"sv);
+	}
+	return 0;
+}
+
 int test_filter_fftdnoiz() {
 	return RunVideo("fftdnoiz", [](auto& track, auto& logger) {
 		track.template Filter<Filter::Video::Fftdnoiz>(logger);
@@ -843,6 +870,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_filter_decimate", test_filter_decimate},
 		TestEntry{"test_filter_deflicker", test_filter_deflicker},
 		TestEntry{"test_filter_degrain", test_filter_degrain},
+		TestEntry{"test_filter_degrain_extreme_aspect_ratios", test_filter_degrain_extreme_aspect_ratios},
 		TestEntry{"test_filter_fftdnoiz", test_filter_fftdnoiz},
 		TestEntry{"test_filter_fieldmatch", test_filter_fieldmatch},
 		TestEntry{"test_filter_format", test_filter_format},

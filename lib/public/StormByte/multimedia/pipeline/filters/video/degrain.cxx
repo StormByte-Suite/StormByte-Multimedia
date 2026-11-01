@@ -399,8 +399,10 @@ void Degrain::ScoreCenter(StormByte::Size index) noexcept {
 							- Box(current, horizontal, vertical + 2, 1)) > 6.0;
 					if (textured)
 						++detail;
-					const int chromaX = horizontal * current.PlaneWidth(1) / current.Width();
-					const int chromaY = vertical * current.PlaneHeight(1) / current.Height();
+					const int chromaX = static_cast<int>(
+						static_cast<std::int64_t>(horizontal) * current.PlaneWidth(1) / current.Width());
+					const int chromaY = static_cast<int>(
+						static_cast<std::int64_t>(vertical) * current.PlaneHeight(1) / current.Height());
 					const int chromaU = current.Data(1)[static_cast<std::ptrdiff_t>(chromaY) * current.Linesize(1) + chromaX];
 					const int chromaV = current.Data(2)[static_cast<std::ptrdiff_t>(chromaY) * current.Linesize(2) + chromaX];
 					// Broad YUV skin-like box, deliberately not face recognition.
