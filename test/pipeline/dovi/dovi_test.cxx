@@ -92,6 +92,44 @@ namespace {
 	enum class DoviComparison { Exact, Regenerated };
 	enum class HdrComparison { Exact, Av1Quantized };
 
+	class UnenforcedPlan final: public Plan {
+		public:
+			UnenforcedPlan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const StormByte::Safe::Function<void(double)>* progress) noexcept
+			: Plan(std::move(reader), std::move(writer), std::move(duration), progress) {
+				Policies(~Policy::EnforceFeatures);
+			}
+
+			UnenforcedPlan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				const class Container& container,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const StormByte::Safe::Function<void(double)>* progress) noexcept
+			: Plan(std::move(reader), std::move(writer), container, std::move(duration), progress) {
+				Policies(~Policy::EnforceFeatures);
+			}
+	};
+
+	class UnenforcedJob final: public Transcoder {
+		public:
+			using Transcoder::Transcoder;
+
+			StormByte::Safe::Shared<class Plan> EmptyPlan(
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const class Container* container) const noexcept override {
+				const auto progress = DurationProgress();
+				if (container)
+					return StormByte::Safe::Shared<class Plan>::MakePointer<UnenforcedPlan>(
+						std::move(reader), std::move(writer), *container, std::move(duration), &progress);
+				return StormByte::Safe::Shared<class Plan>::MakePointer<UnenforcedPlan>(
+					std::move(reader), std::move(writer), std::move(duration), &progress);
+			}
+	};
+
 	struct NativeMetadata {
 		AVDOVIMetadata metadata{};
 		AVDOVIRpuDataHeader header{};
@@ -789,6 +827,36 @@ int test_unsupported_vp9_dovi_hdr10() { return check_unsupported_encoder(dovi_hd
 int test_unsupported_hevc_dovi_only() { return check_unsupported_encoder(dovi_only, "H.265", "libkvazaar"); }
 int test_unsupported_hevc_dovi_hdr10() { return check_unsupported_encoder(dovi_hdr10, "H.265", "libkvazaar"); }
 
+int test_reencode_dovi_without_preservation_discards_side_data() {
+	auto codec = Registry::Instance().FindCodec("H.264");
+	TEST_REQUIRE(codec);
+	if (!codec.value().get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+
+	const auto output = OutputPath("pipeline/dovi/dovi-drop-h264.mkv");
+	auto logger = MakeLogger();
+	UnenforcedJob job{TestLocation(FixturePath(dovi_only.path)), TestLocation(output), logger, 2000000000LL};
+	job.Video(0).Codec(codec.value().get())
+		.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libx264"})
+		.Preset(StormByte::Safe::String{"ultrafast"})
+		.CRF(30);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	if (const int result = WaitForOptionalCodec(job); result != 0)
+		return result;
+	TEST_REQUIRE(job.Plan());
+	TEST_REQUIRE(!job.Plan()->Policies().Has(Plan::Policy::EnforceFeatures));
+
+	auto encoded = File::Open(StormByte::Safe::String{output.string()});
+	TEST_REQUIRE(encoded && encoded.value().Streams().size() == 1);
+	const auto stream = encoded.value().Streams()[0];
+	TEST_REQUIRE(stream.Codec().Name() == "H.264");
+	const auto video = stream.Video();
+	TEST_REQUIRE(video);
+	TEST_REQUIRE(!video.value().DOVI());
+	return 0;
+}
+
 int test_video_and_frame_copy_move_preserve_dovi() {
 	for (const auto& fixture : {dovi_only, hdr10_only, dovi_hdr10}) {
 		TEST_PHASE("opening media file for inspection");
@@ -1017,6 +1085,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_unsupported_vp9_dovi_hdr10", test_unsupported_vp9_dovi_hdr10},
 		TestEntry{"test_unsupported_hevc_dovi_only", test_unsupported_hevc_dovi_only},
 		TestEntry{"test_unsupported_hevc_dovi_hdr10", test_unsupported_hevc_dovi_hdr10},
+		TestEntry{"test_reencode_dovi_without_preservation_discards_side_data", test_reencode_dovi_without_preservation_discards_side_data},
 		TestEntry{"test_video_and_frame_copy_move_preserve_dovi", test_video_and_frame_copy_move_preserve_dovi},
 		TestEntry{"test_dovi_owned_rpu_and_invalid_loads_preserve_configuration", test_dovi_owned_rpu_and_invalid_loads_preserve_configuration},
 		TestEntry{"test_dovi_metadata_rejects_invalid_extension_offsets", test_dovi_metadata_rejects_invalid_extension_offsets},

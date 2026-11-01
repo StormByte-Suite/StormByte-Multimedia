@@ -36,7 +36,8 @@ foreach(test_name IN ITEMS
 	test_replace_frame_hdr10_only
 	test_replace_frame_dovi_hdr10
 	test_unsupported_hevc_dovi_only
-	test_unsupported_hevc_dovi_hdr10)
+	test_unsupported_hevc_dovi_hdr10
+	test_reencode_dovi_without_preservation_discards_side_data)
 	add_optional_pipeline_test(MultimediaPipelineDoviTests ${test_name})
 endforeach()
 

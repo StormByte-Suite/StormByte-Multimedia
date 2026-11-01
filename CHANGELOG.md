@@ -21,9 +21,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### TODO
+### Fixed
 
-- Fix transcoding Dolby Vision sources with encoders that do not retain Dolby Vision (for example, `hevc_nvenc` when essential-property preservation is disabled): discard parsed Dolby Vision metadata and RPU side data consistently when Dolby Vision is not configured, while retaining strict validation when it is required. A Dolby Vision profile-7 source currently reaches `AVEncoder::SendFrame` with these attachments and can be rejected before `avcodec_send_frame`, despite valid 4K `p010le` input. Report the specific metadata rejection or original FFmpeg error instead of only `failed to send frame`. Add regressions for intentional Dolby Vision removal and required-metadata preservation.
+- Encoders that do not preserve Dolby Vision now discard parsed Dolby Vision metadata and RPU side data before submitting frames, while encoders configured for Dolby Vision retain strict metadata validation. Frame submission failures report the specific metadata rejection or original FFmpeg error instead of only `failed to send frame`; regression coverage includes intentional metadata removal and required-metadata preservation.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
@@ -68,6 +68,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Reduced-resource SVT-AV1 encoding maps the per-stage target to a supported `lp` parallelism level instead of passing the thread count as the level. SVT-AV1 documents `lp` as a parallelism/buffering tier, not a processor count or hard thread limit; Full retains SVT's historical automatic level.
 - Decoder discovery rejects video implementations whose advertised pixel formats are hardware-only, including FFmpeg's native `av1` decoder, which requires hardware acceleration despite not advertising the hardware capability flag. Software AV1 alternatives remain selectable and covered by real decoding tests.
 - Windows Release builds no longer override the shared AVX baseline with a target-local `/arch:AVX2`. The override allowed clang-cl to emit Haswell-only instructions, including BMI1 `ANDN` in codec capability queries, causing `STATUS_ILLEGAL_INSTRUCTION` on Sandy Bridge and Ivy Bridge CPUs. Specialized dependency kernels retain their runtime CPU dispatch.
+
+[1.1.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...1.1.0
 
 ## [1.0.0] - 2026-10-28
 
@@ -212,5 +214,4 @@ and their build, lifecycle and media-preservation guarantees.
 - Exercise Watermark from both path and `#embed` bytes; `File` verifies generated streams while visual appearance remains a manual check. Tests use Multimedia APIs in-process, do not invoke external FFmpeg programs, and document synthetic fixture/font provenance separately.
 - Include synthetic-noise MP3 and Opus fixtures with placeholder music tags, documented authoring commands and checksums.
 
-[1.1.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/releases/tag/1.0.0

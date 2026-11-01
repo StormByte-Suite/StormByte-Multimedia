@@ -449,12 +449,14 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	}
 
 	auto* handle = &*m_input;
-	const auto result = m_encoder->SendFrame(*handle);
+	char sendError[256]{};
+	const auto result = m_encoder->SendFrame(*handle, sendError, sizeof(sendError));
 	if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
 		return false;
 	if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
-			"failed to send frame ctx={}x{} fmt={} in={}x{} fmt={} pts={}",
+			"failed to send frame: {} ctx={}x{} fmt={} in={}x{} fmt={} pts={}",
+			std::string_view{sendError},
 			ctxW, ctxH, ctxFmt,
 			handle->Width(), handle->Height(), handle->Format(),
 			handle->Pts()));

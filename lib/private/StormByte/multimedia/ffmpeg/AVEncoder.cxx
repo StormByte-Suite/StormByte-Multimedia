@@ -696,22 +696,47 @@ bool FFmpeg::AVEncoder::RestoreLook(AVFrame& frame) const noexcept {
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
-	if (m_ptr && frame.Get()) {
-		const auto* configuration = av_packet_side_data_get(m_ptr->coded_side_data,
-			m_ptr->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF);
-		const bool configured = configuration && configuration->data
-			&& configuration->size >= sizeof(AVDOVIDecoderConfigurationRecord)
-			&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(configuration->data)->rpu_present_flag;
+	return SendFrame(frame, nullptr, 0);
+}
+
+FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error,
+	std::size_t errorSize) noexcept {
+	if (error && errorSize > 0)
+		error[0] = '\0';
+	const auto setError = [error, errorSize](const char* format, auto... args) noexcept {
+		if (error && errorSize > 0)
+			std::snprintf(error, errorSize, format, args...);
+	};
+	if (!m_ptr || !frame.Get()) {
+		setError("%s", !m_ptr ? "encoder is not open" : "frame is empty");
+		return OperationResult::Error;
+	}
+
+	const auto* configuration = av_packet_side_data_get(m_ptr->coded_side_data,
+		m_ptr->nb_coded_side_data, AV_PKT_DATA_DOVI_CONF);
+	const bool configured = configuration && configuration->data
+		&& configuration->size >= sizeof(AVDOVIDecoderConfigurationRecord)
+		&& reinterpret_cast<const AVDOVIDecoderConfigurationRecord*>(configuration->data)->rpu_present_flag;
+	if (!configured) {
+		frame.RemoveSideData(AV_FRAME_DATA_DOVI_METADATA);
+		frame.RemoveSideData(AV_FRAME_DATA_DOVI_RPU_BUFFER);
+	}
+	else {
 		const auto* parsed = frame.SideData(AV_FRAME_DATA_DOVI_METADATA);
-		if (parsed && !ValidDoviMetadata(parsed))
+		if (!parsed) {
+			setError("%s", "Dolby Vision encoding requires parsed frame metadata");
 			return OperationResult::Error;
-		const bool metadata = parsed != nullptr;
-		if ((configured && !metadata) || (!configured && (metadata || frame.SideData(AV_FRAME_DATA_DOVI_RPU_BUFFER))))
+		}
+		if (!ValidDoviMetadata(parsed)) {
+			setError("%s", "invalid Dolby Vision frame metadata");
 			return OperationResult::Error;
+		}
 		auto* side = av_frame_get_side_data(frame.Get(), AV_FRAME_DATA_DOVI_METADATA);
 		if (side && HasEnhancementLayer(reinterpret_cast<const AVDOVIMetadata*>(side->data))) {
-			if (av_buffer_make_writable(&side->buf) < 0)
+			if (av_buffer_make_writable(&side->buf) < 0) {
+				setError("%s", "failed to make Dolby Vision metadata writable");
 				return OperationResult::Error;
+			}
 			side->data = side->buf->data;
 			ToSingleLayer(reinterpret_cast<AVDOVIMetadata*>(side->data));
 		}
@@ -732,9 +757,14 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
 		case AVERROR(EAGAIN):
 			return OperationResult::TryAgain;
 		case AVERROR_EOF:
+			setError("%s", "encoder reached EOF while sending a frame");
 			return OperationResult::EndOfFile;
-		default:
+		default: {
+			char reason[AV_ERROR_MAX_STRING_SIZE]{};
+			av_strerror(ret, reason, sizeof(reason));
+			setError("avcodec_send_frame failed: %s", reason);
 			return OperationResult::Error;
+		}
 	}
 }
 

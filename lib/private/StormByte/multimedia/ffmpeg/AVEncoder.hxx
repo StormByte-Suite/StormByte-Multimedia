@@ -59,6 +59,7 @@
 #include <StormByte/safe/binary.hxx>
 #include <StormByte/safe/map.hxx>
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
 
@@ -158,6 +159,15 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * ITU-T T.35 payload keyed by PTS so ReceivePacket can emit SEI.
 			 */
 			FFmpeg::OperationResult SendFrame(AVFrame& frame) noexcept;
+
+			/**
+			 * @brief Sends a frame and optionally writes a failure diagnostic.
+			 * @param frame Source frame.
+			 * @param error Destination for a null-terminated error message.
+			 * @param errorSize Size of @p error in bytes.
+			 * @return Operation result.
+			 */
+			FFmpeg::OperationResult SendFrame(AVFrame& frame, char* error, std::size_t errorSize) noexcept;
 
 			/**
 			 * @brief Encodes one text subtitle (`avcodec_encode_subtitle`).
