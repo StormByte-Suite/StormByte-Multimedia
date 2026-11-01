@@ -67,6 +67,7 @@
 #include <fstream>
 #include <initializer_list>
 #include <mutex>
+#include <sstream>
 #include <thread>
 #include <vector>
 
@@ -1368,6 +1369,60 @@ int test_packed_avi_seek() {
 	return 0;
 }
 
+int CheckRejectedPreviewPacket(std::string_view chunk, unsigned rejectedIndex) {
+	const auto input = OutputPath("rejected-packet.avi");
+	TEST_REQUIRE(WriteRejectedAviPacket(input, chunk, rejectedIndex) == 0);
+	std::ostringstream diagnostics;
+	auto logger = Safe::MakeShared<StormByte::Logger::Log>(
+		diagnostics, StormByte::Logger::Level::Warning, "[%L]");
+	auto display = Safe::MakeShared<FakeDisplay>();
+	SimplePlayer player(display, logger);
+	TEST_REQUIRE(player.Open(TestLocation(input)));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
+	if (!player.Error().empty())
+		std::cerr << "[DETAIL] " << std::string_view(player.Error()) << std::endl;
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	{
+		std::lock_guard lock(display->m_mutex);
+		TEST_REQUIRE(display->m_videos >= 24);
+		TEST_REQUIRE(display->m_audios >= 70);
+	}
+	TEST_REQUIRE(player.Stop());
+	TEST_REQUIRE(player.Seek(0));
+	TEST_REQUIRE(Wait([&] {
+		if (player.State() == PlaybackState::Error)
+			return true;
+		std::lock_guard lock(display->m_mutex);
+		return static_cast<bool>(display->m_image);
+	}));
+	TEST_REQUIRE(player.State() == PlaybackState::Paused);
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	TEST_REQUIRE(player.Error().empty());
+	TEST_REQUIRE(player.Close());
+	const auto output = diagnostics.str();
+	TEST_REQUIRE(output.find("preview packet rejected t=" + std::string(chunk == "01wb" ? "1" : "0"))
+		!= std::string::npos);
+	TEST_REQUIRE(output.find("bytes=") != std::string::npos);
+	TEST_REQUIRE(output.find("Invalid data found when processing input") != std::string::npos);
+	TEST_REQUIRE(output.find("skipping packet and continuing decoding") != std::string::npos);
+	return 0;
+}
+
+int test_recovers_rejected_initial_avi_mp3_packet() {
+	return CheckRejectedPreviewPacket("01wb", 0);
+}
+
+int test_recovers_rejected_avi_mp3_packet() {
+	return CheckRejectedPreviewPacket("01wb", 10);
+}
+
+int test_recovers_rejected_avi_video_packet() {
+	return CheckRejectedPreviewPacket("00dc", 0);
+}
+
 /**
  * @brief Decode actual PGS bitmaps and text/styled subtitles.
  * @return Test status.
@@ -1639,6 +1694,9 @@ int main(int argc, char** argv) {
 		TestEntry{"test_long_subtitle_duration", test_long_subtitle_duration},
 		TestEntry{"test_opus_without_video", test_opus_without_video},
 		TestEntry{"test_packed_avi_seek", test_packed_avi_seek},
+		TestEntry{"test_recovers_rejected_initial_avi_mp3_packet", test_recovers_rejected_initial_avi_mp3_packet},
+		TestEntry{"test_recovers_rejected_avi_mp3_packet", test_recovers_rejected_avi_mp3_packet},
+		TestEntry{"test_recovers_rejected_avi_video_packet", test_recovers_rejected_avi_video_packet},
 		TestEntry{"test_subtitle_decode", test_subtitle_decode},
 		TestEntry{"test_subtitle_paused_seek", test_subtitle_paused_seek},
 		TestEntry{"test_unknown_duration_seek", test_unknown_duration_seek},

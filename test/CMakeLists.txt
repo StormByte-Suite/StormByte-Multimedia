@@ -52,6 +52,9 @@ if(ENABLE_TEST)
 		test_long_subtitle_duration
 		test_opus_without_video
 		test_packed_avi_seek
+		test_recovers_rejected_initial_avi_mp3_packet
+		test_recovers_rejected_avi_mp3_packet
+		test_recovers_rejected_avi_video_packet
 		test_subtitle_decode
 		test_subtitle_paused_seek
 		test_unknown_duration_seek

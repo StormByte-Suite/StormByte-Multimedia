@@ -975,7 +975,19 @@ class Backend::SimplePlayer::Context {
 								return;
 							sent = avcodec_send_packet(m_decoders[slot].m_codec, scratch.m_packet);
 						}
-						Check(sent, "send preview packet");
+						if (sent == AVERROR_INVALIDDATA) {
+							char reason[AV_ERROR_MAX_STRING_SIZE]{};
+							av_strerror(sent, reason, sizeof(reason));
+							const auto message = Safe::String::ReplaceToken(
+								"preview packet rejected t={} pts={} bytes={}: {}; skipping packet and continuing decoding",
+								scratch.m_packet->stream_index, scratch.m_packet->pts, scratch.m_packet->size, reason);
+							if (m_logger)
+								*m_logger << Logger::Level::Warning << std::string_view(message) << std::endl;
+							else
+								std::fprintf(stderr, "SimplePlayer: %s\n", message.c_str());
+						}
+						else
+							Check(sent, "send preview packet");
 						if (!Receive(slot, scratch.m_frame))
 							return;
 					}

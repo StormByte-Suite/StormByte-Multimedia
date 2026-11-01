@@ -53,12 +53,17 @@
 #include <StormByte/safe/string.hxx>
 #include <StormByte/safe/wstring.hxx>
 
+#include <algorithm>
+#include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <iterator>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 /** @brief CTest return code for an unavailable optional encoder case. */
 inline constexpr int TEST_SKIP = 77;
@@ -187,3 +192,39 @@ inline std::string_view TestView(const StormByte::Safe::String& value) {
 			return 1; \
 		} \
 	} while (false)
+
+inline int WriteRejectedAviPacket(const std::filesystem::path& input,
+	std::string_view chunk, unsigned rejectedIndex) {
+	std::ifstream source(FixturePath("video/xvid_mp3_stereo.avi"), std::ios::binary);
+	TEST_REQUIRE(source);
+	std::vector<char> bytes{std::istreambuf_iterator<char>{source}, std::istreambuf_iterator<char>{}};
+	const auto marker = std::string_view{bytes.data(), bytes.size()}.find("movi");
+	TEST_REQUIRE(marker != std::string_view::npos);
+	bool replaced = false;
+	unsigned index = 0;
+	for (std::size_t offset = marker + 4; offset + 8 <= bytes.size();) {
+		std::uint32_t size = 0;
+		for (unsigned byte = 0; byte < 4; ++byte)
+			size |= static_cast<std::uint32_t>(static_cast<unsigned char>(bytes[offset + 4 + byte])) << (8 * byte);
+		TEST_REQUIRE(size <= bytes.size() - offset - 8);
+		if (std::string_view{bytes.data() + offset, 4} == chunk && index++ == rejectedIndex) {
+			TEST_REQUIRE(size > 19);
+			const auto first = bytes.begin() + offset + 8;
+			if (chunk == "01wb") {
+				// Keep an MP3 sync word after a partial-frame prefix, as in cut legacy AVIs.
+				std::move_backward(first, first + size - 19, first + size);
+				std::fill_n(first, 19, '\x11');
+			}
+			else
+				std::fill_n(first, size, '\0');
+			replaced = true;
+			break;
+		}
+		offset += 8 + size + (size & 1);
+	}
+	TEST_REQUIRE(replaced);
+	std::ofstream destination(input, std::ios::binary);
+	destination.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+	TEST_REQUIRE(destination.good());
+	return 0;
+}

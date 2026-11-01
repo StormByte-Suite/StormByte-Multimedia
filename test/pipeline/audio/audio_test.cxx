@@ -78,39 +78,7 @@ int CheckRejectedAviPacket(std::string_view chunk, unsigned rejectedIndex, bool 
 		return TEST_SKIP;
 	const auto input = OutputPath("pipeline/rejected-packet.avi");
 	const auto output = OutputPath("pipeline/recovered-packet.mkv");
-	{
-		std::ifstream source(FixturePath("video/xvid_mp3_stereo.avi"), std::ios::binary);
-		TEST_REQUIRE(source);
-		std::vector<char> bytes{std::istreambuf_iterator<char>{source}, std::istreambuf_iterator<char>{}};
-		const auto marker = std::string_view{bytes.data(), bytes.size()}.find("movi");
-		TEST_REQUIRE(marker != std::string_view::npos);
-		bool replaced = false;
-		unsigned index = 0;
-		for (std::size_t offset = marker + 4; offset + 8 <= bytes.size();) {
-			std::uint32_t size = 0;
-			for (unsigned byte = 0; byte < 4; ++byte)
-				size |= static_cast<std::uint32_t>(static_cast<unsigned char>(bytes[offset + 4 + byte])) << (8 * byte);
-			TEST_REQUIRE(size <= bytes.size() - offset - 8);
-			if (std::string_view{bytes.data() + offset, 4} == chunk && index++ == rejectedIndex) {
-				TEST_REQUIRE(size > 19);
-				const auto first = bytes.begin() + offset + 8;
-				if (chunk == "01wb") {
-					// Keep an MP3 sync word after a partial-frame prefix, as in cut legacy AVIs.
-					std::move_backward(first, first + size - 19, first + size);
-					std::fill_n(first, 19, '\x11');
-				}
-				else
-					std::fill_n(first, size, '\0');
-				replaced = true;
-				break;
-			}
-			offset += 8 + size + (size & 1);
-		}
-		TEST_REQUIRE(replaced);
-		std::ofstream destination(input, std::ios::binary);
-		destination.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
-		TEST_REQUIRE(destination.good());
-	}
+	TEST_REQUIRE(WriteRejectedAviPacket(input, chunk, rejectedIndex) == 0);
 	auto logger = MakeLogger();
 	Transcoder job{TestLocation(input), TestLocation(output), logger};
 	job.Video(0).Codec(h264->get());
