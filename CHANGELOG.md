@@ -38,6 +38,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Bitmap subtitle conversion rejects undersized positive strides and overflowing stacked geometry before reading or allocating.
 - Degrain measurement widens luma-to-chroma coordinate multiplication before division, preventing signed overflow and incorrect chroma reads on valid frames with extreme aspect ratios; regression coverage includes wide and tall frames verified with undefined-behavior sanitization.
 - NLMeans uses 64-bit squared sample differences and preserves the full range of native-endian 16-bit samples instead of treating them as 12-bit; full-range regression samples reproduce the original overflow under UBSan and match the scalar reference after correction.
+- Sanitizer builds disable the unused bundled liblzma command-line sandbox, avoiding its Landlock configuration error when sanitizer flags are propagated to dependencies.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
