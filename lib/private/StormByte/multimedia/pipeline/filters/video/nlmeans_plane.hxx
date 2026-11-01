@@ -20,7 +20,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video::Detail {
 	 * @param destinationStride Destination row stride in bytes.
 	 * @param width Positive plane width in samples.
 	 * @param height Positive plane height in samples.
-	 * @param bitsPerComponent Sample depth: 8, 10 or 12 bits.
+	 * @param bitsPerComponent Sample depth: 8, 10, 12 or 16 bits.
 	 * @param research Nonnegative candidate search radius, restricted to the image.
 	 * @param patch Nonnegative patch radius with squared patch sums fitting uint64_t.
 	 * @param strength Normalized distance bandwidth, squared and floored at 1e-8.
@@ -60,7 +60,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video::Detail {
 					const int candidateX = static_cast<int>(std::clamp<std::int64_t>(column + offsetX, 0, width - 1));
 					const int candidateY = static_cast<int>(std::clamp<std::int64_t>(row + offsetY, 0, height - 1));
 					const int difference = sample(sourceX, sourceY) - sample(candidateX, candidateY);
-					return static_cast<std::uint64_t>(difference * difference);
+					return static_cast<std::uint64_t>(static_cast<std::int64_t>(difference) * difference);
 				};
 				for (std::size_t column = 0; column < columnCount; ++column) {
 					std::uint64_t columnSum = 0;

@@ -61,7 +61,7 @@ int test_nlmeans_rolling_sums_match_reference() {
 	for (const auto& shape : dimensions) {
 		const int width = shape[0];
 		const int height = shape[1];
-		for (const int depth : {8, 10, 12}) {
+		for (const int depth : {8, 10, 12, 16}) {
 			const int strideBytes = ((width * (depth == 8 ? 1 : 2) + 7) / 2) * 2;
 			const auto wordCount = static_cast<std::size_t>(strideBytes / 2 * height);
 			std::vector<std::uint16_t> source(wordCount, 0xA5A5);
@@ -96,9 +96,30 @@ int test_nlmeans_rolling_sums_match_reference() {
 	return 0;
 }
 
+int test_nlmeans_full_range_samples() {
+	std::array<std::uint16_t, 4> expected{};
+	std::array<std::uint16_t, 4> actual{};
+	for (const int depth : {10, 12, 16}) {
+		const auto peak = static_cast<std::uint16_t>((1 << depth) - 1);
+		const std::array<std::uint16_t, 4> source{0, peak, peak, 0};
+		for (const int patch : {0, 1, 2}) {
+			for (const double strength : {0.0, 0.8, 1.0}) {
+				ReferencePlane(reinterpret_cast<const std::uint8_t*>(source.data()),
+					reinterpret_cast<std::uint8_t*>(expected.data()), 4, 2, 2, depth, 1, patch, strength);
+				StormByte::Multimedia::Pipeline::Filter::Video::Detail::FilterPlane(
+					reinterpret_cast<const std::uint8_t*>(source.data()),
+					reinterpret_cast<std::uint8_t*>(actual.data()), 4, 4, 2, 2, depth, 1, patch, strength);
+				TEST_REQUIRE(actual == expected);
+			}
+		}
+	}
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_nlmeans_rolling_sums_match_reference", test_nlmeans_rolling_sums_match_reference},
+		TestEntry{"test_nlmeans_full_range_samples", test_nlmeans_full_range_samples},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

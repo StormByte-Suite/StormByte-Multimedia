@@ -84,6 +84,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * Implemented on the frame, not via avfilter `nlmeans`.
 	 * Rolling integer sums reuse patch distances for each displacement
 	 * instead of visiting every patch sample for every candidate.
+	 * Native-endian 16-bit samples retain their full range; squared
+	 * sample differences are evaluated with 64-bit arithmetic.
 	 *
 	 * @par Defaults
 	 * Empty arguments pick a profile from the first video frame:

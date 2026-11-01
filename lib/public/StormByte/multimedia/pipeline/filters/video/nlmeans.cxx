@@ -66,7 +66,7 @@ namespace {
 		if (!raw)
 			return 8;
 		const int depth = raw.BitsPerComponent();
-		return depth <= 8 ? 8 : (depth <= 10 ? 10 : 12);
+		return depth <= 8 ? 8 : (depth <= 10 ? 10 : (depth <= 12 ? 12 : 16));
 	}
 
 	void FilterPlane(const FFrame& src, FFrame& dst, int plane, int bpc,
