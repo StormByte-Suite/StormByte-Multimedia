@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### TODO
+
+- Fix transcoding Dolby Vision sources with encoders that do not retain Dolby Vision (for example, `hevc_nvenc` when essential-property preservation is disabled): discard parsed Dolby Vision metadata and RPU side data consistently when Dolby Vision is not configured, while retaining strict validation when it is required. A Dolby Vision profile-7 source currently reaches `AVEncoder::SendFrame` with these attachments and can be rejected before `avcodec_send_frame`, despite valid 4K `p010le` input. Report the specific metadata rejection or original FFmpeg error instead of only `failed to send frame`. Add regressions for intentional Dolby Vision removal and required-metadata preservation.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
 ## [1.1.0] - 2026-11-01
