@@ -137,22 +137,9 @@ class DemoDisplay final: public Display {
 			m_epoch = epoch;
 			m_image.reset();
 			m_cues.clear();
-			m_audio_valid = false;
-			m_priming = true;
-			m_audio_end = 0;
 			m_active_video = active_video;
-			m_dump.close();
-			m_dump_bytes = 0;
 			m_dump_part = 0;
-			if (m_device)
-				SDL_PauseAudioDevice(m_device, 1);
-			if (m_stream)
-				SDL_AudioStreamClear(m_stream);
-			std::lock_guard audio(m_audio_mutex);
-			m_audio_read = 0;
-			m_audio_size = 0;
-			m_audio_position = 0;
-			m_callback_previous = {};
+			FlushAudio();
 		}
 
 		/**
@@ -171,6 +158,19 @@ class DemoDisplay final: public Display {
 					m_callback_previous = {};
 				}
 			}
+		}
+
+		/**
+		 * @brief Flush audio without replacing the displayed image or cues.
+		 * @param epoch Current generation.
+		 * @return True after synchronous device reset.
+		 */
+		bool InvalidateAudio(std::uint64_t epoch) override {
+			std::lock_guard lock(m_mutex);
+			if (epoch != m_epoch)
+				throw Exception("stale demo audio invalidation");
+			FlushAudio();
+			return true;
 		}
 
 		/**
@@ -388,6 +388,26 @@ class DemoDisplay final: public Display {
 		}
 
 	private:
+		/**
+		 * @brief Flush PCM and clock state with the control mutex held.
+		 */
+		void FlushAudio() {
+			m_audio_valid = false;
+			m_priming = true;
+			m_audio_end = 0;
+			m_dump.close();
+			m_dump_bytes = 0;
+			if (m_device)
+				SDL_PauseAudioDevice(m_device, 1);
+			if (m_stream)
+				SDL_AudioStreamClear(m_stream);
+			std::lock_guard audio(m_audio_mutex);
+			m_audio_read = 0;
+			m_audio_size = 0;
+			m_audio_position = 0;
+			m_callback_previous = {};
+		}
+
 		/**
 		 * @brief Negotiate all source channels and explicitly map SDL speaker order.
 		 * @param audio Source contract.

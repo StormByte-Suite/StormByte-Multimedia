@@ -143,6 +143,27 @@ class FakeDisplay final: public Display {
 		}
 
 		/**
+		 * @brief Reset only simulated PCM timing for opt-in live-switch tests.
+		 * @param epoch Current presentation generation.
+		 * @return Whether this adapter supports audio-only invalidation.
+		 */
+		bool InvalidateAudio(std::uint64_t epoch) override {
+			std::lock_guard lock(m_mutex);
+			if (!m_live_audio)
+				return false;
+			if (m_throw_audio_invalidation)
+				throw StormByte::Exception("test audio invalidation failure");
+			if (epoch != m_epoch)
+				throw StormByte::Exception("stale audio invalidation");
+			m_audio_valid = false;
+			m_audible = 0;
+			m_pending_end = 0;
+			m_first_audio.reset();
+			++m_audio_invalidations;
+			return true;
+		}
+
+		/**
 		 * @brief Capture real decoded images and check A/V clock alignment.
 		 * @param image Decoded image.
 		 */
@@ -153,8 +174,10 @@ class FakeDisplay final: public Display {
 			if (image->m_epoch != m_epoch || image->m_pixels.empty())
 				throw StormByte::Exception("invalid image");
 			m_image = image;
-			m_deferred.push_back(image);
+			if (m_capture_deferred)
+				m_deferred.push_back(image);
 			m_video_positions.push_back(image->m_position);
+			m_video_times.push_back(TestClock::now());
 			if (m_audio_valid && !m_paused)
 				m_max_video_lead = std::max(m_max_video_lead, image->m_position - Played());
 			++m_videos;
@@ -288,6 +311,7 @@ class FakeDisplay final: public Display {
 		std::vector<Safe::Shared<const PreviewVideo>> m_deferred;	///< m_deferred GUI messages.
 		std::vector<Safe::Shared<const PreviewSubtitle>> m_cues;	///< Active cues.
 		std::vector<double> m_video_positions;						///< Captured decode timestamps.
+		std::vector<TestClock::time_point> m_video_times;			///< Delivery wall timestamps.
 		TestClock::time_point m_started = TestClock::now();			///< Simulated device anchor.
 		std::uint64_t m_epoch = 0;									///< Active generation.
 		double m_audible = 0;										///< Frozen audio cursor.
@@ -306,6 +330,10 @@ class FakeDisplay final: public Display {
 		unsigned m_bitmaps = 0;										///< Bitmap rectangles.
 		unsigned m_fonts = 0;										///< m_cues carrying embedded fonts.
 		unsigned m_invalidations = 0;								///< Synchronous generation changes.
+		unsigned m_audio_invalidations = 0;							///< PCM-only resets.
+		bool m_live_audio = false;									///< Enable the optional sink operation.
+		bool m_throw_audio_invalidation = false;					///< Exercise live-reset failures.
+		bool m_capture_deferred = true;								///< Retain stale pictures for epoch tests.
 		bool m_active_video = false;								///< Selected video state.
 		bool m_audio_valid = false;									///< Device clock availability.
 		bool m_paused = true;										///< Device pause state.
@@ -547,11 +575,12 @@ int test_empty_display() {
  * @param rate Source sample rate.
  * @param channels Source channel count.
  * @param mask Exact WAV speaker mask.
+ * @param frame_count Explicit length, or zero for the default short fixture.
  * @return Native-endian expected decoded sample bytes.
  */
 std::vector<std::byte> WriteAudioFixture(const std::filesystem::path& path,
-	std::uint32_t rate, std::uint16_t channels, std::uint32_t mask) {
-	const auto frames = rate / 10;
+	std::uint32_t rate, std::uint16_t channels, std::uint32_t mask, std::uint32_t frame_count = 0) {
+	const auto frames = frame_count ? frame_count : rate / 10;
 	std::ofstream file(path, std::ios::binary | std::ios::trunc);
 	auto number = [&](std::uint32_t value, unsigned width) {
 		for (unsigned i = 0; i < width; ++i)
@@ -967,6 +996,208 @@ int test_av_seek_switch_epochs() {
 	TEST_REQUIRE(player.Stop());
 	TEST_REQUIRE(display->DeliverDeferred() > 0);
 	TEST_REQUIRE(!display->m_image);
+	return 0;
+}
+
+/**
+ * @brief Keep video and the reader cursor intact across live audio changes.
+ * @return Test status.
+ */
+int test_live_audio_selection() {
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_live_audio = true;
+	auto stats = Safe::MakeShared<ReaderStats>();
+	SimplePlayer player(display);
+	TEST_REQUIRE(player.Open(Safe::MakeUnique<TokenReader>(Fixture("video/anime_like.mkv"), stats)));
+	TEST_REQUIRE(player.SelectTrack(MediaType::Subtitle, -1));
+	const int audio = player.SelectedTrack(MediaType::Audio);
+	TEST_REQUIRE(audio >= 0);
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.Position() > .15; }));
+	const unsigned seeks = stats->m_seeks;
+	std::uint64_t epoch = 0;
+	unsigned invalidations = 0;
+	{
+		std::lock_guard lock(display->m_mutex);
+		epoch = display->m_epoch;
+		invalidations = display->m_invalidations;
+	}
+	for (const int selected : {-1, audio, -1, audio}) {
+		const double position = player.Position();
+		unsigned videos = 0, resets = 0;
+		{
+			std::lock_guard lock(display->m_mutex);
+			videos = display->m_videos;
+			resets = display->m_audio_invalidations;
+		}
+		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, selected));
+		TEST_REQUIRE(player.SelectedTrack(MediaType::Audio) == selected);
+		TEST_REQUIRE(stats->m_seeks == seeks);
+		TEST_REQUIRE(player.State() == PlaybackState::Playing);
+		TEST_REQUIRE(Wait([&] {
+			std::lock_guard lock(display->m_mutex);
+			return display->m_videos >= videos + 2;
+		}));
+		TEST_REQUIRE(player.Position() >= position);
+		std::lock_guard lock(display->m_mutex);
+		TEST_REQUIRE(display->m_epoch == epoch);
+		TEST_REQUIRE(display->m_invalidations == invalidations);
+		TEST_REQUIRE(display->m_audio_invalidations == resets + 1);
+		TEST_REQUIRE(display->m_image);
+	}
+	for (int i = 0; i < 10; ++i) {
+		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
+		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, audio));
+	}
+	TEST_REQUIRE(stats->m_seeks == seeks);
+	{
+		std::lock_guard lock(display->m_mutex);
+		TEST_REQUIRE(display->m_epoch == epoch);
+		TEST_REQUIRE(display->m_invalidations == invalidations);
+		for (std::size_t i = 1; i < display->m_video_times.size(); ++i)
+			TEST_REQUIRE(display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500));
+	}
+	TEST_REQUIRE(player.Pause());
+	const double paused = player.Position();
+	TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
+	TEST_REQUIRE(player.State() == PlaybackState::Paused);
+	TEST_REQUIRE(player.Position() == paused);
+	TEST_REQUIRE(player.Seek(.5));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	TEST_REQUIRE(player.SelectTrack(MediaType::Audio, audio));
+	TEST_REQUIRE(player.State() == PlaybackState::Paused);
+	TEST_REQUIRE(player.Seek(1.9));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	TEST_REQUIRE(player.Close());
+	return 0;
+}
+
+/**
+ * @brief Cycle all audio tracks while checking uninterrupted video timestamps.
+ * @return Test status.
+ */
+int test_live_audio_tracks() {
+	const char* input = std::getenv("STORMBYTE_MM_LIVE_INPUT");
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_live_audio = true;
+	display->m_capture_deferred = false;
+	SimplePlayer player(display);
+	TEST_REQUIRE(player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv")));
+	std::vector<int> tracks{-1};
+	for (const auto& track : player.Tracks())
+		if (track.m_type == MediaType::Audio)
+			tracks.push_back(track.m_index);
+	TEST_REQUIRE(tracks.size() >= 2);
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.Position() > .15; }));
+	for (int cycle = 0; cycle < 3; ++cycle) {
+		for (int track : tracks) {
+			const double previous = player.Position();
+			unsigned videos, resets;
+			std::uint64_t epoch;
+			{
+				std::lock_guard lock(display->m_mutex);
+				videos = display->m_videos;
+				resets = display->m_audio_invalidations;
+				epoch = display->m_epoch;
+			}
+			const auto started = TestClock::now();
+			TEST_REQUIRE(player.SelectTrack(MediaType::Audio, track));
+			TEST_REQUIRE(player.SelectTrack(MediaType::Audio, track));
+			TEST_REQUIRE(Wait([&] {
+				{
+					std::lock_guard lock(display->m_mutex);
+					if (display->m_videos > videos && (track < 0 || display->m_first_audio))
+						return true;
+				}
+				return player.State() == PlaybackState::Error;
+			}));
+			TEST_REQUIRE(player.State() == PlaybackState::Playing);
+			TEST_REQUIRE(player.Position() >= previous);
+			if (input)
+				TEST_REQUIRE(Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; }));
+			TEST_REQUIRE(player.State() != PlaybackState::Error);
+			{
+				std::lock_guard lock(display->m_mutex);
+				TEST_REQUIRE(display->m_epoch == epoch);
+				TEST_REQUIRE(display->m_audio_invalidations == resets + 1);
+				TEST_REQUIRE(display->m_image);
+			}
+			std::cout << "live audio track=" << track << " position=" << player.Position()
+				<< " switch+delivery_ms=" << std::chrono::duration_cast<std::chrono::milliseconds>(
+					TestClock::now() - started).count() << '\n';
+		}
+	}
+	TEST_REQUIRE(player.Close());
+	for (std::size_t i = 1; i < display->m_video_positions.size(); ++i) {
+		TEST_REQUIRE(display->m_video_positions[i] > display->m_video_positions[i - 1]);
+		TEST_REQUIRE(display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500));
+	}
+	return 0;
+}
+
+/**
+ * @brief Flush a full audio-only queue and expose sink reset failures.
+ * @return Test status.
+ */
+int test_live_audio_backpressure_errors() {
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_live_audio = true;
+	display->m_speed = 0;
+	const auto path = OutputPath("live-audio-pressure.wav");
+	WriteAudioFixture(path, 48000, 1, 4, 48000 * 30);
+	SimplePlayer player(display);
+	TEST_REQUIRE(player.Open(TestLocation(path)));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] {
+		std::lock_guard lock(display->m_mutex);
+		return display->m_audios > 0;
+	}));
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
+	{
+		std::lock_guard lock(display->m_mutex);
+		TEST_REQUIRE(display->m_audio_invalidations == 1);
+	}
+	TEST_REQUIRE(player.Close());
+	display->m_speed = 1;
+	display->m_throw_audio_invalidation = true;
+	TEST_REQUIRE(player.Open(Fixture("video/anime_like.mkv")));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.Position() > .1; }));
+	TEST_REQUIRE(!player.SelectTrack(MediaType::Audio, -1));
+	TEST_REQUIRE(player.State() == PlaybackState::Error);
+	TEST_REQUIRE(std::string_view(player.Error()).find("test audio invalidation failure") != std::string_view::npos);
+	TEST_REQUIRE(player.Close());
+	display->m_live_audio = false;
+	display->m_throw_audio_invalidation = false;
+	TEST_REQUIRE(player.Open(Fixture("video/anime_like.mkv")));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.Position() > .1; }));
+	std::uint64_t epoch;
+	unsigned resets, videos;
+	{
+		std::lock_guard lock(display->m_mutex);
+		epoch = display->m_epoch;
+		resets = display->m_audio_invalidations;
+		videos = display->m_videos;
+	}
+	TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
+	TEST_REQUIRE(Wait([&] {
+		std::lock_guard lock(display->m_mutex);
+		return display->m_videos > videos;
+	}));
+	{
+		std::lock_guard lock(display->m_mutex);
+		TEST_REQUIRE(display->m_epoch > epoch);
+		TEST_REQUIRE(display->m_audio_invalidations == resets);
+	}
+	TEST_REQUIRE(player.State() == PlaybackState::Playing);
+	TEST_REQUIRE(player.Close());
 	return 0;
 }
 
@@ -1400,6 +1631,9 @@ int main(int argc, char** argv) {
 		TestEntry{"test_audio_pacing_pause_drain", test_audio_pacing_pause_drain},
 		TestEntry{"test_audio_paused_seek", test_audio_paused_seek},
 		TestEntry{"test_av_seek_switch_epochs", test_av_seek_switch_epochs},
+		TestEntry{"test_live_audio_selection", test_live_audio_selection},
+		TestEntry{"test_live_audio_tracks", test_live_audio_tracks},
+		TestEntry{"test_live_audio_backpressure_errors", test_live_audio_backpressure_errors},
 		TestEntry{"test_av_seek_within_frame", test_av_seek_within_frame},
 		TestEntry{"test_explicit_errors", test_explicit_errors},
 		TestEntry{"test_long_subtitle_duration", test_long_subtitle_duration},

@@ -21,6 +21,14 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Added
+
+- Optional `Display::InvalidateAudio` flushes only PCM/device timing without changing the presentation epoch, video image or subtitle cues. Consumers opting in must rebuild against the updated Display interface; existing adapters default to the legacy global-seek selection path.
+
+### Fixed
+
+- Live audio-track selection with an audio-invalidation-capable Display keeps the video decoder, queued images, demux cursor and presentation worker running. Only the audio decoder is replaced; monotonic video timing bridges the silence until fresh audio timing becomes available. Disabled audio, repeated selections, paused selection and unsupported adapters retain explicit lifecycle behavior.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
 ## [1.1.0] - 2026-10-31

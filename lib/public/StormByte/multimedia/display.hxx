@@ -425,6 +425,20 @@ namespace StormByte {
 				virtual void Invalidate(std::uint64_t epoch, bool active_video) = 0;
 
 				/**
+				 * @brief Flush only audio while retaining video, cues and the delivery epoch.
+				 * @param epoch Current generation.
+				 * @return True when audio was flushed; false without changing presentation
+				 * if unsupported, in which case track selection uses the legacy global seek.
+				 *
+				 * Serialized with all sink callbacks. Reset device clock validity and pending
+				 * PCM synchronously. The player reapplies Pause before sending new audio.
+				 */
+				virtual bool InvalidateAudio(std::uint64_t epoch) {
+					(void)epoch;
+					return false;
+				}
+
+				/**
 				 * @brief Freeze or resume device audio and subtitle timers; invalidate an old pause timer.
 				 * @param paused Whether presentation is paused.
 				 * @param epoch Current generation.

@@ -244,7 +244,11 @@ namespace StormByte {
 				 * @brief Switch or disable a media kind at the current position.
 				 * @param type Video, audio or subtitle.
 				 * @param index Stream index, or -1 to disable.
-				 * @return Whether decoder selection and seek succeeded.
+				 * @return Whether selection succeeded; asynchronous errors remain observable.
+				 *
+				 * Selecting the active index is a no-op. During playback, an audio-only
+				 * invalidation-capable Display preserves video decoding and presentation;
+				 * other changes and end-of-input reconstruct at the current position.
 				 */
 				bool SelectTrack(enum Type type, int index);
 

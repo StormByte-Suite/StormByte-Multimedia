@@ -44,6 +44,9 @@ if(ENABLE_TEST)
 		test_audio_pacing_pause_drain
 		test_audio_paused_seek
 		test_av_seek_switch_epochs
+		test_live_audio_selection
+		test_live_audio_tracks
+		test_live_audio_backpressure_errors
 		test_av_seek_within_frame
 		test_explicit_errors
 		test_long_subtitle_duration

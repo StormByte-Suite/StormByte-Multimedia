@@ -368,6 +368,8 @@ Callbacks run on worker or control-caller threads, **not necessarily the GUI thr
 
 `Pause(paused, epoch)` freezes/resumes the audio device and subtitle timers for the current generation. Queued pause operations must also respect invalidation.
 
+Optionally override `InvalidateAudio(epoch)` to synchronously flush PCM and device timing **without** clearing video, subtitle cues or changing the epoch, and return `true`. This enables live audio-track changes without a demux seek, video-decoder reset or global invalidation. The player bridges any silence with wall timing until the new audio clock catches up, then reapplies `Pause` before delivering new PCM. Callbacks remain bounded and serialized; cancel deferred audio work using an adapter-local audio generation if necessary. Return `false` without side effects when unsupported (the default); selection then uses the existing global seek. Paused and end-of-input changes still use seek reconstruction, and selecting the already-active track is a no-op. Rebuild consumers against the new Display interface when adopting this unreleased API.
+
 #### Deliver pictures, samples and cues
 
 | Callback | Payload | Adapter work |
@@ -525,6 +527,13 @@ Preview tests use a clocked fake Display, synthetic inputs and a remote-like rea
 ```sh
 cmake --build build-tests --target MultimediaSimplePlayerTests -j"$(nproc)"
 ctest --test-dir build-tests/test -R '^preview\.' --output-on-failure
+```
+
+The live-audio cases also cover disabled audio, repeated/rapid selections, full PCM queues, sink errors and pause/seek/EOF reconstruction. For a local multitrack file (not redistributed with the tests), the same registered case cycles every audio track and checks increasing video timestamps, bounded delivery gaps and unchanged video epoch:
+
+```sh
+STORMBYTE_MM_LIVE_INPUT=/path/to/local-multitrack.mkv \
+  ctest --test-dir build-tests/test -R '^preview.test_live_audio_tracks$' --output-on-failure
 ```
 
 See [fixture documentation](test/files/README.md) for provenance and redistribution notices. Test success is not certification of every codec/platform, visual restoration quality or long-running workload. Real-output listening uses the optional demo separately.

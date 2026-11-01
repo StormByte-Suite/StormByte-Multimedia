@@ -391,6 +391,7 @@ class Backend::SimplePlayer::Context {
 		 */
 		void Halt() noexcept {
 			m_cancel = true;
+			m_decode_stop = true;
 			m_ready.notify_all();
 			if (m_decode.joinable())
 				m_decode.join();
@@ -423,6 +424,7 @@ class Backend::SimplePlayer::Context {
 			m_end = m_position;
 			m_audio_end = m_position;
 			m_eof = false;
+			m_draining = false;
 			m_preview_done = false;
 			m_error.clear();
 			m_open_cue = 0;
@@ -574,9 +576,12 @@ class Backend::SimplePlayer::Context {
 			if (m_preview && (m_queue.size() >= MaxEvents || m_bytes + event.m_bytes > MaxBytes))
 				throw Exception("paused preview exceeds bounded presentation storage");
 			m_ready.wait(lock, [&] {
-				return m_cancel || (m_queue.size() < MaxEvents && m_bytes + event.m_bytes <= MaxBytes);
+				return m_cancel || (m_decode_stop && event.m_audio)
+					|| (m_queue.size() < MaxEvents && m_bytes + event.m_bytes <= MaxBytes);
 			});
 			if (m_cancel)
+				return false;
+			if (m_decode_stop && event.m_audio)
 				return false;
 			if (std::isfinite(event.m_end))
 				m_end = std::max(m_end, event.m_end);
@@ -585,7 +590,7 @@ class Backend::SimplePlayer::Context {
 				[](double start, const Event& queued) { return start < queued.m_start; });
 			m_queue.insert(at, std::move(event));
 			m_ready.notify_all();
-			return true;
+			return !m_decode_stop;
 		}
 
 		/**
@@ -687,7 +692,7 @@ class Backend::SimplePlayer::Context {
 			const double start = decoder.m_next;
 			decoder.m_next += static_cast<double>(frame->nb_samples) / frame->sample_rate;
 			const int skip = static_cast<int>(std::min<double>(frame->nb_samples,
-				std::max(0.0, std::ceil((m_target - start) * frame->sample_rate))));
+				std::max(0.0, std::ceil((std::max(m_target, m_audio_target) - start) * frame->sample_rate))));
 			if (skip == frame->nb_samples)
 				return true;
 			audio->m_frames = frame->nb_samples - skip;
@@ -860,7 +865,7 @@ class Backend::SimplePlayer::Context {
 		 */
 		bool Receive(int slot, AVFrame* frame) {
 			auto& decoder = m_decoders[slot];
-			while (!m_cancel) {
+			while (!m_cancel && !m_decode_stop) {
 				const int result = avcodec_receive_frame(decoder.m_codec, frame);
 				if (result == AVERROR(EAGAIN) || result == AVERROR_EOF)
 					return true;
@@ -931,12 +936,12 @@ class Backend::SimplePlayer::Context {
 				for (int slot = 0; slot < 2; ++slot)
 					if (m_decoders[slot].m_codec && !Receive(slot, scratch.m_frame))
 						return;
-				while (!m_cancel) {
+				while (!m_cancel && !m_decode_stop) {
 					{
 						std::unique_lock lock(m_mutex);
-						m_ready.wait(lock, [&] { return m_cancel || !m_paused || m_preview; });
+						m_ready.wait(lock, [&] { return m_cancel || m_decode_stop || !m_paused || m_preview; });
 					}
-					if (m_cancel)
+					if (m_cancel || m_decode_stop)
 						return;
 					const int result = av_read_frame(m_format, scratch.m_packet);
 					if (result == AVERROR(EAGAIN)) {
@@ -979,10 +984,14 @@ class Backend::SimplePlayer::Context {
 						&& (m_selected[2] < 0 || m_preview_subtitle_ready))
 						break;
 				}
-				if (m_cancel)
+				if (m_cancel || m_decode_stop)
 					return;
 				if (m_seek_prefix_size)
 					throw Exception("incomplete AVI AC-3 seek fragment at EOF");
+				{
+					std::lock_guard lock(m_mutex);
+					m_draining = true;
+				}
 				for (int slot = 0; slot < 2; ++slot) {
 					if (!m_decoders[slot].m_codec)
 						continue;
@@ -1032,6 +1041,8 @@ class Backend::SimplePlayer::Context {
 		double MediaClock() {
 			std::lock_guard lock(m_mutex);
 			const double wall = m_anchor + std::chrono::duration<double>(PlaybackClock::now() - m_start).count();
+			if (m_audio_switching)
+				return wall;
 			if (m_selected[1] < 0 || m_audio_end <= m_target)
 				return wall;
 			const auto audio = m_display->AudioClock(m_epoch);
@@ -1040,6 +1051,11 @@ class Backend::SimplePlayer::Context {
 			if (!std::isfinite(audio.m_position) || !std::isfinite(audio.m_latency) || audio.m_latency < 0)
 				throw Exception("display supplied an invalid audio clock");
 			const double audible = std::max(m_target, audio.m_position - audio.m_latency);
+			if (m_audio_transition) {
+				if (audible + 0.02 < wall)
+					return wall;
+				m_audio_transition = false;
+			}
 			const bool pending_audio = std::any_of(m_queue.begin(), m_queue.end(),
 				[](const Event& event) { return static_cast<bool>(event.m_audio); });
 			if (audio.m_drained && !pending_audio && audible + 0.001 >= m_audio_end) {
@@ -1047,7 +1063,7 @@ class Backend::SimplePlayer::Context {
 				m_start = PlaybackClock::now();
 				m_audio_end = m_target;
 			}
-			return audible;
+			return std::max(m_position, audible);
 		}
 
 		/**
@@ -1077,7 +1093,8 @@ class Backend::SimplePlayer::Context {
 					auto found = std::find_if(m_queue.begin(), m_queue.end(), [&](const Event& event) {
 						if (preview)
 							return static_cast<bool>(event.m_video) || (event.m_subtitle && event.m_start <= m_target);
-						return event.m_start <= clock + (event.m_audio ? AudioAhead : 0);
+						return (!event.m_audio || !m_audio_switching)
+							&& event.m_start <= clock + (event.m_audio ? AudioAhead : 0);
 					});
 					if (found != m_queue.end()) {
 						Event event = std::move(*found);
@@ -1136,6 +1153,10 @@ class Backend::SimplePlayer::Context {
 		 */
 		void Launch(bool preview) {
 			m_cancel = false;
+			m_decode_stop = false;
+			m_audio_switching = false;
+			m_audio_transition = false;
+			m_audio_target = m_target;
 			m_preview = preview;
 			m_preview_done = false;
 			m_preview_video_ready = false;
@@ -1193,6 +1214,66 @@ class Backend::SimplePlayer::Context {
 			m_display->Pause(!playing, m_epoch);
 			if (playing || m_selected[0] >= 0 || m_selected[2] >= 0)
 				Launch(!playing);
+			return true;
+		}
+
+		/**
+		 * @brief Replace only the audio decoder at the current demux cursor.
+		 * @param index Selected stream, or -1.
+		 * @return True if the sink supports audio-only invalidation.
+		 */
+		bool SwitchAudio(int index) {
+			{
+				std::lock_guard delivery(m_delivery);
+				const double position = MediaClock();
+				std::lock_guard lock(m_mutex);
+				m_anchor = std::max(m_position, position);
+				m_start = PlaybackClock::now();
+				m_audio_switching = true;
+				m_decode_stop = true;
+				// Free old PCM first so a blocked video/cue enqueue can finish.
+				for (auto it = m_queue.begin(); it != m_queue.end();) {
+					if (it->m_audio) {
+						m_bytes -= it->m_bytes;
+						it = m_queue.erase(it);
+					}
+					else ++it;
+				}
+			}
+			m_ready.notify_all();
+			if (m_decode.joinable())
+				m_decode.join();
+			if (m_cancel)
+				throw Exception("audio selection interrupted by playback failure");
+			{
+				std::lock_guard lock(m_mutex);
+				if (m_eof || m_draining)
+					return false;
+			}
+			{
+				std::lock_guard delivery(m_delivery);
+				if (!m_display->InvalidateAudio(m_epoch))
+					return false;
+				{
+					std::lock_guard lock(m_mutex);
+					m_audio_end = m_position;
+					m_audio_target = m_position;
+					m_selected[1] = index;
+				}
+				OpenDecoder(1, index);
+				m_decoders[1].m_next = m_audio_target;
+				m_seek_audio = true;
+				m_seek_prefix_size = 0;
+				m_display->Pause(false, m_epoch);
+				{
+					std::lock_guard lock(m_mutex);
+					m_audio_switching = false;
+					m_audio_transition = index >= 0;
+				}
+			}
+			m_decode_stop = false;
+			m_ready.notify_all();
+			m_decode = std::thread([this] { Decode(); });
 			return true;
 		}
 
@@ -1265,6 +1346,7 @@ class Backend::SimplePlayer::Context {
 		std::mutex m_delivery;										///< Serializes sink callbacks with pause.
 		std::condition_variable m_ready;							///< Interruptible queue and pause wakeup.
 		std::atomic<bool> m_cancel{false};							///< Worker cancellation request.
+		std::atomic<bool> m_decode_stop{false};						///< Stop demux at a decode boundary, retaining video state.
 		std::thread m_decode;										///< Decode worker.
 		std::thread m_present;										///< Presentation worker.
 		std::deque<Event> m_queue;									///< Bounded scheduled presentation.
@@ -1279,16 +1361,20 @@ class Backend::SimplePlayer::Context {
 		double m_duration = 0;										///< Known duration, or zero.
 		double m_origin = 0;										///< Container timestamp origin.
 		double m_target = 0;										///< Current seek target.
+		double m_audio_target = 0;									///< Audio trim boundary after a live selection.
 		double m_end = 0;											///< Last scheduled presentation end.
 		double m_audio_end = 0;										///< Last submitted audio end.
 		double m_anchor = 0;										///< Monotonic clock media anchor.
 		PlaybackClock::time_point m_start = PlaybackClock::now();	///< Monotonic clock wall anchor.
 		bool m_paused = false;										///< Frozen presentation.
+		bool m_audio_switching = false;								///< Use wall timing while replacing audio.
+		bool m_audio_transition = false;							///< Wait for fresh device timing to catch up.
 		bool m_preview = false;										///< Paused seek decode.
 		bool m_preview_done = false;								///< Paused preview delivered.
 		bool m_preview_video_ready = false;							///< Target image decoded.
 		bool m_preview_subtitle_ready = false;						///< Subtitle target boundary reached.
 		bool m_eof = false;											///< Decode or paused reconstruction complete.
+		bool m_draining = false;									///< Codec EOF has started; live replacement must reconstruct.
 		bool m_seek_audio = false;									///< Inspect first post-seek audio framing.
 		int m_seek_prefix_size = 0;									///< Pending bounded AC-3 prefix length.
 		std::int64_t m_seek_prefix_pts = 0;							///< Byte-clock prefix timestamp.
@@ -1406,6 +1492,15 @@ bool Backend::SimplePlayer::SelectTrack(enum StormByte::Multimedia::Type type, i
 			return m_ctx->Fail("preview track index does not match media kind");
 		const bool playing = State() == PlaybackState::Playing;
 		const double position = Position();
+		if (m_ctx->m_selected[slot] == index)
+			return true;
+		bool live_audio = false;
+		{
+			std::lock_guard lock(m_ctx->m_mutex);
+			live_audio = slot == 1 && playing && !m_ctx->m_eof && !m_ctx->m_draining;
+		}
+		if (live_audio && m_ctx->SwitchAudio(index))
+			return true;
 		m_ctx->Halt();
 		if (!m_ctx->m_format)
 			m_ctx->OpenFormat(false);
