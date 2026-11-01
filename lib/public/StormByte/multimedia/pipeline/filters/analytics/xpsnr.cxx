@@ -51,6 +51,8 @@
 #include <StormByte/multimedia/pipeline/filters/analytics/xpsnr.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <cstddef>
+
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -147,9 +149,10 @@ namespace {
 				double act = 0.0;
 				unsigned n = 0;
 				for (int j = 0; j < bh; ++j) {
-					const uint8_t* ra = a + (y0 + j) * as;
-					const uint8_t* rb = b + (y0 + j) * bs;
-					const uint8_t* rn = (y0 + j + 1 < h) ? a + (y0 + j + 1) * as : ra;
+					const uint8_t* ra = a + static_cast<std::ptrdiff_t>(y0 + j) * as;
+					const uint8_t* rb = b + static_cast<std::ptrdiff_t>(y0 + j) * bs;
+					const uint8_t* rn = (y0 + j + 1 < h)
+						? a + static_cast<std::ptrdiff_t>(y0 + j + 1) * as : ra;
 					for (int i = 0; i < bw; ++i) {
 						const double vx = Sample(ra, x0 + i, bpc);
 						const double vy = Sample(rb, x0 + i, bpc);

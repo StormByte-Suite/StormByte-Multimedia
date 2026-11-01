@@ -139,7 +139,8 @@ namespace {
 	void CopyPlane(const uint8_t* src, int srcStride, uint8_t* dst, ptrdiff_t dstStride,
 		int bytes, int height) noexcept {
 		for (int y = 0; y < height; ++y)
-			std::memcpy(dst + y * dstStride, src + y * srcStride, static_cast<std::size_t>(bytes));
+			std::memcpy(dst + static_cast<ptrdiff_t>(y) * dstStride,
+				src + static_cast<ptrdiff_t>(y) * srcStride, static_cast<std::size_t>(bytes));
 	}
 }
 

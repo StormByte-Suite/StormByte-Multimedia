@@ -56,6 +56,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 
 using StormByte::Logger::Level;
@@ -109,11 +110,11 @@ namespace {
 
 		const int peak = (1 << bpc) - 1;
 		for (int y = 0; y < h; ++y) {
-			const uint8_t* srow = s + y * ss;
-			uint8_t* drow = d + y * ds;
-			const uint8_t* prow = p ? p + y * ps : nullptr;
-			const uint8_t* above = s + std::max(0, y - 1) * ss;
-			const uint8_t* below = s + std::min(h - 1, y + 1) * ss;
+			const uint8_t* srow = s + static_cast<std::ptrdiff_t>(y) * ss;
+			uint8_t* drow = d + static_cast<std::ptrdiff_t>(y) * ds;
+			const uint8_t* prow = p ? p + static_cast<std::ptrdiff_t>(y) * ps : nullptr;
+			const uint8_t* above = s + static_cast<std::ptrdiff_t>(std::max(0, y - 1)) * ss;
+			const uint8_t* below = s + static_cast<std::ptrdiff_t>(std::min(h - 1, y + 1)) * ss;
 			for (int x = 0; x < w; ++x) {
 				const int c = Pel(srow, x, bpc);
 				const int l = Pel(srow, std::max(0, x - 1), bpc);

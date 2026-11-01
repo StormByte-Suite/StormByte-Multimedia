@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/pipeline/filters/analytics/psnr.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <cstddef>
 #include <cmath>
 #include <deque>
 #include <optional>
@@ -131,8 +132,8 @@ namespace {
 		const double n = static_cast<double>(w) * static_cast<double>(h);
 		if (bpc <= 8) {
 			for (int y = 0; y < h; ++y) {
-				const uint8_t* ra = a + y * as;
-				const uint8_t* rb = b + y * bs;
+				const uint8_t* ra = a + static_cast<std::ptrdiff_t>(y) * as;
+				const uint8_t* rb = b + static_cast<std::ptrdiff_t>(y) * bs;
 				for (int x = 0; x < w; ++x) {
 					const int d = static_cast<int>(ra[x]) - static_cast<int>(rb[x]);
 					acc += static_cast<double>(d) * static_cast<double>(d);
@@ -141,8 +142,8 @@ namespace {
 		}
 		else {
 			for (int y = 0; y < h; ++y) {
-				const auto* ra = reinterpret_cast<const uint16_t*>(a + y * as);
-				const auto* rb = reinterpret_cast<const uint16_t*>(b + y * bs);
+				const auto* ra = reinterpret_cast<const uint16_t*>(a + static_cast<std::ptrdiff_t>(y) * as);
+				const auto* rb = reinterpret_cast<const uint16_t*>(b + static_cast<std::ptrdiff_t>(y) * bs);
 				for (int x = 0; x < w; ++x) {
 					const int d = static_cast<int>(ra[x]) - static_cast<int>(rb[x]);
 					acc += static_cast<double>(d) * static_cast<double>(d);

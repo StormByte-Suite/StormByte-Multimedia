@@ -55,6 +55,7 @@
 #include <StormByte/safe/string.hxx>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <utility>
 
@@ -102,18 +103,18 @@ namespace {
 			return;
 
 		for (int y = 0; y < h; ++y) {
-			uint8_t* drow = dst + y * ds;
-			const uint8_t* crow = c + y * cs;
+			uint8_t* drow = dst + static_cast<std::ptrdiff_t>(y) * ds;
+			const uint8_t* crow = c + static_cast<std::ptrdiff_t>(y) * cs;
 			const bool keep = tff ? ((y & 1) == 0) : ((y & 1) == 1);
 			if (keep) {
 				const int bytes = (bpc <= 8) ? w : w * 2;
 				std::copy(crow, crow + bytes, drow);
 				continue;
 			}
-			const uint8_t* above = c + std::max(0, y - 1) * cs;
-			const uint8_t* below = c + std::min(h - 1, y + 1) * cs;
-			const uint8_t* prow = p ? p + y * ps : nullptr;
-			const uint8_t* nrow = n ? n + y * ns : nullptr;
+			const uint8_t* above = c + static_cast<std::ptrdiff_t>(std::max(0, y - 1)) * cs;
+			const uint8_t* below = c + static_cast<std::ptrdiff_t>(std::min(h - 1, y + 1)) * cs;
+			const uint8_t* prow = p ? p + static_cast<std::ptrdiff_t>(y) * ps : nullptr;
+			const uint8_t* nrow = n ? n + static_cast<std::ptrdiff_t>(y) * ns : nullptr;
 			for (int x = 0; x < w; ++x) {
 				const int spatial = (Pel(above, x, bpc) + Pel(below, x, bpc) + 1) / 2;
 				if (!prow || !nrow) {

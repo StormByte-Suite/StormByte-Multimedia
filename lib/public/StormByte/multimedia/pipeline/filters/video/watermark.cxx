@@ -58,6 +58,7 @@
 #include <charconv>
 #include <climits>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -162,7 +163,7 @@ namespace {
 		if (!gray || !gray.Data(0))
 			return;
 		for (int y = 0; y < gray.Height(); ++y) {
-			uint8_t* row = gray.Data(0) + y * gray.Linesize(0);
+			uint8_t* row = gray.Data(0) + static_cast<std::ptrdiff_t>(y) * gray.Linesize(0);
 			for (int x = 0; x < gray.Width(); ++x)
 				row[x] = lut[row[x]];
 		}
@@ -279,17 +280,17 @@ namespace {
 			const int fy = y + row;
 			if (fy < 0 || fy >= frameH)
 				continue;
-			uint8_t* line = dst + fy * dstLinesize;
-			const uint8_t* src = logo + row * logoW * 4;
+			uint8_t* line = dst + static_cast<std::ptrdiff_t>(fy) * dstLinesize;
+			const uint8_t* src = logo + static_cast<std::ptrdiff_t>(row) * logoW * 4;
 			for (int col = 0; col < logoW; ++col) {
 				const int fx = x + col;
 				if (fx < 0 || fx >= frameW)
 					continue;
-				const uint8_t* px = src + col * 4;
+				const uint8_t* px = src + static_cast<std::ptrdiff_t>(col) * 4;
 				const int a = (static_cast<int>(px[3]) * alphaScale) / 100;
 				if (a <= 0)
 					continue;
-				uint8_t* d = line + fx * 4;
+				uint8_t* d = line + static_cast<std::ptrdiff_t>(fx) * 4;
 				const int ia = 255 - a;
 				d[0] = static_cast<uint8_t>((d[0] * ia + px[0] * a) / 255);
 				d[1] = static_cast<uint8_t>((d[1] * ia + px[1] * a) / 255);
@@ -421,7 +422,8 @@ namespace {
 			return false;
 		for (int row = 0; row < height; ++row) {
 			const auto* in = src + static_cast<std::size_t>(row) * static_cast<std::size_t>(width) * 4;
-			std::copy(in, in + static_cast<std::size_t>(width) * 4, dst.Data(0) + row * dst.Linesize(0));
+			std::copy(in, in + static_cast<std::size_t>(width) * 4,
+				dst.Data(0) + static_cast<std::ptrdiff_t>(row) * dst.Linesize(0));
 		}
 		TagSrgb(dst);
 		return true;
@@ -429,8 +431,8 @@ namespace {
 
 	void ExtractAlpha(const FFrame& rgba, FFrame& gray) noexcept {
 		for (int row = 0; row < rgba.Height(); ++row) {
-			const std::uint8_t* src = rgba.Data(0) + row * rgba.Linesize(0);
-			std::uint8_t* dst = gray.Data(0) + row * gray.Linesize(0);
+			const std::uint8_t* src = rgba.Data(0) + static_cast<std::ptrdiff_t>(row) * rgba.Linesize(0);
+			std::uint8_t* dst = gray.Data(0) + static_cast<std::ptrdiff_t>(row) * gray.Linesize(0);
 			for (int col = 0; col < rgba.Width(); ++col)
 				dst[col] = src[col * 4 + 3];
 		}
@@ -468,8 +470,8 @@ namespace {
 			return false;
 		dst.resize(static_cast<std::size_t>(dstW) * static_cast<std::size_t>(dstH) * 4);
 		for (int row = 0; row < dstH; ++row) {
-			const std::uint8_t* rgb = packedOut.Data(0) + row * packedOut.Linesize(0);
-			const std::uint8_t* a = alphaOut.Data(0) + row * alphaOut.Linesize(0);
+			const std::uint8_t* rgb = packedOut.Data(0) + static_cast<std::ptrdiff_t>(row) * packedOut.Linesize(0);
+			const std::uint8_t* a = alphaOut.Data(0) + static_cast<std::ptrdiff_t>(row) * alphaOut.Linesize(0);
 			std::uint8_t* out = dst.data() + static_cast<std::size_t>(row) * static_cast<std::size_t>(dstW) * 4;
 			for (int col = 0; col < dstW; ++col) {
 				out[col * 4 + 0] = rgb[col * 4 + 0];
@@ -488,7 +490,8 @@ namespace {
 			if (!frame.Data(plane))
 				return;
 			for (int row = 0; row < frame.Height(); ++row) {
-				auto* samples = reinterpret_cast<float*>(frame.Data(plane) + row * frame.Linesize(plane));
+				auto* samples = reinterpret_cast<float*>(frame.Data(plane)
+					+ static_cast<std::ptrdiff_t>(row) * frame.Linesize(plane));
 				for (int col = 0; col < frame.Width(); ++col)
 					samples[col] *= gain;
 			}
@@ -560,8 +563,9 @@ namespace {
 			const int rowBytes = copyW * sample;
 			const int srcX = (x >> shiftX) * sample;
 			for (int row = 0; row < copyH; ++row) {
-				const std::uint8_t* in = src.Data(plane) + ((y >> shiftY) + row) * src.Linesize(plane) + srcX;
-				std::uint8_t* out = tile.Data(plane) + row * tile.Linesize(plane);
+				const std::uint8_t* in = src.Data(plane)
+					+ static_cast<std::ptrdiff_t>((y >> shiftY) + row) * src.Linesize(plane) + srcX;
+				std::uint8_t* out = tile.Data(plane) + static_cast<std::ptrdiff_t>(row) * tile.Linesize(plane);
 				std::copy(in, in + rowBytes, out);
 			}
 		}
@@ -626,7 +630,8 @@ namespace {
 						+ (static_cast<std::size_t>(box.y >> shiftY) + static_cast<std::size_t>(row))
 							* static_cast<std::size_t>(dst.Linesize(plane))
 						+ static_cast<std::size_t>((box.x >> shiftX) + col) * static_cast<std::size_t>(sample);
-					const std::uint8_t* src = tile.Data(plane) + row * tile.Linesize(plane)
+					const std::uint8_t* src = tile.Data(plane)
+						+ static_cast<std::ptrdiff_t>(row) * tile.Linesize(plane)
 						+ static_cast<std::size_t>(col) * static_cast<std::size_t>(sample);
 					if (packed && alphaOffset >= 0 && alphaBytes > 0 && alphaOffset + alphaBytes <= sample) {
 						std::uint8_t saved[8] {};
@@ -676,12 +681,18 @@ namespace {
 			const int ty = originY + row;
 			if (ty < 0 || ty >= tile.Height())
 				continue;
-			auto* tileG = reinterpret_cast<float*>(tile.Data(0) + ty * tile.Linesize(0));
-			auto* tileB = reinterpret_cast<float*>(tile.Data(1) + ty * tile.Linesize(1));
-			auto* tileR = reinterpret_cast<float*>(tile.Data(2) + ty * tile.Linesize(2));
-			const auto* logoG = reinterpret_cast<const float*>(logo.Data(0) + row * logo.Linesize(0));
-			const auto* logoB = reinterpret_cast<const float*>(logo.Data(1) + row * logo.Linesize(1));
-			const auto* logoR = reinterpret_cast<const float*>(logo.Data(2) + row * logo.Linesize(2));
+			auto* tileG = reinterpret_cast<float*>(tile.Data(0)
+				+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(0));
+			auto* tileB = reinterpret_cast<float*>(tile.Data(1)
+				+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(1));
+			auto* tileR = reinterpret_cast<float*>(tile.Data(2)
+				+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(2));
+			const auto* logoG = reinterpret_cast<const float*>(logo.Data(0)
+				+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(0));
+			const auto* logoB = reinterpret_cast<const float*>(logo.Data(1)
+				+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(1));
+			const auto* logoR = reinterpret_cast<const float*>(logo.Data(2)
+				+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(2));
 			const std::uint8_t* alpha = rgba + static_cast<std::size_t>(row) * static_cast<std::size_t>(logoW) * 4;
 			for (int col = 0; col < logoW; ++col) {
 				const int tx = originX + col;
@@ -907,10 +918,10 @@ bool Watermark::DecodeLogo() noexcept {
 	m_logoHeight = rgba.Height();
 	m_rgba.resize(static_cast<std::size_t>(m_logoWidth) * static_cast<std::size_t>(m_logoHeight) * 4);
 	for (int row = 0; row < m_logoHeight; ++row) {
-		const uint8_t* src = rgba.Data(0) + row * rgba.Linesize(0);
+		const uint8_t* src = rgba.Data(0) + static_cast<std::ptrdiff_t>(row) * rgba.Linesize(0);
 		uint8_t* dst = m_rgba.data() +
 			static_cast<std::size_t>(row) * static_cast<std::size_t>(m_logoWidth) * 4;
-		std::copy(src, src + m_logoWidth * 4, dst);
+		std::copy(src, src + static_cast<std::size_t>(m_logoWidth) * 4, dst);
 	}
 
 	return true;
@@ -1147,7 +1158,8 @@ bool Watermark::Prepare(int frameW, int frameH) noexcept {
 		bitmap.convertToRGBA();
 		m_scaled.resize(static_cast<std::size_t>(m_paintW) * static_cast<std::size_t>(m_paintH) * 4);
 		for (int row = 0; row < m_paintH; ++row)
-			std::copy_n(bitmap.data() + row * bitmap.stride(), static_cast<std::size_t>(m_paintW) * 4,
+			std::copy_n(bitmap.data() + static_cast<std::ptrdiff_t>(row) * bitmap.stride(),
+				static_cast<std::size_t>(m_paintW) * 4,
 				m_scaled.data() + static_cast<std::size_t>(row) * static_cast<std::size_t>(m_paintW) * 4);
 	}
 	m_prepared = true;

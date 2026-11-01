@@ -54,6 +54,7 @@
 #include <StormByte/safe/string.hxx>
 
 #include <algorithm>
+#include <cstddef>
 #include <array>
 #include <cmath>
 #include <utility>
@@ -128,7 +129,7 @@ namespace {
 		if (!gray || !gray.Data(0))
 			return;
 		for (int y = 0; y < gray.Height(); ++y) {
-			uint8_t* row = gray.Data(0) + y * gray.Linesize(0);
+			uint8_t* row = gray.Data(0) + static_cast<std::ptrdiff_t>(y) * gray.Linesize(0);
 			for (int x = 0; x < gray.Width(); ++x)
 				row[x] = lut[row[x]];
 		}

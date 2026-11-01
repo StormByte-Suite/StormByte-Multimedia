@@ -124,7 +124,7 @@ bool Input::Pad(const AVFrame& source, int width, int height, AVFrame& destinati
 		const bool chroma = descriptor->nb_components > 1 && plane != descriptor->comp[0].plane
 			&& (plane == descriptor->comp[1].plane || plane == descriptor->comp[2].plane);
 		output[plane] += static_cast<std::ptrdiff_t>(top >> (chroma ? descriptor->log2_chroma_h : 0)) * strides[plane]
-			+ (left >> (chroma ? descriptor->log2_chroma_w : 0)) * steps[plane];
+			+ static_cast<std::ptrdiff_t>(left >> (chroma ? descriptor->log2_chroma_w : 0)) * steps[plane];
 	}
 	av_image_copy(output.data(), outputStrides.data(), input.data(), inputStrides.data(),
 		format, source.Width(), source.Height());

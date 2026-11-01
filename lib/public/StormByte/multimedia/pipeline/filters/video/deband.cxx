@@ -55,6 +55,7 @@
 #include <StormByte/safe/string.hxx>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 
 using StormByte::Logger::Level;
@@ -120,8 +121,8 @@ namespace {
 		const int amp = grain * peak / 255;
 
 		for (int y = 0; y < h; ++y) {
-			const uint8_t* srow = s + y * ss;
-			uint8_t* drow = d + y * ds;
+			const uint8_t* srow = s + static_cast<std::ptrdiff_t>(y) * ss;
+			uint8_t* drow = d + static_cast<std::ptrdiff_t>(y) * ds;
 			for (int x = 0; x < w; ++x) {
 				const int c = Pel(srow, x, bpc);
 				const int xl = std::max(0, x - r);
@@ -130,8 +131,8 @@ namespace {
 				const int yd = std::min(h - 1, y + r);
 				const int l = Pel(srow, xl, bpc);
 				const int ri = Pel(srow, xr, bpc);
-				const int u = Pel(s + yu * ss, x, bpc);
-				const int dn = Pel(s + yd * ss, x, bpc);
+				const int u = Pel(s + static_cast<std::ptrdiff_t>(yu) * ss, x, bpc);
+				const int dn = Pel(s + static_cast<std::ptrdiff_t>(yd) * ss, x, bpc);
 				int out = c;
 				if (std::abs(c - l) < thr && std::abs(c - ri) < thr
 					&& std::abs(c - u) < thr && std::abs(c - dn) < thr)

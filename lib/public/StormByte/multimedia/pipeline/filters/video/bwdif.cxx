@@ -55,6 +55,7 @@
 #include <StormByte/safe/string.hxx>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 
 using StormByte::Logger::Level;
@@ -105,8 +106,8 @@ namespace {
 			return;
 
 		for (int y = 0; y < h; ++y) {
-			uint8_t* drow = dst + y * ds;
-			const uint8_t* crow = c + y * cs;
+			uint8_t* drow = dst + static_cast<std::ptrdiff_t>(y) * ds;
+			const uint8_t* crow = c + static_cast<std::ptrdiff_t>(y) * cs;
 			const bool keep = tff ? ((y & 1) == 0) : ((y & 1) == 1);
 			if (keep) {
 				const int bytes = (bpc <= 8) ? w : w * 2;
@@ -114,14 +115,14 @@ namespace {
 				continue;
 			}
 			const auto line = [&](int yy) {
-				return c + std::clamp(yy, 0, h - 1) * cs;
+				return c + static_cast<std::ptrdiff_t>(std::clamp(yy, 0, h - 1)) * cs;
 			};
 			const uint8_t* l0 = line(y - 3);
 			const uint8_t* l1 = line(y - 1);
 			const uint8_t* l2 = line(y + 1);
 			const uint8_t* l3 = line(y + 3);
-			const uint8_t* prow = p ? p + y * ps : nullptr;
-			const uint8_t* nrow = n ? n + y * ns : nullptr;
+			const uint8_t* prow = p ? p + static_cast<std::ptrdiff_t>(y) * ps : nullptr;
+			const uint8_t* nrow = n ? n + static_cast<std::ptrdiff_t>(y) * ns : nullptr;
 			for (int x = 0; x < w; ++x) {
 				int spatial = Cubic(Pel(l0, x, bpc), Pel(l1, x, bpc),
 					Pel(l2, x, bpc), Pel(l3, x, bpc));

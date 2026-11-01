@@ -51,6 +51,8 @@
 #include <StormByte/multimedia/pipeline/filters/analytics/ssim.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <cstddef>
+
 #include <cstdint>
 #include <deque>
 #include <optional>
@@ -139,8 +141,8 @@ namespace {
 			for (int x = 0; x + kWindow <= w; x += kWindow) {
 				double sx = 0.0, sy = 0.0, sxx = 0.0, syy = 0.0, sxy = 0.0;
 				for (int j = 0; j < kWindow; ++j) {
-					const uint8_t* ra = a + (y + j) * as;
-					const uint8_t* rb = b + (y + j) * bs;
+					const uint8_t* ra = a + static_cast<std::ptrdiff_t>(y + j) * as;
+					const uint8_t* rb = b + static_cast<std::ptrdiff_t>(y + j) * bs;
 					for (int i = 0; i < kWindow; ++i) {
 						const double vx = Sample(ra, x + i, bpc);
 						const double vy = Sample(rb, x + i, bpc);

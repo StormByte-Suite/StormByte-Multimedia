@@ -34,6 +34,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Semiplanar NV12/NV21/P010 frames are normalized before planar-only zimg and VMAF processing, and P010 samples are checked against the 10-bit range before repacking.
 - Matroska demuxing resets its parsing state after generic or byte seeks, so seeking after EOF can read packets again. Bundled FFmpeg includes an API/FATE regression test for byte-seeking back to the start.
 - Bundled static FFmpeg on Linux links detected VA-API and DRM dependencies, fixing unresolved symbols when VA-API support is enabled.
+- Video row and sample offsets are widened before stride multiplication to prevent signed overflow on large frames.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 

@@ -305,17 +305,19 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 				auto* output = destination.Data(destinationPlane)
 					+ static_cast<std::ptrdiff_t>(row) * destination.Linesize(destinationPlane) + destinationOffset;
 				for (int column = 0; column < width; ++column) {
+					const auto sourceColumn = static_cast<std::ptrdiff_t>(column) * sourceStep;
+					const auto destinationColumn = static_cast<std::ptrdiff_t>(column) * destinationStep;
 					unsigned sample = bytesPerSample == 1
-						? input[column * sourceStep]
-						: ReadWord(input + column * sourceStep);
+						? input[sourceColumn]
+						: ReadWord(input + sourceColumn);
 					if (sourceFormat == AV_PIX_FMT_YUV420P10LE && sample > 1023)
 						return false;
 					if (sourceMsbAligned != destinationMsbAligned)
 						sample = sourceMsbAligned ? sample >> 6 : sample << 6;
 					if (bytesPerSample > 1)
-						WriteWord(output + column * destinationStep, sample);
+						WriteWord(output + destinationColumn, sample);
 					else
-						output[column * destinationStep] = static_cast<std::uint8_t>(sample);
+						output[destinationColumn] = static_cast<std::uint8_t>(sample);
 				}
 			}
 		}
