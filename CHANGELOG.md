@@ -21,21 +21,13 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
+
+## [1.1.0] - 2026-11-01
+
 ### Added
 
 - Optional `Display::InvalidateAudio` flushes only PCM/device timing without changing the presentation epoch, video image or subtitle cues. Consumers opting in must rebuild against the updated Display interface; existing adapters default to the legacy global-seek selection path.
-
-### Fixed
-
-- The three long-gap `mov_text` regression tests return a skip for SYSTEM FFmpeg releases through 9.0.2, which lack the custom bundled patch, instead of aborting PGO training. Bundled builds and newer SYSTEM releases retain the regression checks.
-- Live audio-track selection with an audio-invalidation-capable Display keeps the video decoder, queued images, demux cursor and presentation worker running. Only the audio decoder is replaced; monotonic video timing bridges the silence until fresh audio timing becomes available. Disabled audio, repeated selections, paused selection and unsupported adapters retain explicit lifecycle behavior.
-
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
-
-## [1.1.0] - 2026-10-31
-
-### Added
-
 - `Multimedia::SimplePlayer` provides asynchronous media preview through a consumer-implemented `Display` for video, audio and subtitles, with play, pause, seek and track selection. Buffered inputs retain their dynamic type; `Stop()` rewinds the reader and `ReleaseReader()` transfers it still open for subsequent jobs, while `Close()` and destruction close owned input. Public preview contracts expose no FFmpeg, GUI-toolkit or operating-system types. This is preview support, not a replacement for a professional media player.
 - Preview audio retains its actual decoded sample format, sample rate, planar/interleaved representation and ordered channel identities without resampling or downmixing; `Display` owns device conversion and speaker mapping. Presentation generations invalidate stale deliveries, device feedback supplies the audible clock, paused seeks reconstruct images and cues without playing audio, and EOF waits for presentation to drain.
 - Optional `MultimediaPreviewDemo` implements a consumer-side SDL2 display with real video and source-channel-count audio, playback/track controls, automatic seek exercises and bounded PCM diagnostics. `ENABLE_PREVIEW_DEMO` defaults to OFF; `--smoke` uses three-second segments and `--listen` uses thirty-second segments. Synthetic preview regressions cover native audio, seeks with genuinely unknown duration, AVI AC-3 framing, subtitles, lifecycle failures and reader transfer into `Transcoder`.
@@ -51,6 +43,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- The three long-gap `mov_text` regression tests return a skip for SYSTEM FFmpeg releases through 9.0.2, which lack the custom bundled patch, instead of aborting PGO training. Bundled builds and newer SYSTEM releases retain the regression checks.
+- Live audio-track selection with an audio-invalidation-capable Display keeps the video decoder, queued images, demux cursor and presentation worker running. Only the audio decoder is replaced; monotonic video timing bridges the silence until fresh audio timing becomes available. Disabled audio, repeated selections, paused selection and unsupported adapters retain explicit lifecycle behavior.
 - AVI byte-clock AC-3 preview seeks verify and withhold a bounded incomplete preroll fragment before decoding the following complete frame, avoiding seek-time decoder failure without ignoring arbitrary invalid packets. Rounded audio timestamps follow the continuous decoded sample timeline rather than introducing false gaps; real discontinuities remain explicit. Preview callback failures are reported and contained during destruction.
 - Video decoding uses FFmpeg's reconstructed presentation timestamp when the decoded frame has no original PTS, as with reordered MPEG-4 video in AVI. Delayed frames lacking both timestamps continue from the preceding timed frame's duration, including the final frame delivered during decoder drain. The recovered timing is retained on both the public frame and its native buffer, restoring encode progress and preventing invalid output timelines.
 - Watermark opacity uses one BT.2020 graphics-white-normalized perceptual curve for SDR, PQ and HLG instead of separate SDR gamma and HDR PQ blends. Existing HDR graphics-white mapping is retained; only covered samples and their shared chroma samples are rewritten, leaving uncovered pixels and metadata intact.
