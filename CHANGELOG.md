@@ -30,6 +30,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Fixed
 
 - Encoders that do not preserve Dolby Vision now discard parsed Dolby Vision metadata and RPU side data before submitting frames, while encoders configured for Dolby Vision retain strict metadata validation. Frame submission failures report the specific metadata rejection or original FFmpeg error instead of only `failed to send frame`; regression coverage includes intentional metadata removal and required-metadata preservation.
+- FFmpeg failures across decoders, encoders, filters, demuxers and muxers now include the failed operation and the underlying FFmpeg error where available, rather than a generic message or silently ignored failure.
+- Semiplanar NV12/NV21/P010 frames are normalized before planar-only zimg and VMAF processing, and P010 samples are checked against the 10-bit range before repacking.
+- Matroska demuxing resets its parsing state after generic or byte seeks, so seeking after EOF can read packets again. Bundled FFmpeg includes an API/FATE regression test for byte-seeking back to the start.
+- Bundled static FFmpeg on Linux links detected VA-API and DRM dependencies, fixing unresolved symbols when VA-API support is enabled.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
