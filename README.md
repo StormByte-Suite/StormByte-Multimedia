@@ -208,6 +208,12 @@ Attach typed filters to an output with `Track::Filter<T>(...)`; job-level `Filte
 
 Watermark's `designedFor` size is the video reference size, not the requested logo size. SVG is rendered at the final paint resolution; external resources and system-font discovery are disabled. Convert text to paths and embed images. LunaSVG is not a browser SVG engine; validate the artwork visually. Invalid SVG dimensions warn and pass media through without a logo.
 
+The three long-gap `mov_text` regression tests are skipped with
+`WITH_FFMPEG=SYSTEM` when the runtime FFmpeg release is 9.0.2 or older: those
+releases lack the custom patch applied to bundled FFmpeg. They still run for
+bundled FFmpeg and SYSTEM releases newer than 9.0.2. This test exclusion does not
+fix the subtitle timestamp limitation in an unpatched system library.
+
 `Degrain` measures regional grain before filtering, preserves timing/geometry and has bounded look storage. It is an experimental heuristic, not motion-compensated restoration or a guarantee of perceptual improvement. Do not stack it with another grain-denoising filter.
 
 VMAF reports scores **and scored-frame counts** per output. Wait for `Done` and inspect report status and counts, not just the mean. Resource modes govern workers and queue budgets; process memory still depends on resolution, concurrent contexts and retained pictures. A queue limit is not a whole-job RAM limit.

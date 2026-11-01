@@ -61,6 +61,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <charconv>
 #include <cmath>
 #include <filesystem>
 #include <iostream>
@@ -433,6 +434,30 @@ namespace {
 	};
 
 	int CheckLongMovTextGaps(bool fragmented, bool mixedTimeBases) {
+#ifdef STORMBYTE_MM_TEST_FFMPEG_SYSTEM
+		// SYSTEM releases through 9.0.2 lack the bundled mov_text gap patch.
+		const std::string_view version = av_version_info();
+		std::array<unsigned, 3> release{};
+		const char* cursor = version.data();
+		const char* end = cursor + version.size();
+		bool known = true;
+		for (std::size_t index = 0; index < release.size(); ++index) {
+			const auto parsed = std::from_chars(cursor, end, release[index]);
+			if (parsed.ec != std::errc{}) {
+				known = false;
+				break;
+			}
+			cursor = parsed.ptr;
+			if (cursor == end || *cursor != '.')
+				break;
+			++cursor;
+		}
+		if (known && release <= std::array<unsigned, 3>{9, 0, 2}) {
+			std::cout << "System FFmpeg " << version
+				<< " lacks the bundled long mov_text gap patch." << std::endl;
+			return TEST_SKIP;
+		}
+#endif
 		const auto output = OutputPath("pipeline/interleave/long-mov-text-gaps.mp4");
 		AVFormatContext* raw = nullptr;
 		TEST_REQUIRE(avformat_alloc_output_context2(&raw, nullptr, "mp4", output.string().c_str()) >= 0);

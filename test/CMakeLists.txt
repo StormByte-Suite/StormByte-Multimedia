@@ -95,6 +95,8 @@ if(ENABLE_TEST)
 	if(WITH_FFMPEG STREQUAL "BUNDLED")
 		target_include_directories(StormByte-Multimedia-Test BEFORE PRIVATE
 			"${PROJECT_SOURCE_DIR}/thirdparty/ffmpeg/src")
+	elseif(WITH_FFMPEG STREQUAL "SYSTEM")
+		target_compile_definitions(StormByte-Multimedia-Test PRIVATE STORMBYTE_MM_TEST_FFMPEG_SYSTEM)
 	endif()
 	target_compile_definitions(StormByte-Multimedia-Test
 		PRIVATE StormByte_Multimedia_Test_EXPORTS

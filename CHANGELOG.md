@@ -27,6 +27,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- The three long-gap `mov_text` regression tests return a skip for SYSTEM FFmpeg releases through 9.0.2, which lack the custom bundled patch, instead of aborting PGO training. Bundled builds and newer SYSTEM releases retain the regression checks.
 - Live audio-track selection with an audio-invalidation-capable Display keeps the video decoder, queued images, demux cursor and presentation worker running. Only the audio decoder is replaced; monotonic video timing bridges the silence until fresh audio timing becomes available. Disabled audio, repeated selections, paused selection and unsupported adapters retain explicit lifecycle behavior.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
