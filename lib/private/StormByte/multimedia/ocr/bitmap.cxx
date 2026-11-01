@@ -51,6 +51,9 @@
 #include <StormByte/multimedia/ocr/bitmap.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 
+#include <cstddef>
+#include <limits>
+
 extern "C" {
 	#include <libavcodec/avcodec.h>
 }
@@ -88,6 +91,10 @@ namespace StormByte::Multimedia::OCR {
 			const AVSubtitleRect* rect = raw->rects ? raw->rects[i] : nullptr;
 			if (!rect || rect->type != SUBTITLE_BITMAP || rect->w <= 0 || rect->h <= 0 || !rect->data[0])
 				continue;
+			if (rect->linesize[0] > 0 && rect->linesize[0] < rect->w)
+				return {};
+			if (rect->h > std::numeric_limits<int>::max() - height)
+				return {};
 			if (rect->w > width)
 				width = rect->w;
 			height += rect->h;
@@ -95,12 +102,16 @@ namespace StormByte::Multimedia::OCR {
 
 		if (width <= 0 || height <= 0)
 			return {};
+		const auto bitmapWidth = static_cast<std::size_t>(width);
+		const auto bitmapHeight = static_cast<std::size_t>(height);
+		if (bitmapHeight > std::numeric_limits<std::size_t>::max() / bitmapWidth)
+			return {};
 
 		GrayBitmap out;
 		out.width = width;
 		out.height = height;
 		out.stride = width;
-		out.pixels.assign(static_cast<std::size_t>(width) * static_cast<std::size_t>(height), 255);
+		out.pixels.assign(bitmapWidth * bitmapHeight, 255);
 
 		int row = 0;
 		for (unsigned i = 0; i < raw->num_rects; ++i) {
@@ -110,12 +121,12 @@ namespace StormByte::Multimedia::OCR {
 			const int linesize = rect->linesize[0] > 0 ? rect->linesize[0] : rect->w;
 			const std::uint8_t* pal = rect->data[1];
 			for (int y = 0; y < rect->h; ++y) {
-				const std::uint8_t* src = rect->data[0] + y * linesize;
+				const std::uint8_t* src = rect->data[0] + static_cast<std::ptrdiff_t>(y) * linesize;
 				std::uint8_t* dst = out.pixels.data()
 					+ static_cast<std::size_t>(row + y) * static_cast<std::size_t>(width);
 				for (int x = 0; x < rect->w; ++x) {
 					if (pal)
-						dst[x] = Luma(pal + static_cast<unsigned>(src[x]) * 4u);
+						dst[x] = Luma(pal + static_cast<std::size_t>(src[x]) * 4u);
 					else
 						dst[x] = src[x];
 				}
