@@ -158,6 +158,11 @@ namespace StormByte::Multimedia::FFmpeg {
 			int PacketError() const noexcept;
 
 			/**
+			 * @brief FFmpeg error from the last failed decoder operation, or zero.
+			 */
+			int OperationError() const noexcept;
+
+			/**
 			 * @brief Receives a decoded frame.
 			 * @param frame Destination frame.
 			 * @return Operation result.
@@ -204,6 +209,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		private:
 			int m_stream_index = -1;		///< Bound stream index
 			int m_packet_error = 0;		///< Last packet submission error.
+			int m_operation_error = 0;	///< Last codec or bitstream-filter operation error.
 			bool m_hardware_fallback = false;	///< Auto policy fell back to a software video decoder.
 			AVBSFPipeline m_bsf_pipeline;	///< Optional BSF chain
 

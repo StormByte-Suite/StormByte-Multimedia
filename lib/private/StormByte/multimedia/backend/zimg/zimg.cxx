@@ -70,15 +70,6 @@ namespace StormByte::Multimedia::Backend {
 			return reinterpret_cast<void*>((p + (kAlign - 1)) & ~std::uintptr_t(kAlign - 1));
 		}
 
-		int Depth(const FFmpeg::AVFrame& frame) noexcept {
-			const int bpc = frame.BitsPerComponent();
-			if (bpc <= 8)
-				return 8;
-			if (bpc <= 10)
-				return 10;
-			return 12;
-		}
-
 		void ApplyFilter(zimg_graph_builder_params& params,
 			FFmpeg::AVFrame::Resample filter) noexcept {
 			if (filter == FFmpeg::AVFrame::Resample::Default)
@@ -118,6 +109,12 @@ namespace StormByte::Multimedia::Backend {
 			const AVPixFmtDescriptor* desc = Descriptor(frame);
 			if (!desc || (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) != 0)
 				return false;
+			for (int component = 0; component < desc->nb_components; ++component) {
+				for (int previous = 0; previous < component; ++previous) {
+					if (desc->comp[component].plane == desc->comp[previous].plane)
+						return false;
+				}
+			}
 			zimg_image_format_default(&fmt, ZIMG_API_VERSION);
 			fmt.width = static_cast<unsigned>(frame.Width());
 			fmt.height = static_cast<unsigned>(frame.Height());
@@ -125,7 +122,7 @@ namespace StormByte::Multimedia::Backend {
 				fmt.depth = 32;
 				fmt.pixel_type = ZIMG_PIXEL_FLOAT;
 			} else {
-				const int depth = Depth(frame);
+				const int depth = desc->comp[0].depth;
 				fmt.depth = static_cast<unsigned>(depth);
 				fmt.pixel_type = (depth > 8) ? ZIMG_PIXEL_WORD : ZIMG_PIXEL_BYTE;
 			}

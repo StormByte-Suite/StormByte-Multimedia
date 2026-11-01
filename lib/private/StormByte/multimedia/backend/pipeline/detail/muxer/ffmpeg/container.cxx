@@ -421,7 +421,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		if (!CopyFileTags(m_ctx->metadata, source)
 			|| !StampCreationTime(m_ctx->metadata)
 			|| !CopyChapters(*m_ctx, source.Chapters(), m_shiftNs)) {
-			owner.Fail("failed to copy source file metadata");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"muxer {} could not copy source tags, creation time, or chapters",
+				m_ctx->oformat && m_ctx->oformat->name ? m_ctx->oformat->name : "unknown container"));
 			return false;
 		}
 		if (!(ctx->oformat->flags & AVFMT_NOFILE)) {
@@ -553,12 +555,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	bool Container::Push(StormByte::Multimedia::Pipeline::Muxer& owner,
 		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
 		if (!packet) {
-			owner.Fail("empty packet");
+			owner.Fail("muxer received an empty packet handle");
 			return false;
 		}
 
 		if (Resolve(*packet) < 0) {
-			owner.Fail("packet stream index is not a mux track");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"muxer has no destination track for packet type={} index={}",
+				static_cast<unsigned>(packet->Type()), packet->Track()));
 			return false;
 		}
 
@@ -685,10 +689,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			if (track.title)
 				av_dict_set(&stream->metadata, "title", track.title->data(), 0);
 			// MP3 reuses this field for the technical Xing/LAME gapless identifier.
-			if (std::strcmp(m_ctx->oformat->name, "mp3") != 0
-				&& av_dict_set(&stream->metadata, "encoder", WritingApp, 0) < 0) {
-				owner.Fail("failed to set output stream branding");
-				return false;
+			if (std::strcmp(m_ctx->oformat->name, "mp3") != 0) {
+				const int branding = av_dict_set(&stream->metadata, "encoder", WritingApp, 0);
+				if (branding < 0) {
+					owner.Fail(StormByte::Safe::String::ReplaceToken(
+						"muxer could not set encoder metadata on output stream {}: {}",
+						stream->index,
+						static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(branding))));
+					return false;
+				}
 			}
 
 			if (const auto disposition = owner.Disposition(index)) {
@@ -744,10 +753,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			return false;
 		}
 		// FFmpeg initializes its encoder tag in avformat_init_output.
-		if (av_dict_set(&m_ctx->metadata, "encoder", WritingApp, 0) < 0
-			|| av_dict_set(&m_ctx->metadata, "encoding_tool", WritingApp, 0) < 0) {
+		int branding = av_dict_set(&m_ctx->metadata, "encoder", WritingApp, 0);
+		if (branding >= 0)
+			branding = av_dict_set(&m_ctx->metadata, "encoding_tool", WritingApp, 0);
+		if (branding < 0) {
 			av_dict_free(&opts);
-			owner.Fail("failed to set output container branding");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"muxer could not set encoder/encoding_tool metadata on {}: {}",
+				m_ctx->oformat && m_ctx->oformat->name ? m_ctx->oformat->name : "unknown container",
+				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(branding))));
 			return false;
 		}
 		const int rc = avformat_write_header(m_ctx, &opts);
@@ -856,13 +870,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const int out = Resolve(packet);
 		const auto it = m_tracks.find(out);
 		if (it == m_tracks.end() || it->second.avIndex < 0) {
-			owner.Fail("packet stream index is not a mux track");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"muxer cannot map packet type={} track={} to an output stream",
+				static_cast<unsigned>(packet.Type()), out));
 			return false;
 		}
 
 		AVPacket* raw = MakeAvPacket(packet);
 		if (!raw) {
-			owner.Fail("could not allocate output packet");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"muxer could not allocate output packet for type={} track={} payload={} bytes",
+				static_cast<unsigned>(packet.Type()), out, packet.Payload().Available()));
 			return false;
 		}
 
@@ -926,7 +944,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		const int rc = av_interleaved_write_frame(m_ctx, raw);
 		av_packet_free(&raw);
 		if (rc < 0) {
-			owner.Fail(StormByte::Safe::String::ReplaceToken("av_interleaved_write_frame failed: {}",
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"muxer could not write type={} track={} stream={} pts={} dts={} to {}: {}",
+				static_cast<unsigned>(packet.Type()), out, track.avIndex,
+				packet.Pts() ? packet.Pts()->Nanoseconds().count() : AV_NOPTS_VALUE,
+				packet.Dts() ? packet.Dts()->Nanoseconds().count() : AV_NOPTS_VALUE,
+				m_ctx->oformat && m_ctx->oformat->name ? m_ctx->oformat->name : "unknown container",
 				static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(rc))));
 			return false;
 		}

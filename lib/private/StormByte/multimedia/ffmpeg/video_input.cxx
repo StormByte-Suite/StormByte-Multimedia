@@ -198,9 +198,9 @@ bool Input::Configure(::AVCodecContext* context, const AVCodec* codec,
 			return true;
 		}
 	}
-	const char* negotiationError = nullptr;
+	std::string negotiationError;
 	const int selected = Negotiate(codec, software, negotiationError);
-	if (negotiationError) {
+	if (!negotiationError.empty()) {
 		error = negotiationError;
 		return false;
 	}

@@ -174,8 +174,10 @@ FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext*
 }
 
 FFmpeg::AVFormatContext::AVFormatContext(AVFormatContext&& other) noexcept
-: AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed) {
+: AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+	m_operationError(other.m_operationError) {
 	other.m_avioBorrowed = false;
+	other.m_operationError = 0;
 }
 
 FFmpeg::AVFormatContext::~AVFormatContext() noexcept {
@@ -187,7 +189,9 @@ FFmpeg::AVFormatContext& FFmpeg::AVFormatContext::operator=(AVFormatContext&& ot
 		AVPointer::operator=(std::move(other));
 		m_io = std::move(other.m_io);
 		m_avioBorrowed = other.m_avioBorrowed;
+		m_operationError = other.m_operationError;
 		other.m_avioBorrowed = false;
+		other.m_operationError = 0;
 	}
 
 	return *this;
@@ -381,6 +385,7 @@ FFmpeg::OperationResult FFmpeg::AVFormatContext::ReadPacket(AVPacket& packet) no
 		m_ptr->pb->eof_reached = 0;
 	}
 	int ret = av_read_frame(m_ptr, packet.Get());
+	m_operationError = (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) ? ret : 0;
 	switch(ret) {
 		case AVERROR(EAGAIN):
 			return OperationResult::TryAgain;
@@ -393,19 +398,28 @@ FFmpeg::OperationResult FFmpeg::AVFormatContext::ReadPacket(AVPacket& packet) no
 	}
 }
 
+int FFmpeg::AVFormatContext::OperationError() const noexcept {
+	return m_operationError;
+}
+
 FFmpeg::OperationResult FFmpeg::AVFormatContext::SeekStart() noexcept {
-	if (!m_ptr)
+	if (!m_ptr) {
+		m_operationError = AVERROR(EINVAL);
 		return OperationResult::Error;
+	}
 	if (m_io) {
 		m_io->consumer.Clean();
 		m_io->position = 0;
 	}
 	const int ret = av_seek_frame(m_ptr, -1, 0, AVSEEK_FLAG_BACKWARD);
 	if (ret < 0 && ret != AVERROR_EOF && ret != AVERROR(ESPIPE)) {
-		if (!m_io)
+		if (!m_io) {
+			m_operationError = ret;
 			return OperationResult::Error;
+		}
 	}
 	avformat_flush(m_ptr);
+	m_operationError = 0;
 	return OperationResult::Success;
 }
 

@@ -1,0 +1,145 @@
+From 590614d9a712da7b5f88f8b040d9249bcd187844 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 00:13:19 +0100
+Subject: [PATCH 8/8] tests/api: cover Matroska byte seek after EOF
+
+---
+ tests/api/Makefile               |  1 +
+ tests/api/api-seek-byte-test.c   | 77 ++++++++++++++++++++++++++++++++
+ tests/fate/api.mak               |  4 ++
+ tests/ref/fate/api-seek-byte-mkv | 12 +++++
+ 4 files changed, 94 insertions(+)
+ create mode 100644 tests/api/api-seek-byte-test.c
+ create mode 100644 tests/ref/fate/api-seek-byte-mkv
+
+diff --git a/tests/api/Makefile b/tests/api/Makefile
+index 987db1b785..f36b190d5a 100644
+--- a/tests/api/Makefile
++++ b/tests/api/Makefile
+@@ -2,6 +2,7 @@ APITESTPROGS-$(call ENCDEC, FLAC, FLAC) += api-flac
+ APITESTPROGS-$(call DEMDEC, H264, H264) += api-h264
+ APITESTPROGS-$(call DEMDEC, H264, H264) += api-h264-slice
+ APITESTPROGS-yes += api-seek api-dump-stream-meta
++APITESTPROGS-yes += api-seek-byte
+ APITESTPROGS-$(call DEMDEC, H263, H263) += api-band
+ APITESTPROGS-$(HAVE_THREADS) += api-threadmessage
+ APITESTPROGS-$(call ALLYES, H261_ENCODER H261_PARSER) += api-enc-parser
+diff --git a/tests/api/api-seek-byte-test.c b/tests/api/api-seek-byte-test.c
+new file mode 100644
+index 0000000000..b7a4ca42a0
+--- /dev/null
++++ b/tests/api/api-seek-byte-test.c
+@@ -0,0 +1,77 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * Read a file to its end, seek back to its first byte with AVSEEK_FLAG_BYTE
++ * and read it again, printing every packet of both passes. A demuxer that
++ * keeps an end of stream across the byte seek prints nothing for the second.
++ */
++
++#include <inttypes.h>
++#include <stdio.h>
++
++#include "libavformat/avformat.h"
++#include "libavutil/adler32.h"
++
++static int read_pass(AVFormatContext *s, AVPacket *pkt, const char *name)
++{
++    int ret, count = 0;
++
++    printf("%s\n", name);
++    while ((ret = av_read_frame(s, pkt)) >= 0) {
++        printf("st:%d pts:%" PRId64 " pos:%" PRId64 " size:%d adler:0x%08"PRIx32"\n",
++               pkt->stream_index, pkt->pts, pkt->pos, pkt->size,
++               av_adler32_update(0, pkt->data, pkt->size));
++        av_packet_unref(pkt);
++        count++;
++    }
++    printf("packets:%d\n", count);
++    return ret == AVERROR_EOF ? 0 : ret;
++}
++
++int main(int argc, char **argv)
++{
++    AVFormatContext *s = NULL;
++    AVPacket *pkt = NULL;
++    int ret;
++
++    if (argc < 2) {
++        fprintf(stderr, "usage: %s <input>\n", argv[0]);
++        return 1;
++    }
++
++    if ((ret = avformat_open_input(&s, argv[1], NULL, NULL)) < 0)
++        return 1;
++    if (!(pkt = av_packet_alloc())) {
++        ret = AVERROR(ENOMEM);
++        goto end;
++    }
++
++    if ((ret = read_pass(s, pkt, "first pass")) < 0)
++        goto end;
++    if ((ret = av_seek_frame(s, -1, 0, AVSEEK_FLAG_BYTE)) < 0) {
++        printf("byte seek failed\n");
++        goto end;
++    }
++    ret = read_pass(s, pkt, "after byte seek to 0");
++
++end:
++    av_packet_free(&pkt);
++    avformat_close_input(&s);
++    return ret < 0;
++}
+diff --git a/tests/fate/api.mak b/tests/fate/api.mak
+index ba9789d9f7..87db57951e 100644
+--- a/tests/fate/api.mak
++++ b/tests/fate/api.mak
+@@ -22,6 +22,10 @@ FATE_API_SAMPLES_LIBAVFORMAT-$(call DEMDEC, H264, H264) += fate-api-h264-slice
+ fate-api-h264-slice: $(APITESTSDIR)/api-h264-slice-test$(EXESUF)
+ fate-api-h264-slice: CMD = run $(APITESTSDIR)/api-h264-slice-test$(EXESUF) 2 $(TARGET_SAMPLES)/h264/crew_cif.nal
+ 
++FATE_API_SAMPLES_LIBAVFORMAT-$(CONFIG_MATROSKA_DEMUXER) += fate-api-seek-byte-mkv
++fate-api-seek-byte-mkv: $(APITESTSDIR)/api-seek-byte-test$(EXESUF)
++fate-api-seek-byte-mkv: CMD = run $(APITESTSDIR)/api-seek-byte-test$(EXESUF) $(TARGET_SAMPLES)/mkv/lzo.mka
++
+ FATE_API_LIBAVFORMAT-yes += $(if $(findstring fate-lavf-flv,$(FATE_LAVF_CONTAINER)),fate-api-seek)
+ fate-api-seek: $(APITESTSDIR)/api-seek-test$(EXESUF) fate-lavf-flv
+ fate-lavf-flv: KEEP_FILES ?= 1
+diff --git a/tests/ref/fate/api-seek-byte-mkv b/tests/ref/fate/api-seek-byte-mkv
+new file mode 100644
+index 0000000000..918b5be2ac
+--- /dev/null
++++ b/tests/ref/fate/api-seek-byte-mkv
+@@ -0,0 +1,12 @@
++first pass
++st:0 pts:0 pos:279 size:16384 adler:0x00000000
++st:0 pts:4096 pos:279 size:16384 adler:0xad7eebf4
++st:0 pts:8192 pos:279 size:16384 adler:0x1d1ff9d9
++st:0 pts:12288 pos:279 size:16384 adler:0xf1d9e2e2
++packets:4
++after byte seek to 0
++st:0 pts:0 pos:279 size:16384 adler:0x00000000
++st:0 pts:4096 pos:279 size:16384 adler:0xad7eebf4
++st:0 pts:8192 pos:279 size:16384 adler:0x1d1ff9d9
++st:0 pts:12288 pos:279 size:16384 adler:0xf1d9e2e2
++packets:4
+-- 
+2.56.0
+

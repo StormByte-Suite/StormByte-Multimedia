@@ -117,6 +117,11 @@ namespace StormByte::Multimedia::FFmpeg {
 			OperationResult Process(AVPacket& pkt) noexcept;
 
 			/**
+			 * @brief FFmpeg error from the last failed filter operation, or zero.
+			 */
+			int ErrorCode() const noexcept;
+
+			/**
 			 * @brief Flushes every filter.
 			 */
 			void Flush() noexcept;
@@ -139,6 +144,7 @@ namespace StormByte::Multimedia::FFmpeg {
 
 		private:
 			StormByte::Safe::Vector<StormByte::Safe::Shared<AVBSF>> m_filters;	///< Base-owned filter chain.
+			int m_error = 0;
 	};
 }
 

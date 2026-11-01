@@ -59,12 +59,16 @@ AVBSFPipeline::~AVBSFPipeline() noexcept = default;
 
 AVBSFPipeline::AVBSFPipeline(AVBSFPipeline&& other) noexcept:
 m_filters(std::move(other.m_filters)) {
+	m_error = other.m_error;
+	other.m_error = 0;
 	other.m_filters.clear();
 }
 
 AVBSFPipeline& AVBSFPipeline::operator=(AVBSFPipeline&& other) noexcept {
 	if (this != &other) {
 		m_filters = std::move(other.m_filters);
+		m_error = other.m_error;
+		other.m_error = 0;
 		other.m_filters.clear();
 	}
 
@@ -77,6 +81,7 @@ void AVBSFPipeline::Add(AVBSF&& bsf) noexcept {
 }
 
 OperationResult AVBSFPipeline::Process(AVPacket& pkt) noexcept {
+	m_error = 0;
 	if (m_filters.empty())
 		return OperationResult::Success;
 
@@ -88,13 +93,17 @@ OperationResult AVBSFPipeline::Process(AVPacket& pkt) noexcept {
 		// Send the current packet to the BSF
 		auto send_res = bsf->SendPacket(current);
 		if (send_res != OperationResult::Success &&
-			send_res != OperationResult::TryAgain)
+			send_res != OperationResult::TryAgain) {
+			m_error = bsf->ErrorCode();
 			return send_res;
+		}
 
 		// Receive the filtered packet into `next`
 		auto recv_res = bsf->ReceivePacket(next);
-		if (recv_res != OperationResult::Success)
+		if (recv_res != OperationResult::Success) {
+			m_error = bsf->ErrorCode();
 			return recv_res;
+		}
 
 		// The output of this filter becomes the input of the next one
 		current = next.Ref();
@@ -106,14 +115,22 @@ OperationResult AVBSFPipeline::Process(AVPacket& pkt) noexcept {
 	return OperationResult::Success;
 }
 
+int AVBSFPipeline::ErrorCode() const noexcept {
+	return m_error;
+}
+
 void AVBSFPipeline::Flush() noexcept {
 	for (auto& bsf : m_filters)
 		bsf->Flush();
 }
 
 void AVBSFPipeline::SetEof() noexcept {
-	for (auto& bsf : m_filters)
+	m_error = 0;
+	for (auto& bsf : m_filters) {
 		bsf->SetEof();
+		if (bsf->ErrorCode() != 0)
+			m_error = bsf->ErrorCode();
+	}
 }
 
 void AVBSFPipeline::Clear() noexcept {

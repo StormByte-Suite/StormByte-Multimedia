@@ -66,6 +66,7 @@ extern "C" {
 	#include <libvmaf/libvmaf.h>
 	#include <libvmaf/model.h>
 	#include <libvmaf/picture.h>
+	#include <libavutil/pixfmt.h>
 }
 
 using StormByte::Multimedia::Pipeline::Filter::Video::VMAF;
@@ -96,6 +97,20 @@ struct StormByte::Multimedia::Pipeline::Filter::Video::Detail::VMAF::Lane {
 };
 
 namespace {
+	int PlanarFormat(int format) noexcept {
+		switch (format) {
+			case AV_PIX_FMT_NV12:
+			case AV_PIX_FMT_NV21:
+				return AV_PIX_FMT_YUV420P;
+			case AV_PIX_FMT_P010LE:
+				return AV_PIX_FMT_YUV420P10LE;
+			case AV_PIX_FMT_P010BE:
+				return AV_PIX_FMT_YUV420P10BE;
+			default:
+				return AV_PIX_FMT_NONE;
+		}
+	}
+
 	enum VmafPixelFormat Pix(const FFrame& raw) noexcept {
 		switch (raw.Layout()) {
 			case FFrame::VideoLayout::Yuv420:	return VMAF_PIX_FMT_YUV420P;
@@ -217,8 +232,16 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 	auto* pic = static_cast<VmafPicture*>(out);
 	if (!raw || !pic || tw <= 0 || th <= 0)
 		return false;
-	const unsigned bpc = Bpc(raw);
-	const auto fmt = Pix(raw);
+	FFrame planar;
+	const FFrame* formatSource = &raw;
+	if (const int planarFormat = PlanarFormat(raw.Format()); planarFormat != AV_PIX_FMT_NONE) {
+		planar.Format(planarFormat);
+		if (!raw.ScaleTo(planar, raw.Width(), raw.Height(), FFrame::Resample::Point, FFrame::Scaler::Sws))
+			return false;
+		formatSource = &planar;
+	}
+	const unsigned bpc = Bpc(*formatSource);
+	const auto fmt = Pix(*formatSource);
 	if (fmt == VMAF_PIX_FMT_UNKNOWN)
 		return false;
 	if (lane.scored == 0) {
@@ -234,10 +257,10 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 		}
 	}
 
-	const FFrame* src = &raw;
+	const FFrame* src = formatSource;
 	FFrame scaled;
-	if (raw.Width() != tw || raw.Height() != th) {
-		if (!raw.ScaleTo(ScalingContext(), scaled, tw, th, FFrame::Resample::Bicubic, FFrame::Scaler::Sws) || !scaled) {
+	if (src->Width() != tw || src->Height() != th) {
+		if (!src->ScaleTo(ScalingContext(), scaled, tw, th, FFrame::Resample::Bicubic, FFrame::Scaler::Sws) || !scaled) {
 			vmaf_picture_unref(pic);
 			return false;
 		}

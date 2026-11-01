@@ -251,8 +251,16 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 			}
 			decoder.InheritSourceTags();
 		}
+		catch (const std::exception& error) {
+			decoder.Fail(StormByte::Safe::String::ReplaceToken(
+				"decoder track {} could not inherit source stream tags: {}",
+				decoder.Index(), error.what()));
+			return decoder;
+		}
 		catch (...) {
-			decoder.Fail("failed to copy source stream tags");
+			decoder.Fail(StormByte::Safe::String::ReplaceToken(
+				"decoder track {} could not inherit source stream tags: non-standard exception",
+				decoder.Index()));
 			return decoder;
 		}
 	}

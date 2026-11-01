@@ -335,11 +335,15 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 
 	FFmpeg::AVFrame firstFrame;
 	if (!firstFrame.Ref(*handle)) {
-		owner.Fail("failed to reference first encoder frame");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"video encoder track {} could not retain first frame {}x{} fmt={}",
+			owner.Index(), handle->Width(), handle->Height(), handle->Format()));
 		return false;
 	}
 	if (!FFmpeg::VideoInput::Attach(frame.Attachments(), firstFrame)) {
-		owner.Fail("failed to preserve first-frame static HDR attachments");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"video encoder track {} could not copy {} first-frame attachments",
+			owner.Index(), frame.Attachments().size()));
 		return false;
 	}
 	if (need.Has(Feature::HDR10) && frame.Video() && frame.Video()->HDR10())
@@ -362,7 +366,9 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
 	if (!frame) {
-		owner.Fail("empty frame");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"video encoder track {} received an empty frame handle",
+			owner.Index()));
 		return false;
 	}
 
@@ -372,7 +378,9 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	const auto* source = FrameHandle(owner, *frame);
 	if (!source || !*source) {
-		owner.Fail("frame has no backend buffer");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"video encoder track {} frame has no FFmpeg backend buffer",
+			owner.Index()));
 		return false;
 	}
 
@@ -407,7 +415,9 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 			&& frame->Video()->SampleAspectRatio()->Valid())
 			handle->SampleAspectRatio(*frame->Video()->SampleAspectRatio());
 		if (!FFmpeg::VideoInput::Attach(frame->Attachments(), *handle)) {
-			owner.Fail("failed to preserve encoder static HDR attachments");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"video encoder track {} could not copy {} frame attachments",
+				owner.Index(), frame->Attachments().size()));
 			return false;
 		}
 		if (frame->Video() && frame->Video()->HDR10() && owner.Capabilities().Has(Feature::HDR10))
@@ -476,7 +486,10 @@ bool Video::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 		|| result == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 		return false;
 	if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
-		owner.Fail("failed to receive packet");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"video encoder track {} could not receive packet: {}",
+			owner.Index(), static_cast<std::string_view>(
+				FFmpeg::ErrorToString(m_encoder->OperationError()))));
 		return false;
 	}
 
@@ -497,12 +510,26 @@ void Video::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 			|| sent == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 			break;
 		if (sent == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain) {
-			if (!DrainOne(owner))
-				break;
+			if (!DrainOne(owner)) {
+				if (owner.Failed())
+					return;
+				const auto retried = m_encoder->SetEof();
+				if (retried == StormByte::Multimedia::FFmpeg::OperationResult::Success
+					|| retried == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
+					break;
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"video encoder track {} made no progress after draining while signaling EOF: {}",
+					owner.Index(), static_cast<std::string_view>(
+						FFmpeg::ErrorToString(m_encoder->OperationError()))));
+				return;
+			}
 			continue;
 		}
 
-		owner.Fail("failed to signal encoder EOF");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"video encoder track {} could not signal EOF: {}",
+			owner.Index(), static_cast<std::string_view>(
+				FFmpeg::ErrorToString(m_encoder->OperationError()))));
 		return;
 	}
 
@@ -520,6 +547,13 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Video::Take() n
 			m_pending.push_back(StormByte::Multimedia::Backend::Pipeline::Encoder::MakePacket(
 				*m_owner, Type::Video, m_index, m_scratch, m_timeBase, keepPacketHdrPlus));
 			m_scratch.Unref();
+		}
+		else if (result != StormByte::Multimedia::FFmpeg::OperationResult::TryAgain
+			&& result != StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile) {
+			m_owner->Fail(StormByte::Safe::String::ReplaceToken(
+				"video encoder track {} could not receive packet: {}",
+				m_index, static_cast<std::string_view>(
+					FFmpeg::ErrorToString(m_encoder->OperationError()))));
 		}
 	}
 

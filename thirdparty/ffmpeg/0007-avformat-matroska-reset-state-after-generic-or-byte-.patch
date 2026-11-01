@@ -1,0 +1,42 @@
+From b74ec0109a812cdeeae60d44c6b7699e0775c989 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 00:13:17 +0100
+Subject: [PATCH 7/8] avformat/matroska: reset state after generic or byte seek
+
+---
+ libavformat/matroskadec.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/libavformat/matroskadec.c b/libavformat/matroskadec.c
+index 18849af689..94b45fee41 100644
+--- a/libavformat/matroskadec.c
++++ b/libavformat/matroskadec.c
+@@ -4481,6 +4481,17 @@ static int matroska_read_packet(AVFormatContext *s, AVPacket *pkt)
+     MatroskaDemuxContext *matroska = s->priv_data;
+     int ret = 0;
+ 
++    if (s->io_repositioned) {
++        /* A generic or byte seek moved the read position without
++         * matroska_read_seek(): parse from the new position, and forget an
++         * end of stream reached before it. */
++        s->io_repositioned = 0;
++        matroska_reset_status(matroska, 0, -1);
++        matroska_clear_queue(matroska);
++        matroska->skip_to_keyframe = 0;
++        matroska->done             = 0;
++    }
++
+     if (matroska->resync_pos == -1) {
+         // This can only happen if generic seeking has been used.
+         matroska->resync_pos = avio_tell(s->pb);
+@@ -4550,6 +4561,7 @@ static int matroska_read_seek(AVFormatContext *s, int stream_index,
+     }
+     matroska->skip_to_keyframe = 1;
+     matroska->done             = 0;
++    s->io_repositioned         = 0;
+     avpriv_update_cur_dts(s, st, sti->index_entries[index].timestamp);
+     return 0;
+ err:
+-- 
+2.56.0
+

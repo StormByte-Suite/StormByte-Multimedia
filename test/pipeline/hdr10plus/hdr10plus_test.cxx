@@ -159,6 +159,12 @@ namespace {
 			&& std::abs(static_cast<std::int64_t>(before.Y()) - after.Y()) <= verticalTolerance;
 	}
 
+	bool SameEncodedPixelFormat(Property::PixelFormat before, Property::PixelFormat after) noexcept {
+		return before == after
+			|| (before == Property::PixelFormat::P010 && after == Property::PixelFormat::YUV420P10)
+			|| (before == Property::PixelFormat::YUV420P10 && after == Property::PixelFormat::P010);
+	}
+
 	int CheckVideo(const Property::Video& before, const Property::Video& after, bool av1) {
 		TEST_REQUIRE(after.HDR10() && before.HDR10());
 		const auto& original = before.HDR10().value();
@@ -175,7 +181,7 @@ namespace {
 		TEST_REQUIRE(SamePoint(original.LightLevel().value(), actual.LightLevel().value()));
 		TEST_REQUIRE(after.Resolution().Width() == before.Resolution().Width());
 		TEST_REQUIRE(after.Resolution().Height() == before.Resolution().Height());
-		TEST_REQUIRE(after.Color().PixelFormat() == before.Color().PixelFormat());
+		TEST_REQUIRE(SameEncodedPixelFormat(before.Color().PixelFormat(), after.Color().PixelFormat()));
 		TEST_REQUIRE(after.Color().Primaries() == before.Color().Primaries());
 		TEST_REQUIRE(after.Color().Transfer() == before.Color().Transfer());
 		TEST_REQUIRE(after.Color().Space() == before.Color().Space());

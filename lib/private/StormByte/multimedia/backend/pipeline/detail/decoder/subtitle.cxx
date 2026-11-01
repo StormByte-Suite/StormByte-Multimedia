@@ -111,7 +111,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	bool Subtitle::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
 		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
 		if (!packet) {
-			owner.Fail("empty packet");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"subtitle decoder track {} received an empty packet handle",
+				owner.Index()));
 			return false;
 		}
 
@@ -121,7 +123,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
 			if (!packet->Payload().Extract(n, bytes) || bytes.size() != n) {
-				owner.Fail("failed to extract packet payload");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"subtitle decoder track {} could not extract {} packet bytes",
+					owner.Index(), n));
 				return false;
 			}
 
@@ -129,7 +133,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		}
 
 		if (!raw.Load(data, static_cast<int>(n), owner.Index(), packet->KeyFrame())) {
-			owner.Fail("out of memory copying packet");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"subtitle decoder track {} could not copy {} packet bytes",
+				owner.Index(), n));
 			return false;
 		}
 
@@ -143,7 +149,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		StormByte::Multimedia::FFmpeg::AVSubtitle sub;
 		const auto result = m_decoder.DecodeSubtitle(raw, sub);
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Error) {
-			owner.Fail("failed to decode subtitle");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"subtitle decoder could not decode packet on track {}: {}",
+				owner.Index(), static_cast<std::string_view>(
+					StormByte::Multimedia::FFmpeg::ErrorToString(m_decoder.OperationError()))));
 			return false;
 		}
 

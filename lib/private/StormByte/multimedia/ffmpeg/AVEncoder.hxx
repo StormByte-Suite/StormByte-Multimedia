@@ -187,6 +187,11 @@ namespace StormByte::Multimedia::FFmpeg {
 			FFmpeg::OperationResult ReceivePacket(AVPacket& pkt) noexcept;
 
 			/**
+			 * @brief FFmpeg error from the last failed encoder operation, or zero.
+			 */
+			int OperationError() const noexcept;
+
+			/**
 			 * @brief Stream index this encoder was opened for.
 			 * @return Stream index.
 			 */
@@ -287,6 +292,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			int m_stream_index = -1;										///< Output track
 			FFmpeg::AVBSFPipeline m_bsf_pipeline;							///< Optional annex-B filter
 			Safe::Map<std::int64_t, Safe::Binary> m_hdrPlusT35;	///< PTS → ST 2094-40 T.35 bytes
+			int m_operation_error = 0;	///< Last codec or bitstream-filter operation error.
 
 			/**
 			 * @brief Adopts an opened codec context.

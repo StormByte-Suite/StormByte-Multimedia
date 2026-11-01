@@ -53,6 +53,7 @@
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -77,19 +78,25 @@ FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(std::string_view name, const AVCodec
 	if (!filter)
 		return Unexpected<BSFError>("Bitstream filter not found");
 	AVBSFContext* ctx = nullptr;
-	if (av_bsf_alloc(filter, &ctx) < 0)
-		return Unexpected<BSFError>("Failed to allocate BSF");
+	int result = av_bsf_alloc(filter, &ctx);
+	if (result < 0)
+		return Unexpected<BSFError>("cannot allocate bitstream filter '{}': {}",
+			name, static_cast<std::string_view>(FFmpeg::ErrorToString(result)));
 
-	if (avcodec_parameters_copy(ctx->par_in, params.Get()) < 0) {
+	result = avcodec_parameters_copy(ctx->par_in, params.Get());
+	if (result < 0) {
 		av_bsf_free(&ctx);
-		return Unexpected<BSFError>("Failed to copy parameters to BSF");
+		return Unexpected<BSFError>("cannot copy codec parameters into bitstream filter '{}': {}",
+			name, static_cast<std::string_view>(FFmpeg::ErrorToString(result)));
 	}
 
 	ctx->time_base_in = FFmpeg::ToRaw(time_base);
 
-	if (av_bsf_init(ctx) < 0) {
+	result = av_bsf_init(ctx);
+	if (result < 0) {
 		av_bsf_free(&ctx);
-		return Unexpected<BSFError>("Failed to initialize BSF");
+		return Unexpected<BSFError>("cannot initialize bitstream filter '{}': {}",
+			name, static_cast<std::string_view>(FFmpeg::ErrorToString(result)));
 	}
 
 	return AVBSF(ctx);
@@ -97,6 +104,7 @@ FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(std::string_view name, const AVCodec
 
 FFmpeg::OperationResult FFmpeg::AVBSF::SendPacket(AVPacket& pkt) noexcept {
 	int ret = av_bsf_send_packet(m_ptr, pkt.Get());
+	m_error = ret < 0 ? ret : 0;
 
 	if (ret == 0)                 return OperationResult::Success;
 	if (ret == AVERROR(EAGAIN))   return OperationResult::TryAgain;
@@ -107,6 +115,7 @@ FFmpeg::OperationResult FFmpeg::AVBSF::SendPacket(AVPacket& pkt) noexcept {
 
 FFmpeg::OperationResult FFmpeg::AVBSF::ReceivePacket(AVPacket& pkt) noexcept {
 	int ret = av_bsf_receive_packet(m_ptr, pkt.m_ptr);
+	m_error = ret < 0 ? ret : 0;
 
 	if (ret == 0)                 return OperationResult::Success;
 	if (ret == AVERROR(EAGAIN))   return OperationResult::TryAgain;
@@ -115,12 +124,17 @@ FFmpeg::OperationResult FFmpeg::AVBSF::ReceivePacket(AVPacket& pkt) noexcept {
 	return OperationResult::Error;
 }
 
+int FFmpeg::AVBSF::ErrorCode() const noexcept {
+	return m_error;
+}
+
 void FFmpeg::AVBSF::Flush() noexcept {
 	av_bsf_flush(m_ptr);
 }
 
 void FFmpeg::AVBSF::SetEof() noexcept {
-	av_bsf_send_packet(m_ptr, nullptr);
+	const int result = av_bsf_send_packet(m_ptr, nullptr);
+	m_error = result < 0 && result != AVERROR_EOF ? result : 0;
 }
 
 void FFmpeg::AVBSF::Free() noexcept {

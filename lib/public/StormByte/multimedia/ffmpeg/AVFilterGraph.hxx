@@ -187,6 +187,12 @@ namespace StormByte {
 					AVRational FrameRate() const noexcept;
 
 					/**
+					 * @brief FFmpeg error from the last failed filter operation.
+					 * @return Negative error code, or zero when no operation failed.
+					 */
+					int OperationError() const noexcept;
+
+					/**
 					 * @brief Pushes @p src and pulls into @p dst (`KEEP_REF` on the source).
 					 * @param src Source frame with buffers.
 					 * @param dst Destination; unreferenced then filled by the sink.
@@ -246,6 +252,7 @@ namespace StormByte {
 					mutable std::int64_t m_endPts = INT64_MIN;	///< End of the last accepted input in source ticks.
 					AVRational m_timeBase{0, 1};		///< Cached source timestamp timebase.
 					AVRational m_frameRate{0, 1};		///< Explicit nominal source cadence.
+					mutable int m_operationError = 0;	///< Last failed source/sink operation.
 			};
 
 			/// @cond

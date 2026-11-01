@@ -57,6 +57,7 @@
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/ffmpeg/hardware_decode.hxx>
 
 extern "C" {
@@ -75,7 +76,7 @@ FFmpeg::AVDecoder::~AVDecoder() noexcept {
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCodecParameters& params,
 	int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
 	if (!codec || !params.Get())
-		return Unexpected<DecoderError>("Invalid codec or parameters");
+		return Unexpected<DecoderError>("cannot open decoder: codec or codec parameters are missing");
 
 	auto create = [&]() noexcept -> AVCodecContext* {
 		AVCodecContext* context = avcodec_alloc_context3(codec);
@@ -96,22 +97,30 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCod
 	bool tried_hardware = false;
 	AVCodecContext* ctx = create();
 	if (!ctx)
-		return Unexpected<DecoderError>("Failed to allocate decoder context or shared video pool owner");
+		return Unexpected<DecoderError>("cannot allocate decoder context or attach the shared video frame pool");
 
 	if (video && acceleration == DecodeAcceleration::Auto)
 		tried_hardware = HardwareDecode::Configure(*ctx, codec);
 
 	int open_result = avcodec_open2(ctx, codec, nullptr);
+	const int hardware_open_error = open_result;
 	if (open_result < 0 && tried_hardware) {
 		Backend::FFmpeg::AVPool::Release(ctx);
 		ctx = create();
 		if (!ctx)
-			return Unexpected<DecoderError>("Failed to allocate software decoder context");
+			return Unexpected<DecoderError>("hardware decoder initialization failed ({}); cannot allocate software fallback context",
+				static_cast<std::string_view>(FFmpeg::ErrorToString(hardware_open_error)));
 		open_result = avcodec_open2(ctx, codec, nullptr);
 	}
 	if (open_result < 0) {
 		Backend::FFmpeg::AVPool::Release(ctx);
-		return Unexpected<DecoderError>("Failed to open decoder");
+		const auto reason = FFmpeg::ErrorToString(open_result);
+		if (tried_hardware)
+			return Unexpected<DecoderError>("cannot open decoder '{}': software fallback failed: {} (hardware attempt: {})",
+				codec->name ? codec->name : "unknown", static_cast<std::string_view>(reason),
+				static_cast<std::string_view>(FFmpeg::ErrorToString(hardware_open_error)));
+		return Unexpected<DecoderError>("cannot open decoder '{}': {}",
+			codec->name ? codec->name : "unknown", static_cast<std::string_view>(reason));
 	}
 
 	AVDecoder dec(ctx);
@@ -150,18 +159,24 @@ bool FFmpeg::AVDecoder::HardwareFallback() const noexcept {
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::SendPacket(AVPacket& pkt) noexcept {
 	m_packet_error = 0;
+	m_operation_error = 0;
 	if (pkt.StreamIndex() != m_stream_index) {
 		m_packet_error = AVERROR(EINVAL);
+		m_operation_error = m_packet_error;
 		return OperationResult::Error;
 	}
 
 	AVPacket filtered_pkt = pkt.Ref();
 	const auto filtered = m_bsf_pipeline.Process(filtered_pkt);
-	if (filtered != OperationResult::Success)
+	if (filtered != OperationResult::Success) {
+		m_operation_error = m_bsf_pipeline.ErrorCode();
+		m_packet_error = m_operation_error;
 		return filtered;
+	}
 
 	const int ret = avcodec_send_packet(m_ptr, filtered_pkt.Get());
 	m_packet_error = ret < 0 ? ret : 0;
+	m_operation_error = m_packet_error;
 	if (ret == AVERROR(EAGAIN))
 		return OperationResult::TryAgain;
 	if (ret == AVERROR_EOF)
@@ -175,12 +190,19 @@ int FFmpeg::AVDecoder::PacketError() const noexcept {
 	return m_packet_error;
 }
 
+int FFmpeg::AVDecoder::OperationError() const noexcept {
+	return m_operation_error;
+}
+
 FFmpeg::OperationResult FFmpeg::AVDecoder::ReceiveFrame(AVFrame& frame) noexcept {
 	int ret = avcodec_receive_frame(m_ptr, frame.Get());
+	m_operation_error = ret < 0 ? ret : 0;
 	switch(ret) {
 		case 0:
-			if (frame.Hardware() && !frame.Download())
+			if (frame.Hardware() && !frame.Download()) {
+				m_operation_error = AVERROR(EIO);
 				return OperationResult::Error;
+			}
 			return OperationResult::Success;
 		case AVERROR(EAGAIN):
 			return OperationResult::TryAgain;
@@ -209,6 +231,7 @@ void FFmpeg::AVDecoder::Flush() noexcept {
 }
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::SetEof() noexcept {
+	m_operation_error = 0;
 	if (!m_ptr) {
 		m_bsf_pipeline.SetEof();
 		return OperationResult::EndOfFile;
@@ -220,6 +243,7 @@ FFmpeg::OperationResult FFmpeg::AVDecoder::SetEof() noexcept {
 	}
 
 	const int ret = avcodec_send_packet(m_ptr, nullptr);
+	m_operation_error = ret < 0 ? ret : 0;
 	if (ret == 0 || ret == AVERROR_EOF) {
 		m_bsf_pipeline.SetEof();
 		return (ret == 0) ? OperationResult::Success : OperationResult::EndOfFile;
@@ -235,13 +259,19 @@ bool FFmpeg::AVDecoder::IsSubtitle() const noexcept {
 }
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::DecodeSubtitle(AVPacket& pkt, FFmpeg::AVSubtitle& out) noexcept {
-	if (!m_ptr || !IsSubtitle())
+	m_operation_error = 0;
+	if (!m_ptr || !IsSubtitle()) {
+		m_operation_error = AVERROR(EINVAL);
 		return OperationResult::Error;
-	if (pkt.StreamIndex() != m_stream_index)
+	}
+	if (pkt.StreamIndex() != m_stream_index) {
+		m_operation_error = AVERROR(EINVAL);
 		return OperationResult::Error;
+	}
 
 	int got = 0;
 	const int ret = avcodec_decode_subtitle2(m_ptr, out.Get(), &got, pkt.Get());
+	m_operation_error = ret < 0 ? ret : 0;
 	if (ret < 0)
 		return OperationResult::Error;
 	if (!got)

@@ -114,6 +114,20 @@ namespace {
 		}
 		return SWS_BILINEAR;
 	}
+
+	int ZimgPlanarFormat(int format) noexcept {
+		switch (format) {
+			case AV_PIX_FMT_NV12:
+			case AV_PIX_FMT_NV21:
+				return AV_PIX_FMT_YUV420P;
+			case AV_PIX_FMT_P010LE:
+				return AV_PIX_FMT_YUV420P10LE;
+			case AV_PIX_FMT_P010BE:
+				return AV_PIX_FMT_YUV420P10BE;
+			default:
+				return AV_PIX_FMT_NONE;
+		}
+	}
 }
 
 FFmpeg::AVFrame::AVFrame() noexcept:
@@ -859,10 +873,31 @@ bool FFmpeg::AVFrame::ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, in
 		dst.Format(fmt);
 	}
 	if (scaler == Scaler::Zimg) {
+		AVFrame planarSource;
+		const AVFrame* zimgSource = this;
+		if (const int planar = ZimgPlanarFormat(Format()); planar != AV_PIX_FMT_NONE) {
+			planarSource.Format(planar);
+			if (!ScaleTo(planarSource, Width(), Height(), Resample::Point, Scaler::Sws))
+				return false;
+			zimgSource = &planarSource;
+		}
+
+		AVFrame planarDestination;
+		AVFrame* zimgDestination = &dst;
+		if (const int planar = ZimgPlanarFormat(dst.Format()); planar != AV_PIX_FMT_NONE) {
+			if (!planarDestination.AllocVideo(dst_w, dst_h, planar, 64)
+				|| !planarDestination.CopyProps(dst))
+				return false;
+			zimgDestination = &planarDestination;
+		}
+
 		auto& zimg = context.m_state->zimg;
-		if (!zimg.Ensure(*this, dst, filter))
+		if (!zimg.Ensure(*zimgSource, *zimgDestination, filter))
 			return false;
-		return zimg.Scale(*this, dst);
+		if (!zimg.Scale(*zimgSource, *zimgDestination))
+			return false;
+		return zimgDestination == &dst
+			|| zimgDestination->ScaleTo(dst, dst_w, dst_h, Resample::Point, Scaler::Sws);
 	}
 	auto& sws = context.m_state->sws;
 	if (!sws.Ensure(Width(), Height(), Format(),
@@ -896,8 +931,30 @@ bool FFmpeg::AVFrame::ScaleTo(ScaleContext& context, AVFrame& dst, int dst_w, in
 	rec.range = (color.range == static_cast<int>(AVCOL_RANGE_JPEG))
 		? static_cast<int>(ZIMG_RANGE_FULL) : static_cast<int>(ZIMG_RANGE_LIMITED);
 	rec.peak = color.peak;
+	AVFrame planarSource;
+	const AVFrame* zimgSource = this;
+	if (const int planar = ZimgPlanarFormat(Format()); planar != AV_PIX_FMT_NONE) {
+		planarSource.Format(planar);
+		if (!ScaleTo(planarSource, Width(), Height(), Resample::Point, Scaler::Sws))
+			return false;
+		zimgSource = &planarSource;
+	}
+
+	AVFrame planarDestination;
+	AVFrame* zimgDestination = &dst;
+	if (const int planar = ZimgPlanarFormat(dst.Format()); planar != AV_PIX_FMT_NONE) {
+		if (!planarDestination.AllocVideo(dst_w, dst_h, planar, 64)
+			|| !planarDestination.CopyProps(dst))
+			return false;
+		zimgDestination = &planarDestination;
+	}
+
 	auto& zimg = context.m_state->zimg;
-	if (!zimg.Ensure(*this, dst, filter, rec) || !zimg.Scale(*this, dst))
+	if (!zimg.Ensure(*zimgSource, *zimgDestination, filter, rec)
+		|| !zimg.Scale(*zimgSource, *zimgDestination))
+		return false;
+	if (zimgDestination != &dst
+		&& !zimgDestination->ScaleTo(dst, dst_w, dst_h, Resample::Point, Scaler::Sws))
 		return false;
 	if (color.range >= 0)
 		dst.ColorRange(color.range);

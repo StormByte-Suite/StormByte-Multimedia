@@ -164,10 +164,10 @@ int test_encoder_configs() {
 		const void* formats = nullptr;
 		int count = 0;
 		const int query = avcodec_get_supported_config(nullptr, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, &formats, &count);
-		const char* error = nullptr;
+		std::string error;
 		const int selected = Input::Negotiate(codec, AV_PIX_FMT_YUV420P10LE, error);
 		if (query < 0 || count < 0 || (formats && count == 0)) {
-			TEST_REQUIRE(selected == AV_PIX_FMT_NONE && error);
+			TEST_REQUIRE(selected == AV_PIX_FMT_NONE && !error.empty());
 			continue;
 		}
 		int expected = Input::Select(AV_PIX_FMT_YUV420P10LE, formats
@@ -189,7 +189,7 @@ int test_encoder_configs() {
 			}
 		}
 		TEST_REQUIRE(selected == expected);
-		TEST_REQUIRE((selected == AV_PIX_FMT_NONE) == (error != nullptr));
+		TEST_REQUIRE((selected == AV_PIX_FMT_NONE) == !error.empty());
 		++checked;
 	}
 	TEST_REQUIRE(checked > 0);
@@ -218,7 +218,9 @@ int test_hardware_plan_selection() {
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, cudaFormats) == AV_PIX_FMT_P010LE);
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV422P10LE, cudaFormats) == AV_PIX_FMT_NONE);
 	constexpr std::array deviceFormats{AV_PIX_FMT_NV12, AV_PIX_FMT_P010LE, AV_PIX_FMT_YUV420P10LE};
-	TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, deviceFormats) == AV_PIX_FMT_P010LE);
+	TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, deviceFormats) == AV_PIX_FMT_YUV420P10LE);
+	constexpr std::array p010Only{AV_PIX_FMT_P010LE};
+	TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, p010Only) == AV_PIX_FMT_P010LE);
 	TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV422P10LE, deviceFormats) == AV_PIX_FMT_NONE);
 	TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, {}) == AV_PIX_FMT_NONE);
 	return 0;
@@ -405,9 +407,9 @@ int test_hardware_transfer() {
 	while (const auto* codec = av_codec_iterate(&state)) {
 		if (!av_codec_is_encoder(codec) || codec->type != AVMEDIA_TYPE_VIDEO)
 			continue;
-		const char* negotiationError = nullptr;
+		std::string negotiationError;
 		const int format = Input::Negotiate(codec, AV_PIX_FMT_YUV420P10LE, negotiationError);
-		if (negotiationError || !Input::Hardware(format))
+		if (!negotiationError.empty() || !Input::Hardware(format))
 			continue;
 		const AVCodecHWConfig* configuration = nullptr;
 		for (int index = 0; const auto* candidate = avcodec_get_hw_config(codec, index); ++index) {
@@ -502,6 +504,7 @@ int test_hardware_transfer() {
 int test_format_negotiation() {
 	constexpr std::array planar{AV_PIX_FMT_P010LE, AV_PIX_FMT_YUV420P10LE};
 	constexpr std::array packed{AV_PIX_FMT_P010LE};
+	constexpr std::array eightBit{AV_PIX_FMT_YUV420P};
 	constexpr std::array loss{AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P10LE, AV_PIX_FMT_YUV444P10LE,
 		AV_PIX_FMT_YUV420P12LE, AV_PIX_FMT_GRAY10LE, AV_PIX_FMT_RGB48LE, AV_PIX_FMT_P010BE, AV_PIX_FMT_VAAPI};
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, planar) == AV_PIX_FMT_YUV420P10LE);
@@ -511,11 +514,58 @@ int test_format_negotiation() {
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P12LE, packed) == AV_PIX_FMT_NONE);
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV422P10LE, packed) == AV_PIX_FMT_NONE);
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10BE, packed) == AV_PIX_FMT_NONE);
+	TEST_REQUIRE(Input::Select(AV_PIX_FMT_NV12, eightBit) == AV_PIX_FMT_YUV420P);
+	TEST_REQUIRE(Input::Select(AV_PIX_FMT_NV21, eightBit) == AV_PIX_FMT_YUV420P);
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_VAAPI, {}) == AV_PIX_FMT_NONE);
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_NONE, {}) == AV_PIX_FMT_NONE);
 	TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, {}) == AV_PIX_FMT_YUV420P10LE);
-	const char* error = nullptr;
-	TEST_REQUIRE(Input::Negotiate(nullptr, AV_PIX_FMT_YUV420P10LE, error) == AV_PIX_FMT_NONE && error);
+	std::string error;
+	TEST_REQUIRE(Input::Negotiate(nullptr, AV_PIX_FMT_YUV420P10LE, error) == AV_PIX_FMT_NONE && !error.empty());
+	return 0;
+}
+
+int test_nv12_repacking() {
+	TestFrame source;
+	FFmpeg::AVFrame planar;
+	FFmpeg::AVFrame nv21;
+	FFmpeg::AVFrame restored;
+	constexpr int width = 5;
+	constexpr int height = 3;
+	const int chromaWidth = width / 2 + width % 2;
+	const int chromaHeight = height / 2 + height % 2;
+	TEST_REQUIRE(source.AllocVideo(width, height, AV_PIX_FMT_NV12, 64));
+	for (int row = 0; row < height; ++row) {
+		for (int column = 0; column < width; ++column)
+			source.Data(0)[row * source.Linesize(0) + column] = static_cast<std::uint8_t>(row * 16 + column);
+	}
+	for (int row = 0; row < chromaHeight; ++row) {
+		for (int column = 0; column < chromaWidth; ++column) {
+			auto* sample = source.Data(1) + row * source.Linesize(1) + column * 2;
+			sample[0] = static_cast<std::uint8_t>(32 + row * 8 + column);
+			sample[1] = static_cast<std::uint8_t>(128 + row * 8 + column);
+		}
+	}
+	TEST_REQUIRE(Input::Prepare(source, AV_PIX_FMT_YUV420P, planar));
+	for (int row = 0; row < height; ++row)
+		TEST_REQUIRE(std::memcmp(source.Data(0) + row * source.Linesize(0),
+			planar.Data(0) + row * planar.Linesize(0), width) == 0);
+	for (int row = 0; row < chromaHeight; ++row) {
+		for (int column = 0; column < chromaWidth; ++column) {
+			TEST_REQUIRE(planar.Data(1)[row * planar.Linesize(1) + column]
+				== static_cast<std::uint8_t>(32 + row * 8 + column));
+			TEST_REQUIRE(planar.Data(2)[row * planar.Linesize(2) + column]
+				== static_cast<std::uint8_t>(128 + row * 8 + column));
+		}
+	}
+	TEST_REQUIRE(Input::Prepare(planar, AV_PIX_FMT_NV21, nv21));
+	TEST_REQUIRE(Input::Prepare(nv21, AV_PIX_FMT_NV12, restored));
+	for (int row = 0; row < chromaHeight; ++row) {
+		for (int column = 0; column < chromaWidth; ++column) {
+			const auto* actual = restored.Data(1) + row * restored.Linesize(1) + column * 2;
+			TEST_REQUIRE(actual[0] == static_cast<std::uint8_t>(32 + row * 8 + column));
+			TEST_REQUIRE(actual[1] == static_cast<std::uint8_t>(128 + row * 8 + column));
+		}
+	}
 	return 0;
 }
 
@@ -817,6 +867,7 @@ int RunPipelineVideoInputTests(int argc, char** argv) {
 		{"test_invalid_hardware_context", test_invalid_hardware_context},
 		{"test_hardware_transfer", test_hardware_transfer},
 		{"test_format_negotiation", test_format_negotiation},
+		{"test_nv12_repacking", test_nv12_repacking},
 		{"test_invalid_input", test_invalid_input},
 		{"test_rawvideo_retry", test_rawvideo_retry},
 		{"test_roundtrip", test_roundtrip},

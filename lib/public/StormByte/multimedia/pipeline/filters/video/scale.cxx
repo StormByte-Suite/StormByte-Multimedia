@@ -87,7 +87,9 @@ void Scale::Setup() noexcept {
 void Scale::Process(const Pipeline::Frame&) noexcept {
 	const FFrame& src = AVFrame();
 	if (!src || src.Width() <= 0 || src.Height() <= 0) {
-		Fail("missing video buffer");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"scale filter received no usable source frame ({}x{} fmt={})",
+			src.Width(), src.Height(), src.Format()));
 		return;
 	}
 

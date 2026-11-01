@@ -167,12 +167,16 @@ FFmpeg::AVRational Audio::TimeBase() const noexcept {
 bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept {
 	if (!src || !m_encoder) {
-		owner.Fail("audio convert missing source or encoder context");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} cannot prepare conversion: source={} encoder={}",
+			owner.Index(), static_cast<bool>(src), static_cast<bool>(m_encoder)));
 		return false;
 	}
 
 	if (src.SampleRate() != m_encoder->SampleRate()) {
-		owner.Fail("encoder sample rate does not match the decoded frame");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} sample rate {} does not match input rate {}",
+			owner.Index(), m_encoder->SampleRate(), src.SampleRate()));
 		return false;
 	}
 
@@ -181,14 +185,18 @@ bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 	m_frameSize = m_encoder->FrameSize() > 0 ? m_encoder->FrameSize() : src.NbSamples();
 	m_channels = m_encoder->Channels();
 	if (m_frameSize <= 0 || m_channels <= 0) {
-		owner.Fail("encoder audio frame size or channel count is invalid");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} has invalid frame size {} or channel count {}",
+			owner.Index(), m_frameSize, m_channels));
 		return false;
 	}
 
 	const auto inLayout = src.ChannelLayout();
 	const auto outLayout = m_encoder->ChannelLayout();
 	if (!inLayout || !outLayout) {
-		owner.Fail("audio convert missing channel layout");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} cannot convert channel layouts: input channels={} output channels={}",
+			owner.Index(), src.Channels(), m_channels));
 		return false;
 	}
 
@@ -200,7 +208,9 @@ bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 			outLayout, m_outFormat, src.SampleRate(),
 			inLayout, m_inFormat, src.SampleRate());
 		if (!swr) {
-			owner.Fail("failed to allocate sample format converter");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot initialize conversion fmt={}->{} rate={} channels={}->{}",
+				owner.Index(), m_inFormat, m_outFormat, src.SampleRate(), src.Channels(), m_channels));
 			return false;
 		}
 
@@ -210,7 +220,9 @@ bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 	auto fifo = StormByte::Multimedia::FFmpeg::AudioFifo::Open(
 		m_outFormat, m_channels, m_frameSize * 2);
 	if (!fifo) {
-		owner.Fail("failed to allocate audio fifo");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} cannot allocate fifo fmt={} channels={} capacity={} samples",
+			owner.Index(), m_outFormat, m_channels, m_frameSize * 2));
 		return false;
 	}
 
@@ -222,7 +234,9 @@ bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 bool Audio::Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
 	StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept {
 	if (!src || !m_fifo || !m_encoder) {
-		owner.Fail("audio ingest missing source or fifo");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} cannot ingest samples: source={} fifo={} encoder={}",
+			owner.Index(), static_cast<bool>(src), static_cast<bool>(m_fifo), static_cast<bool>(m_encoder)));
 		return false;
 	}
 
@@ -238,17 +252,23 @@ bool Audio::Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
 		m_converted.NbSamples(src.NbSamples());
 		if (const auto layout = m_encoder->ChannelLayout();
 			!layout || !m_converted.CopyChannelLayout(layout)) {
-			owner.Fail("failed to copy audio channel layout");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot set converted frame channel layout (channels={})",
+				owner.Index(), m_channels));
 			return false;
 		}
 
 		if (!m_converted.GetBuffer(0)) {
-			owner.Fail("failed to allocate converted audio buffer");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot allocate converted buffer fmt={} samples={} channels={}",
+				owner.Index(), m_outFormat, src.NbSamples(), m_channels));
 			return false;
 		}
 
 		if (!m_swr->Convert(src, m_converted)) {
-			owner.Fail("failed to convert audio sample format");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot convert samples fmt={}->{} rate={} samples={}",
+				owner.Index(), m_inFormat, m_outFormat, src.SampleRate(), src.NbSamples()));
 			return false;
 		}
 
@@ -256,12 +276,16 @@ bool Audio::Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
 	}
 
 	if (!m_fifo->Realloc(m_fifo->Size() + ready->NbSamples())) {
-		owner.Fail("failed to grow audio fifo");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} cannot grow fifo from {} to {} samples",
+			owner.Index(), m_fifo->Size(), m_fifo->Size() + ready->NbSamples()));
 		return false;
 	}
 
 	if (!m_fifo->Write(*ready)) {
-		owner.Fail("failed to write audio fifo");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} cannot write {} samples to fifo (available={})",
+			owner.Index(), ready->NbSamples(), m_fifo->Size()));
 		return false;
 	}
 
@@ -289,17 +313,23 @@ bool Audio::Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) noe
 		m_converted.DurationTicks(take);
 		if (const auto layout = m_encoder->ChannelLayout();
 			!layout || !m_converted.CopyChannelLayout(layout)) {
-			owner.Fail("failed to copy audio channel layout");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot set output frame channel layout (channels={})",
+				owner.Index(), m_channels));
 			return false;
 		}
 
 		if (!m_converted.GetBuffer(0)) {
-			owner.Fail("failed to allocate encoder audio buffer");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot allocate output buffer fmt={} samples={} channels={}",
+				owner.Index(), m_outFormat, take, m_channels));
 			return false;
 		}
 
 		if (!m_fifo->Read(m_converted, take)) {
-			owner.Fail("failed to read audio fifo");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot read {} samples from fifo (available={})",
+				owner.Index(), take, available));
 			return false;
 		}
 
@@ -310,13 +340,18 @@ bool Audio::Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) noe
 				return false;
 			result = m_encoder->SendFrame(m_converted);
 			if (!produced && result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain) {
-				owner.Fail("encoder stalled");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"audio encoder track {} returned EAGAIN without producing a packet while sending {} samples",
+					owner.Index(), take));
 				return false;
 			}
 		}
 
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Error) {
-			owner.Fail("failed to send frame");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} rejected frame pts={} samples={} fmt={} rate={} channels={}: {}",
+				owner.Index(), m_converted.Pts(), take, m_outFormat, m_encoder->SampleRate(), m_channels,
+				static_cast<std::string_view>(FFmpeg::ErrorToString(m_encoder->OperationError()))));
 			return false;
 		}
 
@@ -357,7 +392,9 @@ bool Audio::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 bool Audio::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
 	if (!frame) {
-		owner.Fail("empty frame");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} received an empty frame handle",
+			owner.Index()));
 		return false;
 	}
 
@@ -367,7 +404,9 @@ bool Audio::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 		return false;
 	auto* handle = FrameHandle(owner, *frame);
 	if (!handle || !*handle) {
-		owner.Fail("frame has no backend buffer");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} frame has no FFmpeg backend buffer",
+			owner.Index()));
 		return false;
 	}
 
@@ -403,7 +442,10 @@ bool Audio::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 		|| result == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 		return false;
 	if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
-		owner.Fail("failed to receive packet");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} could not receive packet: {}",
+			owner.Index(), static_cast<std::string_view>(
+				FFmpeg::ErrorToString(m_encoder->OperationError()))));
 		return false;
 	}
 
@@ -422,14 +464,38 @@ void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 		m_converted.Format(m_outFormat);
 		m_converted.SampleRate(m_encoder->SampleRate());
 		m_converted.NbSamples(m_frameSize);
-		if (const auto layout = m_encoder->ChannelLayout();
-			layout && m_converted.CopyChannelLayout(layout)
-			&& m_converted.GetBuffer(0)
-			&& m_swr->Drain(m_converted)
-			&& m_converted.NbSamples() > 0
-			&& m_fifo) {
-			(void)m_fifo->Realloc(m_fifo->Size() + m_converted.NbSamples());
-			(void)m_fifo->Write(m_converted);
+		const auto layout = m_encoder->ChannelLayout();
+		if (!layout || !m_converted.CopyChannelLayout(layout)) {
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot set resampler drain channel layout",
+				owner.Index()));
+			return;
+		}
+		if (!m_converted.GetBuffer(0)) {
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot allocate resampler drain buffer fmt={} samples={}",
+				owner.Index(), m_outFormat, m_frameSize));
+			return;
+		}
+		if (!m_swr->Drain(m_converted)) {
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} cannot drain resampler fmt={} rate={} channels={}",
+				owner.Index(), m_outFormat, m_encoder->SampleRate(), m_channels));
+			return;
+		}
+		if (m_converted.NbSamples() > 0) {
+			if (!m_fifo || !m_fifo->Realloc(m_fifo->Size() + m_converted.NbSamples())) {
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"audio encoder track {} cannot grow fifo for {} drained samples",
+					owner.Index(), m_converted.NbSamples()));
+				return;
+			}
+			if (!m_fifo->Write(m_converted)) {
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"audio encoder track {} cannot queue {} drained samples",
+					owner.Index(), m_converted.NbSamples()));
+				return;
+			}
 		}
 	}
 
@@ -448,13 +514,19 @@ void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 				if (retried == StormByte::Multimedia::FFmpeg::OperationResult::Success
 					|| retried == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 					break;
-				owner.Fail("failed to signal encoder EOF after draining");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"audio encoder track {} could not signal EOF after draining: {}",
+					owner.Index(), static_cast<std::string_view>(
+						FFmpeg::ErrorToString(m_encoder->OperationError()))));
 				return;
 			}
 			continue;
 		}
 
-		owner.Fail("failed to signal encoder EOF");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"audio encoder track {} could not signal EOF: {}",
+			owner.Index(), static_cast<std::string_view>(
+				FFmpeg::ErrorToString(m_encoder->OperationError()))));
 		return;
 	}
 
@@ -471,6 +543,13 @@ StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Audio::Take() n
 			m_pending.push_back(StormByte::Multimedia::Backend::Pipeline::Encoder::MakePacket(
 				*m_owner, Type::Audio, m_index, m_scratch, m_timeBase, true));
 			m_scratch.Unref();
+		}
+		else if (result != StormByte::Multimedia::FFmpeg::OperationResult::TryAgain
+			&& result != StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile) {
+			m_owner->Fail(StormByte::Safe::String::ReplaceToken(
+				"audio encoder track {} could not receive packet: {}",
+				m_index, static_cast<std::string_view>(
+					FFmpeg::ErrorToString(m_encoder->OperationError()))));
 		}
 	}
 

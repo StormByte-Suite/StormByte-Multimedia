@@ -701,6 +701,7 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error,
 	std::size_t errorSize) noexcept {
+	m_operation_error = 0;
 	if (error && errorSize > 0)
 		error[0] = '\0';
 	const auto setError = [error, errorSize](const char* format, auto... args) noexcept {
@@ -708,6 +709,7 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error
 			std::snprintf(error, errorSize, format, args...);
 	};
 	if (!m_ptr || !frame.Get()) {
+		m_operation_error = AVERROR(EINVAL);
 		setError("%s", !m_ptr ? "encoder is not open" : "frame is empty");
 		return OperationResult::Error;
 	}
@@ -724,16 +726,19 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error
 	else {
 		const auto* parsed = frame.SideData(AV_FRAME_DATA_DOVI_METADATA);
 		if (!parsed) {
+			m_operation_error = AVERROR_INVALIDDATA;
 			setError("%s", "Dolby Vision encoding requires parsed frame metadata");
 			return OperationResult::Error;
 		}
 		if (!ValidDoviMetadata(parsed)) {
+			m_operation_error = AVERROR_INVALIDDATA;
 			setError("%s", "invalid Dolby Vision frame metadata");
 			return OperationResult::Error;
 		}
 		auto* side = av_frame_get_side_data(frame.Get(), AV_FRAME_DATA_DOVI_METADATA);
 		if (side && HasEnhancementLayer(reinterpret_cast<const AVDOVIMetadata*>(side->data))) {
 			if (av_buffer_make_writable(&side->buf) < 0) {
+				m_operation_error = AVERROR(ENOMEM);
 				setError("%s", "failed to make Dolby Vision metadata writable");
 				return OperationResult::Error;
 			}
@@ -751,12 +756,14 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error
 	}
 
 	int ret = avcodec_send_frame(m_ptr, frame.Get());
+	m_operation_error = ret < 0 ? ret : 0;
 	switch (ret) {
 		case 0:
 			return OperationResult::Success;
 		case AVERROR(EAGAIN):
 			return OperationResult::TryAgain;
 		case AVERROR_EOF:
+			m_operation_error = ret;
 			setError("%s", "encoder reached EOF while sending a frame");
 			return OperationResult::EndOfFile;
 		default: {
@@ -769,17 +776,24 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::EncodeSubtitle(AVSubtitle& sub, AVPacket& pkt) noexcept {
-	if (!m_ptr || m_ptr->codec_type != AVMEDIA_TYPE_SUBTITLE)
+	m_operation_error = 0;
+	if (!m_ptr || m_ptr->codec_type != AVMEDIA_TYPE_SUBTITLE) {
+		m_operation_error = AVERROR(EINVAL);
 		return OperationResult::Error;
+	}
 
 	std::uint8_t buf[65536];
 	const int n = avcodec_encode_subtitle(m_ptr, buf, static_cast<int>(sizeof(buf)), sub.Get());
-	if (n < 0)
+	if (n < 0) {
+		m_operation_error = n;
 		return OperationResult::Error;
+	}
 	if (n == 0)
 		return OperationResult::TryAgain;
-	if (!pkt.Load(buf, n, m_stream_index, false))
+	if (!pkt.Load(buf, n, m_stream_index, false)) {
+		m_operation_error = AVERROR(ENOMEM);
 		return OperationResult::Error;
+	}
 
 	const std::int64_t pts = sub.Pts();
 	const ::AVRational tb = (m_ptr->time_base.num > 0) ? m_ptr->time_base : ::AVRational{1, AV_TIME_BASE};
@@ -793,12 +807,17 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::EncodeSubtitle(AVSubtitle& sub, AVPac
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept {
+	m_operation_error = 0;
 	AVPacket tmp;
 	int ret = avcodec_receive_packet(m_ptr, tmp.Get());
 	if (ret == AVERROR(EAGAIN))
 		return OperationResult::TryAgain;
 	if (ret == AVERROR_EOF) {
 		m_bsf_pipeline.SetEof();
+		if (m_bsf_pipeline.ErrorCode() != 0) {
+			m_operation_error = m_bsf_pipeline.ErrorCode();
+			return OperationResult::Error;
+		}
 		if (!m_bsf_pipeline.Empty()) {
 			const auto filtered = m_bsf_pipeline.Process(tmp);
 			if (filtered == OperationResult::Success) {
@@ -808,19 +827,24 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept
 
 			if (filtered == OperationResult::TryAgain)
 				return OperationResult::EndOfFile;
+			m_operation_error = m_bsf_pipeline.ErrorCode();
 			return filtered;
 		}
 
 		return OperationResult::EndOfFile;
 	}
 
-	if (ret < 0)
+	if (ret < 0) {
+		m_operation_error = ret;
 		return OperationResult::Error;
+	}
 
 	if (!m_bsf_pipeline.Empty()) {
 		const auto filtered = m_bsf_pipeline.Process(tmp);
-		if (filtered != OperationResult::Success)
+		if (filtered != OperationResult::Success) {
+			m_operation_error = m_bsf_pipeline.ErrorCode();
 			return filtered;
+		}
 	}
 
 	if (InjectsHdrPlus(m_ptr) && tmp) {
@@ -833,14 +857,20 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept
 				t35.push_back(std::to_integer<std::uint8_t>(value));
 			const bool injected = m_ptr->codec_id == AV_CODEC_ID_HEVC
 				? PrependHevcSei(tmp, t35) : InsertAv1Metadata(tmp, t35);
-			if (!injected)
+			if (!injected) {
+				m_operation_error = AVERROR_INVALIDDATA;
 				return OperationResult::Error;
+			}
 			m_hdrPlusT35.erase(found);
 		}
 	}
 
 	pkt = std::move(tmp);
 	return OperationResult::Success;
+}
+
+int FFmpeg::AVEncoder::OperationError() const noexcept {
+	return m_operation_error;
 }
 
 int FFmpeg::AVEncoder::StreamIndex() const noexcept {
@@ -864,14 +894,21 @@ void FFmpeg::AVEncoder::Flush() noexcept {
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SetEof() noexcept {
+	m_operation_error = 0;
 	if (!m_ptr || m_ptr->codec_type == AVMEDIA_TYPE_SUBTITLE) {
 		m_bsf_pipeline.SetEof();
+		m_operation_error = m_bsf_pipeline.ErrorCode();
 		return OperationResult::EndOfFile;
 	}
 
 	const int ret = avcodec_send_frame(m_ptr, nullptr);
+	m_operation_error = ret < 0 ? ret : 0;
 	if (ret == 0 || ret == AVERROR_EOF) {
 		m_bsf_pipeline.SetEof();
+		if (m_bsf_pipeline.ErrorCode() != 0) {
+			m_operation_error = m_bsf_pipeline.ErrorCode();
+			return OperationResult::Error;
+		}
 		return (ret == 0) ? OperationResult::Success : OperationResult::EndOfFile;
 	}
 

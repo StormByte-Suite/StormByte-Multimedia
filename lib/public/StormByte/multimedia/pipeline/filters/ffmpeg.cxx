@@ -56,6 +56,7 @@
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 #include <StormByte/multimedia/log.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
@@ -452,7 +453,9 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 	frame->m_payload = StormByte::Buffer::FIFO{};
 	frame->m_backend->Put(*frame, incoming.Detach());
 	if (!frame->m_backend->ContentValid()) {
-		Fail("failed to preserve required frame metadata during replacement");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"filter {} could not preserve required metadata while replacing track {} frame {}:{}",
+			m_name, frame->Track(), frame->Serial().value_or(0), frame->Part()));
 		return;
 	}
 	if (!frame->m_backend->Warning().empty())
@@ -550,7 +553,11 @@ void FFmpeg::EmitGraph(StormByte::Multimedia::FFmpeg::AVFilterGraph& graph,
 		if (Failed() || Stopping())
 			return;
 		if (!graph.Receive(incoming)) {
-			Fail("failed to receive pending filter output");
+			const int error = graph.OperationError();
+			Fail(StormByte::Safe::String::ReplaceToken(
+				"filter {} could not receive pending FFmpeg output: {}",
+				m_name, static_cast<std::string_view>(
+					StormByte::Multimedia::FFmpeg::ErrorToString(error))));
 			return;
 		}
 	}

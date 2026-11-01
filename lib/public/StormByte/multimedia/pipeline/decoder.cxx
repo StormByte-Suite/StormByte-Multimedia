@@ -141,8 +141,16 @@ bool Decoder::SetupPlan() noexcept {
 		if (const std::size_t capacity = InputCeiling(); capacity > 0)
 			pipe().Capacity(m_index, capacity);
 	}
+	catch (const std::exception& error) {
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"decoder track {} plan configuration failed: {}",
+			m_index, error.what()));
+		return false;
+	}
 	catch (...) {
-		Fail("failed to configure decoder from plan");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"decoder track {} plan configuration threw a non-standard exception",
+			m_index));
 		return false;
 	}
 	return true;
@@ -200,7 +208,9 @@ void Decoder::StampLook(Frame& frame) noexcept {
 		FFmpeg::AVFrame restored;
 		const auto& raw = frame.m_backend->Handle();
 		if (!restored.Ref(raw) || !Backend::Pipeline::Encoder::RestoreLook(*m_encodeSource, restored)) {
-			Fail("failed to remove automatic encoder padding from analytics input");
+			Fail(StormByte::Safe::String::ReplaceToken(
+				"decoder track {} could not restore unpadded look frame {}x{} fmt={}",
+				m_index, raw.Width(), raw.Height(), raw.Format()));
 			return;
 		}
 		if (restored.Width() != raw.Width() || restored.Height() != raw.Height())
@@ -354,7 +364,9 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 		::AVCodecParameters* effective = avcodec_parameters_alloc();
 		if (!effective || !params.Export(effective)) {
 			avcodec_parameters_free(&effective);
-			Fail("failed to inspect look codec parameters");
+			Fail(StormByte::Safe::String::ReplaceToken(
+				"decoder track {} could not copy look codec parameters for stream {}",
+				m_index, m_sourceIndex >= 0 ? m_sourceIndex : m_index));
 			return false;
 		}
 		StormByte::Safe::Optional<Property::DOVI> dovi;
@@ -364,7 +376,9 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 			if (!parsed.LoadConfiguration(std::span<const std::byte>{
 				reinterpret_cast<const std::byte*>(configuration->data), configuration->size})) {
 				avcodec_parameters_free(&effective);
-				Fail("invalid look Dolby Vision configuration");
+				Fail(StormByte::Safe::String::ReplaceToken(
+					"decoder track {} received invalid Dolby Vision configuration ({} bytes)",
+					m_index, configuration->size));
 				return false;
 			}
 			dovi = std::move(parsed);

@@ -116,7 +116,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	bool Audio::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
 		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
 		if (!packet) {
-			owner.Fail("empty packet");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio decoder track {} received an empty packet handle",
+				owner.Index()));
 			return false;
 		}
 
@@ -126,7 +128,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		const std::uint8_t* data = nullptr;
 		if (n > 0) {
 			if (!packet->Payload().Peek(n, bytes) || bytes.size() != n) {
-				owner.Fail("failed to read packet payload");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"audio decoder track {} could not read {} packet payload bytes",
+					owner.Index(), n));
 				return false;
 			}
 
@@ -134,7 +138,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		}
 
 		if (!raw.Load(data, static_cast<int>(n), owner.Index(), packet->KeyFrame())) {
-			owner.Fail("out of memory copying packet");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio decoder track {} could not allocate or copy a {}-byte packet",
+				owner.Index(), n));
 			return false;
 		}
 
@@ -160,7 +166,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			|| result == StormByte::Multimedia::FFmpeg::OperationResult::EndOfFile)
 			return {};
 		if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
-			owner.Fail("failed to receive frame");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio decoder could not receive a frame on track {}: {}",
+				owner.Index(), static_cast<std::string_view>(
+					StormByte::Multimedia::FFmpeg::ErrorToString(m_decoder.OperationError()))));
 			return {};
 		}
 
@@ -194,7 +203,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				break;
 			if (sent == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain)
 				break;
-			owner.Fail("failed to signal decoder EOF");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"audio decoder could not signal end-of-stream on track {}: {}",
+				owner.Index(), static_cast<std::string_view>(
+					StormByte::Multimedia::FFmpeg::ErrorToString(m_decoder.OperationError()))));
 			return;
 		}
 

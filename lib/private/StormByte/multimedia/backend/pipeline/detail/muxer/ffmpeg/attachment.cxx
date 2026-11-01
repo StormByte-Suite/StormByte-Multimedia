@@ -125,7 +125,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			}
 			auto* stream = avformat_new_stream(&context, nullptr);
 			if (!stream || av_new_packet(&stream->attached_pic, static_cast<int>(bytes.size())) < 0) {
-				owner.Fail("could not allocate cover stream or packet");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"muxer could not allocate cover stream/packet for {}-byte {} image",
+					bytes.size(), mime ? static_cast<std::string_view>(*mime) : std::string_view{"unknown"}));
 				return false;
 			}
 			stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -142,7 +144,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			if ((attachment.FileName()
 				&& av_dict_set(&stream->metadata, "title", attachment.FileName()->data(), 0) < 0)
 				|| av_dict_set(&stream->metadata, "comment", picture++ == 0 ? "Cover (front)" : "Other", 0) < 0) {
-				owner.Fail("could not copy cover image metadata");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"muxer could not set title/comment metadata on cover stream {}",
+					stream->index));
 				return false;
 			}
 		}
@@ -157,15 +161,18 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				continue;
 			auto* packet = av_packet_clone(&stream->attached_pic);
 			if (!packet) {
-				owner.Fail("could not allocate cover output packet");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"muxer could not clone attached-picture packet from stream {}",
+					index));
 				return false;
 			}
 			packet->stream_index = static_cast<int>(index);
 			const int result = av_interleaved_write_frame(&context, packet);
 			av_packet_free(&packet);
 			if (result < 0) {
-				owner.Fail(StormByte::Safe::String::ReplaceToken("cover write failed: {}",
-					static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(result))));
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"muxer could not write attached-picture packet for stream {}: {}",
+					index, static_cast<std::string_view>(StormByte::Multimedia::FFmpeg::ErrorToString(result))));
 				return false;
 			}
 		}
@@ -214,7 +221,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			block.insert(block.end(), data, data + bytes.size());
 			std::string encoded(AV_BASE64_SIZE(block.size()), '\0');
 			if (!av_base64_encode(encoded.data(), static_cast<int>(encoded.size()), block.data(), static_cast<int>(block.size()))) {
-				owner.Fail("could not write Ogg cover metadata");
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"muxer could not base64-encode Ogg cover metadata ({} bytes)",
+					block.size()));
 				return false;
 			}
 			// oggenc merges global tags with DONT_OVERWRITE, which would discard all
@@ -223,7 +232,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				auto* stream = context.streams[index];
 				if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO
 					&& av_dict_set(&stream->metadata, "METADATA_BLOCK_PICTURE", encoded.c_str(), AV_DICT_MULTIKEY) < 0) {
-					owner.Fail("could not write Ogg cover metadata");
+					owner.Fail(StormByte::Safe::String::ReplaceToken(
+						"muxer could not set METADATA_BLOCK_PICTURE on audio stream {}",
+						index));
 					return false;
 				}
 			}
@@ -253,7 +264,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				const auto name = StormByte::Safe::String::ReplaceToken("cover-{}{}",
 					stream->index, ImageHint(stream->codecpar->codec_id));
 				if (av_dict_set(&stream->metadata, "filename", name.data(), 0) < 0) {
-					owner.Fail("could not name embedded cover attachment");
+					owner.Fail(StormByte::Safe::String::ReplaceToken(
+						"muxer could not assign filename '{}' to attachment stream {}",
+						static_cast<std::string_view>(name), stream->index));
 					return false;
 				}
 			}

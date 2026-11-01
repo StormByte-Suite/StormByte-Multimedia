@@ -103,14 +103,18 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	}
 
 	/**
-	 * @brief Recognizes the proven little-endian 10-bit 4:2:0 layout pair.
+	 * @brief Recognizes 4:2:0 layouts that can be repacked without changing samples.
 	 * @param source Source pixel format.
 	 * @param destination Destination pixel format.
 	 * @return Whether repacking preserves every component sample.
 	 */
 	inline bool Equivalent(int source, int destination) noexcept {
 		return (source == AV_PIX_FMT_YUV420P10LE && destination == AV_PIX_FMT_P010LE)
-			|| (source == AV_PIX_FMT_P010LE && destination == AV_PIX_FMT_YUV420P10LE);
+			|| (source == AV_PIX_FMT_P010LE && destination == AV_PIX_FMT_YUV420P10LE)
+			|| ((source == AV_PIX_FMT_NV12 || source == AV_PIX_FMT_NV21) && destination == AV_PIX_FMT_YUV420P)
+			|| (source == AV_PIX_FMT_YUV420P && (destination == AV_PIX_FMT_NV12 || destination == AV_PIX_FMT_NV21))
+			|| ((source == AV_PIX_FMT_NV12 || source == AV_PIX_FMT_NV21)
+				&& (destination == AV_PIX_FMT_NV12 || destination == AV_PIX_FMT_NV21));
 	}
 
 	/**
@@ -134,7 +138,10 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 		if (!descriptor || Hardware(source))
 			return AV_PIX_FMT_NONE;
 		for (const auto format : supported)
-			if (format == source || Equivalent(source, format))
+			if (format == source)
+				return source;
+		for (const auto format : supported)
+			if (Equivalent(source, format))
 				return format;
 		return AV_PIX_FMT_NONE;
 	}
@@ -188,8 +195,8 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	 * @param error Failure description, or nullptr on success.
 	 * @return Negotiated format, or AV_PIX_FMT_NONE on failure.
 	 */
-	inline int Negotiate(const AVCodec* codec, int source, const char*& error) noexcept {
-		error = nullptr;
+	inline int Negotiate(const AVCodec* codec, int source, std::string& error) noexcept {
+		error.clear();
 		const void* configurations = nullptr;
 		int count = 0;
 		if (!codec || avcodec_get_supported_config(nullptr, codec, AV_CODEC_CONFIG_PIX_FORMAT,
@@ -215,7 +222,9 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 					return hardware;
 			}
 		}
-		error = "encoder has no sample-exact CPU input or supported hardware frames configuration";
+		const char* pixelFormat = av_get_pix_fmt_name(static_cast<AVPixelFormat>(source));
+		error = "encoder has no sample-exact CPU input or supported hardware frames configuration for pixel format ";
+		error += pixelFormat ? pixelFormat : std::to_string(source);
 		return AV_PIX_FMT_NONE;
 	}
 
@@ -239,7 +248,7 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	}
 
 	/**
-	 * @brief References unchanged pixels or exactly repacks the proven layout pair.
+	 * @brief References unchanged pixels or exactly repacks an equivalent 4:2:0 layout.
 	 * @param source Untouched source, including native metadata and timing.
 	 * @param format Negotiated CPU format.
 	 * @param destination Separate frame owner; must not alias source.
@@ -253,11 +262,26 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 		if (!Equivalent(source.Format(), format) || source.Width() <= 0 || source.Height() <= 0
 			|| source.Width() > std::numeric_limits<int>::max() / 4)
 			return false;
-		const bool planarSource = source.Format() == AV_PIX_FMT_YUV420P10LE;
+		const int sourceFormat = source.Format();
+		const bool sourcePlanar = sourceFormat == AV_PIX_FMT_YUV420P10LE
+			|| sourceFormat == AV_PIX_FMT_YUV420P;
+		const bool destinationPlanar = format == AV_PIX_FMT_YUV420P10LE
+			|| format == AV_PIX_FMT_YUV420P;
+		const bool sourceSemiPlanar = !sourcePlanar;
+		const bool destinationSemiPlanar = !destinationPlanar;
+		const bool sourceTenBit = sourceFormat == AV_PIX_FMT_YUV420P10LE
+			|| sourceFormat == AV_PIX_FMT_P010LE;
+		const bool sourceMsbAligned = sourceFormat == AV_PIX_FMT_P010LE;
+		const bool destinationMsbAligned = format == AV_PIX_FMT_P010LE;
+		const bool sourceVu = sourceFormat == AV_PIX_FMT_NV21;
+		const bool destinationVu = format == AV_PIX_FMT_NV21;
+		const int bytesPerSample = sourceTenBit ? 2 : 1;
 		const int chromaWidth = source.Width() / 2 + source.Width() % 2;
-		for (int plane = 0; plane < (planarSource ? 3 : 2); ++plane) {
+		for (int plane = 0; plane < (sourcePlanar ? 3 : 2); ++plane) {
 			const std::int64_t stride = source.Linesize(plane);
-			const int rowBytes = plane == 0 ? source.Width() * 2 : chromaWidth * (planarSource ? 2 : 4);
+			const int rowBytes = plane == 0
+				? source.Width() * bytesPerSample
+				: chromaWidth * bytesPerSample * (sourceSemiPlanar ? 2 : 1);
 			if (!source.Data(plane) || (stride < 0 ? -stride : stride) < rowBytes)
 				return false;
 		}
@@ -267,23 +291,31 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 		for (int component = 0; component < 3; ++component) {
 			const int width = component == 0 ? source.Width() : chromaWidth;
 			const int height = component == 0 ? source.Height() : source.Height() / 2 + source.Height() % 2;
-			const int sourcePlane = planarSource || component == 0 ? component : 1;
-			const int destinationPlane = !planarSource || component == 0 ? component : 1;
-			const int sourceStep = planarSource || component == 0 ? 2 : 4;
-			const int destinationStep = !planarSource || component == 0 ? 2 : 4;
-			const int sourceOffset = !planarSource && component == 2 ? 2 : 0;
-			const int destinationOffset = planarSource && component == 2 ? 2 : 0;
+			const int sourcePlane = component == 0 || sourcePlanar ? component : 1;
+			const int destinationPlane = component == 0 || destinationPlanar ? component : 1;
+			const int sourceStep = component == 0 || sourcePlanar ? bytesPerSample : bytesPerSample * 2;
+			const int destinationStep = component == 0 || destinationPlanar ? bytesPerSample : bytesPerSample * 2;
+			const int sourceOffset = component > 0 && sourceSemiPlanar
+				&& (sourceVu ? component == 1 : component == 2) ? bytesPerSample : 0;
+			const int destinationOffset = component > 0 && destinationSemiPlanar
+				&& (destinationVu ? component == 1 : component == 2) ? bytesPerSample : 0;
 			for (int row = 0; row < height; ++row) {
 				const auto* input = source.Data(sourcePlane)
 					+ static_cast<std::ptrdiff_t>(row) * source.Linesize(sourcePlane) + sourceOffset;
 				auto* output = destination.Data(destinationPlane)
 					+ static_cast<std::ptrdiff_t>(row) * destination.Linesize(destinationPlane) + destinationOffset;
 				for (int column = 0; column < width; ++column) {
-					unsigned sample = ReadWord(input + column * sourceStep);
-					if (planarSource && sample > 1023)
+					unsigned sample = bytesPerSample == 1
+						? input[column * sourceStep]
+						: ReadWord(input + column * sourceStep);
+					if (sourceFormat == AV_PIX_FMT_YUV420P10LE && sample > 1023)
 						return false;
-					sample = planarSource ? sample << 6 : sample >> 6;
-					WriteWord(output + column * destinationStep, sample);
+					if (sourceMsbAligned != destinationMsbAligned)
+						sample = sourceMsbAligned ? sample >> 6 : sample << 6;
+					if (bytesPerSample > 1)
+						WriteWord(output + column * destinationStep, sample);
+					else
+						output[column * destinationStep] = static_cast<std::uint8_t>(sample);
 				}
 			}
 		}

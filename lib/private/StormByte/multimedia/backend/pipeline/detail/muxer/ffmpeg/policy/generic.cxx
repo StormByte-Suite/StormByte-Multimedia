@@ -50,6 +50,7 @@
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/policy.hxx>
+#include <StormByte/multimedia/ffmpeg/typedefs.hxx>
 
 extern "C" {
 	#include <libavformat/avformat.h>
@@ -102,10 +103,15 @@ namespace {
 
 			bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
 				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept override {
-				if (std::string_view{context.oformat->name} == "aiff"
-					&& av_opt_set_int(context.priv_data, "write_id3v2", 1, 0) < 0) {
-					owner.Fail("could not enable AIFF ID3 cover metadata");
-					return false;
+				if (std::string_view{context.oformat->name} == "aiff") {
+					const int result = av_opt_set_int(context.priv_data, "write_id3v2", 1, 0);
+					if (result < 0) {
+						owner.Fail(StormByte::Safe::String::ReplaceToken(
+							"muxer could not enable ID3v2 cover metadata for AIFF: {}",
+							static_cast<std::string_view>(
+								StormByte::Multimedia::FFmpeg::ErrorToString(result))));
+						return false;
+					}
 				}
 				return Attachment::WriteCovers(owner, context, attachments, "Audio");
 			}

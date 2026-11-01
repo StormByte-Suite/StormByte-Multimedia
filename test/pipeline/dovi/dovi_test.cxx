@@ -92,6 +92,12 @@ namespace {
 	enum class DoviComparison { Exact, Regenerated };
 	enum class HdrComparison { Exact, Av1Quantized };
 
+	bool SameEncodedPixelFormat(Property::PixelFormat before, Property::PixelFormat after) noexcept {
+		return before == after
+			|| (before == Property::PixelFormat::P010 && after == Property::PixelFormat::YUV420P10)
+			|| (before == Property::PixelFormat::YUV420P10 && after == Property::PixelFormat::P010);
+	}
+
 	class UnenforcedPlan final: public Plan {
 		public:
 			UnenforcedPlan(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
@@ -283,7 +289,9 @@ namespace {
 		HdrComparison hdr_comparison = HdrComparison::Exact) {
 		TEST_REQUIRE(after.Resolution().Width() == before.Resolution().Width());
 		TEST_REQUIRE(after.Resolution().Height() == before.Resolution().Height());
-		TEST_REQUIRE(after.Color().PixelFormat() == before.Color().PixelFormat());
+		TEST_REQUIRE(comparison == DoviComparison::Regenerated
+			? SameEncodedPixelFormat(before.Color().PixelFormat(), after.Color().PixelFormat())
+			: after.Color().PixelFormat() == before.Color().PixelFormat());
 		TEST_REQUIRE(after.Color().Space() == before.Color().Space());
 		TEST_REQUIRE(after.Color().Range() == before.Color().Range());
 		TEST_REQUIRE(after.Color().Primaries() == before.Color().Primaries());

@@ -303,7 +303,9 @@ FFmpeg::AVRational Subtitle::TimeBase() const noexcept {
 bool Subtitle::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
 	if (frame.Type() != Type::Subtitle) {
-		owner.Fail("encoder destination is subtitle but frame is not");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"subtitle encoder track {} received a {} frame",
+			owner.Index(), static_cast<unsigned>(frame.Type())));
 		return false;
 	}
 	return PrepareForHeader(owner);
@@ -354,7 +356,9 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 				reinterpret_cast<const std::uint8_t*>(text.data()),
 				static_cast<int>(text.size()),
 				owner.Index(), true)) {
-			owner.Fail("failed to encode subtitle");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"subtitle encoder track {} could not build text packet ({} bytes)",
+				owner.Index(), text.size()));
 			m_heldText.clear();
 			m_heldPts = AV_NOPTS_VALUE;
 			return;
@@ -373,9 +377,20 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 			text = PackAss(std::move(text), 0);
 		StormByte::Multimedia::FFmpeg::AVSubtitle sub;
 		sub.FillText(StormByte::Safe::String(text), m_heldPts, durationMs, WantsAssRect(impl) || impl == "mov_text");
-		if (!m_encoder || m_encoder->EncodeSubtitle(sub, m_scratch)
-			!= StormByte::Multimedia::FFmpeg::OperationResult::Success) {
-			owner.Fail("failed to encode subtitle");
+		if (!m_encoder) {
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"subtitle encoder track {} has no open codec for cue pts={} duration={}ms",
+				owner.Index(), m_heldPts, durationMs));
+			m_heldText.clear();
+			m_heldPts = AV_NOPTS_VALUE;
+			return;
+		}
+		const auto result = m_encoder->EncodeSubtitle(sub, m_scratch);
+		if (result != StormByte::Multimedia::FFmpeg::OperationResult::Success) {
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"subtitle encoder track {} could not encode cue pts={} duration={}ms: {}",
+				owner.Index(), m_heldPts, durationMs, static_cast<std::string_view>(
+					FFmpeg::ErrorToString(m_encoder->OperationError()))));
 			m_heldText.clear();
 			m_heldPts = AV_NOPTS_VALUE;
 			return;
@@ -393,7 +408,9 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
 	if (!frame) {
-		owner.Fail("empty frame");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"subtitle encoder track {} received an empty frame handle",
+			owner.Index()));
 		return false;
 	}
 
@@ -417,7 +434,12 @@ bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 			bitmap->height,
 			bitmap->stride);
 		if (!recognized.has_value()) {
-			owner.Fail(recognized.error() ? recognized.error()->what() : "OCR failed");
+			if (recognized.error())
+				owner.Fail(recognized.error()->what());
+			else
+				owner.Fail(StormByte::Safe::String::ReplaceToken(
+					"subtitle OCR on track {} failed without returning an error detail",
+					owner.Index()));
 			return false;
 		}
 

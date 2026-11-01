@@ -172,6 +172,12 @@ namespace StormByte::Multimedia::FFmpeg {
 			OperationResult ReadPacket(AVPacket& packet) noexcept;
 
 			/**
+			 * @brief FFmpeg error from the last failed demux operation.
+			 * @return Negative error code, or zero when no operation failed.
+			 */
+			int OperationError() const noexcept;
+
+			/**
 			 * @brief Non-owning stream views.
 			 * @return Views ordered by stream index; this context must outlive all views.
 			 */
@@ -204,6 +210,7 @@ namespace StormByte::Multimedia::FFmpeg {
 
 			Safe::Unique<ConsumerIO> m_io;	///< Base-owned custom AVIO state (Consumer opens).
 			bool m_avioBorrowed;				///< true: @c pb is not owned
+			int m_operationError = 0;			///< Last failed read/seek error code.
 
 			/**
 			 * @brief Adopts a raw format context.

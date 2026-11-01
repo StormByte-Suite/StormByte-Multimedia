@@ -422,7 +422,7 @@ class Backend::SimplePlayer::Context {
 				return Fail(error.what());
 			}
 			catch (...) {
-				return Fail("unknown preview or display failure");
+				return Fail("preview or display worker caught a non-standard exception");
 			}
 		}
 

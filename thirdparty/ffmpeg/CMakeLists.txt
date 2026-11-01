@@ -78,6 +78,15 @@ function(_sb_mm_attach_ffmpeg target visibility)
 		if(TARGET ffmpeg_install)
 			add_dependencies(${target} ffmpeg_install)
 		endif()
+		if(TARGET PkgConfig::StormByteLibVA)
+			target_link_libraries(${target} ${visibility} PkgConfig::StormByteLibVA)
+		endif()
+		if(TARGET PkgConfig::StormByteLibVADRM)
+			target_link_libraries(${target} ${visibility} PkgConfig::StormByteLibVADRM)
+		endif()
+		if(TARGET PkgConfig::StormByteLibDRM)
+			target_link_libraries(${target} ${visibility} PkgConfig::StormByteLibDRM)
+		endif()
 		return()
 	endif()
 	# Windows / macOS: the ffmpeg INTERFACE already carries the six
@@ -101,6 +110,15 @@ function(stormbyte_link_ffmpeg target)
 		set_property(GLOBAL APPEND PROPERTY _SB_MM_FFMPEG_PENDING_VIS "${_vis}")
 	endif()
 endfunction()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND WITH_FFMPEG STREQUAL "BUNDLED")
+	find_package(PkgConfig QUIET)
+	if(PKG_CONFIG_FOUND)
+		pkg_check_modules(StormByteLibVA QUIET IMPORTED_TARGET GLOBAL libva)
+		pkg_check_modules(StormByteLibVADRM QUIET IMPORTED_TARGET GLOBAL libva-drm)
+		pkg_check_modules(StormByteLibDRM QUIET IMPORTED_TARGET GLOBAL libdrm)
+	endif()
+endif()
 
 if(WITH_FFMPEG STREQUAL "SYSTEM")
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
@@ -246,6 +264,9 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0003-clang-cl-no-nonlocal-asm-labels.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0004-avcodec-apv-parser-rename-close.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0005-movenc-preserve-long-subtitle-gaps.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0006-meson-vaapi-check-name.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0007-avformat-matroska-reset-state-after-generic-or-byte-.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0008-tests-api-cover-Matroska-byte-seek-after-EOF.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"

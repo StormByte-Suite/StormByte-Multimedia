@@ -605,7 +605,12 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		row->name, params, owner.Index(), options, timeBase, firstFrame,
 		static_cast<int>(threadCount));
 	if (!opened.has_value()) {
-		owner.Fail(opened.error() ? opened.error()->what() : "Failed to open encoder");
+		if (opened.error())
+			owner.Fail(opened.error()->what());
+		else
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"encoder '{}' on track {} failed to open without returning an error detail",
+				row->name, owner.Index()));
 		return std::nullopt;
 	}
 

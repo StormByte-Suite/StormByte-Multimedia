@@ -932,7 +932,9 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 		luma->Format(FFrame::FormatGray8());
 			if (!src.ScaleTo(ScalingContext(), *luma, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
-			Fail("failed to allocate luma probe");
+			Fail(StormByte::Safe::String::ReplaceToken(
+				"watermark could not convert source {}x{} fmt={} to its luma probe",
+				src.Width(), src.Height(), src.Format()));
 			return nullptr;
 		}
 
@@ -943,7 +945,9 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 	}
 	else if (!src.ScaleTo(ScalingContext(), *m_luma, src.Width(), src.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
-		Fail("failed to convert frame to luma");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark could not refresh luma probe from {}x{} fmt={}",
+			src.Width(), src.Height(), src.Format()));
 		return nullptr;
 	}
 
@@ -1236,8 +1240,16 @@ bool Watermark::Composite(const FFrame& src, int x, int y) noexcept {
 			FFrame::Resample::Point, FFrame::Scaler::Zimg, back) || !restored.Data(0))
 		return false;
 	FFrame out;
-	if (!out.AllocVideo(src.Width(), src.Height(), src.Format()) || !out.Copy(src) || !out.CopyProps(src)) {
-		Fail("failed to allocate destination");
+	if (!out.AllocVideo(src.Width(), src.Height(), src.Format())) {
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark could not allocate output frame {}x{} fmt={}",
+			src.Width(), src.Height(), src.Format()));
+		return true;
+	}
+	if (!out.Copy(src) || !out.CopyProps(src)) {
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark could not copy source pixels or metadata for {}x{} fmt={}",
+			src.Width(), src.Height(), src.Format()));
 		return true;
 	}
 	Scatter(restored, out, box, rgba, m_paintW, m_paintH, x, y, m_opacity, desc);
@@ -1252,11 +1264,15 @@ void Watermark::PaintLegacy(int x, int y) noexcept {
 	out.Format(FFrame::FormatRgba());
 	if (!src.ScaleTo(ScalingContext(), out, src.Width(), src.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws)) {
-		Fail("failed to convert frame to RGBA");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark could not convert source {}x{} fmt={} to RGBA",
+			src.Width(), src.Height(), src.Format()));
 		return;
 	}
 	if (!out.Data(0)) {
-		Fail("failed to allocate destination");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark RGBA conversion produced no output buffer for {}x{}",
+			src.Width(), src.Height()));
 		return;
 	}
 	Blend(out.Data(0), out.Linesize(0), out.Width(), out.Height(),
@@ -1266,7 +1282,9 @@ void Watermark::PaintLegacy(int x, int y) noexcept {
 		restored.Format(src.Format());
 		if (!out.ScaleTo(ScalingContext(), restored, src.Width(), src.Height(),
 				FFrame::Resample::Default, FFrame::Scaler::Sws)) {
-			Fail("failed to convert frame back");
+			Fail(StormByte::Safe::String::ReplaceToken(
+				"watermark could not convert RGBA frame back to fmt={} at {}x{}",
+				src.Format(), src.Width(), src.Height()));
 			return;
 		}
 		Save(std::move(restored));
@@ -1283,7 +1301,9 @@ void Watermark::Paint() noexcept {
 
 	const FFrame& src = AVFrame();
 	if (!src || src.Width() <= 0 || src.Height() <= 0) {
-		Fail("missing video buffer");
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark received no usable source frame ({}x{} fmt={})",
+			src.Width(), src.Height(), src.Format()));
 		return;
 	}
 

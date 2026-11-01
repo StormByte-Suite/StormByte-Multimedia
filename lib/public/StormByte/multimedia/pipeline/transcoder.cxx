@@ -503,7 +503,9 @@ void Transcoder::Resources(ResourceUsage usage) noexcept {
 			m_backend->Resources = usage;
 			return;
 	}
-	Fail("unknown resource policy");
+	Fail(StormByte::Safe::String::ReplaceToken(
+		"resource policy value {} is not recognized",
+		static_cast<unsigned>(usage)));
 }
 
 Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {

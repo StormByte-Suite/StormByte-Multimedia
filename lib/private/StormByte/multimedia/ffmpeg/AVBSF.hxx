@@ -122,6 +122,11 @@ namespace StormByte::Multimedia::FFmpeg {
 			OperationResult ReceivePacket(AVPacket& pkt) noexcept;
 
 			/**
+			 * @brief FFmpeg error from the last failed operation, or zero.
+			 */
+			int ErrorCode() const noexcept;
+
+			/**
 			 * @brief Flushes the filter.
 			 */
 			void Flush() noexcept;
@@ -144,6 +149,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			void Free() noexcept override;
 
 			using AVPointer<::AVBSFContext>::Get;
+			int m_error = 0;
 	};
 
 	extern template class STORMBYTE_MULTIMEDIA_PRIVATE AVPointer<::AVBSFContext>;

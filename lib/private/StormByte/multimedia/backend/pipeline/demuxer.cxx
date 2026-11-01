@@ -156,24 +156,24 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 
 	auto& reader = owner.Origin();
 	if (!reader.IsOpen() && !reader.Open()) {
-		owner.Fail("reader open failed");
+		owner.Fail("demux input reader could not open the configured origin");
 		return false;
 	}
 	if (!reader.Rewind()) {
-		owner.Fail("reader rewind failed");
+		owner.Fail("demux input reader could not rewind the origin before probing");
 		return false;
 	}
 
 	m_ctx->avio.emplace(reader);
 	if (!m_ctx->avio->Arm() || !m_ctx->avio->Context()) {
-		owner.Fail("file AVIO alloc failed");
+		owner.Fail("FFmpeg custom AVIO could not allocate or arm the input reader");
 		m_ctx->avio.reset();
 		return false;
 	}
 
 	::AVFormatContext* raw = avformat_alloc_context();
 	if (!raw) {
-		owner.Fail("avformat_alloc_context failed");
+		owner.Fail("libavformat could not allocate an input context");
 		m_ctx->avio.reset();
 		return false;
 	}
@@ -187,7 +187,9 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 			raw->pb = nullptr;
 			avformat_free_context(raw);
 		}
-		owner.Fail("avformat_open_input failed");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"libavformat could not open the demux input: {}",
+			static_cast<std::string_view>(FFmpeg::ErrorToString(ret))));
 		m_ctx->avio.reset();
 		return false;
 	}
@@ -196,7 +198,9 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 	if (ret < 0) {
 		raw->pb = nullptr;
 		avformat_close_input(&raw);
-		owner.Fail("avformat_find_stream_info failed");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"libavformat could not read input stream information: {}",
+			static_cast<std::string_view>(FFmpeg::ErrorToString(ret))));
 		m_ctx->avio.reset();
 		return false;
 	}
@@ -256,7 +260,11 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 		if (result == FFmpeg::OperationResult::TryAgain)
 			continue;
 		if (result != FFmpeg::OperationResult::Success) {
-			owner.Fail("failed to read packet");
+			owner.Fail(StormByte::Safe::String::ReplaceToken(
+				"demuxer could not read packet from {}: {}",
+				static_cast<std::string_view>(m_ctx->format->FormatName()),
+				static_cast<std::string_view>(
+					StormByte::Multimedia::FFmpeg::ErrorToString(m_ctx->format->OperationError()))));
 			return {};
 		}
 
@@ -328,7 +336,11 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Rewind(
 		return false;
 	}
 	if (m_ctx->format->SeekStart() != FFmpeg::OperationResult::Success) {
-		owner.Fail("failed to rewind origin");
+		owner.Fail(StormByte::Safe::String::ReplaceToken(
+			"demuxer could not rewind {} to its origin: {}",
+			static_cast<std::string_view>(m_ctx->format->FormatName()),
+			static_cast<std::string_view>(
+				StormByte::Multimedia::FFmpeg::ErrorToString(m_ctx->format->OperationError()))));
 		return false;
 	}
 	return true;
