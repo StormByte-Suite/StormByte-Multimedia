@@ -56,6 +56,7 @@
 #include <StormByte/buffer/telemetry.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/codec.hxx>
+#include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
@@ -389,6 +390,13 @@ namespace StormByte {
 							 * @return *this.
 							 */
 							Track& Implementation(ImplementationSide side, StormByte::Safe::String name);
+
+							/**
+							 * @brief Selects hardware or software decoding for this video track.
+							 * @param acceleration Decoder acceleration policy.
+							 * @return *this.
+							 */
+							Track& Acceleration(DecodeAcceleration acceleration);
 
 							/**
 							 * @brief Sets CRF/CQ. Clears BitRate.

@@ -44,6 +44,8 @@ if(ENABLE_TEST)
 		test_audio_pacing_pause_drain
 		test_audio_paused_seek
 		test_av_seek_switch_epochs
+		test_hdr_preview_tone_mapping
+		test_hdr_preview_preserves_signal
 		test_live_audio_selection
 		test_live_audio_tracks
 		test_live_audio_backpressure_errors

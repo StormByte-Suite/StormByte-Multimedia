@@ -55,6 +55,7 @@
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
+#include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/atomic.hxx>
@@ -74,6 +75,7 @@
  */
 namespace StormByte::Multimedia::Backend::Pipeline {
 	class Decoder;
+	class Demuxer;
 	class Frame;
 }
 
@@ -145,6 +147,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC Decoder final: public Step {
 		friend class Backend::Pipeline::Decoder;
+		friend class Backend::Pipeline::Demuxer;
 		friend class Backend::Pipeline::Detail::Worker::Decode;
 		friend class Demuxer;
 		friend class Filters;
@@ -286,6 +289,22 @@ namespace StormByte::Multimedia::Pipeline {
 			void Implementation(StormByte::Safe::String name) noexcept;
 
 			/**
+			 * @brief Video decode acceleration policy, independent of encoder selection.
+			 * @return Configured policy.
+			 */
+			inline DecodeAcceleration Acceleration() const noexcept {
+				return m_acceleration;
+			}
+
+			/**
+			 * @brief Sets video decode acceleration before the decoder is wired.
+			 * @param acceleration Auto attempts supported hardware then software; Software forces CPU decode.
+			 */
+			inline void Acceleration(DecodeAcceleration acceleration) noexcept {
+				m_acceleration = acceleration;
+			}
+
+			/**
 			 * @brief Extra required Feature bits.
 			 * @return Mask.
 			 */
@@ -314,6 +333,8 @@ namespace StormByte::Multimedia::Pipeline {
 			 */
 
 		private:
+			void HardwareFallback() noexcept;
+
 			/**
 			 * @class EncodeLook
 			 * @brief Tag. Dest look after an Encoder. Only Route constructs it.
@@ -522,6 +543,7 @@ namespace StormByte::Multimedia::Pipeline {
 			bool m_implementationConfigured = false;	///< Explicit selection, including automatic decoding.
 			Features m_require;										///< Extra required bits
 			Features m_capabilities;								///< Opened row bits
+			DecodeAcceleration m_acceleration = DecodeAcceleration::Auto;	///< Video decode backend policy.
 			Demuxer* m_origin = nullptr;							///< Origin demuxer, origin mode
 			Filters* m_analytics = nullptr;							///< Dest-look clock; null on origin decode
 			StormByte::Safe::Unique<Backend::Pipeline::Decoder> m_backend;	///< Decode backend

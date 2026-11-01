@@ -101,7 +101,8 @@ namespace {
 	int CheckVideoCodec(const std::filesystem::path& input, const std::filesystem::path& output,
 		std::string_view containerName, std::string_view codecName, std::string_view encoder,
 		std::string_view decoder = {}, AVPixelFormat sourceFormat = AV_PIX_FMT_NONE, int threads = 0,
-		ResourceUsage resources = ResourceUsage::Full) {
+		ResourceUsage resources = ResourceUsage::Full,
+		DecodeAcceleration acceleration = DecodeAcceleration::Auto) {
 		TEST_PHASE("opening media file for inspection");
 		auto source = File::Open(StormByte::Safe::String{input.string()});
 		TEST_REQUIRE(source);
@@ -120,12 +121,13 @@ namespace {
 		}
 		auto logger = MakeLogger();
 		{
-					TEST_PHASE("creating transcoder");
-					Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
-					job.Resources(resources);
-					auto track = job.Video(0);
+			TEST_PHASE("creating transcoder");
+			Transcoder job{TestLocation(input), TestLocation(output), logger, 2000000000LL};
+			job.Resources(resources);
+			auto track = job.Video(0);
 			track.Codec(codec.value().get())
-				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder});
+				.Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder})
+				.Acceleration(acceleration);
 			if (!decoder.empty())
 				track.Implementation(ImplementationSide::Decoder, StormByte::Safe::String{decoder});
 			track.Filter<Filter::Video::Scale>(logger, 320u, 192u);
@@ -162,9 +164,10 @@ namespace {
 	}
 
 	int CheckVideoEncode(std::string_view destination, std::string_view containerName,
-		std::string_view codecName, std::string_view encoder) {
+		std::string_view codecName, std::string_view encoder,
+		DecodeAcceleration acceleration = DecodeAcceleration::Auto) {
 		return CheckVideoCodec(FixturePath("video/bluray_like_hdr10.mp4"), OutputPath(destination),
-			containerName, codecName, encoder);
+			containerName, codecName, encoder, {}, AV_PIX_FMT_NONE, 0, ResourceUsage::Full, acceleration);
 	}
 
 	int CheckNvencHevcEncode(std::string_view source, std::string_view destination,
@@ -366,6 +369,11 @@ int test_libvpx_vp9_honors_explicit_threads() {
 
 int test_x264_encodes_h264_mp4() {
 	return CheckVideoEncode("pipeline/video-codecs/x264.mp4", "MP4", "H.264", "libx264");
+}
+
+int test_software_decode_x264_encodes_h264_matroska() {
+	return CheckVideoEncode("pipeline/video-codecs/x264-software-decode.mkv", "Matroska", "H.264",
+		"libx264", DecodeAcceleration::Software);
 }
 
 int test_openh264_encodes_h264_matroska() {
@@ -639,6 +647,7 @@ int RunPipelineVideoCodecTests(int argc, char** argv) {
 		TestEntry{"test_libvpx_encodes_vp9_webm", test_libvpx_encodes_vp9_webm},
 		TestEntry{"test_libvpx_vp9_honors_explicit_threads", test_libvpx_vp9_honors_explicit_threads},
 		TestEntry{"test_x264_encodes_h264_mp4", test_x264_encodes_h264_mp4},
+		TestEntry{"test_software_decode_x264_encodes_h264_matroska", test_software_decode_x264_encodes_h264_matroska},
 		TestEntry{"test_openh264_encodes_h264_matroska", test_openh264_encodes_h264_matroska},
 		TestEntry{"test_openh264_rejects_ten_bit_input", test_openh264_rejects_ten_bit_input},
 		TestEntry{"test_openh264_encodes_ten_bit_after_format", test_openh264_encodes_ten_bit_after_format},

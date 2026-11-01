@@ -32,6 +32,7 @@ foreach(test_name IN ITEMS
 	test_vaapi_encodes_hevc_main_matroska
 	test_libwebp_anim_encodes_webp
 	test_libwebp_decodes_animated_webp
+	test_software_decode_x264_encodes_h264_matroska
 )
 	add_optional_pipeline_test(MultimediaPipelineVideoCodecTests ${test_name})
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;video-codecs")

@@ -21,6 +21,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Added
+
+- Independent `DecodeAcceleration::Auto`/`Software` policy for preview and transcode video decoders, configurable per transcode lane with `Track::Acceleration(...)`. Auto selects only FFmpeg-advertised hardware configurations supported by an initialized device (VideoToolbox, D3D11VA/DXVA2, CUDA/NVDEC or VA-API as built), then falls back to software if device creation or decoder opening fails. Hardware-decoded frames are downloaded with frame properties preserved before CPU preview/filter processing; decoder selection remains independent of encoder pins, feature enforcement and remux.
+- Optional `HDRDisplay` preview extension delivers PQ/HLG frames as RGBA16LE with colorimetry and available mastering/content-light metadata; the default `Display` interface remains unchanged.
+- SDR preview now tone-maps PQ/HLG frames through linear light and converts them to BT.709 before producing RGBA8. Neither preview mode claims Dolby Vision rendering.
+
 ### Fixed
 
 - Encoders that do not preserve Dolby Vision now discard parsed Dolby Vision metadata and RPU side data before submitting frames, while encoders configured for Dolby Vision retain strict metadata validation. Frame submission failures report the specific metadata rejection or original FFmpeg error instead of only `failed to send frame`; regression coverage includes intentional metadata removal and required-metadata preservation.

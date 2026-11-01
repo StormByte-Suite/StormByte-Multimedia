@@ -50,6 +50,7 @@
 
 #include <StormByte/multimedia/backend/zimg/zimg.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
+#include <StormByte/multimedia/ffmpeg/hardware_decode.hxx>
 #include <StormByte/multimedia/ffmpeg/Sws.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
 #include <StormByte/multimedia/property/dovi.hxx>
@@ -379,6 +380,21 @@ bool FFmpeg::AVFrame::Hardware() const noexcept {
 		return false;
 	const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(m_ptr->format));
 	return !desc || (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) != 0;
+}
+
+bool FFmpeg::AVFrame::Download() noexcept {
+	if (!m_ptr || !Hardware())
+		return m_ptr != nullptr;
+	::AVFrame* downloaded = av_frame_alloc();
+	if (!downloaded)
+		return false;
+	const bool success = HardwareDecode::Download(*m_ptr, *downloaded);
+	if (success) {
+		av_frame_unref(m_ptr);
+		av_frame_move_ref(m_ptr, downloaded);
+	}
+	av_frame_free(&downloaded);
+	return success;
 }
 
 int FFmpeg::AVFrame::FormatNone() noexcept {

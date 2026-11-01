@@ -379,12 +379,13 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 	const unsigned threadCount = plan ? Ceiling::StageThreads(*plan, Ceiling::MaxThreads()) : 0;
 	auto opened = FFmpeg::AVDecoder::Open(
 		const_cast<::AVCodec*>(codec), *params, *m_ctx->format, decoder.Index(),
-		static_cast<int>(threadCount));
+		static_cast<int>(threadCount), decoder.Acceleration());
 	if (!opened.has_value()) {
 		decoder.Fail(opened.error()->what());
 		return {};
 	}
-
+	if (opened->HardwareFallback())
+		decoder.HardwareFallback();
 	if (mapped.has_value() && mapped->first) {
 		return StormByte::Safe::MakeUnique<Detail::Decoder::Video>(
 			std::move(opened.value()), timeBase,

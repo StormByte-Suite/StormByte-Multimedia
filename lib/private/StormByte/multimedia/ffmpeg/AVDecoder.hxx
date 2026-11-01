@@ -54,6 +54,7 @@
 #include <StormByte/multimedia/ffmpeg/AVPointer.hxx>
 #include <StormByte/multimedia/ffmpeg/AVRational.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
+#include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/ffmpeg/fwd.hxx>
 #include <StormByte/multimedia/ffmpeg/backend_typedefs.hxx>
 
@@ -112,6 +113,10 @@ namespace StormByte::Multimedia::FFmpeg {
 			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
 				const AVFormatContext& fmt, int stream_index, int thread_count = 0) noexcept;
 
+			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
+				const AVFormatContext& fmt, int stream_index, int thread_count,
+				DecodeAcceleration acceleration) noexcept;
+
 			/**
 			 * @brief Opens a decoder from codec and parameters. No BSF.
 			 * @param codec Decoder codec.
@@ -126,6 +131,19 @@ namespace StormByte::Multimedia::FFmpeg {
 			 */
 			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
 				int stream_index, int thread_count = 0) noexcept;
+
+			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
+				int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept;
+
+			/**
+			 * @brief Whether FFmpeg opened this decoder with a hardware device.
+			 */
+			bool HardwareAccelerated() const noexcept;
+
+			/**
+			 * @brief Whether Auto requested hardware but this decoder opened in software.
+			 */
+			bool HardwareFallback() const noexcept;
 
 			/**
 			 * @brief Sends a packet (after BSF) to the decoder.
@@ -186,6 +204,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		private:
 			int m_stream_index = -1;		///< Bound stream index
 			int m_packet_error = 0;		///< Last packet submission error.
+			bool m_hardware_fallback = false;	///< Auto policy fell back to a software video decoder.
 			AVBSFPipeline m_bsf_pipeline;	///< Optional BSF chain
 
 			/**
@@ -202,7 +221,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @return Decoder or DecoderError. BSF is empty.
 			 */
 			static ExpectedAVDecoder OpenRaw(AVCodec* codec, const AVCodecParameters& params,
-				int stream_index, int thread_count) noexcept;
+				int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept;
 
 			/**
 			 * @brief Frees the codec context.

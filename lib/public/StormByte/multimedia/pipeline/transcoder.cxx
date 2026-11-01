@@ -226,6 +226,28 @@ Transcoder::Track& Transcoder::Track::Implementation(ImplementationSide side, St
 	return *this;
 }
 
+Transcoder::Track& Transcoder::Track::Acceleration(DecodeAcceleration acceleration) {
+	if (!m_owner || !m_owner->ValidSlot(m_slot))
+		return *this;
+	auto& slot = m_owner->m_backend->Mapped[m_slot];
+	if (slot.Kind != Type::Video) {
+		m_owner->Fail("decode acceleration only applies to video tracks");
+		return *this;
+	}
+	switch (acceleration) {
+		case DecodeAcceleration::Auto:
+		case DecodeAcceleration::Software:
+			break;
+		default:
+			m_owner->Fail("decode acceleration policy is invalid");
+			return *this;
+	}
+	auto implementation = slot.Config->Implementation();
+	implementation.Acceleration = acceleration;
+	slot.Config->Implementation(std::move(implementation));
+	return *this;
+}
+
 Transcoder::Track& Transcoder::Track::CRF(double value) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;

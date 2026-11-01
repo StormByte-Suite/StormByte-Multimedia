@@ -142,10 +142,6 @@ else()
 		libv4l2=disabled
 		xlib=disabled
 		libxcb=disabled
-		libdrm=disabled
-		vaapi=disabled
-		vaapi_drm=disabled
-		vaapi_x11=disabled
 		deinterlace_vaapi_filter=disabled
 		denoise_vaapi_filter=disabled
 		overlay_vaapi_filter=disabled
@@ -196,6 +192,19 @@ else()
 			metal=disabled
 			securetransport=disabled
 		)
+	elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+		list(APPEND FFMPEG_MESON_OPTIONS
+			videotoolbox=disabled
+			audiotoolbox=disabled
+			metal=disabled
+			securetransport=disabled
+			libdrm=auto
+			vaapi=auto
+			vaapi_drm=auto
+			vaapi_x11=auto
+			d3d11va=disabled
+			dxva2=disabled
+		)
 	else()
 		list(APPEND FFMPEG_MESON_OPTIONS
 			appkit=disabled
@@ -204,6 +213,8 @@ else()
 			audiotoolbox=disabled
 			metal=disabled
 			securetransport=disabled
+			d3d11va=auto
+			dxva2=auto
 		)
 	endif()
 

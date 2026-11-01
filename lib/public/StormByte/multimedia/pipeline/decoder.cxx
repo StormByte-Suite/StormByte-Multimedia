@@ -126,13 +126,14 @@ bool Decoder::WaitForPlan() noexcept {
 
 bool Decoder::SetupPlan() noexcept {
 	try {
-		if (!m_implementationConfigured && !m_look) {
+		if (!m_look) {
 			for (const auto& track : Plan()->Tracks()) {
 				if (!track || track->In() != m_index || !track->Config())
 					continue;
 				const auto& implementation = track->Config()->Implementation();
-				if (implementation.Decoder)
+				if (!m_implementationConfigured && implementation.Decoder)
 					Implementation(*implementation.Decoder);
+				Acceleration(implementation.Acceleration);
 				break;
 			}
 		}
@@ -166,6 +167,11 @@ void Decoder::Implementation(StormByte::Safe::String name) noexcept {
 		m_implementation.reset();
 	else
 		m_implementation = std::move(name);
+}
+
+void Decoder::HardwareFallback() noexcept {
+	Log(StormByte::Logger::Level::Warning,
+		"hardware video decoder unavailable; continuing with software decode");
 }
 
 void Decoder::Attach(Frame& frame, StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept {

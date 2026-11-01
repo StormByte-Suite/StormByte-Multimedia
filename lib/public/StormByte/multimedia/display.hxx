@@ -51,12 +51,14 @@
 #pragma once
 
 #include <StormByte/multimedia/attachment.hxx>
+#include <StormByte/multimedia/property/color.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/binary.hxx>
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/safe/string.hxx>
 #include <StormByte/safe/vector.hxx>
 
+#include <array>
 #include <cstdint>
 
 /**
@@ -69,6 +71,15 @@ namespace StormByte {
 	 * @brief Portable multimedia preview contracts.
 	 */
 	namespace Multimedia {
+		/**
+		 * @enum PreviewColorMode
+		 * @brief Selects SDR presentation or HDR signal preservation for preview.
+		 */
+		enum class PreviewColorMode {
+			SDR,	///< Tone-map PQ/HLG to BT.709 and deliver RGBA8 through Display.
+			HDR		///< Deliver PQ/HLG as full-range RGBA16LE through HDRDisplay.
+		};
+
 		/**
 		 * @struct PreviewVideo
 		 * @brief Owned, tightly packed RGBA8 preview image, not an HDR mastering surface.
@@ -116,6 +127,40 @@ namespace StormByte {
 			std::uint64_t m_epoch = 0;	///< Delivery generation.
 			double m_position = 0;		///< Presentation time in media seconds.
 			double m_duration = 0;		///< Image duration in seconds.
+		};
+
+		/**
+		 * @struct PreviewHDRVideo
+		 * @brief Owned RGBA16LE image retaining its HDR transfer and color primaries.
+		 *
+		 * RGB channels are full-range code values using m_transfer; alpha is opaque.
+		 * Rows are tightly packed at eight bytes per pixel. Mastering-display and
+		 * content-light values are optional and expressed in cd/m^2.
+		 */
+		struct STORMBYTE_MULTIMEDIA_PUBLIC PreviewHDRVideo {
+			PreviewHDRVideo() = default;
+			PreviewHDRVideo(const PreviewHDRVideo& other) = default;
+			PreviewHDRVideo(PreviewHDRVideo&& other) noexcept = default;
+			~PreviewHDRVideo() noexcept = default;
+			PreviewHDRVideo& operator=(const PreviewHDRVideo& other) = default;
+			PreviewHDRVideo& operator=(PreviewHDRVideo&& other) noexcept = default;
+
+			Safe::Binary m_pixels;		///< Tightly packed RGBA16LE signal values.
+			std::uint32_t m_width = 0;	///< Pixel width.
+			std::uint32_t m_height = 0;	///< Pixel height.
+			std::uint64_t m_epoch = 0;	///< Delivery generation.
+			double m_position = 0;		///< Presentation time in media seconds.
+			double m_duration = 0;		///< Image duration in seconds.
+			Property::Primaries m_primaries = Property::Primaries::Unspecified;	///< Signal chromaticity primaries.
+			Property::Transfer m_transfer = Property::Transfer::Unspecified;	///< PQ or HLG signal transfer.
+			std::array<std::array<double, 2>, 3> m_display_primaries{};	///< Optional R/G/B mastering chromaticities.
+			std::array<double, 2> m_white_point{};	///< Optional mastering white point.
+			double m_min_luminance_nits = 0;	///< Optional mastering-display minimum.
+			double m_max_luminance_nits = 0;	///< Optional mastering-display maximum.
+			std::uint32_t m_max_content_light_nits = 0;	///< Optional MaxCLL.
+			std::uint32_t m_max_frame_average_light_nits = 0;	///< Optional MaxFALL.
+			bool m_has_mastering_display = false;	///< Whether mastering-display metadata is present.
+			bool m_has_content_light = false;	///< Whether content-light metadata is present.
 		};
 
 		/**
@@ -486,6 +531,25 @@ namespace StormByte {
 				 * @return True only after presentation has drained.
 				 */
 				virtual bool Drained(std::uint64_t epoch) = 0;
+		};
+
+		/**
+		 * @class HDRDisplay
+		 * @brief Optional HDR presentation extension for a Display implementation.
+		 *
+		 * Implement this interface alongside Display and pass the combined object
+		 * to SimplePlayer to opt in to HDR preview. Display itself is unchanged, so
+		 * existing SDR implementations keep their ABI and RGBA8 delivery contract.
+		 */
+		class STORMBYTE_MULTIMEDIA_PUBLIC HDRDisplay {
+			public:
+				virtual ~HDRDisplay() noexcept = default;
+
+				/**
+				 * @brief Present a PQ/HLG image without SDR tone mapping.
+				 * @param image Owned HDR signal and color metadata.
+				 */
+				virtual void VideoHDR(Safe::Shared<const PreviewHDRVideo> image) = 0;
 		};
 	}
 }

@@ -100,6 +100,10 @@ namespace StormByte {
 					 */
 					bool Open(Safe::Unique<Buffer::IO::BufferedLocationReader> reader);
 
+					void Acceleration(DecodeAcceleration acceleration) noexcept;
+
+					bool OutputColor(PreviewColorMode mode);
+
 					/**
 					 * @brief Start or resume workers.
 					 * @return Success.

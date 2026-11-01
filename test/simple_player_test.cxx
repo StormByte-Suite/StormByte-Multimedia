@@ -78,8 +78,11 @@ using StormByte::Multimedia::AudioPresentation;
 using StormByte::Multimedia::AudioLayout;
 using StormByte::Multimedia::AudioSample;
 using StormByte::Multimedia::Display;
+using StormByte::Multimedia::HDRDisplay;
 using StormByte::Multimedia::PlaybackState;
 using StormByte::Multimedia::PreviewAudio;
+using StormByte::Multimedia::PreviewColorMode;
+using StormByte::Multimedia::PreviewHDRVideo;
 using StormByte::Multimedia::PreviewSubtitle;
 using StormByte::Multimedia::PreviewVideo;
 using StormByte::Multimedia::SimplePlayer;
@@ -90,7 +93,7 @@ using TestClock = std::chrono::steady_clock;
  * @class FakeDisplay
  * @brief Headless clocked sink with deliberately deferred GUI delivery.
  */
-class FakeDisplay final: public Display {
+class FakeDisplay final: public Display, public HDRDisplay {
 	public:
 		/**
 		 * @brief Construct a clocked sink.
@@ -122,6 +125,7 @@ class FakeDisplay final: public Display {
 			m_epoch = epoch;
 			m_active_video = active_video;
 			m_image.reset();
+			m_hdr_image.reset();
 			m_audio_valid = false;
 			m_pending_end = 0;
 			m_audible = 0;
@@ -181,6 +185,25 @@ class FakeDisplay final: public Display {
 			m_video_times.push_back(TestClock::now());
 			if (m_audio_valid && !m_paused)
 				m_max_video_lead = std::max(m_max_video_lead, image->m_position - Played());
+			++m_videos;
+		}
+
+		/**
+		 * @brief Capture HDR signal values and their transfer metadata.
+		 * @param image Decoded HDR image.
+		 */
+		void VideoHDR(Safe::Shared<const PreviewHDRVideo> image) override {
+			std::lock_guard lock(m_mutex);
+			if (!image)
+				throw StormByte::Exception("empty HDR image");
+			const auto expected = static_cast<std::size_t>(image->m_width) * image->m_height * 8;
+			if (image->m_epoch != m_epoch || image->m_pixels.size() != expected
+				|| (image->m_transfer != StormByte::Multimedia::Property::Transfer::SMPTE2084
+					&& image->m_transfer != StormByte::Multimedia::Property::Transfer::ARIB_B67))
+				throw StormByte::Exception("invalid HDR image");
+			m_hdr_image = image;
+			m_video_positions.push_back(image->m_position);
+			m_video_times.push_back(TestClock::now());
 			++m_videos;
 		}
 
@@ -309,6 +332,7 @@ class FakeDisplay final: public Display {
 
 		std::mutex m_mutex;											///< Test and callback synchronization.
 		Safe::Shared<const PreviewVideo> m_image;					///< Active image.
+		Safe::Shared<const PreviewHDRVideo> m_hdr_image;				///< Active HDR image.
 		std::vector<Safe::Shared<const PreviewVideo>> m_deferred;	///< m_deferred GUI messages.
 		std::vector<Safe::Shared<const PreviewSubtitle>> m_cues;	///< Active cues.
 		std::vector<double> m_video_positions;						///< Captured decode timestamps.
@@ -953,6 +977,7 @@ int test_av_seek_switch_epochs() {
 	auto display = Safe::MakeShared<FakeDisplay>();
 	display->m_speed = 0.8;
 	SimplePlayer player(display);
+	player.Acceleration(StormByte::Multimedia::DecodeAcceleration::Software);
 	TEST_REQUIRE(player.Open(Fixture("video/anime_like.mkv")));
 	const int video = player.SelectedTrack(MediaType::Video);
 	TEST_REQUIRE(video >= 0);
@@ -997,6 +1022,64 @@ int test_av_seek_switch_epochs() {
 	TEST_REQUIRE(player.Stop());
 	TEST_REQUIRE(display->DeliverDeferred() > 0);
 	TEST_REQUIRE(!display->m_image);
+	return 0;
+}
+
+/**
+ * @brief Verify SDR preview tone-maps a short PQ/BT.2020 clip.
+ * @return Test status.
+ */
+int test_hdr_preview_tone_mapping() {
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_speed = 20;
+	SimplePlayer player(display);
+	player.Acceleration(StormByte::Multimedia::DecodeAcceleration::Software);
+	TEST_REQUIRE(player.Open(Fixture("video/bluray_like_hdr10.mkv")));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] {
+		return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error;
+	}));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	std::lock_guard lock(display->m_mutex);
+	TEST_REQUIRE(display->m_videos > 0);
+	TEST_REQUIRE(display->m_image);
+	TEST_REQUIRE(display->m_image->m_pixels.size()
+		== static_cast<std::size_t>(display->m_image->m_width) * display->m_image->m_height * 4);
+	const auto [minimum, maximum] = std::minmax_element(
+		display->m_image->m_pixels.begin(), display->m_image->m_pixels.end());
+	TEST_REQUIRE(minimum != display->m_image->m_pixels.end());
+	TEST_REQUIRE(*minimum < *maximum);
+	TEST_REQUIRE(*maximum > std::byte{0});
+	return 0;
+}
+
+/**
+ * @brief Preserve PQ signal data and metadata for an HDR-capable sink.
+ * @return Test status.
+ */
+int test_hdr_preview_preserves_signal() {
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_speed = 20;
+	SimplePlayer player(display);
+	player.Acceleration(StormByte::Multimedia::DecodeAcceleration::Software);
+	TEST_REQUIRE(player.OutputColor(PreviewColorMode::HDR));
+	TEST_REQUIRE(player.Open(Fixture("video/bluray_like_hdr10.mkv")));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] {
+		return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error;
+	}));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	std::lock_guard lock(display->m_mutex);
+	TEST_REQUIRE(display->m_videos > 0);
+	TEST_REQUIRE(display->m_hdr_image);
+	TEST_REQUIRE(!display->m_image);
+	TEST_REQUIRE(display->m_hdr_image->m_pixels.size()
+		== static_cast<std::size_t>(display->m_hdr_image->m_width)
+			* display->m_hdr_image->m_height * 8);
+	TEST_REQUIRE(display->m_hdr_image->m_transfer == StormByte::Multimedia::Property::Transfer::SMPTE2084);
+	TEST_REQUIRE(display->m_hdr_image->m_primaries == StormByte::Multimedia::Property::Primaries::BT2020);
+	TEST_REQUIRE(display->m_hdr_image->m_has_mastering_display);
+	TEST_REQUIRE(display->m_hdr_image->m_max_luminance_nits > 0);
 	return 0;
 }
 
@@ -1686,6 +1769,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_audio_pacing_pause_drain", test_audio_pacing_pause_drain},
 		TestEntry{"test_audio_paused_seek", test_audio_paused_seek},
 		TestEntry{"test_av_seek_switch_epochs", test_av_seek_switch_epochs},
+		TestEntry{"test_hdr_preview_tone_mapping", test_hdr_preview_tone_mapping},
+		TestEntry{"test_hdr_preview_preserves_signal", test_hdr_preview_preserves_signal},
 		TestEntry{"test_live_audio_selection", test_live_audio_selection},
 		TestEntry{"test_live_audio_tracks", test_live_audio_tracks},
 		TestEntry{"test_live_audio_backpressure_errors", test_live_audio_backpressure_errors},

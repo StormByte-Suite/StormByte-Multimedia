@@ -51,6 +51,7 @@
 #pragma once
 
 #include <StormByte/multimedia/type.hxx>
+#include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/clonable.hxx>
 #include <StormByte/safe/optional.hxx>
@@ -118,6 +119,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 
 		StormByte::Safe::Optional<StormByte::Safe::String> Decoder;	///< Decode pin; empty = default
 		StormByte::Safe::Optional<StormByte::Safe::String> Encoder;	///< Encode pin; empty = default
+		StormByte::Multimedia::DecodeAcceleration Acceleration = StormByte::Multimedia::DecodeAcceleration::Auto;	///< Video decoder acceleration; independent of the encoder.
 	};
 
 	/**

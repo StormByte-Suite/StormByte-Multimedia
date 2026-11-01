@@ -52,6 +52,10 @@
 #include <StormByte/exception.hxx>
 #include <StormByte/multimedia/backend/file_avio.hxx>
 #include <StormByte/multimedia/backend/simple_player.hxx>
+#include <StormByte/multimedia/ffmpeg/hardware_decode.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
+#include <StormByte/multimedia/ffmpeg/property.hxx>
 #include <StormByte/multimedia/log.hxx>
 
 #include <algorithm>
@@ -78,6 +82,7 @@ extern "C" {
 	#include <libavutil/channel_layout.h>
 	#include <libavutil/error.h>
 	#include <libavutil/imgutils.h>
+	#include <libavutil/mastering_display_metadata.h>
 	#include <libavutil/samplefmt.h>
 	#include <libswscale/swscale.h>
 }
@@ -156,6 +161,20 @@ namespace {
 	}
 
 	/**
+	 * @brief Calculate bounded RGBA16 storage.
+	 * @param width Pixel width.
+	 * @param height Pixel height.
+	 * @return Required bytes.
+	 * @throws StormByte::Exception If geometry is invalid or exceeds the limit.
+	 */
+	std::size_t HDRImageBytes(int width, int height) {
+		if (width <= 0 || height <= 0 || width > 32768 || height > 32768
+			|| static_cast<std::uint64_t>(width) * height * 8 > MaxBytes)
+			throw Exception("HDR preview image exceeds bounded storage");
+		return static_cast<std::size_t>(width) * height * 8;
+	}
+
+	/**
 	 * @struct Event
 	 * @brief One bounded scheduled presentation unit.
 	 */
@@ -197,6 +216,7 @@ namespace {
 		Event& operator=(Event&& other) noexcept = default;
 
 		Safe::Shared<PreviewVideo> m_video;			///< Optional image.
+		Safe::Shared<PreviewHDRVideo> m_hdr_video;	///< Optional HDR image.
 		Safe::Shared<PreviewAudio> m_audio;			///< Optional samples.
 		Safe::Shared<PreviewSubtitle> m_subtitle;	///< Optional subtitle.
 		double m_start = 0;							///< Delivery time.
@@ -234,8 +254,11 @@ namespace {
 		 */
 		void Reset() noexcept {
 			avcodec_free_context(&m_codec);
+			av_frame_free(&m_download);
 			sws_freeContext(m_scale);
 			m_scale = nullptr;
+			m_tonemap.reset();
+			m_color_scale.reset();
 			av_channel_layout_uninit(&m_input_layout);
 			m_input_format = AV_SAMPLE_FMT_NONE;
 			m_input_rate = 0;
@@ -244,7 +267,10 @@ namespace {
 		}
 
 		AVCodecContext* m_codec = nullptr;					///< Owned private codec context.
+		AVFrame* m_download = nullptr;						///< Reusable software transfer for hardware video.
 		SwsContext* m_scale = nullptr;						///< Owned pixel converter.
+		std::optional<FFmpeg::AVFilterGraph> m_tonemap;		///< HDR-to-linear-light tone-map curve.
+		std::optional<FFmpeg::AVFrame::ScaleContext> m_color_scale;	///< Reusable color-managed scaling graphs.
 		AVChannelLayout m_input_layout{};					///< Owned source channel layout.
 		AVSampleFormat m_input_format = AV_SAMPLE_FMT_NONE;	///< Current audio input format.
 		int m_input_rate = 0;								///< Current audio input rate.
@@ -302,7 +328,8 @@ class Backend::SimplePlayer::Context {
 		 * @param logger Optional logger.
 		 */
 		Context(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
-			m_display(std::move(display)), m_logger(UseLog(std::move(logger), "SimplePlayer")) {}
+			m_display(std::move(display)), m_hdr_display(dynamic_cast<HDRDisplay*>(m_display.get())),
+			m_logger(UseLog(std::move(logger), "SimplePlayer")) {}
 
 		Context(const Context&) = delete;
 
@@ -343,6 +370,19 @@ class Backend::SimplePlayer::Context {
 					std::fputs("SimplePlayer: logging failed; ", stderr);
 				}
 			}
+			std::fwrite(message.data(), 1, message.size(), stderr);
+			std::fputc('\n', stderr);
+		}
+
+		void LogWarning(std::string_view message) noexcept {
+			if (m_logger) {
+				try {
+					*m_logger << Logger::Level::Warning << message << std::endl;
+					return;
+				}
+				catch (...) {}
+			}
+			std::fputs("SimplePlayer: ", stderr);
 			std::fwrite(message.data(), 1, message.size(), stderr);
 			std::fputc('\n', stderr);
 		}
@@ -479,15 +519,42 @@ class Backend::SimplePlayer::Context {
 			const auto* codec = avcodec_find_decoder(parameters->codec_id);
 			if (!codec)
 				throw Exception("selected preview decoder is unavailable");
-			decoder.m_codec = avcodec_alloc_context3(codec);
+			auto create = [&]() -> AVCodecContext* {
+				AVCodecContext* context = avcodec_alloc_context3(codec);
+				if (!context)
+					return nullptr;
+				if (avcodec_parameters_to_context(context, parameters) < 0) {
+					avcodec_free_context(&context);
+					return nullptr;
+				}
+				context->pkt_timebase = m_format->streams[index]->time_base;
+				context->thread_count = 2;
+				context->max_pixels = MaxBytes / 4;
+				context->max_samples = MaxBytes / 8;
+				return context;
+			};
+			decoder.m_codec = create();
 			if (!decoder.m_codec)
-				throw Exception("preview decoder allocation failed");
-			Check(avcodec_parameters_to_context(decoder.m_codec, parameters), "copy decoder parameters");
-			decoder.m_codec->pkt_timebase = m_format->streams[index]->time_base;
-			decoder.m_codec->thread_count = 2;
-			decoder.m_codec->max_pixels = MaxBytes / 4;
-			decoder.m_codec->max_samples = MaxBytes / 8;
-			Check(avcodec_open2(decoder.m_codec, codec, nullptr), "open preview decoder");
+				throw Exception("preview decoder allocation or parameter copy failed");
+			const bool video = parameters->codec_type == AVMEDIA_TYPE_VIDEO;
+			const bool hardware = video && m_acceleration == DecodeAcceleration::Auto
+				&& FFmpeg::HardwareDecode::Configure(*decoder.m_codec, codec);
+			int opened = avcodec_open2(decoder.m_codec, codec, nullptr);
+			if (opened < 0 && hardware) {
+				avcodec_free_context(&decoder.m_codec);
+				decoder.m_codec = create();
+				if (!decoder.m_codec)
+					throw Exception("preview software decoder allocation failed");
+				opened = avcodec_open2(decoder.m_codec, codec, nullptr);
+			}
+			Check(opened, "open preview decoder");
+			if (video && m_acceleration == DecodeAcceleration::Auto && !decoder.m_codec->hw_device_ctx)
+				LogWarning("hardware video decoder unavailable; continuing with software decode");
+			if (hardware && decoder.m_codec->hw_device_ctx) {
+				decoder.m_download = av_frame_alloc();
+				if (!decoder.m_download)
+					throw Exception("preview hardware transfer frame allocation failed");
+			}
 			decoder.m_next = m_target;
 		}
 
@@ -612,6 +679,14 @@ class Backend::SimplePlayer::Context {
 		 */
 		bool Video(AVFrame* frame) {
 			auto& decoder = m_decoders[0];
+			if (FFmpeg::HardwareDecode::Hardware(static_cast<AVPixelFormat>(frame->format))) {
+				if (!decoder.m_download)
+					throw Exception("preview hardware frame has no transfer destination");
+				av_frame_unref(decoder.m_download);
+				if (!FFmpeg::HardwareDecode::Download(*frame, *decoder.m_download))
+					throw Exception("preview hardware frame transfer failed");
+				frame = decoder.m_download;
+			}
 			const double start = Timestamp(0, frame->best_effort_timestamp);
 			const auto rate = av_guess_frame_rate(m_format, m_format->streams[m_selected[0]], frame);
 			const double duration = frame->duration > 0
@@ -622,6 +697,195 @@ class Backend::SimplePlayer::Context {
 				return true;
 			if (m_preview && m_preview_video_ready)
 				return true;
+
+			using PreviewFrame = FFmpeg::AVFrame;
+			const int transfer = frame->color_trc;
+			if (m_color_mode == PreviewColorMode::HDR
+				&& (transfer == AVCOL_TRC_SMPTE2084 || transfer == AVCOL_TRC_ARIB_STD_B67)) {
+				if (!m_hdr_display)
+					throw Exception("HDR preview requires an HDRDisplay sink");
+				PreviewFrame source;
+				source.Reset(av_frame_clone(frame));
+				if (!source)
+					throw Exception("preview HDR frame reference failed");
+				PreviewFrame hdr_rgb;
+				hdr_rgb.Format(AV_PIX_FMT_GBRPF32LE);
+				PreviewFrame::ColorTarget hdr_target{
+					.transfer = transfer,
+					.primaries = frame->color_primaries,
+					.matrix = AVCOL_SPC_RGB,
+					.range = AVCOL_RANGE_JPEG,
+					.peak = 0.0
+				};
+				if (!m_decoders[0].m_color_scale)
+					m_decoders[0].m_color_scale.emplace();
+				if (!source.ScaleTo(*m_decoders[0].m_color_scale, hdr_rgb, frame->width, frame->height,
+						PreviewFrame::Resample::Default, PreviewFrame::Scaler::Zimg, hdr_target))
+					throw Exception("preview HDR RGB conversion failed");
+				hdr_rgb.ColorTransfer(transfer);
+				hdr_rgb.ColorPrimaries(frame->color_primaries);
+				hdr_rgb.ColorSpace(AVCOL_SPC_RGB);
+				hdr_rgb.ColorRange(AVCOL_RANGE_JPEG);
+				auto image = Safe::MakeShared<PreviewHDRVideo>();
+				image->m_width = frame->width;
+				image->m_height = frame->height;
+				image->m_epoch = m_epoch;
+				image->m_position = start;
+				image->m_duration = duration;
+				const auto color = FFmpeg::MapColor(source, {});
+				image->m_primaries = color.Primaries();
+				image->m_transfer = transfer == AVCOL_TRC_SMPTE2084
+					? Property::Transfer::SMPTE2084 : Property::Transfer::ARIB_B67;
+				const auto bytes = HDRImageBytes(frame->width, frame->height);
+				const auto row_bytes = static_cast<std::size_t>(frame->width) * 8;
+				if (!hdr_rgb.Data(0) || !hdr_rgb.Data(1) || !hdr_rgb.Data(2)
+					|| hdr_rgb.Linesize(0) < frame->width * static_cast<int>(sizeof(float))
+					|| hdr_rgb.Linesize(1) < frame->width * static_cast<int>(sizeof(float))
+					|| hdr_rgb.Linesize(2) < frame->width * static_cast<int>(sizeof(float)))
+					throw Exception("preview HDR RGB frame has an invalid stride");
+				image->m_pixels.resize(ByteSize{bytes});
+				auto* destination = static_cast<std::byte*>(image->m_pixels.data());
+				const auto encode = [](const std::uint8_t* plane, int pixel) {
+					float value = 0;
+					std::memcpy(&value, plane + static_cast<std::size_t>(pixel) * sizeof(float), sizeof(value));
+					if (!std::isfinite(value))
+						throw Exception("preview HDR conversion produced a non-finite channel");
+					return static_cast<std::uint16_t>(
+						std::lround(std::clamp(value, 0.0f, 1.0f) * 65535.0f));
+				};
+				for (int row = 0; row < frame->height; ++row) {
+					// FFmpeg stores planar GBR in G, B, R plane order.
+					const auto* green = hdr_rgb.Data(0) + static_cast<std::size_t>(row) * hdr_rgb.Linesize(0);
+					const auto* blue = hdr_rgb.Data(1) + static_cast<std::size_t>(row) * hdr_rgb.Linesize(1);
+					const auto* red = hdr_rgb.Data(2) + static_cast<std::size_t>(row) * hdr_rgb.Linesize(2);
+					auto* output = destination + static_cast<std::size_t>(row) * row_bytes;
+					for (int column = 0; column < frame->width; ++column) {
+						const auto offset = static_cast<std::size_t>(column) * 8;
+						const std::array channels{encode(red, column), encode(green, column), encode(blue, column)};
+						for (std::size_t channel = 0; channel < channels.size(); ++channel) {
+							output[offset + channel * 2] = static_cast<std::byte>(channels[channel] & 0xff);
+							output[offset + channel * 2 + 1] = static_cast<std::byte>(channels[channel] >> 8);
+						}
+						output[offset + 6] = std::byte{0xff};
+						output[offset + 7] = std::byte{0xff};
+					}
+				}
+				if (const auto* side = av_frame_get_side_data(frame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+					side && side->size >= sizeof(AVMasteringDisplayMetadata)) {
+					const auto* metadata = reinterpret_cast<const AVMasteringDisplayMetadata*>(side->data);
+					if (metadata->has_primaries) {
+						const auto read_chromaticity = [](AVRational value, double& output) {
+							if (value.den == 0)
+								return false;
+							output = av_q2d(value);
+							return std::isfinite(output) && output >= 0.0 && output <= 1.0;
+						};
+						bool valid = true;
+						for (std::size_t primary = 0; primary < image->m_display_primaries.size(); ++primary) {
+							valid = read_chromaticity(metadata->display_primaries[primary][0],
+								image->m_display_primaries[primary][0]) && valid;
+							valid = read_chromaticity(metadata->display_primaries[primary][1],
+								image->m_display_primaries[primary][1]) && valid;
+						}
+						valid = read_chromaticity(metadata->white_point[0], image->m_white_point[0]) && valid;
+						valid = read_chromaticity(metadata->white_point[1], image->m_white_point[1]) && valid;
+						image->m_has_mastering_display = valid;
+					}
+					if (metadata->has_luminance) {
+						const double minimum = metadata->min_luminance.den != 0
+							? av_q2d(metadata->min_luminance) : -1.0;
+						const double maximum = metadata->max_luminance.den != 0
+							? av_q2d(metadata->max_luminance) : -1.0;
+						if (std::isfinite(minimum) && std::isfinite(maximum)
+							&& minimum >= 0.0 && maximum > 0.0 && maximum >= minimum) {
+							image->m_min_luminance_nits = minimum;
+							image->m_max_luminance_nits = maximum;
+							image->m_has_mastering_display = true;
+						}
+					}
+				}
+				if (const auto* side = av_frame_get_side_data(frame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+					side && side->size >= sizeof(AVContentLightMetadata)) {
+					const auto* metadata = reinterpret_cast<const AVContentLightMetadata*>(side->data);
+					image->m_max_content_light_nits = metadata->MaxCLL;
+					image->m_max_frame_average_light_nits = metadata->MaxFALL;
+					image->m_has_content_light = true;
+				}
+				Event event;
+				event.m_start = std::max(start, m_target);
+				event.m_end = start + duration;
+				event.m_bytes = bytes;
+				event.m_hdr_video = std::move(image);
+				const bool accepted = Enqueue(std::move(event));
+				if (accepted && m_preview)
+					m_preview_video_ready = true;
+				return accepted;
+			}
+			PreviewFrame display_rgb;
+			std::array<const std::uint8_t*, 4> source_data{};
+			std::array<int, 4> source_linesize{};
+			AVPixelFormat source_format = static_cast<AVPixelFormat>(frame->format);
+			for (int plane = 0; plane < 4; ++plane) {
+				source_data[plane] = frame->data[plane];
+				source_linesize[plane] = frame->linesize[plane];
+			}
+			if (transfer == AVCOL_TRC_SMPTE2084 || transfer == AVCOL_TRC_ARIB_STD_B67) {
+				PreviewFrame source;
+				source.Reset(av_frame_clone(frame));
+				if (!source)
+					throw Exception("preview HDR frame reference failed");
+				PreviewFrame linear;
+				linear.Format(AV_PIX_FMT_GBRPF32LE);
+				PreviewFrame::ColorTarget linear_target{
+					.transfer = AVCOL_TRC_LINEAR,
+					.primaries = AVCOL_PRI_BT709,
+					.matrix = AVCOL_SPC_RGB,
+					.range = AVCOL_RANGE_JPEG,
+					.peak = 100.0
+				};
+				if (!m_decoders[0].m_color_scale)
+					m_decoders[0].m_color_scale.emplace();
+				if (!source.ScaleTo(*m_decoders[0].m_color_scale, linear, frame->width, frame->height,
+						PreviewFrame::Resample::Default, PreviewFrame::Scaler::Zimg, linear_target))
+					throw Exception("preview HDR linear-light conversion failed");
+				linear.ColorTransfer(AVCOL_TRC_LINEAR);
+				linear.ColorPrimaries(AVCOL_PRI_BT709);
+				linear.ColorSpace(AVCOL_SPC_RGB);
+				linear.ColorRange(AVCOL_RANGE_JPEG);
+				constexpr std::string_view chain = "tonemap=tonemap=hable:desat=0";
+				if (!m_decoders[0].m_tonemap) {
+					auto graph = FFmpeg::AVFilterGraph::Open(linear, chain);
+					if (!graph)
+						throw Exception("preview HDR tone-mapping filter is unavailable");
+					m_decoders[0].m_tonemap.emplace(std::move(graph));
+				}
+				else if (!m_decoders[0].m_tonemap->Ensure(linear, chain))
+					throw Exception("preview HDR tone-mapping filter reset failed");
+				PreviewFrame curved;
+				if (!m_decoders[0].m_tonemap->Filter(linear, curved))
+					throw Exception("preview HDR tone-mapping failed");
+				curved.ColorTransfer(AVCOL_TRC_LINEAR);
+				curved.ColorPrimaries(AVCOL_PRI_BT709);
+				curved.ColorSpace(AVCOL_SPC_RGB);
+				curved.ColorRange(AVCOL_RANGE_JPEG);
+				display_rgb.Format(AV_PIX_FMT_GBRP);
+				PreviewFrame::ColorTarget sdr_target{
+					.transfer = AVCOL_TRC_BT709,
+					.primaries = AVCOL_PRI_BT709,
+					.matrix = AVCOL_SPC_RGB,
+					.range = AVCOL_RANGE_JPEG,
+					.peak = 0.0
+				};
+				if (!curved.ScaleTo(*m_decoders[0].m_color_scale, display_rgb, frame->width, frame->height,
+						PreviewFrame::Resample::Default, PreviewFrame::Scaler::Zimg, sdr_target))
+					throw Exception("preview HDR BT.709 conversion failed");
+				source_format = static_cast<AVPixelFormat>(display_rgb.Format());
+				for (int plane = 0; plane < 4; ++plane) {
+					source_data[plane] = display_rgb.Data(plane);
+					source_linesize[plane] = display_rgb.Linesize(plane);
+				}
+			}
+
 			auto image = Safe::MakeShared<PreviewVideo>();
 			image->m_width = frame->width;
 			image->m_height = frame->height;
@@ -630,14 +894,14 @@ class Backend::SimplePlayer::Context {
 			image->m_duration = duration;
 			image->m_pixels.resize(ByteSize{ImageBytes(frame->width, frame->height)});
 			decoder.m_scale = sws_getCachedContext(decoder.m_scale, frame->width, frame->height,
-				static_cast<AVPixelFormat>(frame->format), frame->width, frame->height,
+				source_format, frame->width, frame->height,
 				AV_PIX_FMT_RGBA, SWS_BILINEAR, nullptr, nullptr, nullptr);
 			if (!decoder.m_scale)
 				throw Exception("preview pixel conversion unavailable");
 			std::uint8_t* output[] = {reinterpret_cast<std::uint8_t*>(image->m_pixels.data()), nullptr, nullptr, nullptr};
 			int strides[] = {frame->width * 4, 0, 0, 0};
-			Check(sws_scale(decoder.m_scale, frame->data, frame->linesize, 0, frame->height, output, strides),
-				"convert preview video");
+			Check(sws_scale(decoder.m_scale, source_data.data(), source_linesize.data(),
+				0, frame->height, output, strides), "convert preview video");
 			Event event;
 			event.m_start = std::max(start, m_target);
 			event.m_end = start + duration;
@@ -1104,7 +1368,8 @@ class Backend::SimplePlayer::Context {
 						m_position = std::max(m_position, clock);
 					auto found = std::find_if(m_queue.begin(), m_queue.end(), [&](const Event& event) {
 						if (preview)
-							return static_cast<bool>(event.m_video) || (event.m_subtitle && event.m_start <= m_target);
+							return static_cast<bool>(event.m_video) || static_cast<bool>(event.m_hdr_video)
+								|| (event.m_subtitle && event.m_start <= m_target);
 						return (!event.m_audio || !m_audio_switching)
 							&& event.m_start <= clock + (event.m_audio ? AudioAhead : 0);
 					});
@@ -1114,12 +1379,14 @@ class Backend::SimplePlayer::Context {
 						m_bytes -= event.m_bytes;
 						if (event.m_audio)
 							m_audio_end = std::max(m_audio_end, event.m_end);
-						if (preview && event.m_video) {
+						if (preview && (event.m_video || event.m_hdr_video)) {
 							m_position = m_target;
 						}
 						lock.unlock();
 						m_ready.notify_all();
-						if (event.m_video)
+						if (event.m_hdr_video)
+							m_hdr_display->VideoHDR(std::move(event.m_hdr_video));
+						else if (event.m_video)
 							m_display->Video(std::move(event.m_video));
 						else if (event.m_audio)
 							m_display->Audio(std::move(event.m_audio));
@@ -1344,6 +1611,7 @@ class Backend::SimplePlayer::Context {
 		}
 
 		Safe::Shared<Display> m_display;							///< Application presentation owner.
+		HDRDisplay* m_hdr_display = nullptr;						///< Borrowed optional HDR extension.
 		Safe::Shared<Logger::Log> m_logger;							///< Scoped diagnostic owner.
 		Safe::Unique<Buffer::IO::BufferedLocationReader> m_reader;	///< Exclusive dynamic input owner.
 		std::optional<FileAvio> m_avio;								///< Borrowed-reader custom AVIO owner.
@@ -1390,6 +1658,8 @@ class Backend::SimplePlayer::Context {
 		bool m_seek_audio = false;									///< Inspect first post-seek audio framing.
 		int m_seek_prefix_size = 0;									///< Pending bounded AC-3 prefix length.
 		std::int64_t m_seek_prefix_pts = 0;							///< Byte-clock prefix timestamp.
+		DecodeAcceleration m_acceleration = DecodeAcceleration::Auto;	///< Video decoder acceleration policy.
+		PreviewColorMode m_color_mode = PreviewColorMode::SDR;		///< Preview signal output policy.
 };
 
 Backend::SimplePlayer::SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
@@ -1425,6 +1695,30 @@ bool Backend::SimplePlayer::Open(Safe::Unique<Buffer::IO::BufferedLocationReader
 		return true;
 	}
 	catch (...) { return m_ctx->Failure(); }
+}
+
+void Backend::SimplePlayer::Acceleration(DecodeAcceleration acceleration) noexcept {
+	std::lock_guard control(m_ctx->m_control);
+	m_ctx->m_acceleration = acceleration;
+}
+
+bool Backend::SimplePlayer::OutputColor(PreviewColorMode mode) {
+	std::lock_guard control(m_ctx->m_control);
+	switch (mode) {
+		case PreviewColorMode::SDR:
+			break;
+		case PreviewColorMode::HDR:
+			if (!m_ctx->m_hdr_display) {
+				m_ctx->LogFailure("HDR preview requested without an HDRDisplay sink");
+				return false;
+			}
+			break;
+		default:
+			m_ctx->LogFailure("preview color mode is invalid");
+			return false;
+	}
+	m_ctx->m_color_mode = mode;
+	return true;
 }
 
 bool Backend::SimplePlayer::Play() {
@@ -1595,6 +1889,14 @@ bool Multimedia::SimplePlayer::Open(std::string_view file) {
 
 bool Multimedia::SimplePlayer::Open(Safe::Unique<Buffer::IO::BufferedLocationReader> reader) {
 	return m_backend->Open(std::move(reader));
+}
+
+void Multimedia::SimplePlayer::Acceleration(DecodeAcceleration acceleration) noexcept {
+	m_backend->Acceleration(acceleration);
+}
+
+bool Multimedia::SimplePlayer::OutputColor(PreviewColorMode mode) {
+	return m_backend->OutputColor(mode);
 }
 
 bool Multimedia::SimplePlayer::Play() {

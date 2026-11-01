@@ -53,6 +53,7 @@
 #include <StormByte/buffer/io/buffered_location_reader.hxx>
 #include <StormByte/logger/log.hxx>
 #include <StormByte/multimedia/display.hxx>
+#include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/type.hxx>
 
 #include <string_view>
@@ -214,6 +215,23 @@ namespace StormByte {
 				 * @return Whether input and decoders are usable.
 				 */
 				bool Open(Safe::Unique<Buffer::IO::BufferedLocationReader> reader);
+
+				/**
+				 * @brief Selects hardware-assisted video decoding or forces software decoding.
+				 * @param acceleration Auto tries the platform's FFmpeg hardware devices and
+				 *        falls back to software if initialization or codec opening fails.
+				 *        Changes apply to the next Open().
+				 */
+				void Acceleration(DecodeAcceleration acceleration) noexcept;
+
+				/**
+				 * @brief Selects SDR tone-mapped or explicit HDR preview output.
+				 * @param mode SDR preserves the RGBA8 Display path; HDR sends PQ/HLG
+				 *        frames to an optional HDRDisplay implementation.
+				 * @return False without changing the setting if HDR is requested
+				 *         without an HDRDisplay sink.
+				 */
+				bool OutputColor(PreviewColorMode mode);
 
 				/**
 				 * @brief Start/resume asynchronous real-time presentation.

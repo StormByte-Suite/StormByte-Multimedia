@@ -57,6 +57,7 @@
 #include <StormByte/multimedia/ffmpeg/AVPacket.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/multimedia/ffmpeg/convert.hxx>
+#include <StormByte/multimedia/ffmpeg/hardware_decode.hxx>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -72,45 +73,79 @@ FFmpeg::AVDecoder::~AVDecoder() noexcept {
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCodecParameters& params,
-	int stream_index, int thread_count) noexcept {
+	int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
 	if (!codec || !params.Get())
 		return Unexpected<DecoderError>("Invalid codec or parameters");
 
-	AVCodecContext* ctx = avcodec_alloc_context3(codec);
+	auto create = [&]() noexcept -> AVCodecContext* {
+		AVCodecContext* context = avcodec_alloc_context3(codec);
+		if (!context || avcodec_parameters_to_context(context, params.Get()) < 0) {
+			avcodec_free_context(&context);
+			return nullptr;
+		}
+		context->thread_count = thread_count;
+		context->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
+		if (Backend::FFmpeg::AVPool::Attach(*context) < 0) {
+			Backend::FFmpeg::AVPool::Release(context);
+			return nullptr;
+		}
+		return context;
+	};
+
+	const bool video = params.Get()->codec_type == AVMEDIA_TYPE_VIDEO;
+	bool tried_hardware = false;
+	AVCodecContext* ctx = create();
 	if (!ctx)
-		return Unexpected<DecoderError>("Out of memory allocating codec context");
+		return Unexpected<DecoderError>("Failed to allocate decoder context or shared video pool owner");
 
-	if (avcodec_parameters_to_context(ctx, params.Get()) < 0) {
-		avcodec_free_context(&ctx);
-		return Unexpected<DecoderError>("Failed to copy codec parameters");
+	if (video && acceleration == DecodeAcceleration::Auto)
+		tried_hardware = HardwareDecode::Configure(*ctx, codec);
+
+	int open_result = avcodec_open2(ctx, codec, nullptr);
+	if (open_result < 0 && tried_hardware) {
+		Backend::FFmpeg::AVPool::Release(ctx);
+		ctx = create();
+		if (!ctx)
+			return Unexpected<DecoderError>("Failed to allocate software decoder context");
+		open_result = avcodec_open2(ctx, codec, nullptr);
 	}
-
-	ctx->thread_count = thread_count;
-	ctx->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
-
-	if (Backend::FFmpeg::AVPool::Attach(*ctx) < 0) {
-		avcodec_free_context(&ctx);
-		return Unexpected<DecoderError>("Failed to allocate shared video pool owner");
-	}
-
-	if (avcodec_open2(ctx, codec, nullptr) < 0) {
+	if (open_result < 0) {
 		Backend::FFmpeg::AVPool::Release(ctx);
 		return Unexpected<DecoderError>("Failed to open decoder");
 	}
 
 	AVDecoder dec(ctx);
 	dec.m_stream_index = stream_index;
+	dec.m_hardware_fallback = video && acceleration == DecodeAcceleration::Auto && !ctx->hw_device_ctx;
 	return dec;
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
-	const AVFormatContext&, int stream_index, int thread_count) noexcept {
-	return OpenRaw(codec, params, stream_index, thread_count);
+	const AVFormatContext&, int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
+	return OpenRaw(codec, params, stream_index, thread_count, acceleration);
+}
+
+FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
+	const AVFormatContext& fmt, int stream_index, int thread_count) noexcept {
+	return Open(codec, params, fmt, stream_index, thread_count, DecodeAcceleration::Software);
+}
+
+FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
+	int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
+	return OpenRaw(codec, params, stream_index, thread_count, acceleration);
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
 	int stream_index, int thread_count) noexcept {
-	return OpenRaw(codec, params, stream_index, thread_count);
+	return Open(codec, params, stream_index, thread_count, DecodeAcceleration::Software);
+}
+
+bool FFmpeg::AVDecoder::HardwareAccelerated() const noexcept {
+	return m_ptr && m_ptr->hw_device_ctx;
+}
+
+bool FFmpeg::AVDecoder::HardwareFallback() const noexcept {
+	return m_hardware_fallback;
 }
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::SendPacket(AVPacket& pkt) noexcept {
@@ -144,6 +179,8 @@ FFmpeg::OperationResult FFmpeg::AVDecoder::ReceiveFrame(AVFrame& frame) noexcept
 	int ret = avcodec_receive_frame(m_ptr, frame.Get());
 	switch(ret) {
 		case 0:
+			if (frame.Hardware() && !frame.Download())
+				return OperationResult::Error;
 			return OperationResult::Success;
 		case AVERROR(EAGAIN):
 			return OperationResult::TryAgain;

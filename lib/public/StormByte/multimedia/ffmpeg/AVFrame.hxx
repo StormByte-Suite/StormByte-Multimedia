@@ -308,6 +308,12 @@ namespace StormByte {
 					bool Hardware() const noexcept;
 
 					/**
+					 * @brief Downloads a hardware frame to a software frame, preserving properties.
+					 * @return true when the frame is already software-backed or transfer succeeded.
+					 */
+					bool Download() noexcept;
+
+					/**
 					 * @brief `AV_PIX_FMT_NONE` as int.
 					 * @return Format token.
 					 */
