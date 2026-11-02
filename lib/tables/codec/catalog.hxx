@@ -80,7 +80,7 @@ namespace StormByte::Multimedia::Tables::Codec {
 			 * @brief Process-lifetime catalog.
 			 * @return Singleton.
 			 */
-			static const Catalog& Instance() noexcept;
+			static const Catalog& Instance();
 
 			/**
 			 * @brief Identity rows of one media kind.
@@ -94,32 +94,32 @@ namespace StormByte::Multimedia::Tables::Codec {
 			 * @param name Catalog key (`H.265` or `hevc`).
 			 * @return Row, or nullptr.
 			 */
-			const CodecDef* Find(std::string_view name) const noexcept;
+			const CodecDef* Find(std::string_view name) const;
 
 			/**
 			 * @brief Media kind of a name or FFmpeg id.
 			 * @param name Catalog key.
 			 * @return Type, or Type::Unknown.
 			 */
-			Type Kind(std::string_view name) const noexcept;
+			Type Kind(std::string_view name) const;
 
 		private:
 			/**
 			 * @brief Builds the name maps.
 			 */
-			Catalog() noexcept;
+			Catalog();
 
 			/**
 			 * @brief Indexes every identity table.
 			 */
-			void Initialize() noexcept;
+			void Initialize();
 
 			/**
 			 * @brief Indexes one table.
 			 * @param type Media kind.
 			 * @param table Rows.
 			 */
-			void Index(Type type, std::span<const CodecDef> table) noexcept;
+			void Index(Type type, std::span<const CodecDef> table);
 
 			StormByte::Safe::UnorderedMap<StormByte::Safe::String, std::uint64_t> m_byName;	///< Name / FFmpeg id → packed type and row index
 			StormByte::Safe::UnorderedMap<StormByte::Safe::String, Type> m_kind;			///< StormByte name → kind

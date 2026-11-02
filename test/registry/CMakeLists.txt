@@ -1,6 +1,12 @@
 add_executable(MultimediaRegistryTests registry_test.cxx)
 target_link_libraries(MultimediaRegistryTests PRIVATE multimedia_test_support)
 
+add_executable(MultimediaRegistryAllocationTests allocation_failure_test.cxx)
+target_link_libraries(MultimediaRegistryAllocationTests PRIVATE multimedia_test_support)
+add_test(NAME registry.allocation_failure COMMAND MultimediaRegistryAllocationTests)
+set_tests_properties(registry.allocation_failure PROPERTIES
+	TIMEOUT 50 LABELS "multimedia;registry" SKIP_RETURN_CODE 77)
+
 function(add_registry_test test_name)
 	add_test(NAME "registry.${test_name}" COMMAND MultimediaRegistryTests "${test_name}")
 	set_tests_properties("registry.${test_name}" PROPERTIES TIMEOUT 50 LABELS "multimedia;registry")

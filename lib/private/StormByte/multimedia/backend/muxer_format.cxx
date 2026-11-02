@@ -66,7 +66,7 @@ using namespace StormByte::Multimedia;
 namespace {
 	// Any token of FFmpeg's comma-separated muxer name that maps to @p container.
 	bool FormatServes(const Registry& registry, const AVOutputFormat& format,
-		const Container& container) noexcept {
+		const Container& container) {
 		std::string_view names{format.name ? format.name : ""};
 		while (!names.empty()) {
 			const auto separator = names.find(',');
@@ -83,7 +83,7 @@ namespace {
 		return false;
 	}
 
-	const AVOutputFormat* IdentityFormat(const Registry& registry, const Container& container) noexcept {
+	const AVOutputFormat* IdentityFormat(const Registry& registry, const Container& container) {
 		// extensions[0] / the first FFmpeg id is the muxer we mean to open.
 		if (!container.Extension().empty()) {
 			const std::string intended{container.Extension()};
@@ -107,7 +107,7 @@ namespace {
 	}
 }
 
-Backend::MuxerChoice Backend::ResolveMuxer(const Registry& registry, const Container& container) noexcept {
+Backend::MuxerChoice Backend::ResolveMuxer(const Registry& registry, const Container& container) {
 	const auto* format = IdentityFormat(registry, container);
 	if (!format)
 		return {};
@@ -126,7 +126,7 @@ Backend::MuxerChoice Backend::ResolveMuxer(const Registry& registry, const Conta
 	return {reopened, name};
 }
 
-bool Backend::MuxerAccepts(const AVOutputFormat& muxer, const Codec& codec) noexcept {
+bool Backend::MuxerAccepts(const AVOutputFormat& muxer, const Codec& codec) {
 	if (codec.Type() == StormByte::Multimedia::Type::Attachment)
 		return true;
 	const auto* def = Tables::Codec::Catalog::Instance().Find(codec.Name());

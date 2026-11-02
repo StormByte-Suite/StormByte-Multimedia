@@ -335,16 +335,16 @@ namespace StormByte::Multimedia::Tables::Container {
 		};
 	}
 
-	const Catalog& Catalog::Instance() noexcept {
+	const Catalog& Catalog::Instance() {
 		static Catalog instance;
 		return instance;
 	}
 
-	Catalog::Catalog() noexcept {
+	Catalog::Catalog() {
 		Initialize();
 	}
 
-	void Catalog::Initialize() noexcept {
+	void Catalog::Initialize() {
 		const auto identity = Identity();
 		m_byName.reserve(identity.size());
 		for (std::size_t index = 0; index < identity.size(); ++index)
@@ -359,20 +359,20 @@ namespace StormByte::Multimedia::Tables::Container {
 		return Identity();
 	}
 
-	const ContainerDef* Catalog::Find(std::string_view name) const noexcept {
+	const ContainerDef* Catalog::Find(std::string_view name) const {
 		const auto it = m_byName.find(StormByte::Safe::String{name});
 		const auto rows = Identity();
 		return it == m_byName.end() || it->second >= rows.size() ? nullptr : &rows[it->second];
 	}
 
-	std::span<const CompatDef> Catalog::Compat(std::string_view name) const noexcept {
+	std::span<const CompatDef> Catalog::Compat(std::string_view name) const {
 		const auto it = m_compat.find(StormByte::Safe::String{name});
 		return it == m_compat.end() || it->second >= std::size(CompatDispatch)
 			? std::span<const CompatDef>{}
 			: CompatDispatch[it->second].rows();
 	}
 
-	std::span<const CompatDef> Catalog::Compat(const ContainerDef& def) const noexcept {
+	std::span<const CompatDef> Catalog::Compat(const ContainerDef& def) const {
 		return Compat(std::string_view{def.name});
 	}
 }

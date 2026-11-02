@@ -80,7 +80,7 @@ namespace StormByte::Multimedia::Tables::Container {
 			 * @brief Process-lifetime catalog.
 			 * @return Singleton.
 			 */
-			static const Catalog& Instance() noexcept;
+			static const Catalog& Instance();
 
 			/**
 			 * @brief All identity rows.
@@ -93,26 +93,26 @@ namespace StormByte::Multimedia::Tables::Container {
 			 * @param name Catalog key.
 			 * @return Row, or nullptr.
 			 */
-			const ContainerDef* Find(std::string_view name) const noexcept;
+			const ContainerDef* Find(std::string_view name) const;
 
 			/**
 			 * @brief Compatibility rows for a StormByte name.
 			 * @param name Catalog key.
 			 * @return Compat span; empty if unknown.
 			 */
-			std::span<const CompatDef> Compat(std::string_view name) const noexcept;
+			std::span<const CompatDef> Compat(std::string_view name) const;
 
 			/**
 			 * @brief Compatibility rows for an identity row.
 			 * @param def Catalog row.
 			 * @return Compat span; empty if unknown.
 			 */
-			std::span<const CompatDef> Compat(const ContainerDef& def) const noexcept;
+			std::span<const CompatDef> Compat(const ContainerDef& def) const;
 
 		private:
-			Catalog() noexcept;
+			Catalog();
 
-			void Initialize() noexcept;
+			void Initialize();
 
 			StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_byName;	///< Name → identity row index.
 			StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_compat;	///< Name → compatibility dispatch index.

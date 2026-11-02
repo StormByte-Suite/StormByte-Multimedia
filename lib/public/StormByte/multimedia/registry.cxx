@@ -90,18 +90,18 @@ namespace {
 	}
 }
 
-Registry::Registry() noexcept {
+Registry::Registry() {
 	Initialize();
 }
 
 Registry::~Registry() noexcept = default;
 
-Registry& Registry::Instance() noexcept {
+Registry& Registry::Instance() {
 	static Registry instance;
 	return instance;
 }
 
-CodecRefs Registry::CodecList(Type type) const noexcept {
+CodecRefs Registry::CodecList(Type type) const {
 	CodecRefs out;
 	const auto start = m_by_type_start.find(type);
 	const auto count = m_by_type_count.find(type);
@@ -116,7 +116,7 @@ CodecRefs Registry::CodecList(Type type) const noexcept {
 	return out;
 }
 
-ContainerRefs Registry::ContainerList() const noexcept {
+ContainerRefs Registry::ContainerList() const {
 	ContainerRefs out;
 	out.reserve(m_containers.size());
 	for (const auto& container : m_containers)
@@ -124,7 +124,7 @@ ContainerRefs Registry::ContainerList() const noexcept {
 	return out;
 }
 
-ExpectedCodec Registry::FindCodec(std::string_view name) const noexcept {
+ExpectedCodec Registry::FindCodec(std::string_view name) const {
 	const auto it = m_by_name.find(StormByte::Safe::String(name));
 	if (it == m_by_name.end())
 		return Unexpected<CodecNotFoundException>(std::string(name));
@@ -132,7 +132,7 @@ ExpectedCodec Registry::FindCodec(std::string_view name) const noexcept {
 	return CodecRef(*m_codecs[static_cast<std::size_t>(it->second)]);
 }
 
-ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept {
+ExpectedContainer Registry::FindContainer(std::string_view name) const {
 	const auto it = m_container_by_name.find(StormByte::Safe::String(name));
 	if (it == m_container_by_name.end())
 		return Unexpected<ContainerNotFoundException>(std::string(name));
@@ -140,7 +140,7 @@ ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept 
 	return ContainerRef(*m_containers[static_cast<std::size_t>(it->second)]);
 }
 
-void Registry::Add(Type type, const Tables::Codec::CodecDef& def) noexcept {
+void Registry::Add(Type type, const Tables::Codec::CodecDef& def) {
 	const std::size_t i = m_codecs.size();
 	Codec codec(type, def.name, def.description, ProbeAccess(type, def));
 	auto stored = StormByte::Safe::Shared<Codec>::MakePointer<Codec>(std::move(codec));
@@ -152,14 +152,14 @@ void Registry::Add(Type type, const Tables::Codec::CodecDef& def) noexcept {
 		m_by_name.emplace(StormByte::Safe::String(def.FfmpegId(n)), StormByte::Size{i});
 }
 
-void Registry::LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> table) noexcept {
+void Registry::LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> table) {
 	m_by_type_start[type] = StormByte::Size{m_codecs.size()};
 	m_by_type_count[type] = StormByte::Size{table.size()};
 	for (const Tables::Codec::CodecDef& def : table)
 		Add(type, def);
 }
 
-void Registry::LoadCodecs() noexcept {
+void Registry::LoadCodecs() {
 	const auto& codecs 		= Tables::Codec::Catalog::Instance();
 	const auto video		= codecs.All(Type::Video);
 	const auto audio		= codecs.All(Type::Audio);
@@ -192,7 +192,7 @@ Access Registry::ProbeContainer(const Tables::Container::ContainerDef& def) cons
 	return access;
 }
 
-void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
+void Registry::Add(const Tables::Container::ContainerDef& def) {
 	const char* ext = def.PrimaryExtension();
 	const std::size_t i = m_containers.size();
 	Container container(
@@ -217,7 +217,7 @@ void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
 		m_container_by_name.emplace(StormByte::Safe::String(def.FfmpegId(n)), StormByte::Size{i});
 }
 
-void Registry::Resolve(const Tables::Container::ContainerDef& def, Container& container) noexcept {
+void Registry::Resolve(const Tables::Container::ContainerDef& def, Container& container) {
 	// Every container is indexed now, so muxer names resolve like they do when muxing.
 	const auto muxer = Backend::ResolveMuxer(*this, container);
 	if (muxer.format)
@@ -247,7 +247,7 @@ void Registry::Resolve(const Tables::Container::ContainerDef& def, Container& co
 	}
 }
 
-void Registry::LoadContainers() noexcept {
+void Registry::LoadContainers() {
 	const auto& catalog = Tables::Container::Catalog::Instance();
 	const auto all = catalog.All();
 	m_containers.reserve(all.size());
@@ -258,11 +258,11 @@ void Registry::LoadContainers() noexcept {
 		Resolve(all[i], *m_containers[i]);
 }
 
-void Registry::Load() noexcept {
+void Registry::Load() {
 	LoadCodecs();
 	LoadContainers();
 }
 
-void Registry::Initialize() noexcept {
+void Registry::Initialize() {
 	Load();
 }

@@ -231,7 +231,7 @@ namespace StormByte {
 				 * @param description Description (table literal).
 				 * @param access Capability mask.
 				 */
-				Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept;
+				Codec(enum Type type, std::string_view name, std::string_view description, Access access);
 		};
 	}
 }

@@ -106,6 +106,8 @@ namespace StormByte {
 		 * @brief Process-wide catalog of codecs and containers.
 		 *
 		 * First Instance() loads the private tables and probes FFmpeg.
+		 * Initialization, lookup and list snapshots may allocate and propagate
+		 * allocation failures. A failed initialization can be retried.
 		 * @note Conditional DLL safety requires compatible compiler, standard-library
 		 * ABI and provider layout. The singleton and its borrowed identities must not
 		 * be destroyed by callers; the multimedia provider must remain loaded during use.
@@ -147,7 +149,7 @@ namespace StormByte {
 				 * @brief Process-wide instance.
 				 * @return The singleton.
 				 */
-				static Registry& Instance() noexcept;
+				static Registry& Instance();
 
 				/**
 				 * @brief Codecs of one Type.
@@ -155,14 +157,14 @@ namespace StormByte {
 				 * @return Safe-owned list of nonempty handles into registry storage.
 				 * @note Handles do not own codecs and expire at registry teardown or unload.
 				 */
-				CodecRefs CodecList(Type type) const noexcept;
+				CodecRefs CodecList(Type type) const;
 
 				/**
 				 * @brief All loaded containers.
 				 * @return Safe-owned list of nonempty handles into registry storage.
 				 * @note Handles do not own containers and expire at registry teardown or unload.
 				 */
-				ContainerRefs ContainerList() const noexcept;
+				ContainerRefs ContainerList() const;
 
 				/**
 				 * @brief Looks up by StormByte name or FFmpeg codec id.
@@ -170,7 +172,7 @@ namespace StormByte {
 				 * @return Nonempty borrowed CodecRef or CodecNotFoundException.
 				 * @note The codec remains registry-owned and expires at registry teardown or unload.
 				 */
-				ExpectedCodec FindCodec(std::string_view name) const noexcept;
+				ExpectedCodec FindCodec(std::string_view name) const;
 
 				/**
 				 * @brief Looks up by StormByte name or FFmpeg format id.
@@ -178,53 +180,53 @@ namespace StormByte {
 				 * @return Nonempty borrowed ContainerRef or ContainerNotFoundException.
 				 * @note The container remains registry-owned and expires at registry teardown or unload.
 				 */
-				ExpectedContainer FindContainer(std::string_view name) const noexcept;
+				ExpectedContainer FindContainer(std::string_view name) const;
 
 			private:
 				/**
 				 * @brief Loads tables and probes FFmpeg.
 				 */
-				Registry() noexcept;
+				Registry();
 
 				/**
 				 * @brief Reserves storage and loads every table.
 				 */
-				void Initialize() noexcept;
+				void Initialize();
 
 				/**
 				 * @brief Loads codecs and containers.
 				 */
-				void Load() noexcept;
+				void Load();
 
 				/**
 				 * @brief Loads every codec identity table.
 				 */
-				void LoadCodecs() noexcept;
+				void LoadCodecs();
 
 				/**
 				 * @brief Inserts every row of @p table as @p type.
 				 * @param type Media kind of the table.
 				 * @param table Rows to load.
 				 */
-				void LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> table) noexcept;
+				void LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> table);
 
 				/**
 				 * @brief Inserts one codec and its FFmpeg ids.
 				 * @param type Media kind.
 				 * @param def Table row.
 				 */
-				void Add(Type type, const Tables::Codec::CodecDef& def) noexcept;
+				void Add(Type type, const Tables::Codec::CodecDef& def);
 
 				/**
 				 * @brief Loads every container identity row and its compatibility set.
 				 */
-				void LoadContainers() noexcept;
+				void LoadContainers();
 
 				/**
 				 * @brief Inserts one container, its FFmpeg ids and allowed codecs.
 				 * @param def Identity row.
 				 */
-				void Add(const Tables::Container::ContainerDef& def) noexcept;
+				void Add(const Tables::Container::ContainerDef& def);
 
 				/**
 				 * @brief Probes the demuxer and attachment support of @p def.
@@ -239,7 +241,7 @@ namespace StormByte {
 				 * @param container Registered container.
 				 * @note Write and the compatibility set follow the muxer the pipeline opens.
 				 */
-				void Resolve(const Tables::Container::ContainerDef& def, Container& container) noexcept;
+				void Resolve(const Tables::Container::ContainerDef& def, Container& container);
 
 				StormByte::Safe::Vector<StormByte::Safe::Shared<Codec>> m_codecs;					///< Stable, Base-owned codec instances.
 				StormByte::Safe::UnorderedMap<StormByte::Safe::String, StormByte::Size> m_by_name;	///< Owned codec key to index.

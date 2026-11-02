@@ -53,7 +53,7 @@
 
 using namespace StormByte::Multimedia;
 
-Container::Container(std::string_view name, std::string_view description, std::string_view extension, Access access) noexcept:
+Container::Container(std::string_view name, std::string_view description, std::string_view extension, Access access):
 	m_name(name), m_description(description), m_extension(extension), m_access(access) {}
 
 Container::Container(Container&& other) noexcept = default;

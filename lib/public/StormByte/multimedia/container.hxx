@@ -179,7 +179,7 @@ namespace StormByte {
 				 * @param extension Primary extension (table literal).
 				 * @param access Capability mask.
 				 */
-				Container(std::string_view name, std::string_view description, std::string_view extension, Access access) noexcept;
+				Container(std::string_view name, std::string_view description, std::string_view extension, Access access);
 		};
 	}
 }

@@ -89,7 +89,7 @@ namespace StormByte {
 			 * single-file muxer serving @p container.
 			 * @note Ignores the container Write flag, which the registry derives from this.
 			 */
-			MuxerChoice ResolveMuxer(const Registry& registry, const Container& container) noexcept;
+			MuxerChoice ResolveMuxer(const Registry& registry, const Container& container);
 
 			/**
 			 * @brief Whether @p muxer can store @p codec.
@@ -99,7 +99,7 @@ namespace StormByte {
 			 * unknown answers and attachments return true.
 			 * @note Uses the same compliance level as the pipeline muxer.
 			 */
-			bool MuxerAccepts(const ::AVOutputFormat& muxer, const Codec& codec) noexcept;
+			bool MuxerAccepts(const ::AVOutputFormat& muxer, const Codec& codec);
 		}
 	}
 }

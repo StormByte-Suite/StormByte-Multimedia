@@ -107,7 +107,7 @@ namespace {
 
 }
 
-Codec::Codec(enum Type type, std::string_view name, std::string_view description, Access access) noexcept
+Codec::Codec(enum Type type, std::string_view name, std::string_view description, Access access)
 : m_type(type), m_name(name), m_description(description), m_access(access) {}
 
 Codec::Codec(Codec&& other) noexcept = default;
