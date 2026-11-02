@@ -1,0 +1,30 @@
+From 3c55d99ba15462db1f74bf6a4a916f6da3fea4c9 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:40:28 +0100
+Subject: [PATCH] AACenc: normalize signed TNS spectrum without negative shifts
+
+TNS normalization measures the available headroom and then left-shifts
+signed spectral samples, which are commonly negative. Shift their
+unsigned bit patterns and restore FIXP_DBL without changing scale
+selection or rounding. Reproduced in FDKaacEnc_ScaleUpSpectrum by stereo
+AAC encoding with UBSan.
+---
+ libAACenc/src/aacenc_tns.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libAACenc/src/aacenc_tns.cpp b/libAACenc/src/aacenc_tns.cpp
+index 4462600..2a232aa 100644
+--- a/libAACenc/src/aacenc_tns.cpp
++++ b/libAACenc/src/aacenc_tns.cpp
+@@ -531,7 +531,7 @@ static inline INT FDKaacEnc_ScaleUpSpectrum(FIXP_DBL *dest, const FIXP_DBL *src,
+ 
+   /* Scale spectrum according to highest value */
+   for (i = startLine; i < stopLine; i++) {
+-    dest[i] = src[i] << scale;
++    dest[i] = (FIXP_DBL)((ULONG)src[i] << scale);
+   }
+ 
+   return scale;
+-- 
+2.56.0
+

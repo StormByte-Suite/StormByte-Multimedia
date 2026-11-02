@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC normalizes signed TNS spectral samples through unsigned bit patterns while retaining its measured headroom and rounding.
 - Bundled Kvazaar reads vertical interpolation row fragments with unaligned-safe SIMD loads and copies four-byte output fragments without scalar alignment assumptions.
 - Bundled FDK-AAC normalizes signed psychoacoustic spectral samples and doubles bounded scale differences without left-shifting negative values.
 - Bundled FDK-AAC clamps negative saturated-left-shift results correctly when the shift reaches or exceeds the destination width, verified against widened reference calculations for 8-, 16-, 24- and 32-bit outputs.
