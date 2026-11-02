@@ -1,0 +1,30 @@
+From 3888e0046427e76880e0cccce049a0369d8a4ba7 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:26:43 +0100
+Subject: [PATCH] floor1: multiply negative post deviations instead of shifting
+
+The floor post deviation mapping deliberately doubles a negative
+deviation in its small-negative branch. A signed left shift is undefined
+there. Use multiplication by two; floor quantization bounds keep the
+result representable and the encoded mapping unchanged. Reproduced by
+the existing Opus-to-Vorbis metadata test with UBSan.
+---
+ lib/floor1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/floor1.c b/lib/floor1.c
+index c4fe3ea..7cde16c 100644
+--- a/lib/floor1.c
++++ b/lib/floor1.c
+@@ -817,7 +817,7 @@ int floor1_encode(oggpack_buffer *opb,vorbis_block *vb,
+           if(val<-headroom)
+             val=headroom-val-1;
+           else
+-            val=-1-(val<<1);
++            val=-1-val*2;
+         else
+           if(val>=headroom)
+             val= val+headroom;
+-- 
+2.56.0
+
