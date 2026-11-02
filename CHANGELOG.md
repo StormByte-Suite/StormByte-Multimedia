@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC converts signed scalefactor estimates and bit-cost differences to fixed-point values through unsigned bit patterns instead of negative signed shifts.
 - Bundled Kvazaar reads exactly four coefficients in four-tap vertical chroma interpolation, preventing a global-table overread when selecting its final filter row.
 - Bundled FDK-AAC scales signed LPC analysis residuals and synthesis state through unsigned bit patterns instead of undefined negative left shifts.
 - Bundled Kvazaar reads byte-addressed SSE4.1 SAD reference and picture fragments without scalar alignment assumptions; an isolated sanitizer check verifies 15,872 cases against scalar SAD calculations.

@@ -1,0 +1,56 @@
+From 6198fa73e8de66e8cc1994f66494bcdecd8e0c99 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:48:49 +0100
+Subject: [PATCH] AACenc: normalize signed scalefactors and bit differences
+ without negative shifts
+
+Scalefactor estimates and changes in scalefactor bit cost may be
+negative. Convert them to ULONG before fixed-point left shifts and
+restore FIXP_DBL, preserving the original modulo representation and
+precision. Leave nonnegative band widths and absolute bit counts
+unchanged. Reproduced in FDKaacEnc_calcSingleSpecPe by stereo AAC
+encoding with UBSan; the old/new comparison and bit-cost difference use
+the same signed conversion.
+---
+ libAACenc/src/sf_estim.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libAACenc/src/sf_estim.cpp b/libAACenc/src/sf_estim.cpp
+index 17a8ae2..2d76122 100644
+--- a/libAACenc/src/sf_estim.cpp
++++ b/libAACenc/src/sf_estim.cpp
+@@ -253,7 +253,7 @@ static FIXP_DBL FDKaacEnc_calcSingleSpecPe(INT scf, FIXP_DBL sfbConstPePart,
+   FIXP_DBL ldRatio;
+   FIXP_DBL scfFract;
+ 
+-  scfFract = (FIXP_DBL)(scf << (DFRACT_BITS - 1 - AS_PE_FAC_SHIFT));
++  scfFract = (FIXP_DBL)((ULONG)scf << (DFRACT_BITS - 1 - AS_PE_FAC_SHIFT));
+ 
+   ldRatio = sfbConstPePart - fMult(FL2FXCONST_DBL(0.375f), scfFract);
+ 
+@@ -307,7 +307,7 @@ static FIXP_DBL FDKaacEnc_countScfBitsDiff(INT *scfOld, INT *scfNew, INT sfbCnt,
+         FDKaacEnc_bitCountScalefactorDelta(scfOld[sfbLast] - scfOld[sfbNext]);
+ 
+   scfBitsFract =
+-      (FIXP_DBL)(scfBitsDiff << (DFRACT_BITS - 1 - (2 * AS_PE_FAC_SHIFT)));
++      (FIXP_DBL)((ULONG)scfBitsDiff << (DFRACT_BITS - 1 - (2 * AS_PE_FAC_SHIFT)));
+ 
+   return scfBitsFract;
+ }
+@@ -342,11 +342,11 @@ static FIXP_DBL FDKaacEnc_calcSpecPeDiff(
+              1) +
+             FL2FXCONST_DBL(0.02152255861f);
+ 
+-      scfFract = (FIXP_DBL)(scfOld[sfb] << (DFRACT_BITS - 1 - AS_PE_FAC_SHIFT));
++      scfFract = (FIXP_DBL)((ULONG)scfOld[sfb] << (DFRACT_BITS - 1 - AS_PE_FAC_SHIFT));
+       ldRatioOld =
+           sfbConstPePart[sfb] - fMult(FL2FXCONST_DBL(0.375f), scfFract);
+ 
+-      scfFract = (FIXP_DBL)(scfNew[sfb] << (DFRACT_BITS - 1 - AS_PE_FAC_SHIFT));
++      scfFract = (FIXP_DBL)((ULONG)scfNew[sfb] << (DFRACT_BITS - 1 - AS_PE_FAC_SHIFT));
+       ldRatioNew =
+           sfbConstPePart[sfb] - fMult(FL2FXCONST_DBL(0.375f), scfFract);
+ 
+-- 
+2.56.0
+

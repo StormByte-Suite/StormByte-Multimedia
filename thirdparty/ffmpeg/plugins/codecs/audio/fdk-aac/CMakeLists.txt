@@ -17,6 +17,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0012-tns-avoid-negative-spectrum-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0013-lpc-avoid-negative-coefficient-normalization-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0014-lpc-avoid-negative-filter-state-shifts.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0015-scalefactor-avoid-negative-fractional-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS
