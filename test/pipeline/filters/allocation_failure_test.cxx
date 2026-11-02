@@ -8,6 +8,7 @@
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/nlmeans.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
@@ -16,9 +17,12 @@
 #include <array>
 #include <atomic>
 #include <cerrno>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <limits>
+#include <new>
+#include <thread>
 #include <utility>
 
 #ifndef __has_feature
@@ -33,6 +37,7 @@ namespace {
 	thread_local std::size_t fail_aligned_at = std::numeric_limits<std::size_t>::max();
 	thread_local std::size_t denied = 0;
 	std::atomic<bool> failed_scratch{false};
+	std::atomic<bool> coordinator_failed{false};
 
 	bool Reject(std::size_t size, bool aligned = false) noexcept {
 		if (!exhausted && (!aligned || size < fail_aligned_at))
@@ -47,6 +52,109 @@ namespace {
 		public:
 			TestStep(): Step({}, Pipeline::Producer::Encoder, {}, {}) {}
 	};
+
+	class ExhaustedJob final: public Pipeline::Transcoder {
+		public:
+			using Transcoder::Transcoder;
+			bool ExhaustWorker = false;
+			bool PauseAtPlan = false;
+			std::atomic<bool> PlanReady{false};
+
+		protected:
+			void OnConfigure() noexcept override {
+				if (ExhaustWorker) {
+					// Initialize libc++abi's per-thread exception state before denying calloc.
+					try {
+						throw std::bad_alloc{};
+					} catch (const std::bad_alloc&) {
+					}
+				}
+			}
+
+			void OnError(const StormByte::Safe::String& message) noexcept override {
+				coordinator_failed.store(exhausted && denied > 0 && message.empty(),
+					std::memory_order_release);
+			}
+
+			void OnPlan(const Pipeline::Plan&) noexcept override {
+				if (PauseAtPlan) {
+					Pause();
+					PlanReady.store(true, std::memory_order_release);
+				}
+			}
+
+			StormByte::Safe::Shared<Pipeline::Plan> EmptyPlan(
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
+				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
+				StormByte::Safe::Optional<std::int64_t> duration,
+				const StormByte::Multimedia::Container* container) const override {
+				if (!ExhaustWorker)
+					return Transcoder::EmptyPlan(std::move(reader), std::move(writer), std::move(duration), container);
+				// Keep dependency-owned file teardown outside the exhausted coordinator thread.
+				m_reader = std::move(reader);
+				m_writer = std::move(writer);
+				denied = 0;
+				exhausted = true;
+				return Transcoder::EmptyPlan({}, {}, std::move(duration), container);
+			}
+
+		private:
+			mutable StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;
+			mutable StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;
+	};
+
+	int TestCoordinatorExhaustion(bool worker) {
+		coordinator_failed.store(false, std::memory_order_release);
+		ExhaustedJob job{TestLocation(FixturePath("video/xvid_mp3_stereo.avi")),
+			TestLocation(OutputPath("pipeline/filters/coordinator-allocation-failure.mkv")),
+			MakeLogger(), 2000000000LL};
+		job.Video(0).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.ExhaustWorker = worker;
+		denied = 0;
+		exhausted = !worker;
+		job.Run();
+		if (!worker)
+			exhausted = false;
+		const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+		while (!coordinator_failed.load(std::memory_order_acquire)
+			&& std::chrono::steady_clock::now() < deadline)
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		TEST_REQUIRE(coordinator_failed.load(std::memory_order_acquire));
+		TEST_REQUIRE(job.Status() == Pipeline::Status::Error);
+		TEST_REQUIRE(!job.Error());
+		return 0;
+	}
+
+	int TestCoordinatorStartExhaustion() {
+		return TestCoordinatorExhaustion(false);
+	}
+
+	int TestCoordinatorWorkerExhaustion() {
+		return TestCoordinatorExhaustion(true);
+	}
+
+	int TestCoordinatorCancelExhaustion() {
+		ExhaustedJob job{TestLocation(FixturePath("video/xvid_mp3_stereo.avi")),
+			TestLocation(OutputPath("pipeline/filters/coordinator-cancel-allocation-failure.mkv")),
+			MakeLogger(), 2000000000LL};
+		job.Video(0).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.PauseAtPlan = true;
+		job.Run();
+		const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+		while (!job.PlanReady.load(std::memory_order_acquire)
+			&& std::chrono::steady_clock::now() < deadline)
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		TEST_REQUIRE(job.PlanReady.load(std::memory_order_acquire));
+		denied = 0;
+		exhausted = true;
+		job.Cancel();
+		exhausted = false;
+		TEST_REQUIRE(denied > 0);
+		TEST_REQUIRE(job.Plan()->State() == Pipeline::Plan::State::Failed);
+		return 0;
+	}
 
 	class FailingNlMeans final: public Pipeline::Filter::Video::NlMeans {
 		public:
@@ -160,7 +268,10 @@ extern "C" void* aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_pipeline_failure_closure_without_allocations", TestFailureClosure},
-		TestEntry{"test_nlmeans_scratch_failure_fails_job", TestNlMeansFailureJob}
+		TestEntry{"test_nlmeans_scratch_failure_fails_job", TestNlMeansFailureJob},
+		TestEntry{"test_transcoder_start_without_allocations", TestCoordinatorStartExhaustion},
+		TestEntry{"test_transcoder_worker_without_allocations", TestCoordinatorWorkerExhaustion},
+		TestEntry{"test_transcoder_cancel_without_allocations", TestCoordinatorCancelExhaustion}
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

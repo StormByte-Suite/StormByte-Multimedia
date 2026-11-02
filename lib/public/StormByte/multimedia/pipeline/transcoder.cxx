@@ -71,6 +71,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <new>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -417,11 +418,9 @@ Transcoder::~Transcoder() noexcept {
 	const auto status = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (status == Status::Running || status == Status::Paused)
 		Cancel();
-	JobLog(m_logger, Level::LowLevel, StormByte::Safe::String::ReplaceToken("coordinator join begin component=Transcoder instance={}",
-		static_cast<const void*>(this)));
+	JobLog(m_logger, Level::LowLevel, "coordinator join begin");
 	m_backend->Join();
-	JobLog(m_logger, Level::LowLevel, StormByte::Safe::String::ReplaceToken("coordinator join end component=Transcoder instance={}",
-		static_cast<const void*>(this)));
+	JobLog(m_logger, Level::LowLevel, "coordinator join end");
 }
 
 void Transcoder::InstallLog() noexcept {
@@ -432,15 +431,35 @@ void Transcoder::InstallLog() noexcept {
 void Transcoder::Fail(std::string_view reason) noexcept {
 	if (!m_backend)
 		return;
+	try {
+		StormByte::Safe::String message{reason};
+		StormByte::Safe::UniqueLock lock(m_backend->Lock);
+		if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Relaxed) == Status::Error)
+			return;
+		if (m_plan)
+			m_plan->State(Plan::State::Failed, message);
+		m_backend->Error = std::move(message);
+		m_backend->Status.store(Status::Error, StormByte::Safe::MemoryOrder::Release);
+		m_backend->RequestCancel();
+		JobLog(m_logger, Level::Error, m_backend->Error.value());
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
+}
+
+void Transcoder::Fail() noexcept {
+	if (!m_backend)
+		return;
 	StormByte::Safe::UniqueLock lock(m_backend->Lock);
-	if (m_plan)
-		m_plan->State(Plan::State::Failed, StormByte::Safe::String{reason});
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Relaxed) == Status::Error)
 		return;
-	m_backend->Error = StormByte::Safe::String{reason};
+	if (m_plan)
+		m_plan->State(Plan::State::Failed, {});
+	m_backend->Error.reset();
 	m_backend->Status.store(Status::Error, StormByte::Safe::MemoryOrder::Release);
 	m_backend->RequestCancel();
-	JobLog(m_logger, Level::Error, m_backend->Error.value());
 }
 
 bool Transcoder::ValidSlot(StormByte::Size slot) const noexcept {
@@ -648,8 +667,15 @@ void Transcoder::Cancel() noexcept {
 		intention = m_plan;
 	}
 	m_backend->RequestCancel();
-	if (intention)
-		intention->State(Plan::State::Failed, StormByte::Safe::String{"transcode cancelled"});
+	if (intention) {
+		try {
+			intention->State(Plan::State::Failed, StormByte::Safe::String{"transcode cancelled"});
+		} catch (const StormByte::Safe::AllocationError&) {
+			intention->State(Plan::State::Failed, {});
+		} catch (const std::bad_alloc&) {
+			intention->State(Plan::State::Failed, {});
+		}
+	}
 }
 
 void Transcoder::Pause() noexcept {
@@ -731,7 +757,7 @@ StormByte::Safe::Shared<class Plan> Transcoder::EmptyPlan(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	StormByte::Safe::Optional<std::int64_t> duration,
-	const class Container* container) const noexcept {
+	const class Container* container) const {
 	const auto progress = DurationProgress();
 	if (container)
 		return StormByte::Safe::Shared<class Plan>::MakePointer<class Plan>(std::move(reader), std::move(writer),
@@ -740,7 +766,7 @@ StormByte::Safe::Shared<class Plan> Transcoder::EmptyPlan(
 		&progress);
 }
 
-StormByte::Safe::Function<void(double)> Transcoder::DurationProgress() const noexcept {
+StormByte::Safe::Function<void(double)> Transcoder::DurationProgress() const {
 	auto context = std::make_unique<const Transcoder*>(this);
 	StormByte::Safe::Function<void(double)> observer(context.get(),
 		[](void* state, double percent) {
@@ -770,7 +796,7 @@ StormByte::Safe::Function<void(double)> Transcoder::DurationProgress() const noe
 	return observer;
 }
 
-StormByte::Safe::Unique<TrackSettled> Transcoder::EmptySettled() const noexcept {
+StormByte::Safe::Unique<TrackSettled> Transcoder::EmptySettled() const {
 	return StormByte::Safe::Unique<TrackSettled>::MakePointer<TrackSettled>();
 }
 
@@ -783,7 +809,13 @@ enum Status Transcoder::OnStart() noexcept {
 void Transcoder::OnPlan(const class Plan&) noexcept {}
 
 void Transcoder::OnSettled(const TrackSettled& row) noexcept {
-	JobLog(m_logger, Level::Debug, row.ToString());
+	try {
+		JobLog(m_logger, Level::Debug, row.ToString());
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
 }
 
 void Transcoder::OnMeasureDone() noexcept {}
@@ -798,7 +830,7 @@ void Transcoder::OnError(const StormByte::Safe::String&) noexcept {}
 
 void Transcoder::OnAborted() noexcept {}
 
-void Transcoder::MarkSettled(int out, Encoder& encoder) noexcept {
+void Transcoder::MarkSettled(int out, Encoder& encoder) {
 	if (!m_backend)
 		return;
 	for (auto& slot : m_backend->Mapped) {

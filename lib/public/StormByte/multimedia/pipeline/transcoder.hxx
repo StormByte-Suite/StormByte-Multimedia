@@ -912,6 +912,7 @@ namespace StormByte {
 					 * Override to return a type derived from Plan. Tracks are
 					 * filled from the fluent map after this returns. After the
 					 * call this Transcoder no longer owns the leaves.
+					 * Allocation failures propagate to the coordinator, which fails the job.
 					 * Construct Shared<Plan>::MakePointer<Derived> in the provider module
 					 * so the exact payload is released there. Keep a local DurationProgress()
 					 * observer and pass its address to the observing Plan constructor.
@@ -920,7 +921,7 @@ namespace StormByte {
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						StormByte::Safe::Optional<std::int64_t> duration = {},
-						const class Container* container = nullptr) const noexcept;
+						const class Container* container = nullptr) const;
 
 					/**
 					 * @brief Observer for duration resolution in custom EmptyPlan implementations.
@@ -929,7 +930,7 @@ namespace StormByte {
 					 * It waits while paused and returns Failure on cancellation, causing
 					 * File::Duration to stop scanning and rewind its reader.
 					 */
-					StormByte::Safe::Function<void(double)> DurationProgress() const noexcept;
+					StormByte::Safe::Function<void(double)> DurationProgress() const;
 
 					/**
 					 * @brief Allocates the settled-row type.
@@ -939,7 +940,7 @@ namespace StormByte {
 					 * MarkSettled fills it and calls OnSettled. Construct
 					 * Unique<TrackSettled>::MakePointer<Derived> in the provider module.
 					 */
-					virtual StormByte::Safe::Unique<TrackSettled> EmptySettled() const noexcept;
+					virtual StormByte::Safe::Unique<TrackSettled> EmptySettled() const;
 
 					/**
 					 * @brief Last chance to raise ceilings before the job starts.
@@ -990,7 +991,7 @@ namespace StormByte {
 
 					/**
 					 * @brief Hard error.
-					 * @param message Error text.
+					 * @param message Error text, possibly empty when allocation failed.
 					 */
 					virtual void OnError(const StormByte::Safe::String& message) noexcept;
 
@@ -1031,6 +1032,11 @@ namespace StormByte {
 					void Fail(std::string_view reason) noexcept;
 
 					/**
+					 * @brief Marks failure without storing a message or allocating.
+					 */
+					void Fail() noexcept;
+
+					/**
 					 * @brief Opens a consultation File from the reader path and discards it after use.
 					 * @return false if owner.Fail() was called.
 					 */
@@ -1049,7 +1055,7 @@ namespace StormByte {
 					 * @param out Mapped output slot of the lane.
 					 * @param encoder Encoder that just opened.
 					 */
-					void MarkSettled(int out, Encoder& encoder) noexcept;
+					void MarkSettled(int out, Encoder& encoder);
 
 					/**
 					 * @brief Whether @p slot is a mapped track.

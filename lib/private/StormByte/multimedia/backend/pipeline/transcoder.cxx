@@ -70,6 +70,8 @@
 #include <StormByte/safe/string.hxx>
 
 #include <chrono>
+#include <exception>
+#include <new>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -99,9 +101,15 @@ TranscoderSlot& TranscoderSlot::operator=(TranscoderSlot&& other) noexcept = def
 namespace {
 	template<typename Optional>
 	StormByte::Safe::String ErrorText(const Optional& error, std::string_view fallback) noexcept {
-		if (error)
-			return StormByte::Safe::String{std::string_view{error.value()}};
-		return StormByte::Safe::String{fallback};
+		try {
+			if (error)
+				return StormByte::Safe::String{std::string_view{error.value()}};
+			return StormByte::Safe::String{fallback};
+		} catch (const StormByte::Safe::AllocationError&) {
+			return {};
+		} catch (const std::bad_alloc&) {
+			return {};
+		}
 	}
 
 	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
@@ -123,20 +131,26 @@ namespace {
 		StormByte::Safe::Shared<StormByte::Logger::Log> Logger;
 
 		~TelemetrySummary() noexcept {
-			if (!Metrics)
+			if (std::uncaught_exceptions() != 0)
 				return;
-			Metrics->SampleMemory();
-			if (!Logger)
-				return;
-			const std::string report = static_cast<std::string>(*Metrics);
-			std::size_t begin = 0;
-			while (begin < report.size()) {
-				const std::size_t end = report.find('\n', begin);
-				const std::size_t length = end == std::string::npos ? report.size() - begin : end - begin;
-				JobLog(Logger, Level::Info, std::string_view{report}.substr(begin, length));
-				if (end == std::string::npos)
-					break;
-				begin = end + 1;
+			try {
+				if (!Metrics)
+					return;
+				Metrics->SampleMemory();
+				if (!Logger)
+					return;
+				const std::string report = static_cast<std::string>(*Metrics);
+				std::size_t begin = 0;
+				while (begin < report.size()) {
+					const std::size_t end = report.find('\n', begin);
+					const std::size_t length = end == std::string::npos ? report.size() - begin : end - begin;
+					JobLog(Logger, Level::Info, std::string_view{report}.substr(begin, length));
+					if (end == std::string::npos)
+						break;
+					begin = end + 1;
+				}
+			} catch (const StormByte::Safe::AllocationError&) {
+			} catch (const std::bad_alloc&) {
 			}
 		}
 	};
@@ -224,6 +238,7 @@ Transcoder::~Transcoder() noexcept {
 }
 
 void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept {
+	try {
 	const auto current = Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (current == StormByte::Multimedia::Pipeline::Status::Running
 		|| current == StormByte::Multimedia::Pipeline::Status::Paused) {
@@ -245,6 +260,13 @@ void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcep
 		StormByte::Multimedia::Detail::UseCNumericLocale();
 		Run(job);
 	});
+	} catch (const StormByte::Safe::AllocationError&) {
+		job.Fail();
+		job.OnError({});
+	} catch (const std::bad_alloc&) {
+		job.Fail();
+		job.OnError({});
+	}
 }
 
 void Transcoder::RequestCancel() noexcept {
@@ -293,6 +315,7 @@ void Transcoder::TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
 }
 
 void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept {
+	try {
 	NameThread("MM-Transcoder");
 	Metrics->SampleMemory();
 	TelemetrySummary summary{Metrics, job.Logger()};
@@ -333,7 +356,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		job.m_container);
 	if (!built) {
 		job.Fail("EmptyPlan returned an empty owner");
-		job.OnError(job.Error().value());
+		job.OnError(ErrorText(job.Error(), "EmptyPlan returned an empty owner"));
 		return;
 	}
 	built->Resources(job.Resources());
@@ -347,8 +370,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	}
 	auto failUnlessFinished = [built]() noexcept {
 		if (built->State() != StormByte::Multimedia::Pipeline::Plan::State::Finished)
-			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed,
-				StormByte::Safe::String{"transcode did not finish"});
+			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed, {});
 	};
 	struct PlanCompletion {
 		decltype(failUnlessFinished)* action;
@@ -516,7 +538,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	for (auto stage : stages)
 		Metrics->RegisterStage(std::move(stage.Name), std::move(stage.Metrics));
 	TickHooks(job, graph);
-	auto captureStageFailure = [&]() noexcept {
+	auto captureStageFailure = [&]() {
 		if (job.Failed())
 			return;
 		if (built->State() == StormByte::Multimedia::Pipeline::Plan::State::Failed) {
@@ -720,4 +742,13 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		std::chrono::steady_clock::now() - started).count();
 	JobLog(job.Logger(), Level::Info, StormByte::Safe::String::ReplaceToken("done tracks={} {}ms", Mapped.size(), ms));
 	job.OnDone();
+	} catch (const StormByte::Safe::AllocationError&) {
+		job.Fail();
+		const StormByte::Safe::String empty;
+		job.OnError(empty);
+	} catch (const std::bad_alloc&) {
+		job.Fail();
+		const StormByte::Safe::String empty;
+		job.OnError(empty);
+	}
 }

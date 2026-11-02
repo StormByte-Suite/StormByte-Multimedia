@@ -1,0 +1,8 @@
+test_transcoder_plan_allocation_failure: 0
+test_transcoder_empty_plan_owner: 0
+test_transcoder_start_without_allocations: 0
+test_transcoder_worker_without_allocations: 0
+test_transcoder_cancel_without_allocations: 0
+test_pipeline_failure_closure_without_allocations: 0
+test_nlmeans_scratch_failure_fails_job: 0
+test_transcoder_remuxes_mp4_audio_into_matroska: 0

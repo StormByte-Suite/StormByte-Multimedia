@@ -1,0 +1,71 @@
+Breakpoint 1 at 0x1ade0
+Loading libc++ pretty-printers.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib64/libthread_db.so.1".
+[Test] Starting test_transcoder_worker_without_allocations
+[Test] OutputPath: preparing /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/test-output/persistent-tests/test_transcoder_worker_without_allocations/pipeline/filters/coordinator-allocation-failure.mkv
+[New Thread 0x7fffb43ff6c0 (LWP 2426114) (id 2)]
+[New Thread 0x7fffb39fd6c0 (LWP 2426115) (id 3)]
+[LowLevel] 02/11/2026 07:04:47 StormByte/Multimedia/Transcoder created
+[New Thread 0x7fffb31fc6c0 (LWP 2426116) (id 4)]
+[New Thread 0x7fffb29fb6c0 (LWP 2426117) (id 5)]
+[New Thread 0x7fffb21fa6c0 (LWP 2426118) (id 6)]
+[New Thread 0x7fffb19f96c0 (LWP 2426119) (id 7)]
+[New Thread 0x7fffb11f86c0 (LWP 2426120) (id 8)]
+[New Thread 0x7fffb09f76c0 (LWP 2426121) (id 9)]
+[New Thread 0x7fffabfff6c0 (LWP 2426122) (id 10)]
+[New Thread 0x7fffab7fe6c0 (LWP 2426123) (id 11)]
+[New Thread 0x7fffaaffd6c0 (LWP 2426124) (id 12)]
+[New Thread 0x7fffaa7fc6c0 (LWP 2426125) (id 13)]
+[New Thread 0x7fffa9ffb6c0 (LWP 2426126) (id 14)]
+[New Thread 0x7fffa97fa6c0 (LWP 2426127) (id 15)]
+[New Thread 0x7fffa8ff96c0 (LWP 2426128) (id 16)]
+[New Thread 0x7fffa3fff6c0 (LWP 2426129) (id 17)]
+[New Thread 0x7fffa37fe6c0 (LWP 2426130) (id 18)]
+[New Thread 0x7fffa2ffd6c0 (LWP 2426131) (id 19)]
+[Thread 0x7fffb21fa6c0 (LWP 2426118) (id 6) exited]
+[Thread 0x7fffb11f86c0 (LWP 2426120) (id 8) exited]
+[Thread 0x7fffb19f96c0 (LWP 2426119) (id 7) exited]
+[Thread 0x7fffb29fb6c0 (LWP 2426117) (id 5) exited]
+[Thread 0x7fffb31fc6c0 (LWP 2426116) (id 4) exited]
+[Thread 0x7fffb09f76c0 (LWP 2426121) (id 9) exited]
+[Thread 0x7fffabfff6c0 (LWP 2426122) (id 10) exited]
+[Thread 0x7fffab7fe6c0 (LWP 2426123) (id 11) exited]
+[Thread 0x7fffaaffd6c0 (LWP 2426124) (id 12) exited]
+[Thread 0x7fffaa7fc6c0 (LWP 2426125) (id 13) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 2426126) (id 14) exited]
+[Thread 0x7fffa97fa6c0 (LWP 2426127) (id 15) exited]
+[Thread 0x7fffa8ff96c0 (LWP 2426128) (id 16) exited]
+[Thread 0x7fffa3fff6c0 (LWP 2426129) (id 17) exited]
+[Thread 0x7fffa37fe6c0 (LWP 2426130) (id 18) exited]
+[Thread 0x7fffa2ffd6c0 (LWP 2426131) (id 19) exited]
+[Notice  ] 02/11/2026 07:04:47 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 07:04:47 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 07:04:47 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Debug   ] 02/11/2026 07:04:47 StormByte/Multimedia/Transcoder track 0 marked remux
+[Test] TestCoordinatorExhaustion: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[New Thread 0x7fffa2ffd6c0 (LWP 2426132) (id 20)]
+[Notice  ] 02/11/2026 07:04:47 StormByte/Multimedia/Transcoder running
+[Switching to thread 20 (Thread 0x7fffa2ffd6c0 (LWP 2426132))]
+
+Thread 20 "MM-Transcoder" hit Breakpoint 1.2, std::terminate () at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_handlers.cpp:79
+warning: 79	/tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_handlers.cpp: No existe el fichero o el directorio
+#0  std::terminate () at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_handlers.cpp:79
+#1  0x00007ffff7ec013e in __cxa_allocate_exception (thrown_size=<optimized out>) at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_exception.cpp:192
+#2  0x00007fffb51851ef in StormByte::Safe::Heap::Allocate(unsigned long) () from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/lib64/libStormByte.so.2.2.3
+#3  0x00007fffe047e6c7 in Make<unsigned long> () at stormbyte-buildmaster/install/include/StormByte/safe/optional.hxx:771
+#4  Optional () at stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:60
+#5  MemoryCurrent () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/telemetry.cxx:383
+#6  operator String () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/telemetry.cxx:408
+#7  0x00007fffe02c72e6 in operator basic_string () at build/ubsan/stormbyte-buildmaster/install/include/StormByte/telemetry.hxx:291
+#8  ~TelemetrySummary () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:139
+#9  0x00007fffe02c47c0 in Run () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:742
+#10 0x00007fffe02c7fde in operator() () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:258
+#11 __invoke<(lambda at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:256:37)> () at /usr/include/c++/v1/__type_traits/invoke.h:90
+#12 __apply_tuple_impl<(lambda at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:256:37), std::__1::tuple<> > () at /usr/include/c++/v1/tuple:1400
+#13 apply<(lambda at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:256:37), std::__1::tuple<> > () at /usr/include/c++/v1/tuple:1404
+#14 Run () at build/ubsan/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186
+#15 0x00007fffb51b5cbb in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) () from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/lib64/libStormByte.so.2.2.3
+#16 0x00007fffb4d88671 in start_thread (arg=<optimized out>) at pthread_create.c:454
+#17 0x00007fffb4e011dc in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
