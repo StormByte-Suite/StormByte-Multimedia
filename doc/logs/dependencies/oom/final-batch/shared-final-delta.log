@@ -1,0 +1,29 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+    Start  96: pipeline.test_transcoder_vmaf_remux_matches_source_at_100
+    Start 400: pipeline.test_filter_degrain
+1/9 Test #400: pipeline.test_filter_degrain ................................   Passed    8.10 sec
+    Start 416: pipeline.test_filter_xpsnr
+2/9 Test #416: pipeline.test_filter_xpsnr ..................................   Passed    1.91 sec
+    Start 415: pipeline.test_filter_ssim
+3/9 Test #415: pipeline.test_filter_ssim ...................................   Passed    1.04 sec
+    Start 414: pipeline.test_filter_psnr
+4/9 Test #414: pipeline.test_filter_psnr ...................................   Passed    0.78 sec
+    Start 413: pipeline.test_filter_count_frames
+5/9 Test #413: pipeline.test_filter_count_frames ...........................   Passed    0.74 sec
+    Start 307: pipeline.test_transcoder_plan_allocation_failure
+6/9 Test #307: pipeline.test_transcoder_plan_allocation_failure ............   Passed    0.68 sec
+    Start 308: pipeline.test_transcoder_empty_plan_owner
+7/9 Test #308: pipeline.test_transcoder_empty_plan_owner ...................   Passed    0.47 sec
+    Start 374: pipeline.test_filter_graph_delayed_output_and_eof
+8/9 Test #374: pipeline.test_filter_graph_delayed_output_and_eof ...........   Passed    0.14 sec
+9/9 Test  #96: pipeline.test_transcoder_vmaf_remux_matches_source_at_100 ...   Passed   22.97 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Label Time Summary:
+multimedia    =  36.83 sec*proc (9 tests)
+pipeline      =  36.83 sec*proc (9 tests)
+
+Total Test time (real) =  22.98 sec
+
+exit_code=0

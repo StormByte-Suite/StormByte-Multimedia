@@ -1,0 +1,5 @@
+[ 88%] Linking CXX shared library libStormByte-Multimedia.so
+[ 88%] Linking CXX executable MultimediaPipelineAllocationTests
+[ 88%] Linking CXX executable MultimediaPipelineCoordinatorAllocationTests
+[ 88%] Linking CXX executable MultimediaSimplePlayerTests
+[ 88%] Linking CXX executable MultimediaPipelineFilterTests

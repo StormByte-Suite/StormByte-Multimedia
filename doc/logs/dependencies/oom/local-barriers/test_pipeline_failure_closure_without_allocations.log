@@ -1,0 +1,13 @@
+[Test] Starting test_pipeline_failure_closure_without_allocations
+[Test] TestFailureClosure: assert allocation_free
+[Test] TestFailureClosure: assert message_rejected
+[Test] TestFailureClosure: assert step.Failed()
+[Test] TestFailureClosure: assert filter.Failed()
+[Test] TestFailureClosure: assert !step.Error()
+[Test] TestFailureClosure: assert describedStep.Failed() && !describedStep.Error()
+[Test] TestFailureClosure: assert describedFilter.Failed()
+[Test] TestFailureClosure: assert step.Telemetry()->Status() == Pipeline::State::Failed
+[Test] TestFailureClosure: assert filter.Telemetry()->Status() == Pipeline::State::Failed
+[Test] Finished test_pipeline_failure_closure_without_allocations: PASS
+
+exit_code=0

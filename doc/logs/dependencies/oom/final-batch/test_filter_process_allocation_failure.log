@@ -1,0 +1,6 @@
+[Test] Starting test_filter_process_allocation_failure
+[Test] TestFilterProcessAllocationFailure: assert denied > before
+[Test] TestFilterProcessAllocationFailure: assert filter.Failed()
+[Test] Finished test_filter_process_allocation_failure: PASS
+
+exit_code=0

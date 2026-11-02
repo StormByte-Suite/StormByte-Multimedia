@@ -10,10 +10,31 @@ builds do not acquire an expectation that external libraries contain these fixes
 The numerical checks mentioned below are isolated validation programs, not new
 CTest requirements.
 
-**The audit is not complete. Releases and tag/retag operations remain on hold.**
+**The confirmed-defect/OOM correction batch is validated. Releases and
+tag/retag operations remain on hold pending the separate agreed release phase.**
 No upstream PR has been opened automatically.
 
 ### Latest OOM validation
+
+The final batch treats all **251 archived allocation-boundary/bounded-formatting
+emissions** (238 barriers plus thirteen leaf-contract risks), with exact
+source/symbol reconciliation. Final isolated UBSan injection is **12 PASS**;
+shared strict ASan/UBSan/LSan selection is **17 PASS / 12 intentional SKIP**,
+followed by **9 overlapping PASS** after the final fixes. Both final builds
+passed. The ninety-unit targeted analyzer rerun has zero execution/compilation
+failures, but is not warning-free: bounded numeric/index paths and explicitly
+retained semantic oversized-string/capacity risks are documented rather than
+blanket-suppressed. No universal exception-safety claim is made.
+[Final commands and logs](logs/dependencies/oom/final-batch/README.md) and
+[exact-site reconciliation](logs/static-analysis/final/oom-batch/README.md).
+
+The older OOM progress paragraphs below are historical. The initial local
+constructor/report/subtitle batch is committed as `2939592f`, `bb19c73d` and
+`605d7742`, with Base prerequisites `8369f80` and `696de23`.
+No whole-suite rerun, version bump, SONAME change or retag was performed.
+The final allocation batch is committed as `88b9f418`, `3a8a80b6`,
+`a46701f6`, `08a0461d` and `a354f199`, with changelog entries per code commit.
+Multimedia has not been pushed.
 
 The Transcoder factory/coordinator allocation boundaries and allocation-free
 failure propagation are committed in `83e31c4e`; real dependency-owner teardown
@@ -544,7 +565,14 @@ dirty Transcoder snapshot and the original dependency-instrumentation boundary.
 Raw historical recover-mode logs are explicitly separated from current strict
 validation; they are not passing evidence or a waiver.
 
-Remaining release gates include FDK threshold adjustment, full-suite failures,
-preview behavior, complete Transcoder OOM handling and remaining static-analysis
-triage. The unfinished Transcoder edits are preserved separately and are not
-included in any upstream patch integration commit.
+The original release-gate list is superseded by the focused follow-ups above:
+39 original failing cases now have canonical passes; eight proprietary NVIDIA
+exceptions were explicitly accepted. The confirmed OOM corrections and static
+allocation-boundary reconciliation are committed and validated separately from
+upstream patch integrations. Semantic maximum-size warnings and unconfirmed
+API-design advisories are documented, not claimed fixed or warning-free.
+
+The remaining phase is the separately agreed dependency/release/retag discussion,
+including propagation of local Base prerequisites into released dependencies.
+No published Base ZIP, Multimedia version, SONAME or tag was changed by this
+audit closure, and no Multimedia push was performed.

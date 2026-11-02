@@ -1,0 +1,66 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:105:17: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]
+  105 | void Deflicker::Process(const Pipeline::Frame& frame) noexcept try {
+      |                 ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:245:4: note: frame #4: function 'FormatFloatAscii<double>' calls function 'PadAscii' here
+  245 |                         PadAscii(ascii, spec);
+      |                         ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #5: function 'FormatReplaceToken<char, unsigned int &>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #6: function 'operator()<unsigned int &>' calls function 'FormatReplaceToken<char, unsigned int &>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #7: function 'ReplaceToken<unsigned int &, std::string_view &>' calls function 'operator()<unsigned int &>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:102:9: note: frame #8: function 'Chain' calls function 'ReplaceToken<unsigned int &, std::string_view &>' here
+  102 |         return StormByte::Safe::String::ReplaceToken("deflicker=size={}:mode={}", size, mode);
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:118:40: note: frame #9: function 'Process' calls function 'Chain' here
+  118 |         const StormByte::Safe::String chain = Chain();
+      |                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:161:17: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]
+  161 | void Deflicker::Eof() noexcept try {
+      |                 ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:245:4: note: frame #4: function 'FormatFloatAscii<double>' calls function 'PadAscii' here
+  245 |                         PadAscii(ascii, spec);
+      |                         ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #5: function 'FormatReplaceToken<char, int>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #6: function 'operator()<int>' calls function 'FormatReplaceToken<char, int>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #7: function 'ReplaceToken<int, int, long>' calls function 'operator()<int>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:172:24: note: frame #8: function 'Eof' calls function 'ReplaceToken<int, int, long>' here
+  172 |                 Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
+      |                                      ^
+
+exit_code=0

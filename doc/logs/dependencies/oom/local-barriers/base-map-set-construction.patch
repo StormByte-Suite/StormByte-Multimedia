@@ -1,0 +1,227 @@
+From 696de23d6d7e2eb5cd5a3017571c65b3c23b81ed Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 07:35:12 +0100
+Subject: [PATCH] Propagate map and set constructor allocation failures safely
+
+---
+ CHANGELOG.md                               |  1 +
+ lib/public/StormByte/safe/map.hxx          |  9 +++--
+ lib/public/StormByte/safe/map.txx          | 18 +++-------
+ lib/public/StormByte/safe/set.hxx          |  6 ++--
+ lib/public/StormByte/safe/set.txx          |  6 ++--
+ test/telemetry_allocation_failure_test.cxx | 42 +++++++++++++++++++++-
+ 6 files changed, 59 insertions(+), 23 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index d3b2426..ea78205 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -24,6 +24,7 @@ If you landed here from a release link and have not read the tree:
+ 
+ ### Fixed
+ - Telemetry constructs its already-lazy clock drawer only when first used, so its `noexcept` constructor does not allocate.
++- Allocating Safe map/set constructors propagate failures, failed move construction leaves the source intact, and map/set move assignment reuses the destination sentinel without allocating.
+ - Best-effort telemetry sampling returns an inactive token without allocating while an exception is unwinding, preventing nested allocation failures in instrumented cleanup. Focused fault-injection tests cover normal and unwinding cleanup, including sustained allocation rejection.
+ 
+ [Unreleased]: https://github.com/StormByte-Suite/StormByte/compare/2.2.3...HEAD
+diff --git a/lib/public/StormByte/safe/map.hxx b/lib/public/StormByte/safe/map.hxx
+index 5b63e7b..705d692 100644
+--- a/lib/public/StormByte/safe/map.hxx
++++ b/lib/public/StormByte/safe/map.hxx
+@@ -334,14 +334,16 @@ namespace StormByte {
+ 
+ 				/**
+ 				 * @brief Construct an empty map.
++				 * @throws AllocationError The sentinel could not be allocated.
+ 				 */
+-				Map() noexcept;
++				Map();
+ 
+ 				/**
+ 				 * @brief Construct an empty map with a comparator.
+ 				 * @param compare Key ordering.
++				 * @throws AllocationError The sentinel could not be allocated.
+ 				 */
+-				explicit Map(const Compare& compare) noexcept;
++				explicit Map(const Compare& compare);
+ 
+ 				/**
+ 				 * @brief Copy every node into new Base blocks.
+@@ -353,8 +355,9 @@ namespace StormByte {
+ 				/**
+ 				 * @brief Take the tree. @p other is left empty.
+ 				 * @param other Source.
++				 * @throws AllocationError The replacement sentinel could not be allocated; the source is unchanged.
+ 				 */
+-				Map(Map&& other) noexcept;
++				Map(Map&& other);
+ 
+ 				/**
+ 				 * @brief Copy a caller-owned STL map. Its state is unchanged.
+diff --git a/lib/public/StormByte/safe/map.txx b/lib/public/StormByte/safe/map.txx
+index a392846..73c16ca 100644
+--- a/lib/public/StormByte/safe/map.txx
++++ b/lib/public/StormByte/safe/map.txx
+@@ -110,13 +110,13 @@ namespace StormByte {
+ 
+ 		template<Type::SafeValue K, Type::SafeValue V, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+-		Map<K, V, Compare>::Map() noexcept: m_compare(), m_header(nullptr), m_size(0) {
++		Map<K, V, Compare>::Map(): m_compare(), m_header(nullptr), m_size(0) {
+ 			CreateHeader();
+ 		}
+ 
+ 		template<Type::SafeValue K, Type::SafeValue V, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+-		Map<K, V, Compare>::Map(const Compare& compare) noexcept: m_compare(compare), m_header(nullptr), m_size(0) {
++		Map<K, V, Compare>::Map(const Compare& compare): m_compare(compare), m_header(nullptr), m_size(0) {
+ 			CreateHeader();
+ 		}
+ 
+@@ -137,10 +137,8 @@ namespace StormByte {
+ 
+ 		template<Type::SafeValue K, Type::SafeValue V, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+-		Map<K, V, Compare>::Map(Map&& other) noexcept: m_compare(std::move(other.m_compare)), m_header(other.m_header), m_size(other.m_size) {
+-			other.m_header = nullptr;
+-			other.m_size = 0;
+-			other.CreateHeader();
++		Map<K, V, Compare>::Map(Map&& other): Map(other.m_compare) {
++			swap(other);
+ 		}
+ 
+ 		template<Type::SafeValue K, Type::SafeValue V, class Compare>
+@@ -172,13 +170,7 @@ namespace StormByte {
+ 			if (this == &other)
+ 				return *this;
+ 			clear();
+-			DestroyHeader();
+-			m_compare = std::move(other.m_compare);
+-			m_header = other.m_header;
+-			m_size = other.m_size;
+-			other.m_header = nullptr;
+-			other.m_size = 0;
+-			other.CreateHeader();
++			swap(other);
+ 			return *this;
+ 		}
+ 
+diff --git a/lib/public/StormByte/safe/set.hxx b/lib/public/StormByte/safe/set.hxx
+index f0d5b46..beaa907 100644
+--- a/lib/public/StormByte/safe/set.hxx
++++ b/lib/public/StormByte/safe/set.hxx
+@@ -315,13 +315,13 @@ namespace StormByte {
+ 				/**
+ 				 * @brief Construct an empty set.
+ 				 */
+-				Set() noexcept;
++				Set();
+ 
+ 				/**
+ 				 * @brief Construct an empty set with a comparator.
+ 				 * @param compare Value ordering.
+ 				 */
+-				explicit Set(const Compare& compare) noexcept;
++				explicit Set(const Compare& compare);
+ 
+ 				/**
+ 				 * @brief Copy the values.
+@@ -334,7 +334,7 @@ namespace StormByte {
+ 				 * @brief Take the values. @p other is left empty.
+ 				 * @param other Source.
+ 				 */
+-				Set(Set&& other) noexcept;
++				Set(Set&& other);
+ 
+ 				/**
+ 				 * @brief Destroy the values.
+diff --git a/lib/public/StormByte/safe/set.txx b/lib/public/StormByte/safe/set.txx
+index 6833623..ed0480e 100644
+--- a/lib/public/StormByte/safe/set.txx
++++ b/lib/public/StormByte/safe/set.txx
+@@ -43,11 +43,11 @@ namespace StormByte {
+ 	namespace Safe {
+ 		template<Type::SafeValue K, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+-		Set<K, Compare>::Set() noexcept = default;
++		Set<K, Compare>::Set() = default;
+ 
+ 		template<Type::SafeValue K, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+-		Set<K, Compare>::Set(const Compare& compare) noexcept: m_values(compare) {}
++		Set<K, Compare>::Set(const Compare& compare): m_values(compare) {}
+ 
+ 		template<Type::SafeValue K, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+@@ -55,7 +55,7 @@ namespace StormByte {
+ 
+ 		template<Type::SafeValue K, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+-		Set<K, Compare>::Set(Set&& other) noexcept: m_values(std::move(other.m_values)) {}
++		Set<K, Compare>::Set(Set&& other): m_values(std::move(other.m_values)) {}
+ 
+ 		template<Type::SafeValue K, class Compare>
+ 		requires std::strict_weak_order<Compare, const K&, const K&>
+diff --git a/test/telemetry_allocation_failure_test.cxx b/test/telemetry_allocation_failure_test.cxx
+index 4c4edfc..5f04f3d 100644
+--- a/test/telemetry_allocation_failure_test.cxx
++++ b/test/telemetry_allocation_failure_test.cxx
+@@ -5,6 +5,8 @@
+  */
+ 
+ #include <StormByte/telemetry.hxx>
++#include <StormByte/safe/map.hxx>
++#include <StormByte/safe/set.hxx>
+ 
+ #include <cerrno>
+ #include <cstdio>
+@@ -91,7 +93,45 @@ int main() {
+ 	exhausted = false;
+ 	if (denied != 0)
+ 		return 1;
+-
++	using Map = StormByte::Safe::Map<int, int>;
++	static_assert(!noexcept(StormByte::Safe::Set<int>{}));
++	static_assert(!noexcept(Map{}));
++	static_assert(!noexcept(Map(std::declval<Map&&>())));
++	unsigned caught = 0;
++	Map source{{1, 2}};
++	exhausted = true;
++	try {
++		Map empty;
++	} catch (const StormByte::Safe::AllocationError&) {
++		++caught;
++	}
++	try {
++		Map compared{std::less<int>{}};
++	} catch (const StormByte::Safe::AllocationError&) {
++		++caught;
++	}
++	try {
++		Map moved{std::move(source)};
++	} catch (const StormByte::Safe::AllocationError&) {
++		++caught;
++	}
++	try {
++		StormByte::Safe::Set<int> empty;
++	} catch (const StormByte::Safe::AllocationError&) {
++		++caught;
++	}
++	exhausted = false;
++	if (caught != 4 || source.at(1) != 2)
++		return 1;
++	Map target{{3, 4}};
++	denied = 0;
++	exhausted = true;
++	target = std::move(source);
++	const bool assignment_allocation_free = denied == 0;
++	exhausted = false;
++	if (!assignment_allocation_free || !source.empty() || target.at(1) != 2)
++		return 1;
++	source.emplace(5, 6);
+ 	exhausted = true;
+ 	{
+ 		Cleanup cleanup{normal, normal_active};
+-- 
+2.56.0
+

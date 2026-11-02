@@ -1,0 +1,207 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:263:12: warning: an exception may be thrown in function 'Plan' which should not throw exceptions [bugprone-exception-escape]
+  263 | void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept {
+      |            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' calls function 'allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__vector/vector.h:595:25: note: frame #5: function '__vallocate' calls function '__allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' here
+  595 |     auto __allocation = std::__allocate_at_least(this->__alloc_, __n);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1066:5: note: frame #6: function '__assign_with_size<std::_ClassicAlgPolicy, StormByte::Multimedia::Pipeline::Step **, StormByte::Multimedia::Pipeline::Step **>' calls function '__vallocate' here
+ 1066 |     __vallocate(__recommend(__new_size));
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:318:5: note: frame #7: function 'assign<StormByte::Multimedia::Pipeline::Step **, 0>' calls function '__assign_with_size<std::_ClassicAlgPolicy, StormByte::Multimedia::Pipeline::Step **, StormByte::Multimedia::Pipeline::Step **>' here
+  318 |     __assign_with_size<_ClassicAlgPolicy>(__first, __last, std::distance(__first, __last));
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:1031:5: note: frame #8: function 'operator=' calls function 'assign<StormByte::Multimedia::Pipeline::Step **, 0>' here
+ 1031 |     assign(__x.__begin_, __x.__end_);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:279:15: note: frame #9: function 'Plan' calls function 'operator=' here
+  279 |                         downstream = m_state->downstream;
+      |                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:323:12: warning: an exception may be thrown in function 'Connect' which should not throw exceptions [bugprone-exception-escape]
+  323 | bool Step::Connect(Step& downstream) noexcept {
+      |            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' calls function 'allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<StormByte::Multimedia::Pipeline::Step *>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<StormByte::Multimedia::Pipeline::Step *>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<StormByte::Multimedia::Pipeline::Step *>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #10: function 'push_back' calls function 'emplace_back<StormByte::Multimedia::Pipeline::Step *>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:329:4: note: frame #11: function 'Connect' calls function 'push_back' here
+  329 |                         links.push_back(&downstream);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:547:12: warning: an exception may be thrown in function 'DumpWork' which should not throw exceptions [bugprone-exception-escape]
+  547 | void Step::DumpWork() noexcept {
+      |            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2714:17: note: frame #7: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #8: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #9: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #10: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #11: function 'FormatReplaceToken<char, unsigned long &>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #12: function 'operator()<unsigned long &>' calls function 'FormatReplaceToken<char, unsigned long &>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #13: function 'ReplaceToken<unsigned long &, long &, long &>' calls function 'operator()<unsigned long &>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:550:20: note: frame #14: function 'DumpWork' calls function 'ReplaceToken<unsigned long &, long &, long &>' here
+  550 |         Log(Level::Debug, StormByte::Safe::String::ReplaceToken("work n={} min={}us max={}us",
+      |                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:578:12: warning: an exception may be thrown in function 'Halt' which should not throw exceptions [bugprone-exception-escape]
+  578 | void Step::Halt() noexcept {
+      |            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2838:5: note: frame #7: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:2847:89: note: frame #8: function 'assign' calls function '__assign_external' here
+ 2847 |   return (__builtin_constant_p(__n) && __fits_in_sso(__n)) ? __assign_short(__s, __n) : __assign_external(__s, __n);
+      |                                                                                         ^
+/usr/include/c++/v1/string:1503:12: note: frame #9: function 'assign<std::string_view, 0>' calls function 'assign' here
+ 1503 |     return assign(__sv.data(), __sv.size());
+      |            ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:316:4: note: frame #10: function 'FormatReplaceToken<char, std::string_view>' calls function 'assign<std::string_view, 0>' here
+  316 |                         out.assign(std::basic_string_view<Char>(std::forward<T>(value)));
+      |                         ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #11: function 'operator()<std::string_view>' calls function 'FormatReplaceToken<char, std::string_view>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #12: function 'ReplaceToken<std::string_view, const void *>' calls function 'operator()<std::string_view>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:580:23: note: frame #13: function 'Halt' calls function 'ReplaceToken<std::string_view, const void *>' here
+  580 |         Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("halt/join begin stage={} instance={}",
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:589:40: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]
+  589 | Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept {
+      |                                        ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' calls function 'allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<StormByte::Multimedia::Pipeline::Step *>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<StormByte::Multimedia::Pipeline::Step *>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<StormByte::Multimedia::Pipeline::Step *>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<StormByte::Multimedia::Pipeline::Step *>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #10: function 'push_back' calls function 'emplace_back<StormByte::Multimedia::Pipeline::Step *>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:596:3: note: frame #11: function 'operator>>' calls function 'push_back' here
+  596 |                 from.m_state->pendingWire.push_back(&to);
+      |                 ^
+
+exit_code=0

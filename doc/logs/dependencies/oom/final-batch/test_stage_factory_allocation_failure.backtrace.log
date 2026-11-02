@@ -1,0 +1,29 @@
+Loading libc++ pretty-printers.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib64/libthread_db.so.1".
+[Test] Starting test_stage_factory_allocation_failure
+libc++abi: terminating due to uncaught exception of type StormByte::Safe::AllocationError
+
+Program received signal SIGABRT, Aborted.
+__pthread_kill_implementation (threadid=<optimized out>, signo=signo@entry=6, no_tid=no_tid@entry=0) at pthread_kill.c:44
+warning: 44	pthread_kill.c: No existe el fichero o el directorio
+#0  __pthread_kill_implementation (threadid=<optimized out>, signo=signo@entry=6, no_tid=no_tid@entry=0) at pthread_kill.c:44
+#1  0x00007fffb4aaf733 in __pthread_kill_internal (threadid=<optimized out>, signo=6) at pthread_kill.c:89
+#2  0x00007fffb4a533e6 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
+#3  0x00007fffb4a3a13f in __GI_abort () at abort.c:77
+#4  0x00007ffff7e5e1bc in __abort_message (format=0x7ffff7e2fdca "terminating due to %s exception of type %s") at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/abort_message.cpp:66
+#5  0x00007ffff7e3d267 in demangling_terminate_handler () at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_default_handlers.cpp:77
+#6  0x00007ffff7e5d197 in std::__terminate (func=0x276f70) at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_handlers.cpp:59
+#7  0x00007ffff7e5d12c in std::terminate () at /tmp/portage/llvm-runtimes/libcxxabi-22.1.8/work/libcxxabi/src/cxa_handlers.cpp:88
+#8  0x00007fffe020f162 in __clang_call_terminate () from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/libStormByte-Multimedia.so.1.0.1
+#9  0x00007fffe04865eb in StageTelemetry () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/telemetry.cxx:166
+#10 0x00007fffe03ff048 in Create<StormByte::Multimedia::Pipeline::StageTelemetry> () at ../base/lib/public/StormByte/safe/pointers.txx:73
+#11 0x00007fffe03fbb1e in MakeShared<StormByte::Multimedia::Pipeline::StageTelemetry> () at ../base/lib/public/StormByte/safe/pointers.txx:546
+#12 0x00007fffe047e5ec in Step () at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:223
+#13 0x000055555bc67655 in TestStep () at /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/allocation_failure_test.cxx:66
+#14 TestFactoryAllocationFailure () at /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/allocation_failure_test.cxx:79
+#15 0x000055555bc6d995 in RunOneTest () at test/pipeline/filters/../../test_helpers.hxx:115
+#16 0x000055555bc6aee4 in RunSelectedTest () at test/pipeline/filters/../../test_helpers.hxx:139
+#17 0x00007fffb4a3c355 in __libc_start_call_main (main=main@entry=0x55555bc64be8 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffd9b8) at ../sysdeps/nptl/libc_start_call_main.h:59
+#18 0x00007fffb4a3c47b in __libc_start_main_impl (main=0x55555bc64be8 <main>, argc=2, argv=0x7fffffffd9b8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, stack_end=0x7fffffffd9a8) at ../csu/libc-start.c:372
+#19 0x000055555bc648a5 in _start ()

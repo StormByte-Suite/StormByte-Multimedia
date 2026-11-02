@@ -1,0 +1,108 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:263:12: warning: an exception may be thrown in function 'Plan' which should not throw exceptions [bugprone-exception-escape]
+  263 | void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept try {
+      |            ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:790:79: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+  790 |   [[__noreturn__]] _LIBCPP_HIDE_FROM_ABI static void __throw_length_error() { std::__throw_length_error("vector"); }
+      |                                                                               ^
+/usr/include/c++/v1/__vector/vector.h:931:5: note: frame #2: function '__recommend' calls function '__throw_length_error' here
+  931 |     this->__throw_length_error();
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:1066:17: note: frame #3: function '__assign_with_size<std::_ClassicAlgPolicy, StormByte::Multimedia::Pipeline::Step **, StormByte::Multimedia::Pipeline::Step **>' calls function '__recommend' here
+ 1066 |     __vallocate(__recommend(__new_size));
+      |                 ^
+/usr/include/c++/v1/__vector/vector.h:318:5: note: frame #4: function 'assign<StormByte::Multimedia::Pipeline::Step **, 0>' calls function '__assign_with_size<std::_ClassicAlgPolicy, StormByte::Multimedia::Pipeline::Step **, StormByte::Multimedia::Pipeline::Step **>' here
+  318 |     __assign_with_size<_ClassicAlgPolicy>(__first, __last, std::distance(__first, __last));
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:1031:5: note: frame #5: function 'operator=' calls function 'assign<StormByte::Multimedia::Pipeline::Step **, 0>' here
+ 1031 |     assign(__x.__begin_, __x.__end_);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:279:15: note: frame #6: function 'Plan' calls function 'operator=' here
+  279 |                         downstream = m_state->downstream;
+      |                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:335:12: warning: an exception may be thrown in function 'Connect' which should not throw exceptions [bugprone-exception-escape]
+  335 | bool Step::Connect(Step& downstream) noexcept try {
+      |            ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:790:79: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+  790 |   [[__noreturn__]] _LIBCPP_HIDE_FROM_ABI static void __throw_length_error() { std::__throw_length_error("vector"); }
+      |                                                                               ^
+/usr/include/c++/v1/__vector/vector.h:931:5: note: frame #2: function '__recommend' calls function '__throw_length_error' here
+  931 |     this->__throw_length_error();
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:1120:50: note: frame #3: function '__emplace_back_slow_path<StormByte::Multimedia::Pipeline::Step *>' calls function '__recommend' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                                  ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #4: function 'operator()' calls function '__emplace_back_slow_path<StormByte::Multimedia::Pipeline::Step *>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #5: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #6: function 'emplace_back<StormByte::Multimedia::Pipeline::Step *>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #7: function 'push_back' calls function 'emplace_back<StormByte::Multimedia::Pipeline::Step *>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:341:4: note: frame #8: function 'Connect' calls function 'push_back' here
+  341 |                         links.push_back(&downstream);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:581:12: warning: an exception may be thrown in function 'DumpWork' which should not throw exceptions [bugprone-exception-escape]
+  581 | void Step::DumpWork() noexcept try {
+      |            ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:245:4: note: frame #4: function 'FormatFloatAscii<double>' calls function 'PadAscii' here
+  245 |                         PadAscii(ascii, spec);
+      |                         ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #5: function 'FormatReplaceToken<char, unsigned long &>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #6: function 'operator()<unsigned long &>' calls function 'FormatReplaceToken<char, unsigned long &>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #7: function 'ReplaceToken<unsigned long &, long &, long &>' calls function 'operator()<unsigned long &>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:584:20: note: frame #8: function 'DumpWork' calls function 'ReplaceToken<unsigned long &, long &, long &>' here
+  584 |         Log(Level::Debug, StormByte::Safe::String::ReplaceToken("work n={} min={}us max={}us",
+      |                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:624:40: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]
+  624 | Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept try {
+      |                                        ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3125:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3125 |     this->__throw_out_of_range();
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #3: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #4: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:633:37: note: frame #5: function 'operator>>' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  633 |         from.Log(Level::Debug, "bound to " + std::string(ToString(to.m_name)));
+      |                                            ^
+
+exit_code=0

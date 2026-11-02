@@ -30,7 +30,11 @@ It is a snapshot, **not a passing release gate**.
   after successful destruction; the eight hardware cases complete as six
   functional passes and two unsupported-capability skips before LSan teardown.
   [Exact exception and evidence](reproduce/nvidia-driver-exception.md).
-  OOM and final static triage are tracked separately and remain open.
+  OOM's final targeted batch now passes: twelve isolated injection cases,
+  seventeen shared sanitizer passes/twelve intentional skips, then nine
+  overlapping final-delta passes. Exact boundary treatments and retained
+  semantic size-limit warnings are in
+  [the final reconciliation](static-analysis/final/oom-batch/README.md).
 
 Earlier status snapshots:
 

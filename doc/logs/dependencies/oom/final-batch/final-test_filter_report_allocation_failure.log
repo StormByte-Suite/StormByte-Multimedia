@@ -1,0 +1,5 @@
+[Test] Starting test_filter_report_allocation_failure
+[Test] TestReportAllocationFailure: assert caught == 2
+[Test] Finished test_filter_report_allocation_failure: PASS
+
+exit_code=0

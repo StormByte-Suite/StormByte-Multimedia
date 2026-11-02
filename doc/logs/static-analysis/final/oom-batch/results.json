@@ -1,0 +1,712 @@
+[
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/content.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_content.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/decoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_decoder.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/demuxer.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_demuxer.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_content_video.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_cover.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_decoder_audio.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_decoder_subtitle.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_decoder_video.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_encoder_audio.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_encoder_subtitle.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/video.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_encoder_video.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_muxer_ffmpeg_attachment.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_muxer_ffmpeg_container.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/generic.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_muxer_ffmpeg_policy_generic.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/mp4.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_muxer_ffmpeg_policy_mp4.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx:93:15: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx:139:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx:246:15: warning: an exception may be thrown in function 'Flush' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_worker_decode.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx:146:14: warning: an exception may be thrown in function 'FeedTrack' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx:191:14: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx:226:14: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_worker_demux.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:85:15: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:96:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_worker_encode.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/worker/filter.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_worker_filter.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/worker/mux.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/mux.cxx:97:12: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_worker_mux.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx:82:14: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx:101:14: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_detail_worker_remux.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/encoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_encoder.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/frame.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_frame.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_pipe.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:93:37: warning: an exception may be thrown in function 'operator()' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:229:14: warning: an exception may be thrown in function 'PumpPop' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_pumper.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:133:3: warning: an exception may be thrown in function '~TelemetrySummary' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:318:18: warning: an exception may be thrown in function 'Run' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_pipeline_transcoder.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/backend/zimg/zimg.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:477:13: warning: an exception may be thrown in function 'Ensure' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:535:13: warning: an exception may be thrown in function 'Scale' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_backend_zimg_zimg.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/AVBSF.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_AVBSF.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_AVBSFPipeline.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_AVDecoder.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_AVEncoder.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_AVFormatContext.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_AVSubtitle.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ffmpeg/video_input.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ffmpeg_video_input.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/log.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_log.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ocr/bitmap.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ocr_bitmap.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ocr/engine.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ocr_engine.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/ocr/tessdata.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_private_StormByte_multimedia_ocr_tessdata.cxx.log"
+  },
+  {
+    "source": "lib/private/StormByte/multimedia/pipeline/route.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/pipeline/route.cxx:185:13: warning: an exception may be thrown in function 'Close' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_private_StormByte_multimedia_pipeline_route.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_public_StormByte_multimedia_ffmpeg_AVChannelLayout.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_public_StormByte_multimedia_ffmpeg_AVFilterGraph.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/ffmpeg/AVFrame.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_public_StormByte_multimedia_ffmpeg_AVFrame.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/config/audio.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_public_StormByte_multimedia_pipeline_config_audio.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/config/subtitle.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_public_StormByte_multimedia_pipeline_config_subtitle.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/config/video.cxx",
+    "exit_code": 0,
+    "diagnostics": [],
+    "log": "lib_public_StormByte_multimedia_pipeline_config_video.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/decoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/decoder.cxx:130:15: warning: an exception may be thrown in function 'SetupPlan' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/decoder.cxx:231:15: warning: an exception may be thrown in function 'StampLook' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/decoder.cxx:351:15: warning: an exception may be thrown in function 'ResetAfterMeasure' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/decoder.cxx:382:15: warning: an exception may be thrown in function 'OpenLook' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_decoder.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/demuxer.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/demuxer.cxx:195:30: warning: an exception may be thrown in function 'Wrap' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/demuxer.cxx:239:43: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_demuxer.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/encoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/encoder.cxx:281:30: warning: an exception may be thrown in function 'Wrap' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_encoder.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters.cxx:258:15: warning: an exception may be thrown in function 'Close' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx:84:19: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx:101:19: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_analytics_frames.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx:283:12: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx:344:12: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_analytics_psnr.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx:299:12: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx:357:12: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_analytics_ssim.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx:229:12: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx:417:12: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx:478:12: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_analytics_vmaf.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx:306:13: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx:364:13: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_analytics_xpsnr.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx:93:16: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx:138:16: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_adeclick.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx:94:14: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx:139:14: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_afftdn.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx:298:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx:346:15: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_denoise.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx:135:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx:208:15: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_downmix.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx:94:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx:139:15: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_limiter.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx:382:16: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx:407:16: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_loudnorm.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx:93:16: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx:149:16: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_resample.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/rubberband.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/rubberband.cxx:92:18: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/rubberband.cxx:137:18: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_rubberband.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/audio/upmix.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/upmix.cxx:172:13: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/upmix.cxx:255:13: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_audio_upmix.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:345:14: warning: an exception may be thrown in function 'Hold' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:368:14: warning: an exception may be thrown in function 'Release' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:481:14: warning: an exception may be thrown in function 'Save' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:521:14: warning: an exception may be thrown in function 'Save' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:607:14: warning: an exception may be thrown in function 'EmitGraph' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:678:14: warning: an exception may be thrown in function 'Work' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx:860:14: warning: an exception may be thrown in function 'DumpWork' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_ffmpeg.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/atadenoise.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/atadenoise.cxx:101:18: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/atadenoise.cxx:146:18: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_atadenoise.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/bm3d.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/bm3d.cxx:106:12: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_bm3d.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/bwdif.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/bwdif.cxx:192:13: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/bwdif.cxx:222:13: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_bwdif.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/cas.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/cas.cxx:91:11: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/cas.cxx:147:11: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_cas.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/crop.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/crop.cxx:408:12: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_crop.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/deband.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deband.cxx:165:14: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_deband.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/decimate.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/decimate.cxx:189:16: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/decimate.cxx:251:16: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_decimate.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:105:17: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx:161:17: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_deflicker.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:713:15: warning: an exception may be thrown in function 'Measure' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:729:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:752:15: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_degrain.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/fftdnoiz.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fftdnoiz.cxx:97:16: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fftdnoiz.cxx:153:16: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_fftdnoiz.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx:119:18: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx:175:18: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_fieldmatch.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/format.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/format.cxx:83:14: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_format.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:89:11: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:148:11: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_fps.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/hqdn3d.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/hqdn3d.cxx:173:14: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_hqdn3d.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/interpolate.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/interpolate.cxx:92:19: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/interpolate.cxx:151:19: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_interpolate.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/nlmeans.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/nlmeans.cxx:120:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_nlmeans.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/pad.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/pad.cxx:91:11: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/pad.cxx:161:11: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_pad.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/scale.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/scale.cxx:84:13: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/scale.cxx:92:13: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_scale.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/tonemap.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/tonemap.cxx:139:15: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/tonemap.cxx:216:15: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_tonemap.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/vaguedenoiser.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/vaguedenoiser.cxx:96:21: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_vaguedenoiser.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx:811:17: warning: an exception may be thrown in function 'Setup' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx:1062:17: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx:1103:17: warning: an exception may be thrown in function 'LastChance' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_watermark.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/filters/video/yadif.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/yadif.cxx:182:13: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/yadif.cxx:212:13: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_filters_video_yadif.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/muxer.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/muxer.cxx:359:13: warning: an exception may be thrown in function 'ArmOctets' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/muxer.cxx:463:43: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/muxer.cxx:487:43: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_muxer.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/remuxer.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/remuxer.cxx:138:43: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_remuxer.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/step.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:263:12: warning: an exception may be thrown in function 'Plan' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:335:12: warning: an exception may be thrown in function 'Connect' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:581:12: warning: an exception may be thrown in function 'DumpWork' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:624:40: warning: an exception may be thrown in function 'operator>>' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_step.cxx.log"
+  },
+  {
+    "source": "lib/public/StormByte/multimedia/pipeline/transcoder.cxx",
+    "exit_code": 0,
+    "diagnostics": [
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:175:39: warning: an exception may be thrown in function 'Remux' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:189:39: warning: an exception may be thrown in function 'Codec' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:490:18: warning: an exception may be thrown in function 'ProbeSource' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:525:18: warning: an exception may be thrown in function 'Resources' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:549:31: warning: an exception may be thrown in function 'AddTrack' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:666:25: warning: an exception may be thrown in function 'Ignore' which should not throw exceptions [bugprone-exception-escape]",
+      "/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:862:18: warning: an exception may be thrown in function 'OnSettled' which should not throw exceptions [bugprone-exception-escape]"
+    ],
+    "log": "lib_public_StormByte_multimedia_pipeline_transcoder.cxx.log"
+  }
+]

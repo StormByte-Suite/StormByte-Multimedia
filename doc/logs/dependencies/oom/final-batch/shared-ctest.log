@@ -1,0 +1,84 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+      Start 407: pipeline.test_filter_nlmeans
+      Start  96: pipeline.test_transcoder_vmaf_remux_matches_source_at_100
+ 1/29 Test  #96: pipeline.test_transcoder_vmaf_remux_matches_source_at_100 ....   Passed   24.16 sec
+      Start  93: pipeline.test_transcoder_remuxes_mp4_audio_into_matroska
+ 2/29 Test  #93: pipeline.test_transcoder_remuxes_mp4_audio_into_matroska .....   Passed    3.29 sec
+      Start 411: pipeline.test_filter_watermark
+ 3/29 Test #411: pipeline.test_filter_watermark ...............................   Passed    3.56 sec
+      Start 400: pipeline.test_filter_degrain
+ 4/29 Test #400: pipeline.test_filter_degrain .................................   Passed    2.30 sec
+      Start 388: pipeline.test_filter_loudnorm
+ 5/29 Test #388: pipeline.test_filter_loudnorm ................................   Passed    1.06 sec
+      Start 391: pipeline.test_filter_upmix
+ 6/29 Test #391: pipeline.test_filter_upmix ...................................   Passed    0.89 sec
+      Start 383: pipeline.test_filter_adeclick
+ 7/29 Test #383: pipeline.test_filter_adeclick ................................   Passed    1.10 sec
+      Start 297: pipeline.test_ass_encodes_matroska
+ 8/29 Test #297: pipeline.test_ass_encodes_matroska ...........................   Passed    0.38 sec
+      Start 296: pipeline.test_srt_encodes_srt
+ 9/29 Test #296: pipeline.test_srt_encodes_srt ................................   Passed    0.39 sec
+      Start 416: pipeline.test_filter_xpsnr
+10/29 Test #416: pipeline.test_filter_xpsnr ...................................   Passed    0.97 sec
+      Start 415: pipeline.test_filter_ssim
+11/29 Test #415: pipeline.test_filter_ssim ....................................   Passed    0.84 sec
+      Start 414: pipeline.test_filter_psnr
+12/29 Test #414: pipeline.test_filter_psnr ....................................   Passed    0.76 sec
+      Start 413: pipeline.test_filter_count_frames
+13/29 Test #413: pipeline.test_filter_count_frames ............................   Passed    0.71 sec
+      Start 307: pipeline.test_transcoder_plan_allocation_failure
+14/29 Test #307: pipeline.test_transcoder_plan_allocation_failure .............   Passed    0.71 sec
+      Start 308: pipeline.test_transcoder_empty_plan_owner
+15/29 Test #308: pipeline.test_transcoder_empty_plan_owner ....................   Passed    0.47 sec
+      Start 374: pipeline.test_filter_graph_delayed_output_and_eof
+16/29 Test #374: pipeline.test_filter_graph_delayed_output_and_eof ............   Passed    0.14 sec
+      Start 358: pipeline.test_pipeline_failure_closure_without_allocations
+17/29 Test #358: pipeline.test_pipeline_failure_closure_without_allocations ...***Skipped   0.23 sec
+      Start 359: pipeline.test_nlmeans_scratch_failure_fails_job
+18/29 Test #359: pipeline.test_nlmeans_scratch_failure_fails_job ..............***Skipped   0.23 sec
+      Start 360: pipeline.test_transcoder_start_without_allocations
+19/29 Test #360: pipeline.test_transcoder_start_without_allocations ...........***Skipped   0.23 sec
+      Start 361: pipeline.test_transcoder_worker_without_allocations
+20/29 Test #361: pipeline.test_transcoder_worker_without_allocations ..........***Skipped   0.23 sec
+      Start 362: pipeline.test_transcoder_cancel_without_allocations
+21/29 Test #362: pipeline.test_transcoder_cancel_without_allocations ..........***Skipped   0.22 sec
+      Start 363: pipeline.test_writer_destruction_without_allocations
+22/29 Test #363: pipeline.test_writer_destruction_without_allocations .........***Skipped   0.23 sec
+      Start 364: pipeline.test_stage_factory_allocation_failure
+23/29 Test #364: pipeline.test_stage_factory_allocation_failure ...............***Skipped   0.22 sec
+      Start 365: pipeline.test_filter_report_allocation_failure
+24/29 Test #365: pipeline.test_filter_report_allocation_failure ...............***Skipped   0.22 sec
+      Start 366: pipeline.test_subtitle_allocation_failure
+25/29 Test #366: pipeline.test_subtitle_allocation_failure ....................***Skipped   0.22 sec
+      Start 367: pipeline.test_stage_wiring_allocation_failure
+26/29 Test #367: pipeline.test_stage_wiring_allocation_failure ................***Skipped   0.22 sec
+      Start 368: pipeline.test_filter_process_allocation_failure
+27/29 Test #368: pipeline.test_filter_process_allocation_failure ..............***Skipped   0.22 sec
+      Start 369: pipeline.test_track_configuration_allocation_failure
+28/29 Test #369: pipeline.test_track_configuration_allocation_failure .........***Skipped   0.22 sec
+29/29 Test #407: pipeline.test_filter_nlmeans .................................   Passed  263.56 sec
+
+100% tests passed, 0 tests failed out of 29
+
+Label Time Summary:
+multimedia         = 307.97 sec*proc (29 tests)
+pipeline           = 307.97 sec*proc (29 tests)
+subtitle-codecs    =   0.77 sec*proc (2 tests)
+
+Total Test time (real) = 263.57 sec
+
+The following tests did not run:
+	358 - pipeline.test_pipeline_failure_closure_without_allocations (Skipped)
+	359 - pipeline.test_nlmeans_scratch_failure_fails_job (Skipped)
+	360 - pipeline.test_transcoder_start_without_allocations (Skipped)
+	361 - pipeline.test_transcoder_worker_without_allocations (Skipped)
+	362 - pipeline.test_transcoder_cancel_without_allocations (Skipped)
+	363 - pipeline.test_writer_destruction_without_allocations (Skipped)
+	364 - pipeline.test_stage_factory_allocation_failure (Skipped)
+	365 - pipeline.test_filter_report_allocation_failure (Skipped)
+	366 - pipeline.test_subtitle_allocation_failure (Skipped)
+	367 - pipeline.test_stage_wiring_allocation_failure (Skipped)
+	368 - pipeline.test_filter_process_allocation_failure (Skipped)
+	369 - pipeline.test_track_configuration_allocation_failure (Skipped)
+
+exit_code=0

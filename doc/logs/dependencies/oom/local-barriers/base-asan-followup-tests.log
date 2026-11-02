@@ -1,0 +1,16 @@
+Test project /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/base-asan/test
+    Start  7: TelemetryTests
+1/4 Test  #7: TelemetryTests ....................   Passed    0.02 sec
+    Start  8: TelemetryAllocationFailureTests
+2/4 Test  #8: TelemetryAllocationFailureTests ...***Skipped   0.01 sec
+    Start 26: MapTests
+3/4 Test #26: MapTests ..........................   Passed    0.01 sec
+    Start 34: SetTests
+4/4 Test #34: SetTests ..........................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.05 sec
+
+The following tests did not run:
+	  8 - TelemetryAllocationFailureTests (Skipped)

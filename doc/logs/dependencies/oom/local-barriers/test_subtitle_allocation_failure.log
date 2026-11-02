@@ -1,0 +1,14 @@
+[Test] Starting test_subtitle_allocation_failure
+[Test] TestSubtitleAllocationFailure: assert empty.Text().empty()
+[Test] TestSubtitleAllocationFailure: assert !restored
+[Test] TestSubtitleAllocationFailure: assert !filled
+[Test] TestSubtitleAllocationFailure: assert moved.Text().empty()
+[Test] TestSubtitleAllocationFailure: assert !filled
+[Test] TestSubtitleAllocationFailure: assert moved.Text().empty()
+[Test] TestSubtitleAllocationFailure: assert !filled
+[Test] TestSubtitleAllocationFailure: assert moved.Text().empty()
+[Test] TestSubtitleAllocationFailure: assert moved.FillText("cue", 42, 1000, false)
+[Test] TestSubtitleAllocationFailure: assert moved.Text() == StormByte::Safe::String{"cue"}
+[Test] Finished test_subtitle_allocation_failure: PASS
+
+exit_code=0

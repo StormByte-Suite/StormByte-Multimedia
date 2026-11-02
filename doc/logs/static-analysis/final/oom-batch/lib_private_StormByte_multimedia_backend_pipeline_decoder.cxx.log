@@ -1,0 +1,3 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/decoder.cxx
+
+exit_code=0

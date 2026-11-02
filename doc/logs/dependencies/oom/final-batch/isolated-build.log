@@ -1,0 +1,375 @@
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:51:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/consumer.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/ring.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/generic.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/typedefs.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/exception.hxx:47:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:51:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/consumer.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/ring.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/generic.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/typedefs.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/exception.hxx:47:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/allocation_failure_test.cxx:7:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../helpers.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/allocation_failure_test.cxx:7:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../helpers.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:51:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/consumer.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/ring.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/generic.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/typedefs.hxx:47:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/byte_size.hxx:1238:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1238 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:51:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/consumer.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/ring.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/generic.hxx:46:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/prefix/buffer/include/StormByte/buffer/typedefs.hxx:47:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/byte_size.hxx:1238:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1238 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/pipeline/route.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/pipeline/route.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+2 warnings generated.
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/demuxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/demuxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/decoder.cxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/decoder.cxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/encoder.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/encoder.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+4 warnings generated.
+2 warnings generated.
+2 warnings generated.
+2 warnings generated.
+2 warnings generated.
+2 warnings generated.
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/muxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/muxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/remuxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:62: warning: 'denorm_absent' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                                                            ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/remuxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/exception.hxx:42:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/string.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/pointers.hxx:43:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/safe/heap.hxx:42:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/../base/lib/public/StormByte/size.hxx:1149:25: warning: 'float_denorm_style' is deprecated [-Wdeprecated-declarations]
+ 1149 |                 static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      |                                       ^
+/usr/include/c++/v1/limits:130:6: note: 'float_denorm_style' has been explicitly marked deprecated here
+  130 | enum _LIBCPP_DEPRECATED_IN_CXX23 float_denorm_style {
+      |      ^
+/usr/include/c++/v1/__config:552:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX23'
+  552 | #    define _LIBCPP_DEPRECATED_IN_CXX23 _LIBCPP_DEPRECATED
+      |                                         ^
+/usr/include/c++/v1/__config:504:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  504 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+2 warnings generated.
+2 warnings generated.

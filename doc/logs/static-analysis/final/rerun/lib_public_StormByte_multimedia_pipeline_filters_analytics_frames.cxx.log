@@ -1,0 +1,99 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx:83:19: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]
+   83 | void CountFrames::Process(const Pipeline::Frame& frame) noexcept {
+      |                   ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2714:17: note: frame #7: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #8: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #9: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #10: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #11: function 'FormatReplaceToken<char, int>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #12: function 'operator()<int>' calls function 'FormatReplaceToken<char, int>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #13: function 'ReplaceToken<int, int, long long>' calls function 'operator()<int>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx:91:23: note: frame #14: function 'Process' calls function 'ReplaceToken<int, int, long long>' here
+   91 |         Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("count t={} producer={} pts={}",
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx:96:19: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]
+   96 | void CountFrames::Eof() noexcept {
+      |                   ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2714:17: note: frame #7: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #8: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #9: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #10: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #11: function 'FormatReplaceToken<char, const int &>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #12: function 'operator()<const int &>' calls function 'FormatReplaceToken<char, const int &>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #13: function 'ReplaceToken<const int &, const unsigned long &>' calls function 'operator()<const int &>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx:98:22: note: frame #14: function 'Eof' calls function 'ReplaceToken<const int &, const unsigned long &>' here
+   98 |                 Log(Level::Notice, StormByte::Safe::String::ReplaceToken("t={} frames={}", track, n));
+      |                                    ^
+
+exit_code=0

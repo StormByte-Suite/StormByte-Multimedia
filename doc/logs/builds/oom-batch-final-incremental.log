@@ -1,0 +1,15 @@
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/transcoder.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/step.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/zimg/zimg.cxx.o
+[ 91%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx.o
+[ 91%] Linking CXX shared library libStormByte-Multimedia.so
+[ 91%] Linking CXX executable MultimediaPipelineAllocationTests
+[ 91%] Linking CXX executable MultimediaPipelineCoordinatorAllocationTests
+[ 91%] Linking CXX executable MultimediaPipelineFilterTests
+[ 91%] Linking CXX executable MultimediaPipelineAnalyticsTests

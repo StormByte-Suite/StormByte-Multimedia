@@ -1,0 +1,189 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:175:39: warning: an exception may be thrown in function 'Remux' which should not throw exceptions [bugprone-exception-escape]
+  175 | Transcoder::Track& Transcoder::Track::Remux() noexcept try {
+      |                                       ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:3129:5: note: frame #4: function 'insert' calls function '__grow_by_and_replace' here
+ 3129 |     __grow_by_and_replace(__cap, __sz + __n - __cap, __sz, __pos, 0, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #5: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #6: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:179:3: note: frame #7: function 'Remux' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  179 |                 + std::to_string(m_owner->m_backend->Mapped[m_slot].In) + " marked remux");
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:189:39: warning: an exception may be thrown in function 'Codec' which should not throw exceptions [bugprone-exception-escape]
+  189 | Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& codec) noexcept try {
+      |                                       ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #4: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:194:29: note: frame #5: function 'Codec' calls function 'basic_string<std::string_view, 0>' here
+  194 |                 m_owner->Fail("codec '" + std::string(codec.Name()) + "' is "
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:490:18: warning: an exception may be thrown in function 'ProbeSource' which should not throw exceptions [bugprone-exception-escape]
+  490 | bool Transcoder::ProbeSource() noexcept try {
+      |                  ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2838:5: note: frame #4: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:2847:89: note: frame #5: function 'assign' calls function '__assign_external' here
+ 2847 |   return (__builtin_constant_p(__n) && __fits_in_sso(__n)) ? __assign_short(__s, __n) : __assign_external(__s, __n);
+      |                                                                                         ^
+/usr/include/c++/v1/string:1503:12: note: frame #6: function 'assign<std::string_view, 0>' calls function 'assign' here
+ 1503 |     return assign(__sv.data(), __sv.size());
+      |            ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:316:4: note: frame #7: function 'FormatReplaceToken<char, std::string_view>' calls function 'assign<std::string_view, 0>' here
+  316 |                         out.assign(std::basic_string_view<Char>(std::forward<T>(value)));
+      |                         ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #8: function 'operator()<std::string_view>' calls function 'FormatReplaceToken<char, std::string_view>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #9: function 'ReplaceToken<std::string_view>' calls function 'operator()<std::string_view>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:507:34: note: frame #10: function 'ProbeSource' calls function 'ReplaceToken<std::string_view>' here
+  507 |         JobLog(m_logger, Level::Notice, StormByte::Safe::String::ReplaceToken("probed source {}", std::string_view{path}));
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:525:18: warning: an exception may be thrown in function 'Resources' which should not throw exceptions [bugprone-exception-escape]
+  525 | void Transcoder::Resources(ResourceUsage usage) noexcept try {
+      |                  ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2714:17: note: frame #3: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #4: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #5: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #6: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #7: function 'FormatReplaceToken<char, unsigned int>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #8: function 'operator()<unsigned int>' calls function 'FormatReplaceToken<char, unsigned int>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #9: function 'ReplaceToken<unsigned int>' calls function 'operator()<unsigned int>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:540:7: note: frame #10: function 'Resources' calls function 'ReplaceToken<unsigned int>' here
+  540 |         Fail(StormByte::Safe::String::ReplaceToken(
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:549:31: warning: an exception may be thrown in function 'AddTrack' which should not throw exceptions [bugprone-exception-escape]
+  549 | Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept try {
+      |                               ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:3129:5: note: frame #4: function 'insert' calls function '__grow_by_and_replace' here
+ 3129 |     __grow_by_and_replace(__cap, __sz + __n - __cap, __sz, __pos, 0, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #5: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #6: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:550:52: note: frame #7: function 'AddTrack' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  550 |         JobLog(m_logger, Level::LowLevel, "add-track in=" + std::to_string(in));
+      |                                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:666:25: warning: an exception may be thrown in function 'Ignore' which should not throw exceptions [bugprone-exception-escape]
+  666 | Transcoder& Transcoder::Ignore(int in) noexcept try {
+      |                         ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:3129:5: note: frame #4: function 'insert' calls function '__grow_by_and_replace' here
+ 3129 |     __grow_by_and_replace(__cap, __sz + __n - __cap, __sz, __pos, 0, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #5: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #6: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:667:46: note: frame #7: function 'Ignore' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  667 |         JobLog(m_logger, Level::LowLevel, "ignore " + std::to_string(in));
+      |                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:862:18: warning: an exception may be thrown in function 'OnSettled' which should not throw exceptions [bugprone-exception-escape]
+  862 | void Transcoder::OnSettled(const TrackSettled& row) noexcept {
+      |                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:168:5: note: frame #0: unhandled exception of type 'BadOptionalAccess' may be thrown in function 'value' here
+  168 |                                 throw BadOptionalAccess();
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:168:47: note: frame #1: function 'ToString' calls function 'value' here
+  168 |                 text += " impl=" + static_cast<std::string>(Implementation.value());
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:864:34: note: frame #2: function 'OnSettled' calls function 'ToString' here
+  864 |                 JobLog(m_logger, Level::Debug, row.ToString());
+      |                                                ^
+
+exit_code=0

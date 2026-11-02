@@ -1,0 +1,140 @@
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/content.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/mp4.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/video.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/generic.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/encoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/mux.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/frame.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSF.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pumper.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/zimg/zimg.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pipe.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/filter.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx.o
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx:54:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx:52:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:54:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx:52:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.hxx:53:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:737: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx.o] Error 1
+gmake[1]: *** Se espera a que terminen otras tareas....
+1 error generated.
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:765: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx.o] Error 1
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:261: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx.o] Error 1
+1 error generated.
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:289: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o] Error 1
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:233: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o] Error 1
+1 error generated.
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:247: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o] Error 1
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:457: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx.o] Error 1
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/demuxer.cxx:52:
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:51:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:793: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx.o] Error 1
+In file included from /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:56:
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:163:33: error: exception specification in declaration does not match previous declaration
+  163 |                                 StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:89:40: note: previous declaration is here
+   89 |         StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
+      |                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:940:20: error: exception specification in declaration does not match previous declaration
+  940 | FFmpeg::AVEncoder::operator bool() const noexcept {
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.hxx:227:13: note: previous declaration is here
+  227 |                         explicit operator bool() const;
+      |                                  ^
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:163: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o] Error 1
+2 errors generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:751: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx.o] Error 1
+gmake: *** [Makefile:1098: StormByte-Multimedia/fast] Error 2

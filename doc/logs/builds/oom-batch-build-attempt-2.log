@@ -1,0 +1,48 @@
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/demuxer.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/subtitle.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/decoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/audio.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/engine.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/video_input.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/pipeline/route.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVChannelLayout.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/video.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/log.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/bitmap.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/tessdata.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFrame.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/encoder.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx.o
+[ 88%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx.o
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/engine.cxx:202:15: error: exception specification in declaration does not match previous declaration
+  202 |         void Engine::Language(StormByte::Safe::String language) noexcept {
+      |                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/engine.hxx:147:9: note: previous declaration is here
+  147 |                         void Language(StormByte::Safe::String language);
+      |                              ^
+1 error generated.
+gmake[1]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:905: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/engine.cxx.o] Error 1
+gmake[1]: *** Se espera a que terminen otras tareas....
+gmake: *** [Makefile:1098: StormByte-Multimedia/fast] Error 2

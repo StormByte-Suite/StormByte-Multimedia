@@ -1,0 +1,78 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:89:11: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]
+   89 | void Fps::Process(const Pipeline::Frame& frame) noexcept try {
+      |           ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2714:17: note: frame #3: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #4: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #5: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #6: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #7: function 'FormatReplaceToken<char, const unsigned int &>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #8: function 'operator()<const unsigned int &>' calls function 'FormatReplaceToken<char, const unsigned int &>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #9: function 'ReplaceToken<const unsigned int &, const unsigned int &>' calls function 'operator()<const unsigned int &>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:86:9: note: frame #10: function 'Chain' calls function 'ReplaceToken<const unsigned int &, const unsigned int &>' here
+   86 |         return StormByte::Safe::String::ReplaceToken("fps=fps={}/{}:round=near", m_num, m_den);
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:106:40: note: frame #11: function 'Process' calls function 'Chain' here
+  106 |         const StormByte::Safe::String chain = Chain();
+      |                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:148:11: warning: an exception may be thrown in function 'Eof' which should not throw exceptions [bugprone-exception-escape]
+  148 | void Fps::Eof() noexcept try {
+      |           ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2714:17: note: frame #3: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #4: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #5: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #6: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #7: function 'FormatReplaceToken<char, int>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #8: function 'operator()<int>' calls function 'FormatReplaceToken<char, int>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #9: function 'ReplaceToken<int, int, long>' calls function 'operator()<int>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/fps.cxx:159:24: note: frame #10: function 'Eof' calls function 'ReplaceToken<int, int, long>' here
+  159 |                 Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
+      |                                      ^
+
+exit_code=0

@@ -1,0 +1,48 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:477:13: warning: an exception may be thrown in function 'Ensure' which should not throw exceptions [bugprone-exception-escape]
+  477 |         bool Zimg::Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
+      |                    ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:790:79: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+  790 |   [[__noreturn__]] _LIBCPP_HIDE_FROM_ABI static void __throw_length_error() { std::__throw_length_error("vector"); }
+      |                                                                               ^
+/usr/include/c++/v1/__vector/vector.h:931:5: note: frame #2: function '__recommend' calls function '__throw_length_error' here
+  931 |     this->__throw_length_error();
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:1120:50: note: frame #3: function '__emplace_back_slow_path<>' calls function '__recommend' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                                  ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #4: function 'operator()' calls function '__emplace_back_slow_path<>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #5: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #6: function 'emplace_back<>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:516:3: note: frame #7: function 'Ensure' calls function 'emplace_back<>' here
+  516 |                 m_slots.emplace_back();
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:535:13: warning: an exception may be thrown in function 'Scale' which should not throw exceptions [bugprone-exception-escape]
+  535 |         bool Zimg::Scale(const FFmpeg::AVFrame& src, FFmpeg::AVFrame& dst) const noexcept try {
+      |                    ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:790:79: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+  790 |   [[__noreturn__]] _LIBCPP_HIDE_FROM_ABI static void __throw_length_error() { std::__throw_length_error("vector"); }
+      |                                                                               ^
+/usr/include/c++/v1/__vector/vector.h:931:5: note: frame #2: function '__recommend' calls function '__throw_length_error' here
+  931 |     this->__throw_length_error();
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:1082:17: note: frame #3: function 'assign' calls function '__recommend' here
+ 1082 |     __vallocate(__recommend(static_cast<size_type>(__n)));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:555:4: note: frame #4: function 'Scale' calls function 'assign' here
+  555 |                         m_jobOk.assign(strips.size(), 0);
+      |                         ^
+
+exit_code=0

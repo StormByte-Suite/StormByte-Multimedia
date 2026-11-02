@@ -1,0 +1,121 @@
+From 8369f8003a47bc972207a826268951422945b8f2 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 07:35:12 +0100
+Subject: [PATCH] Defer telemetry drawer allocation until first clock access
+
+---
+ CHANGELOG.md                               |  1 +
+ lib/public/StormByte/telemetry.cxx         | 38 +++++++++++++++-------
+ test/telemetry_allocation_failure_test.cxx |  9 +++++
+ 3 files changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 1dadde1..d3b2426 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -23,6 +23,7 @@ If you landed here from a release link and have not read the tree:
+ ## [Unreleased]
+ 
+ ### Fixed
++- Telemetry constructs its already-lazy clock drawer only when first used, so its `noexcept` constructor does not allocate.
+ - Best-effort telemetry sampling returns an inactive token without allocating while an exception is unwinding, preventing nested allocation failures in instrumented cleanup. Focused fault-injection tests cover normal and unwinding cleanup, including sustained allocation rejection.
+ 
+ [Unreleased]: https://github.com/StormByte-Suite/StormByte/compare/2.2.3...HEAD
+diff --git a/lib/public/StormByte/telemetry.cxx b/lib/public/StormByte/telemetry.cxx
+index ef97ff4..bc07ebe 100644
+--- a/lib/public/StormByte/telemetry.cxx
++++ b/lib/public/StormByte/telemetry.cxx
+@@ -61,6 +61,10 @@ namespace StormByte {
+ 
+ using namespace StormByte;
+ 
++namespace {
++	std::mutex drawer_creation_lock;
++}
++
+ // --- StormByte::Clock ---
+ 
+ Clock::Clock() noexcept:
+@@ -166,7 +170,7 @@ std::uint64_t Clock::Count() const noexcept {
+ // --- StormByte::Telemetry ---
+ 
+ Telemetry::Telemetry() noexcept:
+-	m_store{Safe::MakeUnique<Store>()} {}
++	m_store{} {}
+ 
+ Telemetry::Telemetry(Telemetry&& other) noexcept:
+ 	m_store{std::move(other.m_store)} {}
+@@ -180,29 +184,39 @@ Telemetry& Telemetry::operator=(Telemetry&& other) noexcept {
+ Telemetry::~Telemetry() noexcept = default;
+ 
+ Clock& Telemetry::Clock(const std::string_view name) {
+-	if (!m_store)
+-		m_store = Safe::MakeUnique<Store>();
+-	m_store->lock.Lock();
++	Store* store;
++	{
++		std::lock_guard lock(drawer_creation_lock);
++		if (!m_store)
++			m_store = Safe::MakeUnique<Store>();
++		store = m_store.get();
++	}
++	store->lock.Lock();
+ 	try {
+-		auto [it, inserted] = m_store->clocks.try_emplace(std::string(name));
++		auto [it, inserted] = store->clocks.try_emplace(std::string(name));
+ 		(void)inserted;
+-		m_store->lock.Unlock();
++		store->lock.Unlock();
+ 		return it->second;
+ 	} catch (...) {
+-		m_store->lock.Unlock();
++		store->lock.Unlock();
+ 		Safe::Heap::RethrowException();
+ 	}
+ }
+ 
+ const Clock& Telemetry::Clock(const std::string_view name) const {
+ 	static const StormByte::Clock empty_clock;
+-	if (!m_store)
++	Store* store;
++	{
++		std::lock_guard lock(drawer_creation_lock);
++		store = m_store.get();
++	}
++	if (!store)
+ 		return empty_clock;
+-	m_store->lock.Lock();
+-	const auto it = m_store->clocks.find(name);
+-	const bool found = (it != m_store->clocks.end());
++	store->lock.Lock();
++	const auto it = store->clocks.find(name);
++	const bool found = (it != store->clocks.end());
+ 	const StormByte::Clock* result = found ? &it->second : &empty_clock;
+-	m_store->lock.Unlock();
++	store->lock.Unlock();
+ 	return *result;
+ }
+ 
+diff --git a/test/telemetry_allocation_failure_test.cxx b/test/telemetry_allocation_failure_test.cxx
+index cfd1ddc..4c4edfc 100644
+--- a/test/telemetry_allocation_failure_test.cxx
++++ b/test/telemetry_allocation_failure_test.cxx
+@@ -83,6 +83,15 @@ int main() {
+ 	bool unwind_allocation_free = false;
+ 	// Initialize libc++abi exception state before denying its initial calloc.
+ 	try { throw std::bad_alloc{}; } catch (const std::bad_alloc&) {}
++	denied = 0;
++	exhausted = true;
++	{
++		Telemetry allocation_free;
++	}
++	exhausted = false;
++	if (denied != 0)
++		return 1;
++
+ 	exhausted = true;
+ 	{
+ 		Cleanup cleanup{normal, normal_active};
+-- 
+2.56.0
+

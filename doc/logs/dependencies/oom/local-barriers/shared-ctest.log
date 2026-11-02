@@ -1,0 +1,36 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+      Start 307: pipeline.test_transcoder_plan_allocation_failure
+ 1/10 Test #307: pipeline.test_transcoder_plan_allocation_failure ....   Passed    0.68 sec
+      Start 308: pipeline.test_transcoder_empty_plan_owner
+ 2/10 Test #308: pipeline.test_transcoder_empty_plan_owner ...........   Passed    0.46 sec
+      Start 364: pipeline.test_stage_factory_allocation_failure
+ 3/10 Test #364: pipeline.test_stage_factory_allocation_failure ......***Skipped   0.24 sec
+      Start 365: pipeline.test_filter_report_allocation_failure
+ 4/10 Test #365: pipeline.test_filter_report_allocation_failure ......***Skipped   0.22 sec
+      Start 366: pipeline.test_subtitle_allocation_failure
+ 5/10 Test #366: pipeline.test_subtitle_allocation_failure ...........***Skipped   0.23 sec
+      Start 371: pipeline.test_filter_graph_delayed_output_and_eof
+ 6/10 Test #371: pipeline.test_filter_graph_delayed_output_and_eof ...   Passed    0.14 sec
+      Start 410: pipeline.test_filter_count_frames
+ 7/10 Test #410: pipeline.test_filter_count_frames ...................   Passed    0.69 sec
+      Start 411: pipeline.test_filter_psnr
+ 8/10 Test #411: pipeline.test_filter_psnr ...........................   Passed    0.75 sec
+      Start 412: pipeline.test_filter_ssim
+ 9/10 Test #412: pipeline.test_filter_ssim ...........................   Passed    0.82 sec
+      Start 413: pipeline.test_filter_xpsnr
+10/10 Test #413: pipeline.test_filter_xpsnr ..........................   Passed    0.96 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+multimedia    =   5.20 sec*proc (10 tests)
+pipeline      =   5.20 sec*proc (10 tests)
+
+Total Test time (real) =   5.21 sec
+
+The following tests did not run:
+	364 - pipeline.test_stage_factory_allocation_failure (Skipped)
+	365 - pipeline.test_filter_report_allocation_failure (Skipped)
+	366 - pipeline.test_subtitle_allocation_failure (Skipped)
+
+exit_code=0

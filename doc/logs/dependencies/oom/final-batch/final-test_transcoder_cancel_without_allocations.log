@@ -1,0 +1,36 @@
+[Test] Starting test_transcoder_cancel_without_allocations
+[Test] OutputPath: preparing /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/test-output/persistent-tests/test_transcoder_cancel_without_allocations/pipeline/filters/coordinator-cancel-allocation-failure.mkv
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Debug   ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder track 0 marked remux
+[Test] TestCoordinatorCancelExhaustion: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Notice  ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder running
+[Notice  ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder paused
+[Notice  ] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer launch
+[Test] TestCoordinatorCancelExhaustion: assert job.PlanReady.load(std::memory_order_acquire)
+[Debug   ] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder aborted
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer halt/join begin
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer stop
+[Test] TestCoordinatorCancelExhaustion: assert denied > 0
+[Test] TestCoordinatorCancelExhaustion: assert job.Plan()->State() == Pipeline::Plan::State::Failed
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer halt/join end
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer halt/join begin
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Muxer halt/join end
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer halt/join begin
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer stop
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer halt/join end
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer halt/join begin
+[LowLevel] 02/11/2026 07:59:36 StormByte/Multimedia/Demuxer halt/join end
+[Info    ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder process_rss(current=423243776 B,min=418246656 B,max=423243776 B,peak=423243776 B,samples=2)
+[Info    ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder Demuxer: origin=Demuxer state=stopped calls=0 in(frame=0,packet=0) out(frame=0,packet=0) process(total=0us,mean=0us,min=0us,max=0us) wait(n=0,total=0us,max=0us) setup=2176us elapsed=2177us
+[Info    ] 02/11/2026 07:59:36 StormByte/Multimedia/Transcoder Muxer: origin=Muxer state=stopped calls=0 in(frame=0,packet=0) out(frame=0,packet=0) process(total=0us,mean=0us,min=0us,max=0us) wait(n=0,total=0us,max=0us) setup=10us elapsed=11us
+[Test] Finished test_transcoder_cancel_without_allocations: PASS
+
+exit_code=0

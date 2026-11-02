@@ -1,0 +1,63 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:93:37: warning: an exception may be thrown in function 'operator()' which should not throw exceptions [bugprone-exception-escape]
+   93 |         m_thread = StormByte::Safe::Thread([this]() noexcept {
+      |                                            ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1064:5: note: frame #4: function 'basic_string<0>' calls function '__init' here
+ 1064 |     __init(__s, traits_type::length(__s));
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:297:25: note: frame #5: function 'FormatReplaceToken<char, const void *>' calls function 'basic_string<0>' here
+  297 |                                 std::string ascii = "0x";
+      |                                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #6: function 'operator()<const void *>' calls function 'FormatReplaceToken<char, const void *>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #7: function 'ReplaceToken<const void *>' calls function 'operator()<const void *>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:125:31: note: frame #8: function 'operator()' calls function 'ReplaceToken<const void *>' here
+  125 |                 m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker pump returned; close output begin host={}",
+      |                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:229:14: warning: an exception may be thrown in function 'PumpPop' which should not throw exceptions [bugprone-exception-escape]
+  229 | void Pumper::PumpPop() noexcept try {
+      |              ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1064:5: note: frame #4: function 'basic_string<0>' calls function '__init' here
+ 1064 |     __init(__s, traits_type::length(__s));
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:297:25: note: frame #5: function 'FormatReplaceToken<char, const void *>' calls function 'basic_string<0>' here
+  297 |                                 std::string ascii = "0x";
+      |                                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #6: function 'operator()<const void *>' calls function 'FormatReplaceToken<char, const void *>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #7: function 'ReplaceToken<const void *>' calls function 'operator()<const void *>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:244:33: note: frame #8: function 'PumpPop' calls function 'ReplaceToken<const void *>' here
+  244 |                                 m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker EOF process begin host={}",
+      |                                                             ^
+
+exit_code=0

@@ -1,0 +1,6 @@
+[Test] Starting test_stage_factory_allocation_failure
+[Test] TestFactoryAllocationFailure: assert caught > 0
+[Test] TestFactoryAllocationFailure: assert caught > 0
+[Test] Finished test_stage_factory_allocation_failure: PASS
+
+exit_code=0

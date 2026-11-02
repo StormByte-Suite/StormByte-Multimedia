@@ -1,0 +1,6 @@
+[Test] Starting test_writer_destruction_without_allocations
+[Test] OutputPath: preparing /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/test-output/persistent-tests/test_writer_destruction_without_allocations/pipeline/filters/unused-writer-oom.mkv
+[Test] TestWriterDestructionExhaustion: assert denied > 0
+[Test] Finished test_writer_destruction_without_allocations: PASS
+
+exit_code=0

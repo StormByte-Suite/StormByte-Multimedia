@@ -1,0 +1,140 @@
+[Test] Starting test_nlmeans_scratch_failure_fails_job
+[Test] TestNlMeansFailureJob: assert codec
+[Test] OutputPath: preparing /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/test-output/persistent-tests/test_nlmeans_scratch_failure_fails_job/pipeline/filters/nlmeans-allocation-failure.mkv
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder track 0 encode to VP9
+[Test] TestNlMeansFailureJob: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] TestNlMeansFailureJob: assert WaitForTranscoderFailure(job) == 0
+[Test] WaitForTranscoderFailure: waiting for expected transcoder failure
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder running
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer bind encoder t=0
+[LowLevel] launch
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans setup
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans ready
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans wait
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer writer /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/test-output/persistent-tests/test_nlmeans_scratch_failure_fails_job/pipeline/filters/nlmeans-allocation-failure.mkv
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer wait
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 0:0 pts=0 dts=0 dur=41666667 key=1 bytes=92533
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=90.36 KiB raw=92533 fnv1a=f0609b96344620ac
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 1:0 pts=83333333 dts=83333333 dur=41666667 key=0 bytes=122
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=122 B raw=122 fnv1a=edccc84ece9cefc9
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 2:0 pts=125000000 dts=125000000 dur=41666667 key=0 bytes=122
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=122 B raw=122 fnv1a=ecde3095fe09bcdc
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 3:0 pts=166666667 dts=166666667 dur=41666667 key=0 bytes=122
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=122 B raw=122 fnv1a=86ef52dd48b3d20c
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 4:0 pts=208333333 dts=208333333 dur=41666667 key=0 bytes=122
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=122 B raw=122 fnv1a=370dc9e19141a807
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 5:0 pts=250000000 dts=250000000 dur=41666667 key=0 bytes=122
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=122 B raw=122 fnv1a=c467cc0524b4d73a
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 8:0 pts=375000000 dts=375000000 dur=41666667 key=0 bytes=122
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=122 B raw=122 fnv1a=b202b245db0ad5fd
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer t=0 Video 9:0 pts=416666667 dts=416666667 dur=41666667 key=0 bytes=122
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=0 bytes=90.36 KiB raw=92533 fnv1a=f0609b96344620ac
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 1:0 pts=83333333 dts=83333333 bytes=122 B raw=122 fnv1a=edccc84ece9cefc9
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 2:0 pts=125000000 dts=125000000 bytes=122 B raw=122 fnv1a=ecde3095fe09bcdc
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 3:0 pts=166666667 dts=166666667 bytes=122 B raw=122 fnv1a=86ef52dd48b3d20c
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 4:0 pts=208333333 dts=208333333 bytes=122 B raw=122 fnv1a=370dc9e19141a807
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 5:0 pts=250000000 dts=250000000 bytes=122 B raw=122 fnv1a=d4c25e6afc1dde37
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 6:0 pts=291666667 dts=291666667 bytes=122 B raw=122 fnv1a=ec255aad3ab47a6a
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 7:0 pts=333333333 dts=333333333 bytes=122 B raw=122 fnv1a=c467cc0524b4d73a
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 8:0 pts=375000000 dts=375000000 bytes=122 B raw=122 fnv1a=b202b245db0ad5fd
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 9:0 pts=416666667 dts=416666667 bytes=122 B raw=122 fnv1a=0e20d8f02af5532d
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 10:0 pts=458333333 dts=458333333 bytes=122 B raw=122 fnv1a=ec452d12546c1060
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 15:0 pts=666666667 dts=666666667 bytes=122 B raw=122 fnv1a=535adbc7a6a2a31e
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder out t=0 15:0 pts=0 dts=666666667 dur=41666667
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 16:0 pts=708333333 dts=708333333 bytes=122 B raw=122 fnv1a=444283f9b8299991
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans wake
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans in t=0 15:0
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans nlmeans latch 640x360 r=3 p=2 h=1.000 uhd=false
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder out t=0 16:0 pts=83333333 dts=708333333 dur=41666667
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer eof
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer work n=49 min=5us max=1571us
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans nlmeans 640x360 r=3 p=2 h=1.000 pts=0
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans frame side-data side-data:11=dropped-incompatible-color side-data:14=dropped-incompatible-color side-data:17=dropped-incompatible-color dovi-metadata=source-absent dovi-rpu=source-absent hdr10plus=source-absent
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans save frame t=0 15:0
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Filters/Video/nlmeans in t=0 16:0
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder dropped 54 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 44:0 pts=1875000000 dts=1875000000 bytes=122 B raw=122 fnv1a=a1d961448e203aff
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder out t=0 44:0 pts=1250000000 dts=1875000000 dur=41666667
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder worker EOF process begin host=0x7f444c03b340
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder worker EOF process end; record work begin host=0x7f444c03b340
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder worker EOF record work end; dump work begin host=0x7f444c03b340
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder work n=1 min=35us max=35us
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder worker EOF dump work end host=0x7f444c03b340
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder worker pump returned; close output begin host=0x7f444c03b340
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder input begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder input end; output begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder output end; fork lock begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder fork lock acquired
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer worker EOF process begin host=0x7f4444000b80
+[Notice  ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer closed
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer worker EOF process end; record work begin host=0x7f4444000b80
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer worker EOF record work end; dump work begin host=0x7f4444000b80
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer work n=1 min=24us max=24us
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer worker EOF dump work end host=0x7f4444000b80
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder in t=0 47:0 pts=2000000000 dts=2000000000 bytes=122 B raw=122 fnv1a=b110d1340a0a5932
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer worker pump returned; close output begin host=0x7f4444000b80
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer input begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer input end; output begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer output end; fork lock begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer fork lock acquired
+[Debug   ] 02/11/2026 07:55:19 StormByte/Multimedia/Decoder work n=97 min=7us max=410845us
+[Error   ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder plan failed
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder dropped 4 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder halt/join end
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder backend release begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder backend release end
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder halt/join begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder halt/join end
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Encoder halt/join begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer dropped 4 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer halt/join end
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer halt/join begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Muxer halt/join end
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer dropped 87 messages
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Demuxer halt/join begin
+[Info    ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder process_rss(current=445865984 B,min=418693120 B,max=448475136 B,peak=448475136 B,samples=25)
+[Info    ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder Demuxer: origin=Demuxer state=stopped calls=49 in(frame=0,packet=0) out(frame=0,packet=48) process(total=8501us,mean=173us,min=5us,max=1571us) wait(n=0,total=0us,max=0us) setup=7391us elapsed=15922us
+[Info    ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder Muxer: origin=Muxer state=stopped calls=1 in(frame=0,packet=0) out(frame=0,packet=0) process(total=24us,mean=24us,min=24us,max=24us) wait(n=1,total=430021us,max=430021us) setup=276us elapsed=430400us
+[Info    ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder Decoder(t=0): origin=Decoder(t=0) state=stopped calls=49 in(frame=0,packet=48) out(frame=48,packet=0) process(total=423479us,mean=8642us,min=12us,max=410845us) wait(n=0,total=0us,max=0us) setup=7966us elapsed=431531us
+[Info    ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder Encoder(VP9): origin=Encoder(VP9) state=stopped calls=1 in(frame=0,packet=0) out(frame=0,packet=0) process(total=35us,mean=35us,min=35us,max=35us) wait(n=1,total=430034us,max=430034us) setup=81us elapsed=430296us
+[Info    ] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder Video/nlmeans[0]: origin=Video/nlmeans[0] state=failed calls=2 in(frame=2,packet=0) out(frame=1,packet=0) process(total=416767us,mean=208383us,min=134us,max=416633us) wait(n=1,total=13253us,max=13253us) setup=26us elapsed=430105us
+[Test] WaitForTranscoderFailure: assert job.Status() == Status::Error
+[Test] WaitForTranscoderFailure: assert job.Failed()
+[Test] WaitForTranscoderFailure: assert job.Plan()->State() == Plan::State::Failed
+[Test] WaitForTranscoderFailure: assert job.Plan()->Error()
+[Test] WaitForTranscoderFailure: assert error && !error->empty()
+[Test] TestNlMeansFailureJob: assert job.Status() == Pipeline::Status::Error
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder destroy
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder coordinator join begin
+[LowLevel] 02/11/2026 07:55:19 StormByte/Multimedia/Transcoder coordinator join end
+[Test] TestNlMeansFailureJob: assert failed_scratch.load(std::memory_order_acquire)
+[Test] Finished test_nlmeans_scratch_failure_fails_job: PASS
+
+exit_code=0

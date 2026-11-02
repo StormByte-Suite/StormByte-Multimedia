@@ -1,0 +1,300 @@
+Command: clang-tidy -p /tmp/BMDATA/sanitizer-clean-final -checks=-*,bugprone-exception-escape,bugprone-unhandled-exception-at-new -header-filter=^/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/ -quiet /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:113:14: warning: an exception may be thrown in function 'KindName' which should not throw exceptions [bugprone-exception-escape]
+  113 |         std::string KindName(StormByte::Multimedia::Type type) noexcept {
+      |                     ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2663:17: note: frame #7: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1064:5: note: frame #8: function 'basic_string<0>' calls function '__init' here
+ 1064 |     __init(__s, traits_type::length(__s));
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:114:10: note: frame #9: function 'KindName' calls function 'basic_string<0>' here
+  114 |                 return ToString(type);
+      |                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:175:39: warning: an exception may be thrown in function 'Remux' which should not throw exceptions [bugprone-exception-escape]
+  175 | Transcoder::Track& Transcoder::Track::Remux() noexcept {
+      |                                       ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:3129:5: note: frame #7: function 'insert' calls function '__grow_by_and_replace' here
+ 3129 |     __grow_by_and_replace(__cap, __sz + __n - __cap, __sz, __pos, 0, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #8: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #9: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:179:3: note: frame #10: function 'Remux' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  179 |                 + std::to_string(m_owner->m_backend->Mapped[m_slot].In) + " marked remux");
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:183:39: warning: an exception may be thrown in function 'Codec' which should not throw exceptions [bugprone-exception-escape]
+  183 | Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& codec) noexcept {
+      |                                       ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2663:17: note: frame #7: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #8: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:188:29: note: frame #9: function 'Codec' calls function 'basic_string<std::string_view, 0>' here
+  188 |                 m_owner->Fail("codec '" + std::string(codec.Name()) + "' is "
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:391:13: warning: an exception may be thrown in function 'Transcoder' which should not throw exceptions [bugprone-exception-escape]
+  391 | Transcoder::Transcoder(
+      |             ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:161:5: note: frame #0: unhandled exception of type 'BadOptionalAccess' may be thrown in function 'value' here
+  161 |                                 throw BadOptionalAccess();
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:401:25: note: frame #1: function 'Transcoder' calls function 'value' here
+  401 |         m_duration(duration && duration.value() > 0 ? std::move(duration) : StormByte::Safe::Optional<std::int64_t>{}),
+      |                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:431:18: warning: an exception may be thrown in function 'Fail' which should not throw exceptions [bugprone-exception-escape]
+  431 | void Transcoder::Fail(std::string_view reason) noexcept {
+      |                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:161:5: note: frame #0: unhandled exception of type 'BadOptionalAccess' may be thrown in function 'value' here
+  161 |                                 throw BadOptionalAccess();
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:444:34: note: frame #1: function 'Fail' calls function 'value' here
+  444 |                 JobLog(m_logger, Level::Error, m_backend->Error.value());
+      |                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:481:18: warning: an exception may be thrown in function 'ProbeSource' which should not throw exceptions [bugprone-exception-escape]
+  481 | bool Transcoder::ProbeSource() noexcept {
+      |                  ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2838:5: note: frame #7: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:2847:89: note: frame #8: function 'assign' calls function '__assign_external' here
+ 2847 |   return (__builtin_constant_p(__n) && __fits_in_sso(__n)) ? __assign_short(__s, __n) : __assign_external(__s, __n);
+      |                                                                                         ^
+/usr/include/c++/v1/string:1503:12: note: frame #9: function 'assign<std::string_view, 0>' calls function 'assign' here
+ 1503 |     return assign(__sv.data(), __sv.size());
+      |            ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:316:4: note: frame #10: function 'FormatReplaceToken<char, std::string_view>' calls function 'assign<std::string_view, 0>' here
+  316 |                         out.assign(std::basic_string_view<Char>(std::forward<T>(value)));
+      |                         ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #11: function 'operator()<std::string_view>' calls function 'FormatReplaceToken<char, std::string_view>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #12: function 'ReplaceToken<std::string_view>' calls function 'operator()<std::string_view>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:498:34: note: frame #13: function 'ProbeSource' calls function 'ReplaceToken<std::string_view>' here
+  498 |         JobLog(m_logger, Level::Notice, StormByte::Safe::String::ReplaceToken("probed source {}", std::string_view{path}));
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:510:18: warning: an exception may be thrown in function 'Resources' which should not throw exceptions [bugprone-exception-escape]
+  510 | void Transcoder::Resources(ResourceUsage usage) noexcept {
+      |                  ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2714:17: note: frame #7: function '__init_with_size<char *, char *>' calls function '__init_internal_buffer' here
+ 2714 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:2707:3: note: frame #8: function '__init<char *, 0>' calls function '__init_with_size<char *, char *>' here
+ 2707 |   __init_with_size(__first, __last, __sz);
+      |   ^
+/usr/include/c++/v1/string:1173:5: note: frame #9: function 'basic_string<char *, 0>' calls function '__init<char *, 0>' here
+ 1173 |     __init(__first, __last);
+      |     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:236:16: note: frame #10: function 'FormatFloatAscii<double>' calls function 'basic_string<char *, 0>' here
+  236 |                         std::string ascii(buffer, result.ptr == buffer ? buffer : result.ptr);
+      |                                     ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #11: function 'FormatReplaceToken<char, unsigned int>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:646:12: note: frame #12: function 'operator()<unsigned int>' calls function 'FormatReplaceToken<char, unsigned int>' here
+  646 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:660:7: note: frame #13: function 'ReplaceToken<unsigned int>' calls function 'operator()<unsigned int>' here
+  660 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:525:7: note: frame #14: function 'Resources' calls function 'ReplaceToken<unsigned int>' here
+  525 |         Fail(StormByte::Safe::String::ReplaceToken(
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:530:31: warning: an exception may be thrown in function 'AddTrack' which should not throw exceptions [bugprone-exception-escape]
+  530 | Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
+      |                               ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:3129:5: note: frame #7: function 'insert' calls function '__grow_by_and_replace' here
+ 3129 |     __grow_by_and_replace(__cap, __sz + __n - __cap, __sz, __pos, 0, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #8: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #9: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:531:52: note: frame #10: function 'AddTrack' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  531 |         JobLog(m_logger, Level::LowLevel, "add-track in=" + std::to_string(in));
+      |                                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:629:25: warning: an exception may be thrown in function 'Ignore' which should not throw exceptions [bugprone-exception-escape]
+  629 | Transcoder& Transcoder::Ignore(int in) noexcept {
+      |                         ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:3129:5: note: frame #7: function 'insert' calls function '__grow_by_and_replace' here
+ 3129 |     __grow_by_and_replace(__cap, __sz + __n - __cap, __sz, __pos, 0, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3211:10: note: frame #8: function 'insert' calls function 'insert' here
+ 3211 |   return insert(__pos, __s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3803:20: note: frame #9: function 'operator+<char, std::char_traits<char>, std::allocator<char>>' calls function 'insert' here
+ 3803 |   return std::move(__rhs.insert(0, __lhs));
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:630:46: note: frame #10: function 'Ignore' calls function 'operator+<char, std::char_traits<char>, std::allocator<char>>' here
+  630 |         JobLog(m_logger, Level::LowLevel, "ignore " + std::to_string(in));
+      |                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:811:18: warning: an exception may be thrown in function 'OnSettled' which should not throw exceptions [bugprone-exception-escape]
+  811 | void Transcoder::OnSettled(const TrackSettled& row) noexcept {
+      |                  ^
+/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:168:5: note: frame #0: unhandled exception of type 'BadOptionalAccess' may be thrown in function 'value' here
+  168 |                                 throw BadOptionalAccess();
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:168:47: note: frame #1: function 'ToString' calls function 'value' here
+  168 |                 text += " impl=" + static_cast<std::string>(Implementation.value());
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.cxx:813:34: note: frame #2: function 'OnSettled' calls function 'ToString' here
+  813 |                 JobLog(m_logger, Level::Debug, row.ToString());
+      |                                                ^
+
+exit_code=0
