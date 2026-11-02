@@ -1,0 +1,35 @@
+From 71877a6223161ff0cee78a3a7e5a9edf2a48e86d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] quantize: multiply negative scalefactor adjustments instead
+ of shifting
+
+The subblock gain adjustment explicitly takes this path when the adjusted
+scalefactor s is negative. Shifting that signed value left to calculate
+the gain is undefined.
+
+Multiply by the positive scale factor instead. scalefac_scale is 0 or 1,
+and s in this branch is bounded below by the preceding adjustment, so
+the product is representable and preserves the intended gain.
+
+Reproduced with UBSan during the existing MP3 audio-cover test.
+---
+ libmp3lame/quantize.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmp3lame/quantize.c b/libmp3lame/quantize.c
+index f29ed88..39ffe23 100644
+--- a/libmp3lame/quantize.c
++++ b/libmp3lame/quantize.c
+@@ -895,7 +895,7 @@ inc_subblock_gain(const lame_internal_flags * const gfc, gr_info * const cod_inf
+ 
+             scalefac[sfb] = 0;
+             {
+-                int const gain = 210 + (s << (cod_info->scalefac_scale + 1));
++                int const gain = 210 + s * (1 << (cod_info->scalefac_scale + 1));
+                 amp = IPOW20(gain);
+             }
+             j += width * (window + 1);
+-- 
+2.56.0
+

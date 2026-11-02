@@ -2,6 +2,7 @@ set(MP3LAME_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake-port")
 set(MP3LAME_COMPONENT "MP3 encoder LAME")
 set(MP3LAME_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-bitstream-use-unsigned-reservoir-shifts.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-quantize-avoid-negative-scalefactor-shift.patch"
 )
 
 set(MP3LAME_OPTIONS "")
