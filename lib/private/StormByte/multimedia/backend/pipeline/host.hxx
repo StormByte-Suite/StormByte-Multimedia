@@ -109,6 +109,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			virtual bool Stopping() const noexcept = 0;
 
 			/**
+			 * @brief Marks failure without allocating or storing text.
+			 */
+			virtual void Fail() noexcept = 0;
+
+			/**
 			 * @brief Marks Failed, closes hoppers and wakes waiters.
 			 * @param reason Message.
 			 *

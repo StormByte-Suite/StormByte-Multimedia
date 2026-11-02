@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- NLMeans scratch allocation failures mark the filter and shared plan as failed instead of terminating through `noexcept`. Emergency stage/filter failure signaling, hopper aborts and failed-worker completion avoid allocating error text or shutdown snapshots; regressions exercise message-allocation fallback and reject allocations through the failed NLMeans worker's exit.
 - Sanitizer pipeline tests use the same extended processing deadline as profile-instrumented tests, so slow Debug/ASan filters are validated instead of being cancelled after 30 seconds; ordinary builds retain their existing deadlines.
 - Encoders that do not preserve Dolby Vision now discard parsed Dolby Vision metadata and RPU side data before submitting frames, while encoders configured for Dolby Vision retain strict metadata validation. Frame submission failures report the specific metadata rejection or original FFmpeg error instead of only `failed to send frame`; regression coverage includes intentional metadata removal and required-metadata preservation.
 - **Error messages:** decoder, encoder, filter, demuxer and muxer failures now identify the failed operation and include the underlying FFmpeg error where available. Generic messages such as `Failed to send packet` were replaced with actionable context, and previously ignored processing failures are now reported.

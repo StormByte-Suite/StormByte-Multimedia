@@ -73,6 +73,10 @@ void Worker::Fail(std::string_view reason) noexcept {
 	m_host.Fail(reason);
 }
 
+void Worker::Fail() noexcept {
+	m_host.Fail();
+}
+
 void Worker::Log(StormByte::Logger::Level level, std::string_view message) noexcept {
 	m_host.Log(level, message);
 }

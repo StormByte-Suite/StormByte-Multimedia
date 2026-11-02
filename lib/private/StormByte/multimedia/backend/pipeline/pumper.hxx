@@ -139,16 +139,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			Multimedia::Pipeline::State Status() const noexcept;
 
 			/**
-			 * @brief Failure text.
-			 * @return Message, or empty.
+			 * @brief Latches Failed without storing a message.
 			 */
-			const StormByte::Safe::Optional<StormByte::Safe::String>& Error() const noexcept;
-
-			/**
-			 * @brief Latches Failed. Does not close hoppers.
-			 * @param reason Message.
-			 */
-			void Fail(std::string_view reason) noexcept;
+			void Fail() noexcept;
 
 		protected:
 			/**
@@ -212,7 +205,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			Host& m_host;											///< Owner, via Host
 			StormByte::Safe::Unique<Worker> m_worker;		///< Body
 			StormByte::Safe::Atomic<int> m_state;			///< Lifecycle
-			StormByte::Safe::Optional<StormByte::Safe::String> m_error;	///< Fail message
 			StormByte::Safe::Thread m_thread;			///< Owned thread
 	};
 }

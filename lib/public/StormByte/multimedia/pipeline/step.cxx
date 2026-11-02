@@ -66,6 +66,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <new>
 #include <string>
 #include <utility>
 #include <vector>
@@ -120,7 +121,17 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		}
 
 		void Fail(std::string_view reason) noexcept override {
-			m_step.Fail(StormByte::Safe::String(reason));
+			try {
+				m_step.Fail(StormByte::Safe::String(reason));
+			} catch (const StormByte::Safe::AllocationError&) {
+				m_step.Fail();
+			} catch (const std::bad_alloc&) {
+				m_step.Fail();
+			}
+		}
+
+		void Fail() noexcept override {
+			m_step.Fail();
 		}
 
 		void Log(StormByte::Logger::Level level, std::string_view message) noexcept override {
@@ -148,6 +159,10 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 		}
 
 		void CloseOutput() noexcept override {
+			if (m_step.Failed()) {
+				m_step.pipe().Abort();
+				return;
+			}
 			m_step.pipe().Close(&m_step, [](void* owner, std::string_view message) noexcept {
 				static_cast<Step*>(owner)->Log(Level::LowLevel, message);
 			});
@@ -346,7 +361,7 @@ bool Step::WaitPlan() noexcept {
 State Step::Status() const noexcept {
 	if (m_state->pumper)
 		return m_state->pumper->Status();
-	return m_error ? State::Failed : State::Created;
+	return m_telemetry->Status();
 }
 
 StormByte::Safe::Shared<const StageTelemetry> Step::Telemetry() const {
@@ -360,23 +375,56 @@ void Step::CloseHoppers() noexcept {
 }
 
 void Step::Fail(StormByte::Safe::String reason) noexcept {
+	try {
+		StormByte::Safe::Shared<class Plan> plan;
+		StormByte::Safe::String message;
+		{
+			StormByte::Safe::UniqueLock lock(m_state->mutex);
+			if (!m_error)
+				m_error = std::move(reason);
+			message = *m_error;
+			plan = m_plan;
+		}
+		m_telemetry->SetError(message);
+		if (m_name == Producer::Encoder)
+			WakeDownstream();
+		if (plan)
+			plan->State(Plan::State::Failed, message);
+		Log(Level::Error, message);
+		if (m_state->pumper)
+			m_state->pumper->Fail();
+		CloseHoppers();
+		Wake();
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
+}
+
+void Step::Fail(std::string_view reason) noexcept {
+	try {
+		Fail(StormByte::Safe::String{reason});
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
+}
+
+void Step::Fail() noexcept {
 	StormByte::Safe::Shared<class Plan> plan;
-	StormByte::Safe::String message;
 	{
 		StormByte::Safe::UniqueLock lock(m_state->mutex);
-		if (!m_error)
-			m_error = std::move(reason);
-		message = *m_error;
 		plan = m_plan;
 	}
-	m_telemetry->SetError(message);
+	m_telemetry->SetState(State::Failed);
 	if (m_name == Producer::Encoder)
 		WakeDownstream();
 	if (plan)
-		plan->State(Plan::State::Failed, message);
-	Log(Level::Error, message);
+		plan->State(Plan::State::Failed, {});
 	if (m_state->pumper)
-		m_state->pumper->Fail(static_cast<std::string>(message));
+		m_state->pumper->Fail();
 	CloseHoppers();
 	Wake();
 }

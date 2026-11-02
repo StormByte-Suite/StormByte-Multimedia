@@ -155,22 +155,15 @@ void Pipe::Close(void* owner, void (*trace)(void*, std::string_view) noexcept) n
 }
 
 void Pipe::Abort() noexcept {
-	ItemSink closed;
-	closed.Eof();
-	for (const int key : m_in.Keys())
-		m_in.To(key) >> closed;
-	for (const int key : m_out.Keys())
-		m_out.To(key) >> closed;
+	m_in.Abort();
+	m_out.Abort();
 	{
 		StormByte::Safe::UniqueLock lock(m_forkMutex);
+		m_closed = true;
 		for (auto& fork : m_forks) {
-			for (const int key : fork.second->Keys())
-				fork.second->To(key) >> closed;
+			fork.second->Abort();
 		}
 	}
-	Close();
-	while (m_in.Pop())
-		;
 	Wake();
 }
 

@@ -71,6 +71,10 @@
 #include <cstdint>
 #include <utility>
 
+namespace StormByte::Multimedia::Pipeline::Filter {
+	class FFmpeg;
+}
+
 /**
  * @namespace StormByte
  * @brief Root namespace of the StormByte C++ suite.
@@ -702,6 +706,8 @@ namespace StormByte {
 					 * @brief Allows stages to register state notifications.
 					 */
 					friend class Step;
+
+					friend class Filter::FFmpeg;
 
 					/**
 					 * @brief Allows private route snapshot consultation.

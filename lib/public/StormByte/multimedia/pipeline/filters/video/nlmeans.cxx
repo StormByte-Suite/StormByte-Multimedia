@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/type.hxx>
 
 #include <cstdint>
+#include <new>
 
 using StormByte::Logger::Level;
 using StormByte::Multimedia::Type;
@@ -70,7 +71,7 @@ namespace {
 	}
 
 	void FilterPlane(const FFrame& src, FFrame& dst, int plane, int bpc,
-		int research, int patch, double h) noexcept {
+		int research, int patch, double h) {
 		const int w = src.PlaneWidth(plane);
 		const int hgt = src.PlaneHeight(plane);
 		const uint8_t* s = src.Data(plane);
@@ -106,7 +107,7 @@ void NlMeans::Setup() noexcept {
 	Clean();
 }
 
-void NlMeans::Latch(int width, int height) noexcept {
+void NlMeans::Latch(int width, int height) {
 	const bool uhd = width >= 3840 || height >= 2160;
 	m_research = m_researchIn.value_or(uhd ? 2u : 3u);
 	m_patch = m_patchIn.value_or(uhd ? 1u : 2u);
@@ -117,30 +118,36 @@ void NlMeans::Latch(int width, int height) noexcept {
 }
 
 void NlMeans::Process(const Pipeline::Frame& frame) noexcept {
-	if (frame.Type() != Type::Video)
-		return;
-	const FFrame& src = AVFrame();
-	if (!src || src.Width() <= 0 || src.Height() <= 0) {
-		Log(Level::Warning, "nlmeans: frame has no picture");
-		return;
+	try {
+		if (frame.Type() != Type::Video)
+			return;
+		const FFrame& src = AVFrame();
+		if (!src || src.Width() <= 0 || src.Height() <= 0) {
+			Log(Level::Warning, "nlmeans: frame has no picture");
+			return;
+		}
+
+		if (!m_latched)
+			Latch(src.Width(), src.Height());
+
+		FFrame out;
+		if (!out.AllocVideo(src.Width(), src.Height(), src.Format()) || !out.CopyProps(src)) {
+			Fail("nlmeans: AllocVideo failed");
+			return;
+		}
+
+		const int bpc = Bpc(src);
+		const int planes = src.PlaneCount();
+		for (int i = 0; i < planes; ++i)
+			FilterPlane(src, out, i, bpc,
+				static_cast<int>(m_research), static_cast<int>(m_patch), m_h);
+
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("nlmeans {}x{} r={} p={} h={:.3f} pts={}",
+			src.Width(), src.Height(), m_research, m_patch, m_h, src.Pts()));
+		Save(std::move(out));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
-
-	if (!m_latched)
-		Latch(src.Width(), src.Height());
-
-	FFrame out;
-	if (!out.AllocVideo(src.Width(), src.Height(), src.Format()) || !out.CopyProps(src)) {
-		Fail("nlmeans: AllocVideo failed");
-		return;
-	}
-
-	const int bpc = Bpc(src);
-	const int planes = src.PlaneCount();
-	for (int i = 0; i < planes; ++i)
-		FilterPlane(src, out, i, bpc,
-			static_cast<int>(m_research), static_cast<int>(m_patch), m_h);
-
-	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("nlmeans {}x{} r={} p={} h={:.3f} pts={}",
-		src.Width(), src.Height(), m_research, m_patch, m_h, src.Pts()));
-	Save(std::move(out));
 }

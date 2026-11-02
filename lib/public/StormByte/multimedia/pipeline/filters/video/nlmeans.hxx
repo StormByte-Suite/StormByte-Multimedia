@@ -176,7 +176,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param width Frame width.
 			 * @param height Frame height.
 			 */
-			void Latch(int width, int height) noexcept;
+			void Latch(int width, int height);
 
 			Safe::Optional<unsigned> m_researchIn;	///< Caller research, or empty
 			Safe::Optional<unsigned> m_patchIn;	///< Caller patch, or empty

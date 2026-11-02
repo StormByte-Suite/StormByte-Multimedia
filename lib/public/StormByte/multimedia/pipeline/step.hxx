@@ -338,6 +338,8 @@ namespace StormByte {
 					/**
 					 * @brief Failure text.
 					 * @return Message, or empty.
+					 * @note A failed stage may have no text after an allocation failure.
+					 * Use Failed() to determine the authoritative state.
 					 */
 					StormByte::Safe::Optional<StormByte::Safe::String> Error() const;
 
@@ -345,27 +347,31 @@ namespace StormByte {
 					 * @brief Marks the stage as failed and notifies connected stages.
 					 *
 					 * Returns without waiting for completion. Stores the reason
-					 * in @ref Error but does not log it.
+					 * in @ref Error and logs it when memory is available.
+					 * Allocation failures fall back to Fail() without a message.
 					 *
 					 * @param reason Message.
 					 */
 					void Fail(StormByte::Safe::String reason) noexcept;
 
 					/**
+					 * @brief Marks failure without storing a message or allocating.
+					 */
+					void Fail() noexcept;
+
+					/**
 					 * @brief Copies a null-terminated failure literal into Safe storage.
 					 * @param reason Message literal; null becomes an empty message.
 					 */
 					STORMBYTE_FORCE_INLINE void Fail(const char* reason) noexcept {
-						Fail(StormByte::Safe::String(reason));
+						Fail(std::string_view{reason ? reason : ""});
 					}
 
 					/**
 					 * @brief Copies borrowed failure text before calling the DLL-safe overload.
 					 * @param reason Borrowed message, used only during this call.
 					 */
-					STORMBYTE_FORCE_INLINE void Fail(std::string_view reason) noexcept {
-						Fail(StormByte::Safe::String(reason));
-					}
+					void Fail(std::string_view reason) noexcept;
 
 					/**
 					 * @}

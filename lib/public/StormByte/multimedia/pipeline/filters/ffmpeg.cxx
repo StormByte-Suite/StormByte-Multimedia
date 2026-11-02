@@ -72,6 +72,7 @@
 #include <deque>
 #include <limits>
 #include <memory>
+#include <new>
 #include <string>
 #include <utility>
 
@@ -132,6 +133,10 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 			m_owner.Fail(reason);
 		}
 
+		void Fail() noexcept override {
+			m_owner.Fail();
+		}
+
 		void Log(StormByte::Logger::Level level, std::string_view message) noexcept override {
 			m_owner.Log(level, message);
 		}
@@ -157,6 +162,10 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 		}
 
 		void CloseOutput() noexcept override {
+			if (m_owner.Failed()) {
+				m_owner.pipe().Abort();
+				return;
+			}
 			m_owner.pipe().Close(&m_owner, [](void* owner, std::string_view message) noexcept {
 				static_cast<FFmpeg*>(owner)->Log(Level::LowLevel, message);
 			});
@@ -247,7 +256,7 @@ class StormByte::Multimedia::Pipeline::Filter::Report FFmpeg::Report() const noe
 State FFmpeg::Status() const noexcept {
 	if (m_state->pumper)
 		return m_state->pumper->Status();
-	return m_error ? State::Failed : State::Created;
+	return m_telemetry->Status();
 }
 
 bool FFmpeg::Failed() const noexcept {
@@ -285,21 +294,46 @@ void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexc
 }
 
 void FFmpeg::Fail(StormByte::Safe::String reason) noexcept {
-	m_hold = 0;
-	m_heldFor = 0;
-	m_state->queue.clear();
-	m_telemetry->SetError(StormByte::Safe::String(reason));
-	m_error = std::move(reason);
-	const StormByte::Safe::String message = std::as_const(m_error).value();
-	Log(Level::Error, message);
-	if (m_state->pumper)
-		m_state->pumper->Fail(static_cast<std::string>(message));
+	try {
+		m_hold = 0;
+		m_heldFor = 0;
+		m_state->queue.clear();
+		m_telemetry->SetError(StormByte::Safe::String(reason));
+		m_error = std::move(reason);
+		const StormByte::Safe::String message = std::as_const(m_error).value();
+		Log(Level::Error, message);
+		if (m_state->pumper)
+			m_state->pumper->Fail();
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
 	CloseHoppers();
 	Wake();
 }
 
 void FFmpeg::Fail(std::string_view reason) noexcept {
-	Fail(StormByte::Safe::String(reason));
+	try {
+		Fail(StormByte::Safe::String(reason));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
+}
+
+void FFmpeg::Fail() noexcept {
+	m_hold = 0;
+	m_heldFor = 0;
+	m_state->queue.clear();
+	m_telemetry->SetState(State::Failed);
+	if (m_plan)
+		m_plan->State(Pipeline::Plan::State::Failed, {});
+	if (m_state->pumper)
+		m_state->pumper->Fail();
+	CloseHoppers();
+	Wake();
 }
 
 void FFmpeg::Hold(std::uint8_t n) noexcept {

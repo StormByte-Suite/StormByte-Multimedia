@@ -466,15 +466,21 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			/**
 			 * @brief Marks a hard error and wakes the filter. The job stops.
 			 * @param reason Owned bare message retained in Safe storage.
+			 * @note Allocation failures fall back to Fail() without a message.
 			 */
 			void Fail(StormByte::Safe::String reason) noexcept;
+
+			/**
+			 * @brief Marks failure without storing a message or allocating.
+			 */
+			void Fail() noexcept;
 
 			/**
 			 * @brief Copies a null-terminated failure literal into Safe storage.
 			 * @param reason Message literal; null becomes an empty message.
 			 */
 			void Fail(const char* reason) noexcept {
-				Fail(StormByte::Safe::String(reason));
+				Fail(std::string_view{reason ? reason : ""});
 			}
 
 			/**

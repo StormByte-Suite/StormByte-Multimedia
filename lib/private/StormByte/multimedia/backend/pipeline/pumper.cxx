@@ -112,6 +112,12 @@ void Pumper::Launch() noexcept {
 		telemetry.SetState(State::Ready);
 		m_host.BecameReady();
 		Pump();
+		if (Failed()) {
+			m_host.CloseOutput();
+			telemetry.Finish();
+			m_host.Completed(false);
+			return;
+		}
 		const bool success = !Stopping();
 		m_host.Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("worker pump returned; close output begin host={}",
 			static_cast<const void*>(&m_host)));
@@ -167,17 +173,12 @@ bool Pumper::Failed() const noexcept {
 	return Status() == State::Failed;
 }
 
-const StormByte::Safe::Optional<StormByte::Safe::String>& Pumper::Error() const noexcept {
-	return m_error;
-}
-
 bool Pumper::Stopping() const noexcept {
 	const State state = Status();
 	return state == State::Stopping || state == State::Stopped || state == State::Failed;
 }
 
-void Pumper::Fail(std::string_view reason) noexcept {
-	m_error = StormByte::Safe::String(reason);
+void Pumper::Fail() noexcept {
 	int current = m_state.load(StormByte::Safe::MemoryOrder::Acquire);
 	while (!Terminal(static_cast<State>(current))) {
 		if (m_state.compare_exchange_weak(current, static_cast<int>(State::Failed),

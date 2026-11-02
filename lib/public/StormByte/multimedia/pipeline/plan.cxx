@@ -386,6 +386,8 @@ void Plan::Unobserve(Step& step) noexcept {
 
 void Plan::Complete(Step& step, bool success) {
 	if (!success) {
+		if (State() == State::Failed)
+			return;
 		State(State::Failed, step.Error().value_or(StormByte::Safe::String{"pipeline stage stopped before completion"}));
 		return;
 	}

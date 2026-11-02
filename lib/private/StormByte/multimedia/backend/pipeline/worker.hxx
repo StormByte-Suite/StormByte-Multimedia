@@ -154,6 +154,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void Fail(std::string_view reason) noexcept;
 
 			/**
+			 * @brief Forwards an allocation-free failure to the Host.
+			 */
+			void Fail() noexcept;
+
+			/**
 			 * @brief Forwards Log to the Host.
 			 * @param level StormByte::Logger::Level of this line.
 			 * @param message Already-formatted text.
