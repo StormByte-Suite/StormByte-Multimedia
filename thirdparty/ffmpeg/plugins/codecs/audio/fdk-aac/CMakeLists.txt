@@ -22,6 +22,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0017-threshold-avoid-negative-minimum-snr-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0018-intensity-avoid-negative-correlation-and-spectrum-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0019-intensity-normalize-signed-correlation-and-mixed-spectra.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0020-threshold-normalize-signed-logarithms-as-bit-patterns.patch"
 )
 
 set(FDK_AAC_OPTIONS

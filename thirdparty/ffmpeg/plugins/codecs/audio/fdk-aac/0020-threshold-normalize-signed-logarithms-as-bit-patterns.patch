@@ -1,0 +1,56 @@
+From 12cd29c9de1467c8da87f47fd784cad8df20d1fa Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:24:01 +0100
+Subject: [PATCH] threshold: normalize signed logarithms using unsigned bit
+ patterns
+
+Logarithmic thresholds and their scale corrections may be negative. Shift their unsigned representations and restore the fixed-point type instead of left-shifting negative signed values. Apply the same conversion to both CBR and VBR threshold formulas and their matching scale correction. UBSan reproduces the threshold shift during stereo encoding.
+---
+ libAACenc/src/adj_thr.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libAACenc/src/adj_thr.cpp b/libAACenc/src/adj_thr.cpp
+index 1ad3e59..b610842 100644
+--- a/libAACenc/src/adj_thr.cpp
++++ b/libAACenc/src/adj_thr.cpp
+@@ -1018,8 +1018,8 @@ static void FDKaacEnc_reduceThresholdsCBR(
+           sfbThrReducedLdData =
+               CalcLdData(fAbs(scaleValue(sfbThrExp, minScale) +
+                               scaleValue(redVal_m, redVal_e + minScale))) -
+-              (FIXP_DBL)(minScale << (DFRACT_BITS - 1 - LD_DATA_SHIFT));
+-          sfbThrReducedLdData <<= 2;
++              (FIXP_DBL)((UINT)minScale << (DFRACT_BITS - 1 - LD_DATA_SHIFT));
++          sfbThrReducedLdData = (FIXP_DBL)((UINT)sfbThrReducedLdData << 2);
+ 
+           /* avoid holes */
+           if ((sfbThrReducedLdData >
+@@ -1266,7 +1266,7 @@ static void FDKaacEnc_reduceThresholdsVBR(
+                 /* threshold reduction formula */
+                 sfbThrReducedLdData =
+                     CalcLdData(sfbThrExp + redVal[groupNumber]);
+-                sfbThrReducedLdData <<= 2;
++                sfbThrReducedLdData = (FIXP_DBL)((UINT)sfbThrReducedLdData << 2);
+               }
+             }
+             sfbThrReducedLdData +=
+@@ -1281,7 +1281,7 @@ static void FDKaacEnc_reduceThresholdsVBR(
+             } else {
+               /* threshold reduction formula */
+               sfbThrReducedLdData = CalcLdData(sfbThrExp + redVal[0]);
+-              sfbThrReducedLdData <<= 2;
++              sfbThrReducedLdData = (FIXP_DBL)((UINT)sfbThrReducedLdData << 2);
+             }
+           }
+ 
+@@ -1398,7 +1398,7 @@ static void FDKaacEnc_correctThresh(
+                     CalcLdData(scaleValue(thrExp[elementId][ch][sfbGrp + sfb],
+                                           minScale) +
+                                scaleValue(redVal_m, redVal_e + minScale)) -
+-                    (FIXP_DBL)(minScale << (DFRACT_BITS - 1 - LD_DATA_SHIFT));
++                    (FIXP_DBL)((UINT)minScale << (DFRACT_BITS - 1 - LD_DATA_SHIFT));
+ 
+                 if (sumLd < FL2FXCONST_DBL(0.f)) {
+                   sfbPeFactorsLdData[elementId][ch][sfbGrp + sfb] =
+-- 
+2.56.0
+
