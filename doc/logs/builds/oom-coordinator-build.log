@@ -1,0 +1,548 @@
+[  0%] [BuildMaster/Core     ]: reset fail markers
+[  0%] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+[  1%] Built target _bm_bin_StormByte-Buffer_dl
+[  1%] Built target _bm_bin_StormByte-System_dl
+[  1%] Built target _bm_bin_StormByte-Base_dl
+[  1%] Built target _bm_bin_StormByte-Logger_dl
+[  1%] Built target buildmaster_build_init
+[  1%] Built target StormByte-Buffer_build
+[  1%] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[  1%] Built target StormByte-Base_build
+[  2%] [BuildMaster/Ninja    ]: Compiling X264 codec
+[  2%] [BuildMaster/Ninja    ]: Compiling zimg
+[  4%] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[  4%] Built target StormByte-Logger_build
+[  4%] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  4%] [BuildMaster/Ninja    ]: Compiling openh264
+[  5%] [BuildMaster/Ninja    ]: Compiling libebur128
+[  5%] [BuildMaster/Ninja    ]: Compiling kvazaar
+[  5%] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[  5%] [BuildMaster/Ninja    ]: Compiling Opus codec
+[  5%] Built target StormByte-System_build
+[  5%] [BuildMaster/Ninja    ]: Compiling VMAF library
+[  5%] [BuildMaster/Ninja    ]: Compiling OGG container
+[  5%] [BuildMaster/Ninja    ]: Compiling dav1d
+[  7%] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[  7%] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[  7%] [BuildMaster/Ninja    ]: Compiling leptonica
+[  7%] [BuildMaster/Ninja    ]: Compiling libwebp
+[  7%] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[  8%] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+[ 10%] [BuildMaster/Ninja    ]: Compiling libaom
+[ 11%] [BuildMaster/Ninja    ]: Compiling LunaSVG
+[ 13%] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[ 13%] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[ 13%] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (build)
+[ 14%] [BuildMaster/Ninja    ]: Compiling VPX codec
+[ 15%] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+-- [BuildMaster/Component]: stamp hit ogg (build)
+[ 15%] Built target ffnvcodec-headers_build
+-- [BuildMaster/Component]: stamp hit bzip2 (build)
+-- [BuildMaster/Component]: stamp hit lunasvg (build)
+[ 15%] Built target bzip2_build
+[ 15%] Built target ogg_build
+[ 15%] Built target lunasvg_build
+[ 15%] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (install)
+-- [BuildMaster/Component]: stamp hit dav1d (build)
+[ 15%] [BuildMaster/Ninja    ]: Installing LunaSVG
+[ 15%] [BuildMaster/Ninja    ]: Installing OGG container
+[ 15%] Built target ffnvcodec-headers_install
+[ 15%] Built target _bm_bin_StormByte-Base_unpack
+[ 17%] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+[ 17%] Built target dav1d_build
+-- [BuildMaster/Component]: stamp hit lunasvg (install)
+-- [BuildMaster/Component]: stamp hit ogg (install)
+-- [BuildMaster/Component]: stamp hit zimg (build)
+[ 17%] Built target StormByte-Base_install
+-- [BuildMaster/Component]: stamp hit bzip2 (install)
+[ 17%] Built target lunasvg_install
+[ 17%] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[ 17%] Built target ogg_install
+[ 17%] [BuildMaster/Ninja    ]: Installing dav1d
+[ 17%] Built target bzip2_install
+[ 17%] [BuildMaster/CMake    ]: Configuring vorbis
+[ 17%] Built target zimg_build
+[ 17%] Built target _bm_bin_StormByte-Logger_unpack
+[ 17%] [BuildMaster/Ninja    ]: Installing zimg
+-- [BuildMaster/Component]: stamp hit dav1d (install)
+[ 17%] Built target StormByte-Logger_install
+[ 18%] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[ 18%] Built target dav1d_install
+[ 18%] Built target _bm_bin_StormByte-System_unpack
+-- [BuildMaster/Component]: stamp hit zlib (build)
+-- [BuildMaster/Component]: stamp hit ebur128 (build)
+[ 18%] Built target zlib_build
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[ 18%] Built target ebur128_build
+[ 18%] Built target StormByte-System_install
+[ 18%] Built target samplerate_build
+[ 20%] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[ 21%] [BuildMaster/Ninja    ]: Installing zlib compression library
+-- [BuildMaster/Component]: stamp hit zimg (install)
+[ 21%] [BuildMaster/Ninja    ]: Installing libebur128
+[ 21%] [BuildMaster/Ninja    ]: Installing libsamplerate
+-- [BuildMaster/Component]: stamp hit webp (build)
+[ 21%] Built target zimg_install
+-- [BuildMaster/Component]: stamp hit lzma (build)
+[ 21%] Built target _bm_bin_StormByte-Buffer_unpack
+[ 21%] Built target webp_build
+[ 21%] Built target lzma_build
+[ 21%] Built target StormByte-Buffer_install
+-- [BuildMaster/Component]: stamp hit x264 (build)
+[ 23%] [BuildMaster/Ninja    ]: Installing libwebp
+-- [BuildMaster/Component]: stamp hit mp3lame (build)
+[ 23%] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+[ 23%] Built target x264_build
+[ 23%] Built target mp3lame_build
+[ 23%] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+[ 23%] [BuildMaster/Ninja    ]: Installing X264 codec
+-- [BuildMaster/Component]: stamp hit aom (build)
+-- [BuildMaster/Component]: stamp hit opus (build)
+-- [BuildMaster/Component]: stamp hit openh264 (build)
+-- [BuildMaster/Component]: stamp hit leptonica (build)
+[ 23%] Built target opus_build
+-- [BuildMaster/Component]: stamp hit zlib (install)
+-- [BuildMaster/Component]: stamp hit ebur128 (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[ 23%] [BuildMaster/Ninja    ]: Installing Opus codec
+[ 23%] Built target openh264_build
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 23%] Built target aom_build
+[ 23%] Built target leptonica_build
+[ 24%] [BuildMaster/Ninja    ]: Installing openh264
+[ 24%] [BuildMaster/Ninja    ]: Installing leptonica
+-- [BuildMaster/Component]: stamp hit vpx (build)
+[ 24%] [BuildMaster/Ninja    ]: Installing libaom
+-- [BuildMaster/Component]: stamp hit vmaf (build)
+[ 24%] Built target ebur128_install
+[ 24%] Built target zlib_install
+[ 24%] Built target samplerate_install
+-- [BuildMaster/Component]: stamp hit webp (install)
+-- [BuildMaster/Component]: stamp hit tessdata (build)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 24%] [BuildMaster/CMake    ]: Configuring rubberband
+[ 24%] Built target vmaf_build
+[ 24%] Built target tessdata_build
+[ 24%] Built target vpx_build
+-- [BuildMaster/Component]: stamp hit lzma (install)
+[ 24%] [BuildMaster/Ninja    ]: Installing Tesseract traineddata
+[ 26%] [BuildMaster/Ninja    ]: Installing VMAF library
+[ 26%] [BuildMaster/Ninja    ]: Installing VPX codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 26%] Built target webp_install
+-- [BuildMaster/Component]: stamp hit x264 (install)
+-- [BuildMaster/Component]: stamp hit mp3lame (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 26%] Built target lzma_install
+[ 26%] Built target x264_install
+[ 26%] Built target mp3lame_install
+[BuildMaster/Component]: stamp hit vorbis (configure)
+[BuildMaster/Component]: stamp hit rubberband (configure)
+-- [BuildMaster/Component]: stamp hit x265-12bit (build)
+[ 26%] Built target rubberband_configure
+[ 26%] Built target vorbis_configure
+[ 26%] Built target x265-12bit_build
+-- [BuildMaster/Component]: stamp hit opus (install)
+[ 27%] [BuildMaster/Ninja    ]: Compiling rubberband
+[ 27%] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+[ 27%] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit openh264 (install)
+-- [BuildMaster/Component]: stamp hit aom (install)
+[ 27%] Built target opus_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 27%] Built target aom_install
+-- [BuildMaster/Component]: stamp hit leptonica (install)
+-- [BuildMaster/Component]: stamp hit rubberband (build)
+[ 27%] Built target openh264_install
+[ 27%] Built target rubberband_build
+[ 27%] [BuildMaster/Ninja    ]: Installing rubberband
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit vmaf (install)
+-- [BuildMaster/Component]: stamp hit vpx (install)
+[ 27%] Built target leptonica_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 28%] [BuildMaster/CMake    ]: Configuring tesseract
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit tessdata (install)
+[ 28%] Built target tessdata_install
+[ 28%] Built target vmaf_install
+-- [BuildMaster/Component]: stamp hit kvazaar (build)
+[ 28%] Built target kvazaar_build
+-- [BuildMaster/Component]: stamp hit rubberband (install)
+[ 28%] Built target vpx_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit svt-av1 (build)
+[ 30%] [BuildMaster/Ninja    ]: Installing kvazaar
+[ 30%] Built target rubberband_install
+[ 30%] Built target svt-av1_build
+[ 30%] [BuildMaster/Ninja    ]: Installing SVT-AV1
+-- [BuildMaster/Component]: stamp hit vorbis (build)
+-- [BuildMaster/Component]: stamp hit fdk-aac (build)
+[ 30%] Built target vorbis_build
+[ 30%] Built target fdk-aac_build
+[ 30%] [BuildMaster/Ninja    ]: Installing Vorbis codec
+[ 31%] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+[BuildMaster/Component]: stamp hit tesseract (configure)
+-- [BuildMaster/Component]: stamp hit x265-12bit (install)
+[ 31%] Built target tesseract_configure
+[ 31%] Built target x265-12bit_install
+[ 31%] [BuildMaster/Ninja    ]: Compiling tesseract
+-- [BuildMaster/Component]: stamp hit vorbis (install)
+-- [BuildMaster/Component]: stamp hit tesseract (build)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 31%] Built target tesseract_build
+[ 31%] Built target vorbis_install
+[ 31%] [BuildMaster/Ninja    ]: Installing tesseract
+-- [BuildMaster/Component]: stamp hit kvazaar (install)
+-- [BuildMaster/Component]: stamp hit x265-10bit (build)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 31%] Built target x265-10bit_build
+[ 31%] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+[ 31%] [BuildMaster/CMake    ]: Configuring x265
+-- [BuildMaster/Component]: stamp hit tesseract (install)
+[ 31%] Built target kvazaar_install
+-- [BuildMaster/Component]: stamp hit svt-av1 (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 31%] Built target tesseract_install
+[ 31%] Built target svt-av1_install
+-- [BuildMaster/Component]: stamp hit fdk-aac (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 31%] Built target fdk-aac_install
+-- [BuildMaster/Component]: stamp hit x265-10bit (install)
+[ 31%] Built target x265-10bit_install
+[BuildMaster/Component]: stamp hit x265 (configure)
+[ 31%] Built target x265_configure
+[ 33%] [BuildMaster/Ninja    ]: Compiling X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (build)
+[ 33%] Built target x265_build
+[ 33%] [BuildMaster/Ninja    ]: Installing X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 33%] Built target x265_install
+[ 33%] Built target ffmpeg-plugins_install
+[ 33%] [BuildMaster/CMake    ]: Configuring ffmpeg
+[BuildMaster/Component]: stamp hit ffmpeg (configure)
+[ 33%] Built target ffmpeg_configure
+[ 33%] [BuildMaster/Ninja    ]: Compiling FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (build)
+[ 33%] Built target ffmpeg_build
+[ 33%] [BuildMaster/Ninja    ]: Installing FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 33%] Built target ffmpeg_install
+[ 33%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o
+[ 33%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/transcoder.cxx.o
+[ 33%] Linking CXX shared library libStormByte-Multimedia.so
+[ 98%] Built target StormByte-Multimedia
+[ 98%] Building CXX object test/pipeline/CMakeFiles/multimedia_pipeline_test_support.dir/helpers.cxx.o
+[100%] Linking CXX static library libmultimedia_pipeline_test_support.a
+[100%] Built target multimedia_pipeline_test_support
+[100%] Building CXX object test/pipeline/negative/CMakeFiles/MultimediaPipelineCoordinatorAllocationTests.dir/allocation_failure_test.cxx.o
+[100%] Linking CXX executable MultimediaPipelineCoordinatorAllocationTests
+[100%] Built target MultimediaPipelineCoordinatorAllocationTests
+-- AddressSanitizer and UndefinedBehaviorSanitizer enabled
+-- [BuildMaster/Core     ]: Bootstrapping StormByte-BuildMaster 2.1.4 (https://github.com/StormByte-Suite/StormByte-BuildMaster)
+-- [BuildMaster/Env      ]: 	Setting up environment...
+-- [BuildMaster/Tools    ]: 	Setting up tools: ninja
+-- [BuildMaster/Component]: BACKEND=host 'StormByte-Multimedia' (shared) — in-process library
+-- StormByte archive: StormByte-2.2.3-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-Base' (shared) — StormByte-2.2.3-linux-x64-libc++.zip
+-- StormByte archive: StormByte-Logger-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-Logger' (shared) — StormByte-Logger-2.0.6-linux-x64-libc++.zip
+-- StormByte archive: StormByte-System-2.1.3-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-System' (shared) — StormByte-System-2.1.3-linux-x64-libc++.zip
+-- StormByte archive: StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-Buffer' (shared) — StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/User     ]: 	Setting up bundled FFmpeg
+-- [BuildMaster/Tools    ]: 	Setting up tools: pkgconfig
+-- [BuildMaster/Tools    ]: 	Setting up tools: meson
+-- [BuildMaster/Pkgconf  ]: 			Using system pkg-config version: 3.0.7
+-- [BuildMaster/Tools    ]: 	Setting up tools: cmake
+-- [BuildMaster/Tools    ]: 	Setting up tools: git
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0001-widen-fractional-samples-without-negative-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0002-log2-avoid-negative-exponent-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0003-pow-avoid-negative-mantissa-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0004-pow2-avoid-negative-integral-part-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0005-scale-avoid-negative-saturating-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0006-fixmul-avoid-negative-product-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0007-block-switch-avoid-negative-sample-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0008-scale-avoid-negative-value-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0009-band-energy-avoid-negative-spectrum-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0010-scale-check-negative-saturation-in-widened-domain.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0011-psy-avoid-negative-normalization-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0012-tns-avoid-negative-spectrum-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0013-lpc-avoid-negative-coefficient-normalization-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0014-lpc-avoid-negative-filter-state-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0015-scalefactor-avoid-negative-fractional-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0016-mdct-avoid-negative-folded-sample-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0017-threshold-avoid-negative-minimum-snr-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0018-intensity-avoid-negative-correlation-and-spectrum-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0019-intensity-normalize-signed-correlation-and-mixed-spectra.patch, thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0020-threshold-normalize-signed-logarithms-as-bit-patterns.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/0001-bitstream-use-unsigned-reservoir-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/0002-quantize-avoid-negative-scalefactor-shift.patch
+-- [BuildMaster/Tools    ]: 	Setting up tools: file
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/opus/0001-dnn-data-from-unpack.patch, thirdparty/ffmpeg/plugins/codecs/audio/opus/0002-shallow-package-version.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/rubberband/0001-mathmisc-stddef.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0001-cmake4-minimum-version.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0002-cmake-declare-libm-in-pkg-config-when-it-exists.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0003-psy-avoid-negative-bark-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0004-psy-bound-noise-offset-interpolation.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0005-floor1-avoid-negative-deviation-shift.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0006-vorbisenc-reuse-shared-mode-residue-allocation.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0007-sharedbook-pack-search-hints-as-unsigned.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0001-kvazaar-external-pthread-msvc.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0002-cmake-pc-libs-private-libm-pthread.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0003-cmake-pc-cflags-static-lib.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0004-cmake-pc-meson110-libs-not-private.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0005-win-pragma-comment-lib-pthread-when-KVZ_STATIC_LIB.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0006-msvc-default-thread-attributes.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0007-version-header-in-binary-dir.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0008-clang-cl-sse41-target.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0009-avx2-unaligned-eight-pixel-loads.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0010-avx2-unaligned-reconstruction-stores.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0011-avx2-unaligned-dc-reference-loads.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0012-avx2-unaligned-four-pixel-reference-loads.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0013-avx2-match-quant-strategy-signature.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0014-avx2-match-sao-edge-strategy-signature.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0015-avx2-unaligned-interpolation-row-accesses.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0016-avx2-unaligned-subpixel-block-copies.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0017-sse41-unaligned-sad-fragment-loads.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0018-avx2-limit-chroma-filter-loads-to-four-bytes.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/openh264/0001-golomb-avoid-empty-word-shifts.patch, thirdparty/ffmpeg/plugins/codecs/video/openh264/0002-golomb-use-unsigned-trailing-mask.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0001-shallow-version.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0002-subpel-variance-unaligned-reference.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0003-avx2-unaligned-level-and-coefficient-loads.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0004-avx2-unaligned-full-two-tap-coefficients.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0005-sse2-unaligned-four-byte-deblock-stores.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0006-avx2-unaligned-cdef-row-accesses.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0007-avx2-unaligned-four-byte-convolution-and-packing.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0008-sse2-store-second-row-without-alignment-or-overflow.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0009-avx2-load-four-byte-sad-rows-without-alignment.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0010-sse41-load-short-rows-without-scalar-alignment.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0011-avx2-load-restoration-tails-at-natural-width.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0012-avx2-load-joint-convolution-rows-without-alignment.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/vpx/0001-clang-cl-simd-target.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/webp/0001-cmake-pkgconfig-lwebp-not-llibwebp.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/x264/0001-shallow-revision.patch, thirdparty/ffmpeg/plugins/codecs/video/x264/0002-threadpool-type-correct-worker-callbacks.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/x265/0001-json11-cstdint.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0002-respect-archive-version.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0003-nal-skip-empty-buffer-copy.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0004-bitstream-avoid-full-width-shift.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0005-lookahead-guard-temporal-estimator-access.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0006-mv-scale-signed-vectors-with-multiplication.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0007-ratecontrol-skip-disabled-amortization-division.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0008-quant-guard-final-coefficient-group-shift.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0009-motion-decode-diamond-directions-without-overflow.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0010-frame-release-owned-dolby-vision-rpu.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/compressors/lzma/liblzma-pc-promote-LZMA_API_STATIC-to-Cflags.patch
+-- [BuildMaster/Git      ]: Patch already applied thirdparty/ffmpeg/plugins/compressors/zlib/zlib-static-name-matches-pc.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/deps/samplerate/0001-cmake4-minimum-version.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/0001-mov-read-track-name-as-raw-utf8.patch, thirdparty/ffmpeg/0002-clang-cl-no-options-strict.patch, thirdparty/ffmpeg/0003-clang-cl-no-nonlocal-asm-labels.patch, thirdparty/ffmpeg/0004-avcodec-apv-parser-rename-close.patch, thirdparty/ffmpeg/0005-movenc-preserve-long-subtitle-gaps.patch, thirdparty/ffmpeg/0006-meson-vaapi-check-name.patch, thirdparty/ffmpeg/0007-avformat-matroska-reset-state-after-generic-or-byte-.patch, thirdparty/ffmpeg/0008-tests-api-cover-Matroska-byte-seek-after-EOF.patch, thirdparty/ffmpeg/0009-opusdec-initialize-active-channel-delay-pointers.patch, thirdparty/ffmpeg/0010-itut35-pad-dolby-vision-payloads.patch, thirdparty/ffmpeg/0011-libopenh264enc-map-constrained-baseline.patch, thirdparty/ffmpeg/0012-libx265-free-generated-rpu-after-encode.patch
+-- FFmpeg 9.0.2 (9.0.2, libavcodec major 63) [BUNDLED]
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ocr/leptonica/0001-msvc-unversioned-output-name.patch, thirdparty/ocr/leptonica/0002-always-create-lept.pc.patch, thirdparty/ocr/leptonica/0003-config-find-dependency-image-libs.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ocr/tesseract/0001-cmake-unversioned-tesseract-output-name.patch
+-- tessdata best [BUNDLED]: languages selected in languages/CMakeLists.txt
+-- [BuildMaster/Git      ]: Applied patch thirdparty/vmaf/0001-clang-cl-math-and-warnings.patch, thirdparty/vmaf/0002-libvmaf-rename-static-close.patch, thirdparty/vmaf/0003-adm-avx2-handle-small-coefficients.patch, thirdparty/vmaf/0004-adm-avx2-pack-coefficients-with-unsigned-shifts.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ebur128/0001-cmake-minimum-3.5.patch
+-- [BuildMaster/File     ]: Downloading Opus DNN data... (cached) OK
+-- [BuildMaster/Component]: FFmpeg plugins
+-- [BuildMaster/Component]: 	Codecs
+-- [BuildMaster/Component]: 		Audio
+-- [BuildMaster/CMake    ]: 			Reconfiguring FDK_AAC codec: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring FDK_AAC codec
+-- [BuildMaster/CMake    ]: 			Reconfiguring MP3 encoder LAME: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring MP3 encoder LAME
+-- [BuildMaster/CMake    ]: 			Reconfiguring Opus codec: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring Opus codec
+-- [BuildMaster/Meson    ]: 			Setting up rubberband for build-time configure
+-- [BuildMaster/CMake    ]: 			Setting up Vorbis codec for build-time configure
+-- [BuildMaster/Component]: 		Subtitles
+-- [BuildMaster/Component]: 			ass_text
+-- [BuildMaster/Component]: 			dvbsub
+-- [BuildMaster/Component]: 			dvdsub
+-- [BuildMaster/Component]: 			movtext
+-- [BuildMaster/Component]: 			pgssub
+-- [BuildMaster/Component]: 			srt
+-- [BuildMaster/Component]: 			ttml
+-- [BuildMaster/Component]: 			webvtt
+-- [BuildMaster/Component]: 		Video
+-- [BuildMaster/CMake    ]: 			Reconfiguring libaom: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring libaom
+-- [BuildMaster/Meson    ]: 			Reconfiguring dav1d: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: 			Configuring dav1d
+-- [BuildMaster/CMake    ]: 			Reconfiguring kvazaar: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring kvazaar
+-- [BuildMaster/Meson    ]: 			Reconfiguring openh264: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: 			Configuring openh264
+-- [BuildMaster/CMake    ]: 			Reconfiguring SVT-AV1: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring SVT-AV1
+-- [BuildMaster/Meson    ]: 			Reconfiguring VPX codec: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: 			Configuring VPX codec
+-- [BuildMaster/CMake    ]: 			Reconfiguring libwebp: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring libwebp
+-- [BuildMaster/Meson    ]: 			Reconfiguring X264 codec: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: 			Configuring X264 codec
+-- [BuildMaster/Component]: 			X265
+-- [BuildMaster/CMake    ]: 				Reconfiguring X265 codec (12-bit): mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 				Configuring X265 codec (12-bit)
+-- [BuildMaster/CMake    ]: 				Reconfiguring X265 codec (10-bit): mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 				Configuring X265 codec (10-bit)
+-- [BuildMaster/CMake    ]: 				Setting up X265 codec for build-time configure
+-- [BuildMaster/Component]: 	Compressors
+-- [BuildMaster/CMake    ]: 		Reconfiguring bzip2 compression library: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 		Configuring bzip2 compression library
+-- [BuildMaster/CMake    ]: 		Reconfiguring liblzma (xz) compression library: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 		Configuring liblzma (xz) compression library
+-- [BuildMaster/CMake    ]: 		Reconfiguring zlib compression library: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 		Configuring zlib compression library
+-- [BuildMaster/Component]: 	Containers
+-- [BuildMaster/Component]: 		Matroska
+-- [BuildMaster/CMake    ]: 		Reconfiguring OGG container: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 		Configuring OGG container
+-- [BuildMaster/Component]: 	Dependencies
+-- [BuildMaster/CMake    ]: 		Reconfiguring FFmpeg NVIDIA codec headers: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 		Configuring FFmpeg NVIDIA codec headers
+-- [BuildMaster/CMake    ]: 		Reconfiguring libsamplerate: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 		Configuring libsamplerate
+-- [BuildMaster/Component]: 	Filters
+-- [BuildMaster/Component]: 		atadenoise
+-- [BuildMaster/Component]: 		bm3d
+-- [BuildMaster/Component]: 		bwdif
+-- [BuildMaster/Component]: 		deband
+-- [BuildMaster/Component]: 		hqdn3d
+-- [BuildMaster/Component]: 		nlmeans
+-- [BuildMaster/Component]: 		psnr
+-- [BuildMaster/Component]: 		ssim
+-- [BuildMaster/Component]: 		xpsnr
+-- [BuildMaster/Component]: 		yadif
+-- [BuildMaster/Meson    ]: 	Setting up FFmpeg for build-time configure
+-- [BuildMaster/Component]: OCR
+-- [BuildMaster/CMake    ]: 	Reconfiguring leptonica: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 	Configuring leptonica
+-- [BuildMaster/CMake    ]: 	Setting up tesseract for build-time configure
+-- [BuildMaster/CMake    ]: Reconfiguring Tesseract traineddata: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: Configuring Tesseract traineddata
+-- [BuildMaster/Meson    ]: Reconfiguring VMAF library: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: Configuring VMAF library
+-- [BuildMaster/CMake    ]: Reconfiguring zimg: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: Configuring zimg
+-- [BuildMaster/CMake    ]: Reconfiguring libebur128: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: Configuring libebur128
+-- [BuildMaster/CMake    ]: Reconfiguring LunaSVG: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: Configuring LunaSVG
+-- [BuildMaster/User     ]: 	Setting up FFmpeg build
+-- [BuildMaster/User     ]: 		Enabled codec options:
+-- 			-Dlibfdk_aac=enabled                -Dlibmp3lame=enabled                
+-- 			-Dlibopus=enabled                   -Dlibrubberband=enabled             
+-- 			-Dlibvorbis=enabled                 -Dlibvorbisenc=enabled              
+-- 			-Dass_demuxer=enabled               -Dass_muxer=enabled                 
+-- 			-Dass_decoder=enabled               -Dass_encoder=enabled               
+-- 			-Dssa_decoder=enabled               -Dssa_encoder=enabled               
+-- 			-Ddvbsub_demuxer=enabled            -Ddvbsub_decoder=enabled            
+-- 			-Ddvbsub_encoder=enabled            -Ddvbsub_parser=enabled             
+-- 			-Ddvdsub_decoder=enabled            -Ddvdsub_encoder=enabled            
+-- 			-Ddvdsub_parser=enabled             -Dvobsub_demuxer=enabled            
+-- 			-Dmovtext_decoder=enabled           -Dmovtext_encoder=enabled           
+-- 			-Dpgssub_decoder=enabled            -Dsup_demuxer=enabled               
+-- 			-Dsup_muxer=enabled                 -Dsrt_demuxer=enabled               
+-- 			-Dsrt_muxer=enabled                 -Dsrt_decoder=enabled               
+-- 			-Dsrt_encoder=enabled               -Dttml_muxer=enabled                
+-- 			-Dttml_encoder=enabled              -Dwebvtt_demuxer=enabled            
+-- 			-Dwebvtt_muxer=enabled              -Dwebvtt_decoder=enabled            
+-- 			-Dwebvtt_encoder=enabled            -Dlibaom=enabled                    
+-- 			-Dlibdav1d=enabled                  -Dlibkvazaar=enabled                
+-- 			-Dlibopenh264=enabled               -Dlibsvtav1=enabled                 
+-- 			-Dlibvpx=enabled                    -Dlibvpx_vp8_encoder=enabled        
+-- 			-Dlibvpx_vp8_decoder=enabled        -Dlibvpx_vp9_encoder=enabled        
+-- 			-Dlibvpx_vp9_decoder=enabled        -Dlibwebp=enabled                   
+-- 			-Dlibx264=enabled                   -Dlibx264_encoder=enabled           
+-- 			-Dlibx264rgb_encoder=enabled        -Dlibx265=enabled                   
+-- 			-Dlibx265_encoder=enabled           -Dbzlib=enabled                     
+-- 			-Dlzma=enabled                      -Dzlib=enabled                      
+-- 			-Dmatroska_muxer=enabled            -Dmatroska_audio_muxer=enabled      
+-- 			-Dmatroska_demuxer=enabled          -Doga_muxer=enabled                 
+-- 			-Dogg_muxer=enabled                 -Dogv_muxer=enabled                 
+-- 			-Dogg_demuxer=enabled               -Dffnvcodec=enabled                 
+-- 			-Dcuda=enabled                      -Dnvenc=enabled                     
+-- 			-Dnvdec=enabled                     -Dcuvid=disabled                    
+-- 			-Dff_cuda_nvcc=disabled             -Dff_cuda_llvm=disabled             
+-- 			-Dff_cuda_sdk=disabled              -Dav1_nvenc_encoder=enabled         
+-- 			-Dh264_nvenc_encoder=enabled        -Dhevc_nvenc_encoder=enabled        
+-- 			-Datadenoise_filter=enabled         -Dbm3d_filter=enabled               
+-- 			-Dbwdif_filter=enabled              -Ddeband_filter=enabled             
+-- 			-Dhqdn3d_filter=enabled             -Dnlmeans_filter=enabled            
+-- 			-Dpsnr_filter=enabled               -Dssim_filter=enabled               
+-- 			-Dxpsnr_filter=enabled              -Dyadif_filter=enabled              
+-- Configuring done (88.8s)
+-- Generating done (0.4s)
+-- Build files have been written to: /tmp/BMDATA/sanitizer-clean-final
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  1%] [BuildMaster/Core     ]: reset fail markers
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+[  1%] Built target _bm_bin_StormByte-Logger_dl
+[  1%] Built target _bm_bin_StormByte-Base_dl
+[  1%] Built target _bm_bin_StormByte-Buffer_dl
+[  1%] Built target _bm_bin_StormByte-System_dl
+[  1%] Built target buildmaster_build_init
+[  1%] Built target StormByte-Buffer_build
+[  1%] Built target StormByte-System_build
+[  1%] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  2%] [BuildMaster/Ninja    ]: Compiling kvazaar
+[  2%] [BuildMaster/Ninja    ]: Compiling VPX codec
+[  2%] [BuildMaster/Ninja    ]: Compiling libwebp
+[  4%] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+[  4%] [BuildMaster/Ninja    ]: Compiling VMAF library
+[  4%] Built target StormByte-Logger_build
+[  4%] [BuildMaster/Ninja    ]: Compiling openh264
+[  5%] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[  7%] [BuildMaster/Ninja    ]: Compiling zimg
+[  8%] [BuildMaster/Ninja    ]: Compiling dav1d
+[  8%] [BuildMaster/Ninja    ]: Compiling libebur128
+[ 10%] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[ 11%] [BuildMaster/Ninja    ]: Compiling LunaSVG
+[ 11%] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[ 11%] [BuildMaster/Ninja    ]: Compiling leptonica
+[ 11%] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[ 11%] [BuildMaster/Ninja    ]: Compiling Opus codec
+[ 12%] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+[ 12%] [BuildMaster/Ninja    ]: Compiling OGG container
+[ 12%] Built target StormByte-Base_build
+[ 12%] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[ 12%] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[ 14%] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[ 14%] [BuildMaster/Ninja    ]: Compiling X264 codec
+[ 14%] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[ 15%] [BuildMaster/Ninja    ]: Compiling libaom
+[ 15%] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+[ 15%] Built target _bm_bin_StormByte-Base_unpack
+[ 15%] Built target ffnvcodec-headers_build
+[ 15%] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+[ 15%] Built target StormByte-Base_install
+[ 15%] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[ 15%] Built target _bm_bin_StormByte-Logger_unpack
+[ 15%] Built target ffnvcodec-headers_install
+[ 17%] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[ 17%] Built target StormByte-Logger_install
+[ 17%] Built target _bm_bin_StormByte-System_unpack
+[ 18%] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[ 18%] Built target StormByte-System_install
+[ 18%] Built target ogg_build
+[ 18%] Built target _bm_bin_StormByte-Buffer_unpack
+[ 18%] [BuildMaster/Ninja    ]: Installing OGG container
+[ 18%] Built target StormByte-Buffer_install
+[ 18%] Built target ogg_install
+[ 18%] [BuildMaster/CMake    ]: Configuring vorbis
+[ 18%] Built target bzip2_build
+[ 20%] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+[ 20%] Built target zlib_build
+CMake Error at /usr/share/cmake/StormByte-BuildMaster/modules/log.cmake:287 (message):
+  [1;31m[FATAL ][BuildMaster/Component]: write_pc:
+  '/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/lib64/pkgconfig/bzip2.pc'
+  already exists (upstream .pc).  BuildMaster will not overwrite it.  Use
+  PC={ENABLED=FALSE} or drop PC={…}.[0m
+Call Stack (most recent call first):
+  /usr/share/cmake/StormByte-BuildMaster/modules/component/pkgconfig/write_pc.cmake:42 (_bm_log_message)
+
+
+CMake Error at /usr/share/cmake/StormByte-BuildMaster/modules/log.cmake:287 (message):
+  [1;31m[FATAL ][BuildMaster/CMake ]: helper .pc failed for bzip2
+  compression library (exit 1)[0m
+Call Stack (most recent call first):
+  /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/scripts/install_rules/bzip2_pc.cmake:24 (_bm_log_message)
+  /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/scripts/install_rules/bzip2_install_rules.cmake:4 (include)
+  /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/scripts/cmake/bzip2_install_library.cmake:78 (include)
+
+
+gmake[3]: *** [CMakeFiles/bzip2_install.dir/build.make:71: CMakeFiles/bzip2_install] Error 1
+[ 21%] [BuildMaster/Ninja    ]: Installing zlib compression library
+gmake[2]: *** [CMakeFiles/Makefile2:3860: CMakeFiles/bzip2_install.dir/all] Error 2
+gmake[2]: *** Se espera a que terminen otras tareas....
+[ 21%] Built target mp3lame_build
+[ 21%] Built target ebur128_build
+[BuildMaster/CMake    ]: 			Reconfiguring Vorbis codec: mode, ABI or options changed
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 21%] Built target lzma_build
+[ 21%] Built target zlib_install
+[ 21%] Built target lunasvg_build
+[ 21%] Built target samplerate_build
+[ 21%] Built target opus_build
+[ 21%] Built target dav1d_build
+[ 21%] Built target tessdata_build
+[ 21%] Built target webp_build
+[ 21%] Built target vorbis_configure
+[ 21%] Built target leptonica_build
+[ 21%] Built target kvazaar_build
+[ 21%] Built target fdk-aac_build
+[ 21%] Built target vmaf_build
+[ 21%] Built target x265-12bit_build
+[ 21%] Built target x265-10bit_build
+[ 21%] Built target openh264_build
+[ 21%] Built target vpx_build
+[ 21%] Built target zimg_build
+[ 21%] Built target svt-av1_build
+[ 21%] Built target aom_build
+[ 21%] Built target x264_build
+gmake[1]: *** [CMakeFiles/Makefile2:7574: test/pipeline/filters/CMakeFiles/MultimediaPipelineAllocationTests.dir/rule] Error 2
+gmake: *** [Makefile:2081: MultimediaPipelineAllocationTests] Error 2

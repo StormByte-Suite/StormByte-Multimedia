@@ -13,6 +13,35 @@ CTest requirements.
 **The audit is not complete. Releases and tag/retag operations remain on hold.**
 No upstream PR has been opened automatically.
 
+### Latest OOM validation
+
+The Transcoder factory/coordinator allocation boundaries and allocation-free
+failure propagation are committed in `83e31c4e`; real dependency-owner teardown
+regressions are committed in `23b20736`. A confirmed Base telemetry failure
+during unwinding is fixed by Base `ce1baac`: observational clock sampling is
+skipped during exception unwinding so cleanup does not allocate or exhaust
+the exception runtime's reserve. The normal no-active-exception destructor
+case is exercised separately.
+
+Persistent allocator-exhaustion validation: **9 passed** in the isolated
+UBSan build, using real Buffer reader/writer destruction rather than retained
+owners. Shared strict ASan/UBSan/LSan validation: **4 passed / 6 intentional
+allocator-interposition skips**, exit **0**, including the canonical long
+live-audio test and normal repeated-video remux.
+[Revisions, package hashes, commands and scope](logs/dependencies/oom/shared-graph-validation.md).
+
+Base 2.2.3's local sanitizer ZIP and the shared validation prefix now contain
+the telemetry fix. No published ZIP or tag was changed. A subsequent
+incremental host/test build passed; a separate ordinary build hit an external
+BuildMaster generated-`bzip2.pc` reinstall collision, preserved as a failed
+build rather than erased from the record.
+
+The final static reconciliation is preserved under
+[static-analysis/final](logs/static-analysis/final/README.md). Numeric warning
+sites have evidenced bounds/provenance; additional concrete local allocating
+`noexcept` barriers found during reconciliation are being corrected separately.
+Do not treat the coordinator tests as proof that every nested boundary is safe.
+
 The complete available evidence is now retained in the repository under
 [doc/logs](logs/README.md), organized by build, test run and provider rather
 than depending on temporary build/session directories. It includes

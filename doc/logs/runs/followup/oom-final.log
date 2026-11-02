@@ -1,0 +1,40 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+      Start  89: pipeline.test_transcoder_remuxes_same_video_twice
+      Start  15: preview.test_live_audio_tracks
+      Start 307: pipeline.test_transcoder_plan_allocation_failure
+      Start 308: pipeline.test_transcoder_empty_plan_owner
+ 1/10 Test #308: pipeline.test_transcoder_empty_plan_owner ....................   Passed    0.46 sec
+      Start 358: pipeline.test_pipeline_failure_closure_without_allocations
+ 2/10 Test #358: pipeline.test_pipeline_failure_closure_without_allocations ...***Skipped   0.14 sec
+      Start 359: pipeline.test_nlmeans_scratch_failure_fails_job
+ 3/10 Test #307: pipeline.test_transcoder_plan_allocation_failure .............   Passed    0.74 sec
+      Start 360: pipeline.test_transcoder_start_without_allocations
+ 4/10 Test #359: pipeline.test_nlmeans_scratch_failure_fails_job ..............***Skipped   0.15 sec
+      Start 361: pipeline.test_transcoder_worker_without_allocations
+ 5/10 Test #360: pipeline.test_transcoder_start_without_allocations ...........***Skipped   0.14 sec
+      Start 362: pipeline.test_transcoder_cancel_without_allocations
+ 6/10 Test #361: pipeline.test_transcoder_worker_without_allocations ..........***Skipped   0.14 sec
+      Start 363: pipeline.test_writer_destruction_without_allocations
+ 7/10 Test #362: pipeline.test_transcoder_cancel_without_allocations ..........***Skipped   0.14 sec
+ 8/10 Test #363: pipeline.test_writer_destruction_without_allocations .........***Skipped   0.14 sec
+ 9/10 Test  #15: preview.test_live_audio_tracks ...............................   Passed   15.29 sec
+10/10 Test  #89: pipeline.test_transcoder_remuxes_same_video_twice ............   Passed   40.73 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+multimedia    =  58.08 sec*proc (10 tests)
+pipeline      =  42.79 sec*proc (9 tests)
+preview       =  15.29 sec*proc (1 test)
+
+Total Test time (real) =  40.74 sec
+
+The following tests did not run:
+	358 - pipeline.test_pipeline_failure_closure_without_allocations (Skipped)
+	359 - pipeline.test_nlmeans_scratch_failure_fails_job (Skipped)
+	360 - pipeline.test_transcoder_start_without_allocations (Skipped)
+	361 - pipeline.test_transcoder_worker_without_allocations (Skipped)
+	362 - pipeline.test_transcoder_cancel_without_allocations (Skipped)
+	363 - pipeline.test_writer_destruction_without_allocations (Skipped)
+
+exit_code=0
