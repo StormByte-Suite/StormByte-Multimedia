@@ -5,6 +5,7 @@ set(SVTAV1_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0002-subpel-variance-unaligned-reference.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0003-avx2-unaligned-level-and-coefficient-loads.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0004-avx2-unaligned-full-two-tap-coefficients.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0005-sse2-unaligned-four-byte-deblock-stores.patch"
 )
 
 set(SVTAV1_OPTIONS

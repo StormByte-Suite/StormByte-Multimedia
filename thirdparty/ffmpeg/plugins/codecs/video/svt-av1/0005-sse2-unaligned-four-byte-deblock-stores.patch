@@ -1,0 +1,56 @@
+From d40d0a3d5da48a3a919a59bac4f3efef08ce3078 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] SSE2: store four-byte deblocking tails without alignment
+ assumptions
+
+High-bit-depth vertical deblocking can write a two-pixel tail at an
+address aligned to two bytes but not four. Use xx_storel_32 for the four
+tail stores, and implement that helper through the existing byte-copy
+routine instead of an aligned uint32_t lvalue. Preserve the original
+source lanes and exact store width. Reproduced by the existing HDR10 AV1
+encoding test with UBSan.
+---
+ Source/Lib/ASM_SSE2/dlf_intrin_sse2.c | 8 ++++----
+ Source/Lib/ASM_SSE2/synonyms.h        | 3 ++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c b/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c
+index 4ae31b488..406831a2a 100644
+--- a/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c
++++ b/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c
+@@ -1918,13 +1918,13 @@ void svt_aom_highbd_lpf_vertical_6_sse2(uint16_t* s, int32_t p, const uint8_t* b
+     highbd_transpose6x6_sse2(&d0, &p0, &p1p0, &q1q0, &q0, &d5, &d0, &d1, &d2, &d3, &d4, &d5);
+ 
+     _mm_storel_epi64((__m128i*)((s - 3) + 0 * p), d0);
+-    *(int32_t*)((s - 3) + 0 * p + 4) = _mm_cvtsi128_si32(_mm_srli_si128(d0, 8));
++    xx_storel_32((s - 3) + 0 * p + 4, _mm_srli_si128(d0, 8));
+     _mm_storel_epi64((__m128i*)((s - 3) + 1 * p), d1);
+-    *(int32_t*)((s - 3) + 1 * p + 4) = _mm_cvtsi128_si32(_mm_srli_si128(d0, 12));
++    xx_storel_32((s - 3) + 1 * p + 4, _mm_srli_si128(d0, 12));
+     _mm_storel_epi64((__m128i*)((s - 3) + 2 * p), d2);
+-    *(int32_t*)((s - 3) + 2 * p + 4) = _mm_cvtsi128_si32(_mm_srli_si128(d2, 8));
++    xx_storel_32((s - 3) + 2 * p + 4, _mm_srli_si128(d2, 8));
+     _mm_storel_epi64((__m128i*)((s - 3) + 3 * p), d3);
+-    *(int32_t*)((s - 3) + 3 * p + 4) = _mm_cvtsi128_si32(_mm_srli_si128(d3, 8));
++    xx_storel_32((s - 3) + 3 * p + 4, _mm_srli_si128(d3, 8));
+ }
+ 
+ void svt_aom_highbd_lpf_vertical_8_sse2(uint16_t* s, int32_t p, const uint8_t* blimit, const uint8_t* limit,
+diff --git a/Source/Lib/ASM_SSE2/synonyms.h b/Source/Lib/ASM_SSE2/synonyms.h
+index 564fea049..c830d6b3d 100644
+--- a/Source/Lib/ASM_SSE2/synonyms.h
++++ b/Source/Lib/ASM_SSE2/synonyms.h
+@@ -40,7 +40,8 @@ static INLINE __m128i xx_loadu_128(const void* a) {
+ }
+ 
+ static INLINE void xx_storel_32(void* const a, const __m128i v) {
+-    *(uint32_t*)a = _mm_cvtsi128_si32(v);
++    const int val = _mm_cvtsi128_si32(v);
++    svt_memcpy_intrin_sse(a, &val, sizeof(val));
+ }
+ 
+ static INLINE void xx_storel_64(void* const a, const __m128i v) {
+-- 
+2.56.0
+
