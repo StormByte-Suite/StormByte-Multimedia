@@ -235,7 +235,7 @@ namespace StormByte {
 					 * @brief Presentation time of the last emitted packet.
 					 * @return Pts, or empty until a packet with Pts arrives.
 					 */
-					StormByte::Safe::Optional<Property::Duration> Position() const noexcept;
+					StormByte::Safe::Optional<Property::Duration> Position() const;
 
 					/**
 					 * @brief Job clock for this tube (measure, analytics, All).

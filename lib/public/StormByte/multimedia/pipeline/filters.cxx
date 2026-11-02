@@ -48,6 +48,8 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/decoder.hxx>
@@ -107,7 +109,7 @@ namespace {
 Filters::Filters() noexcept = default;
 
 bool Filters::Matches(const Filter::FFmpeg& filter, const Step& origin,
-	Producer destination, int track) noexcept {
+	Producer destination, int track) {
 	if (destination != Producer::Encoder && destination != Producer::Remuxer)
 		return false;
 	const auto plan = origin.Plan();
@@ -123,7 +125,7 @@ bool Filters::Matches(const Filter::FFmpeg& filter, const Step& origin,
 Filters::Handle::Handle(Filters& owner, StormByte::Size index) noexcept
 : m_owner(&owner), m_index(index) {}
 
-Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
+Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) {
 	if (!filter || !m_owner || m_index >= m_owner->m_stretches.size())
 		return *this;
 	auto& stretch = m_owner->m_stretches[m_index];
@@ -155,7 +157,7 @@ Filters::Handle& Filters::Handle::Add(StormByte::Safe::Shared<Filter::FFmpeg> fi
 }
 
 Filters::Handle Filters::Between(StormByte::Safe::Shared<Step> origin,
-	StormByte::Safe::Shared<Step> destination) noexcept {
+	StormByte::Safe::Shared<Step> destination) {
 	Stretch stretch;
 	stretch.Origin = std::move(origin);
 	stretch.Destination = std::move(destination);
@@ -190,7 +192,7 @@ Filters::~Filters() noexcept {
 	}
 }
 
-Filters& Filters::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
+Filters& Filters::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) {
 	if (!filter)
 		return *this;
 	if (!StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter)) {
@@ -253,7 +255,7 @@ void Filters::ClockAnalytics() noexcept {
 		m_progress->AnalyticsDone();
 }
 
-void Filters::Close() noexcept {
+void Filters::Close() noexcept try {
 	BindClock();
 	for (auto& stretch : m_stretches) {
 		if (!stretch.Lane || !stretch.Origin || !stretch.Destination)
@@ -310,6 +312,20 @@ void Filters::Close() noexcept {
 	demuxer->m_filters = this;
 	m_measuring = true;
 	m_measureDrained.store(std::uint64_t{0}, StormByte::Safe::MemoryOrder::Release);
+} catch (const StormByte::Safe::AllocationError&) {
+	for (const auto& item : m_reports)
+		if (item.Filter) item.Filter->Fail();
+	for (auto& stretch : m_stretches) {
+		if (stretch.Origin) stretch.Origin->Fail();
+		if (stretch.Destination) stretch.Destination->Fail();
+	}
+} catch (const std::bad_alloc&) {
+	for (const auto& item : m_reports)
+		if (item.Filter) item.Filter->Fail();
+	for (auto& stretch : m_stretches) {
+		if (stretch.Origin) stretch.Origin->Fail();
+		if (stretch.Destination) stretch.Destination->Fail();
+	}
 }
 
 void Filters::BindPlan(StormByte::Safe::Shared<const class Plan> plan) noexcept {

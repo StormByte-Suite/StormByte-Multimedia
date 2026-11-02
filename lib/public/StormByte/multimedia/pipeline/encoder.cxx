@@ -48,6 +48,8 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/audio.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.hxx>
@@ -86,7 +88,7 @@ using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
 namespace {
-	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) {
 		if (!value)
 			return "-";
 		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
@@ -119,7 +121,7 @@ bool Encoder::WaitForPlan() noexcept {
 	return WaitPlan();
 }
 
-bool Encoder::SetupPlan() noexcept {
+bool Encoder::SetupPlan() noexcept try {
 	if (m_index < 0 || static_cast<std::size_t>(m_index) >= Plan()->Tracks().size()) {
 		Fail("encoder destination index is not in the plan");
 		return false;
@@ -150,16 +152,19 @@ bool Encoder::SetupPlan() noexcept {
 	if (const std::size_t capacity = InputCeiling(); capacity > 0)
 		pipe().Capacity(track.In(), capacity);
 	return Backend::Pipeline::Encoder::PrepareForMux(*this);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
 Encoder::~Encoder() noexcept {
 	Halt();
-	const auto implementation = m_implementation.value_or(StormByte::Safe::String{"auto"});
-	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("backend release begin stage=Encoder t={} impl={} instance={}",
-		m_index, std::string_view{implementation}, static_cast<const void*>(this)));
+	Log(Level::LowLevel, "backend release begin");
 	m_backend.reset();
-	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("backend release end stage=Encoder t={} impl={} instance={}",
-		m_index, std::string_view{implementation}, static_cast<const void*>(this)));
+	Log(Level::LowLevel, "backend release end");
 }
 
 Encoder::operator bool() const noexcept {
@@ -223,14 +228,18 @@ StormByte::Safe::Optional<int> Encoder::AudioSampleFormat() const {
 	}
 }
 
-void Encoder::Implementation(StormByte::Safe::String name) noexcept {
+void Encoder::Implementation(StormByte::Safe::String name) noexcept try {
 	if (name.empty())
 		m_implementation.reset();
 	else
 		m_implementation = std::move(name);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Encoder::Preset(StormByte::Safe::String name) noexcept {
+void Encoder::Preset(StormByte::Safe::String name) noexcept try {
 	if (Failed())
 		return;
 	if (name.empty()) {
@@ -239,9 +248,13 @@ void Encoder::Preset(StormByte::Safe::String name) noexcept {
 	}
 
 	m_preset = std::move(name);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Encoder::Tune(StormByte::Safe::String name) noexcept {
+void Encoder::Tune(StormByte::Safe::String name) noexcept try {
 	if (Failed())
 		return;
 	if (m_codec->Type() != Type::Video) {
@@ -255,6 +268,10 @@ void Encoder::Tune(StormByte::Safe::String name) noexcept {
 	}
 
 	m_tune = std::move(name);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Encoder::Emit(Packet::PointerType packet) noexcept {
@@ -269,7 +286,7 @@ Packet::PointerType Encoder::Wrap(
 	StormByte::Safe::Optional<Property::Duration> duration,
 	bool keyFrame,
 	StormByte::Safe::Vector<SideData> attachments,
-	StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept {
+	StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept try {
 	if (!m_serial) {
 		Fail("encoder packet has no serial");
 		return {};
@@ -291,6 +308,12 @@ Packet::PointerType Encoder::Wrap(
 		*m_serial, m_part);
 	packet->Bind(std::move(backend));
 	return packet;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return {};
+} catch (const std::bad_alloc&) {
+	Fail();
+	return {};
 }
 
 bool Encoder::MuxBindStream(void* avStream) noexcept {
@@ -342,7 +365,7 @@ const void* Encoder::FrameHandle(const Frame& frame) noexcept {
 	return frame.m_backend ? &frame.m_backend->Handle() : nullptr;
 }
 
-StormByte::Safe::String Encoder::Label() const noexcept {
+StormByte::Safe::String Encoder::Label() const {
 	if (m_implementation && !m_implementation->empty())
 		return StormByte::Safe::String::ReplaceToken("Encoder({})", std::string_view{*m_implementation});
 	return StormByte::Safe::String("Encoder(" + std::string(m_codec->Name()) + ")");

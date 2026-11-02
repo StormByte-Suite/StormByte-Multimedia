@@ -29,6 +29,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Pipeline runtime and graph-wiring allocation failures mark stages/jobs as failed and wake their peers without formatting another allocating error; partially registered stage links are rolled back, and teardown continues when diagnostics cannot allocate.
+- Codec configuration and settled-track moves propagate their allocating map construction contracts, including vendor-option forwarding.
 - Filter lifecycle, queue, measurement and save boundaries report allocation failure without terminating; allocating filter constructors and chain-formatting helpers propagate to those guarded boundaries.
 - Backend decode/encode/mux/queue entry points handle allocation failures through their existing owner failure state rather than terminating in nested helpers.
 - FFmpeg/OCR owning results and metadata helpers propagate allocation failures instead of terminating. Encoder contexts, filter graphs, HDR metadata buffers, decoder look parameters and OCR text retain RAII ownership during failed construction.

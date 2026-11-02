@@ -99,7 +99,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Subtitle(Subtitle&& other) noexcept;
+			Subtitle(Subtitle&& other);
 
 			/**
 			 * @brief Destructor.

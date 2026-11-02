@@ -58,7 +58,7 @@ Audio::Audio(): Base(StormByte::Multimedia::Type::Audio), m_codec(nullptr) {}
 
 Audio::Audio(const Audio& other) = default;
 
-Audio::Audio(Audio&& other) noexcept = default;
+Audio::Audio(Audio&& other) = default;
 
 Audio::~Audio() noexcept = default;
 

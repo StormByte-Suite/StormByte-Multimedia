@@ -48,6 +48,8 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/pumper/source.hxx>
@@ -75,7 +77,7 @@ using StormByte::Logger::Level;
 using StormByte::Buffer::IO::BufferedFileReader;
 
 namespace {
-	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<Property::Duration>& value) {
 		if (!value)
 			return "-";
 		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
@@ -105,7 +107,7 @@ bool Demuxer::Eof() const noexcept {
 	return m_eof;
 }
 
-StormByte::Safe::Optional<Property::Duration> Demuxer::Position() const noexcept {
+StormByte::Safe::Optional<Property::Duration> Demuxer::Position() const {
 	const std::int64_t ns = m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (ns < 0)
 		return std::nullopt;
@@ -198,7 +200,7 @@ Packet::PointerType Demuxer::Wrap(
 	StormByte::Safe::Optional<Property::Duration> dts,
 	StormByte::Safe::Optional<Property::Duration> duration,
 	bool keyframe,
-	StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept {
+	StormByte::Safe::Unique<Backend::Pipeline::Packet> backend) noexcept try {
 	if (m_measuring) {
 		const auto& tracks = m_measureTracks;
 		if (std::find(tracks.begin(), tracks.end(), track) == tracks.end())
@@ -226,9 +228,15 @@ Packet::PointerType Demuxer::Wrap(
 	if (backend)
 		packet->Bind(std::move(backend));
 	return packet;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return {};
+} catch (const std::bad_alloc&) {
+	Fail();
+	return {};
 }
 
-Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& decoder) noexcept {
+Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& decoder) noexcept try {
 	if (decoder.Failed())
 		return decoder;
 	if (!demuxer.Connect(decoder))
@@ -271,5 +279,11 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	if (const std::size_t cap = decoder.InputCeiling(); cap > 0)
 		decoder.pipe().Capacity(decoder.Index(), cap);
 	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind decoder t={}", decoder.Index()));
+	return decoder;
+} catch (const StormByte::Safe::AllocationError&) {
+	demuxer.Fail(); decoder.Fail();
+	return decoder;
+} catch (const std::bad_alloc&) {
+	demuxer.Fail(); decoder.Fail();
 	return decoder;
 }

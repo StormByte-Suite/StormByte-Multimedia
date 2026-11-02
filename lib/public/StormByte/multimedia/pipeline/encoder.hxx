@@ -465,7 +465,7 @@ namespace StormByte {
 					 * @return `Encoder(<implementation>)` when pinned or selected,
 					 *         otherwise `Encoder(<registry codec name>)`.
 					 */
-					StormByte::Safe::String Label() const noexcept override;
+					StormByte::Safe::String Label() const override;
 
 					/**
 					 * @}

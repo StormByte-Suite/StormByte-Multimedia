@@ -434,7 +434,7 @@ namespace StormByte {
 					 * Media buffers are shared according to @ref Item::Clone;
 					 * the returned item does not duplicate the media payload.
 					 */
-					Item::PointerType CloneItem(const Item& item) const noexcept;
+					Item::PointerType CloneItem(const Item& item) const;
 
 					/**
 					 * @brief Waits until input is available, the stage fails or stops,
@@ -583,7 +583,7 @@ namespace StormByte {
 					 * @return @ref Producer name (`Encoder`) unless a leaf overrides
 					 *         it (`Encoder(libx265)`).
 					 */
-					virtual StormByte::Safe::String Label() const noexcept;
+					virtual StormByte::Safe::String Label() const;
 
 					/**
 					 * @brief Writes one log line on the scoped module logger.

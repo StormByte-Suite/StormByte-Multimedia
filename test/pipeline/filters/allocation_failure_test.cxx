@@ -64,6 +64,7 @@ namespace {
 	class TestStep final: public Pipeline::Step {
 		public:
 			TestStep(): Step({}, Pipeline::Producer::Encoder, {}, {}) {}
+			using Step::Connect;
 	};
 
 	static_assert(!noexcept(TestStep{}));
@@ -146,6 +147,52 @@ namespace {
 		}
 		TEST_REQUIRE(moved.FillText("cue", 42, 1000, false));
 		TEST_REQUIRE(moved.Text() == StormByte::Safe::String{"cue"});
+		return 0;
+	}
+
+	int TestStageWiringAllocationFailure() {
+		unsigned rejected = 0;
+		for (std::size_t position = 0; position < 16; ++position) {
+			TestStep from;
+			TestStep to;
+			const auto before = denied;
+			reject_after = position;
+			from >> to;
+			reject_after = std::numeric_limits<std::size_t>::max();
+			if (denied != before) {
+				++rejected;
+				TEST_REQUIRE(from.Failed() || to.Failed());
+			}
+		}
+		TEST_REQUIRE(rejected >= 3);
+		return 0;
+	}
+
+	int TestFilterProcessAllocationFailure() {
+		Pipeline::Filter::Video::CountFrames filter({});
+		Pipeline::Frame frame{0, StormByte::Multimedia::Type::Video, Pipeline::Producer::Encoder,
+			{}, {}, {}, {}, {}, {}, 0, 0};
+		const auto before = denied;
+		reject_after = 0;
+		filter.Process(frame);
+		reject_after = std::numeric_limits<std::size_t>::max();
+		TEST_REQUIRE(denied > before);
+		TEST_REQUIRE(filter.Failed());
+		return 0;
+	}
+
+	int TestTrackConfigurationAllocationFailure() {
+		Pipeline::Transcoder job{TestLocation(FixturePath("video/xvid_mp3_stereo.avi")),
+			TestLocation(OutputPath("pipeline/filters/track-configuration-oom.mkv")),
+			MakeLogger(), 2000000000LL};
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		const auto before = denied;
+		reject_after = 0;
+		static_cast<void>(job.Video(0));
+		reject_after = std::numeric_limits<std::size_t>::max();
+		TEST_REQUIRE(denied > before);
+		TEST_REQUIRE(job.Status() == Pipeline::Status::Error);
+		TEST_REQUIRE(!job.Error());
 		return 0;
 	}
 
@@ -368,7 +415,10 @@ int main(int argc, char** argv) {
 		TestEntry{"test_writer_destruction_without_allocations", TestWriterDestructionExhaustion},
 		TestEntry{"test_stage_factory_allocation_failure", TestFactoryAllocationFailure},
 		TestEntry{"test_filter_report_allocation_failure", TestReportAllocationFailure},
-		TestEntry{"test_subtitle_allocation_failure", TestSubtitleAllocationFailure}
+		TestEntry{"test_subtitle_allocation_failure", TestSubtitleAllocationFailure},
+		TestEntry{"test_stage_wiring_allocation_failure", TestStageWiringAllocationFailure},
+		TestEntry{"test_filter_process_allocation_failure", TestFilterProcessAllocationFailure},
+		TestEntry{"test_track_configuration_allocation_failure", TestTrackConfigurationAllocationFailure}
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

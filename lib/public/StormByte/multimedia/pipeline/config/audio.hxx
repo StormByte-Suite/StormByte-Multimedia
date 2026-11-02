@@ -105,7 +105,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Audio(Audio&& other) noexcept;
+			Audio(Audio&& other);
 
 			/**
 			 * @brief Destructor.

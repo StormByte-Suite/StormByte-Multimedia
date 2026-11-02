@@ -48,6 +48,9 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
+#include <memory>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/multimedia/ffmpeg/AVCodecParameters.hxx>
 #include <StormByte/multimedia/ffmpeg/AVDecoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
@@ -124,7 +127,7 @@ bool Decoder::WaitForPlan() noexcept {
 	return WaitPlan();
 }
 
-bool Decoder::SetupPlan() noexcept {
+bool Decoder::SetupPlan() noexcept try {
 	try {
 		if (!m_look) {
 			for (const auto& track : Plan()->Tracks()) {
@@ -154,6 +157,12 @@ bool Decoder::SetupPlan() noexcept {
 		return false;
 	}
 	return true;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
 Decoder::operator bool() const noexcept {
@@ -169,12 +178,16 @@ StormByte::Size Decoder::InputCeiling() const noexcept {
 	return cap.Packets() != 0 ? cap.Packets() : cap.Frames();
 }
 
-void Decoder::Implementation(StormByte::Safe::String name) noexcept {
+void Decoder::Implementation(StormByte::Safe::String name) noexcept try {
 	m_implementationConfigured = true;
 	if (name.empty())
 		m_implementation.reset();
 	else
 		m_implementation = std::move(name);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Decoder::HardwareFallback() noexcept {
@@ -182,28 +195,40 @@ void Decoder::HardwareFallback() noexcept {
 		"hardware video decoder unavailable; continuing with software decode");
 }
 
-void Decoder::Attach(Frame& frame, StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept {
+void Decoder::Attach(Frame& frame, StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept try {
 	frame.m_language = m_language;
 	frame.m_title = m_title;
 	frame.Bind(std::move(backend));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Decoder::CloseCue(Frame& frame, Property::Duration duration) noexcept {
+void Decoder::CloseCue(Frame& frame, Property::Duration duration) noexcept try {
 	frame.m_duration = std::move(duration);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Decoder::StampLineage(Frame& frame) noexcept {
+void Decoder::StampLineage(Frame& frame) noexcept try {
 	frame.m_serial = m_serial;
 	frame.m_part = m_part++;
 	frame.m_dts = m_inDts;
 	frame.m_pass = m_pass;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Decoder::BindAnalytics(Filters& filters) noexcept {
 	m_analytics = &filters;
 }
 
-void Decoder::StampLook(Frame& frame) noexcept {
+void Decoder::StampLook(Frame& frame) noexcept try {
 	if (m_encodeSource && frame.Type() == Type::Video && frame.m_backend) {
 		FFmpeg::AVFrame restored;
 		const auto& raw = frame.m_backend->Handle();
@@ -222,6 +247,10 @@ void Decoder::StampLook(Frame& frame) noexcept {
 		return;
 	if (const auto& pts = frame.Pts(); pts)
 		m_analytics->NoteAnalytics(pts->Nanoseconds().count());
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Decoder::Bind(StormByte::Safe::Unique<Backend::Pipeline::Decoder> backend) noexcept {
@@ -229,14 +258,20 @@ void Decoder::Bind(StormByte::Safe::Unique<Backend::Pipeline::Decoder> backend) 
 	m_capabilities = Features{};
 }
 
-StormByte::Safe::Unique<Backend::Pipeline::Decoder> Decoder::OpenOrigin() noexcept {
+StormByte::Safe::Unique<Backend::Pipeline::Decoder> Decoder::OpenOrigin() noexcept try {
 	if (!m_origin)
 		return {};
 	return m_origin->OpenDecoder(*this);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return {};
+} catch (const std::bad_alloc&) {
+	Fail();
+	return {};
 }
 
 void Decoder::Stamp(StormByte::Safe::Optional<StormByte::Safe::String> language,
-	StormByte::Safe::Optional<StormByte::Safe::String> title) noexcept {
+	StormByte::Safe::Optional<StormByte::Safe::String> title) noexcept try {
 	if (!language || language->empty())
 		m_language.reset();
 	else
@@ -245,6 +280,10 @@ void Decoder::Stamp(StormByte::Safe::Optional<StormByte::Safe::String> language,
 		m_title.reset();
 	else
 		m_title = std::move(title);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Decoder::InheritSourceTags() {
@@ -271,7 +310,7 @@ void Decoder::MeasureSourceClosed() noexcept {
 	Wake();
 }
 
-void Decoder::DrainMeasure() noexcept {
+void Decoder::DrainMeasure() noexcept try {
 	if (m_look)
 		return;
 	if (!m_measureClosed.load(StormByte::Safe::MemoryOrder::Acquire))
@@ -288,6 +327,10 @@ void Decoder::DrainMeasure() noexcept {
 		return;
 	if (m_origin && m_origin->m_filters)
 		m_origin->m_filters->OnMeasureDrained();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 bool Decoder::WakeNow() const noexcept {
@@ -305,7 +348,7 @@ void Decoder::AfterWait() noexcept {
 		DrainMeasure();
 }
 
-bool Decoder::ResetAfterMeasure() noexcept {
+bool Decoder::ResetAfterMeasure() noexcept try {
 	if (Failed())
 		return false;
 	if (m_look)
@@ -328,9 +371,15 @@ bool Decoder::ResetAfterMeasure() noexcept {
 	++m_pass;
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("reopen after measure t={}", m_index));
 	return true;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
-bool Decoder::OpenLook(const Packet& packet) noexcept {
+bool Decoder::OpenLook(const Packet& packet) noexcept try {
 	if (!packet.m_backend || !packet.m_backend->Parameters()) {
 		Fail("look packet has no codec parameters");
 		return false;
@@ -362,8 +411,11 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 			}
 		}
 		::AVCodecParameters* effective = avcodec_parameters_alloc();
+		const auto release = [](::AVCodecParameters* parameters) noexcept {
+			avcodec_parameters_free(&parameters);
+		};
+		const std::unique_ptr<::AVCodecParameters, decltype(release)> owned{effective, release};
 		if (!effective || !params.Export(effective)) {
-			avcodec_parameters_free(&effective);
 			Fail(StormByte::Safe::String::ReplaceToken(
 				"decoder track {} could not copy look codec parameters for stream {}",
 				m_index, m_sourceIndex >= 0 ? m_sourceIndex : m_index));
@@ -375,7 +427,6 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 			Property::DOVI parsed;
 			if (!parsed.LoadConfiguration(std::span<const std::byte>{
 				reinterpret_cast<const std::byte*>(configuration->data), configuration->size})) {
-				avcodec_parameters_free(&effective);
 				Fail(StormByte::Safe::String::ReplaceToken(
 					"decoder track {} received invalid Dolby Vision configuration ({} bytes)",
 					m_index, configuration->size));
@@ -383,7 +434,6 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 			}
 			dovi = std::move(parsed);
 		}
-		avcodec_parameters_free(&effective);
 		if (video)
 			video = Property::Video(video->Color(), video->Resolution(), video->HDR10(),
 				video->FrameRate(), video->SampleAspectRatio(), std::move(dovi));
@@ -403,9 +453,15 @@ bool Decoder::OpenLook(const Packet& packet) noexcept {
 
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("look open t={}", m_index));
 	return static_cast<bool>(m_backend);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
-StormByte::Safe::String Decoder::Label() const noexcept {
+StormByte::Safe::String Decoder::Label() const {
 	if (m_look) {
 		if (m_lookStamp == Producer::Encoder)
 			return StormByte::Safe::String("Decoder(look encode t=" + std::to_string(m_index) + ")");

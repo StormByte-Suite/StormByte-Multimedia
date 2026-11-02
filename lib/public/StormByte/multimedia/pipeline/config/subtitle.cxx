@@ -58,7 +58,7 @@ Subtitle::Subtitle(): Base(StormByte::Multimedia::Type::Subtitle), m_codec(nullp
 
 Subtitle::Subtitle(const Subtitle& other) = default;
 
-Subtitle::Subtitle(Subtitle&& other) noexcept = default;
+Subtitle::Subtitle(Subtitle&& other) = default;
 
 Subtitle::~Subtitle() noexcept = default;
 

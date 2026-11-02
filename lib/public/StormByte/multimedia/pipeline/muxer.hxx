@@ -281,7 +281,7 @@ namespace StormByte {
 					 * @return Pts of the last video packet, or of audio if no video
 					 *         has been written yet.
 					 */
-					StormByte::Safe::Optional<Property::Duration> Position() const noexcept;
+					StormByte::Safe::Optional<Property::Duration> Position() const;
 
 					/**
 					 * @brief Destination container.
@@ -331,42 +331,42 @@ namespace StormByte {
 					 * @param output_index Mux destination order key.
 					 * @return Tag, or empty.
 					 */
-					StormByte::Safe::Optional<StormByte::Safe::String> Language(int output_index) const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Language(int output_index) const;
 
 					/**
 					 * @brief Sets the language tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @param language BCP-47 / ISO tag. Empty clears.
 					 */
-					void Language(int output_index, StormByte::Safe::String language) noexcept;
+					void Language(int output_index, StormByte::Safe::String language);
 
 					/**
 					 * @brief Title tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @return Title, or empty.
 					 */
-					StormByte::Safe::Optional<StormByte::Safe::String> Title(int output_index) const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Title(int output_index) const;
 
 					/**
 					 * @brief Sets the title tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @param title Stream title. Empty clears.
 					 */
-					void Title(int output_index, StormByte::Safe::String title) noexcept;
+					void Title(int output_index, StormByte::Safe::String title);
 
 					/**
 					 * @brief Disposition for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @return Flags, or empty to let the container policy choose.
 					 */
-					StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Disposition(int output_index) const noexcept;
+					StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Disposition(int output_index) const;
 
 					/**
 					 * @brief Sets the disposition for mux output @p output_index.
 					 * @param output_index Mux destination order key.
 					 * @param disposition Flags written verbatim (default, forced, ...).
 					 */
-					void Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition) noexcept;
+					void Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition);
 
 					/**
 					 * @}

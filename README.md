@@ -242,6 +242,14 @@ Show `Main` as the transcode bar, with measure/analytics separately when present
 
 After `Done`, `Reports()` contains analytics results. Capture `Telemetry()` before running if the final snapshot must outlive the job. It retains stage counts, setup/processing/wait times and sampled memory. Memory minimum/current/peak are **process-wide RSS**, not stage allocations; sampling can miss short peaks.
 
+Construction, graph attachment, owning metadata access and report snapshots may
+throw `StormByte::Safe::AllocationError` or `std::bad_alloc`; they do not promise
+allocation-free operation. Worker lifecycle callbacks retain their `noexcept`
+contracts and convert allocation failures into the stage/job failure state,
+waking blocked peers. After allocation failure the diagnostic text may be empty:
+check the failure state rather than treating an empty message as success.
+Shutdown and destruction do not depend on allocating formatted diagnostics.
+
 `Transcoder` is designed to be inherited, but inheritance is not required for a normal job. Override `OnProgress`, `OnDone` and `OnError` to integrate a UI, scheduler or batch runner. Override `EmptyPlan()` / `EmptySettled()` for application-owned payloads while retaining the processing machinery and provider-safe ownership.
 
 ### Advanced: wire the pipeline yourself

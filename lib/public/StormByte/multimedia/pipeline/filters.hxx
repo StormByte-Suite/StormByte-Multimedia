@@ -233,7 +233,7 @@ namespace StormByte {
 					 * unidentifiable track causes the destination stage to fail.
 					 */
 					Handle Between(StormByte::Safe::Shared<Step> origin,
-						StormByte::Safe::Shared<Step> destination) noexcept;
+						StormByte::Safe::Shared<Step> destination);
 
 					/**
 					 * @brief Global analytics. One node, every matching stretch.
@@ -243,7 +243,7 @@ namespace StormByte {
 					 * Process / Packet / ProcessTwoPasses leaves Fail: they
 					 * go on @ref Handle::Add.
 					 */
-					Filters& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
+					Filters& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter);
 
 					/**
 					 * @brief Constructs a global analytics leaf and attaches it.
@@ -253,7 +253,7 @@ namespace StormByte {
 					 * @return This facade.
 					 */
 					template<typename T, typename... Args>
-					Filters& Add(Args&&... args) noexcept {
+					Filters& Add(Args&&... args) {
 						return Add(StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<T>(
 							std::forward<Args>(args)...));
 					}
@@ -307,7 +307,7 @@ namespace StormByte {
 							 *
 							 * ProcessTwoPasses on a remux destination Fails the dest.
 							 */
-							Handle& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
+							Handle& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter);
 
 							/**
 							 * @brief Constructs a leaf and mounts it on this stretch.
@@ -317,7 +317,7 @@ namespace StormByte {
 							 * @return This handle.
 							 */
 							template<typename T, typename... Args>
-							Handle& Add(Args&&... args) noexcept {
+							Handle& Add(Args&&... args) {
 								return Add(StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<T>(
 									std::forward<Args>(args)...));
 							}
@@ -386,7 +386,7 @@ namespace StormByte {
 					 * @return Whether the leaf applies; an unpublished Plan defers media validation.
 					 */
 					static bool Matches(const Filter::FFmpeg& filter, const Step& origin,
-						Producer destination, int track) noexcept;
+						Producer destination, int track);
 
 					/**
 					 * @brief Whether a measure pass started by @ref Close is active.

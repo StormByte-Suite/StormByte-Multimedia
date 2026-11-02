@@ -96,13 +96,13 @@ namespace {
 	}
 
 	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
-		Level level, std::string_view text) noexcept {
+		Level level, std::string_view text) {
 		if (!log)
 			return;
 		*log << level << text << std::endl;
 	}
 
-	StormByte::Safe::Optional<StormByte::Multimedia::Stream> FindStream(const File& file, int index) noexcept {
+	StormByte::Safe::Optional<StormByte::Multimedia::Stream> FindStream(const File& file, int index) {
 		for (const auto& stream : file.Streams()) {
 			if (stream.Index() == index)
 				return stream;
@@ -110,7 +110,7 @@ namespace {
 		return {};
 	}
 
-	std::string KindName(StormByte::Multimedia::Type type) noexcept {
+	std::string KindName(StormByte::Multimedia::Type type) {
 		return ToString(type);
 	}
 
@@ -140,7 +140,7 @@ TrackSettled::TrackSettled() = default;
 
 TrackSettled::TrackSettled(const TrackSettled& other) = default;
 
-TrackSettled::TrackSettled(TrackSettled&& other) noexcept = default;
+TrackSettled::TrackSettled(TrackSettled&& other) = default;
 
 TrackSettled::~TrackSettled() noexcept = default;
 
@@ -172,15 +172,21 @@ StormByte::Safe::String TrackSettled::ToString() const {
 Transcoder::Track::Track(Transcoder& owner, StormByte::Size slot) noexcept
 : m_owner(&owner), m_slot(slot) {}
 
-Transcoder::Track& Transcoder::Track::Remux() noexcept {
+Transcoder::Track& Transcoder::Track::Remux() noexcept try {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	JobLog(m_owner->m_logger, Level::Debug, "track "
 		+ std::to_string(m_owner->m_backend->Mapped[m_slot].In) + " marked remux");
 	return *this;
+} catch (const StormByte::Safe::AllocationError&) {
+	if (m_owner) m_owner->Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	if (m_owner) m_owner->Fail();
+	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& codec) noexcept {
+Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& codec) noexcept try {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	auto& slot = m_owner->m_backend->Mapped[m_slot];
@@ -199,6 +205,12 @@ Transcoder::Track& Transcoder::Track::Codec(const StormByte::Multimedia::Codec& 
 		subtitle->Codec(codec);
 	JobLog(m_owner->m_logger, Level::Debug, "track " + std::to_string(slot.In)
 		+ " encode to " + std::string(codec.Name()));
+	return *this;
+} catch (const StormByte::Safe::AllocationError&) {
+	if (m_owner) m_owner->Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	if (m_owner) m_owner->Fail();
 	return *this;
 }
 
@@ -311,7 +323,7 @@ Transcoder::Track& Transcoder::Track::Tune(StormByte::Safe::String name) {
 	return *this;
 }
 
-Transcoder::Track& Transcoder::Track::FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept {
+Transcoder::Track& Transcoder::Track::FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) {
 	if (!m_owner || !m_owner->ValidSlot(m_slot))
 		return *this;
 	auto* config = m_owner->m_backend->Mapped[m_slot].Config.get();
@@ -341,51 +353,51 @@ Transcoder::Track& Transcoder::Track::Title(StormByte::Safe::String title) {
 Transcoder::Transcoder(const StormByte::Safe::String& source,
 	const StormByte::Safe::String& destination,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(const StormByte::Safe::String& source,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 	: Transcoder(LocalReader(source), std::move(writer), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	const StormByte::Safe::String& destination,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 	: Transcoder(std::move(reader), LocalWriter(destination), std::move(logger), std::move(duration)) {}
 
 Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Transcoder(std::move(reader), std::move(writer), std::move(logger), std::move(duration), nullptr) {}
 
 Transcoder::Transcoder(const StormByte::Safe::String& source,
 	const StormByte::Safe::String& destination, const class Container& container,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Transcoder(LocalReader(source), LocalWriter(destination), std::move(logger), std::move(duration), &container) {}
 
 Transcoder::Transcoder(const StormByte::Safe::String& source,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	const class Container& container, StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Transcoder(LocalReader(source), std::move(writer), std::move(logger), std::move(duration), &container) {}
 
 Transcoder::Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	const StormByte::Safe::String& destination, const class Container& container,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Transcoder(std::move(reader), LocalWriter(destination), std::move(logger), std::move(duration), &container) {}
 
 Transcoder::Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	const class Container& container, StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Transcoder(std::move(reader), std::move(writer), std::move(logger), std::move(duration), &container) {}
 
 Transcoder::Transcoder(
@@ -393,7 +405,7 @@ Transcoder::Transcoder(
 	StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 	StormByte::Safe::Optional<std::int64_t> duration,
-	const class Container* container) noexcept
+	const class Container* container)
 : m_app_log(logger), m_logger(std::move(logger)),
 	m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
@@ -412,18 +424,15 @@ Transcoder::Transcoder(
 }
 
 Transcoder::~Transcoder() noexcept {
-	JobLog(m_logger, Level::LowLevel, "destroy");
 	if (!m_backend)
 		return;
 	const auto status = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (status == Status::Running || status == Status::Paused)
 		Cancel();
-	JobLog(m_logger, Level::LowLevel, "coordinator join begin");
 	m_backend->Join();
-	JobLog(m_logger, Level::LowLevel, "coordinator join end");
 }
 
-void Transcoder::InstallLog() noexcept {
+void Transcoder::InstallLog() {
 	m_logger = StormByte::Multimedia::UseLog(m_app_log, "Transcoder");
 	JobLog(m_logger, Level::LowLevel, "created");
 }
@@ -441,7 +450,7 @@ void Transcoder::Fail(std::string_view reason) noexcept {
 		m_backend->Error = std::move(message);
 		m_backend->Status.store(Status::Error, StormByte::Safe::MemoryOrder::Release);
 		m_backend->RequestCancel();
-		JobLog(m_logger, Level::Error, m_backend->Error.value());
+		JobLog(m_logger, Level::Error, *m_backend->Error);
 	} catch (const StormByte::Safe::AllocationError&) {
 		Fail();
 	} catch (const std::bad_alloc&) {
@@ -478,7 +487,7 @@ void Transcoder::AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter)
 	m_backend->Analytics.push_back(std::move(filter));
 }
 
-bool Transcoder::ProbeSource() noexcept {
+bool Transcoder::ProbeSource() noexcept try {
 	if (!m_reader) {
 		Fail("reader is empty");
 		return false;
@@ -497,6 +506,12 @@ bool Transcoder::ProbeSource() noexcept {
 	m_consult = StormByte::Safe::Unique<File>::MakePointer<File>(std::move(*opened));
 	JobLog(m_logger, Level::Notice, StormByte::Safe::String::ReplaceToken("probed source {}", std::string_view{path}));
 	return true;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
 const StormByte::Safe::Shared<StormByte::Logger::Log>& Transcoder::Logger() const noexcept {
@@ -507,7 +522,7 @@ ResourceUsage Transcoder::Resources() const noexcept {
 	return m_backend ? m_backend->Resources : ResourceUsage::Full;
 }
 
-void Transcoder::Resources(ResourceUsage usage) noexcept {
+void Transcoder::Resources(ResourceUsage usage) noexcept try {
 	if (!m_backend)
 		return;
 	const auto current = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
@@ -525,9 +540,13 @@ void Transcoder::Resources(ResourceUsage usage) noexcept {
 	Fail(StormByte::Safe::String::ReplaceToken(
 		"resource policy value {} is not recognized",
 		static_cast<unsigned>(usage)));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
+Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept try {
 	JobLog(m_logger, Level::LowLevel, "add-track in=" + std::to_string(in));
 	if (!m_consult && !ProbeSource())
 		return Track(*this, InvalidSlot);
@@ -590,6 +609,12 @@ Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept {
 	JobLog(m_logger, Level::Debug, "mapped " + KindName(kind) + " " + std::to_string(in)
 		+ " -> order " + std::to_string(m_backend->Mapped.size() - 1));
 	return Track(*this, m_backend->Mapped.size() - 1);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return Track(*this, InvalidSlot);
+} catch (const std::bad_alloc&) {
+	Fail();
+	return Track(*this, InvalidSlot);
 }
 
 Transcoder::Track Transcoder::Video(int in) noexcept {
@@ -604,11 +629,17 @@ Transcoder::Track Transcoder::Subtitle(int in) noexcept {
 	return AddTrack(in, Type::Subtitle);
 }
 
-Transcoder& Transcoder::Attachments() noexcept {
+Transcoder& Transcoder::Attachments() noexcept try {
 	return Attachments("*/*");
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return *this;
 }
 
-Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept {
+Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept try {
 	if (!StormByte::Multimedia::Detail::MimePatternOk(pattern)) {
 		Fail("attachment MIME pattern is not exact, type-star or star-star");
 		return *this;
@@ -624,9 +655,15 @@ Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept {
 			AddTrack(i, Type::Attachment);
 	}
 	return *this;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return *this;
 }
 
-Transcoder& Transcoder::Ignore(int in) noexcept {
+Transcoder& Transcoder::Ignore(int in) noexcept try {
 	JobLog(m_logger, Level::LowLevel, "ignore " + std::to_string(in));
 	if (!m_consult && !ProbeSource())
 		return *this;
@@ -642,6 +679,12 @@ Transcoder& Transcoder::Ignore(int in) noexcept {
 	for (int i = 0; i < static_cast<int>(mapped.size()); ++i)
 		mapped[static_cast<std::size_t>(i)].Out = i;
 	JobLog(m_logger, Level::Debug, "ignore stream " + std::to_string(in));
+	return *this;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	Fail();
 	return *this;
 }
 
@@ -678,7 +721,7 @@ void Transcoder::Cancel() noexcept {
 	}
 }
 
-void Transcoder::Pause() noexcept {
+void Transcoder::Pause() noexcept try {
 	if (!m_backend)
 		return;
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Running)
@@ -687,9 +730,13 @@ void Transcoder::Pause() noexcept {
 	m_backend->Status.store(Status::Paused, StormByte::Safe::MemoryOrder::Release);
 	m_backend->Hold(*this, true);
 	JobLog(m_logger, Level::Notice, "paused");
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Transcoder::Resume() noexcept {
+void Transcoder::Resume() noexcept try {
 	if (!m_backend)
 		return;
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Paused)
@@ -702,6 +749,10 @@ void Transcoder::Resume() noexcept {
 	m_backend->Status.store(Status::Running, StormByte::Safe::MemoryOrder::Release);
 	m_backend->PauseCv.notify_all();
 	JobLog(m_logger, Level::Notice, "resumed");
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 enum Status Transcoder::Status() const noexcept {

@@ -48,6 +48,8 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/pumper/sink.hxx>
@@ -138,7 +140,7 @@ bool Muxer::Closed() const noexcept {
 	return m_closed.load(StormByte::Safe::MemoryOrder::Acquire) || Failed();
 }
 
-StormByte::Safe::Optional<Property::Duration> Muxer::Position() const noexcept {
+StormByte::Safe::Optional<Property::Duration> Muxer::Position() const {
 	const std::int64_t ns = m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
 	if (ns < 0)
 		return std::nullopt;
@@ -193,39 +195,39 @@ StormByte::Size Muxer::InputCeiling() const noexcept {
 	return 0;
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Language(int output_index) const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Language(int output_index) const {
 	if (!m_language.contains(output_index))
 		return std::nullopt;
 	return m_language.at(output_index);
 }
 
-void Muxer::Language(int output_index, StormByte::Safe::String language) noexcept {
+void Muxer::Language(int output_index, StormByte::Safe::String language) {
 	if (language.empty())
 		m_language.erase(output_index);
 	else
 		m_language[output_index] = std::move(language);
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Title(int output_index) const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Title(int output_index) const {
 	if (!m_title.contains(output_index))
 		return std::nullopt;
 	return m_title.at(output_index);
 }
 
-void Muxer::Title(int output_index, StormByte::Safe::String title) noexcept {
+void Muxer::Title(int output_index, StormByte::Safe::String title) {
 	if (title.empty())
 		m_title.erase(output_index);
 	else
 		m_title[output_index] = std::move(title);
 }
 
-StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Muxer::Disposition(int output_index) const noexcept {
+StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Muxer::Disposition(int output_index) const {
 	if (!m_disposition.contains(output_index))
 		return std::nullopt;
 	return m_disposition.at(output_index);
 }
 
-void Muxer::Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition) noexcept {
+void Muxer::Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition) {
 	m_disposition.erase(output_index);
 	m_disposition.insert({output_index, StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition>(std::move(disposition))});
 }
@@ -248,7 +250,7 @@ bool Muxer::ConnectInput(Step& source) noexcept {
 	return source.Connect(*this);
 }
 
-bool Muxer::SetupPlan() noexcept {
+bool Muxer::SetupPlan() noexcept try {
 	WaitArmed();
 	if (Stopping())
 		return false;
@@ -317,9 +319,15 @@ bool Muxer::SetupPlan() noexcept {
 	if (!BindPlanAttachments() || Stopping() || Plan()->State() != Plan::State::Running)
 		return false;
 	return ArmOctets();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
-bool Muxer::SpawnBackend() noexcept {
+bool Muxer::SpawnBackend() noexcept try {
 	if (m_backend)
 		return true;
 	if (!m_plan) {
@@ -340,9 +348,15 @@ bool Muxer::SpawnBackend() noexcept {
 
 	m_backend = StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Muxer::FFmpeg::Container>();
 	return true;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
-bool Muxer::ArmOctets() noexcept {
+bool Muxer::ArmOctets() noexcept try {
 	if (m_backend && m_backend->IsOpen())
 		return true;
 	if (!SpawnBackend())
@@ -363,9 +377,15 @@ bool Muxer::ArmOctets() noexcept {
 
 	Log(Level::Notice, StormByte::Safe::String::ReplaceToken("writer {}", std::string_view{m_plan->Path()}));
 	return true;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
-bool Muxer::BindPlanAttachments() noexcept {
+bool Muxer::BindPlanAttachments() noexcept try {
 	if (!m_backend)
 		return SpawnBackend();
 	m_attachments.clear();
@@ -392,6 +412,12 @@ bool Muxer::BindPlanAttachments() noexcept {
 			StormByte::Buffer::FIFO{item.Payload()});
 	}
 	return m_backend->BindAttachments(*this, m_attachments);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
 void Muxer::FlushOctets() noexcept {
@@ -402,8 +428,14 @@ void Muxer::FlushOctets() noexcept {
 		static_cast<void>(writer.Flush());
 }
 
-bool Muxer::BindEncoderStream(Encoder& encoder, void* avStream) noexcept {
+bool Muxer::BindEncoderStream(Encoder& encoder, void* avStream) noexcept try {
 	return encoder.MuxBindStream(avStream);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
 bool Muxer::RemuxCodec(int inIndex, void*& params, void* timeBase, void* averageFrameRate) noexcept {
@@ -428,7 +460,7 @@ void Muxer::ClockPass(std::int64_t ns) noexcept {
 		m_progress->SetPassNs(ns);
 }
 
-Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& muxer) noexcept {
+Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& muxer) noexcept try {
 	if (!muxer.ConnectInput(encoder))
 		return encoder;
 	if (encoder.Index() < 0 || muxer.m_connections->encoders.contains(encoder.Index())
@@ -442,9 +474,17 @@ Encoder& StormByte::Multimedia::Pipeline::operator>>(Encoder& encoder, Muxer& mu
 	muxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind encoder t={}", encoder.Index()));
 	muxer.Wake();
 	return encoder;
+} catch (const StormByte::Safe::AllocationError&) {
+	encoder.Fail();
+	muxer.Fail();
+	return encoder;
+} catch (const std::bad_alloc&) {
+	encoder.Fail();
+	muxer.Fail();
+	return encoder;
 }
 
-Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& muxer) noexcept {
+Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& muxer) noexcept try {
 	if (!muxer.ConnectInput(remuxer))
 		return remuxer;
 	if (remuxer.In() < 0 || remuxer.m_output < -1
@@ -463,9 +503,17 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Remuxer& remuxer, Muxer& mu
 	muxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind remux t={}", remuxer.In()));
 	muxer.Wake();
 	return remuxer;
+} catch (const StormByte::Safe::AllocationError&) {
+	remuxer.Fail();
+	muxer.Fail();
+	return remuxer;
+} catch (const std::bad_alloc&) {
+	remuxer.Fail();
+	muxer.Fail();
+	return remuxer;
 }
 
-Muxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Muxer& muxer) noexcept {
+Muxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Muxer& muxer) noexcept try {
 	if (!muxer.ConnectInput(demuxer))
 		return muxer;
 	if (muxer.m_origin && muxer.m_origin != &demuxer) {
@@ -476,5 +524,13 @@ Muxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Muxer& muxe
 	muxer.m_progress = demuxer.m_progress;
 	muxer.Log(Level::Debug, "bound remux origin");
 	muxer.Wake();
+	return muxer;
+} catch (const StormByte::Safe::AllocationError&) {
+	demuxer.Fail();
+	muxer.Fail();
+	return muxer;
+} catch (const std::bad_alloc&) {
+	demuxer.Fail();
+	muxer.Fail();
 	return muxer;
 }

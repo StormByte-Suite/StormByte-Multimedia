@@ -101,7 +101,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @brief Move constructor.
 			 * @param other Config to take.
 			 */
-			Video(Video&& other) noexcept;
+			Video(Video&& other);
 
 			/**
 			 * @brief Destructor.

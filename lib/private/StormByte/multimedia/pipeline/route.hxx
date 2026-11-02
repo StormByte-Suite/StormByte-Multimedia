@@ -180,7 +180,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * the filter. Launch starts the worker; the worker waits
 			 * on the Pipe until @ref Filters::Close binds a hopper.
 			 */
-			Route& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
+			Route& Add(StormByte::Safe::Shared<Filter::FFmpeg> filter);
 
 			/**
 			 * @brief Constructs a leaf of type @p T on this track.
@@ -190,7 +190,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @return *this.
 			 */
 			template<typename T, typename... Args>
-			Route& Add(Args&&... args) noexcept {
+			Route& Add(Args&&... args) {
 				return Add(StormByte::Safe::Shared<Filter::FFmpeg>(
 									StormByte::Safe::MakeShared<T>(std::forward<Args>(args)...)));
 			}
@@ -211,14 +211,14 @@ namespace StormByte::Multimedia::Pipeline {
 			 *
 			 * Call after @ref Idle.
 			 */
-			StormByte::Safe::Vector<Filter::Report> Reports() const noexcept;
+			StormByte::Safe::Vector<Filter::Report> Reports() const;
 
 		private:
 			/**
 			 * @brief Source media of this route in the origin plan snapshot.
 			 * @return Stream type, or @ref StormByte::Multimedia::Type::Unknown when unpublished.
 			 */
-			enum StormByte::Multimedia::Type SourceMedia() const noexcept;
+			enum StormByte::Multimedia::Type SourceMedia() const;
 
 			/**
 			 * @brief Destination identity shared by both analytics looks.
@@ -265,7 +265,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @param lane Process / analytics of one Kind.
 			 * @param filter Node to append.
 			 */
-			void Hook(Lane& lane, Filter::FFmpeg& filter) noexcept;
+			void Hook(Lane& lane, Filter::FFmpeg& filter);
 
 			/**
 			 * @brief Feeds @p analytics with the source look.
@@ -280,7 +280,7 @@ namespace StormByte::Multimedia::Pipeline {
 			/**
 			 * @brief Wires an already-launched analytics leaf (global Add).
 			 */
-			void Observe(StormByte::Safe::Shared<Filter::FFmpeg> analytics) noexcept;
+			void Observe(StormByte::Safe::Shared<Filter::FFmpeg> analytics);
 
 			int m_track;													///< Origin stream index
 			StormByte::Safe::Shared<Step> m_origin;							///< Producer retained through Base-heap shared ownership.

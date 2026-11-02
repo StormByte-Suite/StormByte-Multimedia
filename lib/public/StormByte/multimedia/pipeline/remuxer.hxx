@@ -243,7 +243,7 @@ namespace StormByte {
 					 * @return `Remuxer(<origin codec name>)` when the Plan
 					 *         lists @ref In, otherwise `Remuxer(t=<index>)`.
 					 */
-					StormByte::Safe::String Label() const noexcept override;
+					StormByte::Safe::String Label() const override;
 
 					/**
 					 * @}

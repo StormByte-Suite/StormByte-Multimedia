@@ -403,7 +403,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 *         mode, otherwise `Decoder(<implementation>)` or
 			 *         `Decoder(t=<index>)`.
 			 */
-			StormByte::Safe::String Label() const noexcept override;
+			StormByte::Safe::String Label() const override;
 
 			/**
 			 * @brief Pins the opened backend.

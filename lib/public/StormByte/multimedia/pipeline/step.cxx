@@ -260,7 +260,7 @@ StormByte::Safe::Shared<class Plan> Step::Plan() const noexcept {
 	return m_plan;
 }
 
-void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept {
+void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept try {
 	if (!plan) {
 		Fail("plan owner is empty");
 		return;
@@ -300,9 +300,13 @@ void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept {
 	if (m_name == Producer::Demuxer)
 		plan->State(Plan::State::Running);
 	Wake();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Step::Wire(Step& downstream) noexcept {
+void Step::Wire(Step& downstream) noexcept try {
 	const auto plan = Plan() ? Plan() : downstream.Plan();
 	if (!plan)
 		return;
@@ -313,14 +317,22 @@ void Step::Wire(Step& downstream) noexcept {
 		if (const std::size_t cap = downstream.InputCeiling(); cap > 0)
 			downstream.pipe().Capacity(track->In(), cap);
 	}
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Step::NotifyComplete(bool success) noexcept {
+void Step::NotifyComplete(bool success) noexcept try {
 	if (const auto plan = Plan())
 		plan->Complete(*this, success);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-bool Step::Connect(Step& downstream) noexcept {
+bool Step::Connect(Step& downstream) noexcept try {
 	bool linked = false;
 	{
 		StormByte::Safe::UniqueLock lock(m_state->mutex);
@@ -331,8 +343,14 @@ bool Step::Connect(Step& downstream) noexcept {
 		}
 	}
 	if (linked) {
-		StormByte::Safe::UniqueLock lock(downstream.m_state->mutex);
-		downstream.m_state->upstream.push_back(this);
+		try {
+			StormByte::Safe::UniqueLock lock(downstream.m_state->mutex);
+			downstream.m_state->upstream.push_back(this);
+		} catch (...) {
+			StormByte::Safe::UniqueLock lock(m_state->mutex);
+			std::erase(m_state->downstream, &downstream);
+			throw;
+		}
 	}
 	const auto sourcePlan = Plan();
 	const auto targetPlan = downstream.Plan();
@@ -341,9 +359,15 @@ bool Step::Connect(Step& downstream) noexcept {
 	else if (targetPlan)
 		Plan(targetPlan);
 	return !Failed() && !downstream.Failed();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
-bool Step::WaitPlan() noexcept {
+bool Step::WaitPlan() noexcept try {
 	m_state->pipe.WaitWake(this, [](void* owner) noexcept {
 		auto& step = *static_cast<Step*>(owner);
 		const auto plan = step.Plan();
@@ -357,6 +381,12 @@ bool Step::WaitPlan() noexcept {
 		return false;
 	}
 	return true;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return false;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return false;
 }
 
 State Step::Status() const noexcept {
@@ -515,18 +545,22 @@ void Step::Emit(Item::PointerType item) noexcept {
 	item >> m_state->pipe;
 }
 
-Item::PointerType Step::CloneItem(const Item& item) const noexcept {
+Item::PointerType Step::CloneItem(const Item& item) const {
 	return item.Clone();
 }
 
-StormByte::Safe::String Step::Label() const noexcept {
+StormByte::Safe::String Step::Label() const {
 	return StormByte::Safe::String(ToString(m_name));
 }
 
-void Step::Log(StormByte::Logger::Level level, std::string_view message) noexcept {
+void Step::Log(StormByte::Logger::Level level, std::string_view message) noexcept try {
 	if (!m_log)
 		return;
 	*m_log << level << message << std::endl;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Step::RecordWork(std::int64_t microseconds) noexcept {
@@ -544,7 +578,7 @@ std::int64_t Step::LastWork() const noexcept {
 	return m_lastWork;
 }
 
-void Step::DumpWork() noexcept {
+void Step::DumpWork() noexcept try {
 	if (m_workN == 0)
 		return;
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("work n={} min={}us max={}us",
@@ -553,6 +587,10 @@ void Step::DumpWork() noexcept {
 	m_workMin = std::numeric_limits<std::int64_t>::max();
 	m_workMax = 0;
 	m_lastWork = 0;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 Backend::Pipeline::Host& Step::Face() noexcept {
@@ -576,17 +614,14 @@ void Step::Launch() noexcept {
 }
 
 void Step::Halt() noexcept {
-	const auto label = Label();
-	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("halt/join begin stage={} instance={}",
-		std::string_view{label}, static_cast<const void*>(this)));
+	Log(Level::LowLevel, "halt/join begin");
 	Stop();
 	if (m_state->pumper)
 		m_state->pumper->Halt();
-	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("halt/join end stage={} instance={}",
-		std::string_view{label}, static_cast<const void*>(this)));
+	Log(Level::LowLevel, "halt/join end");
 }
 
-Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept {
+Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept try {
 	if (!from.Connect(to))
 		return to;
 	if (from.Plan() || to.Plan())
@@ -596,5 +631,11 @@ Step& StormByte::Multimedia::Pipeline::operator>>(Step& from, Step& to) noexcept
 		from.m_state->pendingWire.push_back(&to);
 	}
 	from.Log(Level::Debug, "bound to " + std::string(ToString(to.m_name)));
+	return to;
+} catch (const StormByte::Safe::AllocationError&) {
+	from.Fail(); to.Fail();
+	return to;
+} catch (const std::bad_alloc&) {
+	from.Fail(); to.Fail();
 	return to;
 }

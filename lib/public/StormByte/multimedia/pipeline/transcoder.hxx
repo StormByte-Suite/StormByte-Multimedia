@@ -188,7 +188,7 @@ namespace StormByte {
 					 * @brief Move constructor.
 					 * @param other Row to take.
 					 */
-					TrackSettled(TrackSettled&& other) noexcept;
+					TrackSettled(TrackSettled&& other);
 
 					/**
 					 * @brief Destructor.
@@ -443,7 +443,7 @@ namespace StormByte {
 							 * @param options Key / value map.
 							 * @return *this.
 							 */
-							Track& FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options) noexcept;
+							Track& FineTune(StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options);
 
 							/**
 							 * @brief Overrides stream language.
@@ -513,7 +513,7 @@ namespace StormByte {
 					Transcoder(const StormByte::Safe::String& source,
 						const StormByte::Safe::String& destination,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Builds a local reader and takes @p writer.
@@ -525,7 +525,7 @@ namespace StormByte {
 					Transcoder(const StormByte::Safe::String& source,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Takes @p reader and builds a local writer.
@@ -537,7 +537,7 @@ namespace StormByte {
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						const StormByte::Safe::String& destination,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Takes both location owners without slicing.
@@ -549,7 +549,7 @@ namespace StormByte {
 					Transcoder(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Builds local locations with an authoritative borrowed container.
@@ -563,7 +563,7 @@ namespace StormByte {
 						const StormByte::Safe::String& destination,
 						const class Container& container,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Builds a local reader and takes the writer with an explicit container.
@@ -577,7 +577,7 @@ namespace StormByte {
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						const class Container& container,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Takes the reader and builds a writer with an explicit container.
@@ -591,7 +591,7 @@ namespace StormByte {
 						const StormByte::Safe::String& destination,
 						const class Container& container,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Takes both locations with an authoritative borrowed container.
@@ -605,7 +605,7 @@ namespace StormByte {
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						const class Container& container,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
-						StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+						StormByte::Safe::Optional<std::int64_t> duration = {});
 
 					/**
 					 * @brief Copy constructor.
@@ -617,7 +617,7 @@ namespace StormByte {
 					 * @brief Move constructor.
 					 * @param other Job to take.
 					 */
-					Transcoder(Transcoder&& other) noexcept = delete;
+					Transcoder(Transcoder&& other) = delete;
 
 					/**
 					 * @brief Destructor. Stops the coordinator and joins.
@@ -888,7 +888,7 @@ namespace StormByte {
 					 * constructor. Each stock constructor calls this after
 					 * the most-derived constructor of this class.
 					 */
-					virtual void InstallLog() noexcept;
+					virtual void InstallLog();
 
 					/**
 					 * @brief Application logger passed to the constructor.
@@ -1023,7 +1023,7 @@ namespace StormByte {
 						StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
 						StormByte::Safe::Shared<StormByte::Logger::Log> logger,
 						StormByte::Safe::Optional<std::int64_t> duration,
-						const class Container* container) noexcept;
+						const class Container* container);
 
 					/**
 					 * @brief Marks a hard error and cancels the coordinator.

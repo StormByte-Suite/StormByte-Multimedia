@@ -58,7 +58,7 @@ Video::Video(): Base(StormByte::Multimedia::Type::Video), m_codec(nullptr) {}
 
 Video::Video(const Video& other) = default;
 
-Video::Video(Video&& other) noexcept = default;
+Video::Video(Video&& other) = default;
 
 Video::~Video() noexcept = default;
 

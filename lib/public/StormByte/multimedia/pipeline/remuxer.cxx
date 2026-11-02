@@ -48,6 +48,8 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/pumper/through.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/worker/remux.hxx>
@@ -84,7 +86,7 @@ bool Remuxer::WaitForPlan() noexcept {
 	return WaitPlan();
 }
 
-void Remuxer::SetupPlan() noexcept {
+void Remuxer::SetupPlan() noexcept try {
 	if (const std::size_t capacity = InputCeiling(); capacity > 0)
 		pipe().Capacity(m_index, capacity);
 	pipe().WaitWake(this, [](void* context) noexcept {
@@ -101,6 +103,10 @@ void Remuxer::SetupPlan() noexcept {
 	}
 	if (m_origin->Failed())
 		Fail(m_origin->Error().value_or(StormByte::Safe::String("demuxer failed")));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 bool Remuxer::ConnectOrigin(Demuxer& demuxer) noexcept {
@@ -129,7 +135,7 @@ void Remuxer::Emit(Packet::PointerType packet) noexcept {
 	Step::Emit(std::move(packet));
 }
 
-Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept {
+Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& remuxer) noexcept try {
 	if (remuxer.Failed())
 		return remuxer;
 	if (!remuxer.ConnectOrigin(demuxer))
@@ -144,9 +150,15 @@ Remuxer& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Remuxer& 
 	remuxer.Wake();
 	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind remuxer t={}", remuxer.In()));
 	return remuxer;
+} catch (const StormByte::Safe::AllocationError&) {
+	demuxer.Fail(); remuxer.Fail();
+	return remuxer;
+} catch (const std::bad_alloc&) {
+	demuxer.Fail(); remuxer.Fail();
+	return remuxer;
 }
 
-StormByte::Safe::String Remuxer::Label() const noexcept {
+StormByte::Safe::String Remuxer::Label() const {
 	if (m_plan && *m_plan) {
 		for (const auto& stream : m_plan->Snapshot().Streams()) {
 			if (stream.Index() == m_index)
