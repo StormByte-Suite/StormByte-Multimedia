@@ -1,0 +1,44 @@
+From bc0eefb25914f3c4a5b9bf6fef0fec27349bb591 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:29:28 +0100
+Subject: [PATCH] AVX2: load restoration tails at their natural width
+
+The restoration window is int16_t addressed. Read one int16_t when inserting a single lane, avoiding the extra halfword access. Use unaligned-safe SIMD helpers for the two- and four-lane insertions rather than requiring scalar int32_t or int64_t alignment. UBSan reports load_more_16_avx2 in repeated encoder cancellation.
+---
+ Source/Lib/ASM_AVX2/pickrst_avx2.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Source/Lib/ASM_AVX2/pickrst_avx2.h b/Source/Lib/ASM_AVX2/pickrst_avx2.h
+index 0f768ceda..5db06a838 100644
+--- a/Source/Lib/ASM_AVX2/pickrst_avx2.h
++++ b/Source/Lib/ASM_AVX2/pickrst_avx2.h
+@@ -308,20 +308,20 @@ static INLINE void hadd_update_6_stats_highbd_avx2(const int64_t* const src, con
+ static INLINE void load_more_16_avx2(const int16_t* const src, const int32_t width, const __m256i org,
+                                      __m256i* const dst) {
+     *dst = _mm256_srli_si256(org, 2);
+-    *dst = _mm256_insert_epi16(*dst, *(int32_t*)src, 7);
+-    *dst = _mm256_insert_epi16(*dst, *(int32_t*)(src + width), 15);
++    *dst = _mm256_insert_epi16(*dst, src[0], 7);
++    *dst = _mm256_insert_epi16(*dst, src[width], 15);
+ }
+ 
+ static INLINE void load_more_32_avx2(const int16_t* const src, const int32_t width, __m256i* const dst) {
+     *dst = _mm256_srli_si256(*dst, 4);
+-    *dst = _mm256_insert_epi32(*dst, *(int32_t*)src, 3);
+-    *dst = _mm256_insert_epi32(*dst, *(int32_t*)(src + width), 7);
++    *dst = _mm256_insert_epi32(*dst, _mm_cvtsi128_si32(xx_loadl_32(src)), 3);
++    *dst = _mm256_insert_epi32(*dst, _mm_cvtsi128_si32(xx_loadl_32(src + width)), 7);
+ }
+ 
+ static INLINE void load_more_64_avx2(const int16_t* const src, const int32_t width, __m256i* const dst) {
+     *dst = _mm256_srli_si256(*dst, 8);
+-    *dst = _mm256_insert_epi64(*dst, *(int64_t*)src, 1);
+-    *dst = _mm256_insert_epi64(*dst, *(int64_t*)(src + width), 3);
++    *dst = _mm256_insert_epi64(*dst, _mm_cvtsi128_si64(xx_loadl_64(src)), 1);
++    *dst = _mm256_insert_epi64(*dst, _mm_cvtsi128_si64(xx_loadl_64(src + width)), 3);
+ }
+ 
+ static INLINE __m256i load_win7_avx2(const int16_t* const d, const int32_t width) {
+-- 
+2.56.0
+

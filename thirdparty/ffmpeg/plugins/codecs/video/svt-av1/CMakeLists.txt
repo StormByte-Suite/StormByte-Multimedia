@@ -11,6 +11,7 @@ set(SVTAV1_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0008-sse2-store-second-row-without-alignment-or-overflow.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0009-avx2-load-four-byte-sad-rows-without-alignment.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0010-sse41-load-short-rows-without-scalar-alignment.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0011-avx2-load-restoration-tails-at-natural-width.patch"
 )
 
 set(SVTAV1_OPTIONS
