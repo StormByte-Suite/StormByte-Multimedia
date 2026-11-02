@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled x265 accesses temporal-filter estimator scratch only when temporal filtering is enabled, avoiding an uninitialized pointer in ordinary lookahead workers.
 - Bundled FDK-AAC normalizes signed power-function exponent mantissas through widened multiplication instead of undefined negative left shifts.
 - Bundled FDK-AAC normalizes signed logarithm exponents through widened multiplication instead of shifting negative values.
 - Bundled Kvazaar copies reconstructed four- and eight-pixel rows without dereferencing potentially misaligned scalar output pointers.
