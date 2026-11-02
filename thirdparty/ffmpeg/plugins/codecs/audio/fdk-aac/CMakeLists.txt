@@ -15,6 +15,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0010-scale-check-negative-saturation-in-widened-domain.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0011-psy-avoid-negative-normalization-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0012-tns-avoid-negative-spectrum-shifts.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0013-lpc-avoid-negative-coefficient-normalization-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS
