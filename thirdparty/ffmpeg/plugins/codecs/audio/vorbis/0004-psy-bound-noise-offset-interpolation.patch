@@ -1,0 +1,29 @@
+From 30a37f625624f13a173f7763fa2dfa1188c7a2a8 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] psy: keep noise offset interpolation inside its final band
+
+Clamping halfoc to P_BANDS - 1 leaves inthalfoc at the final valid
+index, but interpolation still reads inthalfoc + 1 even when its weight
+is zero. Clamp the lower interpolation index to the penultimate band so
+the upper endpoint has weight one and all accesses stay in bounds.
+Reproduced by the existing Opus-to-Vorbis metadata test with UBSan.
+---
+ lib/psy.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/psy.c b/lib/psy.c
+index 72ef475..d3dd2cd 100644
+--- a/lib/psy.c
++++ b/lib/psy.c
+@@ -339,6 +339,7 @@ void _vp_psy_init(vorbis_look_psy *p,vorbis_info_psy *vi,
+     if(halfoc<0)halfoc=0;
+     if(halfoc>=P_BANDS-1)halfoc=P_BANDS-1;
+     inthalfoc=(int)halfoc;
++    if(inthalfoc>=P_BANDS-1)inthalfoc=P_BANDS-2;
+     del=halfoc-inthalfoc;
+ 
+     for(j=0;j<P_NOISECURVES;j++)
+-- 
+2.56.0
+
