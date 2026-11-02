@@ -103,16 +103,16 @@ namespace {
 		try {
 			return progress->Call(percent) == StormByte::Safe::Status::Success;
 		}
-		catch (const StormByte::Exception&) {
+		catch (...) {
 			return false;
 		}
 	}
 
-	ExpectedFile FailOpen(std::string_view label, std::string_view reason) noexcept {
+	ExpectedFile FailOpen(std::string_view label, std::string_view reason) {
 		return Unexpected(FilePathOpenException(label, reason));
 	}
 
-	ExpectedContainer ResolveContainer(std::string_view formatName, std::string_view path) noexcept {
+	ExpectedContainer ResolveContainer(std::string_view formatName, std::string_view path) {
 		auto& registry = Registry::Instance();
 		const auto separator = path.find_last_of("/\\");
 		const auto dot = path.find_last_of('.');
@@ -142,7 +142,7 @@ namespace {
 		return Unexpected<ContainerNotFoundException>(std::string(formatName));
 	}
 
-	ExpectedCodec ResolveCodec(const FFmpeg::AVStream& stream) noexcept {
+	ExpectedCodec ResolveCodec(const FFmpeg::AVStream& stream) {
 		const auto params = stream.CodecParameters();
 		const char* name = avcodec_get_name(static_cast<AVCodecID>(params.CodecId()));
 		if (!name || name[0] == '\0' || std::string_view(name) == "none")
@@ -159,7 +159,7 @@ namespace {
 		return std::chrono::nanoseconds{ns};
 	}
 
-	StormByte::Safe::Binary AttachmentBytes(const FFmpeg::AVStream& stream) noexcept {
+	StormByte::Safe::Binary AttachmentBytes(const FFmpeg::AVStream& stream) {
 		StormByte::Safe::Binary bytes;
 		const ::AVStream* raw = stream.Raw();
 		if (raw && raw->attached_pic.size > 0 && raw->attached_pic.data) {
@@ -174,7 +174,7 @@ namespace {
 		return bytes;
 	}
 
-	Attachment MakeAttachment(const FFmpeg::AVStream& stream) noexcept {
+	Attachment MakeAttachment(const FFmpeg::AVStream& stream) {
 		const auto described = Detail::MakeAttachment(stream);
 		auto name = described.FileName();
 		auto mime = described.MimeType();
@@ -183,7 +183,7 @@ namespace {
 	}
 
 	void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx,
-		StormByte::Safe::Vector<Attachment>& attachments, const StormByte::Safe::Vector<int>& coverIndex) noexcept {
+		StormByte::Safe::Vector<Attachment>& attachments, const StormByte::Safe::Vector<int>& coverIndex) {
 		bool missing = false;
 		for (const auto& item : std::as_const(attachments)) {
 			if (item.Payload().Available() == 0) {
@@ -284,18 +284,18 @@ File::File(File&&) noexcept = default;
 File::~File() noexcept = default;
 
 ExpectedFile File::Open(const StormByte::Safe::String& path,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept {
+	StormByte::Safe::Optional<std::int64_t> duration) {
 	auto reader = LocalReader(path);
 	return Probe(*reader, std::move(duration), path, nullptr);
 }
 
 ExpectedFile File::Open(BufferedLocationReader& reader,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept {
+	StormByte::Safe::Optional<std::int64_t> duration) {
 	return Probe(reader, std::move(duration), {}, &reader);
 }
 
 bool File::ScanWithReader(BufferedLocationReader& reader, StormByte::Safe::Vector<Stream>& streams,
-	StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress) noexcept {
+	StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress) {
 	double percent = 0.0;
 	if (!ReportProgress(progress, percent)) {
 		static_cast<void>(reader.Rewind());
@@ -439,7 +439,7 @@ catch (...) {
 
 bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams,
 	StormByte::Safe::Optional<Property::Duration>& container, BufferedLocationReader& reader,
-	const DurationProgress* progress, double& percent) noexcept {
+	const DurationProgress* progress, double& percent) {
 	auto published = std::chrono::steady_clock::now();
 	std::uint64_t payloadBytes = 0;
 	const bool hasPrimaryVideo = Detail::HasPrimaryVideo(ctx);
@@ -533,7 +533,7 @@ bool File::ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<S
 
 ExpectedFile File::Probe(BufferedLocationReader& reader,
 	StormByte::Safe::Optional<std::int64_t> knownDuration,
-	StormByte::Safe::String path, BufferedLocationReader* borrowed) noexcept {
+	StormByte::Safe::String path, BufferedLocationReader* borrowed) {
 	const auto label = reader.Path();
 	Backend::FileAvio avio(reader);
 	::AVFormatContext* raw = nullptr;
@@ -620,19 +620,19 @@ const StormByte::Safe::Vector<Attachment>& File::Attachments() const noexcept {
 	return m_attachments;
 }
 
-const StormByte::Safe::Optional<Property::Duration>& File::Duration() const noexcept {
+const StormByte::Safe::Optional<Property::Duration>& File::Duration() const {
 	if (!m_durationResolved)
 		ResolveDuration(nullptr);
 	return m_duration;
 }
 
-const StormByte::Safe::Optional<Property::Duration>& File::Duration(const DurationProgress& progress) const noexcept {
+const StormByte::Safe::Optional<Property::Duration>& File::Duration(const DurationProgress& progress) const {
 	if (!m_durationResolved)
 		ResolveDuration(&progress);
 	return m_duration;
 }
 
-void File::ResolveDuration(const DurationProgress* progress) const noexcept {
+void File::ResolveDuration(const DurationProgress* progress) const {
 	if (m_reader)
 		m_durationResolved = ScanWithReader(*m_reader, m_streams, m_duration, progress);
 	else {

@@ -232,7 +232,7 @@ namespace StormByte {
 				 * instance. If Open(..., duration) was used, this is that value, there
 				 * is no extra I/O, and stream durations stay as probed.
 				 */
-				const StormByte::Safe::Optional<Property::Duration>& Duration() const noexcept;
+				const StormByte::Safe::Optional<Property::Duration>& Duration() const;
 
 				/**
 				 * @brief Resolve duration while reporting packet scan progress.
@@ -244,7 +244,7 @@ namespace StormByte {
 				 * or interruption; an interrupted scan is not cached and may be retried.
 				 * Updates also arrive periodically when the source size is unknown.
 				 */
-				const StormByte::Safe::Optional<Property::Duration>& Duration(const DurationProgress& progress) const noexcept;
+				const StormByte::Safe::Optional<Property::Duration>& Duration(const DurationProgress& progress) const;
 
 				/**
 				 * @brief Opens and probes @p path. Temporary reader is dropped.
@@ -253,7 +253,7 @@ namespace StormByte {
 				 * @return Snapshot or FileOpenException.
 				 */
 				static ExpectedFile Open(const StormByte::Safe::String& path,
-					StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+					StormByte::Safe::Optional<std::int64_t> duration = {});
 
 				/**
 				 * @brief Opens and probes @p reader with AVIO only.
@@ -262,7 +262,7 @@ namespace StormByte {
 				 * @return Snapshot or FileOpenException.
 				 */
 				static ExpectedFile Open(StormByte::Buffer::IO::BufferedLocationReader& reader,
-					StormByte::Safe::Optional<std::int64_t> duration = {}) noexcept;
+					StormByte::Safe::Optional<std::int64_t> duration = {});
 
 			private:
 				StormByte::Safe::String m_path;									///< Stored local path
@@ -303,13 +303,13 @@ namespace StormByte {
 				static ExpectedFile Probe(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					StormByte::Safe::Optional<std::int64_t> duration,
 					StormByte::Safe::String path,
-					StormByte::Buffer::IO::BufferedLocationReader* borrowed) noexcept;
+					StormByte::Buffer::IO::BufferedLocationReader* borrowed);
 
 				/**
 				 * @brief Packet scan for container and missing stream durations.
 				 * @param progress Borrowed byte-position observer, or nullptr.
 				 */
-				void ResolveDuration(const DurationProgress* progress) const noexcept;
+				void ResolveDuration(const DurationProgress* progress) const;
 
 				/**
 				 * @brief Opens AVIO on @p reader and scans durations.
@@ -321,7 +321,7 @@ namespace StormByte {
 				 */
 				static bool ScanWithReader(StormByte::Buffer::IO::BufferedLocationReader& reader,
 					StormByte::Safe::Vector<Stream>& streams,
-					StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress) noexcept;
+					StormByte::Safe::Optional<Property::Duration>& duration, const DurationProgress* progress);
 
 				/**
 				 * @brief Sets HDR10+ on a video stream.
@@ -350,7 +350,7 @@ namespace StormByte {
 				static bool ScanDurations(FFmpeg::AVFormatContext& ctx, StormByte::Safe::Vector<Stream>& streams,
 					StormByte::Safe::Optional<Property::Duration>& container,
 					StormByte::Buffer::IO::BufferedLocationReader& reader,
-					const DurationProgress* progress, double& percent) noexcept;
+					const DurationProgress* progress, double& percent);
 		};
 	}
 }

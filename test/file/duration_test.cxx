@@ -63,6 +63,8 @@
 #include <chrono>
 #include <fstream>
 #include <iterator>
+#include <new>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 
@@ -198,6 +200,33 @@ namespace {
 		const auto completedCalls = state.Calls;
 		TEST_REQUIRE(opened->Duration(observer));
 		TEST_REQUIRE(state.Calls == completedCalls);
+		return 0;
+	}
+
+	int test_throwing_duration_observer_interrupts_and_can_retry() {
+		ScanReader reader{true};
+		auto opened = File::Open(reader);
+		TEST_REQUIRE(opened);
+		unsigned calls = 0;
+		File::DurationProgress throwing(
+			new unsigned*(&calls),
+			[](void* context, double) -> StormByte::Safe::Status {
+				++**static_cast<unsigned**>(context);
+				throw std::runtime_error("observer failed");
+			},
+			[](const void* context) noexcept -> void* {
+				return new (std::nothrow) unsigned*(*static_cast<unsigned* const*>(context));
+			},
+			[](void* context) noexcept { delete static_cast<unsigned**>(context); });
+		static_cast<void>(opened->Duration(throwing));
+		TEST_REQUIRE(calls == 1);
+		TEST_REQUIRE(reader.Tell() == StormByte::ByteSize{0});
+
+		ScanObserver state;
+		state.Cancel = false;
+		auto observer = Observe(state);
+		TEST_REQUIRE(opened->Duration(observer));
+		TEST_REQUIRE(state.Complete);
 		return 0;
 	}
 
@@ -413,6 +442,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_duration_pause_and_resume", test_duration_pause_and_resume},
 		TestEntry{"test_duration_cancel_while_paused", test_duration_cancel_while_paused},
 		TestEntry{"test_duration_cancel_while_running", test_duration_cancel_while_running},
+		TestEntry{"test_throwing_duration_observer_interrupts_and_can_retry", test_throwing_duration_observer_interrupts_and_can_retry},
 		TestEntry{"test_supplied_duration_skips_scan_control", test_supplied_duration_skips_scan_control},
 		TestEntry{"test_duration_hint_does_not_scan", test_duration_hint_does_not_scan},
 		TestEntry{"test_progress_duration_hint_skips_scan", test_progress_duration_hint_skips_scan},

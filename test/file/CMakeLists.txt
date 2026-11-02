@@ -24,6 +24,7 @@ foreach(test_name IN ITEMS
 	test_duration_pause_and_resume
 	test_duration_cancel_while_paused
 	test_duration_cancel_while_running
+	test_throwing_duration_observer_interrupts_and_can_retry
 	test_supplied_duration_skips_scan_control
 	test_duration_hint_does_not_scan
 	test_progress_duration_hint_skips_scan

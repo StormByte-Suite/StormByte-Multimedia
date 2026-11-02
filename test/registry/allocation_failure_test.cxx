@@ -5,6 +5,7 @@
  */
 
 #include <StormByte/multimedia/registry.hxx>
+#include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
@@ -33,6 +34,8 @@ static_assert(!noexcept(std::declval<const Registry&>().CodecList(MediaType::Vid
 static_assert(!noexcept(std::declval<const Registry&>().ContainerList()));
 static_assert(!noexcept(std::declval<const Registry&>().FindCodec("hevc")));
 static_assert(!noexcept(std::declval<const Registry&>().FindContainer("mkv")));
+static_assert(!noexcept(StormByte::Multimedia::File::Open(std::declval<const String&>())));
+static_assert(!noexcept(std::declval<const StormByte::Multimedia::File&>().Duration()));
 static_assert(!noexcept(std::declval<const StageTelemetry&>().Origin()));
 static_assert(!noexcept(std::declval<const StageTelemetry&>().Error()));
 static_assert(!noexcept(std::declval<const StageTelemetry&>().SetOrigin("stage")));
@@ -182,6 +185,11 @@ int CheckTelemetry() {
 	return errors;
 }
 
+int CheckFile() {
+	const String path{std::string(4096, 'x')};
+	return ExpectAllocationFailure("file open", [&] { StormByte::Multimedia::File::Open(path); });
+}
+
 int main() {
 	std::set_terminate([] { std::_Exit(86); });
 	int errors = ExpectAllocationFailure("initialization", [] { Registry::Instance(); });
@@ -202,7 +210,7 @@ int main() {
 		std::fputs("allocation failures changed registry contents\n", stderr);
 		++errors;
 	}
-	return errors + CheckTelemetry();
+	return errors + CheckTelemetry() + CheckFile();
 }
 
 #else
