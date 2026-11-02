@@ -1,0 +1,27 @@
+From f867a28e11e3ea18dc38732ee9bf12be38286717 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:09:33 +0100
+Subject: [PATCH] golomb: construct the trailing-bit mask with unsigned
+ arithmetic
+
+When a write leaves 31 trailing bits, (1 << 31) - 1 overflows signed int. Use an unsigned one so the mask calculation is defined for all trailing-bit counts. Confirmed with an isolated ASan/UBSan check of 1000 bitstreams against a bit-by-bit reference, including 1-to-32-bit writes and repeated empty flushes.
+---
+ codec/common/inc/golomb_common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/codec/common/inc/golomb_common.h b/codec/common/inc/golomb_common.h
+index 92d5799d..f7545277 100644
+--- a/codec/common/inc/golomb_common.h
++++ b/codec/common/inc/golomb_common.h
+@@ -86,7 +86,7 @@ static inline int32_t BsWriteBits (PBitStringAux pBitString, int32_t iLen, const
+                             pBitString->uiCurBits << pBitString->iLeftBits : 0) | (kuiValue >> iLen);
+     WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits);
+     pBitString->pCurBuf += 4;
+-    pBitString->uiCurBits = kuiValue & ((1 << iLen) - 1);
++    pBitString->uiCurBits = kuiValue & ((1u << iLen) - 1);
+     pBitString->iLeftBits = 32 - iLen;
+   }
+   return 0;
+-- 
+2.56.0
+

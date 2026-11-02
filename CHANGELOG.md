@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled OpenH264 constructs trailing-bit masks with unsigned arithmetic, avoiding signed overflow when a write leaves 31 trailing bits; an isolated sanitizer check verifies 1,000 bitstreams against a bit-by-bit reference.
 - Bundled OpenH264 avoids shifting its bit accumulator by 32 when flushing an empty word or writing a full word into an empty accumulator.
 - Bundled Vorbis bounds both indices used to interpolate noise-offset bands, avoiding an out-of-bounds read at the final band even when its interpolation weight is zero.
 - Bundled x265 guards full-width partial-byte shifts in every build, not only builds configured with signed-overflow trapping.
