@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FFmpeg translates constrained-baseline H.264 profiles to OpenH264's `PRO_BASELINE` rather than passing FFmpeg constraint flags as an invalid `EProfileIdc` value.
 - Bundled FFmpeg pads externally owned Dolby Vision T.35 payloads before bitstream parsing, preventing out-of-bounds EMDF footer reads when AV1 metadata is supplied by libdav1d.
 - Bundled FFmpeg initializes Opus hybrid delay pointers only for active channels, avoiding arithmetic on the absent second CELT buffer when decoding mono.
 - NLMeans scratch allocation failures mark the filter and shared plan as failed instead of terminating through `noexcept`. Emergency stage/filter failure signaling, hopper aborts and failed-worker completion avoid allocating error text or shutdown snapshots; regressions exercise message-allocation fallback and reject allocations through the failed NLMeans worker's exit.

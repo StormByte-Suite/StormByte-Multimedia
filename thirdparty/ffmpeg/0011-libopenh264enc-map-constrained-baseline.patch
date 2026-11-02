@@ -1,0 +1,37 @@
+From a91ed5a0c4d5b99db20164fcfc72a7e5f9155249 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] avcodec/libopenh264enc: map constrained baseline to
+ PRO_BASELINE
+
+AV_PROFILE_H264_CONSTRAINED_BASELINE includes FFmpeg's constraint flag
+and has the value 578. OpenH264 expects an EProfileIdc enumerator, not
+the FFmpeg profile value with constraint flags. Passing 578 causes an
+invalid enum load in OpenH264 parameter validation.
+
+Translate constrained baseline to PRO_BASELINE at the API boundary.
+Keep the FFmpeg profile and the existing CAVLC selection unchanged.
+Main and high profile values are unaffected.
+
+Reproduced with UBSan in the existing OpenH264 encoder tests.
+---
+ libavcodec/libopenh264enc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libavcodec/libopenh264enc.c b/libavcodec/libopenh264enc.c
+index 6f6f264636..37621cb207 100644
+--- a/libavcodec/libopenh264enc.c
++++ b/libavcodec/libopenh264enc.c
+@@ -220,7 +220,8 @@ static av_cold int svc_encode_init(AVCodecContext *avctx)
+     param.sSpatialLayers[0].fFrameRate          = param.fMaxFrameRate;
+     param.sSpatialLayers[0].iSpatialBitrate     = param.iTargetBitrate;
+     param.sSpatialLayers[0].iMaxSpatialBitrate  = param.iMaxBitrate;
+-    param.sSpatialLayers[0].uiProfileIdc        = s->profile;
++    param.sSpatialLayers[0].uiProfileIdc        = s->profile == AV_PROFILE_H264_CONSTRAINED_BASELINE ?
++                                                PRO_BASELINE : s->profile;
+ 
+ #if OPENH264_VER_AT_LEAST(1, 7)
+     if (avctx->sample_aspect_ratio.num && avctx->sample_aspect_ratio.den) {
+-- 
+2.56.0
+
