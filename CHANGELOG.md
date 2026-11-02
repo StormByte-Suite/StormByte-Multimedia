@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled Kvazaar reads byte-addressed SSE4.1 SAD reference and picture fragments without scalar alignment assumptions; an isolated sanitizer check verifies 15,872 cases against scalar SAD calculations.
 - Bundled FDK-AAC normalizes signed PARCOR-to-LPC work-buffer coefficients through unsigned bit patterns before converting coefficient precision.
 - Bundled Kvazaar copies half- and quarter-pixel block fragments without scalar alignment requirements, preserving backward traversal for overlapping row shifts.
 - Bundled FDK-AAC normalizes signed TNS spectral samples through unsigned bit patterns while retaining its measured headroom and rounding.

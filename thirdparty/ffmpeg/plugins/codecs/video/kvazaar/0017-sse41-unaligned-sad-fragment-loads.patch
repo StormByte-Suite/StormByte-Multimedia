@@ -1,0 +1,150 @@
+From ba92c05a12ff5e794f8491ecb0e9b26f6315bf26 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:46:01 +0100
+Subject: [PATCH] sse41: load SAD pixel fragments without scalar alignment
+
+SAD reference and picture pointers may point at individual byte-offset
+pixels. Replace the eight-byte vertical-reference dereference with an
+unaligned SIMD load and copy repeated four-byte fragments through a
+small local memcpy helper. Preserve broadcast, row insertion and
+residual-row behavior. Reproduced in ver_sad_w8 by the unaligned-video
+test with UBSan; the four-pixel SAD paths accept the same byte-addressed
+input.
+---
+ .../sse41/reg_sad_pow2_widths-sse41.h         | 62 +++++++++++--------
+ 1 file changed, 35 insertions(+), 27 deletions(-)
+
+diff --git a/src/strategies/sse41/reg_sad_pow2_widths-sse41.h b/src/strategies/sse41/reg_sad_pow2_widths-sse41.h
+index af72f174..f8ed39e7 100644
+--- a/src/strategies/sse41/reg_sad_pow2_widths-sse41.h
++++ b/src/strategies/sse41/reg_sad_pow2_widths-sse41.h
+@@ -39,6 +39,14 @@
+ 
+ #include "strategies/missing-intel-intrinsics.h"
+ #include <immintrin.h>
++#include <string.h>
++
++static INLINE uint32_t sad_load_u32(const void *src)
++{
++  uint32_t value;
++  memcpy(&value, src, sizeof(value));
++  return value;
++}
+ 
+ static INLINE uint32_t reg_sad_w0(const uint8_t * const data1, const uint8_t * const data2,
+                            const int32_t height, const uint32_t stride1,
+@@ -58,23 +66,23 @@ static INLINE uint32_t reg_sad_w4(const uint8_t * const data1, const uint8_t * c
+   const int32_t height_residual_lines  = height &  3;
+ 
+   for (y = 0; y < height_fourline_groups; y += 4) {
+-    __m128i a = _mm_cvtsi32_si128(*(uint32_t *)(data1 + y * stride1));
+-    __m128i b = _mm_cvtsi32_si128(*(uint32_t *)(data2 + y * stride2));
++    __m128i a = _mm_cvtsi32_si128(sad_load_u32(data1 + y * stride1));
++    __m128i b = _mm_cvtsi32_si128(sad_load_u32(data2 + y * stride2));
+ 
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(data1 + (y + 1) * stride1), 1);
+-    b = _mm_insert_epi32(b, *(const uint32_t *)(data2 + (y + 1) * stride2), 1);
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(data1 + (y + 2) * stride1), 2);
+-    b = _mm_insert_epi32(b, *(const uint32_t *)(data2 + (y + 2) * stride2), 2);
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(data1 + (y + 3) * stride1), 3);
+-    b = _mm_insert_epi32(b, *(const uint32_t *)(data2 + (y + 3) * stride2), 3);
++    a = _mm_insert_epi32(a, sad_load_u32(data1 + (y + 1) * stride1), 1);
++    b = _mm_insert_epi32(b, sad_load_u32(data2 + (y + 1) * stride2), 1);
++    a = _mm_insert_epi32(a, sad_load_u32(data1 + (y + 2) * stride1), 2);
++    b = _mm_insert_epi32(b, sad_load_u32(data2 + (y + 2) * stride2), 2);
++    a = _mm_insert_epi32(a, sad_load_u32(data1 + (y + 3) * stride1), 3);
++    b = _mm_insert_epi32(b, sad_load_u32(data2 + (y + 3) * stride2), 3);
+ 
+     __m128i curr_sads = _mm_sad_epu8(a, b);
+     sse_inc = _mm_add_epi64(sse_inc, curr_sads);
+   }
+   if (height_residual_lines) {
+     for (; y < height; y++) {
+-      __m128i a = _mm_cvtsi32_si128(*(const uint32_t *)(data1 + y * stride1));
+-      __m128i b = _mm_cvtsi32_si128(*(const uint32_t *)(data2 + y * stride2));
++      __m128i a = _mm_cvtsi32_si128(sad_load_u32(data1 + y * stride1));
++      __m128i b = _mm_cvtsi32_si128(sad_load_u32(data2 + y * stride2));
+ 
+       __m128i curr_sads = _mm_sad_epu8(a, b);
+       sse_inc = _mm_add_epi64(sse_inc, curr_sads);
+@@ -352,7 +360,7 @@ static INLINE uint32_t reg_sad_arbitrary(const uint8_t * const data1, const uint
+ static uint32_t ver_sad_w4(const uint8_t *pic_data, const uint8_t *ref_data,
+                            int32_t height, uint32_t stride)
+ {
+-  __m128i ref_row = _mm_set1_epi32(*(const uint32_t *)ref_data);
++  __m128i ref_row = _mm_set1_epi32(sad_load_u32(ref_data));
+   __m128i sse_inc = _mm_setzero_si128();
+   int32_t y;
+ 
+@@ -360,11 +368,11 @@ static uint32_t ver_sad_w4(const uint8_t *pic_data, const uint8_t *ref_data,
+   const int32_t height_residual_lines  = height &  3;
+ 
+   for (y = 0; y < height_fourline_groups; y += 4) {
+-    __m128i a = _mm_cvtsi32_si128(*(uint32_t *)(pic_data + y * stride));
++    __m128i a = _mm_cvtsi32_si128(sad_load_u32(pic_data + y * stride));
+ 
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(pic_data + (y + 1) * stride), 1);
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(pic_data + (y + 2) * stride), 2);
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(pic_data + (y + 3) * stride), 3);
++    a = _mm_insert_epi32(a, sad_load_u32(pic_data + (y + 1) * stride), 1);
++    a = _mm_insert_epi32(a, sad_load_u32(pic_data + (y + 2) * stride), 2);
++    a = _mm_insert_epi32(a, sad_load_u32(pic_data + (y + 3) * stride), 3);
+ 
+     __m128i curr_sads = _mm_sad_epu8(a, ref_row);
+     sse_inc = _mm_add_epi64(sse_inc, curr_sads);
+@@ -374,7 +382,7 @@ static uint32_t ver_sad_w4(const uint8_t *pic_data, const uint8_t *ref_data,
+     ref_row = _mm_bsrli_si128(ref_row, 12);
+ 
+     for (; y < height; y++) {
+-      __m128i a = _mm_cvtsi32_si128(*(const uint32_t *)(pic_data + y * stride));
++      __m128i a = _mm_cvtsi32_si128(sad_load_u32(pic_data + y * stride));
+ 
+       __m128i curr_sads = _mm_sad_epu8(a, ref_row);
+       sse_inc = _mm_add_epi64(sse_inc, curr_sads);
+@@ -389,7 +397,7 @@ static uint32_t ver_sad_w4(const uint8_t *pic_data, const uint8_t *ref_data,
+ static uint32_t ver_sad_w8(const uint8_t *pic_data, const uint8_t *ref_data,
+                            int32_t height, uint32_t stride)
+ {
+-  const __m128i ref_row = _mm_set1_epi64x(*(const uint64_t *)ref_data);
++  const __m128i ref_row = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i *)ref_data)));
+   __m128i sse_inc = _mm_setzero_si128();
+   int32_t y;
+ 
+@@ -610,15 +618,15 @@ static uint32_t hor_sad_sse41_w4(const uint8_t *pic_data, const uint8_t *ref_dat
+   __m128i sse_inc = _mm_setzero_si128();
+   int32_t y;
+   for (y = 0; y < height_fourline_groups; y += 4) {
+-    __m128i a = _mm_cvtsi32_si128(*(const uint32_t *)(pic_data + y * pic_stride));
+-    __m128i b = _mm_cvtsi32_si128(*(const uint32_t *)(ref_data + y * ref_stride + leftoff));
++    __m128i a = _mm_cvtsi32_si128(sad_load_u32(pic_data + y * pic_stride));
++    __m128i b = _mm_cvtsi32_si128(sad_load_u32(ref_data + y * ref_stride + leftoff));
+ 
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(pic_data + (y + 1) * pic_stride),           1);
+-    b = _mm_insert_epi32(b, *(const uint32_t *)(ref_data + (y + 1) * ref_stride + leftoff), 1);
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(pic_data + (y + 2) * pic_stride),           2);
+-    b = _mm_insert_epi32(b, *(const uint32_t *)(ref_data + (y + 2) * ref_stride + leftoff), 2);
+-    a = _mm_insert_epi32(a, *(const uint32_t *)(pic_data + (y + 3) * pic_stride),           3);
+-    b = _mm_insert_epi32(b, *(const uint32_t *)(ref_data + (y + 3) * ref_stride + leftoff), 3);
++    a = _mm_insert_epi32(a, sad_load_u32(pic_data + (y + 1) * pic_stride),           1);
++    b = _mm_insert_epi32(b, sad_load_u32(ref_data + (y + 1) * ref_stride + leftoff), 1);
++    a = _mm_insert_epi32(a, sad_load_u32(pic_data + (y + 2) * pic_stride),           2);
++    b = _mm_insert_epi32(b, sad_load_u32(ref_data + (y + 2) * ref_stride + leftoff), 2);
++    a = _mm_insert_epi32(a, sad_load_u32(pic_data + (y + 3) * pic_stride),           3);
++    b = _mm_insert_epi32(b, sad_load_u32(ref_data + (y + 3) * ref_stride + leftoff), 3);
+ 
+     __m128i b_epol    = _mm_shuffle_epi8(b,       epol_mask);
+     __m128i curr_sads = _mm_sad_epu8    (a,       b_epol);
+@@ -626,8 +634,8 @@ static uint32_t hor_sad_sse41_w4(const uint8_t *pic_data, const uint8_t *ref_dat
+   }
+   if (height_residual_lines) {
+     for (; y < height; y++) {
+-      __m128i a = _mm_cvtsi32_si128(*(const uint32_t *)(pic_data + y * pic_stride));
+-      __m128i b = _mm_cvtsi32_si128(*(const uint32_t *)(ref_data + y * ref_stride + leftoff));
++      __m128i a = _mm_cvtsi32_si128(sad_load_u32(pic_data + y * pic_stride));
++      __m128i b = _mm_cvtsi32_si128(sad_load_u32(ref_data + y * ref_stride + leftoff));
+ 
+       __m128i b_epol = _mm_shuffle_epi8(b, epol_mask);
+       __m128i curr_sads = _mm_sad_epu8 (a, b_epol);
+-- 
+2.56.0
+
