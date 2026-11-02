@@ -1,0 +1,35 @@
+From b09291ebc983abf0850efac248bf5a0ce036320d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] libFDK: avoid signed left shift when widening fractional
+ samples
+
+FX_SGL2FX_DBL shifts a signed LONG value by the difference in fractional
+widths. Negative FIXP_SGL samples, including -32768, make that shift
+undefined.
+
+Use multiplication by the positive power of two instead. Every signed
+16-bit input maps exactly into the signed 32-bit fractional range, so
+the product is representable and preserves the conversion bits.
+
+Reproduced with UBSan in the existing AAC encoder and decoder tests.
+---
+ libFDK/include/common_fix.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libFDK/include/common_fix.h b/libFDK/include/common_fix.h
+index 7c08225..e732948 100644
+--- a/libFDK/include/common_fix.h
++++ b/libFDK/include/common_fix.h
+@@ -216,7 +216,7 @@ typedef LONG FIXP_DBL;
+ #define FX_ACC2FX_DBL(val) ((FIXP_DBL)((val) >> (ACCU_BITS - DFRACT_BITS)))
+ #define FX_SGL2FX_ACC(val) ((FIXP_ACC)((LONG)(val) << (ACCU_BITS - FRACT_BITS)))
+ #define FX_SGL2FX_DBL(val) \
+-  ((FIXP_DBL)((LONG)(val) << (DFRACT_BITS - FRACT_BITS)))
++  ((FIXP_DBL)((LONG)(val) * (1L << (DFRACT_BITS - FRACT_BITS))))
+ #define FX_DBL2FX_SGL(val) ((FIXP_SGL)((val) >> (DFRACT_BITS - FRACT_BITS)))
+ 
+ /* ############################################################# */
+-- 
+2.56.0
+

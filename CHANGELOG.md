@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC widens signed fractional samples by representable multiplication, avoiding negative left shifts in `FX_SGL2FX_DBL`.
 - Bundled VMAF's AVX2 integer ADM handles small coefficients before counting leading zeroes or rounding, avoiding `clz(0)` and negative shifts in lanes that are subsequently blended out.
 - Bundled Vorbis packs negative Bark-window lower bounds through representable multiplication instead of undefined signed left shifts.
 - Bundled x265 skips the zero-length copy from its initially null NAL buffer when allocating storage for the first output NAL.

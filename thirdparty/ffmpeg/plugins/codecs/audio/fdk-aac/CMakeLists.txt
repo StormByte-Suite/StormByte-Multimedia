@@ -19,7 +19,7 @@ buildmaster_component(
 	"${FDK_AAC_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"fdk-aac"
-	""
+	"GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-widen-fractional-samples-without-negative-shift.patch;TITLE=FDK-AAC fixed-point conversion}"
 )
 buildmaster_group_add(ff-audio fdk-aac)
 register_plugin(fdk-aac "libfdk_aac=enabled")
