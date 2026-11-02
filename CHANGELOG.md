@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled OpenH264 avoids shifting its bit accumulator by 32 when flushing an empty word or writing a full word into an empty accumulator.
 - Bundled Vorbis bounds both indices used to interpolate noise-offset bands, avoiding an out-of-bounds read at the final band even when its interpolation weight is zero.
 - Bundled x265 guards full-width partial-byte shifts in every build, not only builds configured with signed-overflow trapping.
 - Bundled LAME computes negative subblock scalefactor gain adjustments using bounded multiplication instead of undefined signed left shifts.

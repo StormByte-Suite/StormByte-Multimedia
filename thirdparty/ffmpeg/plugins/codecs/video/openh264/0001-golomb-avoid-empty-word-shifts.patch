@@ -1,0 +1,42 @@
+From 96a43d5b08328a34cdb80be732d9c1c8848de3d2 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] golomb: avoid shifting by the word width when the accumulator
+ is empty
+
+BsFlush shifts a uint32_t by 32 when the accumulator is empty, including
+after writing a complete word. Do not write an empty accumulator. Also
+guard the matching shift in BsWriteBits when a full word fills an empty
+accumulator. Preserve the existing pointer advancement and partial-word
+padding. Reproduced in both existing OpenH264 encoding tests with UBSan.
+---
+ codec/common/inc/golomb_common.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/codec/common/inc/golomb_common.h b/codec/common/inc/golomb_common.h
+index 04f87b00..92d5799d 100644
+--- a/codec/common/inc/golomb_common.h
++++ b/codec/common/inc/golomb_common.h
+@@ -82,7 +82,8 @@ static inline int32_t BsWriteBits (PBitStringAux pBitString, int32_t iLen, const
+     pBitString->iLeftBits -= iLen;
+   } else {
+     iLen -= pBitString->iLeftBits;
+-    pBitString->uiCurBits = (pBitString->uiCurBits << pBitString->iLeftBits) | (kuiValue >> iLen);
++    pBitString->uiCurBits = (pBitString->iLeftBits < 32 ?
++                            pBitString->uiCurBits << pBitString->iLeftBits : 0) | (kuiValue >> iLen);
+     WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits);
+     pBitString->pCurBuf += 4;
+     pBitString->uiCurBits = kuiValue & ((1 << iLen) - 1);
+@@ -100,7 +101,8 @@ static inline int32_t BsWriteOneBit (PBitStringAux pBitString, const uint32_t ku
+ }
+ 
+ static inline int32_t BsFlush (PBitStringAux pBitString) {
+-  WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits << pBitString->iLeftBits);
++  if (pBitString->iLeftBits < 32)
++    WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits << pBitString->iLeftBits);
+   pBitString->pCurBuf += 4 - pBitString->iLeftBits / 8;
+   pBitString->iLeftBits = 32;
+   pBitString->uiCurBits = 0;
+-- 
+2.56.0
+
