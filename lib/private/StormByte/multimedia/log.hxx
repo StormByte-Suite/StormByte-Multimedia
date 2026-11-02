@@ -76,5 +76,5 @@ namespace StormByte::Multimedia {
 	 * StormByte/Multimedia. Warning, Error and Fatal stay unthrottled.
 	 */
 	STORMBYTE_MULTIMEDIA_PRIVATE StormByte::Safe::Shared<StormByte::Logger::Log> UseLog(
-		StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view leaf) noexcept;
+		StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view leaf);
 }
