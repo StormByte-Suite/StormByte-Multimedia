@@ -1,8 +1,8 @@
 add_library(multimedia_pipeline_test_support STATIC helpers.cxx)
 target_link_libraries(multimedia_pipeline_test_support PUBLIC multimedia_test_support)
 
-# ctest must outlive the in-process wait (360s while training) plus teardown.
-if(PGO_STAGE STREQUAL "generate")
+# ctest must outlive the instrumented in-process wait plus teardown.
+if(PGO_STAGE STREQUAL "generate" OR ENABLE_ASAN)
 	set(PIPELINE_TEST_TIMEOUT 480)
 	set(PIPELINE_TEST_TIMEOUT_LONG 480)
 else()
