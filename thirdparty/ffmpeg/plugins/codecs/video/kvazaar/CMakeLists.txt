@@ -18,6 +18,7 @@ set(KVAZAAR_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0015-avx2-unaligned-interpolation-row-accesses.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0016-avx2-unaligned-subpixel-block-copies.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0017-sse41-unaligned-sad-fragment-loads.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0018-avx2-limit-chroma-filter-loads-to-four-bytes.patch"
 )
 
 set(KVAZAAR_OPTIONS

@@ -1,0 +1,46 @@
+From 22d90014fc9ae4c4204ddb4ff91b0665c3bb90ef Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:48:49 +0100
+Subject: [PATCH] avx2: read exactly four coefficients in vertical chroma
+ interpolation
+
+The four-tap vertical interpolation paths load eight bytes from a four-
+byte chroma filter row. Selecting the last row reads beyond the global
+coefficient table. Copy exactly four bytes and place them in the low
+SIMD lane; only the first two coefficient pairs are consumed, so unused
+lanes may be zero. Reproduced by the unaligned-video test with ASan
+after removing preceding alignment defects. Fix both pixel and high-
+precision output paths.
+---
+ src/strategies/avx2/ipol-avx2.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/strategies/avx2/ipol-avx2.c b/src/strategies/avx2/ipol-avx2.c
+index 65fbaef8..bebbe909 100644
+--- a/src/strategies/avx2/ipol-avx2.c
++++ b/src/strategies/avx2/ipol-avx2.c
+@@ -502,7 +502,9 @@ static void kvz_ipol_4tap_ver_im_px_avx2(int8_t *filter,
+   int32_t wp_shift1 = 14 - KVZ_BIT_DEPTH;
+   int32_t wp_offset1 = 1 << (wp_shift1 - 1);
+ 
+-  __m128i weights_8b = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)filter)));
++  uint32_t filter_bits;
++  memcpy(&filter_bits, filter, sizeof(filter_bits));
++  __m128i weights_8b = _mm_cvtsi32_si128(filter_bits);
+   __m256i weights_16b = _mm256_cvtepi8_epi16(weights_8b);
+   __m256i all_w01 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(0, 0, 0, 0));
+   __m256i all_w23 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(1, 1, 1, 1));
+@@ -573,7 +575,9 @@ static void kvz_ipol_4tap_ver_im_hi_avx2(int8_t *filter,
+ {
+   const int shift2 = 6;
+ 
+-  __m128i weights_8b = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)filter)));
++  uint32_t filter_bits;
++  memcpy(&filter_bits, filter, sizeof(filter_bits));
++  __m128i weights_8b = _mm_cvtsi32_si128(filter_bits);
+   __m256i weights_16b = _mm256_cvtepi8_epi16(weights_8b);
+   __m256i all_w01 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(0, 0, 0, 0));
+   __m256i all_w23 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(1, 1, 1, 1));
+-- 
+2.56.0
+
