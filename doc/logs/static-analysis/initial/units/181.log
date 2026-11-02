@@ -1,0 +1,998 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '294912' provided to the cast expression is not in the valid range of values for 'Feature' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:82:14: note: enum declared here
+   82 |                 enum class Feature: std::uint32_t {
+      |                 ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+   83 |                         None                                    = 0,                    ///< No flags.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   84 |                         MultiThreaded                   = 1u << 0,              ///< Frame or slice threading.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   85 |                         RealTime                                = 1u << 1,              ///< Suitable for real-time use.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   86 |                         LowDelay                                = 1u << 2,              ///< Low latency.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   87 |                         ZeroCopy                                = 1u << 3,              ///< Zero-copy paths.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   88 |                         HardwareAcceleration    = 1u << 4,              ///< Hardware decode or encode.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   89 |                         HighQuality                             = 1u << 5,              ///< High quality presets.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   90 |                         PsychoVisual                    = 1u << 6,              ///< Psycho-visual tuning.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   91 |                         AdaptiveQuantization    = 1u << 7,              ///< Adaptive quantization.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   92 |                         Lookahead                               = 1u << 8,              ///< Lookahead analysis.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   93 |                         TwoPass                                 = 1u << 9,              ///< Two-pass encoding.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   94 |                         Lossless                                = 1u << 10,             ///< Lossless mode.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   95 |                         ProfileBased                    = 1u << 11,             ///< Profile selection.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                         ContentTuning                   = 1u << 12,             ///< Content-type tuning.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   97 |                         TenBit                                  = 1u << 13,             ///< 10-bit.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:252:2: note: Assuming the condition is false
+  252 |         TEST_REQUIRE(hevc);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:7: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                     ^~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:252:2: note: Taking false branch
+  252 |         TEST_REQUIRE(hevc);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:3: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:252:2: note: Loop condition is false.  Exiting loop
+  252 |         TEST_REQUIRE(hevc);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:188:2: note: expanded from macro 'TEST_REQUIRE'
+  188 |         do { \
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:254:15: note: Assuming the condition is true
+  254 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::SurroundSound));
+      |                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:254:2: note: Taking false branch
+  254 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:3: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:254:2: note: Loop condition is false.  Exiting loop
+  254 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:188:2: note: expanded from macro 'TEST_REQUIRE'
+  188 |         do { \
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:255:15: note: Assuming the condition is true
+  255 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::SurroundSound));
+      |                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:255:2: note: Taking false branch
+  255 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:3: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:255:2: note: Loop condition is false.  Exiting loop
+  255 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:188:2: note: expanded from macro 'TEST_REQUIRE'
+  188 |         do { \
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:256:15: note: Assuming the condition is true
+  256 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read | Operation::Write, Feature::SurroundSound));
+      |                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:256:2: note: Taking false branch
+  256 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read | Operation::Write, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:3: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:256:2: note: Loop condition is false.  Exiting loop
+  256 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read | Operation::Write, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:188:2: note: expanded from macro 'TEST_REQUIRE'
+  188 |         do { \
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:257:50: note: Calling 'operator|<StormByte::Multimedia::Feature>'
+  257 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::SurroundSound));
+      |                                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '294912' provided to the cast expression is not in the valid range of values for 'Feature'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '3' provided to the cast expression is not in the valid range of values for 'Operation' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:100:42: note: enum declared here
+  100 |                 enum class STORMBYTE_MULTIMEDIA_PUBLIC Operation: std::uint8_t {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+  101 |                         None    = 0,                    ///< No access
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  102 |                         Read    = 1 << 0,               ///< Decode / demux is available
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  103 |                         Write   = 1 << 1,               ///< At least one encoder / muxer exists
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |                         Attach  = 1 << 2                ///< Container can hold real attachments (covers, fonts)
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |                 };
+      |                 ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:235:23: note: Assuming '__begin1' is not equal to '__end1'
+  235 |         for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:237:25: note: Assuming '__begin2' is not equal to '__end2'
+  237 |                 for (const auto codec : Registry::Instance().CodecList(type)) {
+      |                                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:239:12: note: Calling 'operator|<StormByte::Multimedia::Operation>'
+  239 |                                 Access{Operation::Read | Operation::Write}, Access{Operation::Attach}}) {
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '3' provided to the cast expression is not in the valid range of values for 'Operation'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '40960' provided to the cast expression is not in the valid range of values for 'Feature' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:82:14: note: enum declared here
+   82 |                 enum class Feature: std::uint32_t {
+      |                 ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+   83 |                         None                                    = 0,                    ///< No flags.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   84 |                         MultiThreaded                   = 1u << 0,              ///< Frame or slice threading.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   85 |                         RealTime                                = 1u << 1,              ///< Suitable for real-time use.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   86 |                         LowDelay                                = 1u << 2,              ///< Low latency.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   87 |                         ZeroCopy                                = 1u << 3,              ///< Zero-copy paths.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   88 |                         HardwareAcceleration    = 1u << 4,              ///< Hardware decode or encode.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   89 |                         HighQuality                             = 1u << 5,              ///< High quality presets.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   90 |                         PsychoVisual                    = 1u << 6,              ///< Psycho-visual tuning.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   91 |                         AdaptiveQuantization    = 1u << 7,              ///< Adaptive quantization.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   92 |                         Lookahead                               = 1u << 8,              ///< Lookahead analysis.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   93 |                         TwoPass                                 = 1u << 9,              ///< Two-pass encoding.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   94 |                         Lossless                                = 1u << 10,             ///< Lossless mode.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   95 |                         ProfileBased                    = 1u << 11,             ///< Profile selection.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                         ContentTuning                   = 1u << 12,             ///< Content-type tuning.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   97 |                         TenBit                                  = 1u << 13,             ///< 10-bit.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:173:23: note: Assuming '__begin1' is not equal to '__end1'
+  173 |         for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:175:25: note: Assuming '__begin2' is not equal to '__end2'
+  175 |                 for (const auto codec : Registry::Instance().CodecList(type)) {
+      |                                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:177:4: note: Loop condition is false. Execution continues on line 183
+  177 |                         for (std::size_t i = 0; i < all.size(); ++i) {
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:183:67: note: Calling 'operator|<StormByte::Multimedia::Feature>'
+  183 |                         for (const auto& need : {Features{Feature::SideData}, Features{Feature::TenBit | Feature::HDR10},
+      |                                                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '40960' provided to the cast expression is not in the valid range of values for 'Feature'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '67108880' provided to the cast expression is not in the valid range of values for 'Feature' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:82:14: note: enum declared here
+   82 |                 enum class Feature: std::uint32_t {
+      |                 ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+   83 |                         None                                    = 0,                    ///< No flags.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   84 |                         MultiThreaded                   = 1u << 0,              ///< Frame or slice threading.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   85 |                         RealTime                                = 1u << 1,              ///< Suitable for real-time use.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   86 |                         LowDelay                                = 1u << 2,              ///< Low latency.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   87 |                         ZeroCopy                                = 1u << 3,              ///< Zero-copy paths.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   88 |                         HardwareAcceleration    = 1u << 4,              ///< Hardware decode or encode.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   89 |                         HighQuality                             = 1u << 5,              ///< High quality presets.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   90 |                         PsychoVisual                    = 1u << 6,              ///< Psycho-visual tuning.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   91 |                         AdaptiveQuantization    = 1u << 7,              ///< Adaptive quantization.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   92 |                         Lookahead                               = 1u << 8,              ///< Lookahead analysis.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   93 |                         TwoPass                                 = 1u << 9,              ///< Two-pass encoding.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   94 |                         Lossless                                = 1u << 10,             ///< Lossless mode.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   95 |                         ProfileBased                    = 1u << 11,             ///< Profile selection.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   96 |                         ContentTuning                   = 1u << 12,             ///< Content-type tuning.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   97 |                         TenBit                                  = 1u << 13,             ///< 10-bit.
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:173:23: note: Assuming '__begin1' is not equal to '__end1'
+  173 |         for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio,
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:175:25: note: Assuming '__begin2' is not equal to '__end2'
+  175 |                 for (const auto codec : Registry::Instance().CodecList(type)) {
+      |                                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:177:4: note: Loop condition is false. Execution continues on line 183
+  177 |                         for (std::size_t i = 0; i < all.size(); ++i) {
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:184:48: note: Calling 'operator|<StormByte::Multimedia::Feature>'
+  184 |                                 Features{Feature::SurroundSound}, Features{Feature::DOVI | Feature::HardwareAcceleration}}) {
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '67108880' provided to the cast expression is not in the valid range of values for 'Feature'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/resource_usage.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:70:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   70 |                 TEST_REQUIRE(expected);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:73:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   73 |                         TEST_REQUIRE(actual);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:74:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   74 |                         TEST_REQUIRE(&actual.value().get() == &expected.value().get());
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:97:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   97 |         TEST_REQUIRE(container);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:98:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   98 |         TEST_REQUIRE(container.value().get().HasAccess(Access{Operation::Read}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:99:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   99 |         TEST_REQUIRE(container.value().get().HasAccess(Access{Operation::Write}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:107:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  107 |         TEST_REQUIRE(canonical);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:108:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  108 |         TEST_REQUIRE(ffmpegName);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:109:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  109 |         TEST_REQUIRE(&canonical.value().get() == &ffmpegName.value().get());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:110:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  110 |         TEST_REQUIRE(canonical.value().get().Type() == StormByte::Multimedia::Type::Video);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:120:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         TEST_REQUIRE(optional);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:122:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  122 |         TEST_REQUIRE(codec);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:124:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  124 |         TEST_REQUIRE(!decoders.empty());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:125:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  125 |         TEST_REQUIRE(decoders[0].Name() == "hevc");
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:126:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  126 |         TEST_REQUIRE(!decoders[0].Description().empty());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:127:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  127 |         TEST_REQUIRE(decoders[0].Features().Has(Feature::TenBit | Feature::HDR10));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:131:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  131 |         TEST_REQUIRE(optional->Name() == decoders[0].Name());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:141:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  141 |                                 TEST_REQUIRE(info.Hardware() == expected);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:143:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  143 |                                 TEST_REQUIRE(copied.Hardware() == info.Hardware());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:145:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  145 |                                 TEST_REQUIRE(moved.Hardware() == info.Hardware());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:151:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  151 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:154:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  154 |                                 TEST_REQUIRE(!info.Hardware());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:162:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  162 |         TEST_REQUIRE(codec);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:165:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  165 |                 TEST_REQUIRE(!decoders.empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:167:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  167 |                         TEST_REQUIRE(decoder.Name() != "av1");
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:178:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  178 |                                 TEST_REQUIRE(!all[i].Name().empty());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:179:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  179 |                                 TEST_REQUIRE(!all[i].Description().empty());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:181:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  181 |                                         TEST_REQUIRE(all[i].Name() != all[j].Name());
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:186:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  186 |                                 TEST_REQUIRE(!filtered.empty() == codec.get().HasAccess(Operation::Read, need));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:191:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  191 |                                         TEST_REQUIRE(index < filtered.size());
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:192:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  192 |                                         TEST_REQUIRE(filtered[index].Name() == info.Name());
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:193:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  193 |                                         TEST_REQUIRE(filtered[index].Features().Has(need));
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:196:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  196 |                                 TEST_REQUIRE(index == filtered.size());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:206:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  206 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:208:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  208 |                 TEST_REQUIRE(decoders.size() == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(decoders[0].Name() == (name == "PCM S16 LE"sv ? "pcm_s16le"sv : "srt"sv));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:210:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  210 |                 TEST_REQUIRE(decoders[0].Features() == Features{});
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:211:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                 TEST_REQUIRE(codec->get().Decoders(Feature::SideData).empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:212:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  212 |                 TEST_REQUIRE(codec->get().Decoders(Feature::Lossless).empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:215:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  215 |                 TEST_REQUIRE(codec.get().Decoders().empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:222:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  222 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:224:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  224 |                 TEST_REQUIRE(!decoders.empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:226:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  226 |                         TEST_REQUIRE(decoder.Features().Has(Feature::SurroundSound));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:229:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  229 |         TEST_REQUIRE(mp3);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:230:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  230 |         TEST_REQUIRE(mp3->get().Decoders(Feature::SurroundSound).empty());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:240:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  240 |                                 TEST_REQUIRE(codec.get().HasAccess(access, Features{})
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:242:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  242 |                                 TEST_REQUIRE(codec.get().HasAccess(access, Feature::None)
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:252:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  252 |         TEST_REQUIRE(hevc);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:254:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  254 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:255:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  255 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:256:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  256 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read | Operation::Write, Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:257:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  257 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::HDR10 | Feature::SurroundSound));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:258:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  258 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::DOVI | Feature::HardwareAcceleration));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:259:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  259 |         TEST_REQUIRE(!codec.HasAccess(Operation::Read, Feature::DOVI | Feature::HardwareAcceleration));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:260:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  260 |         TEST_REQUIRE(!codec.HasAccess(Operation::Attach, Feature::HDR10));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:261:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  261 |         TEST_REQUIRE(codec.HasAccess(Operation::None, Feature::HDR10));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:268:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  268 |         TEST_REQUIRE(canonical);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:269:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  269 |         TEST_REQUIRE(alias);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:271:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  271 |         TEST_REQUIRE(codec.HasAccess(Operation::Write, Feature::SurroundSound)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:273:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  273 |         TEST_REQUIRE(alias->get().HasAccess(Operation::Write, Feature::SurroundSound)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:275:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  275 |         TEST_REQUIRE(!codec.HasAccess(Operation::Write, Feature::HDR10));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:282:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  282 |         TEST_REQUIRE(pcm);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:283:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  283 |         TEST_REQUIRE(srt);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:284:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  284 |         TEST_REQUIRE(pcm->get().HasAccess(Operation::Read, Feature::None));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:285:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  285 |         TEST_REQUIRE(!pcm->get().HasAccess(Operation::Read, Feature::Lossless));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:286:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  286 |         TEST_REQUIRE(!pcm->get().HasAccess(Operation::Write, Feature::Lossless));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:287:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  287 |         TEST_REQUIRE(!srt->get().HasAccess(Operation::Read, Feature::SideData));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:296:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  296 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:298:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  298 |                 TEST_REQUIRE(kind && kind.value() == SubtitleKind::Text);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:302:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  302 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:304:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  304 |                 TEST_REQUIRE(kind && kind.value() == SubtitleKind::Bitmap);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:314:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  314 |                         TEST_REQUIRE(!codec.get().SubtitleKind());
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:317:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  317 |                 TEST_REQUIRE(codec.get().SubtitleKind());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:320:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  320 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:322:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  322 |                 TEST_REQUIRE(kind && kind.value() == SubtitleKind::Unknown);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:332:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  332 |                         TEST_REQUIRE(codec.get().HasAccess(Operation::Write) == !codec.get().Encoders().empty());
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:339:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  339 |         TEST_REQUIRE(dts && ttml && h265);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:340:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  340 |         TEST_REQUIRE(dts->get().HasAccess(Operation::Read));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:341:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  341 |         TEST_REQUIRE(!dts->get().HasAccess(Operation::Write));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:342:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  342 |         TEST_REQUIRE(!ttml->get().HasAccess(Operation::Read));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:343:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  343 |         TEST_REQUIRE(h265->get().HasAccess(Operation::Read));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:357:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  357 |         TEST_REQUIRE(mp4 && mkv && vp8 && webvtt && ttml && timedText && h265 && pgs);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:358:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  358 |         TEST_REQUIRE(mp4->get().HasAccess(Operation::Write));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:359:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  359 |         TEST_REQUIRE(mkv->get().HasAccess(Operation::Write));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:360:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  360 |         TEST_REQUIRE(!mp4->get().Allows({vp8.value()}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:361:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  361 |         TEST_REQUIRE(!mp4->get().Allows({webvtt.value()}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:362:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  362 |         TEST_REQUIRE(!mkv->get().Allows({ttml.value()}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:363:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  363 |         TEST_REQUIRE(!mkv->get().Allows({timedText.value()}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:364:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  364 |         TEST_REQUIRE(mp4->get().Allows({h265.value(), timedText.value()}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:365:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  365 |         TEST_REQUIRE(mkv->get().Allows({h265.value(), vp8.value(), webvtt.value(), pgs.value()}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:369:5: warning: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape]
+  369 | int main(int argc, char** argv) {
+      |     ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2764:54: note: frame #3: function '__grow_by' calls function '__get_amortized_growth_capacity' here
+ 2764 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2792:3: note: frame #4: function '__grow_by_without_replace' calls function '__grow_by' here
+ 2792 |   __grow_by(__old_cap, __delta_cap, __old_sz, __n_copy, __n_del, __n_add);
+      |   ^
+/usr/include/c++/v1/string:1451:9: note: frame #5: function 'append<const char *, 0>' calls function '__grow_by_without_replace' here
+ 1451 |         __grow_by_without_replace(__cap, __sz + __n - __cap, __sz, __sz, 0);
+      |         ^
+/usr/include/c++/v1/__filesystem/path.h:272:5: note: frame #6: function '__append_range<const char *, 0>' calls function 'append<const char *, 0>' here
+  272 |     __dest.append(__b, __e);
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:285:5: note: frame #7: function '__append_source<std::string_view>' calls function '__append_range<const char *, 0>' here
+  285 |     __append_range(__dest, _Traits::__range_begin(__s), _Traits::__range_end(__s));
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:414:5: note: frame #8: function 'path<std::string_view, void>' calls function '__append_source<std::string_view>' here
+  414 |     _SourceCVT<_Source>::__append_source(__pn_, __src);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:111:21: note: frame #9: function 'RunOneTest' calls function 'path<std::string_view, void>' here
+  111 |         auto outputScope = std::filesystem::path(executable).stem();
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/../test_helpers.hxx:129:23: note: frame #10: function 'RunSelectedTest' calls function 'RunOneTest' here
+  129 |                         const int result = RunOneTest(test, argv[0]);
+      |                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/registry/registry_test.cxx:391:9: note: frame #11: function 'main' calls function 'RunSelectedTest' here
+  391 |         return RunSelectedTest(argc, argv, tests);
+      |                ^

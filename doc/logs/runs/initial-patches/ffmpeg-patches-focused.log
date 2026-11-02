@@ -1,0 +1,37 @@
+Test project /tmp/BMDATA/sanitizer-validation/multimedia/test
+    Start  7: preview.test_audio_native_opus
+1/3 Test  #7: preview.test_audio_native_opus ..............   Passed    0.17 sec
+    Start 12: preview.test_hdr_preview_tone_mapping
+2/3 Test #12: preview.test_hdr_preview_tone_mapping .......***Failed    9.68 sec
+[Test] Starting test_hdr_preview_tone_mapping
+[Test] test_hdr_preview_tone_mapping: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_tone_mapping: assert player.Play()
+[Test] test_hdr_preview_tone_mapping: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7ce5904113c0] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7ce5904113c0] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[ASSERT] test_hdr_preview_tone_mapping: Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_hdr_preview_tone_mapping: FAIL
+
+    Start 13: preview.test_hdr_preview_preserves_signal
+3/3 Test #13: preview.test_hdr_preview_preserves_signal ...***Failed    6.58 sec
+[Test] Starting test_hdr_preview_preserves_signal
+[Test] test_hdr_preview_preserves_signal: assert player.OutputColor(PreviewColorMode::HDR)
+[Test] test_hdr_preview_preserves_signal: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_preserves_signal: assert player.Play()
+[Test] test_hdr_preview_preserves_signal: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[ASSERT] test_hdr_preview_preserves_signal: Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_hdr_preview_preserves_signal: FAIL
+
+
+33% tests passed, 2 tests failed out of 3
+
+Label Time Summary:
+multimedia    =  16.43 sec*proc (3 tests)
+preview       =  16.43 sec*proc (3 tests)
+
+Total Test time (real) =  16.43 sec
+
+The following tests FAILED:
+	 12 - preview.test_hdr_preview_tone_mapping (Failed)    multimedia preview
+	 13 - preview.test_hdr_preview_preserves_signal (Failed) multimedia preview
+Errors while running CTest

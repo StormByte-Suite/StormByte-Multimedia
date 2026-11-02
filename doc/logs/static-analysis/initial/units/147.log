@@ -1,0 +1,42 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.cxx:61:10: warning: std::move of the variable 'color' of the trivially-copyable type 'class Color' has no effect; remove std::move() [performance-move-const-arg]
+   61 |         m_color(std::move(color)),
+      |                 ^~~~~~~~~~     ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.cxx:62:15: warning: std::move of the variable 'resolution' of the trivially-copyable type 'class Resolution' has no effect; remove std::move() [performance-move-const-arg]
+   62 |         m_resolution(std::move(resolution)),
+      |                      ^~~~~~~~~~          ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

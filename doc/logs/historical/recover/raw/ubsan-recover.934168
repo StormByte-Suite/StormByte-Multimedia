@@ -1,0 +1,769 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:534:33: runtime error: load of misaligned address 0x7f585bfde8a4 for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfde8a4: note: pointer points here
+  01 00 00 00 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80
+              ^ 
+    #0 0x7f590b343eaf in get_residual_8x1_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:534:33
+    #1 0x7f590b343eaf in get_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:588:18
+    #2 0x7f590b343eaf in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:662:3
+    #3 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #4 0x7f590b29583c in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:502:7
+    #5 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #6 0x7f590b251ea7 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:807:7
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:534:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:548:36: runtime error: load of misaligned address 0x7f585bfde8a4 for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfde8a4: note: pointer points here
+  01 00 00 00 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80
+              ^ 
+    #0 0x7f590b346144 in get_quantized_recon_8x1_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:548:36
+    #1 0x7f590b346144 in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:620:55
+    #2 0x7f590b346144 in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #3 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #4 0x7f590b29583c in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:502:7
+    #5 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #6 0x7f590b251ea7 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:807:7
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:548:36 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:620:11: runtime error: store to misaligned address 0x7f585bfde8a4 for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfde8a4: note: pointer points here
+  01 00 00 00 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80
+              ^ 
+    #0 0x7f590b3461cc in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:620:53
+    #1 0x7f590b3461cc in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b29583c in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:502:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b251ea7 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:807:7
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #8 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #9 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #10 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #11 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:620:11 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:621:11: runtime error: store to misaligned address 0x7f585bfde8ac for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfde8ac: note: pointer points here
+  0f 10 11 10 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 00 00 00 00
+              ^ 
+    #0 0x7f590b346350 in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:621:59
+    #1 0x7f590b346350 in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b29583c in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:502:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b251ea7 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:807:7
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #8 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #9 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #10 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #11 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:621:11 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:608:7: runtime error: store to misaligned address 0x7f585bfe70dc for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe70dc: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b346b7c in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:608:45
+    #1 0x7f590b346b7c in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:608:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:609:7: runtime error: store to misaligned address 0x7f585bfe70fc for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe70fc: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b346582 in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:609:45
+    #1 0x7f590b346582 in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:609:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:610:7: runtime error: store to misaligned address 0x7f585bfe711c for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe711c: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b34661f in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:610:45
+    #1 0x7f590b34661f in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:610:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:611:7: runtime error: store to misaligned address 0x7f585bfe713c for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe713c: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b3466bc in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:611:45
+    #1 0x7f590b3466bc in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:611:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:612:7: runtime error: store to misaligned address 0x7f585bfe715c for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe715c: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b34677f in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:612:45
+    #1 0x7f590b34677f in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:612:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:613:7: runtime error: store to misaligned address 0x7f585bfe717c for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe717c: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b34684c in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:613:45
+    #1 0x7f590b34684c in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:613:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:614:7: runtime error: store to misaligned address 0x7f585bfe719c for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe719c: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b346919 in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:614:45
+    #1 0x7f590b346919 in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:614:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:615:7: runtime error: store to misaligned address 0x7f585bfe71bc for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfe71bc: note: pointer points here
+  00 00 00 00 80 80 80 80  80 80 80 80 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b3469d5 in get_quantized_recon_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:615:45
+    #1 0x7f590b3469d5 in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:706:5
+    #2 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #3 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #4 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #5 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:615:7 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1127:27: runtime error: load of misaligned address 0x7f585bfd314d for type 'const uint64_t' (aka 'const unsigned long'), which requires 8 byte alignment
+0x7f585bfd314d: note: pointer points here
+ 10 00 00 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 80 7f 00 00  31 d6 c0 17 59 7f 00 00  00
+             ^ 
+    #0 0x7f590b2c7592 in pred_filtered_dc_8x8 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1127:27
+    #1 0x7f590b2c7592 in kvz_intra_pred_filtered_dc_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1399:5
+    #2 0x7f590b288ca9 in search_intra_rough /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:514:7
+    #3 0x7f590b288ca9 in kvz_search_cu_intra /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:854:23
+    #4 0x7f590b250fcc in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:779:7
+    #5 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1127:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1128:27: runtime error: load of misaligned address 0x7f585bfd310c for type 'const uint64_t' (aka 'const unsigned long'), which requires 8 byte alignment
+0x7f585bfd310c: note: pointer points here
+  5a 00 19 80 80 80 80 80  80 80 80 80 80 80 80 80  80 80 80 80 58 7f 00 00  00 10 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b2c75d0 in pred_filtered_dc_8x8 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1128:27
+    #1 0x7f590b2c75d0 in kvz_intra_pred_filtered_dc_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1399:5
+    #2 0x7f590b288ca9 in search_intra_rough /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:514:7
+    #3 0x7f590b288ca9 in kvz_search_cu_intra /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:854:23
+    #4 0x7f590b250fcc in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:779:7
+    #5 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1128:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1018:24: runtime error: load of misaligned address 0x7f585bfd44bd for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+0x7f585bfd44bd: note: pointer points here
+ 80 80 80 80 80 80 80  80 80 80 80 80 7f 00 00  80 22 ff 5b 58 7f 00 00  f0 37 00 b8 58 7f 00 00  00
+             ^ 
+    #0 0x7f590b2c6acd in kvz_intra_pred_planar_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1018:24
+    #1 0x7f590b1ebb3f in intra_recon_tb_leaf /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:593:3
+    #2 0x7f590b1eab43 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:683:7
+    #3 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #4 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #5 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #8 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #9 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #10 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #11 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1018:24 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:681:5: runtime error: call to function kvz_quant_avx2 through pointer to incorrect function type 'void (*)(const struct encoder_state_t *, short *, short *, int, int, signed char, signed char, signed char)'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:364: note: kvz_quant_avx2 defined here
+    #0 0x7f590b3464a8 in kvz_quantize_residual_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:681:5
+    #1 0x7f590b29721a in quantize_tr_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:402:18
+    #2 0x7f590b295880 in kvz_quantize_lcu_residual /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/transform.c:505:7
+    #3 0x7f590b1eaba8 in kvz_intra_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:687:5
+    #4 0x7f590b252078 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:823:9
+    #5 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #9 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #10 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #11 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #12 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: function-type-mismatch /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/quant-avx2.c:681:5 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1066:27: runtime error: load of misaligned address 0x7f585bfd2d6d for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+0x7f585bfd2d6d: note: pointer points here
+ aa aa aa 80 80 80 80  80 80 80 80 80 aa aa aa  aa aa aa aa aa aa aa aa  aa aa aa aa aa aa aa aa  aa
+             ^ 
+    #0 0x7f590b2c7513 in pred_filtered_dc_4x4 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1066:27
+    #1 0x7f590b2c7513 in kvz_intra_pred_filtered_dc_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1397:5
+    #2 0x7f590b288ca9 in search_intra_rough /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:514:7
+    #3 0x7f590b288ca9 in kvz_search_cu_intra /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:854:23
+    #4 0x7f590b250fcc in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:779:7
+    #5 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #6 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #9 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #10 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #11 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #12 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #13 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1066:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:517:22: runtime error: call to function sao_edge_ddistortion_avx2 through pointer to incorrect function type 'int (*)(const struct encoder_control_t *, const unsigned char *, const unsigned char *, int, int, int, int *)'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/sao-avx2.c:294: note: sao_edge_ddistortion_avx2 defined here
+    #0 0x7f590b23bba8 in sao_search_best_mode /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:517:22
+    #1 0x7f590b238cf1 in sao_search_luma /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:668:3
+    #2 0x7f590b238cf1 in kvz_sao_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:696:3
+    #3 0x7f590b19233b in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:680:5
+    #4 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #5 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #6 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: function-type-mismatch /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:517:22 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:580:34: runtime error: call to function sao_edge_ddistortion_avx2 through pointer to incorrect function type 'int (*)(const struct encoder_control_t *, const unsigned char *, const unsigned char *, int, int, int, int *)'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/sao-avx2.c:294: note: sao_edge_ddistortion_avx2 defined here
+    #0 0x7f590b23e686 in sao_search_best_mode /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:580:34
+    #1 0x7f590b238cf1 in sao_search_luma /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:668:3
+    #2 0x7f590b238cf1 in kvz_sao_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:696:3
+    #3 0x7f590b19233b in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:680:5
+    #4 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #5 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #6 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: function-type-mismatch /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/sao.c:580:34 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:278:37: runtime error: load of misaligned address 0x7f585bfc7742 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc7742: note: pointer points here
+ dc 03  80 04 52 04 b7 03 20 04  86 04 fa 03 94 03 40 04  2e 04 bf 03 14 04 fa 03  02 04 fe 03 03 04
+              ^ 
+    #0 0x7f590b2fa598 in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:278:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:278:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:279:37: runtime error: load of misaligned address 0x7f585bfc77c2 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc77c2: note: pointer points here
+ dc 03  80 04 52 04 b7 03 20 04  86 04 fa 03 94 03 40 04  2e 04 bf 03 14 04 fa 03  02 04 fe 03 03 04
+              ^ 
+    #0 0x7f590b2fa697 in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:279:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:279:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:280:37: runtime error: load of misaligned address 0x7f585bfc7842 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc7842: note: pointer points here
+ dc 03  80 04 52 04 b7 03 20 04  86 04 fa 03 94 03 40 04  2e 04 bf 03 14 04 fa 03  02 04 fe 03 03 04
+              ^ 
+    #0 0x7f590b2fa7ba in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:280:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:280:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:281:37: runtime error: load of misaligned address 0x7f585bfc78c2 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc78c2: note: pointer points here
+ dc 03  80 04 52 04 b7 03 20 04  86 04 fa 03 94 03 40 04  2e 04 bf 03 14 04 fa 03  02 04 fe 03 03 04
+              ^ 
+    #0 0x7f590b2fa901 in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:281:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:281:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:282:37: runtime error: load of misaligned address 0x7f585bfc7942 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc7942: note: pointer points here
+ dc 03  80 04 53 04 5e 04 c0 03  ed 03 82 04 7f 03 42 03  cf 03 0a 04 fb 03 02 04  00 04 01 04 fa 03
+              ^ 
+    #0 0x7f590b2faa6c in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:282:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:282:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:283:37: runtime error: load of misaligned address 0x7f585bfc79c2 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc79c2: note: pointer points here
+ b8 03  e0 03 79 12 4d 11 38 12  5c 13 f9 12 b5 12 95 13  c9 14 ef 14 9b 14 60 14  34 14 5a 14 af 14
+              ^ 
+    #0 0x7f590b2fabfb in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:283:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:283:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:284:37: runtime error: load of misaligned address 0x7f585bfc7a42 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc7a42: note: pointer points here
+ f9 13  0c 14 5b 13 8d 12 4d 12  4b 13 27 13 fd 11 ce 11  c0 13 e9 14 27 14 dd 13  ba 13 d6 13 35 14
+              ^ 
+    #0 0x7f590b2fad98 in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:284:37
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:284:37 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:311:31: runtime error: load of misaligned address 0x7f585bfc7ac2 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc7ac2: note: pointer points here
+ bf 14  a2 13 1e 14 09 0d ec 07  4b 08 66 07 2f 09 82 07  fd 07 93 08 f0 07 98 07  7a 07 98 07 ed 07
+              ^ 
+    #0 0x7f590b2f9fdd in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:311:31
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:311:31 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:312:31: runtime error: load of misaligned address 0x7f585bfc7b42 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfc7b42: note: pointer points here
+ 29 07  8c 06 b9 12 3c 0c 39 05  f8 07 0b 09 61 07 c2 07  ef 08 42 08 29 08 dc 07  b4 07 dc 07 22 08
+              ^ 
+    #0 0x7f590b2fa14b in kvz_ipol_8tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:312:31
+    #1 0x7f590b2edfca in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:707:3
+    #2 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #3 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #4 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #5 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:312:31 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:714:76: runtime error: load of misaligned address 0x7f585bfd1707 for type 'int64_t' (aka 'long'), which requires 8 byte alignment
+0x7f585bfd1707: note: pointer points here
+ 12 10 0e 11 11  0f 10 10 10 10 10 10 0e  0f 0f 0e 10 11 11 0f 0f  0f 0e 0e 0f 0f 10 10 0f  10 10 10
+             ^ 
+    #0 0x7f590b2ee2da in kvz_filter_hpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:714:76
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #6 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #7 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #8 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #9 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:714:76 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:911:26: runtime error: load of misaligned address 0x7f585bfd0737 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd0737: note: pointer points here
+ 10 0f 10 0e 0f  10 10 10 10 10 10 0f 13  11 11 0e 11 11 0d 0d 10  10 10 10 10 10 10 10 0f  12 10 10
+             ^ 
+    #0 0x7f590b2f0c6b in kvz_filter_qpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:911:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #6 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #7 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #8 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #9 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:911:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1055:26: runtime error: load of misaligned address 0x7f585bfd0737 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd0737: note: pointer points here
+ 13 13 13 12 13  13 13 13 13 13 13 13 16  0b 0c 09 0b 0b 07 07 09  09 09 0a 0a 09 09 0a 07  0b 08 09
+             ^ 
+    #0 0x7f590b2f26ac in kvz_filter_qpel_blocks_diag_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1055:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #6 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #7 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #8 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #9 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1055:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1102:26: runtime error: load of misaligned address 0x7f585bfd2737 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd2737: note: pointer points here
+ 0c 0a 0c 0a 0b  0c 0c 0c 0c 0c 0c 0b 0e  1c 1c 19 1c 1c 1a 1a 1d  1d 1d 1d 1d 1d 1d 1d 1d  1e 1e 1e
+             ^ 
+    #0 0x7f590b2f30c2 in kvz_filter_qpel_blocks_diag_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1102:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #6 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #7 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #8 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #9 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1102:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:460:14: runtime error: load of misaligned address 0x7f58b87f7b9f for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f58b87f7b9f: note: pointer points here
+ 75 75 75 75 74  74 73 73 73 73 73 73 72  6f 6d 6e 6d 6e 6e 6e 6d  6b 6a 6a 6a 6a 6a 6a 6b  6e 6b 6b
+             ^ 
+    #0 0x7f590b2fbe7a in kvz_ipol_4tap_hor_px_im_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:460:37
+    #1 0x7f590b2f3c8a in kvz_sample_octpel_chroma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1214:3
+    #2 0x7f590b1d0982 in inter_recon_frac_chroma /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:218:3
+    #3 0x7f590b1d0982 in inter_recon_unipred /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:453:7
+    #4 0x7f590b1d482e in kvz_inter_pred_pu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:653:5
+    #5 0x7f590b1d3eb2 in kvz_inter_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:586:5
+    #6 0x7f590b2613b7 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c
+    #7 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #8 0x7f590b2535fd in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:986:44
+    #9 0x7f590b2535fd in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:986:44
+    #10 0x7f590b2536c6 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:985:44
+    #11 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #12 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #13 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #14 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #15 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:460:14 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:461:14: runtime error: load of misaligned address 0x7f58b87f7e5f for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f58b87f7e5f: note: pointer points here
+ 78 78 78 78 78  78 78 78 78 78 78 78 77  70 6f 6f 6f 6f 6f 6f 6e  6b 6a 6a 6a 6a 6a 6a 6a  6f 6a 68
+             ^ 
+    #0 0x7f590b2fbfb4 in kvz_ipol_4tap_hor_px_im_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:461:37
+    #1 0x7f590b2f3c8a in kvz_sample_octpel_chroma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1214:3
+    #2 0x7f590b1d0982 in inter_recon_frac_chroma /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:218:3
+    #3 0x7f590b1d0982 in inter_recon_unipred /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:453:7
+    #4 0x7f590b1d482e in kvz_inter_pred_pu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:653:5
+    #5 0x7f590b1d3eb2 in kvz_inter_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:586:5
+    #6 0x7f590b2613b7 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c
+    #7 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #8 0x7f590b2535fd in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:986:44
+    #9 0x7f590b2535fd in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:986:44
+    #10 0x7f590b2536c6 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:985:44
+    #11 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #12 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #13 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #14 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #15 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:461:14 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:503:40: runtime error: load of misaligned address 0x7f590027ce24 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f590027ce24: note: pointer points here
+  fc 24 24 fc fc 1c 2e fa  fe 10 36 fc fe 0a 3a fe  00 00 0b 00 27 69 6e 74  27 00 00 00 00 00 00 00
+              ^ 
+    #0 0x7f590b2f4ccc in kvz_ipol_4tap_ver_im_px_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:503:40
+    #1 0x7f590b2f4ccc in kvz_sample_octpel_chroma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1215:3
+    #2 0x7f590b1d0982 in inter_recon_frac_chroma /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:218:3
+    #3 0x7f590b1d0982 in inter_recon_unipred /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:453:7
+    #4 0x7f590b1d482e in kvz_inter_pred_pu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:653:5
+    #5 0x7f590b1d3eb2 in kvz_inter_recon_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/inter.c:586:5
+    #6 0x7f590b2613b7 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c
+    #7 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #8 0x7f590b2535fd in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:986:44
+    #9 0x7f590b253742 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:987:44
+    #10 0x7f590b2536c6 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:985:44
+    #11 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #12 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #13 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #14 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #15 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:503:40 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:934:26: runtime error: load of misaligned address 0x7f585bfd1357 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd1357: note: pointer points here
+ 20 20 21 22 23  23 23 23 23 23 22 22 22  aa aa aa aa aa aa aa aa  aa aa aa aa aa aa aa aa  aa aa aa
+             ^ 
+    #0 0x7f590b2f11c5 in kvz_filter_qpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:934:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b253742 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:987:44
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:934:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:960:26: runtime error: load of misaligned address 0x7f585bfd2357 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd2357: note: pointer points here
+ 20 20 20 22 23  23 23 23 23 23 23 23 24  10 fc ff ff e6 09 00 00  f0 37 00 b8 58 7f 00 00  00 6c 28
+             ^ 
+    #0 0x7f590b2f1706 in kvz_filter_qpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:960:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b253742 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:987:44
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:960:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:984:26: runtime error: load of misaligned address 0x7f585bfd3357 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd3357: note: pointer points here
+ 20 20 21 21 22  23 23 23 23 23 22 21 20  d0 44 fd 5b 58 7f 00 00  65 42 34 0b 59 7f 00 00  00 00 00
+             ^ 
+    #0 0x7f590b2f1c76 in kvz_filter_qpel_blocks_hor_ver_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:984:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b253742 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:987:44
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:984:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1079:26: runtime error: load of misaligned address 0x7f585bfd1357 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd1357: note: pointer points here
+ 20 20 21 22 23  23 23 23 23 23 23 23 24  aa aa aa aa aa aa aa aa  aa aa aa aa aa aa aa aa  aa aa aa
+             ^ 
+    #0 0x7f590b2f2bd2 in kvz_filter_qpel_blocks_diag_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1079:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b253742 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:987:44
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1079:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1125:26: runtime error: load of misaligned address 0x7f585bfd3357 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f585bfd3357: note: pointer points here
+ 20 20 21 22 22  23 23 23 23 23 22 21 20  d0 44 fd 5b 58 7f 00 00  65 42 34 0b 59 7f 00 00  00 00 00
+             ^ 
+    #0 0x7f590b2f35a2 in kvz_filter_qpel_blocks_diag_luma_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1125:26
+    #1 0x7f590b26b5a7 in search_frac /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1092:5
+    #2 0x7f590b26b5a7 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1895:9
+    #3 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #4 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #5 0x7f590b253742 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:987:44
+    #6 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #7 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #8 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #9 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #10 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/ipol-avx2.c:1125:26 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/sse41/reg_sad_pow2_widths-sse41.h:392:43: runtime error: load of misaligned address 0x7f58b87b1c9f for type 'const uint64_t' (aka 'const unsigned long'), which requires 8 byte alignment
+0x7f58b87b1c9f: note: pointer points here
+ 13 0f 0f 0e 12  10 11 10 11 11 10 11 10  10 11 10 11 11 10 11 10  10 0f 0f 0f 0f 10 10 10  10 10 10
+             ^ 
+    #0 0x7f590b3251cf in ver_sad_w8 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/sse41/reg_sad_pow2_widths-sse41.h:392:43
+    #1 0x7f590b3251cf in ver_sad_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/picture-avx2.c:1506:12
+    #2 0x7f590b14c79e in image_interpolated_sad /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/image.c:371:15
+    #3 0x7f590b14c79e in kvz_image_calc_sad /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/image.c:439:11
+    #4 0x7f590b25dcf8 in check_mv_cost /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:212:17
+    #5 0x7f590b27e2d6 in early_terminate /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:466:11
+    #6 0x7f590b27e2d6 in search_pu_inter_ref /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1356:18
+    #7 0x7f590b269263 in search_pu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:1811:5
+    #8 0x7f590b260a24 in kvz_search_cu_inter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_inter.c:2218:3
+    #9 0x7f590b24fa2c in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:718:7
+    #10 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #11 0x7f590b2536c6 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:985:44
+    #12 0x7f590b25358a in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #13 0x7f590b24bc03 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #14 0x7f590b18c6c3 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #15 0x7f590b2918ef in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #16 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #17 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/sse41/reg_sad_pow2_widths-sse41.h:392:43 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1348:27: runtime error: passing zero to __builtin_clz(), which is not a valid argument
+    #0 0x7f59079f3fe2 in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1348:13
+    #1 0x7f59079f3fe2 in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1512:29
+    #2 0x7f59079cd14f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x7f59079d676a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x7f5907922c32 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x7f590791cb34 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x7f5907c2c173 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-builtin-use ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1348:27 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23: runtime error: shift exponent -396059647 is negative
+    #0 0x7f59079f40a8 in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23
+    #1 0x7f59079f40a8 in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1512:29
+    #2 0x7f59079cd14f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x7f59079d676a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x7f5907922c32 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x7f590791cb34 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x7f5907c2c173 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-exponent ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36: runtime error: shift exponent -396059646 is negative
+    #0 0x7f59079f4178 in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36
+    #1 0x7f59079f4178 in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1512:29
+    #2 0x7f59079cd14f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x7f59079d676a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x7f5907922c32 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x7f590791cb34 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x7f5907c2c173 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f58d5588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f58d56011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-exponent ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36 

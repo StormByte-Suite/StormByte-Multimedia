@@ -1,0 +1,11 @@
+Test project /tmp/BMDATA/sanitizer-validation/multimedia/test
+    Start 175: pipeline.test_reencode_aom_av1_dovi_only
+1/1 Test #175: pipeline.test_reencode_aom_av1_dovi_only ...   Passed   26.03 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+multimedia    =  26.03 sec*proc (1 test)
+pipeline      =  26.03 sec*proc (1 test)
+
+Total Test time (real) =  26.04 sec

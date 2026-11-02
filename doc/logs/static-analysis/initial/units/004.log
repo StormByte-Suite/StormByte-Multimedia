@@ -1,0 +1,294 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:67:9: warning: The value provided to the cast expression is not in the valid range of values for 'Policy' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   67 |         return static_cast<E>(Type::ToUnderlying(a) & Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:221:17: note: enum declared here
+  221 |                                         enum class Policy: std::uint32_t {
+      |                                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+  222 |                                                 None                            = 0,            ///< No flags.
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  223 |                                                 EnforceFeatures         = 1u << 0       ///< Check rejects an encode that drops source features.
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  224 |                                         };
+      |                                         ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:246:7: note: Left side of '||' is false
+  246 |                 if (!plan || plan->Tracks().empty())
+      |                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:246:16: note: Assuming the condition is false
+  246 |                 if (!plan || plan->Tracks().empty())
+      |                              ^~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:246:3: note: Taking false branch
+  246 |                 if (!plan || plan->Tracks().empty())
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:248:7: note: Assuming the condition is false
+  248 |                 if (track.Type() == Type::Attachment || track.Type() == Type::Unknown)
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:248:7: note: Left side of '||' is false
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:248:43: note: Assuming the condition is false
+  248 |                 if (track.Type() == Type::Attachment || track.Type() == Type::Unknown)
+      |                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:248:3: note: Taking false branch
+  248 |                 if (track.Type() == Type::Attachment || track.Type() == Type::Unknown)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:251:22: note: Assuming the condition is true
+  251 |                 const bool video = track.Type() == Type::Video;
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:254:44: note: Calling 'Plan::Resources'
+  254 |                 const std::size_t remux = ResourceFrames(plan->Resources(), RemuxPackets());
+      |                                                          ^~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:554:11: note: Calling 'Bitmask::Has'
+  554 |                                                 if (m_policies.Has(static_cast<Policy>(1u << 30)))
+      |                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.txx:111:11: note: Calling 'operator&<StormByte::Multimedia::Pipeline::Plan::Policy>'
+  111 |                 return (m_value & value) == value;
+      |                         ^~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:67:9: note: The value provided to the cast expression is not in the valid range of values for 'Policy'
+   67 |         return static_cast<E>(Type::ToUnderlying(a) & Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:108:3: warning: 2 adjacent parameters of 'MemoryFrames' of similar type ('std::size_t') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  108 |                 std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:108:15: note: the first parameter in the range is 'availableRam'
+  108 |                 std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+      |                             ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:108:41: note: the last parameter in the range is 'frameBytes'
+  108 |                 std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+      |                                                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:108:53: warning: 2 adjacent parameters of 'MemoryFrames' of similar type ('std::size_t') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  108 |                 std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+      |                                                                   ^~~~~~~~~~~~~~~~~~~
+  109 |                 std::size_t fullFrames) noexcept {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:108:65: note: the first parameter in the range is 'queues'
+  108 |                 std::size_t availableRam, std::size_t frameBytes, std::size_t queues,
+      |                                                                               ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:109:15: note: the last parameter in the range is 'fullFrames'
+  109 |                 std::size_t fullFrames) noexcept {
+      |                             ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:144:3: warning: 3 adjacent parameters of 'VmafThreads' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  144 |                 unsigned requested, std::size_t availableRam, std::size_t pixels,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:144:12: note: the first parameter in the range is 'requested'
+  144 |                 unsigned requested, std::size_t availableRam, std::size_t pixels,
+      |                          ^~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:144:61: note: the last parameter in the range is 'pixels'
+  144 |                 unsigned requested, std::size_t availableRam, std::size_t pixels,
+      |                                                                           ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:144:3: note: 
+  144 |                 unsigned requested, std::size_t availableRam, std::size_t pixels,
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:144:23: note: 'unsigned int' and 'std::size_t' may be implicitly converted: 'unsigned int' -> 'unsigned long' -> 'std::size_t' (as 'decltype(sizeof(int))'), 'std::size_t' (as 'decltype(sizeof(int))') -> 'unsigned int'
+  144 |                 unsigned requested, std::size_t availableRam, std::size_t pixels,
+      |                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:194:3: warning: 2 adjacent parameters of 'StageThreads' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  194 |                 unsigned available, std::size_t stages) noexcept {
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:194:12: note: the first parameter in the range is 'available'
+  194 |                 unsigned available, std::size_t stages) noexcept {
+      |                          ^~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:194:35: note: the last parameter in the range is 'stages'
+  194 |                 unsigned available, std::size_t stages) noexcept {
+      |                                                 ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:194:3: note: 
+  194 |                 unsigned available, std::size_t stages) noexcept {
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:194:23: note: 'unsigned int' and 'std::size_t' may be implicitly converted: 'unsigned int' -> 'unsigned long' -> 'std::size_t' (as 'decltype(sizeof(int))'), 'std::size_t' (as 'decltype(sizeof(int))') -> 'unsigned int'
+  194 |                 unsigned available, std::size_t stages) noexcept {
+      |                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:242:77: warning: the parameter 'plan' of type 'StormByte::Safe::Shared<const Multimedia::Pipeline::Plan>' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param]
+  242 |         Ceiling::Ceiling(StormByte::Safe::Shared<const Multimedia::Pipeline::Plan> plan,
+      |                                                                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:290:4: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  290 |                         case Producer::Remuxer:
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:295:10: note: last of these clones ends here
+  295 |                                 break;
+      |                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/base.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/subtitle.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:554:26: warning: The value '1073741824' provided to the cast expression is not in the valid range of values for 'Policy' [clang-analyzer-optin.core.EnumCastOutOfRange]
+  554 |                                                 if (m_policies.Has(static_cast<Policy>(1u << 30)))
+      |                                                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:221:17: note: enum declared here
+  221 |                                         enum class Policy: std::uint32_t {
+      |                                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+  222 |                                                 None                            = 0,            ///< No flags.
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  223 |                                                 EnforceFeatures         = 1u << 0       ///< Check rejects an encode that drops source features.
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  224 |                                         };
+      |                                         ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:206:26: note: Assuming the condition is false
+  206 |                 for (const auto& track : plan.Tracks()) {
+      |                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:210:23: note: Calling 'Plan::Resources'
+  210 |                 return StageThreads(plan.Resources(), available, lanes * 2);
+      |                                     ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:554:26: note: The value '1073741824' provided to the cast expression is not in the valid range of values for 'Policy'
+  554 |                                                 if (m_policies.Has(static_cast<Policy>(1u << 30)))
+      |                                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:556:26: warning: The value '536870912' provided to the cast expression is not in the valid range of values for 'Policy' [clang-analyzer-optin.core.EnumCastOutOfRange]
+  556 |                                                 if (m_policies.Has(static_cast<Policy>(1u << 29)))
+      |                                                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:221:17: note: enum declared here
+  221 |                                         enum class Policy: std::uint32_t {
+      |                                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+  222 |                                                 None                            = 0,            ///< No flags.
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  223 |                                                 EnforceFeatures         = 1u << 0       ///< Check rejects an encode that drops source features.
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  224 |                                         };
+      |                                         ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:206:26: note: Assuming the condition is false
+  206 |                 for (const auto& track : plan.Tracks()) {
+      |                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx:210:23: note: Calling 'Plan::Resources'
+  210 |                 return StageThreads(plan.Resources(), available, lanes * 2);
+      |                                     ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:554:7: note: Taking false branch
+  554 |                                                 if (m_policies.Has(static_cast<Policy>(1u << 30)))
+      |                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:556:26: note: The value '536870912' provided to the cast expression is not in the valid range of values for 'Policy'
+  556 |                                                 if (m_policies.Has(static_cast<Policy>(1u << 29)))
+      |                                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/resource_usage.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/track.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+[1/1] (1/3) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.
+[1/1] (2/3) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.
+[1/1] (3/3) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.

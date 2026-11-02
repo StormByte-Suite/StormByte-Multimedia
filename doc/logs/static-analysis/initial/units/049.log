@@ -1,0 +1,548 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVBSF.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVCodecParameters.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:110:4: warning: empty catch statements hide issues; to handle exceptions appropriately, consider re-throwing, handling, or avoiding catch altogether [bugprone-empty-catch]
+  110 |                         catch (...) {}
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:249:14: warning: an exception may be thrown in function 'AvError' which should not throw exceptions [bugprone-exception-escape]
+  249 |         std::string AvError(int err) noexcept {
+      |                     ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2663:17: note: frame #7: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1064:5: note: frame #8: function 'basic_string<0>' calls function '__init' here
+ 1064 |     __init(__s, traits_type::length(__s));
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:252:10: note: frame #9: function 'AvError' calls function 'basic_string<0>' here
+  252 |                 return buf;
+      |                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:289:7: warning: an exception may be thrown in function 'PushSeiLength' which should not throw exceptions [bugprone-exception-escape]
+  289 |         void PushSeiLength(std::vector<std::uint8_t>& out, std::size_t value) noexcept {
+      |              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<unsigned char>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<unsigned char>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<unsigned char>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #10: function 'push_back' calls function 'emplace_back<unsigned char>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:291:4: note: frame #11: function 'PushSeiLength' calls function 'push_back' here
+  291 |                         out.push_back(0xFF);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:298:7: warning: an exception may be thrown in function 'AppendRbsp' which should not throw exceptions [bugprone-exception-escape]
+  298 |         void AppendRbsp(std::vector<std::uint8_t>& out, const std::uint8_t* src, std::size_t size) noexcept {
+      |              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<unsigned char>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<unsigned char>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<unsigned char>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #10: function 'push_back' calls function 'emplace_back<unsigned char>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:302:5: note: frame #11: function 'AppendRbsp' calls function 'push_back' here
+  302 |                                 out.push_back(0x03);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:311:28: warning: an exception may be thrown in function 'MakeHevcPrefixSeiT35' which should not throw exceptions [bugprone-exception-escape]
+  311 |         std::vector<std::uint8_t> MakeHevcPrefixSeiT35(const std::vector<std::uint8_t>& t35) noexcept {
+      |                                   ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<unsigned char>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<unsigned char>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<unsigned char>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #10: function 'push_back' calls function 'emplace_back<unsigned char>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:313:3: note: frame #11: function 'MakeHevcPrefixSeiT35' calls function 'push_back' here
+  313 |                 payload.push_back(4);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:333:7: warning: an exception may be thrown in function 'PrependHevcSei' which should not throw exceptions [bugprone-exception-escape]
+  333 |         bool PrependHevcSei(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) noexcept {
+      |              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1362:50: note: frame #6: function '__insert_with_size<std::_ClassicAlgPolicy, const unsigned char *, const unsigned char *>' calls function '__split_buffer' here
+ 1362 |       __split_buffer<value_type, allocator_type> __v(__recommend(size() + __n), __p - this->__begin_, this->__alloc_);
+      |                                                  ^
+/usr/include/c++/v1/__vector/vector.h:536:12: note: frame #7: function 'insert<const unsigned char *, 0>' calls function '__insert_with_size<std::_ClassicAlgPolicy, const unsigned char *, const unsigned char *>' here
+  536 |     return __insert_with_size<_ClassicAlgPolicy>(__position, __first, __last, std::distance(__first, __last));
+      |            ^
+/usr/include/c++/v1/__vector/vector.h:555:12: note: frame #8: function 'insert' calls function 'insert<const unsigned char *, 0>' here
+  555 |     return insert(__position, __il.begin(), __il.end());
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:342:4: note: frame #9: function 'PrependHevcSei' calls function 'insert' here
+  342 |                         out.insert(out.end(), {0x00, 0x00, 0x00, 0x01});
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:368:7: warning: an exception may be thrown in function 'PushLeb128' which should not throw exceptions [bugprone-exception-escape]
+  368 |         void PushLeb128(std::vector<std::uint8_t>& out, std::size_t value) noexcept {
+      |              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<const unsigned char &>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<const unsigned char &>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<const unsigned char &>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:462:93: note: frame #10: function 'push_back' calls function 'emplace_back<const unsigned char &>' here
+  462 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(const_reference __x) { emplace_back(__x); }
+      |                                                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:374:4: note: frame #11: function 'PushLeb128' calls function 'push_back' here
+  374 |                         out.push_back(byte);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:378:62: warning: 2 adjacent parameters of 'ReadLeb128' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  378 |         bool ReadLeb128(const std::uint8_t* data, std::size_t size, std::size_t& pos, std::uint64_t& value) noexcept {
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:378:75: note: the first parameter in the range is 'pos'
+  378 |         bool ReadLeb128(const std::uint8_t* data, std::size_t size, std::size_t& pos, std::uint64_t& value) noexcept {
+      |                                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:378:95: note: the last parameter in the range is 'value'
+  378 |         bool ReadLeb128(const std::uint8_t* data, std::size_t size, std::size_t& pos, std::uint64_t& value) noexcept {
+      |                                                                                                      ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:378:62: note: 
+  378 |         bool ReadLeb128(const std::uint8_t* data, std::size_t size, std::size_t& pos, std::uint64_t& value) noexcept {
+      |                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:378:80: note: 'std::size_t &' and 'std::uint64_t &' may be implicitly converted: 'std::size_t &' (as 'decltype(sizeof(int))') -> 'std::uint64_t &' (as 'unsigned long'), 'std::uint64_t &' (as 'unsigned long') -> 'std::size_t &' (as 'decltype(sizeof(int))')
+  378 |         bool ReadLeb128(const std::uint8_t* data, std::size_t size, std::size_t& pos, std::uint64_t& value) noexcept {
+      |                                                                                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:393:7: warning: an exception may be thrown in function 'InsertAv1Metadata' which should not throw exceptions [bugprone-exception-escape]
+  393 |         bool InsertAv1Metadata(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) noexcept {
+      |              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1362:50: note: frame #6: function '__insert_with_size<std::_ClassicAlgPolicy, std::__wrap_iter<const unsigned char *>, std::__wrap_iter<const unsigned char *>>' calls function '__split_buffer' here
+ 1362 |       __split_buffer<value_type, allocator_type> __v(__recommend(size() + __n), __p - this->__begin_, this->__alloc_);
+      |                                                  ^
+/usr/include/c++/v1/__vector/vector.h:536:12: note: frame #7: function 'insert<std::__wrap_iter<const unsigned char *>, 0>' calls function '__insert_with_size<std::_ClassicAlgPolicy, std::__wrap_iter<const unsigned char *>, std::__wrap_iter<const unsigned char *>>' here
+  536 |     return __insert_with_size<_ClassicAlgPolicy>(__position, __first, __last, std::distance(__first, __last));
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:416:3: note: frame #8: function 'InsertAv1Metadata' calls function 'insert<std::__wrap_iter<const unsigned char *>, 0>' here
+  416 |                 payload.insert(payload.end(), t35.begin(), t35.end());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:445:28: warning: an exception may be thrown in function 'T35FromFrame' which should not throw exceptions [bugprone-exception-escape]
+  445 |         std::vector<std::uint8_t> T35FromFrame(const FFmpeg::AVFrame& frame) noexcept {
+      |                                   ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__vector/vector.h:595:25: note: frame #5: function '__vallocate' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  595 |     auto __allocation = std::__allocate_at_least(this->__alloc_, __n);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1066:5: note: frame #6: function '__assign_with_size<std::_ClassicAlgPolicy, const unsigned char *, const unsigned char *>' calls function '__vallocate' here
+ 1066 |     __vallocate(__recommend(__new_size));
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:318:5: note: frame #7: function 'assign<const unsigned char *, 0>' calls function '__assign_with_size<std::_ClassicAlgPolicy, const unsigned char *, const unsigned char *>' here
+  318 |     __assign_with_size<_ClassicAlgPolicy>(__first, __last, std::distance(__first, __last));
+      |     ^
+/usr/include/c++/v1/__vector/vector.h:285:5: note: frame #8: function 'operator=' calls function 'assign<const unsigned char *, 0>' here
+  285 |     assign(__il.begin(), __il.end());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:455:7: note: frame #9: function 'T35FromFrame' calls function 'operator=' here
+  455 |                 out = {
+      |                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:475:2: warning: Call to virtual method 'AVEncoder::Free' during destruction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  475 |         Free();
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:647:6: note: Assuming the condition is true
+  647 |         if (!opened.has_value())
+      |             ^~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:647:2: note: Taking true branch
+  647 |         if (!opened.has_value())
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:648:10: note: Calling defaulted destructor for 'expected<StormByte::Multimedia::FFmpeg::AVEncoder, StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::EncoderError>>'
+  648 |                 return opened;
+      |                        ^
+/usr/include/c++/v1/__expected/expected.h:602:55: note: Calling implicit destructor for '__expected_base<StormByte::Multimedia::FFmpeg::AVEncoder, StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::EncoderError>>'
+  602 |   _LIBCPP_HIDE_FROM_ABI constexpr ~expected() = default;
+      |                                                       ^
+/usr/include/c++/v1/__expected/expected.h:602:55: note: Calling implicit destructor for '__conditional_no_unique_address<false, std::__expected_base<StormByte::Multimedia::FFmpeg::AVEncoder, StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::EncoderError>>::__repr>'
+/usr/include/c++/v1/__expected/expected.h:602:55: note: Calling '~__repr'
+/usr/include/c++/v1/__expected/expected.h:318:7: note: Calling '__repr::__destroy_union_member'
+  318 |       __destroy_union_member();
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/v1/__expected/expected.h:361:11: note: Assuming field '__has_val_' is true
+  361 |       if (__has_val_) {
+      |           ^~~~~~~~~~
+/usr/include/c++/v1/__expected/expected.h:361:7: note: Taking true branch
+  361 |       if (__has_val_) {
+      |       ^
+/usr/include/c++/v1/__expected/expected.h:362:9: note: Calling 'destroy_at<StormByte::Multimedia::FFmpeg::AVEncoder>'
+  362 |         std::destroy_at(std::addressof(__union_.__v.__val_));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/v1/__memory/construct_at.h:74:3: note: Calling '__destroy_at<StormByte::Multimedia::FFmpeg::AVEncoder>'
+   74 |   std::__destroy_at(__loc);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/v1/__memory/construct_at.h:59:3: note: '?' condition is true
+   59 |   _LIBCPP_ASSERT_NON_NULL(__loc != nullptr, "null pointer given to destroy_at");
+      |   ^
+/usr/include/c++/v1/__assert:67:71: note: expanded from macro '_LIBCPP_ASSERT_NON_NULL'
+   67 | #  define _LIBCPP_ASSERT_NON_NULL(expression, message)                _LIBCPP_ASSERT(expression, message)
+      |                                                                       ^
+/usr/include/c++/v1/__assert:21:4: note: expanded from macro '_LIBCPP_ASSERT'
+   21 |   (__builtin_expect(static_cast<bool>(expression), 1)                                                                  \
+      |    ^
+/usr/include/c++/v1/__memory/construct_at.h:61:17: note: 'is_array_v' is false
+   61 |   if constexpr (is_array_v<_Tp>) {
+      |                 ^~~~~~~~~~~~~~~
+/usr/include/c++/v1/__memory/construct_at.h:61:3: note: Taking false branch
+   61 |   if constexpr (is_array_v<_Tp>) {
+      |   ^
+/usr/include/c++/v1/__memory/construct_at.h:67:5: note: Calling '~AVEncoder'
+   67 |     __loc->~_Tp();
+      |     ^~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:475:2: note: Call to virtual method 'AVEncoder::Free' during destruction bypasses virtual dispatch
+  475 |         Free();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:478:46: warning: an exception may be thrown in function 'Open' which should not throw exceptions [bugprone-exception-escape]
+  478 | FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
+      |                                              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2663:17: note: frame #7: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #8: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:481:20: note: frame #9: function 'Open' calls function 'basic_string<std::string_view, 0>' here
+  481 |         const std::string codec_name_copy{codec_name};
+      |                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:809:44: warning: an exception may be thrown in function 'ReceivePacket' which should not throw exceptions [bugprone-exception-escape]
+  809 | FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept {
+      |                                            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1092:48: note: frame #6: function 'reserve' calls function '__split_buffer' here
+ 1092 |     __split_buffer<value_type, allocator_type> __v(__n, size(), this->__alloc_);
+      |                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:855:4: note: frame #7: function 'ReceivePacket' calls function 'reserve' here
+  855 |                         t35.reserve(static_cast<std::size_t>(found->second.size()));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVStream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/backend_typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/convert.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:198:13: warning: an exception may be thrown in function 'Negotiate' which should not throw exceptions [bugprone-exception-escape]
+  198 |         inline int Negotiate(const AVCodec* codec, int source, std::string& error) noexcept {
+      |                    ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2838:5: note: frame #7: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3017:10: note: frame #8: function '__assign_external' calls function '__assign_external' here
+ 3017 |   return __assign_external(__s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3026:10: note: frame #9: function 'assign' calls function '__assign_external' here
+ 3026 |   return __assign_external(__s);
+      |          ^
+/usr/include/c++/v1/string:1241:12: note: frame #10: function 'operator=' calls function 'assign' here
+ 1241 |     return assign(__s);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:204:10: note: frame #11: function 'Negotiate' calls function 'operator=' here
+  204 |                         error = "failed to query encoder CPU pixel formats";
+      |                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

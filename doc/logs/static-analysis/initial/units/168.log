@@ -1,0 +1,714 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/base.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/report.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/frame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/item.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/packet.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/progress.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/resource_usage.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/telemetry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/track.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:145:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  145 |                 TEST_REQUIRE(avformat_open_input(&raw, FixturePath(Fixture).string().c_str(), nullptr, nullptr) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:147:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  147 |                 TEST_REQUIRE(avformat_find_stream_info(media.get(), nullptr) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:149:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  149 |                 TEST_REQUIRE(avformat_open_input(&raw, FixturePath("video/anime_like.mkv").string().c_str(), nullptr, nullptr) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:151:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  151 |                 TEST_REQUIRE(avformat_find_stream_info(subtitles.get(), nullptr) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:153:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  153 |                 TEST_REQUIRE(avformat_alloc_output_context2(&mux, nullptr, "matroska", output.string().c_str()) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:162:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  162 |                         TEST_REQUIRE(stream && avcodec_parameters_copy(stream->codecpar, source->codecpar) >= 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:165:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  165 |                                 TEST_REQUIRE(av_dict_set(&stream->metadata, "language", "eng", 0) >= 0);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:167:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  167 |                 TEST_REQUIRE(avio_open(&mux->pb, output.string().c_str(), AVIO_FLAG_WRITE) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:168:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  168 |                 TEST_REQUIRE(avformat_write_header(mux, nullptr) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:171:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  171 |                 TEST_REQUIRE(packet);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:178:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  178 |                                 TEST_REQUIRE(packets.back());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:182:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  182 |                 TEST_REQUIRE(result == AVERROR_EOF);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:193:7: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  193 |                                                 TEST_REQUIRE(copy);
+      |                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:205:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  205 |                 TEST_REQUIRE(result == AVERROR_EOF);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(av_interleaved_write_frame(mux, pending.get()) >= 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:212:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  212 |                 TEST_REQUIRE(av_write_trailer(mux) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:218:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  218 |                 TEST_REQUIRE(avformat_open_input(&raw, output.string().c_str(), nullptr, nullptr) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:220:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  220 |                 TEST_REQUIRE(avformat_find_stream_info(input.get(), nullptr) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:222:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  222 |                 TEST_REQUIRE(packet);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:235:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  235 |                                         TEST_REQUIRE(packet->size > 0 && packet->duration > 0);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:244:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  244 |                 TEST_REQUIRE(result == AVERROR_EOF);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:246:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  246 |                 TEST_REQUIRE(worstLate <= MaxSpreadSeconds);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:247:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  247 |                 TEST_REQUIRE(starts[2].size() == (empty ? 0u : 3u));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:248:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  248 |                 TEST_REQUIRE(starts[3].size() == 3);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:250:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  250 |                         TEST_REQUIRE(std::abs(starts[3][i] - (2.0 + 4.0 * i)) < 0.01);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:252:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  252 |                         TEST_REQUIRE(std::abs(starts[2].back() - 11.8) < 0.01);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:253:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  253 |                         TEST_REQUIRE(std::abs(finalDuration - 2.0) < 0.01);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:271:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  271 |                 TEST_REQUIRE(avformat_open_input(&raw, output.string().c_str(), nullptr, nullptr) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:273:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  273 |                 TEST_REQUIRE(avformat_find_stream_info(input.get(), nullptr) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:275:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  275 |                 TEST_REQUIRE(packet);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:295:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  295 |                 TEST_REQUIRE(read == AVERROR_EOF);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:296:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  296 |                 TEST_REQUIRE(first.size() >= 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:318:49: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  318 |                                                         << it->second << " to " << entry.time << std::endl;
+      |                                                                                                  ^~~~~~~~~
+      |                                                                                                  '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:325:86: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  325 |                 std::cout << "[Test] worst audio/video spread in file order: " << worst << " s" << std::endl;
+      |                                                                                                    ^~~~~~~~~
+      |                                                                                                    '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:326:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  326 |                 TEST_REQUIRE(worst <= MaxSpreadSeconds);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:333:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  333 |                 TEST_REQUIRE(av1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:348:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  348 |                 TEST_REQUIRE(aac);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:359:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  359 |                 TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:463:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  463 |                 TEST_REQUIRE(avformat_alloc_output_context2(&raw, nullptr, "mp4", output.string().c_str()) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:472:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  472 |                         TEST_REQUIRE(stream);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:477:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  477 |                 TEST_REQUIRE(avio_open(&raw->pb, output.string().c_str(), AVIO_FLAG_WRITE) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:480:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  480 |                         TEST_REQUIRE(av_dict_set(&options, "movflags", "frag_custom+empty_moov", 0) >= 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:483:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  483 |                 TEST_REQUIRE(header >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:492:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  492 |                 TEST_REQUIRE(packet);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:495:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  495 |                                 TEST_REQUIRE(av_new_packet(packet.get(), 3) >= 0);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:503:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  503 |                                 TEST_REQUIRE(av_write_frame(raw, packet.get()) >= 0);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:507:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  507 |                                 TEST_REQUIRE(av_write_frame(raw, nullptr) >= 0);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:509:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  509 |                 TEST_REQUIRE(av_write_trailer(raw) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:513:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  513 |                 TEST_REQUIRE(avformat_open_input(&source, output.string().c_str(), nullptr, nullptr) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:515:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  515 |                 TEST_REQUIRE(avformat_find_stream_info(source, nullptr) >= 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:522:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  522 |                                 TEST_REQUIRE(cue < times.size());
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:525:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  525 |                                 TEST_REQUIRE(packet->pts == expected && packet->dts == expected);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:526:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  526 |                                 TEST_REQUIRE(packet->duration == av_rescale_q(500000, AVRational{1, 1000000}, base));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:527:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  527 |                                 TEST_REQUIRE(packet->size == 3 && packet->data[2] == 'A' + cue);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:531:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  531 |                 TEST_REQUIRE(result == AVERROR_EOF);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:532:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  532 |                 TEST_REQUIRE(counts.size() == (mixedTimeBases ? 2u : 1u));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:534:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  534 |                         TEST_REQUIRE(count == times.size());
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:540:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  540 |                 TEST_REQUIRE(ass && ass->get().HasAccess(Access{Operation::Write}));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:543:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  543 |                 TEST_REQUIRE(MakeSubtitleInput(input) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:554:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  554 |                 TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:566:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  566 |                                 TEST_REQUIRE(error && TestView(*error) == "transcode cancelled");
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:569:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  569 |                                 TEST_REQUIRE(job.Status() == Status::Aborted);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:572:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  572 |                 TEST_REQUIRE(WaitForTranscoder(job) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:573:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  573 |                 TEST_REQUIRE(CheckInterleave(output) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:605:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  605 |         TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:617:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  617 |         TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:627:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  627 |         TEST_REQUIRE(WaitForTranscoder(job) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:628:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  628 |         TEST_REQUIRE(timing.Valid.load());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:629:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  629 |         TEST_REQUIRE(timing.Count.load() == 50);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:630:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  630 |         TEST_REQUIRE(advanced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:632:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  632 |         TEST_REQUIRE(avformat_open_input(&raw, output.string().c_str(), nullptr, nullptr) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:634:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  634 |         TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:635:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  635 |         TEST_REQUIRE(raw->duration > 1900000 && raw->duration < 2200000);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:637:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  637 |         TEST_REQUIRE(packet);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:643:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  643 |                         TEST_REQUIRE(packet->pts != AV_NOPTS_VALUE && packet->dts != AV_NOPTS_VALUE);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:645:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  645 |                         TEST_REQUIRE(pts > previous && pts >= 0 && pts < 2.2);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:651:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  651 |         TEST_REQUIRE(result == AVERROR_EOF && count == 50);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/runners.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/visibility.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

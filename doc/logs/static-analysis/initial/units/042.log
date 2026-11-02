@@ -1,0 +1,200 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:67:9: warning: an exception may be thrown in function 'Align64' which should not throw exceptions [bugprone-exception-escape]
+   67 |                 void* Align64(std::vector<std::uint8_t>& buf, std::size_t bytes) noexcept {
+      |                       ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<unsigned char>>' calls function 'allocate_at_least<std::allocator<unsigned char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<unsigned char>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1377:50: note: frame #6: function 'resize' calls function '__split_buffer' here
+ 1377 |       __split_buffer<value_type, allocator_type> __v(__recommend(__new_size), __current_size, __alloc_);
+      |                                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:68:4: note: frame #7: function 'Align64' calls function 'resize' here
+   68 |                         buf.resize(bytes + kAlign);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:70:11: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+   70 |                         return reinterpret_cast<void*>((p + (kAlign - 1)) & ~std::uintptr_t(kAlign - 1));
+      |                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:335:37: warning: 3 adjacent parameters of 'BuildStrip' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  335 |                 FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height,
+      |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  336 |                 double peak) noexcept {
+      |                 ~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:335:46: note: the first parameter in the range is 'top'
+  335 |                 FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height,
+      |                                                            ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:336:10: note: the last parameter in the range is 'peak'
+  336 |                 double peak) noexcept {
+      |                        ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:336:3: note: 'unsigned int' and 'double' may be implicitly converted
+  336 |                 double peak) noexcept {
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:369:13: warning: an exception may be thrown in function 'BuildSlot' which should not throw exceptions [bugprone-exception-escape]
+  369 |         bool Zimg::BuildSlot(Slot& slot, const FFmpeg::AVFrame& src,
+      |                    ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Strip>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Strip>>' calls function 'allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Strip>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Strip>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1377:50: note: frame #6: function 'resize' calls function '__split_buffer' here
+ 1377 |       __split_buffer<value_type, allocator_type> __v(__recommend(__new_size), __current_size, __alloc_);
+      |                                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:390:3: note: frame #7: function 'BuildSlot' calls function 'resize' here
+  390 |                 slot.strips.resize(jobs);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:372:23: warning: enum value of type 'zimg_color_primaries_e' initialized with invalid value of 0, enum doesn't have a zero-value enumerator [bugprone-invalid-enum-default-initialization]
+  372 |                 zimg_image_format in{};
+      |                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/zimg/cmake-wrapper/src/src/zimg/api/zimg.h:329:14: note: enum is defined here
+  329 | typedef enum zimg_color_primaries_e {
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:372:23: warning: enum value of type 'zimg_transfer_characteristics_e' initialized with invalid value of 0, enum doesn't have a zero-value enumerator [bugprone-invalid-enum-default-initialization]
+  372 |                 zimg_image_format in{};
+      |                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/zimg/cmake-wrapper/src/src/zimg/api/zimg.h:302:14: note: enum is defined here
+  302 | typedef enum zimg_transfer_characteristics_e {
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:373:24: warning: enum value of type 'zimg_color_primaries_e' initialized with invalid value of 0, enum doesn't have a zero-value enumerator [bugprone-invalid-enum-default-initialization]
+  373 |                 zimg_image_format out{};
+      |                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/zimg/cmake-wrapper/src/src/zimg/api/zimg.h:329:14: note: enum is defined here
+  329 | typedef enum zimg_color_primaries_e {
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:373:24: warning: enum value of type 'zimg_transfer_characteristics_e' initialized with invalid value of 0, enum doesn't have a zero-value enumerator [bugprone-invalid-enum-default-initialization]
+  373 |                 zimg_image_format out{};
+      |                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/zimg/cmake-wrapper/src/src/zimg/api/zimg.h:302:14: note: enum is defined here
+  302 | typedef enum zimg_transfer_characteristics_e {
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:467:13: warning: an exception may be thrown in function 'Ensure' which should not throw exceptions [bugprone-exception-escape]
+  467 |         bool Zimg::Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
+      |                    ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Slot>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Slot>>' calls function 'allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Slot>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<StormByte::Multimedia::Backend::Zimg::Slot>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:500:3: note: frame #10: function 'Ensure' calls function 'emplace_back<>' here
+  500 |                 m_slots.emplace_back();
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:511:13: warning: an exception may be thrown in function 'Scale' which should not throw exceptions [bugprone-exception-escape]
+  511 |         bool Zimg::Scale(const FFmpeg::AVFrame& src, FFmpeg::AVFrame& dst) const noexcept {
+      |                    ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<int>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<int>>' calls function 'allocate_at_least<std::allocator<int>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__vector/vector.h:595:25: note: frame #5: function '__vallocate' calls function '__allocate_at_least<std::allocator<int>>' here
+  595 |     auto __allocation = std::__allocate_at_least(this->__alloc_, __n);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1082:5: note: frame #6: function 'assign' calls function '__vallocate' here
+ 1082 |     __vallocate(__recommend(static_cast<size_type>(__n)));
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.cxx:529:4: note: frame #7: function 'Scale' calls function 'assign' here
+  529 |                         m_jobOk.assign(strips.size(), 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/zimg/zimg.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

@@ -1,0 +1,155 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '3' provided to the cast expression is not in the valid range of values for 'Operation' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:100:42: note: enum declared here
+  100 |                 enum class STORMBYTE_MULTIMEDIA_PUBLIC Operation: std::uint8_t {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+  101 |                         None    = 0,                    ///< No access
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  102 |                         Read    = 1 << 0,               ///< Decode / demux is available
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  103 |                         Write   = 1 << 1,               ///< At least one encoder / muxer exists
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |                         Attach  = 1 << 2                ///< Container can hold real attachments (covers, fonts)
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |                 };
+      |                 ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:100:18: note: Calling default constructor for 'Registry'
+  100 |         static Registry instance;
+      |                         ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:94:2: note: Calling 'Registry::Initialize'
+   94 |         Initialize();
+      |         ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:267:2: note: Calling 'Registry::Load'
+  267 |         Load();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:262:2: note: Calling 'Registry::LoadCodecs'
+  262 |         LoadCodecs();
+      |         ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:174:2: note: Calling 'Registry::LoadCodecs'
+  174 |         LoadCodecs(Type::Video, video);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:159:3: note: Calling 'Registry::Add'
+  159 |                 Add(type, def);
+      |                 ^~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:145:47: note: Calling 'ProbeAccess'
+  145 |         Codec codec(type, def.name, def.description, ProbeAccess(type, def));
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:74:7: note: 'type' is not equal to Attachment
+   74 |                 if (type == StormByte::Multimedia::Type::Attachment)
+      |                     ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:74:3: note: Taking false branch
+   74 |                 if (type == StormByte::Multimedia::Type::Attachment)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:77:3: note: Loop condition is true.  Entering loop body
+   77 |                 for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:79:8: note: Assuming 'id' is non-null
+   79 |                         if (!id)
+      |                             ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:79:4: note: Taking false branch
+   79 |                         if (!id)
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:8: note: Assuming 'descriptor' is non-null
+   82 |                         if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+      |                             ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:8: note: Left side of '&&' is true
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:22: note: Assuming the condition is true
+   82 |                         if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:4: note: Taking true branch
+   82 |                         if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:84:5: note:  Execution continues on line 87
+   84 |                                 break;
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:7: note: Assuming field 'name' is non-null
+   87 |                 if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+      |                     ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:7: note: Left side of '&&' is true
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:19: note: Assuming the condition is true
+   87 |                 if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:3: note: Taking true branch
+   87 |                 if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:88:4: note: Calling 'Bitmask::operator|='
+   88 |                         access |= Access(Operation::Write);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/bitmask.txx:78:13: note: Calling 'operator|<StormByte::Multimedia::Operation>'
+   78 |                 m_value = m_value | other.m_value;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '3' provided to the cast expression is not in the valid range of values for 'Operation'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '5' provided to the cast expression is not in the valid range of values for 'Operation' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:100:42: note: enum declared here
+  100 |                 enum class STORMBYTE_MULTIMEDIA_PUBLIC Operation: std::uint8_t {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+  101 |                         None    = 0,                    ///< No access
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  102 |                         Read    = 1 << 0,               ///< Decode / demux is available
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  103 |                         Write   = 1 << 1,               ///< At least one encoder / muxer exists
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |                         Attach  = 1 << 2                ///< Container can hold real attachments (covers, fonts)
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |                 };
+      |                 ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:100:18: note: Calling default constructor for 'Registry'
+  100 |         static Registry instance;
+      |                         ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:94:2: note: Calling 'Registry::Initialize'
+   94 |         Initialize();
+      |         ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:267:2: note: Calling 'Registry::Load'
+  267 |         Load();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:263:2: note: Calling 'Registry::LoadContainers'
+  263 |         LoadContainers();
+      |         ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:256:3: note: Calling 'Registry::Add'
+  256 |                 Add(def);
+      |                 ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:201:3: note: Assuming 'ext' is null
+  201 |                 ext ? std::string_view{ext} : std::string_view{},
+      |                 ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:201:3: note: '?' condition is false
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:202:3: note: Calling 'Registry::ProbeContainer'
+  202 |                 ProbeContainer(def)
+      |                 ^~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:182:2: note: Loop condition is true.  Entering loop body
+  182 |         for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:184:7: note: Assuming 'id' is non-null
+  184 |                 if (!id)
+      |                     ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:184:3: note: Taking false branch
+  184 |                 if (!id)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:186:7: note: Assuming the condition is true
+  186 |                 if (av_find_input_format(id) != nullptr)
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:186:3: note: Taking true branch
+  186 |                 if (av_find_input_format(id) != nullptr)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:182:2: note: Loop condition is false. Execution continues on line 190
+  182 |         for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:190:6: note: Assuming field 'attachments' is true
+  190 |         if (def.attachments)
+      |             ^~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:190:2: note: Taking true branch
+  190 |         if (def.attachments)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:191:3: note: Calling 'Bitmask::operator|='
+  191 |                 access |= Access(Operation::Attach);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/bitmask.txx:78:13: note: Calling 'operator|<StormByte::Multimedia::Operation>'
+   78 |                 m_value = m_value | other.m_value;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '5' provided to the cast expression is not in the valid range of values for 'Operation'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

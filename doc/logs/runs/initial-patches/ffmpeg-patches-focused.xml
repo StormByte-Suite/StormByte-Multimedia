@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="3"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="16"
+	timestamp="2026-11-02T04:53:14"
+	>
+	<testcase name="preview.test_audio_native_opus" classname="preview.test_audio_native_opus" time="0.169705" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_audio_native_opus
+[Test] test_audio_native_opus: assert player.Open(Fixture("audio/noise_51.opus"))
+[Test] test_audio_native_opus: assert player.Play()
+[Test] test_audio_native_opus: assert Wait([&amp;] { std::lock_guard lock(display-&gt;m_mutex); return static_cast&lt;bool&gt;(display-&gt;m_first_audio); })
+[Test] test_audio_native_opus: assert player.Pause()
+[Test] test_audio_native_opus: assert player.Close()
+[Test] test_audio_native_opus: assert audio-&gt;m_rate == 48000
+[Test] test_audio_native_opus: assert audio-&gt;m_format == AudioSample::Float32
+[Test] test_audio_native_opus: assert audio-&gt;m_planar
+[Test] test_audio_native_opus: assert audio-&gt;m_layout == AudioLayout::Speakers
+[Test] test_audio_native_opus: assert audio-&gt;m_channels.size() == 6
+[Test] test_audio_native_opus: assert audio-&gt;m_planes.size() == 6
+[Test] test_audio_native_opus: assert std::string_view(audio-&gt;m_channels[channel]) == order[channel]
+[Test] test_audio_native_opus: assert audio-&gt;m_planes[channel].size() == audio-&gt;m_frames * sizeo...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_hdr_preview_tone_mapping" classname="preview.test_hdr_preview_tone_mapping" time="9.68102" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_hdr_preview_tone_mapping
+[Test] test_hdr_preview_tone_mapping: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_tone_mapping: assert player.Play()
+[Test] test_hdr_preview_tone_mapping: assert Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7ce5904113c0] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7ce5904113c0] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[ASSERT] test_hdr_preview_tone_mapping: Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_hdr_preview_tone_mapping: FAIL
+</system-out>
+	</testcase>
+	<testcase name="preview.test_hdr_preview_preserves_signal" classname="preview.test_hdr_preview_preserves_signal" time="6.57543" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_hdr_preview_preserves_signal
+[Test] test_hdr_preview_preserves_signal: assert player.OutputColor(PreviewColorMode::HDR)
+[Test] test_hdr_preview_preserves_signal: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_preserves_signal: assert player.Play()
+[Test] test_hdr_preview_preserves_signal: assert Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[ASSERT] test_hdr_preview_preserves_signal: Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_hdr_preview_preserves_signal: FAIL
+</system-out>
+	</testcase>
+</testsuite>

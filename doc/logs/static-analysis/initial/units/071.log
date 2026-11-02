@@ -1,0 +1,207 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:81:8: warning: 'other' used after it was moved [bugprone-use-after-move]
+   81 |         m_src(other.m_src),
+      |               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:82:9: warning: 'other' used after it was moved [bugprone-use-after-move]
+   82 |         m_sink(other.m_sink),
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:83:6: warning: 'other' used after it was moved [bugprone-use-after-move]
+   83 |         m_w(other.m_w),
+      |             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:84:6: warning: 'other' used after it was moved [bugprone-use-after-move]
+   84 |         m_h(other.m_h),
+      |             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:85:8: warning: 'other' used after it was moved [bugprone-use-after-move]
+   85 |         m_fmt(other.m_fmt),
+      |               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:86:9: warning: 'other' used after it was moved [bugprone-use-after-move]
+   86 |         m_rate(other.m_rate),
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:87:7: warning: 'other' used after it was moved [bugprone-use-after-move]
+   87 |         m_ch(other.m_ch),
+      |              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:88:9: warning: 'other' used after it was moved [bugprone-use-after-move]
+   88 |         m_mask(other.m_mask),
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:89:20: warning: 'other' used after it was moved [bugprone-use-after-move]
+   89 |         m_graph(std::move(other.m_graph)),
+      |                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:90:11: warning: 'other' used after it was moved [bugprone-use-after-move]
+   90 |         m_closed(other.m_closed),
+      |                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:91:11: warning: 'other' used after it was moved [bugprone-use-after-move]
+   91 |         m_endPts(other.m_endPts),
+      |                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:92:13: warning: 'other' used after it was moved [bugprone-use-after-move]
+   92 |         m_timeBase(other.m_timeBase),
+      |                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:93:14: warning: 'other' used after it was moved [bugprone-use-after-move]
+   93 |         m_frameRate(other.m_frameRate),
+      |                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:94:19: warning: 'other' used after it was moved [bugprone-use-after-move]
+   94 |         m_operationError(other.m_operationError) {
+      |                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:95:2: warning: 'other' used after it was moved [bugprone-use-after-move]
+   95 |         other.m_src = nullptr;
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:80:3: note: move occurred here
+   80 | : AVPointer(std::move(other)),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:108:2: warning: Call to virtual method 'AVFilterGraph::Free' during destruction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  108 |         Free();
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:275:9: note: Calling 'AVFilterGraph::Ensure'
+  275 |         return Ensure(src, graph, FFmpeg::AVRational{0, 1});
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:279:21: note: Assuming the condition is false
+  279 |         const bool video = src.Width() > 0 && src.Height() > 0;
+      |                            ^~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:279:37: note: Left side of '&&' is false
+  279 |         const bool video = src.Width() > 0 && src.Height() > 0;
+      |                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:280:24: note: '?' condition is true
+  280 |         const auto timeBase = src.TimeBase().Valid() ? src.TimeBase()
+      |                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:282:20: note: Assuming field 'm_ptr' is null
+  282 |         const bool same = m_ptr && m_src && m_sink && !m_closed
+      |                           ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:282:26: note: Left side of '&&' is false
+  282 |         const bool same = m_ptr && m_src && m_sink && !m_closed
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:292:6: note: 'same' is false
+  292 |         if (same)
+      |             ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:292:2: note: Taking false branch
+  292 |         if (same)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:295:2: note: Taking true branch
+  295 |         if (!next)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:296:10: note: Calling '~AVFilterGraph'
+  296 |                 return false;
+      |                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:108:2: note: Call to virtual method 'AVFilterGraph::Free' during destruction bypasses virtual dispatch
+  108 |         Free();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:115:11: warning: 'other' used after it was moved [bugprone-use-after-move]
+  115 |                 m_src = other.m_src;
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:114:14: note: move occurred here
+  114 |                 AVPointer::operator=(std::move(other));
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:152:46: warning: an exception may be thrown in function 'Open' which should not throw exceptions [bugprone-exception-escape]
+  152 | FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
+      |                                              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2310:20: note: frame #6: function '__init_internal_buffer' calls function '__allocate_long_buffer' here
+ 2310 |       __rep_.__l = __allocate_long_buffer(__alloc_, __size);
+      |                    ^
+/usr/include/c++/v1/string:2663:17: note: frame #7: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #8: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx:205:15: note: frame #9: function 'Open' calls function 'basic_string<std::string_view, 0>' here
+  205 |                 std::string described{static_cast<std::string_view>(src.ChannelLayout().Describe())};
+      |                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

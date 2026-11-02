@@ -1,0 +1,203 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:63:98: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   63 |         std::cout << "[VMAF] version=" << vmaf_version() << " picture_bytes=" << sizeof(VmafPicture) << std::endl;
+      |                                                                                                         ^~~~~~~~~
+      |                                                                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:77:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   77 |                 TEST_REQUIRE(vmaf_init(&owner.m_context, configuration) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:78:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   78 |                 TEST_REQUIRE(vmaf_model_load(&owner.m_model, &modelConfiguration, "vmaf_v0.6.1") == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:79:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   79 |                 TEST_REQUIRE(vmaf_use_features_from_model(owner.m_context, owner.m_model) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:85:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   85 |                                         TEST_REQUIRE(vmaf_picture_alloc(picture, VMAF_PIX_FMT_YUV420P, depth, 320, 192) == 0);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:87:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   87 |                                         TEST_REQUIRE(vmaf_fetch_preallocated_picture(owner.m_context, picture) == 0);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:88:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   88 |                                 TEST_REQUIRE(picture->pix_fmt == VMAF_PIX_FMT_YUV420P);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:89:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   89 |                                 TEST_REQUIRE(picture->bpc == depth);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:90:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   90 |                                 TEST_REQUIRE(picture->w[0] == 320 && picture->h[0] == 192);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:92:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   92 |                                         TEST_REQUIRE(picture->data[plane] && picture->stride[plane] > 0);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:96:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   96 |                         TEST_REQUIRE(vmaf_read_pictures(owner.m_context, &reference.m_picture, &distorted.m_picture, index) == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:98:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   98 |                 TEST_REQUIRE(vmaf_read_pictures(owner.m_context, nullptr, nullptr, 0) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:100:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  100 |                 TEST_REQUIRE(vmaf_score_pooled(owner.m_context, owner.m_model, VMAF_POOL_METHOD_MEAN, &score, 0, 2) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:101:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  101 |                 TEST_REQUIRE(std::isfinite(score) && score >= 0 && score <= 100);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:106:5: warning: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape]
+  106 | int main(int argc, char** argv) {
+      |     ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2764:21: note: frame #6: function '__grow_by' calls function '__allocate_long_buffer' here
+ 2764 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2792:3: note: frame #7: function '__grow_by_without_replace' calls function '__grow_by' here
+ 2792 |   __grow_by(__old_cap, __delta_cap, __old_sz, __n_copy, __n_del, __n_add);
+      |   ^
+/usr/include/c++/v1/string:1451:9: note: frame #8: function 'append<const char *, 0>' calls function '__grow_by_without_replace' here
+ 1451 |         __grow_by_without_replace(__cap, __sz + __n - __cap, __sz, __sz, 0);
+      |         ^
+/usr/include/c++/v1/__filesystem/path.h:272:5: note: frame #9: function '__append_range<const char *, 0>' calls function 'append<const char *, 0>' here
+  272 |     __dest.append(__b, __e);
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:285:5: note: frame #10: function '__append_source<std::string_view>' calls function '__append_range<const char *, 0>' here
+  285 |     __append_range(__dest, _Traits::__range_begin(__s), _Traits::__range_end(__s));
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:414:5: note: frame #11: function 'path<std::string_view, void>' calls function '__append_source<std::string_view>' here
+  414 |     _SourceCVT<_Source>::__append_source(__pn_, __src);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:111:21: note: frame #12: function 'RunOneTest' calls function 'path<std::string_view, void>' here
+  111 |         auto outputScope = std::filesystem::path(executable).stem();
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/../../test_helpers.hxx:129:23: note: frame #13: function 'RunSelectedTest' calls function 'RunOneTest' here
+  129 |                         const int result = RunOneTest(test, argv[0]);
+      |                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/analytics/vmaf_api_test.cxx:113:9: note: frame #14: function 'main' calls function 'RunSelectedTest' here
+  113 |         return RunSelectedTest(argc, argv, tests);
+      |                ^

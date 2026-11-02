@@ -1,0 +1,129 @@
+Start testing: Nov 02 04:06 CET
+----------------------------------------------------------
+1/6 Testing: DeviceTests
+1/6 Test: DeviceTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/DeviceTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test
+"DeviceTests" start time: Nov 02 04:06 CET
+Output:
+----------------------------------------------------------
+root path=/ ok=true fault=StormByte.System.Device: Success
+root kind=HDD readable=true writable=false read_bps=157286400 write_bps=157286400 window_read=314572 window_write=314572
+temp path=/tmp ok=true fault=StormByte.System.Device: Success
+temp kind=HDD readable=true writable=true read_bps=157286400 write_bps=157286400 window_read=314572 window_write=314572
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"DeviceTests" end time: Nov 02 04:06 CET
+"DeviceTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/6 Testing: DirectoryTests
+2/6 Test: DirectoryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/DirectoryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test
+"DirectoryTests" start time: Nov 02 04:06 CET
+Output:
+----------------------------------------------------------
+current ok=true value=/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test fault=StormByte.System.Directory: Success
+current_executable ok=true value=/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test fault=StormByte.System.Directory: Success
+home ok=true value=/home/stormbyte fault=StormByte.System.Directory: Success
+temporary ok=true value=/tmp fault=StormByte.System.Directory: Success
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"DirectoryTests" end time: Nov 02 04:06 CET
+"DirectoryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/6 Testing: FileTests
+3/6 Test: FileTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/FileTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test
+"FileTests" start time: Nov 02 04:06 CET
+Output:
+----------------------------------------------------------
+current_executable ok=true value=/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/FileTests fault=StormByte.System.File: Success
+temporary ok=true value=/tmp/SBwdydfz.tmp fault=StormByte.System.File: Success
+temporary_default ok=true value=/tmp/TMPaJFSmt fault=StormByte.System.File: Success
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"FileTests" end time: Nov 02 04:06 CET
+"FileTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/6 Testing: HostTests
+4/6 Test: HostTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/HostTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test
+"HostTests" start time: Nov 02 04:06 CET
+Output:
+----------------------------------------------------------
+architecture value=x86_64 fault=StormByte.System.Host: Success
+bitness=64
+logical_processors=32
+cpu_manufacturer value=GenuineIntel fault=StormByte.System.Host: Success
+cpu value=13th Gen Intel(R) Core(TM) i9-13900KF fault=StormByte.System.Host: Success
+physical_cores=24 fault=StormByte.System.Host: Success
+kernel value=Linux 7.2.13-Wesker.Umbrella SMP PREEMPT_DYNAMIC fault=StormByte.System.Host: Success
+page_size=4096 fault=StormByte.System.Host: Success
+physical_memory=134830981120 fault=StormByte.System.Host: Success
+available_memory=26247311360 fault=StormByte.System.Host: Success
+board_manufacturer value=ASUSTeK COMPUTER INC. fault=StormByte.System.Host: Success
+board_model value=ROG STRIX Z790-F GAMING WIFI fault=StormByte.System.Host: Success
+board_revision value=Rev 1.xx fault=StormByte.System.Host: Success
+name ok=true value=Wesker fault=StormByte.System.Host: Success
+os value=Gentoo 2.18 fault=StormByte.System.Host: Success
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"HostTests" end time: Nov 02 04:06 CET
+"HostTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/6 Testing: ProcessTests
+5/6 Test: ProcessTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/ProcessTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test
+"ProcessTests" start time: Nov 02 04:06 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   9.05 sec
+----------------------------------------------------------
+Test Passed.
+"ProcessTests" end time: Nov 02 04:06 CET
+"ProcessTests" time elapsed: 00:00:09
+----------------------------------------------------------
+
+6/6 Testing: ThisThreadTests
+6/6 Test: ThisThreadTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/ThisThreadTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test
+"ThisThreadTests" start time: Nov 02 04:06 CET
+Output:
+----------------------------------------------------------
+set ok=true fault=StormByte.System.ThisThread: Success
+get ok=true value=sb-thread fault=StormByte.System.ThisThread: Success
+sleep done
+too_long ok=false fault=StormByte.System.ThisThread: Thread name is too long
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ThisThreadTests" end time: Nov 02 04:06 CET
+"ThisThreadTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 02 04:06 CET

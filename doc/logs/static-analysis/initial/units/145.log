@@ -1,0 +1,33 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:55:14: warning: 2 adjacent parameters of 'Point' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   55 | Point::Point(int x, int y) noexcept:
+      |              ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:55:18: note: the first parameter in the range is 'x'
+   55 | Point::Point(int x, int y) noexcept:
+      |                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:55:25: note: the last parameter in the range is 'y'
+   55 | Point::Point(int x, int y) noexcept:
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:66:25: warning: 2 adjacent parameters of 'Normalized' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   66 | Point Point::Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept {
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:66:29: note: the first parameter in the range is 'numerator_x'
+   66 | Point Point::Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept {
+      |                             ^~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:66:46: note: the last parameter in the range is 'denominator_x'
+   66 | Point Point::Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept {
+      |                                              ^~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:66:61: warning: 2 adjacent parameters of 'Normalized' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   66 | Point Point::Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept {
+      |                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:66:65: note: the first parameter in the range is 'numerator_y'
+   66 | Point Point::Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept {
+      |                                                                 ^~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.cxx:66:82: note: the last parameter in the range is 'denominator_y'
+   66 | Point Point::Normalized(int numerator_x, int denominator_x, int numerator_y, int denominator_y, int denominator) noexcept {
+      |                                                                                  ^~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

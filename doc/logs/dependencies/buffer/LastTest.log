@@ -1,0 +1,350 @@
+Start testing: Nov 02 04:11 CET
+----------------------------------------------------------
+1/15 Testing: BridgeTests
+1/15 Test: BridgeTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/BridgeTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"BridgeTests" start time: Nov 02 04:11 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"BridgeTests" end time: Nov 02 04:11 CET
+"BridgeTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/15 Testing: BufferedFileReaderTests
+2/15 Test: BufferedFileReaderTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/BufferedFileReaderTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"BufferedFileReaderTests" start time: Nov 02 04:11 CET
+Output:
+----------------------------------------------------------
+[telemetry hex-fake-after-fill] Delivered=64.00 KiB MeanRate=504.50 KiB/s HitAhead=64.00 KiB HitBack=0 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=126863874 WaitMax=126863874 WaitTotal=126863874 WaitSamples=1
+[telemetry hex-fake-seek-8k] Delivered=64.00 KiB MeanRate=504.50 KiB/s HitAhead=64.00 KiB HitBack=0 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=126863874 WaitMax=126863874 WaitTotal=126863874 WaitSamples=1
+[telemetry hex-fake-read-16] Delivered=64.02 KiB MeanRate=504.42 KiB/s HitAhead=64.00 KiB HitBack=16 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=68941 WaitMax=126863874 WaitTotal=126932815 WaitSamples=2
+[telemetry hex-fake-seek0-done] Delivered=64.11 KiB MeanRate=504.93 KiB/s HitAhead=64.00 KiB HitBack=112 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=3 SeekOrigin=0 SeekSavedFull=2 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=29891 WaitMax=126863874 WaitTotal=126997170 WaitSamples=4
+[telemetry peek-then-read-fake-seek] Delivered=32.01 KiB MeanRate=417.98 KiB/s HitAhead=32.00 KiB HitBack=8 B Miss=0 B Origin=48.00 KiB Cached=48.00 KiB CachedPeak=48.00 KiB Cap=64.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=38793 WaitMax=76554459 WaitTotal=76640743 WaitSamples=3
+[telemetry hex-catchup-seek-40k] Delivered=48.00 KiB MeanRate=534.86 KiB/s HitAhead=48.00 KiB HitBack=0 B Miss=0 B Origin=64.00 KiB Cached=64.00 KiB CachedPeak=64.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=89747761 WaitMax=89747761 WaitTotal=89747761 WaitSamples=1
+[telemetry hex-catchup-past-old-tell] Delivered=57.00 KiB MeanRate=626.17 KiB/s HitAhead=49.00 KiB HitBack=8.00 KiB Miss=0 B Origin=64.00 KiB Cached=64.00 KiB CachedPeak=64.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=153028 WaitMax=89747761 WaitTotal=91069013 WaitSamples=5
+[telemetry after-fill-64k] Delivered=64.00 KiB MeanRate=519.33 KiB/s HitAhead=64.00 KiB HitBack=0 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=123246550 WaitMax=123246550 WaitTotal=123246550 WaitSamples=1
+[telemetry fake-seek-8k-before-read] Delivered=64.00 KiB MeanRate=519.33 KiB/s HitAhead=64.00 KiB HitBack=0 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=123246550 WaitMax=123246550 WaitTotal=123246550 WaitSamples=1
+[telemetry fake-seek-8k-after-read16] Delivered=64.02 KiB MeanRate=519.25 KiB/s HitAhead=64.00 KiB HitBack=16 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=64833 WaitMax=123246550 WaitTotal=123311383 WaitSamples=2
+[telemetry fake-seek-16k-three-small-reads] Delivered=64.06 KiB MeanRate=519.33 KiB/s HitAhead=64.00 KiB HitBack=64 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=1 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=23537 WaitMax=123246550 WaitTotal=123393371 WaitSamples=5
+[telemetry fake-seek-0-after-read32] Delivered=64.09 KiB MeanRate=519.49 KiB/s HitAhead=64.00 KiB HitBack=96 B Miss=0 B Origin=96.00 KiB Cached=96.00 KiB CachedPeak=96.00 KiB Cap=256.00 KiB SeekLogical=3 SeekOrigin=0 SeekSavedFull=2 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=23537 WaitMax=123246550 WaitTotal=123419928 WaitSamples=6
+[telemetry relative-fake-back] Delivered=20.06 KiB MeanRate=752.08 KiB/s HitAhead=20.00 KiB HitBack=64 B Miss=0 B Origin=36.00 KiB Cached=36.00 KiB CachedPeak=36.00 KiB Cap=64.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=98373 WaitMax=26600794 WaitTotal=26699167 WaitSamples=2
+[telemetry cold-2m-before-read] Delivered=4.00 KiB MeanRate=387.11 KiB/s HitAhead=4.00 KiB HitBack=0 B Miss=0 B Origin=12.00 KiB Cached=12.00 KiB CachedPeak=12.00 KiB Cap=32.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=22466195 WaitMax=22466195 WaitTotal=22466195 WaitSamples=1
+[telemetry cold-3m-after-read] Delivered=4.09 KiB MeanRate=387.68 KiB/s HitAhead=4.00 KiB HitBack=0 B Miss=97 B Origin=12.09 KiB Cached=12.09 KiB CachedPeak=12.09 KiB Cap=32.00 KiB SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=126182 WaitMax=22466195 WaitTotal=22725438 WaitSamples=3
+[telemetry hex-cold-seek-2m] Delivered=4.00 KiB MeanRate=1.03 MiB/s HitAhead=4.00 KiB HitBack=0 B Miss=0 B Origin=8.00 KiB Cached=8.00 KiB CachedPeak=8.00 KiB Cap=32.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=3814647 WaitMax=3814647 WaitTotal=3814647 WaitSamples=1
+[telemetry hex-cold-done] Delivered=4.09 KiB MeanRate=954.93 KiB/s HitAhead=4.00 KiB HitBack=0 B Miss=97 B Origin=8.09 KiB Cached=8.09 KiB CachedPeak=8.09 KiB Cap=32.00 KiB SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=62375 WaitMax=3814647 WaitTotal=4018555 WaitSamples=3
+[telemetry hex-partial-seek-4k] Delivered=8.00 KiB MeanRate=593.78 KiB/s HitAhead=8.00 KiB HitBack=0 B Miss=0 B Origin=12.00 KiB Cached=12.00 KiB CachedPeak=12.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=13481867 WaitMax=13481867 WaitTotal=13481867 WaitSamples=1
+[telemetry hex-partial-after-hole] Delivered=40.00 KiB MeanRate=443.43 KiB/s HitAhead=12.00 KiB HitBack=4.00 KiB Miss=24.00 KiB Origin=36.00 KiB Cached=16.00 KiB CachedPeak=16.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=1 WaitMin=13481867 WaitMax=68509614 WaitTotal=81991481 WaitSamples=2
+[telemetry partial-before-overread] Delivered=8.00 KiB MeanRate=502.54 KiB/s HitAhead=8.00 KiB HitBack=0 B Miss=0 B Origin=16.00 KiB Cached=16.00 KiB CachedPeak=16.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=0 WaitMin=15928172 WaitMax=15928172 WaitTotal=15928172 WaitSamples=1
+[telemetry partial-after-overread] Delivered=40.00 KiB MeanRate=449.57 KiB/s HitAhead=16.00 KiB HitBack=4.00 KiB Miss=20.00 KiB Origin=36.00 KiB Cached=16.00 KiB CachedPeak=16.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=2 Evicted=1 WaitMin=15928172 WaitMax=73103625 WaitTotal=89031797 WaitSamples=2
+[telemetry partial-island-before-overread] Delivered=16.00 KiB MeanRate=1.22 MiB/s HitAhead=8.00 KiB HitBack=0 B Miss=8.00 KiB Origin=20.00 KiB Cached=20.00 KiB CachedPeak=20.00 KiB Cap=256.00 KiB SeekLogical=2 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=1431167 WaitMax=11391041 WaitTotal=12822208 WaitSamples=2
+[telemetry partial-island-after-overread] Delivered=48.00 KiB MeanRate=629.92 KiB/s HitAhead=8.00 KiB HitBack=7.00 KiB Miss=33.00 KiB Origin=49.00 KiB Cached=49.00 KiB CachedPeak=49.00 KiB Cap=256.00 KiB SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=1431167 WaitMax=63397744 WaitTotal=76219952 WaitSamples=3
+[telemetry partial-island-epoch-closed] Delivered=48.00 KiB MeanRate=629.92 KiB/s HitAhead=8.00 KiB HitBack=7.00 KiB Miss=33.00 KiB Origin=49.00 KiB Cached=49.00 KiB CachedPeak=49.00 KiB Cap=256.00 KiB SeekLogical=3 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=1 TryAgain=0 Saturated=0 Evicted=0 WaitMin=1431167 WaitMax=63397744 WaitTotal=76219952 WaitSamples=3
+[telemetry hex-stress-done] Delivered=64.33 KiB MeanRate=1.36 MiB/s HitAhead=23.78 KiB HitBack=36.29 KiB Miss=4.26 KiB Origin=100.29 KiB Cached=100.29 KiB CachedPeak=100.29 KiB Cap=128.00 KiB SeekLogical=97 SeekOrigin=6 SeekSavedFull=89 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=13007 WaitMax=12592160 WaitTotal=29043250 WaitSamples=97
+[benchmark no-cache] 15.843 s, 4.03964 MiB/s
+[benchmark cache-only] 18.2977 s, 3.4977 MiB/s
+[benchmark window] 18.7041 s, 3.42171 MiB/s
+[benchmark full] 13.2932 s, 4.81449 MiB/s
+[telemetry tel-cold-warm] Delivered=4.00 KiB MeanRate=4.44 MiB/s HitAhead=4.00 KiB HitBack=0 B Miss=0 B Origin=8.00 KiB Cached=8.00 KiB CachedPeak=8.00 KiB Cap=32.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=888721 WaitMax=888721 WaitTotal=888721 WaitSamples=1
+[telemetry tel-cold-epoch-closed] Delivered=8.00 KiB MeanRate=5.95 MiB/s HitAhead=4.00 KiB HitBack=0 B Miss=4.00 KiB Origin=24.00 KiB Cached=24.00 KiB CachedPeak=24.00 KiB Cap=32.00 KiB SeekLogical=2 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=436375 WaitMax=888721 WaitTotal=1325096 WaitSamples=2
+[telemetry ctor] Delivered=0 B MeanRate=0 B/s HitAhead=0 B HitBack=0 B Miss=0 B Origin=0 B Cached=0 B CachedPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=0 WaitMax=0 WaitTotal=0 WaitSamples=0
+[telemetry tel-fake-open] Delivered=0 B MeanRate=0 B/s HitAhead=0 B HitBack=0 B Miss=0 B Origin=0 B Cached=0 B CachedPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=0 WaitMax=0 WaitTotal=0 WaitSamples=0
+[telemetry tel-fake-filled] Delivered=64.00 KiB MeanRate=9.63 MiB/s HitAhead=64.00 KiB HitBack=0 B Miss=0 B Origin=80.00 KiB Cached=80.00 KiB CachedPeak=80.00 KiB Cap=256.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6498710 WaitMax=6498710 WaitTotal=6498710 WaitSamples=1
+[telemetry tel-fake-seek-open-epoch] Delivered=64.00 KiB MeanRate=9.63 MiB/s HitAhead=64.00 KiB HitBack=0 B Miss=0 B Origin=80.00 KiB Cached=80.00 KiB CachedPeak=80.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6498710 WaitMax=6498710 WaitTotal=6498710 WaitSamples=1
+[telemetry tel-fake-small-reads] Delivered=66.00 KiB MeanRate=9.68 MiB/s HitAhead=64.00 KiB HitBack=2.00 KiB Miss=0 B Origin=80.00 KiB Cached=80.00 KiB CachedPeak=80.00 KiB Cap=256.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=78847 WaitMax=6498710 WaitTotal=6670856 WaitSamples=3
+[telemetry tel-fake-epoch-closed] Delivered=66.00 KiB MeanRate=9.68 MiB/s HitAhead=64.00 KiB HitBack=2.00 KiB Miss=0 B Origin=80.00 KiB Cached=80.00 KiB CachedPeak=80.00 KiB Cap=256.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=1 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=78847 WaitMax=6498710 WaitTotal=6670856 WaitSamples=3
+[telemetry open] Delivered=0 B MeanRate=0 B/s HitAhead=0 B HitBack=0 B Miss=0 B Origin=0 B Cached=0 B CachedPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=0 WaitMax=0 WaitTotal=0 WaitSamples=0
+[telemetry seq-512k] Delivered=512.00 KiB MeanRate=5.76 MiB/s HitAhead=64.00 KiB HitBack=0 B Miss=448.00 KiB Origin=512.00 KiB Cached=64.00 KiB CachedPeak=64.00 KiB Cap=64.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=2 Evicted=1 WaitMin=86770816 WaitMax=86770816 WaitTotal=86770816 WaitSamples=1
+[telemetry seek-back-8k] Delivered=520.00 KiB MeanRate=5.81 MiB/s HitAhead=64.00 KiB HitBack=8.00 KiB Miss=448.00 KiB Origin=512.00 KiB Cached=64.00 KiB CachedPeak=64.00 KiB Cap=64.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=2 Evicted=1 WaitMin=573910 WaitMax=86770816 WaitTotal=87344726 WaitSamples=2
+[telemetry seek-cold-2m] Delivered=528.00 KiB MeanRate=5.76 MiB/s HitAhead=64.00 KiB HitBack=8.00 KiB Miss=456.00 KiB Origin=520.00 KiB Cached=8.00 KiB CachedPeak=64.00 KiB Cap=64.00 KiB SeekLogical=2 SeekOrigin=1 SeekSavedFull=1 SeekSavedPartial=0 TryAgain=0 Saturated=2 Evicted=2 WaitMin=573910 WaitMax=86770816 WaitTotal=89589741 WaitSamples=3
+[telemetry after-close] Delivered=528.00 KiB MeanRate=5.76 MiB/s HitAhead=64.00 KiB HitBack=8.00 KiB Miss=456.00 KiB Origin=536.00 KiB Cached=24.00 KiB CachedPeak=64.00 KiB Cap=64.00 KiB SeekLogical=2 SeekOrigin=1 SeekSavedFull=1 SeekSavedPartial=0 TryAgain=0 Saturated=2 Evicted=2 WaitMin=573910 WaitMax=86770816 WaitTotal=89589741 WaitSamples=3
+All tests passed!
+<end of output>
+Test time = 117.47 sec
+----------------------------------------------------------
+Test Passed.
+"BufferedFileReaderTests" end time: Nov 02 04:13 CET
+"BufferedFileReaderTests" time elapsed: 00:01:57
+----------------------------------------------------------
+
+3/15 Testing: BufferedFileWriterTests
+3/15 Test: BufferedFileWriterTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/BufferedFileWriterTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"BufferedFileWriterTests" start time: Nov 02 04:13 CET
+Output:
+----------------------------------------------------------
+[telemetry hex-fake-before-seek] Accepted=64.00 KiB MeanRate=1.30 GiB/s Behind=64.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=64.00 KiB HitAhead=0 B HitBack=0 B Miss=64.00 KiB Dirty=64.00 KiB DirtyPeak=64.00 KiB Cap=16.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=55893 WaitMax=55893 WaitTotal=55893 WaitSamples=1
+[telemetry hex-fake-after-seek] Accepted=64.00 KiB MeanRate=1.30 GiB/s Behind=64.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=64.00 KiB HitAhead=0 B HitBack=0 B Miss=64.00 KiB Dirty=64.00 KiB DirtyPeak=64.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=55893 WaitMax=55893 WaitTotal=55893 WaitSamples=1
+[telemetry hex-fake-after-patch] Accepted=64.00 KiB MeanRate=1.05 GiB/s Behind=64.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=64.00 KiB HitAhead=0 B HitBack=4 B Miss=64.00 KiB Dirty=64.00 KiB DirtyPeak=64.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=15671 WaitMax=55893 WaitTotal=71564 WaitSamples=2
+[telemetry hex-fake-back-at-front] Accepted=64.01 KiB MeanRate=1.36 GiB/s Behind=64.01 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=64.00 KiB HitAhead=0 B HitBack=6 B Miss=64.00 KiB Dirty=64.00 KiB DirtyPeak=64.00 KiB Cap=16.00 KiB SeekLogical=4 SeekOrigin=0 SeekSavedFull=3 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=3774 WaitMax=39754 WaitTotal=61243 WaitSamples=4
+[telemetry island-before-close] Accepted=16 B MeanRate=976.56 KiB/s Behind=16 B Direct=0 B Origin=0 B Materialized=0 B HighWater=1.00 MiB HitAhead=0 B HitBack=0 B Miss=16 B Dirty=16 B DirtyPeak=16 B Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=8739 WaitMax=15395 WaitTotal=24134 WaitSamples=2
+[telemetry hole-before-close] Accepted=4 B MeanRate=177.56 KiB/s Behind=4 B Direct=0 B Origin=0 B Materialized=0 B HighWater=10 B HitAhead=0 B HitBack=0 B Miss=4 B Dirty=4 B DirtyPeak=4 B Cap=32 B SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=9714 WaitMax=26425 WaitTotal=36139 WaitSamples=2
+[telemetry hex-seq-before-close] Accepted=64.00 KiB MeanRate=2.18 GiB/s Behind=64.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=64.00 KiB HitAhead=0 B HitBack=0 B Miss=64.00 KiB Dirty=64.00 KiB DirtyPeak=64.00 KiB Cap=16.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=35162 WaitMax=35162 WaitTotal=35162 WaitSamples=1
+[telemetry evict-after-fill] Accepted=16.00 KiB MeanRate=30.05 MiB/s Behind=16.00 KiB Direct=0 B Origin=16.00 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=16.00 KiB Dirty=16.00 KiB DirtyPeak=16.00 KiB Cap=2.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=1 WaitMin=34754 WaitMax=34754 WaitTotal=34754 WaitSamples=1
+[telemetry evict-after-patch] Accepted=16.01 KiB MeanRate=29.44 MiB/s Behind=16.01 KiB Direct=0 B Origin=16.00 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=16.01 KiB Dirty=8 B DirtyPeak=16.00 KiB Cap=2.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=1 WaitMin=16006 WaitMax=34754 WaitTotal=50760 WaitSamples=2
+[telemetry evict-closed] Accepted=16.01 KiB MeanRate=28.68 MiB/s Behind=16.01 KiB Direct=0 B Origin=16.01 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=16.01 KiB Dirty=0 B DirtyPeak=16.00 KiB Cap=2.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=1 WaitMin=16006 WaitMax=34754 WaitTotal=50760 WaitSamples=2
+[telemetry clsev-direct] Accepted=8.00 KiB MeanRate=108.53 MiB/s Behind=0 B Direct=8.00 KiB Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=1 SeekOrigin=3 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=4000 WaitMax=62083 WaitTotal=85410 WaitSamples=4
+[telemetry clsev-ring-only] Accepted=8.00 KiB MeanRate=12.56 MiB/s Behind=8.00 KiB Direct=0 B Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=2 B DirtyPeak=6.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=49010 WaitMax=242902 WaitTotal=399634 WaitSamples=4
+[telemetry clsev-pages-small] Accepted=8.00 KiB MeanRate=28.62 MiB/s Behind=8.00 KiB Direct=0 B Origin=6.00 KiB Materialized=6.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=8.00 KiB Dirty=2.00 KiB DirtyPeak=6.00 KiB Cap=2.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=1 WaitMin=6031 WaitMax=96118 WaitTotal=126510 WaitSamples=4
+[telemetry clsev-pages-large] Accepted=8.00 KiB MeanRate=28.83 MiB/s Behind=8.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 KiB HitAhead=0 B HitBack=2 B Miss=8.00 KiB Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=4444 WaitMax=164121 WaitTotal=280177 WaitSamples=4
+[telemetry clsev-pages-ring] Accepted=8.00 KiB MeanRate=26.58 MiB/s Behind=8.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 KiB HitAhead=0 B HitBack=2 B Miss=8.00 KiB Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=32.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6440 WaitMax=189525 WaitTotal=304952 WaitSamples=4
+[telemetry dflush-direct] Accepted=8.00 KiB MeanRate=122.13 MiB/s Behind=0 B Direct=8.00 KiB Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=1 SeekOrigin=3 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=3742 WaitMax=52566 WaitTotal=73284 WaitSamples=4
+[telemetry dflush-ring-only] Accepted=8.00 KiB MeanRate=14.92 MiB/s Behind=8.00 KiB Direct=0 B Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=6.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=18830 WaitMax=53377 WaitTotal=155696 WaitSamples=4
+[telemetry dflush-pages-small] Accepted=8.00 KiB MeanRate=19.79 MiB/s Behind=8.00 KiB Direct=0 B Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=8.00 KiB Dirty=0 B DirtyPeak=6.00 KiB Cap=2.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=1 Evicted=1 WaitMin=5670 WaitMax=92630 WaitTotal=124316 WaitSamples=4
+[telemetry dflush-pages-large] Accepted=8.00 KiB MeanRate=14.58 MiB/s Behind=8.00 KiB Direct=0 B Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=8.00 KiB Dirty=0 B DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=8110 WaitMax=176367 WaitTotal=296188 WaitSamples=4
+[telemetry dflush-pages-ring] Accepted=8.00 KiB MeanRate=13.98 MiB/s Behind=8.00 KiB Direct=0 B Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=8.00 KiB Dirty=0 B DirtyPeak=8.00 KiB Cap=32.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=9724 WaitMax=182087 WaitTotal=294712 WaitSamples=4
+[telemetry evictm-direct] Accepted=32 B MeanRate=400.64 KiB/s Behind=0 B Direct=32 B Origin=32 B Materialized=16.01 KiB HighWater=16.01 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=3 SeekOrigin=3 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=3179 WaitMax=73388 WaitTotal=91044 WaitSamples=4
+[telemetry evictm-ring-only] Accepted=32 B MeanRate=19.35 KiB/s Behind=32 B Direct=0 B Origin=24 B Materialized=8.01 KiB HighWater=16.01 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=8 B DirtyPeak=8 B Cap=16.00 KiB SeekLogical=3 SeekOrigin=3 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=11222 WaitMax=648268 WaitTotal=836757 WaitSamples=4
+[telemetry evictm-pages-small] Accepted=32 B MeanRate=1.13 MiB/s Behind=32 B Direct=0 B Origin=0 B Materialized=0 B HighWater=16.01 KiB HitAhead=0 B HitBack=0 B Miss=32 B Dirty=32 B DirtyPeak=32 B Cap=2.00 KiB SeekLogical=3 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=5217 WaitMax=15997 WaitTotal=36500 WaitSamples=4
+[telemetry evictm-pages-large] Accepted=32 B MeanRate=1.13 MiB/s Behind=32 B Direct=0 B Origin=0 B Materialized=0 B HighWater=16.01 KiB HitAhead=0 B HitBack=0 B Miss=32 B Dirty=32 B DirtyPeak=32 B Cap=16.00 KiB SeekLogical=3 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6081 WaitMax=14565 WaitTotal=36853 WaitSamples=4
+[telemetry evictm-pages-ring] Accepted=32 B MeanRate=1.22 MiB/s Behind=32 B Direct=0 B Origin=0 B Materialized=0 B HighWater=16.01 KiB HitAhead=0 B HitBack=0 B Miss=32 B Dirty=32 B DirtyPeak=32 B Cap=32.00 KiB SeekLogical=3 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=5261 WaitMax=15285 WaitTotal=34133 WaitSamples=4
+[telemetry far-direct] Accepted=20 B MeanRate=134.70 KiB/s Behind=0 B Direct=20 B Origin=20 B Materialized=8.00 MiB HighWater=8.00 MiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=5321 WaitMax=98862 WaitTotal=156565 WaitSamples=3
+[telemetry far-ring-only] Accepted=20 B MeanRate=42.00 KiB/s Behind=20 B Direct=0 B Origin=16 B Materialized=8.00 MiB HighWater=8.00 MiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=4 B DirtyPeak=8 B Cap=16.00 KiB SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=13097 WaitMax=128381 WaitTotal=253585 WaitSamples=3
+[telemetry far-pages-small] Accepted=20 B MeanRate=781.25 KiB/s Behind=20 B Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 MiB HitAhead=0 B HitBack=4 B Miss=16 B Dirty=16 B DirtyPeak=16 B Cap=2.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6855 WaitMax=20897 WaitTotal=36089 WaitSamples=3
+[telemetry far-pages-large] Accepted=20 B MeanRate=813.80 KiB/s Behind=20 B Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 MiB HitAhead=0 B HitBack=4 B Miss=16 B Dirty=16 B DirtyPeak=16 B Cap=16.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6781 WaitMax=19379 WaitTotal=34298 WaitSamples=3
+[telemetry far-pages-ring] Accepted=20 B MeanRate=781.25 KiB/s Behind=20 B Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 MiB HitAhead=0 B HitBack=4 B Miss=16 B Dirty=16 B DirtyPeak=16 B Cap=32.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=6809 WaitMax=19920 WaitTotal=35096 WaitSamples=3
+[telemetry patev-direct] Accepted=16.02 KiB MeanRate=118.49 MiB/s Behind=0 B Direct=16.02 KiB Origin=16.02 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=2 SeekOrigin=7 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=3421 WaitMax=100243 WaitTotal=153092 WaitSamples=8
+[mismatch patev-direct] expect_size=16384 got_size=16384 identical
+[telemetry patev-ring-only] Accepted=16.02 KiB MeanRate=22.44 MiB/s Behind=16.02 KiB Direct=0 B Origin=16.01 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=8 B DirtyPeak=7.00 KiB Cap=16.00 KiB SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=17885 WaitMax=129600 WaitTotal=414622 WaitSamples=8
+[mismatch patev-ring-only] expect_size=16384 got_size=16384 identical
+[telemetry patev-pages-small] Accepted=16.02 KiB MeanRate=18.64 MiB/s Behind=16.02 KiB Direct=0 B Origin=16.00 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=16.02 KiB Dirty=16 B DirtyPeak=6.00 KiB Cap=2.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=3 Evicted=2 WaitMin=5658 WaitMax=107412 WaitTotal=343508 WaitSamples=8
+[mismatch patev-pages-small] expect_size=16384 got_size=16384 identical
+[telemetry patev-pages-large] Accepted=16.02 KiB MeanRate=14.18 MiB/s Behind=16.02 KiB Direct=0 B Origin=16.00 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=16.02 KiB Dirty=16 B DirtyPeak=16.00 KiB Cap=16.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=5384 WaitMax=348555 WaitTotal=665704 WaitSamples=8
+[mismatch patev-pages-large] expect_size=16384 got_size=16384 identical
+[telemetry patev-pages-ring] Accepted=16.02 KiB MeanRate=14.21 MiB/s Behind=16.02 KiB Direct=0 B Origin=16.00 KiB Materialized=16.00 KiB HighWater=16.00 KiB HitAhead=0 B HitBack=0 B Miss=16.02 KiB Dirty=16 B DirtyPeak=16.00 KiB Cap=32.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=5194 WaitMax=316805 WaitTotal=632582 WaitSamples=8
+[mismatch patev-pages-ring] expect_size=16384 got_size=16384 identical
+[telemetry reopen-direct] Accepted=2 B MeanRate=50.08 KiB/s Behind=0 B Direct=2 B Origin=2 B Materialized=4 B HighWater=4 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=49005 WaitMax=49005 WaitTotal=49005 WaitSamples=1
+[telemetry reopen-ring-only] Accepted=2 B MeanRate=81.38 KiB/s Behind=2 B Direct=0 B Origin=0 B Materialized=0 B HighWater=4 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=2 B DirtyPeak=2 B Cap=16.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=27098 WaitMax=27098 WaitTotal=27098 WaitSamples=1
+[telemetry reopen-pages-small] Accepted=2 B MeanRate=279.02 KiB/s Behind=2 B Direct=0 B Origin=0 B Materialized=0 B HighWater=4 B HitAhead=0 B HitBack=0 B Miss=2 B Dirty=2 B DirtyPeak=2 B Cap=2.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=10892 WaitMax=10892 WaitTotal=10892 WaitSamples=1
+[telemetry reopen-pages-large] Accepted=2 B MeanRate=177.56 KiB/s Behind=2 B Direct=0 B Origin=0 B Materialized=0 B HighWater=4 B HitAhead=0 B HitBack=0 B Miss=2 B Dirty=2 B DirtyPeak=2 B Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=14125 WaitMax=14125 WaitTotal=14125 WaitSamples=1
+[telemetry reopen-pages-ring] Accepted=2 B MeanRate=150.24 KiB/s Behind=2 B Direct=0 B Origin=0 B Materialized=0 B HighWater=4 B HitAhead=0 B HitBack=0 B Miss=2 B Dirty=2 B DirtyPeak=2 B Cap=32.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=21447 WaitMax=21447 WaitTotal=21447 WaitSamples=1
+[telemetry rseek-ring] Accepted=24 B MeanRate=192.11 KiB/s Behind=24 B Direct=0 B Origin=24 B Materialized=16 B HighWater=16 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=8 B DirtyPeak=16 B Cap=128 B SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=3271 WaitMax=63509 WaitTotal=79124 WaitSamples=3
+[telemetry rseek-ring-pages] Accepted=24 B MeanRate=571.65 KiB/s Behind=24 B Direct=0 B Origin=0 B Materialized=0 B HighWater=16 B HitAhead=0 B HitBack=8 B Miss=16 B Dirty=16 B DirtyPeak=16 B Cap=128 B SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=10827 WaitMax=18194 WaitTotal=43539 WaitSamples=3
+[telemetry rseek-direct] Accepted=24 B MeanRate=418.53 KiB/s Behind=0 B Direct=24 B Origin=24 B Materialized=16 B HighWater=16 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=1 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=4109 WaitMax=51055 WaitTotal=64784 WaitSamples=3
+[telemetry ctor] Accepted=0 B MeanRate=0 B/s Behind=0 B Direct=0 B Origin=0 B Materialized=0 B HighWater=0 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=0 WaitMax=0 WaitTotal=0 WaitSamples=0
+[telemetry direct] Accepted=5 B MeanRate=63.41 KiB/s Behind=0 B Direct=5 B Origin=5 B Materialized=5 B HighWater=5 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=84298 WaitMax=84298 WaitTotal=84298 WaitSamples=1
+[telemetry tel-fill] Accepted=8.00 KiB MeanRate=459.56 MiB/s Behind=8.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=8.00 KiB Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=23261 WaitMax=23261 WaitTotal=23261 WaitSamples=1
+[telemetry tel-seek] Accepted=8.00 KiB MeanRate=459.56 MiB/s Behind=8.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 KiB HitAhead=0 B HitBack=0 B Miss=8.00 KiB Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=23261 WaitMax=23261 WaitTotal=23261 WaitSamples=1
+[telemetry tel-patch] Accepted=8.00 KiB MeanRate=325.68 MiB/s Behind=8.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 KiB HitAhead=0 B HitBack=4 B Miss=8.00 KiB Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=10099 WaitMax=23261 WaitTotal=33360 WaitSamples=2
+[telemetry tel-front] Accepted=8.00 KiB MeanRate=325.68 MiB/s Behind=8.00 KiB Direct=0 B Origin=0 B Materialized=0 B HighWater=8.00 KiB HitAhead=0 B HitBack=4 B Miss=8.00 KiB Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=1 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=10099 WaitMax=23261 WaitTotal=33360 WaitSamples=2
+[telemetry tel-closed] Accepted=8.00 KiB MeanRate=24.50 MiB/s Behind=8.00 KiB Direct=0 B Origin=8.00 KiB Materialized=8.00 KiB HighWater=8.00 KiB HitAhead=0 B HitBack=4 B Miss=8.00 KiB Dirty=0 B DirtyPeak=8.00 KiB Cap=16.00 KiB SeekLogical=2 SeekOrigin=0 SeekSavedFull=1 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=10099 WaitMax=23261 WaitTotal=33360 WaitSamples=2
+[telemetry tel-island] Accepted=4 B MeanRate=244.14 KiB/s Behind=4 B Direct=0 B Origin=0 B Materialized=0 B HighWater=4.00 KiB HitAhead=0 B HitBack=0 B Miss=4 B Dirty=4 B DirtyPeak=4 B Cap=16.00 KiB SeekLogical=1 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=7594 WaitMax=15001 WaitTotal=22595 WaitSamples=2
+[telemetry tel-island-closed] Accepted=4 B MeanRate=54.25 KiB/s Behind=4 B Direct=0 B Origin=4 B Materialized=4.00 KiB HighWater=4.00 KiB HitAhead=0 B HitBack=0 B Miss=4 B Dirty=0 B DirtyPeak=4 B Cap=16.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=7594 WaitMax=15001 WaitTotal=22595 WaitSamples=2
+[telemetry seq-512k] Accepted=512.00 KiB MeanRate=62.68 MiB/s Behind=512.00 KiB Direct=0 B Origin=508.00 KiB Materialized=508.00 KiB HighWater=512.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=4.00 KiB DirtyPeak=6.00 KiB Cap=32.00 KiB SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=31733 WaitMax=62263 WaitTotal=8181476 WaitSamples=171
+[telemetry seek0-8k] Accepted=520.00 KiB MeanRate=62.57 MiB/s Behind=520.00 KiB Direct=0 B Origin=516.00 KiB Materialized=512.00 KiB HighWater=512.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=32.00 KiB SeekLogical=1 SeekOrigin=1 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=31733 WaitMax=134067 WaitTotal=8315543 WaitSamples=172
+[telemetry seek-mid-8k] Accepted=528.00 KiB MeanRate=62.51 MiB/s Behind=528.00 KiB Direct=0 B Origin=524.00 KiB Materialized=512.00 KiB HighWater=512.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=8.00 KiB DirtyPeak=8.00 KiB Cap=32.00 KiB SeekLogical=2 SeekOrigin=2 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=31733 WaitMax=134067 WaitTotal=8445421 WaitSamples=173
+[telemetry seek-rel-4k] Accepted=532.00 KiB MeanRate=62.41 MiB/s Behind=532.00 KiB Direct=0 B Origin=532.00 KiB Materialized=512.00 KiB HighWater=512.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=4.00 KiB DirtyPeak=8.00 KiB Cap=32.00 KiB SeekLogical=3 SeekOrigin=3 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=31733 WaitMax=134067 WaitTotal=8519428 WaitSamples=174
+[telemetry after-flush] Accepted=532.00 KiB MeanRate=62.40 MiB/s Behind=532.00 KiB Direct=0 B Origin=532.00 KiB Materialized=512.00 KiB HighWater=512.00 KiB HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=8.00 KiB Cap=32.00 KiB SeekLogical=3 SeekOrigin=3 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=31733 WaitMax=134067 WaitTotal=8519428 WaitSamples=174
+[telemetry ring-bp] Accepted=2 B MeanRate=325.52 KiB/s Behind=2 B Direct=0 B Origin=0 B Materialized=0 B HighWater=2 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=2 B DirtyPeak=2 B Cap=4 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=1 Saturated=0 Evicted=0 WaitMin=13765 WaitMax=13765 WaitTotal=13765 WaitSamples=1
+[telemetry after-truncate] Accepted=3 B MeanRate=55.28 KiB/s Behind=0 B Direct=3 B Origin=3 B Materialized=0 B HighWater=0 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=58760 WaitMax=58760 WaitTotal=58760 WaitSamples=1
+[telemetry after-close] Accepted=3 B MeanRate=52.32 KiB/s Behind=0 B Direct=3 B Origin=3 B Materialized=0 B HighWater=0 B HitAhead=0 B HitBack=0 B Miss=0 B Dirty=0 B DirtyPeak=0 B Cap=0 B SeekLogical=0 SeekOrigin=0 SeekSavedFull=0 SeekSavedPartial=0 TryAgain=0 Saturated=0 Evicted=0 WaitMin=58760 WaitMax=58760 WaitTotal=58760 WaitSamples=1
+All tests passed!
+<end of output>
+Test time =   4.89 sec
+----------------------------------------------------------
+Test Passed.
+"BufferedFileWriterTests" end time: Nov 02 04:13 CET
+"BufferedFileWriterTests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+4/15 Testing: BufferedLocationDeviceTests
+4/15 Test: BufferedLocationDeviceTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/BufferedLocationDeviceTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"BufferedLocationDeviceTests" start time: Nov 02 04:13 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   3.66 sec
+----------------------------------------------------------
+Test Passed.
+"BufferedLocationDeviceTests" end time: Nov 02 04:13 CET
+"BufferedLocationDeviceTests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+5/15 Testing: ExceptionTests
+5/15 Test: ExceptionTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/ExceptionTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"ExceptionTests" start time: Nov 02 04:13 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ExceptionTests" end time: Nov 02 04:13 CET
+"ExceptionTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/15 Testing: FIFOTests
+6/15 Test: FIFOTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/FIFOTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"FIFOTests" start time: Nov 02 04:13 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"FIFOTests" end time: Nov 02 04:13 CET
+"FIFOTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/15 Testing: HopperTests
+7/15 Test: HopperTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/HopperTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"HopperTests" start time: Nov 02 04:13 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"HopperTests" end time: Nov 02 04:13 CET
+"HopperTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/15 Testing: PipelineTests
+8/15 Test: PipelineTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/PipelineTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"PipelineTests" start time: Nov 02 04:13 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time = 112.13 sec
+----------------------------------------------------------
+Test Passed.
+"PipelineTests" end time: Nov 02 04:15 CET
+"PipelineTests" time elapsed: 00:01:52
+----------------------------------------------------------
+
+9/15 Testing: ProducerConsumerTests
+9/15 Test: ProducerConsumerTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/ProducerConsumerTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"ProducerConsumerTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"ProducerConsumerTests" end time: Nov 02 04:15 CET
+"ProducerConsumerTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/15 Testing: PumperTests
+10/15 Test: PumperTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/PumperTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"PumperTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"PumperTests" end time: Nov 02 04:15 CET
+"PumperTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/15 Testing: RingTests
+11/15 Test: RingTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/RingTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"RingTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   1.33 sec
+----------------------------------------------------------
+Test Passed.
+"RingTests" end time: Nov 02 04:15 CET
+"RingTests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+12/15 Testing: SharedFIFOTests
+12/15 Test: SharedFIFOTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/SharedFIFOTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"SharedFIFOTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"SharedFIFOTests" end time: Nov 02 04:15 CET
+"SharedFIFOTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/15 Testing: SinkTests
+13/15 Test: SinkTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/SinkTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"SinkTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"SinkTests" end time: Nov 02 04:15 CET
+"SinkTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/15 Testing: SinkAllocationFailureTests
+14/15 Test: SinkAllocationFailureTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/SinkAllocationFailureTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"SinkAllocationFailureTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+Allocation interposition requires Linux/glibc without AddressSanitizer.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SinkAllocationFailureTests" end time: Nov 02 04:15 CET
+"SinkAllocationFailureTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/15 Testing: TelemetryTests
+15/15 Test: TelemetryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/TelemetryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+"TelemetryTests" start time: Nov 02 04:15 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"TelemetryTests" end time: Nov 02 04:15 CET
+"TelemetryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 02 04:15 CET

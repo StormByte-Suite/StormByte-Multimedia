@@ -1,0 +1,72 @@
+{
+  "status": "analyzer_run_complete_warning_revalidation_in_progress",
+  "repository": "StormByte-Suite/StormByte-Multimedia",
+  "checks": ["clang-analyzer-*", "bugprone-*", "performance-*", "portability-*"],
+  "coverage": {
+    "unique_compile_database_files": 184,
+    "library_sources_including_unity_tables": 436,
+    "test_sources_including_optional_sdl_demo": 33,
+    "analyzer_execution_errors": 0,
+    "platform": "Linux, Clang 22, C++26; native Windows/macOS branches not compiled"
+  },
+  "confirmed_fix": {
+    "commit": "68777c7b",
+    "file": "lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx",
+    "defect": "Signed int overflow when mapping luma coordinates to chroma on extreme frame aspect ratios.",
+    "evidence_before_fix": "UBSan in actual Degrain implementation: 43228 * 50000 cannot be represented in int.",
+    "fix": "Widen coordinate multiplication to int64_t before division.",
+    "regression_shapes": [[192, 128], [100000, 64], [64, 100000]],
+    "validation": [
+      "Actual Degrain implementation instrumented with undefined-behavior sanitizer: PASS after fix.",
+      "Full instrumented build before fix and focused rebuild after fix: PASS with -j$(nproc).",
+      "CTest: Degrain extreme aspect ratios, Degrain pipeline, NLMeans pipeline, zimg color-cache regression: 4/4 PASS.",
+      "Clang-tidy on changed implementation and test: no errors."
+    ]
+  },
+  "triage": [
+    "Move warnings refer predominantly to moving base subobjects followed by independent derived-member transfers; AVPointer moves only its own pointer.",
+    "Moved-from Frame access in the DOVI test intentionally verifies the documented empty state.",
+    "Optional frame scalers and tone-map graphs are emplaced before use; VMAF mean and minimum scores are assigned together.",
+    "Policy enum has fixed uint32_t underlying type; complement masks and reserved resource bits are intentional.",
+    "RETRACTED: NLMeans samples cannot be assumed bounded to 12 bits. Its caller accepts native 16-bit frames; full-range samples trigger signed multiplication overflow. Fixed in 1faf07d5 with 64-bit multiplication and 16-bit range selection.",
+    "Degrain reserve multiplication and grid array extent use small compile-time constants.",
+    "Rounding warnings operate on nonnegative sample values; no negative-rounding defect demonstrated.",
+    "Virtual cleanup calls in concrete destructors deliberately release resources before base teardown.",
+    "Codec pointer sorting uses explicit preference comparators, not pointer-address ordering.",
+    "No style-only, speculative or unconfirmed-warning changes applied."
+  ],
+  "revalidation": {
+    "confirmed_additional_fix": {
+      "commit": "1faf07d5f9fb8d8f4bc7686ac3f0bf00feaeee12",
+      "defect": "NLMeans difference square overflow on 16-bit samples; caller also selected a 12-bit peak for 16-bit frames.",
+      "before": "UBSan: 65535 * 65535 cannot be represented in int, nlmeans_plane.hxx:63; executable exit 1.",
+      "after": "NLMeans plane suites pass with UBSan; 10/12/16-bit full-range samples, several patch radii and strengths match scalar reference.",
+      "other_validation": "5/5 focused CTests pass; clang-tidy completes without errors and no longer reports production squared-difference multiplication; tests retain pre-existing bounded-stride multiplication warnings.",
+      "changelog": "CHANGELOG.md Unreleased Fixed"
+    },
+    "verified_source_invariants": [
+      "AVPointer move transfers only m_ptr; AVFilterGraph transfers its independent derived members afterwards.",
+      "Frame and Packet transfer Item then independent derived members, and reset the moved-from state.",
+      "SimplePlayer color scaler is emplaced before each reported dereference; tone-map graph is emplaced in the missing branch and retained in the other.",
+      "VMAF mean and minimum are assigned together before Report checks mean.",
+      "AVFormatContext decoder expected.value() and bitstream-filter expected.value() each have a has-value guard.",
+      "Policy has a fixed uint32_t underlying type; complement and reserved resource masks are intentional.",
+      "Codec stable_sort compares preference, not pointer addresses."
+    ],
+    "invariant_tests": "7/7 existing CTests pass: two HDR preview paths, VMAF remux score, DOVI copy/move, two resource policy checks, delayed filter graph output.",
+    "unresolved": [
+      "Allocation-related exception-escape warnings must not be classified as false positives. Safe::Vector scratch allocation can throw AllocationError and many string operations allocate; broad noexcept contract changes require separate analysis.",
+      "Not every individual exception-escape trace has been revalidated or dynamically fault-injected.",
+      "A full separate non-PGO UBSan build/test run completed with GPL/nonfree enabled. Strict baseline: 297 passed, 124 failed on external-source UBSan diagnostics, 10 skipped. Unsuppressed recovery diagnostic: 421 passed, 10 skipped; 1525 reports at 252 external-source locations, no owned-source primary report. Strict sanitizer verdict remains FAIL, not clean. Details: ubsan-validation.json."
+    ],
+    "scope": "A passing dynamic test supports only exercised paths; no claim that all sanitizer or static warnings are eliminated."
+  },
+  "sanitizer_integration_fix": {
+    "commit": "aee9dcbd",
+    "defect": "Bundled liblzma integration did not disable its sanitizer-incompatible command-line sandbox.",
+    "validation": "Full UBSan configuration/build completed; configuration regression covers C and CXX flags with UBSan, ASan+UBSan and no sanitizer.",
+    "release_actions": "Local atomic commit with Unreleased entry; no push or tag."
+  },
+  "worktree": "clean after aee9dcbd",
+  "release_actions": "No bump, tag or push."
+}

@@ -1,0 +1,14 @@
+[Test] Starting test_filter_degrain_extreme_aspect_ratios
+[Test] test_filter_degrain_extreme_aspect_ratios: assert source.AllocVideo(shape[0], shape[1], AV_PIX_FMT_YUV420P)
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"frames"})) == "1"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"rejected"})) == "0"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"ran"})) == "0"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert source.AllocVideo(shape[0], shape[1], AV_PIX_FMT_YUV420P)
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"frames"})) == "1"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"rejected"})) == "0"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"ran"})) == "0"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert source.AllocVideo(shape[0], shape[1], AV_PIX_FMT_YUV420P)
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"frames"})) == "1"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"rejected"})) == "0"sv
+[Test] test_filter_degrain_extreme_aspect_ratios: assert TestView(report.Data().at(StormByte::Safe::String{"ran"})) == "0"sv
+[Test] Finished test_filter_degrain_extreme_aspect_ratios: PASS

@@ -1,0 +1,2354 @@
+{
+  "dependencies/buffer/buffer-ctest.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/buffer-ctest.log"
+  ],
+  "static-analysis/current/clang-tidy-current.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clang-tidy-current.log"
+  ],
+  "static-analysis/current/clang-tidy-diagnostics.txt": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clang-tidy-diagnostics.txt"
+  ],
+  "runs/current/clean-current-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-current-focused.log"
+  ],
+  "runs/current/clean-current-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-current-focused.xml"
+  ],
+  "runs/current/clean-current-full-strict.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-current-full-strict.log"
+  ],
+  "runs/current/clean-current-full-strict.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-current-full-strict.xml"
+  ],
+  "builds/eighth/clean-eighth-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-eighth-build.log"
+  ],
+  "builds/eighth/clean-eighth-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-eighth-configure.log"
+  ],
+  "runs/eighth/clean-eighth-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-eighth-focused.log"
+  ],
+  "runs/eighth/clean-eighth-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-eighth-focused.xml"
+  ],
+  "builds/fifth/clean-fifth-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fifth-build.log"
+  ],
+  "builds/fifth/clean-fifth-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fifth-configure.log"
+  ],
+  "runs/fifth/clean-fifth-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fifth-focused.log"
+  ],
+  "runs/fifth/clean-fifth-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fifth-focused.xml"
+  ],
+  "builds/clean-final/clean-final-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-final-build.log"
+  ],
+  "builds/clean-final/clean-final-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-final-configure.log"
+  ],
+  "runs/clean-final/clean-final-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-final-focused.log"
+  ],
+  "runs/clean-final/clean-final-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-final-focused.xml"
+  ],
+  "builds/followup/clean-followup-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-followup-build.log"
+  ],
+  "builds/followup/clean-followup-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-followup-configure.log"
+  ],
+  "runs/followup/clean-followup-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-followup-focused.log"
+  ],
+  "runs/followup/clean-followup-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-followup-focused.xml"
+  ],
+  "builds/fourth/clean-fourth-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fourth-build.log"
+  ],
+  "builds/fourth/clean-fourth-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fourth-configure.log"
+  ],
+  "runs/fourth/clean-fourth-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fourth-focused.log"
+  ],
+  "runs/fourth/clean-fourth-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fourth-focused.xml"
+  ],
+  "builds/ninth/clean-ninth-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-ninth-build.log"
+  ],
+  "builds/ninth/clean-ninth-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-ninth-configure.log"
+  ],
+  "runs/ninth/clean-ninth-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-ninth-focused.log"
+  ],
+  "runs/ninth/clean-ninth-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-ninth-focused.xml"
+  ],
+  "builds/seventh/clean-seventh-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-seventh-build.log"
+  ],
+  "builds/seventh/clean-seventh-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-seventh-configure.log"
+  ],
+  "runs/seventh/clean-seventh-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-seventh-focused.log"
+  ],
+  "runs/seventh/clean-seventh-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-seventh-focused.xml"
+  ],
+  "builds/sixth/clean-sixth-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-sixth-build.log"
+  ],
+  "builds/sixth/clean-sixth-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-sixth-configure.log"
+  ],
+  "runs/sixth/clean-sixth-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-sixth-focused.log"
+  ],
+  "runs/sixth/clean-sixth-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-sixth-focused.xml"
+  ],
+  "builds/tenth/clean-tenth-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-tenth-build.log"
+  ],
+  "builds/tenth/clean-tenth-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-tenth-configure.log"
+  ],
+  "runs/tenth/clean-tenth-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-tenth-focused.log"
+  ],
+  "runs/tenth/clean-tenth-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-tenth-focused.xml"
+  ],
+  "builds/third/clean-third-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-third-build.log"
+  ],
+  "builds/third/clean-third-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-third-configure.log"
+  ],
+  "runs/third/clean-third-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-third-focused.log"
+  ],
+  "runs/third/clean-third-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-third-focused.xml"
+  ],
+  "runs/initial-patches/ffmpeg-dovi-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/ffmpeg-dovi-focused.log"
+  ],
+  "builds/initial-patches/ffmpeg-patches-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/ffmpeg-patches-build.log"
+  ],
+  "builds/initial-patches/ffmpeg-patches-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/ffmpeg-patches-configure.log"
+  ],
+  "runs/initial-patches/ffmpeg-patches-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/ffmpeg-patches-focused.log"
+  ],
+  "runs/initial-patches/ffmpeg-patches-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/ffmpeg-patches-focused.xml"
+  ],
+  "builds/baseline/multimedia-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-build.log"
+  ],
+  "builds/baseline/multimedia-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-configure.log"
+  ],
+  "runs/baseline/multimedia-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-focused.log"
+  ],
+  "runs/baseline/multimedia-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-focused.xml"
+  ],
+  "runs/baseline/multimedia-full-plain.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-full-plain.log"
+  ],
+  "runs/baseline/multimedia-full-plain.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-full-plain.xml"
+  ],
+  "runs/baseline/multimedia-full-strict.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-full-strict.log"
+  ],
+  "runs/baseline/multimedia-full-strict.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-full-strict.xml"
+  ],
+  "builds/baseline/plain-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-build.log"
+  ],
+  "builds/baseline/plain-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-configure.log"
+  ],
+  "runs/baseline/oom/plain-oom-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-oom-focused.log"
+  ],
+  "runs/baseline/oom/plain-oom.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-oom.log"
+  ],
+  "runs/baseline/preview/plain-preview-recheck.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-preview-recheck.log"
+  ],
+  "runs/baseline/preview/plain-preview-recheck.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-preview-recheck.xml"
+  ],
+  "builds/initial-patches/provider-patches-build.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/provider-patches-build.log"
+  ],
+  "builds/initial-patches/provider-patches-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/provider-patches-configure.log"
+  ],
+  "runs/initial-patches/provider-patches-focused.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/provider-patches-focused.log"
+  ],
+  "runs/initial-patches/provider-patches-focused.xml": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/provider-patches-focused.xml"
+  ],
+  "builds/baseline/rubberband-configure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/rubberband-configure.log"
+  ],
+  "builds/baseline/sanitizer-rebuild.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/sanitizer-rebuild.log"
+  ],
+  "builds/baseline/sanitizer-reconfigure.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/sanitizer-reconfigure.log"
+  ],
+  "static-analysis/initial/units/000.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/000.log"
+  ],
+  "static-analysis/initial/units/001.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/001.log"
+  ],
+  "static-analysis/initial/units/002.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/002.log"
+  ],
+  "static-analysis/initial/units/003.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/003.log"
+  ],
+  "static-analysis/initial/units/004.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/004.log"
+  ],
+  "static-analysis/initial/units/005.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/005.log"
+  ],
+  "static-analysis/initial/units/006.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/006.log"
+  ],
+  "static-analysis/initial/units/007.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/007.log"
+  ],
+  "static-analysis/initial/units/008.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/008.log"
+  ],
+  "static-analysis/initial/units/009.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/009.log"
+  ],
+  "static-analysis/initial/units/010.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/010.log"
+  ],
+  "static-analysis/initial/units/011.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/011.log"
+  ],
+  "static-analysis/initial/units/012.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/012.log"
+  ],
+  "static-analysis/initial/units/013.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/013.log"
+  ],
+  "static-analysis/initial/units/014.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/014.log"
+  ],
+  "static-analysis/initial/units/015.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/015.log"
+  ],
+  "static-analysis/initial/units/016.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/016.log"
+  ],
+  "static-analysis/initial/units/017.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/017.log"
+  ],
+  "static-analysis/initial/units/018.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/018.log"
+  ],
+  "static-analysis/initial/units/019.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/019.log"
+  ],
+  "static-analysis/initial/units/020.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/020.log"
+  ],
+  "static-analysis/initial/units/021.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/021.log"
+  ],
+  "static-analysis/initial/units/022.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/022.log"
+  ],
+  "static-analysis/initial/units/023.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/023.log"
+  ],
+  "static-analysis/initial/units/024.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/024.log"
+  ],
+  "static-analysis/initial/units/025.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/025.log"
+  ],
+  "static-analysis/initial/units/026.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/026.log"
+  ],
+  "static-analysis/initial/units/027.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/027.log"
+  ],
+  "static-analysis/initial/units/028.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/028.log"
+  ],
+  "static-analysis/initial/units/029.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/029.log"
+  ],
+  "static-analysis/initial/units/030.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/030.log"
+  ],
+  "static-analysis/initial/units/031.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/031.log"
+  ],
+  "static-analysis/initial/units/032.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/032.log"
+  ],
+  "static-analysis/initial/units/033.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/033.log"
+  ],
+  "static-analysis/initial/units/034.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/034.log"
+  ],
+  "static-analysis/initial/units/035.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/035.log"
+  ],
+  "static-analysis/initial/units/036.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/036.log"
+  ],
+  "static-analysis/initial/units/037.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/037.log"
+  ],
+  "static-analysis/initial/units/038.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/038.log"
+  ],
+  "static-analysis/initial/units/039.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/039.log"
+  ],
+  "static-analysis/initial/units/040.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/040.log"
+  ],
+  "static-analysis/initial/units/041.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/041.log"
+  ],
+  "static-analysis/initial/units/042.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/042.log"
+  ],
+  "static-analysis/initial/units/043.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/043.log"
+  ],
+  "static-analysis/initial/units/044.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/044.log"
+  ],
+  "static-analysis/initial/units/045.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/045.log"
+  ],
+  "static-analysis/initial/units/046.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/046.log"
+  ],
+  "static-analysis/initial/units/047.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/047.log"
+  ],
+  "static-analysis/initial/units/048.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/048.log"
+  ],
+  "static-analysis/initial/units/049.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/049.log"
+  ],
+  "static-analysis/initial/units/050.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/050.log"
+  ],
+  "static-analysis/initial/units/051.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/051.log"
+  ],
+  "static-analysis/initial/units/052.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/052.log"
+  ],
+  "static-analysis/initial/units/053.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/053.log"
+  ],
+  "static-analysis/initial/units/054.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/054.log"
+  ],
+  "static-analysis/initial/units/055.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/055.log"
+  ],
+  "static-analysis/initial/units/056.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/056.log"
+  ],
+  "static-analysis/initial/units/057.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/057.log"
+  ],
+  "static-analysis/initial/units/058.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/058.log"
+  ],
+  "static-analysis/initial/units/059.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/059.log"
+  ],
+  "static-analysis/initial/units/060.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/060.log"
+  ],
+  "static-analysis/initial/units/061.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/061.log"
+  ],
+  "static-analysis/initial/units/062.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/062.log"
+  ],
+  "static-analysis/initial/units/063.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/063.log"
+  ],
+  "static-analysis/initial/units/064.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/064.log"
+  ],
+  "static-analysis/initial/units/065.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/065.log"
+  ],
+  "static-analysis/initial/units/066.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/066.log"
+  ],
+  "static-analysis/initial/units/067.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/067.log"
+  ],
+  "static-analysis/initial/units/068.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/068.log"
+  ],
+  "static-analysis/initial/units/069.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/069.log"
+  ],
+  "static-analysis/initial/units/070.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/070.log"
+  ],
+  "static-analysis/initial/units/071.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/071.log"
+  ],
+  "static-analysis/initial/units/072.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/072.log"
+  ],
+  "static-analysis/initial/units/073.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/073.log"
+  ],
+  "static-analysis/initial/units/074.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/074.log"
+  ],
+  "static-analysis/initial/units/075.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/075.log"
+  ],
+  "static-analysis/initial/units/076.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/076.log"
+  ],
+  "static-analysis/initial/units/077.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/077.log"
+  ],
+  "static-analysis/initial/units/078.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/078.log"
+  ],
+  "static-analysis/initial/units/079.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/079.log"
+  ],
+  "static-analysis/initial/units/080.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/080.log"
+  ],
+  "static-analysis/initial/units/081.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/081.log"
+  ],
+  "static-analysis/initial/units/082.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/082.log"
+  ],
+  "static-analysis/initial/units/083.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/083.log"
+  ],
+  "static-analysis/initial/units/084.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/084.log"
+  ],
+  "static-analysis/initial/units/085.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/085.log"
+  ],
+  "static-analysis/initial/units/086.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/086.log"
+  ],
+  "static-analysis/initial/units/087.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/087.log"
+  ],
+  "static-analysis/initial/units/088.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/088.log"
+  ],
+  "static-analysis/initial/units/089.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/089.log"
+  ],
+  "static-analysis/initial/units/090.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/090.log"
+  ],
+  "static-analysis/initial/units/091.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/091.log"
+  ],
+  "static-analysis/initial/units/092.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/092.log"
+  ],
+  "static-analysis/initial/units/093.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/093.log"
+  ],
+  "static-analysis/initial/units/094.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/094.log"
+  ],
+  "static-analysis/initial/units/095.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/095.log"
+  ],
+  "static-analysis/initial/units/096.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/096.log"
+  ],
+  "static-analysis/initial/units/097.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/097.log"
+  ],
+  "static-analysis/initial/units/098.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/098.log"
+  ],
+  "static-analysis/initial/units/099.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/099.log"
+  ],
+  "static-analysis/initial/units/100.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/100.log"
+  ],
+  "static-analysis/initial/units/101.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/101.log"
+  ],
+  "static-analysis/initial/units/102.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/102.log"
+  ],
+  "static-analysis/initial/units/103.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/103.log"
+  ],
+  "static-analysis/initial/units/104.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/104.log"
+  ],
+  "static-analysis/initial/units/105.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/105.log"
+  ],
+  "static-analysis/initial/units/106.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/106.log"
+  ],
+  "static-analysis/initial/units/107.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/107.log"
+  ],
+  "static-analysis/initial/units/108.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/108.log"
+  ],
+  "static-analysis/initial/units/109.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/109.log"
+  ],
+  "static-analysis/initial/units/110.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/110.log"
+  ],
+  "static-analysis/initial/units/111.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/111.log"
+  ],
+  "static-analysis/initial/units/112.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/112.log"
+  ],
+  "static-analysis/initial/units/113.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/113.log"
+  ],
+  "static-analysis/initial/units/114.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/114.log"
+  ],
+  "static-analysis/initial/units/115.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/115.log"
+  ],
+  "static-analysis/initial/units/116.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/116.log"
+  ],
+  "static-analysis/initial/units/117.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/117.log"
+  ],
+  "static-analysis/initial/units/118.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/118.log"
+  ],
+  "static-analysis/initial/units/119.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/119.log"
+  ],
+  "static-analysis/initial/units/120.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/120.log"
+  ],
+  "static-analysis/initial/units/121.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/121.log"
+  ],
+  "static-analysis/initial/units/122.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/122.log"
+  ],
+  "static-analysis/initial/units/123.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/123.log"
+  ],
+  "static-analysis/initial/units/124.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/124.log"
+  ],
+  "static-analysis/initial/units/125.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/125.log"
+  ],
+  "static-analysis/initial/units/126.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/126.log"
+  ],
+  "static-analysis/initial/units/127.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/127.log"
+  ],
+  "static-analysis/initial/units/128.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/128.log"
+  ],
+  "static-analysis/initial/units/129.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/129.log"
+  ],
+  "static-analysis/initial/units/130.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/130.log"
+  ],
+  "static-analysis/initial/units/131.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/131.log"
+  ],
+  "static-analysis/initial/units/132.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/132.log"
+  ],
+  "static-analysis/initial/units/133.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/133.log"
+  ],
+  "static-analysis/initial/units/134.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/134.log"
+  ],
+  "static-analysis/initial/units/135.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/135.log"
+  ],
+  "static-analysis/initial/units/136.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/136.log"
+  ],
+  "static-analysis/initial/units/137.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/137.log"
+  ],
+  "static-analysis/initial/units/138.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/138.log"
+  ],
+  "static-analysis/initial/units/139.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/139.log"
+  ],
+  "static-analysis/initial/units/140.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/140.log"
+  ],
+  "static-analysis/initial/units/141.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/141.log"
+  ],
+  "static-analysis/initial/units/142.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/142.log"
+  ],
+  "static-analysis/initial/units/143.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/143.log"
+  ],
+  "static-analysis/initial/units/144.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/144.log"
+  ],
+  "static-analysis/initial/units/145.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/145.log"
+  ],
+  "static-analysis/initial/units/146.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/146.log"
+  ],
+  "static-analysis/initial/units/147.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/147.log"
+  ],
+  "static-analysis/initial/units/148.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/148.log"
+  ],
+  "static-analysis/initial/units/149.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/149.log"
+  ],
+  "static-analysis/initial/units/150.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/150.log"
+  ],
+  "static-analysis/initial/units/151.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/151.log"
+  ],
+  "static-analysis/initial/units/152.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/152.log"
+  ],
+  "static-analysis/initial/units/153.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/153.log"
+  ],
+  "static-analysis/initial/units/154.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/154.log"
+  ],
+  "static-analysis/initial/units/155.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/155.log"
+  ],
+  "static-analysis/initial/units/156.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/156.log"
+  ],
+  "static-analysis/initial/units/157.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/157.log"
+  ],
+  "static-analysis/initial/units/158.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/158.log"
+  ],
+  "static-analysis/initial/units/159.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/159.log"
+  ],
+  "static-analysis/initial/units/160.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/160.log"
+  ],
+  "static-analysis/initial/units/161.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/161.log"
+  ],
+  "static-analysis/initial/units/162.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/162.log"
+  ],
+  "static-analysis/initial/units/163.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/163.log"
+  ],
+  "static-analysis/initial/units/164.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/164.log"
+  ],
+  "static-analysis/initial/units/165.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/165.log"
+  ],
+  "static-analysis/initial/units/166.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/166.log"
+  ],
+  "static-analysis/initial/units/167.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/167.log"
+  ],
+  "static-analysis/initial/units/168.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/168.log"
+  ],
+  "static-analysis/initial/units/169.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/169.log"
+  ],
+  "static-analysis/initial/units/170.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/170.log"
+  ],
+  "static-analysis/initial/units/171.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/171.log"
+  ],
+  "static-analysis/initial/units/172.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/172.log"
+  ],
+  "static-analysis/initial/units/173.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/173.log"
+  ],
+  "static-analysis/initial/units/174.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/174.log"
+  ],
+  "static-analysis/initial/units/175.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/175.log"
+  ],
+  "static-analysis/initial/units/176.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/176.log"
+  ],
+  "static-analysis/initial/units/177.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/177.log"
+  ],
+  "static-analysis/initial/units/178.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/178.log"
+  ],
+  "static-analysis/initial/units/179.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/179.log"
+  ],
+  "static-analysis/initial/units/180.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/180.log"
+  ],
+  "static-analysis/initial/units/181.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/181.log"
+  ],
+  "static-analysis/initial/units/182.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/182.log"
+  ],
+  "static-analysis/initial/units/183.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/183.log"
+  ],
+  "historical/static-triage/build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/build.log"
+  ],
+  "historical/static-triage/conclusion.json": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/conclusion.json"
+  ],
+  "historical/static-triage/degrain-fixed-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/degrain-fixed-build.log"
+  ],
+  "historical/static-triage/degrain-repro-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/degrain-repro-build.log"
+  ],
+  "historical/static-triage/degrain-tidy-fixed.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/degrain-tidy-fixed.log"
+  ],
+  "historical/static-triage/degrain-ubsan-fixed.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/degrain-ubsan-fixed.log"
+  ],
+  "historical/static-triage/demo.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/demo.log"
+  ],
+  "static-analysis/initial/diagnostics.txt": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/diagnostics.txt"
+  ],
+  "historical/static-triage/external-ubsan.supp": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/external-ubsan.supp"
+  ],
+  "historical/static-triage/filter-link-commands.txt": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/filter-link-commands.txt"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1170917": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1170917"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171001": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171001"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171145": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171145"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171224": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171224"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171273": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171273"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171361": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171361"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171415": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171415"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171755": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171755"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171813": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171813"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1171879": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1171879"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1172204": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1172204"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1172292": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1172292"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1172300": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1172300"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1172546": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1172546"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1172583": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1172583"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1172619": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1172619"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1173166": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1173166"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1173653": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1173653"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1173768": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1173768"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1173952": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1173952"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174033": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174033"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174119": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174119"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174286": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174286"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174396": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174396"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174485": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174485"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174566": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174566"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174689": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174689"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174790": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174790"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174884": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174884"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1174890": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1174890"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1175066": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1175066"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1175282": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1175282"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1175547": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1175547"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1175966": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1175966"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1178968": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1178968"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1179409": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1179409"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1179804": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1179804"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1180173": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1180173"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1180551": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1180551"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1180943": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1180943"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1181314": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1181314"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1181693": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1181693"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1182081": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1182081"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1182466": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1182466"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1183002": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1183002"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1183302": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1183302"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1183879": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1183879"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1184457": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1184457"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1185035": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1185035"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1185627": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1185627"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1186229": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1186229"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1186839": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1186839"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1187421": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1187421"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1187999": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1187999"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1194881": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1194881"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1196059": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1196059"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1196392": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1196392"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1196624": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1196624"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1196853": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1196853"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1196988": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1196988"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1197552": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1197552"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1197657": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1197657"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1197873": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1197873"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1198376": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1198376"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1198884": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1198884"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1199374": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1199374"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1200200": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1200200"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1200380": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1200380"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1200479": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1200479"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1200947": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1200947"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1201571": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1201571"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1201706": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1201706"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205203": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205203"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205324": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205324"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205445": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205445"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205720": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205720"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205753": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205753"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205786": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205786"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1205847": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1205847"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206144": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206144"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206206": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206206"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206504": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206504"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206523": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206523"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206534": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206534"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206546": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206546"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206618": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206618"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206709": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206709"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206809": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206809"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206838": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206838"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206881": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206881"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206895": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206895"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1206909": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1206909"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207021": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207021"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207077": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207077"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207206": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207206"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207298": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207298"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207312": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207312"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207326": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207326"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207541": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207541"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207639": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207639"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207675": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207675"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207711": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207711"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207756": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207756"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207792": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207792"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207831": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207831"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207902": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207902"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1207942": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1207942"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1208142": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1208142"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1208215": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1208215"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1208408": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1208408"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1208684": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1208684"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1209246": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1209246"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1210207": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1210207"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1210220": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1210220"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1210295": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1210295"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1210400": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1210400"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1210647": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1210647"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1215605": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1215605"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1215789": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1215789"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1215858": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1215858"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1215918": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1215918"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1215970": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1215970"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1216116": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1216116"
+  ],
+  "historical/recover/raw/multimedia-suite-patch-recover.1216305": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/multimedia-suite-patch-recover.1216305"
+  ],
+  "historical/static-triage/nlmeans-final-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/nlmeans-final-build.log"
+  ],
+  "historical/static-triage/nlmeans-revalidation-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/nlmeans-revalidation-build.log"
+  ],
+  "historical/static-triage/nlmeans-revalidation-tidy.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/nlmeans-revalidation-tidy.log"
+  ],
+  "historical/static-triage/nlmeans-revalidation-ubsan.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/nlmeans-revalidation-ubsan.log"
+  ],
+  "historical/static-triage/noexcept-revalidation.json": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/noexcept-revalidation.json"
+  ],
+  "static-analysis/initial/results.json": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/results.json"
+  ],
+  "historical/static-triage/string_noexcept_probe.cxx": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/string_noexcept_probe.cxx"
+  ],
+  "historical/static-triage/ubsan-build-final.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-build-final.log"
+  ],
+  "historical/static-triage/ubsan-build-resumed.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-build-resumed.log"
+  ],
+  "historical/static-triage/ubsan-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-build.log"
+  ],
+  "historical/static-triage/ubsan-configure.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-configure.log"
+  ],
+  "historical/static-triage/ubsan-full-tests.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-full-tests.log"
+  ],
+  "historical/static-triage/ubsan-full-tests.xml": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-full-tests.xml"
+  ],
+  "historical/static-triage/ubsan-isolated-pass3.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-isolated-pass3.log"
+  ],
+  "historical/static-triage/ubsan-isolated-pass3.xml": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-isolated-pass3.xml"
+  ],
+  "historical/static-triage/ubsan-isolated-tests.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-isolated-tests.log"
+  ],
+  "historical/static-triage/ubsan-isolated-tests.xml": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-isolated-tests.xml"
+  ],
+  "historical/static-triage/ubsan-link-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-link-build.log"
+  ],
+  "historical/static-triage/ubsan-recover-tests.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover-tests.log"
+  ],
+  "historical/static-triage/ubsan-recover-tests.xml": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover-tests.xml"
+  ],
+  "historical/recover/raw/ubsan-recover.929647": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.929647"
+  ],
+  "historical/recover/raw/ubsan-recover.929698": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.929698"
+  ],
+  "historical/recover/raw/ubsan-recover.930022": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.930022"
+  ],
+  "historical/recover/raw/ubsan-recover.930200": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.930200"
+  ],
+  "historical/recover/raw/ubsan-recover.930251": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.930251"
+  ],
+  "historical/recover/raw/ubsan-recover.930354": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.930354"
+  ],
+  "historical/recover/raw/ubsan-recover.930399": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.930399"
+  ],
+  "historical/recover/raw/ubsan-recover.930983": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.930983"
+  ],
+  "historical/recover/raw/ubsan-recover.931104": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.931104"
+  ],
+  "historical/recover/raw/ubsan-recover.931259": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.931259"
+  ],
+  "historical/recover/raw/ubsan-recover.931696": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.931696"
+  ],
+  "historical/recover/raw/ubsan-recover.931844": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.931844"
+  ],
+  "historical/recover/raw/ubsan-recover.931852": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.931852"
+  ],
+  "historical/recover/raw/ubsan-recover.932257": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.932257"
+  ],
+  "historical/recover/raw/ubsan-recover.932303": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.932303"
+  ],
+  "historical/recover/raw/ubsan-recover.932363": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.932363"
+  ],
+  "historical/recover/raw/ubsan-recover.933108": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.933108"
+  ],
+  "historical/recover/raw/ubsan-recover.933677": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.933677"
+  ],
+  "historical/recover/raw/ubsan-recover.933888": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.933888"
+  ],
+  "historical/recover/raw/ubsan-recover.934067": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.934067"
+  ],
+  "historical/recover/raw/ubsan-recover.934168": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.934168"
+  ],
+  "historical/recover/raw/ubsan-recover.934299": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.934299"
+  ],
+  "historical/recover/raw/ubsan-recover.934529": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.934529"
+  ],
+  "historical/recover/raw/ubsan-recover.934689": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.934689"
+  ],
+  "historical/recover/raw/ubsan-recover.934788": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.934788"
+  ],
+  "historical/recover/raw/ubsan-recover.935010": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935010"
+  ],
+  "historical/recover/raw/ubsan-recover.935113": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935113"
+  ],
+  "historical/recover/raw/ubsan-recover.935234": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935234"
+  ],
+  "historical/recover/raw/ubsan-recover.935354": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935354"
+  ],
+  "historical/recover/raw/ubsan-recover.935360": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935360"
+  ],
+  "historical/recover/raw/ubsan-recover.935497": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935497"
+  ],
+  "historical/recover/raw/ubsan-recover.935740": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935740"
+  ],
+  "historical/recover/raw/ubsan-recover.935961": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.935961"
+  ],
+  "historical/recover/raw/ubsan-recover.936402": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.936402"
+  ],
+  "historical/recover/raw/ubsan-recover.939847": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.939847"
+  ],
+  "historical/recover/raw/ubsan-recover.940227": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.940227"
+  ],
+  "historical/recover/raw/ubsan-recover.940632": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.940632"
+  ],
+  "historical/recover/raw/ubsan-recover.941081": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.941081"
+  ],
+  "historical/recover/raw/ubsan-recover.941462": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.941462"
+  ],
+  "historical/recover/raw/ubsan-recover.941842": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.941842"
+  ],
+  "historical/recover/raw/ubsan-recover.942290": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.942290"
+  ],
+  "historical/recover/raw/ubsan-recover.942733": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.942733"
+  ],
+  "historical/recover/raw/ubsan-recover.943134": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.943134"
+  ],
+  "historical/recover/raw/ubsan-recover.943547": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.943547"
+  ],
+  "historical/recover/raw/ubsan-recover.944094": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.944094"
+  ],
+  "historical/recover/raw/ubsan-recover.944393": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.944393"
+  ],
+  "historical/recover/raw/ubsan-recover.945031": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.945031"
+  ],
+  "historical/recover/raw/ubsan-recover.945609": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.945609"
+  ],
+  "historical/recover/raw/ubsan-recover.946206": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.946206"
+  ],
+  "historical/recover/raw/ubsan-recover.946824": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.946824"
+  ],
+  "historical/recover/raw/ubsan-recover.947492": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.947492"
+  ],
+  "historical/recover/raw/ubsan-recover.948175": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.948175"
+  ],
+  "historical/recover/raw/ubsan-recover.948767": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.948767"
+  ],
+  "historical/recover/raw/ubsan-recover.949376": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.949376"
+  ],
+  "historical/recover/raw/ubsan-recover.958076": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.958076"
+  ],
+  "historical/recover/raw/ubsan-recover.959250": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.959250"
+  ],
+  "historical/recover/raw/ubsan-recover.959554": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.959554"
+  ],
+  "historical/recover/raw/ubsan-recover.960130": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.960130"
+  ],
+  "historical/recover/raw/ubsan-recover.960597": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.960597"
+  ],
+  "historical/recover/raw/ubsan-recover.960784": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.960784"
+  ],
+  "historical/recover/raw/ubsan-recover.961396": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.961396"
+  ],
+  "historical/recover/raw/ubsan-recover.961555": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.961555"
+  ],
+  "historical/recover/raw/ubsan-recover.961884": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.961884"
+  ],
+  "historical/recover/raw/ubsan-recover.962549": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.962549"
+  ],
+  "historical/recover/raw/ubsan-recover.963039": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.963039"
+  ],
+  "historical/recover/raw/ubsan-recover.963525": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.963525"
+  ],
+  "historical/recover/raw/ubsan-recover.964439": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.964439"
+  ],
+  "historical/recover/raw/ubsan-recover.964680": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.964680"
+  ],
+  "historical/recover/raw/ubsan-recover.964793": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.964793"
+  ],
+  "historical/recover/raw/ubsan-recover.965332": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.965332"
+  ],
+  "historical/recover/raw/ubsan-recover.966285": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.966285"
+  ],
+  "historical/recover/raw/ubsan-recover.966582": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.966582"
+  ],
+  "historical/recover/raw/ubsan-recover.970561": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.970561"
+  ],
+  "historical/recover/raw/ubsan-recover.970692": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.970692"
+  ],
+  "historical/recover/raw/ubsan-recover.970846": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.970846"
+  ],
+  "historical/recover/raw/ubsan-recover.971182": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.971182"
+  ],
+  "historical/recover/raw/ubsan-recover.971253": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.971253"
+  ],
+  "historical/recover/raw/ubsan-recover.971311": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.971311"
+  ],
+  "historical/recover/raw/ubsan-recover.971373": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.971373"
+  ],
+  "historical/recover/raw/ubsan-recover.971649": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.971649"
+  ],
+  "historical/recover/raw/ubsan-recover.971711": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.971711"
+  ],
+  "historical/recover/raw/ubsan-recover.972010": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972010"
+  ],
+  "historical/recover/raw/ubsan-recover.972040": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972040"
+  ],
+  "historical/recover/raw/ubsan-recover.972051": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972051"
+  ],
+  "historical/recover/raw/ubsan-recover.972063": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972063"
+  ],
+  "historical/recover/raw/ubsan-recover.972248": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972248"
+  ],
+  "historical/recover/raw/ubsan-recover.972355": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972355"
+  ],
+  "historical/recover/raw/ubsan-recover.972466": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972466"
+  ],
+  "historical/recover/raw/ubsan-recover.972495": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972495"
+  ],
+  "historical/recover/raw/ubsan-recover.972597": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972597"
+  ],
+  "historical/recover/raw/ubsan-recover.972611": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972611"
+  ],
+  "historical/recover/raw/ubsan-recover.972636": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972636"
+  ],
+  "historical/recover/raw/ubsan-recover.972686": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972686"
+  ],
+  "historical/recover/raw/ubsan-recover.972782": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.972782"
+  ],
+  "historical/recover/raw/ubsan-recover.973016": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973016"
+  ],
+  "historical/recover/raw/ubsan-recover.973172": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973172"
+  ],
+  "historical/recover/raw/ubsan-recover.973186": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973186"
+  ],
+  "historical/recover/raw/ubsan-recover.973211": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973211"
+  ],
+  "historical/recover/raw/ubsan-recover.973399": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973399"
+  ],
+  "historical/recover/raw/ubsan-recover.973492": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973492"
+  ],
+  "historical/recover/raw/ubsan-recover.973528": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973528"
+  ],
+  "historical/recover/raw/ubsan-recover.973564": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973564"
+  ],
+  "historical/recover/raw/ubsan-recover.973600": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973600"
+  ],
+  "historical/recover/raw/ubsan-recover.973645": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973645"
+  ],
+  "historical/recover/raw/ubsan-recover.973695": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973695"
+  ],
+  "historical/recover/raw/ubsan-recover.973810": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973810"
+  ],
+  "historical/recover/raw/ubsan-recover.973956": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.973956"
+  ],
+  "historical/recover/raw/ubsan-recover.974154": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.974154"
+  ],
+  "historical/recover/raw/ubsan-recover.974227": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.974227"
+  ],
+  "historical/recover/raw/ubsan-recover.974475": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.974475"
+  ],
+  "historical/recover/raw/ubsan-recover.974774": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.974774"
+  ],
+  "historical/recover/raw/ubsan-recover.975411": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.975411"
+  ],
+  "historical/recover/raw/ubsan-recover.976441": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.976441"
+  ],
+  "historical/recover/raw/ubsan-recover.976454": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.976454"
+  ],
+  "historical/recover/raw/ubsan-recover.976549": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.976549"
+  ],
+  "historical/recover/raw/ubsan-recover.976674": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.976674"
+  ],
+  "historical/recover/raw/ubsan-recover.976978": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.976978"
+  ],
+  "historical/recover/raw/ubsan-recover.983943": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.983943"
+  ],
+  "historical/recover/raw/ubsan-recover.984118": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.984118"
+  ],
+  "historical/recover/raw/ubsan-recover.984234": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.984234"
+  ],
+  "historical/recover/raw/ubsan-recover.984403": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.984403"
+  ],
+  "historical/recover/raw/ubsan-recover.984455": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.984455"
+  ],
+  "historical/recover/raw/ubsan-recover.984601": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.984601"
+  ],
+  "historical/recover/raw/ubsan-recover.984790": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-recover.984790"
+  ],
+  "historical/static-triage/ubsan-runtime-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-runtime-build.log"
+  ],
+  "historical/static-triage/ubsan-runtime-configure.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-runtime-configure.log"
+  ],
+  "historical/static-triage/ubsan-runtime-probe.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-runtime-probe.log"
+  ],
+  "historical/static-triage/ubsan-tests.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-tests.log"
+  ],
+  "historical/static-triage/ubsan-validation.json": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-validation.json"
+  ],
+  "historical/static-triage/ubsan_runtime_probe.cxx": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan_runtime_probe.cxx"
+  ],
+  "static-analysis/initial/static_audit.py": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static_audit.py"
+  ],
+  "historical/contracts/file-contract-suite.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/file-contract-suite.log"
+  ],
+  "historical/contracts/multimedia-new-suite-build.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/multimedia-new-suite-build.log"
+  ],
+  "historical/contracts/registry-contract-tidy.log": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/registry-contract-tidy.log"
+  ],
+  "dependencies/base/CTestCostData.txt": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Testing/Temporary/CTestCostData.txt"
+  ],
+  "dependencies/base/LastTest.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Testing/Temporary/LastTest.log"
+  ],
+  "dependencies/base/LastTestsDisabled.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Testing/Temporary/LastTestsDisabled.log"
+  ],
+  "dependencies/buffer/CTestCostData.txt": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/Testing/Temporary/CTestCostData.txt"
+  ],
+  "dependencies/buffer/LastTest.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/Testing/Temporary/LastTest.log"
+  ],
+  "dependencies/buffer/LastTestsDisabled.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/Testing/Temporary/LastTestsDisabled.log"
+  ],
+  "dependencies/buffer/LastTestsFailed.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test/Testing/Temporary/LastTestsFailed.log"
+  ],
+  "dependencies/logger/CTestCostData.txt": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/Testing/Temporary/CTestCostData.txt"
+  ],
+  "dependencies/logger/LastTest.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/Testing/Temporary/LastTest.log"
+  ],
+  "dependencies/system/CTestCostData.txt": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/Testing/Temporary/CTestCostData.txt"
+  ],
+  "dependencies/system/LastTest.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/Testing/Temporary/LastTest.log"
+  ],
+  "dependencies/system/LastTestsFailed.log": [
+    "verbatim",
+    "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-system/test/Testing/Temporary/LastTestsFailed.log"
+  ],
+  "providers/openh264/standalone/openh264-bitwriter-check.cxx": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/openh264-bitwriter-check.cxx"
+  ],
+  "providers/fdk-aac/standalone/fdk-fixed-multiply-check.cxx": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/fdk-fixed-multiply-check.cxx"
+  ],
+  "providers/fdk-aac/standalone/fdk-scale-check.cxx": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/fdk-scale-check.cxx"
+  ],
+  "providers/kvazaar/standalone/kvazaar-sad-check.cxx": [
+    "verbatim",
+    "/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/kvazaar-sad-check.cxx"
+  ],
+  "reproduce/patches.tsv": [
+    "extracted",
+    "doc/PR-DRAFTS.md and upstream authoring repositories"
+  ],
+  "reproduce/ctest-reproducers.tsv": [
+    "extracted",
+    "tracked test sources and CTest JSON discovery (no tests executed)"
+  ],
+  "runs/current/test-results.tsv": [
+    "extracted",
+    "clean-current-full-strict.xml"
+  ],
+  "runs/current/failures.tsv": [
+    "extracted",
+    "clean-current-full-strict.xml"
+  ],
+  "providers/ffmpeg/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/ffmpeg/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/svt-av1/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/svt-av1/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/kvazaar/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/kvazaar/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/x265/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/x265/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/vorbis/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/vorbis/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/vmaf/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/vmaf/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/fdk-aac/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/fdk-aac/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/x264/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/x264/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/lame/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/lame/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "providers/openh264/ctest-index.tsv": [
+    "extracted",
+    "Preserved runs/**/*.xml; provider/test-name and diagnostic-path association"
+  ],
+  "providers/openh264/ctest-evidence.log": [
+    "generated",
+    "Exact testcase itertext extracted from preserved JUnit XML"
+  ],
+  "reproduce/fixtures.tsv": [
+    "extracted",
+    "Current tracked test/files tree; media not duplicated"
+  ],
+  "reproduce/multimedia-transcoder-wip.patch": [
+    "generated",
+    "Uncommitted Transcoder OOM diff, provenance only, not an approved fix"
+  ],
+  "snapshot.json": [
+    "generated",
+    "Git/tool/CTest state at evidence preservation"
+  ]
+}

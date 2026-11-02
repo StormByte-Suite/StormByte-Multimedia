@@ -1,0 +1,1004 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:109:31: runtime error: load of misaligned address 0x7f2489ca6475 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f2489ca6475: note: pointer points here
+ 00 04 01 05 04 05 05  00 00 02 00 00 00 00 00  03 05 01 01 04 00 00 01  00 00 00 00 02 03 02 01  04
+             ^ 
+    #0 0x7f2628449a00 in load_64x4 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:109:31
+    #1 0x7f2628448e1d in load_levels_8x4x5_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:126:16
+    #2 0x7f2628445ec0 in get_8_coeff_contexts_2d_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:264:9
+    #3 0x7f2628445ec0 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:731:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f262746622c in svt_aom_txb_estimate_coeff_bits_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1210:29
+    #6 0x7f26272fdfdf in perform_tx_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:4440:9
+    #7 0x7f26272cff50 in full_loop_core_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:5884:5
+    #8 0x7f26272cff50 in md_stage_3_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7000:5
+    #9 0x7f26272cff50 in md_encode_block_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:8256:5
+    #10 0x7f26272c5fab in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10403:9
+    #11 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #12 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #13 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #14 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #15 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #16 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #17 0x7f2626cd8086 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:2973:25
+    #18 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #19 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #20 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #21 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:109:31 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:110:31: runtime error: load of misaligned address 0x7f2489ca6481 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f2489ca6481: note: pointer points here
+ 00 00 00  03 05 01 01 04 00 00 01  00 00 00 00 02 03 02 01  04 00 01 00 00 00 00 00  07 02 04 02 01
+              ^ 
+    #0 0x7f2628449a41 in load_64x4 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:110:31
+    #1 0x7f2628448e1d in load_levels_8x4x5_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:126:16
+    #2 0x7f2628445ec0 in get_8_coeff_contexts_2d_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:264:9
+    #3 0x7f2628445ec0 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:731:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f262746622c in svt_aom_txb_estimate_coeff_bits_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1210:29
+    #6 0x7f26272fdfdf in perform_tx_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:4440:9
+    #7 0x7f26272cff50 in full_loop_core_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:5884:5
+    #8 0x7f26272cff50 in md_stage_3_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7000:5
+    #9 0x7f26272cff50 in md_encode_block_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:8256:5
+    #10 0x7f26272c5fab in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10403:9
+    #11 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #12 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #13 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #14 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #15 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #16 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #17 0x7f2626cd8086 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:2973:25
+    #18 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #19 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #20 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #21 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:110:31 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:111:31: runtime error: load of misaligned address 0x7f2489ca648d for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f2489ca648d: note: pointer points here
+ 00 00 00 02 03 02 01  04 00 01 00 00 00 00 00  07 02 04 02 01 02 01 00  00 00 00 00 06 01 02 04  00
+             ^ 
+    #0 0x7f2628449a82 in load_64x4 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:111:31
+    #1 0x7f2628448e1d in load_levels_8x4x5_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:126:16
+    #2 0x7f2628445ec0 in get_8_coeff_contexts_2d_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:264:9
+    #3 0x7f2628445ec0 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:731:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f262746622c in svt_aom_txb_estimate_coeff_bits_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1210:29
+    #6 0x7f26272fdfdf in perform_tx_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:4440:9
+    #7 0x7f26272cff50 in full_loop_core_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:5884:5
+    #8 0x7f26272cff50 in md_stage_3_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7000:5
+    #9 0x7f26272cff50 in md_encode_block_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:8256:5
+    #10 0x7f26272c5fab in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10403:9
+    #11 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #12 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #13 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #14 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #15 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #16 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #17 0x7f2626cd8086 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:2973:25
+    #18 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #19 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #20 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #21 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:111:31 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:112:31: runtime error: load of misaligned address 0x7f2489ca6499 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f2489ca6499: note: pointer points here
+ 00 00 00  07 02 04 02 01 02 01 00  00 00 00 00 06 01 02 04  00 00 00 00 00 00 00 00  02 03 00 02 00
+              ^ 
+    #0 0x7f2628449ab7 in load_64x4 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:112:31
+    #1 0x7f2628448e1d in load_levels_8x4x5_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:126:16
+    #2 0x7f2628445ec0 in get_8_coeff_contexts_2d_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:264:9
+    #3 0x7f2628445ec0 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:731:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f262746622c in svt_aom_txb_estimate_coeff_bits_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1210:29
+    #6 0x7f26272fdfdf in perform_tx_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:4440:9
+    #7 0x7f26272cff50 in full_loop_core_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:5884:5
+    #8 0x7f26272cff50 in md_stage_3_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7000:5
+    #9 0x7f26272cff50 in md_encode_block_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:8256:5
+    #10 0x7f26272c5fab in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10403:9
+    #11 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #12 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #13 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #14 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #15 0x7f26272c7e18 in test_split_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10324:44
+    #16 0x7f26272c7e18 in svt_aom_pick_partition_pd0 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10412:33
+    #17 0x7f2626cd8086 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:2973:25
+    #18 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #19 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #20 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #21 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:112:31 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1921:5: runtime error: store to misaligned address 0x7f256cd918c2 for type 'int32_t' (aka 'int'), which requires 4 byte alignment
+0x7f256cd918c2: note: pointer points here
+ 1a 02  10 02 57 02 f2 01 64 01  92 01 75 02 bc 02 94 02  7f 02 5f 02 74 02 87 02  3a 02 f7 01 37 02
+              ^ 
+    #0 0x7f262786e459 in svt_aom_highbd_lpf_vertical_6_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1921:38
+    #1 0x7f2626c91091 in svt_av1_filter_block_plane_vert /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c
+    #2 0x7f2626c9561d in svt_aom_loop_filter_sb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c:644:13
+    #3 0x7f2626ce2af2 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3138:33
+    #4 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #5 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #6 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1921:5 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1923:5: runtime error: store to misaligned address 0x7f256cd92102 for type 'int32_t' (aka 'int'), which requires 4 byte alignment
+0x7f256cd92102: note: pointer points here
+ bd 01  a7 01 e5 01 ff 01 b1 01  9a 01 2c 02 74 02 7e 02  7a 02 45 02 34 02 32 02  21 02 17 02 39 02
+              ^ 
+    #0 0x7f262786e575 in svt_aom_highbd_lpf_vertical_6_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1923:38
+    #1 0x7f2626c91091 in svt_av1_filter_block_plane_vert /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c
+    #2 0x7f2626c9561d in svt_aom_loop_filter_sb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c:644:13
+    #3 0x7f2626ce2af2 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3138:33
+    #4 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #5 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #6 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1923:5 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1925:5: runtime error: store to misaligned address 0x7f256cd92942 for type 'int32_t' (aka 'int'), which requires 4 byte alignment
+0x7f256cd92942: note: pointer points here
+ d2 01  c2 01 90 01 00 02 3c 02  d9 01 a4 01 c9 01 22 02  54 02 39 02 13 02 e1 01  de 01 1d 02 35 02
+              ^ 
+    #0 0x7f262786e6a1 in svt_aom_highbd_lpf_vertical_6_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1925:38
+    #1 0x7f2626c91091 in svt_av1_filter_block_plane_vert /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c
+    #2 0x7f2626c9561d in svt_aom_loop_filter_sb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c:644:13
+    #3 0x7f2626ce2af2 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3138:33
+    #4 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #5 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #6 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1925:5 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1927:5: runtime error: store to misaligned address 0x7f256cd93182 for type 'int32_t' (aka 'int'), which requires 4 byte alignment
+0x7f256cd93182: note: pointer points here
+ 94 02  fa 01 45 01 7b 01 47 02  59 02 b4 01 69 01 a4 01  10 02 59 02 67 02 39 02  c7 01 a5 01 b4 01
+              ^ 
+    #0 0x7f262786e7c4 in svt_aom_highbd_lpf_vertical_6_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1927:38
+    #1 0x7f2626c91091 in svt_av1_filter_block_plane_vert /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c
+    #2 0x7f2626c9561d in svt_aom_loop_filter_sb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/deblocking_filter.c:644:13
+    #3 0x7f2626ce2af2 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3138:33
+    #4 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #5 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #6 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_SSE2/dlf_intrin_sse2.c:1927:5 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:102:27: runtime error: load of misaligned address 0x7f24892765b5 for type 'const int32_t' (aka 'const int'), which requires 4 byte alignment
+0x7f24892765b5: note: pointer points here
+ 03 01 01 07 01 03 02  00 00 00 00 03 03 02 00  00 00 00 00 07 01 02 00  00 00 00 00 00 01 00 00  00
+             ^ 
+    #0 0x7f2628448d16 in load_8bit_4x4_to_1_reg_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:102:27
+    #1 0x7f2628448219 in load_levels_4x4x5_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:117:16
+    #2 0x7f26284460e8 in get_4_nz_map_contexts_2d_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:224:9
+    #3 0x7f26284460e8 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:729:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f2627466c92 in svt_aom_txb_estimate_coeff_bits /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1285:34
+    #6 0x7f2626eadd67 in svt_aom_full_loop_uv /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/full_loop.c:2501:13
+    #7 0x7f2627388f73 in full_loop_core /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:6857:9
+    #8 0x7f26273411a2 in md_stage_3 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7067:9
+    #9 0x7f26273411a2 in md_encode_block /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:9521:5
+    #10 0x7f26272e8fc6 in test_depth /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10806:17
+    #11 0x7f26272e8fc6 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10870:9
+    #12 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #13 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #14 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #15 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #16 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #17 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #18 0x7f2626ce1812 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3061:25
+    #19 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #20 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #21 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #22 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:102:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:103:27: runtime error: load of misaligned address 0x7f24892765bd for type 'const int32_t' (aka 'const int'), which requires 4 byte alignment
+0x7f24892765bd: note: pointer points here
+ 00 00 00 03 03 02 00  00 00 00 00 07 01 02 00  00 00 00 00 00 01 00 00  00 00 00 00 00 00 00 00  00
+             ^ 
+    #0 0x7f2628448d57 in load_8bit_4x4_to_1_reg_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:103:27
+    #1 0x7f2628448219 in load_levels_4x4x5_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:117:16
+    #2 0x7f26284460e8 in get_4_nz_map_contexts_2d_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:224:9
+    #3 0x7f26284460e8 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:729:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f2627466c92 in svt_aom_txb_estimate_coeff_bits /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1285:34
+    #6 0x7f2626eadd67 in svt_aom_full_loop_uv /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/full_loop.c:2501:13
+    #7 0x7f2627388f73 in full_loop_core /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:6857:9
+    #8 0x7f26273411a2 in md_stage_3 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7067:9
+    #9 0x7f26273411a2 in md_encode_block /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:9521:5
+    #10 0x7f26272e8fc6 in test_depth /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10806:17
+    #11 0x7f26272e8fc6 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10870:9
+    #12 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #13 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #14 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #15 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #16 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #17 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #18 0x7f2626ce1812 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3061:25
+    #19 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #20 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #21 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #22 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:103:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:104:27: runtime error: load of misaligned address 0x7f24892765c5 for type 'const int32_t' (aka 'const int'), which requires 4 byte alignment
+0x7f24892765c5: note: pointer points here
+ 00 00 00 07 01 02 00  00 00 00 00 00 01 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+             ^ 
+    #0 0x7f2628448d98 in load_8bit_4x4_to_1_reg_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:104:27
+    #1 0x7f2628448219 in load_levels_4x4x5_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:117:16
+    #2 0x7f26284460e8 in get_4_nz_map_contexts_2d_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:224:9
+    #3 0x7f26284460e8 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:729:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f2627466c92 in svt_aom_txb_estimate_coeff_bits /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1285:34
+    #6 0x7f2626eadd67 in svt_aom_full_loop_uv /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/full_loop.c:2501:13
+    #7 0x7f2627388f73 in full_loop_core /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:6857:9
+    #8 0x7f26273411a2 in md_stage_3 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7067:9
+    #9 0x7f26273411a2 in md_encode_block /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:9521:5
+    #10 0x7f26272e8fc6 in test_depth /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10806:17
+    #11 0x7f26272e8fc6 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10870:9
+    #12 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #13 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #14 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #15 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #16 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #17 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #18 0x7f2626ce1812 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3061:25
+    #19 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #20 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #21 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #22 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:104:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:105:27: runtime error: load of misaligned address 0x7f24892765cd for type 'const int32_t' (aka 'const int'), which requires 4 byte alignment
+0x7f24892765cd: note: pointer points here
+ 00 00 00 00 01 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+             ^ 
+    #0 0x7f2628448dcd in load_8bit_4x4_to_1_reg_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:105:27
+    #1 0x7f2628448219 in load_levels_4x4x5_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:117:16
+    #2 0x7f26284460e8 in get_4_nz_map_contexts_2d_sse2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:224:9
+    #3 0x7f26284460e8 in svt_av1_get_nz_map_contexts_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:729:13
+    #4 0x7f2627450ddf in svt_av1_cost_coeffs_txb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:412:5
+    #5 0x7f2627466c92 in svt_aom_txb_estimate_coeff_bits /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/rd_cost.c:1285:34
+    #6 0x7f2626eadd67 in svt_aom_full_loop_uv /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/full_loop.c:2501:13
+    #7 0x7f2627388f73 in full_loop_core /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:6857:9
+    #8 0x7f26273411a2 in md_stage_3 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:7067:9
+    #9 0x7f26273411a2 in md_encode_block /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:9521:5
+    #10 0x7f26272e8fc6 in test_depth /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10806:17
+    #11 0x7f26272e8fc6 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10870:9
+    #12 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #13 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #14 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #15 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #16 0x7f26272ec711 in test_split_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10671:44
+    #17 0x7f26272ec711 in svt_aom_pick_partition /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/product_coding_loop.c:10897:33
+    #18 0x7f2626ce1812 in svt_aom_mode_decision_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3061:25
+    #19 0x7f2626cf4c12 in svt_aom_mode_decision_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/enc_dec_process.c:3255:27
+    #20 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #21 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #22 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/encodetxb_avx2.c:105:27 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:594:32: runtime error: load of misaligned address 0x7f248dfd4632 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd4632: note: pointer points here
+ c2 01  10 02 c4 01 0d 02 47 02  29 02 20 02 2f 02 5c 02  57 02 21 02 28 02 35 02  0d 02 fb 01 10 02
+              ^ 
+    #0 0x7f2628355e4c in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:594:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:594:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:613:33: runtime error: load of misaligned address 0x7f248e0d5752 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5752: note: pointer points here
+ da 01  f1 01 d8 01 9c 01 88 01  bb 01 00 02 0c 02 10 02  3e 02 16 02 dc 01 0b 02  03 02 f3 01 1f 02
+              ^ 
+    #0 0x7f262835655f in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:613:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:613:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:598:32: runtime error: load of misaligned address 0x7f248e3d850e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e3d850e: note: pointer points here
+ 1c 02 1c 02 c2 01  d0 01 f7 01 13 02 e5 01  a9 01 7f 01 88 01 c5 01  d9 01 e0 01 e9 01 ef 01  b4 01
+             ^ 
+    #0 0x7f26283561a3 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:598:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:598:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:614:32: runtime error: load of misaligned address 0x7f248e0d5872 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5872: note: pointer points here
+ ae 01  2f 02 3f 02 b6 01 9b 01  17 02 37 02 ef 01 b6 01  f4 01 38 02 27 02 17 02  d5 01 c8 01 44 02
+              ^ 
+    #0 0x7f2628356668 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:614:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:614:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:595:32: runtime error: load of misaligned address 0x7f248ded3632 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248ded3632: note: pointer points here
+ 7f 7f  06 02 17 02 04 02 1b 02  25 02 e7 01 c0 01 e2 01  23 02 10 02 ee 01 48 02  6c 02 25 02 f2 01
+              ^ 
+    #0 0x7f2628355f19 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:595:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:595:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:599:32: runtime error: load of misaligned address 0x7f248dfd450e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd450e: note: pointer points here
+ 29 02 8a 01 06 02  39 02 e5 01 e6 01 50 02  7d 02 63 02 68 02 a0 02  7b 02 16 02 53 02 8e 02  82 02
+             ^ 
+    #0 0x7f262835628c in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:599:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:599:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:597:32: runtime error: load of misaligned address 0x7f248e2d7872 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d7872: note: pointer points here
+ fe 01  05 02 c2 01 fb 01 30 02  d8 01 c9 01 15 02 00 02  fa 01 d4 01 53 01 a4 01  17 02 b8 01 8c 01
+              ^ 
+    #0 0x7f26283560c0 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:597:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:597:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:616:32: runtime error: load of misaligned address 0x7f248dfd4ab4 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd4ab4: note: pointer points here
+  ea 01 b3 01 1e 02 5e 02  cc 01 b1 01 0b 02 2e 02  59 02 71 02 80 02 54 02  05 02 ef 01 cd 01 bb 01
+              ^ 
+    #0 0x7f2628356887 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:616:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:616:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:615:32: runtime error: load of misaligned address 0x7f248e0d5992 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5992: note: pointer points here
+ fd 01  f0 01 f5 01 97 01 e9 01  74 02 1e 02 b0 01 91 01  bb 01 46 02 8c 02 4c 02  e6 01 a3 01 c2 01
+              ^ 
+    #0 0x7f2628356775 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:615:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:615:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:601:32: runtime error: load of misaligned address 0x7f248ded386e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248ded386e: note: pointer points here
+ 7f 7f 7f 7f 7f 7f  00 02 a7 01 b6 01 00 02  38 02 0e 02 ad 01 cf 01  e5 01 b3 01 f7 01 23 02  d3 01
+             ^ 
+    #0 0x7f2628356461 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:601:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:601:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:596:32: runtime error: load of misaligned address 0x7f248e1d6872 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d6872: note: pointer points here
+ 7f 7f  57 01 70 01 f5 01 75 02  31 02 98 01 75 01 d3 01  10 02 ec 01 f7 01 f5 01  8f 01 84 01 ea 01
+              ^ 
+    #0 0x7f2628355fea in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:596:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:596:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:618:32: runtime error: load of misaligned address 0x7f248dfd43ec for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd43ec: note: pointer points here
+  7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f
+              ^ 
+    #0 0x7f2628356acb in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:618:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:618:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:619:32: runtime error: load of misaligned address 0x7f248e0d550e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d550e: note: pointer points here
+ 42 02 36 02 0a 02  b9 01 51 01 61 01 ec 01  3e 02 14 02 3e 02 61 02  c4 01 de 01 12 02 76 01  0b 02
+             ^ 
+    #0 0x7f2628356bf0 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:619:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:619:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:617:33: runtime error: load of misaligned address 0x7f248e2d762c for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d762c: note: pointer points here
+  f2 01 7f 02 2b 02 0b 02  40 02 ed 01 0c 02 22 02  4b 02 1e 02 f9 01 47 02  cd 01 8f 01 2d 02 35 02
+              ^ 
+    #0 0x7f26283569a6 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:617:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:617:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:641:32: runtime error: load of misaligned address 0x7f248e0d5752 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5752: note: pointer points here
+ da 01  f1 01 d8 01 9c 01 88 01  bb 01 00 02 0c 02 10 02  3e 02 16 02 dc 01 0b 02  03 02 f3 01 1f 02
+              ^ 
+    #0 0x7f2628357b26 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:641:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:641:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:631:33: runtime error: load of misaligned address 0x7f248e2d7512 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d7512: note: pointer points here
+ 2f 02  bf 01 d3 01 f0 01 3c 02  93 02 07 02 9e 01 f4 01  c5 01 9c 01 ef 01 2e 02  10 02 ae 01 8b 01
+              ^ 
+    #0 0x7f2628356e52 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:631:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:631:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:639:33: runtime error: load of misaligned address 0x7f248e1d6512 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d6512: note: pointer points here
+ 7f 7f  75 01 f8 01 23 02 c3 01  df 01 ed 01 b1 01 b1 01  da 01 08 02 b9 01 af 01  f6 01 c6 01 ca 01
+              ^ 
+    #0 0x7f2628357898 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:639:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:639:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:640:32: runtime error: load of misaligned address 0x7f248dfd4632 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd4632: note: pointer points here
+ c2 01  10 02 c4 01 0d 02 47 02  29 02 20 02 2f 02 5c 02  57 02 21 02 28 02 35 02  0d 02 fb 01 10 02
+              ^ 
+    #0 0x7f26283579dd in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:640:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:640:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:632:32: runtime error: load of misaligned address 0x7f248e2d7632 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d7632: note: pointer points here
+ 0b 02  40 02 ed 01 0c 02 22 02  4b 02 1e 02 f9 01 47 02  cd 01 8f 01 2d 02 35 02  dc 01 b8 01 bc 01
+              ^ 
+    #0 0x7f2628356f97 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:632:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:632:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:644:32: runtime error: load of misaligned address 0x7f248dfd462e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd462e: note: pointer points here
+ eb 01 a8 01 c2 01  10 02 c4 01 0d 02 47 02  29 02 20 02 2f 02 5c 02  57 02 21 02 28 02 35 02  0d 02
+             ^ 
+    #0 0x7f2628357f06 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:644:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:644:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:643:33: runtime error: load of misaligned address 0x7f248e1d650e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d650e: note: pointer points here
+ 7f 7f 7f 7f 7f 7f  75 01 f8 01 23 02 c3 01  df 01 ed 01 b1 01 b1 01  da 01 08 02 b9 01 af 01  f6 01
+             ^ 
+    #0 0x7f2628357dbd in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:643:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:643:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:642:32: runtime error: load of misaligned address 0x7f248e0d5872 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5872: note: pointer points here
+ ae 01  2f 02 3f 02 b6 01 9b 01  17 02 37 02 ef 01 b6 01  f4 01 38 02 27 02 17 02  d5 01 c8 01 44 02
+              ^ 
+    #0 0x7f2628357c74 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:642:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:642:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:646:32: runtime error: load of misaligned address 0x7f248e1d686e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d686e: note: pointer points here
+ 7f 7f 7f 7f 7f 7f  57 01 70 01 f5 01 75 02  31 02 98 01 75 01 d3 01  10 02 ec 01 f7 01 f5 01  8f 01
+             ^ 
+    #0 0x7f262835819b in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:646:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:646:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:633:32: runtime error: load of misaligned address 0x7f248e2d7752 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d7752: note: pointer points here
+ fb 01  6f 02 b4 01 cc 01 0b 02  e8 01 c7 01 12 02 6a 02  f1 01 73 01 8e 01 bd 01  d8 01 c3 01 9c 01
+              ^ 
+    #0 0x7f26283570e0 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:633:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:633:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:645:32: runtime error: load of misaligned address 0x7f248dfd474e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd474e: note: pointer points here
+ 95 01 a7 01 d7 01  0a 02 c9 01 e9 01 c3 01  c3 01 18 02 36 02 47 02  4e 02 3c 02 21 02 21 02  f1 01
+             ^ 
+    #0 0x7f262835804f in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:645:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:645:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:664:33: runtime error: load of misaligned address 0x7f248e0d574e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d574e: note: pointer points here
+ 18 02 d4 01 da 01  f1 01 d8 01 9c 01 88 01  bb 01 00 02 0c 02 10 02  3e 02 16 02 dc 01 0b 02  03 02
+             ^ 
+    #0 0x7f26283582de in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:664:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:664:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:673:32: runtime error: load of misaligned address 0x7f248dfd4634 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd4634: note: pointer points here
+  10 02 c4 01 0d 02 47 02  29 02 20 02 2f 02 5c 02  57 02 21 02 28 02 35 02  0d 02 fb 01 10 02 1a 02
+              ^ 
+    #0 0x7f2628358e7f in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:673:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:673:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:634:32: runtime error: load of misaligned address 0x7f248e2d7872 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d7872: note: pointer points here
+ fe 01  05 02 c2 01 fb 01 30 02  d8 01 c9 01 15 02 00 02  fa 01 d4 01 53 01 a4 01  17 02 b8 01 8c 01
+              ^ 
+    #0 0x7f262835722e in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:634:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:634:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:672:33: runtime error: load of misaligned address 0x7f248e1d6514 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d6514: note: pointer points here
+  75 01 f8 01 23 02 c3 01  df 01 ed 01 b1 01 b1 01  da 01 08 02 b9 01 af 01  f6 01 c6 01 ca 01 ee 01
+              ^ 
+    #0 0x7f2628358d2c in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:672:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:672:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:620:32: runtime error: load of misaligned address 0x7f248ded386c for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248ded386c: note: pointer points here
+  7f 7f 7f 7f 7f 7f 7f 7f  00 02 a7 01 b6 01 00 02  38 02 0e 02 ad 01 cf 01  e5 01 b3 01 f7 01 23 02
+              ^ 
+    #0 0x7f2628356d18 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:620:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:620:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:674:32: runtime error: load of misaligned address 0x7f248dfd4754 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd4754: note: pointer points here
+  0a 02 c9 01 e9 01 c3 01  c3 01 18 02 36 02 47 02  4e 02 3c 02 21 02 21 02  f1 01 86 01 9a 01 f4 01
+              ^ 
+    #0 0x7f2628358fd2 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:674:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:674:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:635:33: runtime error: load of misaligned address 0x7f248e2d750e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d750e: note: pointer points here
+ 26 02 66 02 2f 02  bf 01 d3 01 f0 01 3c 02  93 02 07 02 9e 01 f4 01  c5 01 9c 01 ef 01 2e 02  10 02
+             ^ 
+    #0 0x7f2628357377 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:635:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:635:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:676:33: runtime error: load of misaligned address 0x7f248dfd450c for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd450c: note: pointer points here
+  8d 02 29 02 8a 01 06 02  39 02 e5 01 e6 01 50 02  7d 02 63 02 68 02 a0 02  7b 02 16 02 53 02 8e 02
+              ^ 
+    #0 0x7f262835927c in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:676:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:676:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:665:32: runtime error: load of misaligned address 0x7f248e0d586e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d586e: note: pointer points here
+ 34 02 c8 01 ae 01  2f 02 3f 02 b6 01 9b 01  17 02 37 02 ef 01 b6 01  f4 01 38 02 27 02 17 02  d5 01
+             ^ 
+    #0 0x7f2628358423 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:665:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:665:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:637:32: runtime error: load of misaligned address 0x7f248e2d774e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d774e: note: pointer points here
+ 4d 02 9b 01 fb 01  6f 02 b4 01 cc 01 0b 02  e8 01 c7 01 12 02 6a 02  f1 01 73 01 8e 01 bd 01  d8 01
+             ^ 
+    #0 0x7f2628357609 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:637:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:637:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:666:32: runtime error: load of misaligned address 0x7f248e0d598e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d598e: note: pointer points here
+ 1f 02 0f 02 fd 01  f0 01 f5 01 97 01 e9 01  74 02 1e 02 b0 01 91 01  bb 01 46 02 8c 02 4c 02  e6 01
+             ^ 
+    #0 0x7f262835856c in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:666:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:666:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:638:32: runtime error: load of misaligned address 0x7f248e2d786e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d786e: note: pointer points here
+ d4 01 a8 01 fe 01  05 02 c2 01 fb 01 30 02  d8 01 c9 01 15 02 00 02  fa 01 d4 01 53 01 a4 01  17 02
+             ^ 
+    #0 0x7f2628357755 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:638:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:638:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:667:32: runtime error: load of misaligned address 0x7f248e0d5aae for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5aae: note: pointer points here
+ cc 01 06 02 65 02  e7 01 91 01 88 01 18 02  4a 02 bf 01 80 01 cc 01  13 02 4a 02 67 02 3e 02  f3 01
+             ^ 
+    #0 0x7f26283586ba in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:667:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:667:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:636:32: runtime error: load of misaligned address 0x7f248ded350e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248ded350e: note: pointer points here
+ 7f 7f 7f 7f 7f 7f  cd 01 84 01 a0 01 3c 02  44 02 b5 01 91 01 d1 01  11 02 38 02 60 02 79 02  39 02
+             ^ 
+    #0 0x7f26283574c0 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:636:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:636:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:675:32: runtime error: load of misaligned address 0x7f248e1d6874 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d6874: note: pointer points here
+  57 01 70 01 f5 01 75 02  31 02 98 01 75 01 d3 01  10 02 ec 01 f7 01 f5 01  8f 01 84 01 ea 01 2c 02
+              ^ 
+    #0 0x7f262835912a in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:675:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:675:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:669:32: runtime error: load of misaligned address 0x7f248e0d53f2 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d53f2: note: pointer points here
+ 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f
+              ^ 
+    #0 0x7f262835894c in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:669:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:669:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:670:32: runtime error: load of misaligned address 0x7f248ded350c for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248ded350c: note: pointer points here
+  7f 7f 7f 7f 7f 7f 7f 7f  cd 01 84 01 a0 01 3c 02  44 02 b5 01 91 01 d1 01  11 02 38 02 60 02 79 02
+              ^ 
+    #0 0x7f2628358a95 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:670:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:670:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:678:32: runtime error: load of misaligned address 0x7f248e1d674c for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e1d674c: note: pointer points here
+  7f 7f 7f 7f 7f 7f 7f 7f  55 01 93 01 fc 01 51 02  1e 02 af 01 9e 01 e9 01  02 02 be 01 d5 01 1a 02
+              ^ 
+    #0 0x7f262835951e in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:678:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:678:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:600:32: runtime error: load of misaligned address 0x7f248e3d874e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e3d874e: note: pointer points here
+ 76 02 81 02 55 02  59 02 80 02 1b 02 f1 01  06 02 1c 02 53 02 90 02  70 02 33 02 d3 01 ac 01  f1 01
+             ^ 
+    #0 0x7f2628356375 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:600:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:600:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:677:32: runtime error: load of misaligned address 0x7f248dfd462c for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248dfd462c: note: pointer points here
+  d5 01 eb 01 a8 01 c2 01  10 02 c4 01 0d 02 47 02  29 02 20 02 2f 02 5c 02  57 02 21 02 28 02 35 02
+              ^ 
+    #0 0x7f26283593cd in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:677:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:677:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:679:32: runtime error: load of misaligned address 0x7f248ded3aac for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248ded3aac: note: pointer points here
+  7f 7f 7f 7f 7f 7f 7f 7f  6f 01 bb 01 c0 01 8f 01  9f 01 02 02 65 02 65 02  00 02 ac 01 cb 01 17 02
+              ^ 
+    #0 0x7f2628359675 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:679:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:679:32 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:668:33: runtime error: load of misaligned address 0x7f248e2d73ec for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e2d73ec: note: pointer points here
+  ee 01 e2 01 25 02 fb 01  cf 01 bb 01 02 02 60 02  86 02 26 02 b5 01 9c 01  80 01 76 01 a1 01 0c 02
+              ^ 
+    #0 0x7f2628358803 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:668:33
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:668:33 
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:671:32: runtime error: load of misaligned address 0x7f248e0d5632 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7f248e0d5632: note: pointer points here
+ 06 02  cb 01 73 01 69 01 a8 01  d2 01 ed 01 2a 02 55 02  2c 02 fd 01 e2 01 cc 01  05 02 33 02 f3 01
+              ^ 
+    #0 0x7f2628358be1 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:671:32
+    #1 0x7f2628347e63 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c
+    #2 0x7f2626c5a0aa in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f2626c4dcb2 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f2626c4dcb2 in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f2626c54582 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f262754245b in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f25f0788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f25f08011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: misaligned-pointer-use /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:671:32 

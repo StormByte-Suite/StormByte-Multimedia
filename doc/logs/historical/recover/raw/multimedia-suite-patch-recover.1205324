@@ -1,0 +1,7 @@
+../../../../../thirdparty/ffmpeg/plugins/codecs/video/x264/src/common/threadpool.c:64:20: runtime error: call to function slicetype_slice_cost through pointer to incorrect function type 'void *(*)(void *)'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/x264/../../../../../thirdparty/ffmpeg/plugins/codecs/video/x264/src/encoder/slicetype.c:815: note: slicetype_slice_cost defined here
+    #0 0x7fbef39a2c54 in threadpool_thread /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/x264/../../../../../thirdparty/ffmpeg/plugins/codecs/video/x264/src/common/threadpool.c:64:20
+    #1 0x7fbeb9588670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #2 0x7fbeb96011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: function-type-mismatch ../../../../../thirdparty/ffmpeg/plugins/codecs/video/x264/src/common/threadpool.c:64:20 

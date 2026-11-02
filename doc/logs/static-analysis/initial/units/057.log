@@ -1,0 +1,164 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:48:14: warning: an exception may be thrown in function 'AvError' which should not throw exceptions [bugprone-exception-escape]
+   48 |         std::string AvError(int error) noexcept {
+      |                     ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1064:5: note: frame #4: function 'basic_string<0>' calls function '__init' here
+ 1064 |     __init(__s, traits_type::length(__s));
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:51:10: note: frame #5: function 'AvError' calls function 'basic_string<0>' here
+   51 |                 return message;
+      |                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:54:13: warning: 2 adjacent parameters of 'Offset' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   54 |         int Offset(int extra, int shift) noexcept {
+      |                    ^~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:54:17: note: the first parameter in the range is 'extra'
+   54 |         int Offset(int extra, int shift) noexcept {
+      |                        ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:54:28: note: the last parameter in the range is 'shift'
+   54 |         int Offset(int extra, int shift) noexcept {
+      |                                   ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:60:13: warning: an exception may be thrown in function 'Align' which should not throw exceptions [bugprone-exception-escape]
+   60 | bool Input::Align(::AVCodecContext* context, const AVCodec* codec, std::string& error) noexcept {
+      |             ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2838:5: note: frame #4: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3017:10: note: frame #5: function '__assign_external' calls function '__assign_external' here
+ 3017 |   return __assign_external(__s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3026:10: note: frame #6: function 'assign' calls function '__assign_external' here
+ 3026 |   return __assign_external(__s);
+      |          ^
+/usr/include/c++/v1/string:1241:12: note: frame #7: function 'operator=' calls function 'assign' here
+ 1241 |     return assign(__s);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:62:9: note: frame #8: function 'Align' calls function 'operator=' here
+   62 |                 error = "invalid encoder dimensions";
+      |                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:161:13: warning: an exception may be thrown in function 'Configure' which should not throw exceptions [bugprone-exception-escape]
+  161 | bool Input::Configure(::AVCodecContext* context, const AVCodec* codec,
+      |             ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2838:5: note: frame #4: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3017:10: note: frame #5: function '__assign_external' calls function '__assign_external' here
+ 3017 |   return __assign_external(__s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3026:10: note: frame #6: function 'assign' calls function '__assign_external' here
+ 3026 |   return __assign_external(__s);
+      |          ^
+/usr/include/c++/v1/string:1241:12: note: frame #7: function 'operator=' calls function 'assign' here
+ 1241 |     return assign(__s);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx:165:9: note: frame #8: function 'Configure' calls function 'operator=' here
+  165 |                 error = "invalid or already configured encoder input context";
+      |                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:198:13: warning: an exception may be thrown in function 'Negotiate' which should not throw exceptions [bugprone-exception-escape]
+  198 |         inline int Negotiate(const AVCodec* codec, int source, std::string& error) noexcept {
+      |                    ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2731:54: note: frame #3: function '__grow_by_and_replace' calls function '__get_amortized_growth_capacity' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2838:5: note: frame #4: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3017:10: note: frame #5: function '__assign_external' calls function '__assign_external' here
+ 3017 |   return __assign_external(__s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3026:10: note: frame #6: function 'assign' calls function '__assign_external' here
+ 3026 |   return __assign_external(__s);
+      |          ^
+/usr/include/c++/v1/string:1241:12: note: frame #7: function 'operator=' calls function 'assign' here
+ 1241 |     return assign(__s);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:204:10: note: frame #8: function 'Negotiate' calls function 'operator=' here
+  204 |                         error = "failed to query encoder CPU pixel formats";
+      |                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+[1/1] (1/2) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx.
+[1/1] (2/2) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx.

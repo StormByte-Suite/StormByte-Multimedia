@@ -1,0 +1,6 @@
+LogTests 1 0.0193543
+ThreadedLogTests 1 0.375736
+ManipulatorsTests 1 0.0115812
+FormatMaskTests 1 0.010615
+PerfTests 1 1.32793
+---

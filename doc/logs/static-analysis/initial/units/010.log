@@ -1,0 +1,62 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/content.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:174:13: warning: 2 adjacent parameters of 'MapWindowsToOrigin' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  174 |                 int in_w, int in_h, int x0, int y0, int out_w, int out_h) noexcept {
+      |                           ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:174:17: note: the first parameter in the range is 'in_h'
+  174 |                 int in_w, int in_h, int x0, int y0, int out_w, int out_h) noexcept {
+      |                               ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:174:27: note: the last parameter in the range is 'x0'
+  174 |                 int in_w, int in_h, int x0, int y0, int out_w, int out_h) noexcept {
+      |                                         ^~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:174:31: warning: 2 adjacent parameters of 'MapWindowsToOrigin' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  174 |                 int in_w, int in_h, int x0, int y0, int out_w, int out_h) noexcept {
+      |                                             ^~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:174:35: note: the first parameter in the range is 'y0'
+  174 |                 int in_w, int in_h, int x0, int y0, int out_w, int out_h) noexcept {
+      |                                                 ^~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:174:43: note: the last parameter in the range is 'out_w'
+  174 |                 int in_w, int in_h, int x0, int y0, int out_w, int out_h) noexcept {
+      |                                                         ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:234:13: warning: an exception may be thrown in function 'Put' which should not throw exceptions [bugprone-exception-escape]
+  234 | void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
+      |             ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:245:4: note: frame #4: function 'FormatFloatAscii<double>' calls function 'PadAscii' here
+  245 |                         PadAscii(ascii, spec);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #5: function 'FormatReplaceToken<char, int>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:643:12: note: frame #6: function 'operator()<int>' calls function 'FormatReplaceToken<char, int>' here
+  643 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:657:7: note: frame #7: function 'ReplaceToken<int>' calls function 'operator()<int>' here
+  657 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx:245:21: note: frame #8: function 'Put' calls function 'ReplaceToken<int>' here
+  245 |                                 m_diagnostic += StormByte::Safe::String::ReplaceToken(" side-data:{}=dropped-incompatible-color", static_cast<int>(type));
+      |                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+[1/1] (1/2) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.
+[1/1] (2/2) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.

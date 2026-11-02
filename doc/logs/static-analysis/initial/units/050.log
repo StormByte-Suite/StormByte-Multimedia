@@ -1,0 +1,204 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVBSF.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVCodecParameters.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:152:41: warning: 2 adjacent parameters of 'Seek' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  152 |         static std::int64_t Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:152:54: note: the first parameter in the range is 'offset'
+  152 |         static std::int64_t Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                             ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:152:66: note: the last parameter in the range is 'whence'
+  152 |         static std::int64_t Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                                         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:152:41: note: 
+  152 |         static std::int64_t Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:152:62: note: 'std::int64_t' and 'int' may be implicitly converted: 'std::int64_t' (as 'long') -> 'int', 'int' -> 'std::int64_t' (as 'long')
+  152 |         static std::int64_t Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:177:47: warning: 'other' used after it was moved [bugprone-use-after-move]
+  177 | : AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+      |                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:177:3: note: move occurred here
+  177 | : AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:177:76: warning: 'other' used after it was moved [bugprone-use-after-move]
+  177 | : AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+      |                                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:177:3: note: move occurred here
+  177 | : AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:178:19: warning: 'other' used after it was moved [bugprone-use-after-move]
+  178 |         m_operationError(other.m_operationError) {
+      |                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:177:3: note: move occurred here
+  177 | : AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:179:2: warning: 'other' used after it was moved [bugprone-use-after-move]
+  179 |         other.m_avioBorrowed = false;
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:177:3: note: move occurred here
+  177 | : AVPointer(std::move(other)), m_io(std::move(other.m_io)), m_avioBorrowed(other.m_avioBorrowed),
+      |   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:184:2: warning: Call to virtual method 'AVFormatContext::Free' during destruction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  184 |         Free();
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:166:9: note: Calling 'AVFormatContext::WrapBorrowed'
+  166 |         return WrapBorrowed(ctx, true);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:171:6: note: 'harvest' is true
+  171 |         if (harvest)
+      |             ^~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:171:2: note: Taking true branch
+  171 |         if (harvest)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:173:9: note: Calling '~AVFormatContext'
+  173 |         return out;
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:184:2: note: Call to virtual method 'AVFormatContext::Free' during destruction bypasses virtual dispatch
+  184 |         Free();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:190:20: warning: 'other' used after it was moved [bugprone-use-after-move]
+  190 |                 m_io = std::move(other.m_io);
+      |                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:189:14: note: move occurred here
+  189 |                 AVPointer::operator=(std::move(other));
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:213:11: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  213 |         if ((ret = avformat_open_input(&raw_ctx, filename.c_str(), nullptr, nullptr)) < 0)
+      |              ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:213:11: note: if it should be an assignment, move it out of the 'if' condition
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:213:11: note: if it is meant to be an equality check, change '=' to '=='
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:218:11: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  218 |         if ((ret = avformat_find_stream_info(fmt_ctx, nullptr)) < 0) {
+      |              ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:218:11: note: if it should be an assignment, move it out of the 'if' condition
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:218:11: note: if it is meant to be an equality check, change '=' to '=='
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:265:11: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  265 |         if ((ret = avformat_find_stream_info(fmt_ctx, nullptr)) < 0) {
+      |              ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:265:11: note: if it should be an assignment, move it out of the 'if' condition
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:265:11: note: if it is meant to be an equality check, change '=' to '=='
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:288:31: warning: an exception may be thrown in function 'HarvestSideData' which should not throw exceptions [bugprone-exception-escape]
+  288 | void FFmpeg::AVFormatContext::HarvestSideData() noexcept {
+      |                               ^
+/usr/include/c++/v1/__expected/expected.h:78:3: note: frame #0: unhandled exception of type 'std::bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::DecoderError>>' may be thrown in function '__throw_bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::DecoderError>, const StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::DecoderError> &>' here
+   78 |   throw bad_expected_access<_Err>(std::forward<_Arg>(__arg));
+      |   ^
+/usr/include/c++/v1/__expected/expected.h:840:7: note: frame #1: function 'value' calls function '__throw_bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::DecoderError>, const StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::DecoderError> &>' here
+  840 |       std::__throw_bad_expected_access<_Err>(std::as_const(error()));
+      |       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:307:87: note: frame #2: function 'HarvestSideData' calls function 'value' here
+  307 |                         decoders[i] = StormByte::Safe::Shared<AVDecoder>::MakePointer<AVDecoder>(std::move(opened.value()));
+      |                                                                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:465:65: warning: an exception may be thrown in function 'Mp4ToAnnexB' which should not throw exceptions [bugprone-exception-escape]
+  465 | StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
+      |                                                                 ^
+/usr/include/c++/v1/__expected/expected.h:78:3: note: frame #0: unhandled exception of type 'std::bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::BSFError>>' may be thrown in function '__throw_bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::BSFError>, const StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::BSFError> &>' here
+   78 |   throw bad_expected_access<_Err>(std::forward<_Arg>(__arg));
+      |   ^
+/usr/include/c++/v1/__expected/expected.h:840:7: note: frame #1: function 'value' calls function '__throw_bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::BSFError>, const StormByte::Safe::Shared<StormByte::Multimedia::FFmpeg::BSFError> &>' here
+  840 |       std::__throw_bad_expected_access<_Err>(std::as_const(error()));
+      |       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:494:71: note: frame #2: function 'Mp4ToAnnexB' calls function 'value' here
+  494 |                 return StormByte::Safe::Unique<AVBSF>::MakePointer<AVBSF>(std::move(expected_bsf.value()));
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:465:77: warning: 2 adjacent parameters of 'Mp4ToAnnexB' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  465 | StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:465:81: note: the first parameter in the range is 'codec_id'
+  465 | StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
+      |                                                                                 ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx:465:95: note: the last parameter in the range is 'stream_index'
+  465 | StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
+      |                                                                                               ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVStream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/backend_typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/convert.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

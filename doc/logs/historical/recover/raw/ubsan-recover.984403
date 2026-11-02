@@ -1,0 +1,21 @@
+../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:346:53: runtime error: applying non-zero offset 3840 to null pointer
+    #0 0x7f43841f09d6 in opus_decode_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:346:53
+    #1 0x7f43841e90bd in opus_decode_subpacket /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:452:23
+    #2 0x7f43841e90bd in opus_decode_packet /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:581:15
+    #3 0x7f43844a798b in decode_simple_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:457:16
+    #4 0x7f43844a798b in decode_simple_receive_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:617:15
+    #5 0x7f43844a798b in ff_decode_receive_frame_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:653:15
+    #6 0x7f43844aba72 in decode_receive_frame_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:671:15
+    #7 0x7f43844ab790 in avcodec_send_packet /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:755:15
+    #8 0x7f438491ca48 in try_decode_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavformat/demux.c:2206:19
+    #9 0x7f438490fe8e in avformat_find_stream_info /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavformat/demux.c:2946:9
+    #10 0x7f4380a67986 in (anonymous namespace)::MakeSubtitleInput(std::__1::__fs::filesystem::path const&) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:151:16
+    #11 0x7f4380a5f949 in (anonymous namespace)::RunSubtitleInterleave(bool, bool) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:543:16
+    #12 0x7f4380a09b34 in RunOneTest(TestEntry const&, std::__1::basic_string_view<char, std::__1::char_traits<char>>) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/file/../test_helpers.hxx:115:21
+    #13 0x7f4380a08793 in RunSelectedTest(int, char**, std::__1::span<TestEntry const, 18446744073709551615ul>) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/file/../test_helpers.hxx:139:11
+    #14 0x7f4380a6533c in RunPipelineInterleaveTests(int, char**) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/interleave/interleave_test.cxx:669:9
+    #15 0x7f433743d354 in __libc_start_call_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../sysdeps/nptl/libc_start_call_main.h:59:16
+    #16 0x7f433743d47a in __libc_start_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../csu/libc-start.c:372:3
+    #17 0x55bbba9518c4 in _start (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/test/pipeline/interleave/MultimediaPipelineInterleaveTests+0x18c4)
+
+SUMMARY: UndefinedBehaviorSanitizer: nullptr-with-nonzero-offset ../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:346:53 

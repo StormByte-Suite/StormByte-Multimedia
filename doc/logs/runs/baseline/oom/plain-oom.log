@@ -1,0 +1,13 @@
+Test project /tmp/BMDATA/plain-multimedia/test
+    Start 356: pipeline.test_pipeline_failure_closure_without_allocations
+1/2 Test #356: pipeline.test_pipeline_failure_closure_without_allocations ...   Passed    0.00 sec
+    Start 357: pipeline.test_nlmeans_scratch_failure_fails_job
+2/2 Test #357: pipeline.test_nlmeans_scratch_failure_fails_job ..............   Passed    1.75 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+multimedia    =   1.75 sec*proc (2 tests)
+pipeline      =   1.75 sec*proc (2 tests)
+
+Total Test time (real) =   1.76 sec

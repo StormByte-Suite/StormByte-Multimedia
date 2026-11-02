@@ -1,0 +1,223 @@
+[ 33%] [BuildMaster/Core     ]: reset fail markers
+[ 33%] Built target buildmaster_build_init
+[ 33%] [BuildMaster/Ninja    ]: Compiling libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[ 33%] Built target samplerate_build
+[ 66%] [BuildMaster/Ninja    ]: Installing libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 66%] Built target samplerate_install
+[100%] [BuildMaster/CMake    ]: Configuring rubberband
+[BuildMaster/Meson ]: Meson setup failed for rubberband
+CMake Error at /usr/share/cmake/StormByte-BuildMaster/modules/log.cmake:287 (message):
+  [1;31m[FATAL ][BuildMaster/Meson ]: Meson setup failed for rubberband
+  (exit 1)
+
+  Working directory / build dir:
+  /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/rubberband
+
+  --- stdout ---
+
+  The Meson build system
+
+  Version: 1.12.1
+
+  Source dir:
+  /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/rubberband/src
+
+  Build dir:
+  /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/rubberband
+
+  Build type: native build
+
+  Project name: Rubber Band Library
+
+  Project version: 4.0.0
+
+
+
+  
+  ../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/rubberband/src/meson.build:2:0:
+  ERROR: Executables created by c compiler /usr/lib/llvm/22/bin/clang-22 are
+  not runnable.
+
+
+
+  A full log can be found at
+  /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/rubberband/meson-logs/meson-log.txt
+
+
+
+  --- stderr ---
+
+
+
+  --- meson-log.txt ---
+
+  Build started at 2026-11-02T04:19:00.936769
+
+  Main binary: /usr/bin/python3.13
+
+  Build Options: -Dbuildtype=debug '-Dc_args=-fsanitize=address,undefined
+  -fno-omit-frame-pointer
+  -I/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/include'
+  '-Dcpp_args=-stdlib=libc++ -fsanitize=address,undefined
+  -fno-omit-frame-pointer
+  -I/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/include'
+  '-Dc_link_args=-Wl,--start-group -shared-libasan
+  -fsanitize=address,undefined -fno-omit-frame-pointer -fuse-ld=lld
+  -L/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/lib64
+  -Wl,--end-group' '-Dcpp_link_args=-Wl,--start-group -shared-libasan
+  -fsanitize=address,undefined -fno-omit-frame-pointer -fuse-ld=lld
+  -L/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/lib64
+  -Wl,--end-group -stdlib=libc++' -Ddefault_library=static
+  -Dprefix=/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install
+  -Dlibdir=lib64 -Db_lto=false -Db_ndebug=if-release
+  -Dresampler=libsamplerate -Dfft=builtin -Djni=disabled -Dladspa=disabled
+  -Dlv2=disabled -Dvamp=disabled -Dcmdline=disabled -Dtests=disabled
+  -Db_staticpic=true
+  --native-file=/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/scripts/meson/native_clang.ini
+
+  Python system: Linux
+
+  The Meson build system
+
+  Version: 1.12.1
+
+  Source dir:
+  /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/rubberband/src
+
+  Build dir:
+  /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/rubberband
+
+  Build type: native build
+
+  Project name: Rubber Band Library
+
+  Project version: 4.0.0
+
+  -----------
+
+  Detecting compiler via: `/usr/lib/llvm/22/bin/clang-22 --version` -> 0
+
+  stdout:
+
+  clang version 22.1.8+libcxx
+
+  Target: x86_64-pc-linux-gnu
+
+  Thread model: posix
+
+  InstalledDir: /usr/lib/llvm/22/bin
+
+  Configuration file: /etc/clang/22/x86_64-pc-linux-gnu-clang.cfg
+
+  -----------
+
+  Running command: -x c -E -dM -
+
+  -----
+
+  -----------
+
+  Detecting linker via: `/usr/lib/llvm/22/bin/clang-22 -Wl,--version
+  -Wl,--start-group -shared-libasan -fsanitize=address,undefined
+  -fno-omit-frame-pointer -fuse-ld=lld
+  -L/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/lib64
+  -Wl,--end-group` -> 0
+
+  stdout:
+
+  LLD 22.1.8 (compatible with GNU linkers)
+
+  -----------
+
+  -----------
+
+  Detecting LLD linker via: `/usr/lib/llvm/22/bin/clang-22 -Wl,-v
+  -Wl,--start-group -shared-libasan -fsanitize=address,undefined
+  -fno-omit-frame-pointer -fuse-ld=lld
+  -L/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/lib64
+  -Wl,--end-group` -> 1
+
+  stdout:
+
+  LLD 22.1.8 (compatible with GNU linkers)
+
+  -----------
+
+  stderr:
+
+  ld.lld: error: undefined symbol: main
+
+  >>> referenced by
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib64/Scrt1.o:(_start)
+
+  clang-22: error: linker command failed with exit code 1 (use -v to see
+  invocation)
+
+  -----------
+
+  Sanity check compiler command line: /usr/lib/llvm/22/bin/clang-22 -o
+  sanity_check_for_c.exe sanity_check_for_c.c -fsanitize=address,undefined
+  -fno-omit-frame-pointer
+  -I/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/include
+  -D_FILE_OFFSET_BITS=64 -Wl,--start-group -shared-libasan -fuse-ld=lld
+  -L/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/lib64
+  -Wl,--end-group
+
+  Sanity check compile stdout:
+
+
+
+  -----
+
+  Sanity check compile stderr:
+
+
+
+  -----
+
+  Sanity check built target output for host machine c compiler
+
+   -- Running test binary command:  /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/rubberband/meson-private/sanity_check_for_c.exe
+
+  -----------
+
+  Sanity check:
+  `/tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/rubberband/meson-private/sanity_check_for_c.exe`
+  -> 1
+
+  stderr:
+
+  ==1751082==ASan runtime does not come first in initial library list; you
+  should either link runtime to your application or manually preload it with
+  LD_PRELOAD.
+
+  -----------
+
+   -- stdout:
+   
+   -- stderr:
+   ==1751082==ASan runtime does not come first in initial library list; you should either link runtime to your application or manually preload it with LD_PRELOAD.
+
+
+
+   -- returncode: 1
+
+
+
+  
+  ../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/rubberband/src/meson.build:2:0:
+  ERROR: Executables created by c compiler /usr/lib/llvm/22/bin/clang-22 are
+  not runnable.
+
+  [0m
+Call Stack (most recent call first):
+  stormbyte-buildmaster/scripts/meson/rubberband_configure.cmake:157 (_bm_log_message)
+
+
+gmake[3]: *** [CMakeFiles/rubberband_configure.dir/build.make:71: CMakeFiles/rubberband_configure] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:2849: CMakeFiles/rubberband_configure.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2856: CMakeFiles/rubberband_configure.dir/rule] Error 2
+gmake: *** [Makefile:313: rubberband_configure] Error 2

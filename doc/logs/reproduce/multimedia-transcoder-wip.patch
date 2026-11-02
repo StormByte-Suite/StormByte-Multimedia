@@ -1,0 +1,133 @@
+diff --git a/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx b/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx
+index e80ed5f0..6d005d0d 100644
+--- a/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx
++++ b/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx
+@@ -70,6 +70,7 @@
+ #include <StormByte/safe/string.hxx>
+ 
+ #include <chrono>
++#include <new>
+ #include <string>
+ #include <string_view>
+ #include <utility>
+@@ -99,9 +100,15 @@ TranscoderSlot& TranscoderSlot::operator=(TranscoderSlot&& other) noexcept = def
+ namespace {
+ 	template<typename Optional>
+ 	StormByte::Safe::String ErrorText(const Optional& error, std::string_view fallback) noexcept {
+-		if (error)
+-			return StormByte::Safe::String{std::string_view{error.value()}};
+-		return StormByte::Safe::String{fallback};
++		try {
++			if (error)
++				return StormByte::Safe::String{std::string_view{error.value()}};
++			return StormByte::Safe::String{fallback};
++		} catch (const StormByte::Safe::AllocationError&) {
++			return {};
++		} catch (const std::bad_alloc&) {
++			return {};
++		}
+ 	}
+ 
+ 	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
+@@ -293,6 +300,7 @@ void Transcoder::TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
+ }
+ 
+ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept {
++	try {
+ 	NameThread("MM-Transcoder");
+ 	Metrics->SampleMemory();
+ 	TelemetrySummary summary{Metrics, job.Logger()};
+@@ -347,8 +355,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept
+ 	}
+ 	auto failUnlessFinished = [built]() noexcept {
+ 		if (built->State() != StormByte::Multimedia::Pipeline::Plan::State::Finished)
+-			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed,
+-				StormByte::Safe::String{"transcode did not finish"});
++			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed, {});
+ 	};
+ 	struct PlanCompletion {
+ 		decltype(failUnlessFinished)* action;
+@@ -720,4 +727,13 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept
+ 		std::chrono::steady_clock::now() - started).count();
+ 	JobLog(job.Logger(), Level::Info, StormByte::Safe::String::ReplaceToken("done tracks={} {}ms", Mapped.size(), ms));
+ 	job.OnDone();
++	} catch (const StormByte::Safe::AllocationError&) {
++		job.Fail();
++		const StormByte::Safe::String empty;
++		job.OnError(empty);
++	} catch (const std::bad_alloc&) {
++		job.Fail();
++		const StormByte::Safe::String empty;
++		job.OnError(empty);
++	}
+ }
+diff --git a/lib/public/StormByte/multimedia/pipeline/transcoder.cxx b/lib/public/StormByte/multimedia/pipeline/transcoder.cxx
+index e46c460f..1a0baff4 100644
+--- a/lib/public/StormByte/multimedia/pipeline/transcoder.cxx
++++ b/lib/public/StormByte/multimedia/pipeline/transcoder.cxx
+@@ -71,6 +71,7 @@
+ #include <algorithm>
+ #include <limits>
+ #include <memory>
++#include <new>
+ #include <optional>
+ #include <string>
+ #include <string_view>
+@@ -430,17 +431,37 @@ void Transcoder::InstallLog() noexcept {
+ }
+ 
+ void Transcoder::Fail(std::string_view reason) noexcept {
++	if (!m_backend)
++		return;
++	try {
++		StormByte::Safe::String message{reason};
++		StormByte::Safe::UniqueLock lock(m_backend->Lock);
++		if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Relaxed) == Status::Error)
++			return;
++		if (m_plan)
++			m_plan->State(Plan::State::Failed, message);
++		m_backend->Error = std::move(message);
++		m_backend->Status.store(Status::Error, StormByte::Safe::MemoryOrder::Release);
++		m_backend->RequestCancel();
++		JobLog(m_logger, Level::Error, m_backend->Error.value());
++	} catch (const StormByte::Safe::AllocationError&) {
++		Fail();
++	} catch (const std::bad_alloc&) {
++		Fail();
++	}
++}
++
++void Transcoder::Fail() noexcept {
+ 	if (!m_backend)
+ 		return;
+ 	StormByte::Safe::UniqueLock lock(m_backend->Lock);
+-	if (m_plan)
+-		m_plan->State(Plan::State::Failed, StormByte::Safe::String{reason});
+ 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Relaxed) == Status::Error)
+ 		return;
+-	m_backend->Error = StormByte::Safe::String{reason};
++	if (m_plan)
++		m_plan->State(Plan::State::Failed, {});
++	m_backend->Error.reset();
+ 	m_backend->Status.store(Status::Error, StormByte::Safe::MemoryOrder::Release);
+ 	m_backend->RequestCancel();
+-	JobLog(m_logger, Level::Error, m_backend->Error.value());
+ }
+ 
+ bool Transcoder::ValidSlot(StormByte::Size slot) const noexcept {
+diff --git a/lib/public/StormByte/multimedia/pipeline/transcoder.hxx b/lib/public/StormByte/multimedia/pipeline/transcoder.hxx
+index cb86265b..c1509e06 100644
+--- a/lib/public/StormByte/multimedia/pipeline/transcoder.hxx
++++ b/lib/public/StormByte/multimedia/pipeline/transcoder.hxx
+@@ -1030,6 +1030,11 @@ namespace StormByte {
+ 					 */
+ 					void Fail(std::string_view reason) noexcept;
+ 
++					/**
++					 * @brief Marks failure without storing a message or allocating.
++					 */
++					void Fail() noexcept;
++
+ 					/**
+ 					 * @brief Opens a consultation File from the reader path and discards it after use.
+ 					 * @return false if owner.Fail() was called.

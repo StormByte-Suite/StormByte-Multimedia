@@ -1,0 +1,165 @@
+[0/2] Re-checking globbed directories...
+[0/96] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip... (cached) OK
+[1/96] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip... (cached) OK
+[2/96] [BuildMaster/Core     ]: reset fail markers
+[3/96] [BuildMaster/Ninja    ]: Compiling libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[4/96] [BuildMaster/Ninja    ]: Compiling OGG container
+-- [BuildMaster/Component]: stamp hit ogg (build)
+[5/96] [BuildMaster/Ninja    ]: Installing libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[6/96] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+-- [BuildMaster/Component]: stamp hit x265-12bit (build)
+[7/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[8/96] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+-- [BuildMaster/Component]: stamp hit x265-10bit (build)
+[9/96] [BuildMaster/Ninja    ]: Installing OGG container
+-- [BuildMaster/Component]: stamp hit ogg (install)
+[10/96] [BuildMaster/CMake    ]: Configuring rubberband
+[BuildMaster/Component]: stamp hit rubberband (configure)
+[11/96] [BuildMaster/CMake    ]: Configuring vorbis
+[BuildMaster/Component]: stamp hit vorbis (configure)
+[12/96] [BuildMaster/CMake    ]: Configuring x265
+[BuildMaster/Component]: stamp hit x265 (configure)
+[13/96] [BuildMaster/Ninja    ]: Compiling Opus codec
+-- [BuildMaster/Component]: stamp hit opus (build)
+[14/96] [BuildMaster/Ninja    ]: Compiling rubberband
+-- [BuildMaster/Component]: stamp hit rubberband (build)
+[15/96] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+-- [BuildMaster/Component]: stamp hit vorbis (build)
+[16/96] [BuildMaster/Ninja    ]: Compiling kvazaar
+-- [BuildMaster/Component]: stamp hit kvazaar (build)
+[17/96] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+-- [BuildMaster/Component]: stamp hit svt-av1 (build)
+[18/96] [BuildMaster/Ninja    ]: Compiling VPX codec
+-- [BuildMaster/Component]: stamp hit vpx (build)
+[19/96] [BuildMaster/Ninja    ]: Compiling libwebp
+-- [BuildMaster/Component]: stamp hit webp (build)
+[20/96] [BuildMaster/Ninja    ]: Compiling X264 codec
+-- [BuildMaster/Component]: stamp hit x264 (build)
+[21/96] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+-- [BuildMaster/Component]: stamp hit x265-12bit (install)
+[22/96] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+-- [BuildMaster/Component]: stamp hit x265-10bit (install)
+[23/96] [BuildMaster/Ninja    ]: Compiling X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (build)
+[24/96] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+-- [BuildMaster/Component]: stamp hit lzma (build)
+[25/96] [BuildMaster/Ninja    ]: Compiling zlib compression library
+-- [BuildMaster/Component]: stamp hit zlib (build)
+[26/96] [BuildMaster/Ninja    ]: Compiling leptonica
+-- [BuildMaster/Component]: stamp hit leptonica (build)
+[27/96] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+-- [BuildMaster/Component]: stamp hit fdk-aac (build)
+[28/96] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+-- [BuildMaster/Component]: stamp hit mp3lame (build)
+[29/96] [BuildMaster/Ninja    ]: Installing Opus codec
+-- [BuildMaster/Component]: stamp hit opus (install)
+[30/96] [BuildMaster/Ninja    ]: Installing rubberband
+-- [BuildMaster/Component]: stamp hit rubberband (install)
+[31/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[32/96] [BuildMaster/Ninja    ]: Installing Vorbis codec
+-- [BuildMaster/Component]: stamp hit vorbis (install)
+[33/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[34/96] [BuildMaster/Ninja    ]: Compiling libaom
+-- [BuildMaster/Component]: stamp hit aom (build)
+[35/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[36/96] [BuildMaster/Ninja    ]: Compiling dav1d
+-- [BuildMaster/Component]: stamp hit dav1d (build)
+[37/96] [BuildMaster/Ninja    ]: Installing kvazaar
+-- [BuildMaster/Component]: stamp hit kvazaar (install)
+[38/96] [BuildMaster/Ninja    ]: Compiling openh264
+-- [BuildMaster/Component]: stamp hit openh264 (build)
+[39/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[40/96] [BuildMaster/Ninja    ]: Installing SVT-AV1
+-- [BuildMaster/Component]: stamp hit svt-av1 (install)
+[41/96] [BuildMaster/Ninja    ]: Installing VPX codec
+-- [BuildMaster/Component]: stamp hit vpx (install)
+[42/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[43/96] [BuildMaster/Ninja    ]: Installing libwebp
+-- [BuildMaster/Component]: stamp hit webp (install)
+[44/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[45/96] [BuildMaster/Ninja    ]: Installing X264 codec
+-- [BuildMaster/Component]: stamp hit x264 (install)
+[46/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[47/96] [BuildMaster/Ninja    ]: Installing X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (install)
+[48/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[49/96] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+-- [BuildMaster/Component]: stamp hit bzip2 (build)
+[50/96] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+-- [BuildMaster/Component]: stamp hit lzma (install)
+[51/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[52/96] [BuildMaster/Ninja    ]: Installing zlib compression library
+-- [BuildMaster/Component]: stamp hit zlib (install)
+[53/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[54/96] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (build)
+[55/96] [BuildMaster/Ninja    ]: Installing leptonica
+-- [BuildMaster/Component]: stamp hit leptonica (install)
+[56/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[57/96] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+-- [BuildMaster/Component]: stamp hit fdk-aac (install)
+[58/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[59/96] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+-- [BuildMaster/Component]: stamp hit mp3lame (install)
+[60/96] [BuildMaster/Ninja    ]: Installing libaom
+-- [BuildMaster/Component]: stamp hit aom (install)
+[61/96] [BuildMaster/Ninja    ]: Installing dav1d
+-- [BuildMaster/Component]: stamp hit dav1d (install)
+[62/96] [BuildMaster/Ninja    ]: Installing openh264
+-- [BuildMaster/Component]: stamp hit openh264 (install)
+[63/96] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+-- [BuildMaster/Component]: stamp hit bzip2 (install)
+[64/96] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (install)
+[65/96] [BuildMaster/CMake    ]: Configuring tesseract
+[BuildMaster/Component]: stamp hit tesseract (configure)
+[66/96] [BuildMaster/CMake    ]: Configuring ffmpeg
+[BuildMaster/Component]: stamp hit ffmpeg (configure)
+[67/96] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+[68/96] [BuildMaster/Ninja    ]: Compiling FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (build)
+[69/96] [BuildMaster/Ninja    ]: Compiling tesseract
+-- [BuildMaster/Component]: stamp hit tesseract (build)
+[70/96] [BuildMaster/Ninja    ]: Compiling VMAF library
+-- [BuildMaster/Component]: stamp hit vmaf (build)
+[71/96] [BuildMaster/Ninja    ]: Compiling libebur128
+-- [BuildMaster/Component]: stamp hit ebur128 (build)
+[72/96] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+[73/96] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.2-linux-x64-libc++.zip... (cached) OK
+[74/96] [BuildMaster/Ninja    ]: Installing FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (install)
+[75/96] [BuildMaster/Ninja    ]: Installing tesseract
+-- [BuildMaster/Component]: stamp hit tesseract (install)
+[76/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[77/96] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+-- [BuildMaster/Component]: stamp hit tessdata (build)
+[78/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[79/96] [BuildMaster/Ninja    ]: Installing VMAF library
+-- [BuildMaster/Component]: stamp hit vmaf (install)
+[80/96] [BuildMaster/Ninja    ]: Compiling zimg
+-- [BuildMaster/Component]: stamp hit zimg (build)
+[81/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[82/96] [BuildMaster/Ninja    ]: Installing libebur128
+-- [BuildMaster/Component]: stamp hit ebur128 (install)
+[83/96] [BuildMaster/Ninja    ]: Compiling LunaSVG
+-- [BuildMaster/Component]: stamp hit lunasvg (build)
+[84/96] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.2-linux-x64-libc++.zip
+[85/96] [BuildMaster/Git      ]: Resetting git source tree after install
+[86/96] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.5-linux-x64-libc++.zip... (cached) OK
+[87/96] [BuildMaster/Ninja    ]: Installing Tesseract traineddata
+-- [BuildMaster/Component]: stamp hit tessdata (install)
+[88/96] [BuildMaster/Ninja    ]: Installing zimg
+-- [BuildMaster/Component]: stamp hit zimg (install)
+[89/96] [BuildMaster/Ninja    ]: Installing LunaSVG
+-- [BuildMaster/Component]: stamp hit lunasvg (install)
+[90/96] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.5-linux-x64-libc++.zip
+[92/96] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineFilterTests.dir/filter_test.cxx.o
+[93/96] Linking CXX shared library lib/libStormByte-Multimedia.so.1.0.1
+[94/96] Creating library symlink lib/libStormByte-Multimedia.so
+[95/96] Linking CXX executable test/pipeline/filters/MultimediaPipelineFilterTests

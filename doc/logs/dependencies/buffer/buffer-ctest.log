@@ -1,0 +1,38 @@
+Test project /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-buffer/test
+      Start  1: BridgeTests
+ 1/15 Test  #1: BridgeTests ......................   Passed    0.95 sec
+      Start  2: BufferedFileReaderTests
+ 2/15 Test  #2: BufferedFileReaderTests ..........   Passed  117.47 sec
+      Start  3: BufferedFileWriterTests
+ 3/15 Test  #3: BufferedFileWriterTests ..........   Passed    4.89 sec
+      Start  4: BufferedLocationDeviceTests
+ 4/15 Test  #4: BufferedLocationDeviceTests ......   Passed    3.66 sec
+      Start  5: ExceptionTests
+ 5/15 Test  #5: ExceptionTests ...................   Passed    0.01 sec
+      Start  6: FIFOTests
+ 6/15 Test  #6: FIFOTests ........................   Passed    0.15 sec
+      Start  7: HopperTests
+ 7/15 Test  #7: HopperTests ......................   Passed    0.12 sec
+      Start  8: PipelineTests
+ 8/15 Test  #8: PipelineTests ....................   Passed  112.13 sec
+      Start  9: ProducerConsumerTests
+ 9/15 Test  #9: ProducerConsumerTests ............   Passed    0.41 sec
+      Start 10: PumperTests
+10/15 Test #10: PumperTests ......................   Passed    0.24 sec
+      Start 11: RingTests
+11/15 Test #11: RingTests ........................   Passed    1.33 sec
+      Start 12: SharedFIFOTests
+12/15 Test #12: SharedFIFOTests ..................   Passed    0.11 sec
+      Start 13: SinkTests
+13/15 Test #13: SinkTests ........................   Passed    0.15 sec
+      Start 14: SinkAllocationFailureTests
+14/15 Test #14: SinkAllocationFailureTests .......***Skipped   0.01 sec
+      Start 15: TelemetryTests
+15/15 Test #15: TelemetryTests ...................   Passed    0.24 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Total Test time (real) = 241.87 sec
+
+The following tests did not run:
+	 14 - SinkAllocationFailureTests (Skipped)

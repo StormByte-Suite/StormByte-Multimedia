@@ -1,0 +1,7 @@
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan_runtime_probe.cxx:5:17: runtime error: signed integer overflow: 2147483647 + 1 cannot be represented in type 'int'
+    #0 0x5591d352064b in main /home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan_runtime_probe.cxx:5:17
+    #1 0x7fa0012ad354 in __libc_start_call_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../sysdeps/nptl/libc_start_call_main.h:59:16
+    #2 0x7fa0012ad47a in __libc_start_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../csu/libc-start.c:372:3
+    #3 0x5591d34f0fe4 in _start (/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-runtime-probe+0x19fe4)
+
+SUMMARY: UndefinedBehaviorSanitizer: signed-integer-overflow /home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan_runtime_probe.cxx:5:17 

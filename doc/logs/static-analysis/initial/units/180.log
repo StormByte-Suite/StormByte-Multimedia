@@ -1,0 +1,805 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/base.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/report.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/scale.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/watermark.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/frame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/item.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/packet.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/progress.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/resource_usage.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/telemetry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/track.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:102:16: warning: 2 adjacent parameters of 'SeedPicture' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  102 |                         SeedPicture(int transfer, int format, CompositeResult& result):
+      |                                     ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:102:20: note: the first parameter in the range is 'transfer'
+  102 |                         SeedPicture(int transfer, int format, CompositeResult& result):
+      |                                         ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:102:34: note: the last parameter in the range is 'format'
+  102 |                         SeedPicture(int transfer, int format, CompositeResult& result):
+      |                                                       ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:116:47: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  116 |                                                 auto* values = reinterpret_cast<float*>(linear.Data(plane) + row * linear.Linesize(plane));
+      |                                                                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:116:68: note: make conversion explicit to silence this warning
+  116 |                                                 auto* values = reinterpret_cast<float*>(linear.Data(plane) + row * linear.Linesize(plane));
+      |                                                                                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                              static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:116:68: note: perform multiplication in a wider type
+  116 |                                                 auto* values = reinterpret_cast<float*>(linear.Data(plane) + row * linear.Linesize(plane));
+      |                                                                                                              ^~~                         
+      |                                                                                                              static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:164:9: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]
+  164 |                         void Process(const Frame&) noexcept override {
+      |                              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<float>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<float>>' calls function 'allocate_at_least<std::allocator<float>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<float>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1120:46: note: frame #6: function '__emplace_back_slow_path<float>' calls function '__split_buffer' here
+ 1120 |   __split_buffer<value_type, allocator_type> __v(__recommend(size() + 1), size(), this->__alloc_);
+      |                                              ^
+/usr/include/c++/v1/__vector/vector.h:1163:21: note: frame #7: function 'operator()' calls function '__emplace_back_slow_path<float>' here
+ 1163 |       [&] { __end = __emplace_back_slow_path(std::forward<_Args>(__args)...); });
+      |                     ^
+/usr/include/c++/v1/__vector/vector.h:1138:7: note: frame #8: function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' calls function 'operator()' here
+ 1138 |       __else();
+      |       ^
+/usr/include/c++/v1/__vector/vector.h:1157:3: note: frame #9: function 'emplace_back<float>' calls function '__if_likely_else<(lambda at /usr/include/c++/v1/__vector/vector.h:1159:7), (lambda at /usr/include/c++/v1/__vector/vector.h:1163:7)>' here
+ 1157 |   std::__if_likely_else(
+      |   ^
+/usr/include/c++/v1/__vector/vector.h:464:90: note: frame #10: function 'push_back' calls function 'emplace_back<float>' here
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:202:8: note: frame #11: function 'Process' calls function 'push_back' here
+  202 |                                                         m_result.Linear.push_back(values[col] / (hdr ? HdrWhite : 1.f));
+      |                                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:171:10: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  171 |                                                                         AVFrame().Data(plane) + row * AVFrame().Linesize(plane),
+      |                                                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:171:34: note: make conversion explicit to silence this warning
+  171 |                                                                         AVFrame().Data(plane) + row * AVFrame().Linesize(plane),
+      |                                                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                 static_cast<ptrdiff_t>(        )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:171:34: note: perform multiplication in a wider type
+  171 |                                                                         AVFrame().Data(plane) + row * AVFrame().Linesize(plane),
+      |                                                                                                 ^~~                            
+      |                                                                                                 static_cast<ptrdiff_t>(        )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:172:10: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  172 |                                                                         m_result.After.Data(plane) + row * m_result.After.Linesize(plane),
+      |                                                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:172:39: note: make conversion explicit to silence this warning
+  172 |                                                                         m_result.After.Data(plane) + row * m_result.After.Linesize(plane),
+      |                                                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                      static_cast<ptrdiff_t>(             )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:172:39: note: perform multiplication in a wider type
+  172 |                                                                         m_result.After.Data(plane) + row * m_result.After.Linesize(plane),
+      |                                                                                                      ^~~                                 
+      |                                                                                                      static_cast<ptrdiff_t>(             )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:200:59: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  200 |                                                 const auto* values = reinterpret_cast<const float*>(linear.Data(plane) + row * linear.Linesize(plane));
+      |                                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:200:80: note: make conversion explicit to silence this warning
+  200 |                                                 const auto* values = reinterpret_cast<const float*>(linear.Data(plane) + row * linear.Linesize(plane));
+      |                                                                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                                          static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:200:80: note: perform multiplication in a wider type
+  200 |                                                 const auto* values = reinterpret_cast<const float*>(linear.Data(plane) + row * linear.Linesize(plane));
+      |                                                                                                                          ^~~                         
+      |                                                                                                                          static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:229:36: warning: 2 adjacent parameters of 'RenderComposite' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  229 |         int RenderComposite(int transfer, int format, unsigned opacity, CompositeResult& result,
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:229:40: note: the first parameter in the range is 'format'
+  229 |         int RenderComposite(int transfer, int format, unsigned opacity, CompositeResult& result,
+      |                                               ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:229:57: note: the last parameter in the range is 'opacity'
+  229 |         int RenderComposite(int transfer, int format, unsigned opacity, CompositeResult& result,
+      |                                                                ^~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:229:48: note: 'int' and 'unsigned int' may be implicitly converted
+  229 |         int RenderComposite(int transfer, int format, unsigned opacity, CompositeResult& result,
+      |                                                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:231:51: warning: the parameter 'designed' of type 'StormByte::Safe::Optional<Property::Resolution>' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param]
+  231 |                 StormByte::Safe::Optional<Property::Resolution> designed = {}, bool fileInput = false) {
+      |                                                                 ^
+      |                 const                                          &
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:233:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  233 |                 TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:251:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  251 |                 TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:253:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  253 |                 TEST_REQUIRE(WaitForTranscoder(job) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:254:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  254 |                 TEST_REQUIRE(result.Captured);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:255:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  255 |                 TEST_REQUIRE(result.After.ColorTransfer() == transfer);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:256:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  256 |                 TEST_REQUIRE(result.After.Format() == format);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:268:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  268 |                 TEST_REQUIRE(a.Linear == b.Linear);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:269:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  269 |                 TEST_REQUIRE(a.RepeatedMatches && b.RepeatedMatches);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:270:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  270 |                 TEST_REQUIRE(a.Frames > 1 && b.Frames > 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:276:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  276 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:303:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  303 |                         TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:312:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  312 |                 TEST_REQUIRE(opened);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:313:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  313 |                 TEST_REQUIRE(opened.value().Container().Name() == "WebM");
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:314:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  314 |                 TEST_REQUIRE(opened.value().Streams().size() == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:316:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  316 |                 TEST_REQUIRE(stream.Type() == StormByte::Multimedia::Type::Video);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:317:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  317 |                 TEST_REQUIRE(stream.Codec().Name() == "VP9");
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:318:14: warning: the const qualified variable 'video' of type 'const StormByte::Safe::Optional<Property::Video>' is copy-constructed from a const reference; consider making it a const reference [performance-unnecessary-copy-initialization]
+  318 |                 const auto video = stream.Video();
+      |                            ^
+      |                           &
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:319:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  319 |                 TEST_REQUIRE(video);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:320:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  320 |                 TEST_REQUIRE(video.value().Resolution().Width() == 640);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:321:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  321 |                 TEST_REQUIRE(video.value().Resolution().Height() == 360);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:323:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  323 |                 TEST_REQUIRE(duration && duration.value().Nanoseconds().count() > 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:324:97: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  324 |                 std::cout << "[WATERMARK " << (binaryInput ? "binary" : "path") << "] " << output.string() << std::endl;
+      |                                                                                                               ^~~~~~~~~
+      |                                                                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:339:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  339 |                 TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, opacity, sdr) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:342:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  342 |                         TEST_REQUIRE(RenderComposite(transfer, AV_PIX_FMT_GBRPF32LE, opacity, hdr) == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:343:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  343 |                         TEST_REQUIRE(sdr.Linear.size() == hdr.Linear.size());
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:351:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  351 |                         TEST_REQUIRE(worst < 0.002f);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:352:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  352 |                         TEST_REQUIRE(finite);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:363:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  363 |         TEST_REQUIRE(decoded.ScaleTo(scaling, rgba, 96, 96, VideoFrame::Resample::Point, VideoFrame::Scaler::Sws));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:367:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  367 |                         TEST_REQUIRE(RenderComposite(transfer, format, 45u, result) == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:385:28: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  385 |                                                 const auto* before = result.Before.Data(plane) + row * result.Before.Linesize(plane) + col * bytes;
+      |                                                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:385:94: note: make conversion explicit to silence this warning
+  385 |                                                 const auto* before = result.Before.Data(plane) + row * result.Before.Linesize(plane) + col * bytes;
+      |                                                                                                                                        ^~~~~~~~~~~
+      |                                                                                                                                        static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:385:94: note: perform multiplication in a wider type
+  385 |                                                 const auto* before = result.Before.Data(plane) + row * result.Before.Linesize(plane) + col * bytes;
+      |                                                                                                                                        ^~~        
+      |                                                                                                                                        static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:386:27: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  386 |                                                 const auto* after = result.After.Data(plane) + row * result.After.Linesize(plane) + col * bytes;
+      |                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:386:91: note: make conversion explicit to silence this warning
+  386 |                                                 const auto* after = result.After.Data(plane) + row * result.After.Linesize(plane) + col * bytes;
+      |                                                                                                                                     ^~~~~~~~~~~
+      |                                                                                                                                     static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:386:91: note: perform multiplication in a wider type
+  386 |                                                 const auto* after = result.After.Data(plane) + row * result.After.Linesize(plane) + col * bytes;
+      |                                                                                                                                     ^~~        
+      |                                                                                                                                     static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:399:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  399 |                         TEST_REQUIRE(untouched > 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:400:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  400 |                         TEST_REQUIRE(transparent > 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:401:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  401 |                         TEST_REQUIRE(changed > 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:402:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  402 |                         TEST_REQUIRE(identical);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:419:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  419 |                 TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, buffer, &svg, design) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:420:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  420 |                 TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, path, &svg, design, true) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:421:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  421 |                 TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, direct, &expected) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:422:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  422 |                 TEST_REQUIRE(CheckSamePicture(buffer, path) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:423:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  423 |                 TEST_REQUIRE(CheckSamePicture(buffer, direct) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:429:27: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  429 |                                         const auto* before = buffer.Before.Data(plane) + y * buffer.Before.Linesize(plane) + x * 4;
+      |                                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:429:91: note: make conversion explicit to silence this warning
+  429 |                                         const auto* before = buffer.Before.Data(plane) + y * buffer.Before.Linesize(plane) + x * 4;
+      |                                                                                                                              ^~~~~
+      |                                                                                                                              static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:429:91: note: perform multiplication in a wider type
+  429 |                                         const auto* before = buffer.Before.Data(plane) + y * buffer.Before.Linesize(plane) + x * 4;
+      |                                                                                                                              ^    
+      |                                                                                                                              static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:430:26: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  430 |                                         const auto* after = buffer.After.Data(plane) + y * buffer.After.Linesize(plane) + x * 4;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:430:88: note: make conversion explicit to silence this warning
+  430 |                                         const auto* after = buffer.After.Data(plane) + y * buffer.After.Linesize(plane) + x * 4;
+      |                                                                                                                           ^~~~~
+      |                                                                                                                           static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:430:88: note: perform multiplication in a wider type
+  430 |                                         const auto* after = buffer.After.Data(plane) + y * buffer.After.Linesize(plane) + x * 4;
+      |                                                                                                                           ^    
+      |                                                                                                                           static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:436:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  436 |                 TEST_REQUIRE(changed);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:437:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  437 |                 TEST_REQUIRE(untouched);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:443:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  443 |         TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, native, &svg) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:444:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  444 |         TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 70u, inferred, &viewBox) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:445:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  445 |         TEST_REQUIRE(CheckSamePicture(native, inferred) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:453:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  453 |         TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 100u, sdr, &svg) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:455:54: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  455 |         const auto* before = reinterpret_cast<const float*>(sdr.Before.Data(0) + y * sdr.Before.Linesize(0));
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:455:75: note: make conversion explicit to silence this warning
+  455 |         const auto* before = reinterpret_cast<const float*>(sdr.Before.Data(0) + y * sdr.Before.Linesize(0));
+      |                                                                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                  static_cast<ptrdiff_t>(   )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:455:75: note: perform multiplication in a wider type
+  455 |         const auto* before = reinterpret_cast<const float*>(sdr.Before.Data(0) + y * sdr.Before.Linesize(0));
+      |                                                                                  ^                         
+      |                                                                                  static_cast<ptrdiff_t>(   )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:456:53: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  456 |         const auto* after = reinterpret_cast<const float*>(sdr.After.Data(0) + y * sdr.After.Linesize(0));
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:456:73: note: make conversion explicit to silence this warning
+  456 |         const auto* after = reinterpret_cast<const float*>(sdr.After.Data(0) + y * sdr.After.Linesize(0));
+      |                                                                                ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                static_cast<ptrdiff_t>(  )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:456:73: note: perform multiplication in a wider type
+  456 |         const auto* after = reinterpret_cast<const float*>(sdr.After.Data(0) + y * sdr.After.Linesize(0));
+      |                                                                                ^                        
+      |                                                                                static_cast<ptrdiff_t>(  )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:457:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  457 |         TEST_REQUIRE(after[x] > before[x] + 0.1f);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:458:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  458 |         TEST_REQUIRE(after[x] < 0.99f);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:462:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  462 |         TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 50u, weighted, &solid) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:466:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  466 |         TEST_REQUIRE(alphaError < 0.004f);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:469:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  469 |                 TEST_REQUIRE(RenderComposite(transfer, AV_PIX_FMT_GBRPF32LE, 100u, hdr, &svg) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:473:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  473 |                 TEST_REQUIRE(worst < 0.002f);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:489:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  489 |                 TEST_REQUIRE(RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 100u, result, &svg) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:493:30: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  493 |                                 identical &= std::memcmp(result.Before.Data(plane) + row * result.Before.Linesize(plane),
+      |                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:493:58: note: make conversion explicit to silence this warning
+  493 |                                 identical &= std::memcmp(result.Before.Data(plane) + row * result.Before.Linesize(plane),
+      |                                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                      static_cast<ptrdiff_t>(            )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:493:58: note: perform multiplication in a wider type
+  493 |                                 identical &= std::memcmp(result.Before.Data(plane) + row * result.Before.Linesize(plane),
+      |                                                                                      ^~~                                
+      |                                                                                      static_cast<ptrdiff_t>(            )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:494:6: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  494 |                                         result.After.Data(plane) + row * result.After.Linesize(plane), PictureSize * sizeof(float)) == 0;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:494:33: note: make conversion explicit to silence this warning
+  494 |                                         result.After.Data(plane) + row * result.After.Linesize(plane), PictureSize * sizeof(float)) == 0;
+      |                                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                    static_cast<ptrdiff_t>(           )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:494:33: note: perform multiplication in a wider type
+  494 |                                         result.After.Data(plane) + row * result.After.Linesize(plane), PictureSize * sizeof(float)) == 0;
+      |                                                                    ^~~                               
+      |                                                                    static_cast<ptrdiff_t>(           )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:495:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  495 |                 TEST_REQUIRE(identical);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:500:5: warning: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape]
+  500 | int main(int argc, char** argv) {
+      |     ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2764:21: note: frame #6: function '__grow_by' calls function '__allocate_long_buffer' here
+ 2764 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2792:3: note: frame #7: function '__grow_by_without_replace' calls function '__grow_by' here
+ 2792 |   __grow_by(__old_cap, __delta_cap, __old_sz, __n_copy, __n_del, __n_add);
+      |   ^
+/usr/include/c++/v1/string:1451:9: note: frame #8: function 'append<const char *, 0>' calls function '__grow_by_without_replace' here
+ 1451 |         __grow_by_without_replace(__cap, __sz + __n - __cap, __sz, __sz, 0);
+      |         ^
+/usr/include/c++/v1/__filesystem/path.h:272:5: note: frame #9: function '__append_range<const char *, 0>' calls function 'append<const char *, 0>' here
+  272 |     __dest.append(__b, __e);
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:285:5: note: frame #10: function '__append_source<std::string_view>' calls function '__append_range<const char *, 0>' here
+  285 |     __append_range(__dest, _Traits::__range_begin(__s), _Traits::__range_end(__s));
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:414:5: note: frame #11: function 'path<std::string_view, void>' calls function '__append_source<std::string_view>' here
+  414 |     _SourceCVT<_Source>::__append_source(__pn_, __src);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:111:21: note: frame #12: function 'RunOneTest' calls function 'path<std::string_view, void>' here
+  111 |         auto outputScope = std::filesystem::path(executable).stem();
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/../../test_helpers.hxx:129:23: note: frame #13: function 'RunSelectedTest' calls function 'RunOneTest' here
+  129 |                         const int result = RunOneTest(test, argv[0]);
+      |                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/watermark/watermark_test.cxx:509:9: note: frame #14: function 'main' calls function 'RunSelectedTest' here
+  509 |         return RunSelectedTest(argc, argv, tests);
+      |                ^

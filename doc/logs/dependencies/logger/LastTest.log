@@ -1,0 +1,96 @@
+Start testing: Nov 02 04:05 CET
+----------------------------------------------------------
+1/5 Testing: LogTests
+1/5 Test: LogTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/LogTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test
+"LogTests" start time: Nov 02 04:05 CET
+Output:
+----------------------------------------------------------
+Info    : Info message
+Error   : Error message
+All tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"LogTests" end time: Nov 02 04:05 CET
+"LogTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/5 Testing: ThreadedLogTests
+2/5 Test: ThreadedLogTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/ThreadedLogTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test
+"ThreadedLogTests" start time: Nov 02 04:05 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.38 sec
+----------------------------------------------------------
+Test Passed.
+"ThreadedLogTests" end time: Nov 02 04:05 CET
+"ThreadedLogTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/5 Testing: ManipulatorsTests
+3/5 Test: ManipulatorsTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/ManipulatorsTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test
+"ManipulatorsTests" start time: Nov 02 04:05 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ManipulatorsTests" end time: Nov 02 04:05 CET
+"ManipulatorsTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/5 Testing: FormatMaskTests
+4/5 Test: FormatMaskTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/FormatMaskTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test
+"FormatMaskTests" start time: Nov 02 04:05 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"FormatMaskTests" end time: Nov 02 04:05 CET
+"FormatMaskTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/5 Testing: PerfTests
+5/5 Test: PerfTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test/PerfTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-logger/test
+"PerfTests" start time: Nov 02 04:05 CET
+Output:
+----------------------------------------------------------
+  [perf] Log filtered 300000 lines in 411 ms
+  [perf] Log filtered owned text 50000 lines in 61 ms
+  [perf] ThreadedLog filtered 50000 lines in 103 ms
+  [perf] ThreadedLog filtered 64000 lines (8 threads) in 25 ms
+  [perf] Log drop+filter 32768 lines in 132 ms
+  [perf] Log sample 8192 lines in 314 ms
+  [perf] Log window 8192 lines in 52 ms
+  [perf] Log scope throttle 4096 lines in 20 ms
+  [perf] Log group throttle 4096 lines in 21 ms
+  [perf] Log rate throttle 2000 lines in 9 ms
+  [perf] ThreadedLog throttle 16384 lines (4 threads) in 129 ms
+All tests passed!
+<end of output>
+Test time =   1.33 sec
+----------------------------------------------------------
+Test Passed.
+"PerfTests" end time: Nov 02 04:05 CET
+"PerfTests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Nov 02 04:05 CET

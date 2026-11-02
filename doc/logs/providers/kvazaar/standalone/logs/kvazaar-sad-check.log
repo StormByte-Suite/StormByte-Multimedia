@@ -1,0 +1,10 @@
+Compiler: clang version 22.1.8+libcxx
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/lib/llvm/22/bin
+Configuration file: /etc/clang/22/x86_64-pc-linux-gnu-clang++.cfg
+Source root: /home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/kvazaar-upstream-fixes
+Command: clang++-22 -std=c++17 -fsanitize=address\,undefined -fno-omit-frame-pointer -msse4.1 -I/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/kvazaar-upstream-fixes/src /home/stormbyte/Software/StormByte/StormByte/multimedia/doc/logs/providers/kvazaar/standalone/kvazaar-sad-check.cxx -o /home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/evidence-checks/kvazaar/kvazaar-sad-check
+compile exit_code: 0
+Unaligned SAD matches scalar reference: 15872 trials
+run exit_code: 0

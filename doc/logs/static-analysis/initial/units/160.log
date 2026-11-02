@@ -1,0 +1,738 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/ceiling.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/base.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/resource_usage.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/track.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:46:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   46 |                                         TEST_REQUIRE(ceiling.Frames() == 0);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:47:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   47 |                                         TEST_REQUIRE(ceiling.Packets() == 8);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:48:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   48 |                                         TEST_REQUIRE(ceiling.Park() == (producer == Producer::Demuxer ? 8 : 0));
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:53:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   53 |                 TEST_REQUIRE(ReadCalls() - before < 10);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:56:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   56 |                 TEST_REQUIRE(decodedVideo.Frames() >= 2 && decodedVideo.Frames() <= 32);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:57:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   57 |                 TEST_REQUIRE(decodedVideo.Packets() == decodedVideo.Frames());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:59:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   59 |                 TEST_REQUIRE(decodedAudio.Frames() == 8 && decodedAudio.Packets() == 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:63:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   63 |                 TEST_REQUIRE(mediumVideo.Frames() >= 2 && mediumVideo.Frames() <= fullFrames);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:64:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   64 |                 TEST_REQUIRE(mediumVideo.Packets() == mediumVideo.Frames());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:67:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   67 |                 TEST_REQUIRE(lowVideo.Frames() >= 2 && lowVideo.Frames() <= mediumVideo.Frames());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:68:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   68 |                 TEST_REQUIRE(lowVideo.Packets() == lowVideo.Frames());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:70:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   70 |                 TEST_REQUIRE(codec);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:80:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   80 |                                 TEST_REQUIRE(cap.Frames() == expected);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:84:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   84 |                                 TEST_REQUIRE(cap.Packets() == packets);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:87:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   87 |                         TEST_REQUIRE(audio.Frames() == packets);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:94:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   94 |                 TEST_REQUIRE(Ceiling::MaxThreads() >= 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:95:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   95 |                 TEST_REQUIRE(Ceiling::AvailableRam() > 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:96:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   96 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Full, 0) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:97:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   97 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Full, 16) == 16);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:98:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   98 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 1) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:99:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   99 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 8) == 4);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:100:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  100 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Medium, 9) == 4);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:101:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  101 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Low, 1) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:102:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  102 |                 TEST_REQUIRE(Ceiling::ResourceThreads(Usage::Low, 8) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:103:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  103 |                 TEST_REQUIRE(Ceiling::StageThreads(Usage::Full, 8, 4) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:104:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  104 |                 TEST_REQUIRE(Ceiling::StageThreads(Usage::Medium, 8, 4) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:105:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  105 |                 TEST_REQUIRE(Ceiling::StageThreads(Usage::Low, 16, 2) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:106:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  106 |                 TEST_REQUIRE(Ceiling::StageThreads(Usage::Low, 16, 0) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:107:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  107 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(0) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:108:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  108 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(1) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:109:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  109 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(2) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:110:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  110 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(3) == 3);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:111:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  111 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(5) == 3);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:112:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  112 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(6) == 4);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:113:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  113 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(11) == 4);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:114:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(12) == 5);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:115:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  115 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(23) == 5);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:116:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  116 |                 TEST_REQUIRE(Ceiling::SvtParallelismLevel(24) == 6);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:117:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Full, 27) == 27);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:118:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  118 |                 TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Medium, 27) == 14);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:119:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  119 |                 TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 27) == 7);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:120:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |                 TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Medium, 2) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:121:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  121 |                 TEST_REQUIRE(Ceiling::ResourceFrames(Usage::Low, 0) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:124:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  124 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 3, 27) == 27);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:125:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  125 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Medium, 64 * gib, 64 * mib, 3, 27) == 10);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:126:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  126 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Low, 64 * gib, 64 * mib, 3, 27) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:127:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  127 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, gib, 64 * mib, 3, 27) == 27);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:128:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  128 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 64 * gib, 64 * mib, 6, 27) == 27);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:129:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  129 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, 0, 0, 0, 0) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:131:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  131 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 64 * gib, pixels, 1) == 64);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:132:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  132 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 64 * gib, pixels, 1) == 25);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:133:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  133 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Low, 64, 64 * gib, pixels, 1) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:134:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  134 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 4 * gib, pixels, 1) == 64);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:135:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  135 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 64, 8 * gib, pixels, 1) == 3);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:136:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  136 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 2, 64 * gib, pixels, 1) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:137:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  137 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 16, 64 * gib, pixels, 2) == 12);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:138:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  138 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Medium, 16, 0, pixels, 1) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:139:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  139 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Medium, 8 * gib, 64 * mib, 3, 32) == 5);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:140:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  140 |                 TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Low, 8 * gib, 64 * mib, 3, 32) == 2);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:141:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  141 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels, 2) == 64);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:142:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 64, 8 * gib, pixels * 4, 1) == 64);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:143:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  143 |                 TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 0, 0, 0, 0) == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:158:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  158 |                         TEST_REQUIRE(Ceiling::VideoFrames(*plan) == 27);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:159:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  159 |                         TEST_REQUIRE(Ceiling::VideoFrames(*plan, 32) == 32);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:160:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  160 |                         TEST_REQUIRE(Ceiling::VideoFrames(*plan, 0) == 2);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:163:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  163 |                 TEST_REQUIRE(ReadCalls() - before < 10);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:166:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  166 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 27) == 27);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:166:57: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  166 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 27) == 27);
+      |                                                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:166:57: note: make conversion explicit to silence this warning
+  166 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 27) == 27);
+      |                                                                              ^
+      |                                                                              static_cast<std::size_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:166:57: note: perform multiplication in a wider type
+  166 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 27) == 27);
+      |                                                                              ^
+      |                                                                              static_cast<long>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:167:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  167 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 32) == 32);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:167:57: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  167 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 32) == 32);
+      |                                                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:167:57: note: make conversion explicit to silence this warning
+  167 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 32) == 32);
+      |                                                                              ^
+      |                                                                              static_cast<std::size_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:167:57: note: perform multiplication in a wider type
+  167 |                         TEST_REQUIRE(Ceiling::MemoryFrames(Usage::Full, ram, 256 * 1024 * 1024, 12, 32) == 32);
+      |                                                                              ^
+      |                                                                              static_cast<long>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:168:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  168 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 32, ram, 7680 * 4320, 4) == 32);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:168:60: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  168 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 32, ram, 7680 * 4320, 4) == 32);
+      |                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:168:60: note: make conversion explicit to silence this warning
+  168 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 32, ram, 7680 * 4320, 4) == 32);
+      |                                                                                 ^
+      |                                                                                 static_cast<std::size_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:168:60: note: perform multiplication in a wider type
+  168 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 32, ram, 7680 * 4320, 4) == 32);
+      |                                                                                 ^
+      |                                                                                 static_cast<long>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:169:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  169 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 2, ram, 7680 * 4320, 4) == 2);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:169:59: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  169 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 2, ram, 7680 * 4320, 4) == 2);
+      |                                                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:169:59: note: make conversion explicit to silence this warning
+  169 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 2, ram, 7680 * 4320, 4) == 2);
+      |                                                                                ^
+      |                                                                                static_cast<std::size_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:169:59: note: perform multiplication in a wider type
+  169 |                         TEST_REQUIRE(Ceiling::VmafThreads(Usage::Full, 2, ram, 7680 * 4320, 4) == 2);
+      |                                                                                ^
+      |                                                                                static_cast<long>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:175:5: warning: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape]
+  175 | int main(int argc, char** argv) {
+      |     ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2764:54: note: frame #3: function '__grow_by' calls function '__get_amortized_growth_capacity' here
+ 2764 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2792:3: note: frame #4: function '__grow_by_without_replace' calls function '__grow_by' here
+ 2792 |   __grow_by(__old_cap, __delta_cap, __old_sz, __n_copy, __n_del, __n_add);
+      |   ^
+/usr/include/c++/v1/string:1451:9: note: frame #5: function 'append<const char *, 0>' calls function '__grow_by_without_replace' here
+ 1451 |         __grow_by_without_replace(__cap, __sz + __n - __cap, __sz, __sz, 0);
+      |         ^
+/usr/include/c++/v1/__filesystem/path.h:272:5: note: frame #6: function '__append_range<const char *, 0>' calls function 'append<const char *, 0>' here
+  272 |     __dest.append(__b, __e);
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:285:5: note: frame #7: function '__append_source<std::string_view>' calls function '__append_range<const char *, 0>' here
+  285 |     __append_range(__dest, _Traits::__range_begin(__s), _Traits::__range_end(__s));
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:414:5: note: frame #8: function 'path<std::string_view, void>' calls function '__append_source<std::string_view>' here
+  414 |     _SourceCVT<_Source>::__append_source(__pn_, __src);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:111:21: note: frame #9: function 'RunOneTest' calls function 'path<std::string_view, void>' here
+  111 |         auto outputScope = std::filesystem::path(executable).stem();
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/../test_helpers.hxx:129:23: note: frame #10: function 'RunSelectedTest' calls function 'RunOneTest' here
+  129 |                         const int result = RunOneTest(test, argv[0]);
+      |                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/ceiling_test.cxx:181:9: note: frame #11: function 'main' calls function 'RunSelectedTest' here
+  181 |         return RunSelectedTest(argc, argv, tests);
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

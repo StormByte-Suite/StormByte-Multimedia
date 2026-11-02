@@ -1,0 +1,429 @@
+[1/2] Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx.
+477 warnings generated.
+[2/2] Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx.
+930 warnings generated.
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:181:34: warning: 2 adjacent parameters of 'Box' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  181 |         double Box(const FFrame& frame, int horizontal, int vertical, int radius) noexcept {
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:181:38: note: the first parameter in the range is 'horizontal'
+  181 |         double Box(const FFrame& frame, int horizontal, int vertical, int radius) noexcept {
+      |                                             ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:181:54: note: the last parameter in the range is 'vertical'
+  181 |         double Box(const FFrame& frame, int horizontal, int vertical, int radius) noexcept {
+      |                                                             ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:213:36: warning: 2 adjacent parameters of 'WriteSample' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  213 |         void WriteSample(uint8_t* sample, unsigned value, int bytes, bool bigEndian) noexcept {
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:213:45: note: the first parameter in the range is 'value'
+  213 |         void WriteSample(uint8_t* sample, unsigned value, int bytes, bool bigEndian) noexcept {
+      |                                                    ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:213:56: note: the last parameter in the range is 'bytes'
+  213 |         void WriteSample(uint8_t* sample, unsigned value, int bytes, bool bigEndian) noexcept {
+      |                                                               ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:213:52: note: 'unsigned int' and 'int' may be implicitly converted
+  213 |         void WriteSample(uint8_t* sample, unsigned value, int bytes, bool bigEndian) noexcept {
+      |                                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:266:15: warning: an exception may be thrown in function 'PushFrame' which should not throw exceptions [bugprone-exception-escape]
+  266 | void Degrain::PushFrame(const FFrame& source) noexcept {
+      |               ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator_traits.h:259:12: note: frame #2: function 'allocate' calls function 'allocate' here
+  259 |     return __a.allocate(__n);
+      |            ^
+/usr/include/c++/v1/__hash_table:1844:21: note: frame #3: function '__construct_node_hash<const long &, unsigned long &>' calls function 'allocate' here
+ 1844 |   __node_holder __h(__node_traits::allocate(__na, 1), _Dp(__na));
+      |                     ^
+/usr/include/c++/v1/__hash_table:798:33: note: frame #4: function 'operator()' calls function '__construct_node_hash<const long &, unsigned long &>' here
+  798 |             __node_holder __h = __construct_node_hash(__hash, std::forward<_Args>(__args2)...);
+      |                                 ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:69:10: note: frame #5: function '__try_key_extraction_impl<long, std::pair<std::__hash_iterator<std::__hash_node<std::__hash_value_type<long, unsigned long>, void *> *>, bool>, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), const long &, unsigned long &, 0>' calls function 'operator()' here
+   69 |   return __with_key(__arg1, std::forward<_Arg1>(__arg1), std::forward<_Arg2>(__arg2));
+      |          ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:108:10: note: frame #6: function '__try_key_extraction<long, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), const long &, unsigned long &>' calls function '__try_key_extraction_impl<long, std::pair<std::__hash_iterator<std::__hash_node<std::__hash_value_type<long, unsigned long>, void *> *>, bool>, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), const long &, unsigned long &, 0>' here
+  108 |   return std::__try_key_extraction_impl<_KeyT, _Ret>(
+      |          ^
+/usr/include/c++/v1/__hash_table:777:12: note: frame #7: function '__emplace_unique<const long &, unsigned long &>' calls function '__try_key_extraction<long, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), const long &, unsigned long &>' here
+  777 |     return std::__try_key_extraction<key_type>(
+      |            ^
+/usr/include/c++/v1/unordered_map:1091:12: note: frame #8: function 'emplace<const long &, unsigned long &>' calls function '__emplace_unique<const long &, unsigned long &>' here
+ 1091 |     return __table_.__emplace_unique(std::forward<_Args>(__args)...);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:344:2: note: frame #9: function 'PushFrame' calls function 'emplace<const long &, unsigned long &>' here
+  344 |         m_state->lookup.emplace(pts, slot.row);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:351:15: warning: an exception may be thrown in function 'ScoreCenter' which should not throw exceptions [bugprone-exception-escape]
+  351 | void Degrain::ScoreCenter(StormByte::Size index) noexcept {
+      |               ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<double>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<double>>' calls function 'allocate_at_least<std::allocator<double>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/__split_buffer:720:25: note: frame #5: function '__split_buffer' calls function '__allocate_at_least<std::allocator<double>>' here
+  720 |     auto __allocation = std::__allocate_at_least(__get_allocator(), __cap);
+      |                         ^
+/usr/include/c++/v1/__vector/vector.h:1092:48: note: frame #6: function 'reserve' calls function '__split_buffer' here
+ 1092 |     __split_buffer<value_type, allocator_type> __v(__n, size(), this->__alloc_);
+      |                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:372:4: note: frame #7: function 'ScoreCenter' calls function 'reserve' here
+  372 |                         residuals.reserve(64 * 2 * RingSpan);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:372:22: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  372 |                         residuals.reserve(64 * 2 * RingSpan);
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:372:22: note: make conversion explicit to silence this warning
+   59 |                         residuals.reserve(64 * 2 * RingSpan);
+      |                                           ^~~~~~
+      |                                           static_cast<std::size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:372:22: note: perform multiplication in a wider type
+  372 |                         residuals.reserve(64 * 2 * RingSpan);
+      |                                           ^~
+      |                                           static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:435:77: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions]
+  435 |                                         if (accepted < 3 || candidates == 0 || static_cast<double>(accepted) / candidates < 0.8)
+      |                                                                                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:484:15: warning: an exception may be thrown in function 'Decide' which should not throw exceptions [bugprone-exception-escape]
+  484 | void Degrain::Decide() noexcept {
+      |               ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:245:4: note: frame #4: function 'FormatFloatAscii<double>' calls function 'PadAscii' here
+  245 |                         PadAscii(ascii, spec);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:336:22: note: frame #5: function 'FormatReplaceToken<char, unsigned int &>' calls function 'FormatFloatAscii<double>' here
+  336 |                                 AssignAscii(out, FormatFloatAscii(static_cast<double>(value), spec));
+      |                                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:643:12: note: frame #6: function 'operator()<unsigned int &>' calls function 'FormatReplaceToken<char, unsigned int &>' here
+  643 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:657:7: note: frame #7: function 'ReplaceToken<unsigned int &, unsigned int &, double &, double &, double &>' calls function 'operator()<unsigned int &>' here
+  657 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:545:22: note: frame #8: function 'Decide' calls function 'ReplaceToken<unsigned int &, unsigned int &, double &, double &, double &>' here
+  545 |                 Log(Level::Notice, StormByte::Safe::String::ReplaceToken("regional targets frames={} active={} sigma min/p50/max={:.3f}/{:.3f}/{:.3f}",
+      |                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:550:56: warning: 2 adjacent parameters of 'RegionTarget' of similar type ('double') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  550 | double Degrain::RegionTarget(const RegionMap& regions, double horizontal, double vertical) noexcept {
+      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:550:63: note: the first parameter in the range is 'horizontal'
+  550 | double Degrain::RegionTarget(const RegionMap& regions, double horizontal, double vertical) noexcept {
+      |                                                               ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:550:82: note: the last parameter in the range is 'vertical'
+  550 | double Degrain::RegionTarget(const RegionMap& regions, double horizontal, double vertical) noexcept {
+      |                                                                                  ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:564:15: warning: an exception may be thrown in function 'FilterWindow' which should not throw exceptions [bugprone-exception-escape]
+  564 | bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
+      |               ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:224:4: note: frame #4: function 'FormatIntegerAscii<long long>' calls function 'PadAscii' here
+  224 |                         PadAscii(ascii, spec);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:325:22: note: frame #5: function 'FormatReplaceToken<char, double &>' calls function 'FormatIntegerAscii<long long>' here
+  325 |                                 AssignAscii(out, FormatIntegerAscii(static_cast<long long>(value), spec));
+      |                                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:643:12: note: frame #6: function 'operator()<double &>' calls function 'FormatReplaceToken<char, double &>' here
+  643 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:657:7: note: frame #7: function 'ReplaceToken<double &, int, const char *>' calls function 'operator()<double &>' here
+  657 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:576:40: note: frame #8: function 'FilterWindow' calls function 'ReplaceToken<double &, int, const char *>' here
+  576 |         const StormByte::Safe::String chain = StormByte::Safe::String::ReplaceToken(
+      |                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:633:15: warning: an exception may be thrown in function 'Apply' which should not throw exceptions [bugprone-exception-escape]
+  633 | bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
+      |               ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator_traits.h:259:12: note: frame #2: function 'allocate' calls function 'allocate' here
+  259 |     return __a.allocate(__n);
+      |            ^
+/usr/include/c++/v1/__hash_table:1844:21: note: frame #3: function '__construct_node_hash<long>' calls function 'allocate' here
+ 1844 |   __node_holder __h(__node_traits::allocate(__na, 1), _Dp(__na));
+      |                     ^
+/usr/include/c++/v1/__hash_table:798:33: note: frame #4: function 'operator()' calls function '__construct_node_hash<long>' here
+  798 |             __node_holder __h = __construct_node_hash(__hash, std::forward<_Args>(__args2)...);
+      |                                 ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:44:10: note: frame #5: function '__try_key_extraction_impl<long, std::pair<std::__hash_iterator<std::__hash_node<long, void *> *>, bool>, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), long, 0>' calls function 'operator()' here
+   44 |   return __with_key(__arg, std::forward<_Arg>(__arg));
+      |          ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:108:10: note: frame #6: function '__try_key_extraction<long, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), long>' calls function '__try_key_extraction_impl<long, std::pair<std::__hash_iterator<std::__hash_node<long, void *> *>, bool>, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), long, 0>' here
+  108 |   return std::__try_key_extraction_impl<_KeyT, _Ret>(
+      |          ^
+/usr/include/c++/v1/__hash_table:777:12: note: frame #7: function '__emplace_unique<long>' calls function '__try_key_extraction<long, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), long>' here
+  777 |     return std::__try_key_extraction<key_type>(
+      |            ^
+/usr/include/c++/v1/unordered_set:765:12: note: frame #8: function 'insert' calls function '__emplace_unique<long>' here
+  765 |     return __table_.__emplace_unique(std::move(__x));
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:635:71: note: frame #9: function 'Apply' calls function 'insert' here
+  635 |         if (source.Pts() == MissingPts || found == m_state->lookup.end() || !m_state->processed.insert(source.Pts()).second
+      |                                                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:749:64: warning: an exception may be thrown in function 'Report' which should not throw exceptions [bugprone-exception-escape]
+  749 | class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const noexcept {
+      |                                                                ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string:2565:5: note: frame #1: function '__throw_out_of_range' calls function '__throw_out_of_range' here
+ 2565 |     std::__throw_out_of_range("basic_string");
+      |     ^
+/usr/include/c++/v1/string:3156:5: note: frame #2: function 'insert' calls function '__throw_out_of_range' here
+ 3156 |     this->__throw_out_of_range();
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:199:5: note: frame #3: function 'PadAscii' calls function 'insert' here
+  199 |                                 text.insert(at, pad, '0');
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:224:4: note: frame #4: function 'FormatIntegerAscii<long long>' calls function 'PadAscii' here
+  224 |                         PadAscii(ascii, spec);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:325:22: note: frame #5: function 'FormatReplaceToken<char, const double &>' calls function 'FormatIntegerAscii<long long>' here
+  325 |                                 AssignAscii(out, FormatIntegerAscii(static_cast<long long>(value), spec));
+      |                                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:643:12: note: frame #6: function 'operator()<const double &>' calls function 'FormatReplaceToken<char, const double &>' here
+  643 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:657:7: note: frame #7: function 'ReplaceToken<const double &>' calls function 'operator()<const double &>' here
+  657 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx:761:49: note: frame #8: function 'Report' calls function 'ReplaceToken<const double &>' here
+  761 |         data.emplace(StormByte::Safe::String("sigma"), StormByte::Safe::String::ReplaceToken("{:.3f}", m_sigmaP50));
+      |                                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.hxx:275:40: warning: performing an implicit widening conversion to type 'size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  275 |                         using RegionMap = std::array<float, GridWidth * GridHeight>;
+      |                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.hxx:275:40: note: make conversion explicit to silence this warning
+  275 |                         using RegionMap = std::array<float, GridWidth * GridHeight>;
+      |                                                             ^~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/video/degrain.hxx:275:40: note: perform multiplication in a wider type
+  275 |                         using RegionMap = std::array<float, GridWidth * GridHeight>;
+      |                                                             ^~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:157:50: warning: 3 adjacent parameters of 'RunVideo' of similar type ('unsigned int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  157 |         int RunVideo(const char* leaf, Attach&& attach, unsigned width = 0,
+      |                                                         ^~~~~~~~~~~~~~~~~~~
+  158 |                 unsigned height = 0, unsigned fps = 0) {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:157:59: note: the first parameter in the range is 'width'
+  157 |         int RunVideo(const char* leaf, Attach&& attach, unsigned width = 0,
+      |                                                                  ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:158:33: note: the last parameter in the range is 'fps'
+  158 |                 unsigned height = 0, unsigned fps = 0) {
+      |                                               ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:202:3: warning: 2 adjacent parameters of 'RunAudio' of similar type ('unsigned int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  202 |                 unsigned channels = 2, unsigned sampleRate = 48000) {
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:202:12: note: the first parameter in the range is 'channels'
+  202 |                 unsigned channels = 2, unsigned sampleRate = 48000) {
+      |                          ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:202:35: note: the last parameter in the range is 'sampleRate'
+  202 |                 unsigned channels = 2, unsigned sampleRate = 48000) {
+      |                                                 ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:306:14: warning: performing an implicit widening conversion to type 'std::int64_t' (aka 'long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  306 |                 source.Pts(index * 1001);
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:306:14: note: make conversion explicit to silence this warning
+  306 |                 source.Pts(index * 1001);
+      |                            ^~~~~~~~~~~~
+      |                            static_cast<std::int64_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:306:14: note: perform multiplication in a wider type
+  306 |                 source.Pts(index * 1001);
+      |                            ^~~~~
+      |                            static_cast<std::int64_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:396:16: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  396 |                         std::memset(source.Data(plane) + row * source.Linesize(plane), plane == 0 ? 16 : 128, size);
+      |                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:396:37: note: make conversion explicit to silence this warning
+  396 |                         std::memset(source.Data(plane) + row * source.Linesize(plane), plane == 0 ? 16 : 128, size);
+      |                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                          static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:396:37: note: perform multiplication in a wider type
+  396 |                         std::memset(source.Data(plane) + row * source.Linesize(plane), plane == 0 ? 16 : 128, size);
+      |                                                          ^~~                         
+      |                                                          static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:430:33: warning: performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  430 |         std::memset(source.Data(0), 0, 1024 * 2 * sizeof(std::int16_t));
+      |                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:430:33: note: make conversion explicit to silence this warning
+  430 |         std::memset(source.Data(0), 0, 1024 * 2 * sizeof(std::int16_t));
+      |                                        ^~~~~~~~
+      |                                        static_cast<__size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:430:33: note: perform multiplication in a wider type
+  430 |         std::memset(source.Data(0), 0, 1024 * 2 * sizeof(std::int16_t));
+      |                                        ^~~~
+      |                                        static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:437:14: warning: performing an implicit widening conversion to type 'std::int64_t' (aka 'long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  437 |                 source.Pts(index * 1024);
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:437:14: note: make conversion explicit to silence this warning
+  437 |                 source.Pts(index * 1024);
+      |                            ^~~~~~~~~~~~
+      |                            static_cast<std::int64_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:437:14: note: perform multiplication in a wider type
+  437 |                 source.Pts(index * 1024);
+      |                            ^~~~~
+      |                            static_cast<std::int64_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:469:52: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  469 |                         auto* pixels = reinterpret_cast<std::uint16_t*>(source.Data(plane) + row * source.Linesize(plane));
+      |                                                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:469:73: note: make conversion explicit to silence this warning
+  469 |                         auto* pixels = reinterpret_cast<std::uint16_t*>(source.Data(plane) + row * source.Linesize(plane));
+      |                                                                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                              static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:469:73: note: perform multiplication in a wider type
+  469 |                         auto* pixels = reinterpret_cast<std::uint16_t*>(source.Data(plane) + row * source.Linesize(plane));
+      |                                                                                              ^~~                         
+      |                                                                                              static_cast<ptrdiff_t>(     )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:506:30: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  506 |                                 TEST_REQUIRE(std::memcmp(reused.Data(plane) + row * reused.Linesize(plane),
+      |                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:506:51: note: make conversion explicit to silence this warning
+  506 |                                 TEST_REQUIRE(std::memcmp(reused.Data(plane) + row * reused.Linesize(plane),
+      |                                                                               ^
+      |                                                                               static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:506:51: note: perform multiplication in a wider type
+  506 |                                 TEST_REQUIRE(std::memcmp(reused.Data(plane) + row * reused.Linesize(plane),
+      |                                                                               ^
+      |                                                                               static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:507:6: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  507 |                                         fresh.Data(plane) + row * fresh.Linesize(plane), 16 * sizeof(float)) == 0);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:507:26: note: make conversion explicit to silence this warning
+  507 |                                         fresh.Data(plane) + row * fresh.Linesize(plane), 16 * sizeof(float)) == 0);
+      |                                                             ^
+      |                                                             static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:507:26: note: perform multiplication in a wider type
+  507 |                                         fresh.Data(plane) + row * fresh.Linesize(plane), 16 * sizeof(float)) == 0);
+      |                                                             ^
+      |                                                             static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:845:5: warning: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape]
+  845 | int main(int argc, char** argv) {
+      |     ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2764:21: note: frame #6: function '__grow_by' calls function '__allocate_long_buffer' here
+ 2764 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2792:3: note: frame #7: function '__grow_by_without_replace' calls function '__grow_by' here
+ 2792 |   __grow_by(__old_cap, __delta_cap, __old_sz, __n_copy, __n_del, __n_add);
+      |   ^
+/usr/include/c++/v1/string:1451:9: note: frame #8: function 'append<const char *, 0>' calls function '__grow_by_without_replace' here
+ 1451 |         __grow_by_without_replace(__cap, __sz + __n - __cap, __sz, __sz, 0);
+      |         ^
+/usr/include/c++/v1/__filesystem/path.h:272:5: note: frame #9: function '__append_range<const char *, 0>' calls function 'append<const char *, 0>' here
+  272 |     __dest.append(__b, __e);
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:285:5: note: frame #10: function '__append_source<std::string_view>' calls function '__append_range<const char *, 0>' here
+  285 |     __append_range(__dest, _Traits::__range_begin(__s), _Traits::__range_end(__s));
+      |     ^
+/usr/include/c++/v1/__filesystem/path.h:414:5: note: frame #11: function 'path<std::string_view, void>' calls function '__append_source<std::string_view>' here
+  414 |     _SourceCVT<_Source>::__append_source(__pn_, __src);
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:111:21: note: frame #12: function 'RunOneTest' calls function 'path<std::string_view, void>' here
+  111 |         auto outputScope = std::filesystem::path(executable).stem();
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/../../test_helpers.hxx:129:23: note: frame #13: function 'RunSelectedTest' calls function 'RunOneTest' here
+  129 |                         const int result = RunOneTest(test, argv[0]);
+      |                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/filters/filter_test.cxx:893:9: note: frame #14: function 'main' calls function 'RunSelectedTest' here
+  893 |         return RunSelectedTest(argc, argv, tests);
+      |                ^
+Suppressed 898 warnings (896 in non-user code, 2 with check filters).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

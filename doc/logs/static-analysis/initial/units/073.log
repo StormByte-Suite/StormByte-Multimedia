@@ -1,0 +1,36 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:72:2: warning: Call to virtual method 'AVPacket::Free' during destruction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+   72 |         Free();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:72:2: note: Call to virtual method 'AVPacket::Free' during destruction bypasses virtual dispatch
+   72 |         Free();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:94:55: warning: 2 adjacent parameters of 'Load' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   94 | bool FFmpeg::AVPacket::Load(const std::uint8_t* data, int size, int stream_index, bool key_frame) noexcept {
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:94:59: note: the first parameter in the range is 'size'
+   94 | bool FFmpeg::AVPacket::Load(const std::uint8_t* data, int size, int stream_index, bool key_frame) noexcept {
+      |                                                           ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:94:69: note: the last parameter in the range is 'stream_index'
+   94 | bool FFmpeg::AVPacket::Load(const std::uint8_t* data, int size, int stream_index, bool key_frame) noexcept {
+      |                                                                     ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:113:53: warning: 2 adjacent parameters of 'Timestamps' of similar type ('std::int64_t') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  113 | void FFmpeg::AVPacket::Timestamps(std::int64_t pts, std::int64_t dts, std::int64_t duration) noexcept {
+      |                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:113:66: note: the first parameter in the range is 'dts'
+  113 | void FFmpeg::AVPacket::Timestamps(std::int64_t pts, std::int64_t dts, std::int64_t duration) noexcept {
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.cxx:113:84: note: the last parameter in the range is 'duration'
+  113 | void FFmpeg::AVPacket::Timestamps(std::int64_t pts, std::int64_t dts, std::int64_t duration) noexcept {
+      |                                                                                    ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

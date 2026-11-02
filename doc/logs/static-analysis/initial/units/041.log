@@ -1,0 +1,276 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:100:35: warning: performing an implicit widening conversion to type 'const std::size_t' (aka 'const unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  100 |         constexpr std::size_t MaxBytes = 64 * 1024 * 1024;
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:100:35: note: make conversion explicit to silence this warning
+   67 |         constexpr std::size_t MaxBytes = 64 * 1024 * 1024;
+      |                                          ^~~~~~~~~~~~~~~~
+      |                                          static_cast<const std::size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:100:35: note: perform multiplication in a wider type
+  100 |         constexpr std::size_t MaxBytes = 64 * 1024 * 1024;
+      |                                          ^~~~~~~~~
+      |                                          static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:323:30: warning: Excessive padding in 'class StormByte::Multimedia::Backend::SimplePlayer::Context' (32 padding bytes, where 0 is optimal). Optimal fields order: m_error, m_decoders, m_hdr_display, m_format, m_font_bytes, m_decode, m_present, m_bytes, m_epoch, m_cue_id, m_open_cue, m_open_cue_start, m_position, m_duration, m_origin, m_target, m_audio_target, m_end, m_audio_end, m_anchor, m_start, m_seek_prefix_pts, m_display, m_logger, m_reader, m_tracks, m_fonts, m_avio, m_control, m_mutex, m_delivery, m_ready, m_queue, m_state, m_seek_prefix_size, m_acceleration, m_color_mode, m_selected, m_cancel, m_decode_stop, m_paused, m_audio_switching, m_audio_transition, m_preview, m_preview_done, m_preview_video_ready, m_preview_subtitle_ready, m_eof, m_draining, m_seek_audio, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  323 | class Backend::SimplePlayer::Context {
+      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+  324 |         public:
+      |         ~~~~~~~
+  325 |                 /**
+      |                 ~~~
+  326 |                  * @brief Retain the application sink and initialize scoped logging.
+      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  327 |                  * @param display Presentation owner.
+      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  328 |                  * @param logger Optional logger.
+      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  329 |                  */
+      |                  ~~
+  330 |                 Context(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  331 |                         m_display(std::move(display)), m_hdr_display(dynamic_cast<HDRDisplay*>(m_display.get())),
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  332 |                         m_logger(UseLog(std::move(logger), "SimplePlayer")) {}
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  333 | 
+  334 |                 Context(const Context&) = delete;
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  335 | 
+  336 |                 Context(Context&&) = delete;
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  337 | 
+  338 |                 /**
+      |                 ~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:323:30: note: Excessive padding in 'class StormByte::Multimedia::Backend::SimplePlayer::Context' (32 padding bytes, where 0 is optimal). Optimal fields order: m_error, m_decoders, m_hdr_display, m_format, m_font_bytes, m_decode, m_present, m_bytes, m_epoch, m_cue_id, m_open_cue, m_open_cue_start, m_position, m_duration, m_origin, m_target, m_audio_target, m_end, m_audio_end, m_anchor, m_start, m_seek_prefix_pts, m_display, m_logger, m_reader, m_tracks, m_fonts, m_avio, m_control, m_mutex, m_delivery, m_ready, m_queue, m_state, m_seek_prefix_size, m_acceleration, m_color_mode, m_selected, m_cancel, m_decode_stop, m_paused, m_audio_switching, m_audio_transition, m_preview, m_preview_done, m_preview_video_ready, m_preview_subtitle_ready, m_eof, m_draining, m_seek_audio, consider reordering the fields or adding explicit padding members
+  323 | class Backend::SimplePlayer::Context {
+      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+  324 |         public:
+      |         ~~~~~~~
+  325 |                 /**
+      |                 ~~~
+  326 |                  * @brief Retain the application sink and initialize scoped logging.
+      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  327 |                  * @param display Presentation owner.
+      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  328 |                  * @param logger Optional logger.
+      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  329 |                  */
+      |                  ~~
+  330 |                 Context(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  331 |                         m_display(std::move(display)), m_hdr_display(dynamic_cast<HDRDisplay*>(m_display.get())),
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  332 |                         m_logger(UseLog(std::move(logger), "SimplePlayer")) {}
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  333 | 
+  334 |                 Context(const Context&) = delete;
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  335 | 
+  336 |                 Context(Context&&) = delete;
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  337 | 
+  338 |                 /**
+      |                 ~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:366:54: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  366 |                                         *m_logger << Logger::Level::Error << message << std::endl;
+      |                                                                                         ^~~~~~~~~
+      |                                                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:380:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  380 |                                         *m_logger << Logger::Level::Warning << message << std::endl;
+      |                                                                                           ^~~~~~~~~
+      |                                                                                           '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:383:5: warning: empty catch statements hide issues; to handle exceptions appropriately, consider re-throwing, handling, or avoiding catch altogether [bugprone-empty-catch]
+  383 |                                 catch (...) {}
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:513:20: warning: 2 adjacent parameters of 'OpenDecoder' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  513 |                 void OpenDecoder(int slot, int index) {
+      |                                  ^~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:513:24: note: the first parameter in the range is 'slot'
+  513 |                 void OpenDecoder(int slot, int index) {
+      |                                      ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:513:34: note: the last parameter in the range is 'index'
+  513 |                 void OpenDecoder(int slot, int index) {
+      |                                                ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:576:26: warning: performing an implicit widening conversion to type 'int64_t' (aka 'long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  576 |                         m_format->probesize = 8 * 1024 * 1024;
+      |                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:576:26: note: make conversion explicit to silence this warning
+  576 |                         m_format->probesize = 8 * 1024 * 1024;
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               static_cast<int64_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:576:26: note: perform multiplication in a wider type
+  576 |                         m_format->probesize = 8 * 1024 * 1024;
+      |                                               ^~~~~~~~
+      |                                               static_cast<int64_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:672:11: warning: narrowing conversion from 'std::int64_t' (aka 'long') to 'double' [bugprone-narrowing-conversions]
+  672 |                         return pts * av_q2d(m_format->streams[m_selected[slot]]->time_base) - m_origin;
+      |                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:693:7: warning: narrowing conversion from 'int64_t' (aka 'long') to 'double' [bugprone-narrowing-conversions]
+  693 |                                 ? frame->duration * av_q2d(m_format->streams[m_selected[0]]->time_base)
+      |                                   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:722:26: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  722 |                                 if (!source.ScaleTo(*m_decoders[0].m_color_scale, hdr_rgb, frame->width, frame->height,
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:848:26: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  848 |                                 if (!source.ScaleTo(*m_decoders[0].m_color_scale, linear, frame->width, frame->height,
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:862:15: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  862 |                                 else if (!m_decoders[0].m_tonemap->Ensure(linear, chain))
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:865:10: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  865 |                                 if (!m_decoders[0].m_tonemap->Filter(linear, curved))
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:879:26: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  879 |                                 if (!curved.ScaleTo(*m_decoders[0].m_color_scale, display_rgb, frame->width, frame->height,
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1041:25: warning: narrowing conversion from 'int64_t' (aka 'long') to 'double' [bugprone-narrowing-conversions]
+ 1041 |                                 cue->m_end = base + packet->duration * av_q2d(m_format->streams[m_selected[2]]->time_base);
+      |                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1077:28: warning: result of multiplication in type 'unsigned int' is used as a pointer offset after an implicit widening conversion to type 'size_t' [bugprone-implicit-widening-of-multiplication-result]
+ 1077 |                                                         std::memcpy(&color, rectangle->data[1] + index * 4, 4);
+      |                                                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1077:49: note: make conversion explicit to silence this warning
+ 1077 |                                                         std::memcpy(&color, rectangle->data[1] + index * 4, 4);
+      |                                                                                                  ^~~~~~~~~
+      |                                                                                                  static_cast<size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1077:49: note: perform multiplication in a wider type
+ 1077 |                                                         std::memcpy(&color, rectangle->data[1] + index * 4, 4);
+      |                                                                                                  ^~~~~    
+      |                                                                                                  static_cast<size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1249:77: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+ 1249 |                                                                 *m_logger << Logger::Level::Warning << std::string_view(message) << std::endl;
+      |                                                                                                                                     ^~~~~~~~~
+      |                                                                                                                                     '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/hardware_decode.hxx:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/log.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/display.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/property.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/simple_player.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

@@ -1,0 +1,158 @@
+-- AddressSanitizer and UndefinedBehaviorSanitizer enabled
+-- [BuildMaster/Core     ]: Bootstrapping StormByte-BuildMaster 2.1.4 (https://github.com/StormByte-Suite/StormByte-BuildMaster)
+-- [BuildMaster/Env      ]: 	Setting up environment...
+-- [BuildMaster/Tools    ]: 	Setting up tools: ninja
+-- [BuildMaster/Component]: BACKEND=host 'StormByte-Multimedia' (shared) — in-process library
+-- StormByte archive: StormByte-2.2.3-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-Base' (shared) — StormByte-2.2.3-linux-x64-libc++.zip
+-- StormByte archive: StormByte-Logger-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-Logger' (shared) — StormByte-Logger-2.0.6-linux-x64-libc++.zip
+-- StormByte archive: StormByte-System-2.1.3-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-System' (shared) — StormByte-System-2.1.3-linux-x64-libc++.zip
+-- StormByte archive: StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/Component]: BACKEND=binary 'StormByte-Buffer' (shared) — StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/User     ]: 	Setting up bundled FFmpeg
+-- [BuildMaster/Tools    ]: 	Setting up tools: pkgconfig
+-- [BuildMaster/Tools    ]: 	Setting up tools: meson
+-- [BuildMaster/Pkgconf  ]: 			Using system pkg-config version: 3.0.7
+-- [BuildMaster/Tools    ]: 	Setting up tools: cmake
+-- [BuildMaster/Tools    ]: 	Setting up tools: git
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/0001-widen-fractional-samples-without-negative-shift.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/0001-bitstream-use-unsigned-reservoir-shifts.patch, thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/0002-quantize-avoid-negative-scalefactor-shift.patch
+-- [BuildMaster/Tools    ]: 	Setting up tools: file
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/opus/0001-dnn-data-from-unpack.patch, thirdparty/ffmpeg/plugins/codecs/audio/opus/0002-shallow-package-version.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/rubberband/0001-mathmisc-stddef.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0001-cmake4-minimum-version.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0002-cmake-declare-libm-in-pkg-config-when-it-exists.patch, thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0003-psy-avoid-negative-bark-shift.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0001-kvazaar-external-pthread-msvc.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0002-cmake-pc-libs-private-libm-pthread.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0003-cmake-pc-cflags-static-lib.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0004-cmake-pc-meson110-libs-not-private.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0005-win-pragma-comment-lib-pthread-when-KVZ_STATIC_LIB.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0006-msvc-default-thread-attributes.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0007-version-header-in-binary-dir.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0008-clang-cl-sse41-target.patch, thirdparty/ffmpeg/plugins/codecs/video/kvazaar/0009-avx2-unaligned-eight-pixel-loads.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0001-shallow-version.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0002-subpel-variance-unaligned-reference.patch, thirdparty/ffmpeg/plugins/codecs/video/svt-av1/0003-avx2-unaligned-level-and-coefficient-loads.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/vpx/0001-clang-cl-simd-target.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/webp/0001-cmake-pkgconfig-lwebp-not-llibwebp.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/x264/0001-shallow-revision.patch, thirdparty/ffmpeg/plugins/codecs/video/x264/0002-threadpool-type-correct-worker-callbacks.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/codecs/video/x265/0001-json11-cstdint.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0002-respect-archive-version.patch, thirdparty/ffmpeg/plugins/codecs/video/x265/0003-nal-skip-empty-buffer-copy.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/compressors/lzma/liblzma-pc-promote-LZMA_API_STATIC-to-Cflags.patch
+-- [BuildMaster/Git      ]: Patch already applied thirdparty/ffmpeg/plugins/compressors/zlib/zlib-static-name-matches-pc.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/plugins/deps/samplerate/0001-cmake4-minimum-version.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ffmpeg/0001-mov-read-track-name-as-raw-utf8.patch, thirdparty/ffmpeg/0002-clang-cl-no-options-strict.patch, thirdparty/ffmpeg/0003-clang-cl-no-nonlocal-asm-labels.patch, thirdparty/ffmpeg/0004-avcodec-apv-parser-rename-close.patch, thirdparty/ffmpeg/0005-movenc-preserve-long-subtitle-gaps.patch, thirdparty/ffmpeg/0006-meson-vaapi-check-name.patch, thirdparty/ffmpeg/0007-avformat-matroska-reset-state-after-generic-or-byte-.patch, thirdparty/ffmpeg/0008-tests-api-cover-Matroska-byte-seek-after-EOF.patch, thirdparty/ffmpeg/0009-opusdec-initialize-active-channel-delay-pointers.patch, thirdparty/ffmpeg/0010-itut35-pad-dolby-vision-payloads.patch, thirdparty/ffmpeg/0011-libopenh264enc-map-constrained-baseline.patch
+-- FFmpeg 9.0.2 (9.0.2, libavcodec major 63) [BUNDLED]
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ocr/leptonica/0001-msvc-unversioned-output-name.patch, thirdparty/ocr/leptonica/0002-always-create-lept.pc.patch, thirdparty/ocr/leptonica/0003-config-find-dependency-image-libs.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ocr/tesseract/0001-cmake-unversioned-tesseract-output-name.patch
+-- tessdata best [BUNDLED]: languages selected in languages/CMakeLists.txt
+-- [BuildMaster/Git      ]: Applied patch thirdparty/vmaf/0001-clang-cl-math-and-warnings.patch, thirdparty/vmaf/0002-libvmaf-rename-static-close.patch, thirdparty/vmaf/0003-adm-avx2-handle-small-coefficients.patch
+-- [BuildMaster/Git      ]: Applied patch thirdparty/ebur128/0001-cmake-minimum-3.5.patch
+-- [BuildMaster/File     ]: Downloading Opus DNN data... (cached) OK
+-- [BuildMaster/Component]: FFmpeg plugins
+-- [BuildMaster/Component]: 	Codecs
+-- [BuildMaster/Component]: 		Audio
+-- [BuildMaster/CMake    ]: 			Reconfiguring FDK_AAC codec: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring FDK_AAC codec
+-- [BuildMaster/CMake    ]: 			Reconfiguring MP3 encoder LAME: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring MP3 encoder LAME
+-- [BuildMaster/Component]: stamp hit opus (configure)
+-- [BuildMaster/Meson    ]: 			Setting up rubberband for build-time configure
+-- [BuildMaster/CMake    ]: 			Setting up Vorbis codec for build-time configure
+-- [BuildMaster/Component]: 		Subtitles
+-- [BuildMaster/Component]: 			ass_text
+-- [BuildMaster/Component]: 			dvbsub
+-- [BuildMaster/Component]: 			dvdsub
+-- [BuildMaster/Component]: 			movtext
+-- [BuildMaster/Component]: 			pgssub
+-- [BuildMaster/Component]: 			srt
+-- [BuildMaster/Component]: 			ttml
+-- [BuildMaster/Component]: 			webvtt
+-- [BuildMaster/Component]: 		Video
+-- [BuildMaster/Component]: stamp hit aom (configure)
+-- [BuildMaster/Component]: stamp hit dav1d (configure)
+-- [BuildMaster/CMake    ]: 			Reconfiguring kvazaar: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring kvazaar
+-- [BuildMaster/Component]: stamp hit openh264 (configure)
+-- [BuildMaster/CMake    ]: 			Reconfiguring SVT-AV1: mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 			Configuring SVT-AV1
+-- [BuildMaster/Component]: stamp hit vpx (configure)
+-- [BuildMaster/Component]: stamp hit webp (configure)
+-- [BuildMaster/Meson    ]: 			Reconfiguring X264 codec: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: 			Configuring X264 codec
+-- [BuildMaster/Component]: 			X265
+-- [BuildMaster/CMake    ]: 				Reconfiguring X265 codec (12-bit): mode, ABI or options changed
+-- [BuildMaster/CMake    ]: 				Configuring X265 codec (12-bit)
+-- [BuildMaster/CMake    ]: 				Setting up X265 codec for build-time configure
+-- [BuildMaster/Component]: 	Compressors
+-- [BuildMaster/Component]: stamp hit bzip2 (configure)
+-- [BuildMaster/Component]: stamp hit lzma (configure)
+-- [BuildMaster/Component]: stamp hit zlib (configure)
+-- [BuildMaster/Component]: 	Containers
+-- [BuildMaster/Component]: 		Matroska
+-- [BuildMaster/Component]: stamp hit ogg (configure)
+-- [BuildMaster/Component]: 	Dependencies
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (configure)
+-- [BuildMaster/Component]: stamp hit samplerate (configure)
+-- [BuildMaster/Component]: 	Filters
+-- [BuildMaster/Component]: 		atadenoise
+-- [BuildMaster/Component]: 		bm3d
+-- [BuildMaster/Component]: 		bwdif
+-- [BuildMaster/Component]: 		deband
+-- [BuildMaster/Component]: 		hqdn3d
+-- [BuildMaster/Component]: 		nlmeans
+-- [BuildMaster/Component]: 		psnr
+-- [BuildMaster/Component]: 		ssim
+-- [BuildMaster/Component]: 		xpsnr
+-- [BuildMaster/Component]: 		yadif
+-- [BuildMaster/Meson    ]: 	Setting up FFmpeg for build-time configure
+-- [BuildMaster/Component]: OCR
+-- [BuildMaster/Component]: stamp hit leptonica (configure)
+-- [BuildMaster/CMake    ]: 	Setting up tesseract for build-time configure
+-- [BuildMaster/Component]: stamp hit tessdata (configure)
+-- [BuildMaster/Meson    ]: Reconfiguring VMAF library: mode, ABI or options changed
+-- [BuildMaster/Meson    ]: Configuring VMAF library
+-- [BuildMaster/Component]: stamp hit zimg (configure)
+-- [BuildMaster/Component]: stamp hit ebur128 (configure)
+-- [BuildMaster/Component]: stamp hit lunasvg (configure)
+-- [BuildMaster/User     ]: 	Setting up FFmpeg build
+-- [BuildMaster/User     ]: 		Enabled codec options:
+-- 			-Dlibfdk_aac=enabled                -Dlibmp3lame=enabled                
+-- 			-Dlibopus=enabled                   -Dlibrubberband=enabled             
+-- 			-Dlibvorbis=enabled                 -Dlibvorbisenc=enabled              
+-- 			-Dass_demuxer=enabled               -Dass_muxer=enabled                 
+-- 			-Dass_decoder=enabled               -Dass_encoder=enabled               
+-- 			-Dssa_decoder=enabled               -Dssa_encoder=enabled               
+-- 			-Ddvbsub_demuxer=enabled            -Ddvbsub_decoder=enabled            
+-- 			-Ddvbsub_encoder=enabled            -Ddvbsub_parser=enabled             
+-- 			-Ddvdsub_decoder=enabled            -Ddvdsub_encoder=enabled            
+-- 			-Ddvdsub_parser=enabled             -Dvobsub_demuxer=enabled            
+-- 			-Dmovtext_decoder=enabled           -Dmovtext_encoder=enabled           
+-- 			-Dpgssub_decoder=enabled            -Dsup_demuxer=enabled               
+-- 			-Dsup_muxer=enabled                 -Dsrt_demuxer=enabled               
+-- 			-Dsrt_muxer=enabled                 -Dsrt_decoder=enabled               
+-- 			-Dsrt_encoder=enabled               -Dttml_muxer=enabled                
+-- 			-Dttml_encoder=enabled              -Dwebvtt_demuxer=enabled            
+-- 			-Dwebvtt_muxer=enabled              -Dwebvtt_decoder=enabled            
+-- 			-Dwebvtt_encoder=enabled            -Dlibaom=enabled                    
+-- 			-Dlibdav1d=enabled                  -Dlibkvazaar=enabled                
+-- 			-Dlibopenh264=enabled               -Dlibsvtav1=enabled                 
+-- 			-Dlibvpx=enabled                    -Dlibvpx_vp8_encoder=enabled        
+-- 			-Dlibvpx_vp8_decoder=enabled        -Dlibvpx_vp9_encoder=enabled        
+-- 			-Dlibvpx_vp9_decoder=enabled        -Dlibwebp=enabled                   
+-- 			-Dlibx264=enabled                   -Dlibx264_encoder=enabled           
+-- 			-Dlibx264rgb_encoder=enabled        -Dlibx265=enabled                   
+-- 			-Dlibx265_encoder=enabled           -Dbzlib=enabled                     
+-- 			-Dlzma=enabled                      -Dzlib=enabled                      
+-- 			-Dmatroska_muxer=enabled            -Dmatroska_audio_muxer=enabled      
+-- 			-Dmatroska_demuxer=enabled          -Doga_muxer=enabled                 
+-- 			-Dogg_muxer=enabled                 -Dogv_muxer=enabled                 
+-- 			-Dogg_demuxer=enabled               -Dffnvcodec=enabled                 
+-- 			-Dcuda=enabled                      -Dnvenc=enabled                     
+-- 			-Dnvdec=enabled                     -Dcuvid=disabled                    
+-- 			-Dff_cuda_nvcc=disabled             -Dff_cuda_llvm=disabled             
+-- 			-Dff_cuda_sdk=disabled              -Dav1_nvenc_encoder=enabled         
+-- 			-Dh264_nvenc_encoder=enabled        -Dhevc_nvenc_encoder=enabled        
+-- 			-Datadenoise_filter=enabled         -Dbm3d_filter=enabled               
+-- 			-Dbwdif_filter=enabled              -Ddeband_filter=enabled             
+-- 			-Dhqdn3d_filter=enabled             -Dnlmeans_filter=enabled            
+-- 			-Dpsnr_filter=enabled               -Dssim_filter=enabled               
+-- 			-Dxpsnr_filter=enabled              -Dyadif_filter=enabled              
+-- Configuring done (40.9s)
+-- Generating done (0.4s)
+-- Build files have been written to: /tmp/BMDATA/sanitizer-validation/multimedia

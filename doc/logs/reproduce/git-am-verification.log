@@ -1,0 +1,79 @@
+Preparando árbol de trabajo (HEAD desacoplado 716f439)
+HEAD está ahora en 716f439 Bump the versions and add changelog entries for v2.0.3
+Aplicando: libFDK: avoid signed left shift when widening fractional samples
+Aplicando: libFDK: normalize signed log2 exponents without negative shifts
+Aplicando: libFDK: normalize signed power exponents with widened multiplication
+Aplicando: libFDK: reconstruct signed power integer parts with widened multiplication
+Aplicando: libFDK: avoid negative shifts in checked saturating conversions
+Aplicando: libFDK: double signed fixed-point products without negative shifts
+Aplicando: AACenc: normalize signed block-switch samples without negative shifts
+Aplicando: libFDK: scale signed values without undefined negative shifts
+Aplicando: AACenc: normalize signed spectra and energy exponents without negative shifts
+Aplicando: libFDK: check negative saturation in the widened product domain
+Aplicando: AACenc: normalize signed psychoacoustic data without negative shifts
+Aplicando: AACenc: normalize signed TNS spectrum without negative shifts
+Aplicando: libFDK: normalize signed LPC coefficients without negative shifts
+Aplicando: libFDK: scale signed LPC analysis and synthesis state without negative shifts
+Aplicando: AACenc: normalize signed scalefactors and bit differences without negative shifts
+Aplicando: libFDK: widen folded MDCT samples without negative shifts
+fdk-aac: PASS; 16 patches; base=716f4394641d53f0d79c9ddac3fa93b03a49f278; tree=9975117fbaf1e752c8d2487b3a30c78b8552a133; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 5a215d7ce4)
+HEAD está ahora en 5a215d7ce4 Update pass for 9.0.2
+Aplicando: avcodec/opusdec: initialize hybrid delay pointers for active channels only
+Aplicando: avcodec/itut35: pad Dolby Vision payloads before bitstream parsing
+Aplicando: avcodec/libopenh264enc: map constrained baseline to PRO_BASELINE
+ffmpeg: PASS; 3 patches; base=5a215d7ce4de21ec5c34214994eea0ac13dc9054; tree=30cc5571ffc79e335487f9bd680139e38efb8d25; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 6040962b)
+HEAD está ahora en 6040962b Update docs and version
+Aplicando: avx2: load eight-pixel residual and prediction rows without alignment assumptions
+Aplicando: avx2: store reconstructed pixels without scalar alignment assumptions
+Aplicando: avx2: load filtered DC reference edges without scalar alignment
+Aplicando: avx2: copy four-pixel intra reference edges without alignment assumptions
+Aplicando: avx2: match the quantization strategy function type
+Aplicando: avx2: match the SAO edge distortion strategy function type
+Aplicando: avx2: access interpolation row fragments without scalar alignment
+Aplicando: avx2: copy subpixel block fragments without scalar alignment
+Aplicando: sse41: load SAD pixel fragments without scalar alignment
+Aplicando: avx2: read exactly four coefficients in vertical chroma interpolation
+kvazaar: PASS; 10 patches; base=6040962bed5cc68c5ad01234c38c08b8b2822068; tree=64081d4612b8f5e32948ddb9ef93e53637115eb2; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 1f5cc94)
+HEAD está ahora en 1f5cc94 Add 64-bit support.
+Aplicando: bitstream: shift the bit reservoir value as unsigned in putbits2
+Aplicando: quantize: multiply negative scalefactor adjustments instead of shifting
+lame: PASS; 2 patches; base=1f5cc9487284d5950343aa5d4f70de433468070a; tree=1f1daac6250bd6718939a1b5f159be44e416062f; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 652bdb77)
+HEAD está ahora en 652bdb77 update release note (#3855)
+Aplicando: golomb: avoid shifting by the word width when the accumulator is empty
+Aplicando: golomb: construct the trailing-bit mask with unsigned arithmetic
+openh264: PASS; 2 patches; base=652bdb7719f30b52b08e506645a7322ff1b2cc6f; tree=7f3be2286a7bd2c35172efb5161698bc8d0dfa0f; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 9292ec8e3)
+HEAD está ahora en 9292ec8e3 docs: bump version
+Aplicando: AVX2: use unaligned loads for level rows and two-tap coefficients
+Aplicando: AVX2: load full two-tap coefficients without scalar alignment
+Aplicando: SSE2: store four-byte deblocking tails without alignment assumptions
+Aplicando: AVX2: use unaligned-safe accesses for CDEF row fragments
+svt-av1: PASS; 4 patches; base=9292ec8e32bce26f781f277ec8739b53426c4300; tree=107b0deb84feecf8edb29d50b943ab6bc1c1b897; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 74f930d1)
+HEAD está ahora en 74f930d1 libvmaf: add the HDR-VMAF v1.1.8 models and default them for PQ sources (#1709)
+Aplicando: libvmaf/adm_avx2: handle small coefficients before clz and rounding shifts
+Aplicando: libvmaf/adm_avx2: convert coefficients to unsigned before packing
+vmaf: PASS; 2 patches; base=74f930d17de8c58e7c2ce55e2b897b0030ebd8ef; tree=81806ab13d9ad4c75b7206208c1daf2acad093dc; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 0657aee)
+HEAD está ahora en 0657aee Add vorbis dependencies when building examples.
+Aplicando: psy: avoid shifting a negative Bark window lower bound
+Aplicando: psy: keep noise offset interpolation inside its final band
+Aplicando: floor1: multiply negative post deviations instead of shifting
+vorbis: PASS; 3 patches; base=0657aee69dec8508a0011f47f3b69d7538e9d262; tree=6a0d512110e2323e19990ca575ed0ef05811cc99; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado 00852f5)
+HEAD está ahora en 00852f5 meson: update to 165.3223 to match Debian unstable
+Aplicando: threadpool: give worker callbacks the declared function pointer type
+x264: PASS; 1 patches; base=00852f599572d10798b2dafd2c5286213d0ce795; tree=040669d3708b5f1409ad47cab4ad2fa1aa3d84ad; exit_code=0
+Preparando árbol de trabajo (HEAD desacoplado e444744c0)
+HEAD está ahora en e444744c0 release:Add release notes for v4.2
+Aplicando: encoder: skip copying an empty NAL buffer during first allocation
+Aplicando: bitstream: guard full-width partial-byte shifts in every build
+Aplicando: lookahead: access temporal-filter scratch only when the filter is enabled
+Aplicando: mv: use bounded multiplication for signed motion-vector scaling
+Aplicando: ratecontrol: skip residual-cost division when amortization is disabled
+x265: PASS; 5 patches; base=e444744c03978c1fb4e037168967020cf2648427; tree=28bda6feb13f07e328d2463ded9ed6b1e6c2b5ed; exit_code=0
+All 48 mail patches verified against all ten exact bases; exit_code=0

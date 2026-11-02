@@ -1,0 +1,21 @@
+Test project /tmp/BMDATA/plain-multimedia/test
+    Start 354: pipeline.test_nlmeans_rolling_sums_match_reference
+1/6 Test #354: pipeline.test_nlmeans_rolling_sums_match_reference ...........   Passed    0.26 sec
+    Start 355: pipeline.test_nlmeans_full_range_samples
+2/6 Test #355: pipeline.test_nlmeans_full_range_samples .....................   Passed    0.00 sec
+    Start 356: pipeline.test_pipeline_failure_closure_without_allocations
+3/6 Test #356: pipeline.test_pipeline_failure_closure_without_allocations ...   Passed    0.00 sec
+    Start 357: pipeline.test_nlmeans_scratch_failure_fails_job
+4/6 Test #357: pipeline.test_nlmeans_scratch_failure_fails_job ..............   Passed    1.51 sec
+    Start 362: pipeline.test_filter_graph_delayed_output_and_eof
+5/6 Test #362: pipeline.test_filter_graph_delayed_output_and_eof ............   Passed    0.01 sec
+    Start 405: pipeline.test_filter_analytics_cancel_mid_encode
+6/6 Test #405: pipeline.test_filter_analytics_cancel_mid_encode .............   Passed    3.87 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+multimedia    =   5.65 sec*proc (6 tests)
+pipeline      =   5.65 sec*proc (6 tests)
+
+Total Test time (real) =   5.66 sec

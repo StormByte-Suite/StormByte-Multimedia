@@ -1,0 +1,35 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:65:14: warning: 5 adjacent parameters of 'HDR10' of similar type ('const Point &') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   65 | HDR10::HDR10(const Point& red, const Point& green, const Point& blue, const Point& white,
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   66 |         const Point& luminance, const StormByte::Safe::Optional<Point>& light_level, Source source):
+      |         ~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:65:27: note: the first parameter in the range is 'red'
+   65 | HDR10::HDR10(const Point& red, const Point& green, const Point& blue, const Point& white,
+      |                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:66:15: note: the last parameter in the range is 'luminance'
+   66 |         const Point& luminance, const StormByte::Safe::Optional<Point>& light_level, Source source):
+      |                      ^~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:72:7: warning: std::move of the variable 'red' of the trivially-copyable type 'Point' has no effect; remove std::move() [performance-move-const-arg]
+   72 | m_red(std::move(red)), m_green(std::move(green)), m_blue(std::move(blue)),
+      |       ^~~~~~~~~~   ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:72:32: warning: std::move of the variable 'green' of the trivially-copyable type 'Point' has no effect; remove std::move() [performance-move-const-arg]
+   72 | m_red(std::move(red)), m_green(std::move(green)), m_blue(std::move(blue)),
+      |                                ^~~~~~~~~~     ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:72:58: warning: std::move of the variable 'blue' of the trivially-copyable type 'Point' has no effect; remove std::move() [performance-move-const-arg]
+   72 | m_red(std::move(red)), m_green(std::move(green)), m_blue(std::move(blue)),
+      |                                                          ^~~~~~~~~~    ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:73:9: warning: std::move of the variable 'white' of the trivially-copyable type 'Point' has no effect; remove std::move() [performance-move-const-arg]
+   73 | m_white(std::move(white)), m_luminance(std::move(luminance)), m_light_level(std::move(light_level)),
+      |         ^~~~~~~~~~     ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.cxx:73:40: warning: std::move of the variable 'luminance' of the trivially-copyable type 'Point' has no effect; remove std::move() [performance-move-const-arg]
+   73 | m_white(std::move(white)), m_luminance(std::move(luminance)), m_light_level(std::move(light_level)),
+      |                                        ^~~~~~~~~~         ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

@@ -1,0 +1,36 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:62:9: warning: missing exception handler for allocation failure at 'new' [bugprone-unhandled-exception-at-new]
+   62 | : m_sub(new ::AVSubtitle{}) {}
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:126:58: warning: 2 adjacent parameters of 'FillText' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  126 | void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+      |                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:126:71: note: the first parameter in the range is 'pts'
+  126 | void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+      |                                                                       ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:126:90: note: the last parameter in the range is 'duration_ms'
+  126 | void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+      |                                                                                          ^~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:126:58: note: 
+  126 | void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+      |                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:126:76: note: 'std::int64_t' and 'std::uint32_t' may be implicitly converted: 'std::int64_t' (as 'long') -> 'std::uint32_t' (as 'unsigned int'), 'std::uint32_t' (as 'unsigned int') -> 'std::int64_t' (as 'long')
+  126 | void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+      |                                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:129:11: warning: missing exception handler for allocation failure at 'new' [bugprone-unhandled-exception-at-new]
+  129 |                 m_sub = new ::AVSubtitle{};
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx:142:11: warning: multilevel pointer conversion from 'AVSubtitleRect **' (aka 'struct AVSubtitleRect **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  142 |                 av_free(m_sub->rects);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVSubtitle.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ocr/bitmap.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

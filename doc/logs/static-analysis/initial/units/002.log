@@ -1,0 +1,23 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx:207:44: warning: 2 adjacent parameters of 'Seek' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  207 |         std::int64_t FileAvio::Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx:207:57: note: the first parameter in the range is 'offset'
+  207 |         std::int64_t FileAvio::Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                                ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx:207:69: note: the last parameter in the range is 'whence'
+  207 |         std::int64_t FileAvio::Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                                            ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx:207:44: note: 
+  207 |         std::int64_t FileAvio::Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                   ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx:207:65: note: 'std::int64_t' and 'int' may be implicitly converted: 'std::int64_t' (as 'long') -> 'int', 'int' -> 'std::int64_t' (as 'long')
+  207 |         std::int64_t FileAvio::Seek(void* opaque, std::int64_t offset, int whence) noexcept {
+      |                                                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+[1/1] (1/2) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx.
+[1/1] (2/2) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx.

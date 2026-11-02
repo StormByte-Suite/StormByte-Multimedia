@@ -1,0 +1,150 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:63:14: warning: an exception may be thrown in function 'Lower' which should not throw exceptions [bugprone-exception-escape]
+   63 |         std::string Lower(std::string_view view) noexcept {
+      |                     ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #4: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:64:15: note: frame #5: function 'Lower' calls function 'basic_string<std::string_view, 0>' here
+   64 |                 std::string out(view);
+      |                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:70:7: warning: an exception may be thrown in function 'SplitMime' which should not throw exceptions [bugprone-exception-escape]
+   70 |         bool SplitMime(std::string_view value, std::string& type, std::string& subtype) noexcept {
+      |              ^
+/usr/include/c++/v1/stdexcept:251:3: note: frame #0: unhandled exception of type 'out_of_range' may be thrown in function '__throw_out_of_range' here
+  251 |   throw out_of_range(__msg);
+      |   ^
+/usr/include/c++/v1/string_view:470:30: note: frame #1: function 'substr' calls function '__throw_out_of_range' here
+  470 |     return __pos > size() ? (__throw_out_of_range("string_view::substr"), basic_string_view())
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:76:16: note: frame #2: function 'SplitMime' calls function 'substr' here
+   76 |                 type = Lower(value.substr(0, slash));
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:135:19: warning: 2 adjacent parameters of 'MimeMatches' of similar type ('std::string_view') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  135 |         bool MimeMatches(std::string_view mime, std::string_view pattern) noexcept {
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:135:36: note: the first parameter in the range is 'mime'
+  135 |         bool MimeMatches(std::string_view mime, std::string_view pattern) noexcept {
+      |                                           ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:135:59: note: the last parameter in the range is 'pattern'
+  135 |         bool MimeMatches(std::string_view mime, std::string_view pattern) noexcept {
+      |                                                                  ^~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:185:7: warning: an exception may be thrown in function 'FillEmptyAttachmentPayloads' which should not throw exceptions [bugprone-exception-escape]
+  185 |         void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx, Multimedia::Attachments& items) noexcept {
+      |              ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator_traits.h:259:12: note: frame #2: function 'allocate' calls function 'allocate' here
+  259 |     return __a.allocate(__n);
+      |            ^
+/usr/include/c++/v1/__hash_table:1844:21: note: frame #3: function '__construct_node_hash<int, unsigned long &>' calls function 'allocate' here
+ 1844 |   __node_holder __h(__node_traits::allocate(__na, 1), _Dp(__na));
+      |                     ^
+/usr/include/c++/v1/__hash_table:798:33: note: frame #4: function 'operator()' calls function '__construct_node_hash<int, unsigned long &>' here
+  798 |             __node_holder __h = __construct_node_hash(__hash, std::forward<_Args>(__args2)...);
+      |                                 ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:69:10: note: frame #5: function '__try_key_extraction_impl<int, std::pair<std::__hash_iterator<std::__hash_node<std::__hash_value_type<int, unsigned long>, void *> *>, bool>, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), int, unsigned long &, 0>' calls function 'operator()' here
+   69 |   return __with_key(__arg1, std::forward<_Arg1>(__arg1), std::forward<_Arg2>(__arg2));
+      |          ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:108:10: note: frame #6: function '__try_key_extraction<int, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), int, unsigned long &>' calls function '__try_key_extraction_impl<int, std::pair<std::__hash_iterator<std::__hash_node<std::__hash_value_type<int, unsigned long>, void *> *>, bool>, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), int, unsigned long &, 0>' here
+  108 |   return std::__try_key_extraction_impl<_KeyT, _Ret>(
+      |          ^
+/usr/include/c++/v1/__hash_table:777:12: note: frame #7: function '__emplace_unique<int, unsigned long &>' calls function '__try_key_extraction<int, (lambda at /usr/include/c++/v1/__hash_table:778:9), (lambda at /usr/include/c++/v1/__hash_table:827:9), int, unsigned long &>' here
+  777 |     return std::__try_key_extraction<key_type>(
+      |            ^
+/usr/include/c++/v1/unordered_map:1091:12: note: frame #8: function 'emplace<int, unsigned long &>' calls function '__emplace_unique<int, unsigned long &>' here
+ 1091 |     return __table_.__emplace_unique(std::forward<_Args>(__args)...);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx:200:5: note: frame #9: function 'FillEmptyAttachmentPayloads' calls function 'emplace<int, unsigned long &>' here
+  200 |                                 empty.emplace(stream.Index(), slot);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/cover.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVBSF.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVCodecParameters.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVFormatContext.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVStream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/backend_typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

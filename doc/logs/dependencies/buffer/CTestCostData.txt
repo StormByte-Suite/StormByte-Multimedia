@@ -1,0 +1,16 @@
+BridgeTests 2 0.47473
+BufferedFileReaderTests 2 58.7351
+BufferedFileWriterTests 2 2.44522
+BufferedLocationDeviceTests 2 1.83082
+ExceptionTests 2 0.00430296
+FIFOTests 2 0.0747168
+HopperTests 2 0.0604723
+PipelineTests 2 56.0637
+ProducerConsumerTests 2 0.20679
+PumperTests 2 0.120584
+RingTests 2 0.663082
+SharedFIFOTests 2 0.0554167
+SinkTests 3 0.0506767
+SinkAllocationFailureTests 0 0
+TelemetryTests 2 0.119737
+---

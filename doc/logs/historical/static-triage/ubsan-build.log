@@ -1,0 +1,12 @@
+[0/2] Re-checking globbed directories...
+[0/327] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip... (cached) OK
+[1/327] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip... (cached) OK
+[2/327] [BuildMaster/Core     ]: reset fail markers
+[3/327] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[4/327] [BuildMaster/Ninja    ]: Compiling OGG container
+[5/327] [BuildMaster/Ninja    ]: Installing libsamplerate
+[6/327] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[7/327] [BuildMaster/Git      ]: Resetting git source tree after install
+ninja: build stopped: interrupted by user.

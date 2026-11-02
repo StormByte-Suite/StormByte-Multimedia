@@ -1,0 +1,2304 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+      Start  96: pipeline.test_transcoder_vmaf_remux_matches_source_at_100
+      Start 103: pipeline.test_vmaf_picture_api_contract
+      Start 104: pipeline.test_transcoder_kvazaar_pads_unaligned_video
+      Start 105: pipeline.test_transcoder_hevc_encode_output_file_properties
+ 1/14 Test #103: pipeline.test_vmaf_picture_api_contract ............................   Passed    0.27 sec
+      Start 109: pipeline.test_transcoder_svt_av1_encode_preserves_hdr10_metadata
+ 2/14 Test #104: pipeline.test_transcoder_kvazaar_pads_unaligned_video ..............Subprocess aborted***Exception:   0.96 sec
+[Test] Starting test_transcoder_kvazaar_pads_unaligned_video
+[Test] test_transcoder_kvazaar_pads_unaligned_video: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineVideoTests/test_transcoder_kvazaar_pads_unaligned_video/pipeline/kvazaar-padded.mkv
+[Test] test_transcoder_kvazaar_pads_unaligned_video: assert source && source->Streams().size() == 1
+[Test] test_transcoder_kvazaar_pads_unaligned_video: assert original
+[Test] test_transcoder_kvazaar_pads_unaligned_video: assert original->Resolution().Width() == 704 && original->Resolution().Height() == 396
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/kvazaar_unaligned_704x396.avi
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder track 0 encode to H.265
+[Test] test_transcoder_kvazaar_pads_unaligned_video: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] test_transcoder_kvazaar_pads_unaligned_video: assert WaitForTranscoder(job) == 0
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineVideoTests/test_transcoder_kvazaar_pads_unaligned_video/pipeline/kvazaar-padded.mkv
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/kvazaar_unaligned_704x396.avi
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 0:0 pts=0 dts=0 dur=41666667 key=1 bytes=21457
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=20.95 KiB raw=21457 fnv1a=17bd7922c1663891
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 1:0 pts=41666667 dts=41666667 dur=41666667 key=0 bytes=8587
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=8.39 KiB raw=8587 fnv1a=12c55f25c5ab6460
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 2:0 pts=83333333 dts=83333333 dur=41666667 key=0 bytes=8760
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=8.55 KiB raw=8760 fnv1a=4aae245aa9fa333b
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 3:0 pts=125000000 dts=125000000 dur=41666667 key=0 bytes=8830
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=8.62 KiB raw=8830 fnv1a=d62d7e72539be519
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 4:0 pts=166666667 dts=166666667 dur=41666667 key=0 bytes=8619
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=8.42 KiB raw=8619 fnv1a=0c0ed261559d14bb
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 5:0 pts=208333333 dts=208333333 dur=41666667 key=0 bytes=8421
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[CUDA @ 0x7bf4e13e0040] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bf4e13e00c0] Failed to initialise VAAPI connection: -1 (unknown libva error).
+[Warning ] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder hardware video decoder unavailable; continuing with software decode
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=0 bytes=20.95 KiB raw=21457 fnv1a=17bd7922c1663891
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 0:0 pts=0 dts=0 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 1:0 pts=41666667 dts=41666667 bytes=8.39 KiB raw=8587 fnv1a=12c55f25c5ab6460
+Compiled: INTEL, flags: MMX SSE SSE2
+Detected: INTEL, flags: MMX SSE SSE2 SSE3 SSSE3 SSE41 SSE42 AVX AVX2
+Available: avx2(55) sse2(2) sse41(4) 
+In use: avx2(55) sse2(1) 
+--owf=auto value set to 2.
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 1:0 pts=41666667 dts=41666667 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=9.41 KiB raw=9635 fnv1a=490b1cb9619f2d66
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder encoder 'libkvazaar' adds centered, chroma-aligned black padding 704x396 -> 704x400 without scaling
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder open t=0 codec=H.265 impl=libkvazaar
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder in t=0 0:0 pts=0 dts=0
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 2:0 pts=83333333 dts=83333333 bytes=8.55 KiB raw=8760 fnv1a=4aae245aa9fa333b
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 8:0 pts=333333333 dts=333333333 dur=41666667 key=0 bytes=9309
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=9.09 KiB raw=9309 fnv1a=891b5db8eb1c3211
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder in t=0 1:0 pts=41666667 dts=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wait
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 2:0 pts=83333333 dts=83333333 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder in t=0 2:0 pts=83333333 dts=83333333
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 3:0 pts=125000000 dts=125000000 bytes=8.62 KiB raw=8830 fnv1a=d62d7e72539be519
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wait
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer t=0 Video 9:0 pts=375000000 dts=375000000 dur=41666667 key=0 bytes=8247
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 3:0 pts=125000000 dts=125000000 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder in t=0 3:0 pts=125000000 dts=125000000
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 4:0 pts=166666667 dts=166666667 bytes=8.42 KiB raw=8619 fnv1a=0c0ed261559d14bb
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 4:0 pts=166666667 dts=166666667 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 5:0 pts=208333333 dts=208333333 bytes=8.22 KiB raw=8421 fnv1a=671926d1c59bffd9
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder in t=0 5:0 pts=208333333 dts=208333333
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=MPEG-4 Part 2 dst=H.265 impl=libkvazaar
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wait
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Encoder in t=0 6:0 pts=250000000 dts=250000000
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 7:0 pts=291666667 dts=291666667 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 8:0 pts=333333333 dts=333333333 bytes=9.09 KiB raw=9309 fnv1a=891b5db8eb1c3211
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder out t=0 8:0 pts=333333333 dts=333333333 dur=41666667
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Decoder in t=0 9:0 pts=375000000 dts=375000000 bytes=8.05 KiB raw=8247 fnv1a=b76777993aecd73c
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1127:27: runtime error: load of misaligned address 0x7b54d5832082 for type 'const uint64_t' (aka 'const unsigned long'), which requires 8 byte alignment
+0x7b54d5832082: note: pointer points here
+ 00 00  00 80 80 80 80 80 80 80  80 80 80 80 80 80 80 80  80 80 00 00 00 00 00 00  00 00 00 00 00 00
+              ^ 
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Demuxer eof
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f552a84ce95 in pred_filtered_dc_8x8 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1127:27
+    #1 0x7f552a842a95 in kvz_intra_pred_filtered_dc_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1399:5
+    #2 0x7f552a68d9cb in kvz_intra_predict /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/intra.c:288:7
+    #3 0x7f552a7b8e8a in search_intra_rough /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:514:7
+    #4 0x7f552a7b52f8 in kvz_search_cu_intra /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search_intra.c:854:23
+    #5 0x7f552a74a16d in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:779:7
+    #6 0x7f552a750270 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #7 0x7f552a750270 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #8 0x7f552a750270 in search_cu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:984:44
+    #9 0x7f552a73f827 in kvz_search_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/search.c:1235:17
+    #10 0x7f552a5e6065 in encoder_state_worker_encode_lcu /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/encoderstate.c:659:3
+    #11 0x7f552a7ca9b7 in threadqueue_worker /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/threadqueue.c:300:5
+    #12 0x7f557a0085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #13 0x7f54e26ae670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #14 0x7f54e27271db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/kvazaar/src/src/strategies/avx2/intra-avx2.c:1127:27 
+
+      Start 166: pipeline.test_reencode_svt_av1_dovi_only
+ 3/14 Test #105: pipeline.test_transcoder_hevc_encode_output_file_properties ........Subprocess aborted***Exception:   2.43 sec
+[Test] Starting test_transcoder_hevc_encode_output_file_properties
+[Test] test_transcoder_hevc_encode_output_file_properties: assert hevc
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineVideoTests/test_transcoder_hevc_encode_output_file_properties/pipeline/encoded-hevc.mkv
+[Test] test_transcoder_hevc_encode_output_file_properties: creating transcoder
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder track 0 encode to H.265
+[Test] test_transcoder_hevc_encode_output_file_properties: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] test_transcoder_hevc_encode_output_file_properties: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineVideoTests/test_transcoder_hevc_encode_output_file_properties/pipeline/encoded-hevc.mkv
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 0:0 pts=0 dts=- dur=41000000 key=1 bytes=579240
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=565.66 KiB raw=579240 fnv1a=3c413379e9ade26a
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 1:0 pts=167000000 dts=- dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=107 B raw=107 fnv1a=f623d86639777500
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 2:0 pts=83000000 dts=0 dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=107 B raw=107 fnv1a=c629624ba61b3f93
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 3:0 pts=42000000 dts=42000000 dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=107 B raw=107 fnv1a=91077210f0f797ae
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 4:0 pts=125000000 dts=83000000 dur=41000000 key=0 bytes=106
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=106 B raw=106 fnv1a=4b95d3a75db027d6
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 5:0 pts=333000000 dts=125000000 dur=41000000 key=0 bytes=108
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=107 B raw=107 fnv1a=bf175fa5104fefd2
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 8:0 pts=292000000 dts=250000000 dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=107 B raw=107 fnv1a=e1802a17b5d441b4
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 9:0 pts=500000000 dts=292000000 dur=41000000 key=0 bytes=108
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[CUDA @ 0x7c249f3ef040] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7c249f3ef0c0] Failed to initialise VAAPI connection: -1 (unknown libva error).
+[Warning ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder hardware video decoder unavailable; continuing with software decode
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder ready
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=- bytes=565.66 KiB raw=579240 fnv1a=3c413379e9ade26a
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 1:0 pts=167000000 dts=- bytes=107 B raw=107 fnv1a=f623d86639777500
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 2:0 pts=83000000 dts=0 bytes=107 B raw=107 fnv1a=c629624ba61b3f93
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer dropped 60 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 39:0 bytes=107 B raw=107 fnv1a=c44864c41da7bb72
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 3:0 pts=42000000 dts=42000000 bytes=107 B raw=107 fnv1a=91077210f0f797ae
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 4:0 pts=125000000 dts=83000000 bytes=106 B raw=106 fnv1a=4b95d3a75db027d6
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 5:0 pts=333000000 dts=125000000 bytes=108 B raw=108 fnv1a=48a9692f2d68548b
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 6:0 pts=250000000 dts=167000000 bytes=109 B raw=109 fnv1a=e691411600410574
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 7:0 pts=208000000 dts=208000000 bytes=107 B raw=107 fnv1a=bf175fa5104fefd2
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 8:0 pts=292000000 dts=250000000 bytes=107 B raw=107 fnv1a=e1802a17b5d441b4
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 9:0 pts=500000000 dts=292000000 bytes=108 B raw=108 fnv1a=48700e0c656ae1af
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 10:0 pts=417000000 dts=333000000 bytes=109 B raw=109 fnv1a=fd6dc7b6c0b88e09
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer eof
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 15:0 pts=542000000 dts=542000000 bytes=107 B raw=107 fnv1a=af2dba4b3ce1c509
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 16:0 pts=625000000 dts=583000000 bytes=107 B raw=107 fnv1a=43faebb7be5bd5f7
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 17:0 pts=833000000 dts=625000000 bytes=108 B raw=108 fnv1a=6428f19ace3852ef
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder out t=0 17:0 pts=0 dts=625000000 dur=41000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 18:0 pts=750000000 dts=667000000 bytes=109 B raw=109 fnv1a=5a8921fed4ff25ac
+x265 [info]: HEVC encoder version 4.2
+x265 [info]: build info [Linux][clang 22.1.8][64 bit] 10bit
+x265 [info]: using cpu capabilities: MMX2 SSE2Fast LZCNT SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+x265 [warning]: Turning on repeat-headers for HDR compatibility
+x265 [info]: Main 10 profile, Level-4 (Main tier)
+x265 [info]: Thread pool created using 32 threads
+x265 [info]: Slices                              : 1
+x265 [info]: frame threads / pool features       : 15 / wpp(34 rows)
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer work n=49 min=54us max=91831us
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 11 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 24:0 pts=958000000 dts=917000000 bytes=107 B raw=107 fnv1a=605680ba488f91ae
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+x265 [info]: Coding QT: max CU size, min CU size : 32 / 16
+x265 [info]: Residual QT: max TU size, max depth : 32 / 1 inter / 1 intra
+x265 [info]: ME / range / subpel / merge         : dia / 57 / 0 / 2
+x265 [info]: Lookahead / bframes / badapt        : 5 / 3 / 0
+x265 [info]: b-pyramid / weightp / weightb       : 1 / 0 / 0
+x265 [info]: References / ref-limit  cu / depth  : 1 / off / off
+x265 [info]: AQ: mode / str / qg-size / cu-tree  : 1 / 0.0 / 32 / 1
+x265 [info]: Rate Control / qCompress            : CRF-28.0 / 0.60
+x265 [info]: tools: rd=2 psy-rd=2.00 early-skip rskip mode=1 tmvp fast-intra
+x265 [info]: tools: strong-intra-smoothing lslices=6 deblock dhdr10-info
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder open t=0 codec=H.265 impl=libx265
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 17:0 pts=0 dts=625000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=H.265 dst=H.265 impl=libx265
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 18:0 pts=42000000 dts=667000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 19:0 pts=83000000 dts=708000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 20:0 pts=125000000 dts=750000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 47 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder worker EOF process begin host=0x7ca49f4a1a80
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 21:0 pts=167000000 dts=792000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 22:0 pts=208000000 dts=833000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 23:0 pts=250000000 dts=875000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/encoder/slicetype.cpp:4086:35: runtime error: reference binding to misaligned address 0xbebebebebebee52e for type 'MotionEstimatorTLD', which requires 8 byte alignment
+0xbebebebebebee52e: note: pointer points here
+<memory cannot be printed>
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 24:0 pts=292000000 dts=917000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 24 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder decoder drain emit end; record work begin t=0 look=false owner=0x7cc49f3f1a60 iteration=3
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 25:0 pts=333000000 dts=958000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f84f239bcba in x265_10bit::CostEstimateGroup::processTasks(int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/encoder/slicetype.cpp:4086:25
+    #1 0x7f84f2f4d6aa in x265_10bit::WorkerThread::threadMain() /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/threadpool.cpp:148:27
+    #2 0x7f84f2f4cf8b in x265_10bit::stackAlignMain(x265_10bit::Thread*) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/threading.cpp:100:15
+    #3 0x7f84f2f4cc6e in x265_10bit::ThreadShim(void*) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/threading.cpp:140:17
+    #4 0x7f85380085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #5 0x7f84a06ae670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #6 0x7f84a07271db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/encoder/slicetype.cpp:4086:35 
+
+      Start 215: pipeline.test_openh264_encodes_h264_matroska
+ 4/14 Test #166: pipeline.test_reencode_svt_av1_dovi_only ...........................Subprocess aborted***Exception:   1.57 sec
+[Test] Starting test_reencode_svt_av1_dovi_only
+[Test] check_pipeline: preparing DOVI pipeline outputs
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineDoviTests/test_reencode_svt_av1_dovi_only/pipeline/dovi/dovi-only-reencode-svt-av1.mkv
+[Test] check_pipeline: creating transcoder
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/dovi_only.mkv
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Test] check_pipeline: assert codec
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder track 0 encode to AV1
+[Test] check_pipeline: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] check_pipeline: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer bind encoder t=0
+[LowLevel] launch
+[LowLevel] launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi setup
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi ready
+[LowLevel] launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi setup
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi setup
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder created
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder launch
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder ready
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder look t=0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder wait
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder wait
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineDoviTests/test_reencode_svt_av1_dovi_only/pipeline/dovi/dovi-only-reencode-svt-av1.mkv
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/dovi_only.mkv
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 0:0 pts=0 dts=0 dur=41000000 key=1 bytes=4836
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=4.72 KiB raw=4836 fnv1a=9c7e3622e0c05608
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 1:0 pts=42000000 dts=42000000 dur=41000000 key=0 bytes=3867
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=3.78 KiB raw=3867 fnv1a=5f7406d754e04a06
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 2:0 pts=83000000 dts=83000000 dur=41000000 key=0 bytes=3457
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=3.38 KiB raw=3457 fnv1a=2a03c63628fd8ff3
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 3:0 pts=125000000 dts=125000000 dur=41000000 key=0 bytes=3196
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=3.12 KiB raw=3196 fnv1a=4a1d6bf4835c3cce
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 4:0 pts=167000000 dts=167000000 dur=41000000 key=0 bytes=3201
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=3.13 KiB raw=3201 fnv1a=a64fb07cdb6352b0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 5:0 pts=208000000 dts=208000000 dur=41000000 key=0 bytes=3114
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=2.95 KiB raw=3022 fnv1a=5f3e9f5c7019059a
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 8:0 pts=333000000 dts=333000000 dur=41000000 key=0 bytes=3077
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=3.00 KiB raw=3077 fnv1a=78cea7e26ee3df5b
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 9:0 pts=375000000 dts=375000000 dur=41000000 key=0 bytes=3214
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[CUDA @ 0x7bd85f9ef2c0] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bd85f9ef340] Failed to initialise VAAPI connection: -1 (unknown libva error).
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Warning ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder hardware video decoder unavailable; continuing with software decode
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=0 bytes=4.72 KiB raw=4836 fnv1a=9c7e3622e0c05608
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 1:0 pts=42000000 dts=42000000 bytes=3.78 KiB raw=3867 fnv1a=5f7406d754e04a06
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 2:0 pts=83000000 dts=83000000 bytes=3.38 KiB raw=3457 fnv1a=2a03c63628fd8ff3
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 3:0 pts=125000000 dts=125000000 bytes=3.12 KiB raw=3196 fnv1a=4a1d6bf4835c3cce
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 4:0 pts=167000000 dts=167000000 bytes=3.13 KiB raw=3201 fnv1a=a64fb07cdb6352b0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 5:0 pts=208000000 dts=208000000 bytes=3.04 KiB raw=3114 fnv1a=4ab7e37566b66017
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 6:0 pts=250000000 dts=250000000 bytes=3.14 KiB raw=3211 fnv1a=1fdc69f249ebcacf
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 7:0 pts=292000000 dts=292000000 bytes=2.95 KiB raw=3022 fnv1a=5f3e9f5c7019059a
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 8:0 pts=333000000 dts=333000000 bytes=3.00 KiB raw=3077 fnv1a=78cea7e26ee3df5b
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 13:0 pts=542000000 dts=542000000 bytes=2.93 KiB raw=2998 fnv1a=2e9b946427662fc7
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 14:0 pts=583000000 dts=583000000 bytes=3.08 KiB raw=3156 fnv1a=10fe1da6ad7fdb51
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 15:0 pts=625000000 dts=625000000 bytes=3.00 KiB raw=3073 fnv1a=7e7f84901b5772b6
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder out t=0 15:0 pts=0 dts=625000000 dur=41000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi in t=0 15:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 15:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 15:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 16:0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi in t=0 16:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [version]:	SVT-AV1 Encoder Lib v4.2.0
+Svt[info]: SVT [build]  :	Clang 22.1.8+libcxx	 64 bit
+Svt[info]: LIB Build date: Nov  2 2026 05:08:14
+Svt[info]: -------------------------------------------
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi in t=0 17:0
+Svt[warn]: Preset M12 is mapped to M11.
+Svt[warn]: Screen-content detection and tools are disabled for RA mode coding at M9 and above; forcing NSC path
+Svt[warn]: Value 15 for matrix_coefficients is reserved and not recommended for usage.
+Svt[warn]: Non-RTC M10+ are meant for automation tooling usage. Visual artifacts may occur otherwise.
+Svt[info]: Level of Parallelism: 6
+Svt[info]: Number of PPCS 161
+Svt[info]: [asm level on system : up to avx2]
+Svt[info]: [asm level selected : up to avx2]
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [config]: main profile	tier (auto)	level (auto)
+Svt[info]: SVT [config]: width / height / fps numerator / fps denominator 		: 320 / 192 / 24 / 1
+Svt[info]: SVT [config]: bit-depth / color format 					: 10 / YUV420
+Svt[info]: SVT [config]: preset / tune / pred struct 					: 11 / PSNR / random access
+Svt[info]: SVT [config]: gop size / mini-gop size / key-frame type 			: 161 / 16 / key frame
+Svt[info]: SVT [config]: BRC mode / rate factor 					: CRF / 40.00 
+Svt[info]: SVT [config]: AQ mode / Variance Boost 					: 2 / 0
+Svt[info]: SVT [config]: sharpness / luminance-based QP bias 				: 0 / 0
+Svt[info]: SVT [config]: QP scale compress strength 					: 0
+Svt[info]: -------------------------------------------
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 17:0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer eof
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi in t=0 18:0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer work n=49 min=85us max=7776us
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi in t=0 20:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 131 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder decoder drain emit end; record work begin t=0 look=false owner=0x7c785f9f3c60 iteration=10
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi dropped 195 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi wait
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi dropped 113 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-encoded-dovi wake
+SvtMalloc[info]: SVT Memory Usage:
+SvtMalloc[info]:     total allocated memory:       240.93 MB
+SvtMalloc[info]:         malloced memory:          38.71 MB
+SvtMalloc[info]:         callocated memory:        15.00 MB
+SvtMalloc[info]:         allocated aligned memory: 187.23 MB
+SvtMalloc[info]:     mutex count: 1941
+SvtMalloc[info]:     semaphore count: 761
+SvtMalloc[info]:     thread count: 79
+SvtMalloc[info]:     hash table fulless: 0.007891, hash bucket is healthy
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder work n=97 min=342us max=42955us
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi work n=49 min=44us max=1421us last=44us
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+SvtMalloc[info]: top 10 malloced memory locations:
+SvtMalloc[info]: (16.19 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:591
+SvtMalloc[info]: (2.52 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1464
+SvtMalloc[info]: (2.52 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1289
+SvtMalloc[info]: (2.20 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/coding_unit.c:137
+SvtMalloc[info]: (1.40 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1467
+SvtMalloc[info]: (1.29 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/md_process.c:382
+SvtMalloc[info]: (1.10 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1072
+SvtMalloc[info]: (941.31 KB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:115
+SvtMalloc[info]: (902.52 KB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/bitstream_unit.c:36
+SvtMalloc[info]: (845.00 KB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/md_process.c:426
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder open t=0 codec=AV1 impl=libsvtav1
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 15:0 pts=0 dts=625000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 16:0 pts=42000000 dts=667000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi dropped 25 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 44:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 17:0 pts=83000000 dts=708000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 45:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 18:0 pts=125000000 dts=750000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi in t=0 46:0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 19:0 pts=167000000 dts=792000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 20:0 pts=208000000 dts=833000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 21:0 pts=250000000 dts=875000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 22:0 pts=292000000 dts=917000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 23:0 pts=333000000 dts=958000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 28:0 pts=542000000 dts=1167000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 29:0 pts=583000000 dts=1208000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 30:0 pts=625000000 dts=1250000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 31:0 pts=667000000 dts=1292000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 32:0 pts=708000000 dts=1333000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 33:0 pts=750000000 dts=1375000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder in t=0 34:0 pts=792000000 dts=1417000000
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Filters/Video/audit-dovi work n=49 min=55us max=485937us last=55us
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=H.265 dst=AV1 impl=libsvtav1
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:613:33: runtime error: load of misaligned address 0x7b37f5cf078e for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7b37f5cf078e: note: pointer points here
+ 7f 7f 7f 7f 7f 7f  ff 01 ff 01 ff 01 ff 01  ff 01 ff 01 ff 01 ff 01  ff 01 ff 01 ff 01 ff 01  ff 01
+             ^ 
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f38ac0f5d12 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:613:33
+    #1 0x7f38ac0dd5c1 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:1108:13
+    #2 0x7f38a9ddfc26 in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f38a9dc6321 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f38a9dbb4db in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f38a9dcad99 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f38aaddb3f4 in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f38c52085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #8 0x7f3860d88670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #9 0x7f3860e011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:613:33 
+
+      Start 217: pipeline.test_openh264_encodes_ten_bit_after_format
+ 5/14 Test #109: pipeline.test_transcoder_svt_av1_encode_preserves_hdr10_metadata ...Subprocess aborted***Exception:   3.74 sec
+[Test] Starting test_transcoder_svt_av1_encode_preserves_hdr10_metadata
+[Test] CheckHdr10Encode: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineVideoTests/test_transcoder_svt_av1_encode_preserves_hdr10_metadata/pipeline/encoded-svt-av1-hdr10.mkv
+[Test] CheckHdr10Encode: creating transcoder
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[LowLevel] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder mapped Video 0 -> order 0
+[Debug   ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder track 0 encode to AV1
+[Test] CheckHdr10Encode: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckHdr10Encode: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:01 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder launch
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineVideoTests/test_transcoder_svt_av1_encode_preserves_hdr10_metadata/pipeline/encoded-svt-av1-hdr10.mkv
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 0:0 pts=0 dts=- dur=41000000 key=1 bytes=579240
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=565.66 KiB raw=579240 fnv1a=3c413379e9ade26a
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 1:0 pts=167000000 dts=- dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=107 B raw=107 fnv1a=f623d86639777500
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 2:0 pts=83000000 dts=0 dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=107 B raw=107 fnv1a=c629624ba61b3f93
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 3:0 pts=42000000 dts=42000000 dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=107 B raw=107 fnv1a=91077210f0f797ae
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 4:0 pts=125000000 dts=83000000 dur=41000000 key=0 bytes=106
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=106 B raw=106 fnv1a=4b95d3a75db027d6
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 5:0 pts=333000000 dts=125000000 dur=41000000 key=0 bytes=108
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=107 B raw=107 fnv1a=bf175fa5104fefd2
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 8:0 pts=292000000 dts=250000000 dur=41000000 key=0 bytes=107
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=107 B raw=107 fnv1a=e1802a17b5d441b4
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer t=0 Video 9:0 pts=500000000 dts=292000000 dur=41000000 key=0 bytes=108
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[CUDA @ 0x7c33d65ef040] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7c33d65ef0c0] Failed to initialise VAAPI connection: -1 (unknown libva error).
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Warning ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder hardware video decoder unavailable; continuing with software decode
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=- bytes=565.66 KiB raw=579240 fnv1a=3c413379e9ade26a
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 1:0 pts=167000000 dts=- bytes=107 B raw=107 fnv1a=f623d86639777500
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 2:0 pts=83000000 dts=0 bytes=107 B raw=107 fnv1a=c629624ba61b3f93
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer dropped 60 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer read t=0 39:0 bytes=107 B raw=107 fnv1a=c44864c41da7bb72
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 3:0 pts=42000000 dts=42000000 bytes=107 B raw=107 fnv1a=91077210f0f797ae
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 4:0 pts=125000000 dts=83000000 bytes=106 B raw=106 fnv1a=4b95d3a75db027d6
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 5:0 pts=333000000 dts=125000000 bytes=108 B raw=108 fnv1a=48a9692f2d68548b
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 6:0 pts=250000000 dts=167000000 bytes=109 B raw=109 fnv1a=e691411600410574
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 7:0 pts=208000000 dts=208000000 bytes=107 B raw=107 fnv1a=bf175fa5104fefd2
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 8:0 pts=292000000 dts=250000000 bytes=107 B raw=107 fnv1a=e1802a17b5d441b4
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 9:0 pts=500000000 dts=292000000 bytes=108 B raw=108 fnv1a=48700e0c656ae1af
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 10:0 pts=417000000 dts=333000000 bytes=109 B raw=109 fnv1a=fd6dc7b6c0b88e09
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer eof
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 15:0 pts=542000000 dts=542000000 bytes=107 B raw=107 fnv1a=af2dba4b3ce1c509
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 16:0 pts=625000000 dts=583000000 bytes=107 B raw=107 fnv1a=43faebb7be5bd5f7
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 17:0 pts=833000000 dts=625000000 bytes=108 B raw=108 fnv1a=6428f19ace3852ef
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder out t=0 17:0 pts=0 dts=625000000 dur=41000000
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder in t=0 18:0 pts=750000000 dts=667000000 bytes=109 B raw=109 fnv1a=5a8921fed4ff25ac
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [version]:	SVT-AV1 Encoder Lib v4.2.0
+Svt[info]: SVT [build]  :	Clang 22.1.8+libcxx	 64 bit
+Svt[info]: LIB Build date: Nov  2 2026 05:08:14
+Svt[info]: -------------------------------------------
+Svt[warn]: Preset M12 is mapped to M11.
+Svt[warn]: Screen-content detection and tools are disabled for RA mode coding at M9 and above; forcing NSC path
+Svt[warn]: Non-RTC M10+ are meant for automation tooling usage. Visual artifacts may occur otherwise.
+Svt[info]: Level of Parallelism: 6
+Svt[info]: Number of PPCS 161
+Svt[info]: [asm level on system : up to avx2]
+Svt[info]: [asm level selected : up to avx2]
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [config]: main profile	tier (auto)	level (auto)
+Svt[info]: SVT [config]: width / height / fps numerator / fps denominator 		: 1920 / 1080 / 24 / 1
+Svt[info]: SVT [config]: bit-depth / color format 					: 10 / YUV420
+Svt[info]: SVT [config]: preset / tune / pred struct 					: 11 / PSNR / random access
+Svt[info]: SVT [config]: gop size / mini-gop size / key-frame type 			: 161 / 16 / key frame
+Svt[info]: SVT [config]: BRC mode / rate factor 					: CRF / 40.00 
+Svt[info]: SVT [config]: AQ mode / Variance Boost 					: 2 / 0
+Svt[info]: SVT [config]: sharpness / luminance-based QP bias 				: 0 / 0
+Svt[info]: SVT [config]: QP scale compress strength 					: 0
+Svt[info]: -------------------------------------------
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Decoder out t=0 18:0 pts=42000000 dts=667000000 dur=41000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer work n=49 min=71us max=104851us
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer dropped 16 messages
+[LowLevel] 02/11/2026 05:24:02 StormByte/Multimedia/Demuxer worker pump returned; close output begin host=0x7cb3d65ef700
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+SvtMalloc[info]: SVT Memory Usage:
+SvtMalloc[info]:     total allocated memory:       2.68 GB
+SvtMalloc[info]:         malloced memory:          349.84 MB
+SvtMalloc[info]:         callocated memory:        80.33 MB
+SvtMalloc[info]:         allocated aligned memory: 2.26 GB
+SvtMalloc[info]:     mutex count: 4484
+SvtMalloc[info]:     semaphore count: 770
+SvtMalloc[info]:     thread count: 82
+SvtMalloc[info]:     hash table fulless: 0.029101, hash bucket is healthy
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+SvtMalloc[info]: top 10 malloced memory locations:
+SvtMalloc[info]: (74.71 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/coding_unit.c:137
+SvtMalloc[info]: (47.63 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1467
+SvtMalloc[info]: (37.35 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1072
+SvtMalloc[info]: (31.25 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:115
+SvtMalloc[info]: (29.67 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/bitstream_unit.c:36
+SvtMalloc[info]: (21.43 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1464
+SvtMalloc[info]: (20.32 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:116
+SvtMalloc[info]: (19.92 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1031
+SvtMalloc[info]: (16.19 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:591
+SvtMalloc[info]: (12.45 MB): /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/pcs.c:1022
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder open t=0 codec=AV1 impl=libsvtav1
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 17:0 pts=0 dts=625000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 18:0 pts=42000000 dts=667000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 19:0 pts=83000000 dts=708000000
+[Debug   ] 02/11/2026 05:24:03 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=H.265 dst=AV1 impl=libsvtav1
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 20:0 pts=125000000 dts=750000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder dropped 58 messages
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder worker EOF process begin host=0x7cb3d66a1a80
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder decoder EOF submit begin t=0 look=false owner=0x7cd3d65f1a60
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder decoder EOF submit end t=0 look=false owner=0x7cd3d65f1a60
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder decoder drain receive begin t=0 look=false owner=0x7cd3d65f1a60 iteration=0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder decoder drain receive end t=0 look=false owner=0x7cd3d65f1a60 iteration=0 frame=true failed=false
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 21:0 pts=167000000 dts=792000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 22:0 pts=208000000 dts=833000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 23:0 pts=250000000 dts=875000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 24:0 pts=292000000 dts=917000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 25:0 pts=333000000 dts=958000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 30:0 pts=542000000 dts=1167000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 31:0 pts=583000000 dts=1208000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 32:0 pts=625000000 dts=1250000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 33:0 pts=667000000 dts=1292000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder dropped 75 messages
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder decoder drain record work end t=0 look=false owner=0x7cd3d65f1a60 iteration=12
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 34:0 pts=708000000 dts=1333000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 35:0 pts=750000000 dts=1375000000
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 36:0 pts=792000000 dts=1417000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 05:24:03 StormByte/Multimedia/Decoder work n=97 min=474us max=596491us
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder dropped 9 messages
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder in t=0 46:0 pts=1208000000 dts=1833000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder dropped 18 messages
+[LowLevel] 02/11/2026 05:24:03 StormByte/Multimedia/Encoder worker EOF process begin host=0x7cb3d669da00
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:594:32: runtime error: load of misaligned address 0x7b92b19a2672 for type 'uint64_t' (aka 'unsigned long'), which requires 8 byte alignment
+0x7b92b19a2672: note: pointer points here
+ 7f 7f  98 01 d8 01 09 02 ef 01  db 01 c2 01 94 01 9c 01  eb 01 05 02 af 01 ce 01  47 02 23 02 c4 01
+              ^ 
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f9422af4291 in svt_cdef_filter_block_4xn_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:594:32
+    #1 0x7f9422add5c1 in svt_cdef_filter_block_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:1108:13
+    #2 0x7f94207dfc26 in svt_cdef_filter_fb /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef.c:389:9
+    #3 0x7f94207c6321 in cdef_seg_search /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:527:25
+    #4 0x7f94207bb4db in svt_aom_cdef_kernel_iter /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:674:13
+    #5 0x7f94207cad99 in svt_aom_cdef_kernel /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/cdef_process.c:778:27
+    #6 0x7f94217db3f4 in svt_thread_trampoline /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/Codec/svt_threads.c:121:12
+    #7 0x7f946f2085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #8 0x7f93d78ae670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #9 0x7f93d79271db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/cdef_block_avx2.c:594:32 
+
+      Start 222: pipeline.test_software_decode_x264_encodes_h264_matroska
+ 6/14 Test #217: pipeline.test_openh264_encodes_ten_bit_after_format ................   Passed    5.62 sec
+      Start 261: pipeline.test_opus_tags_preserved_in_vorbis
+ 7/14 Test #261: pipeline.test_opus_tags_preserved_in_vorbis ........................Subprocess aborted***Exception:   0.51 sec
+[Test] Starting test_opus_tags_preserved_in_vorbis
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track().value() == 3
+[Test] CheckPlaceholderTags: assert tags.Disc() && tags.Disc().value() == 2
+[Test] CheckPlaceholderTags: assert !tags.Copyright()
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_opus_tags_preserved_in_vorbis/pipeline/audio-codecs/tagged.ogg
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged.opus
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder track 0 encode to Vorbis
+[Test] CheckAudioCodec: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckAudioCodec: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_opus_tags_preserved_in_vorbis/pipeline/audio-codecs/tagged.ogg
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged.opus
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 0:0 pts=-6500000 dts=-6500000 dur=20000000 key=1 bytes=498
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=498 B raw=498 fnv1a=91e7da7e22928c8f
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 1:0 pts=13500000 dts=13500000 dur=20000000 key=1 bytes=247
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=247 B raw=247 fnv1a=ecef337b1ed67116
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 2:0 pts=33500000 dts=33500000 dur=20000000 key=1 bytes=233
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=233 B raw=233 fnv1a=ec01dabadc33cc01
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 3:0 pts=53500000 dts=53500000 dur=20000000 key=1 bytes=215
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=215 B raw=215 fnv1a=6ec9cc96240fa98b
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 4:0 pts=73500000 dts=73500000 dur=20000000 key=1 bytes=215
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=215 B raw=215 fnv1a=ca98cfde1a3209a4
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 5:0 pts=93500000 dts=93500000 dur=20000000 key=1 bytes=217
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=217 B raw=217 fnv1a=ac94aa117bc420ab
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 8:0 pts=153500000 dts=153500000 dur=20000000 key=1 bytes=215
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 0:0 pts=-6500000 dts=-6500000 bytes=498 B raw=498 fnv1a=91e7da7e22928c8f
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=215 B raw=215 fnv1a=384132263402871a
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Demuxer t=0 Audio 9:0 pts=173500000 dts=173500000 dur=20000000 key=1 bytes=215
+[opus @ 0x7d51c120fd80] Could not update timestamps for skipped samples.
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 0:0 pts=- dts=-6500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 1:0 pts=13500000 dts=13500000 bytes=247 B raw=247 fnv1a=ecef337b1ed67116
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 1:0 pts=13500000 dts=13500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 2:0 pts=33500000 dts=33500000 bytes=233 B raw=233 fnv1a=ec01dabadc33cc01
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 2:0 pts=33500000 dts=33500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 3:0 pts=53500000 dts=53500000 bytes=215 B raw=215 fnv1a=6ec9cc96240fa98b
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 3:0 pts=53500000 dts=53500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 4:0 pts=73500000 dts=73500000 bytes=215 B raw=215 fnv1a=ca98cfde1a3209a4
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 4:0 pts=73500000 dts=73500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 5:0 pts=93500000 dts=93500000 bytes=217 B raw=217 fnv1a=8a0803776e9a4411
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 7:0 pts=133500000 dts=133500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 8:0 pts=153500000 dts=153500000 bytes=215 B raw=215 fnv1a=384132263402871a
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder out t=0 8:0 pts=153500000 dts=153500000 dur=20000000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Decoder in t=0 9:0 pts=173500000 dts=173500000 bytes=215 B raw=215 fnv1a=9da29bf85a57a4b5
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder open t=0 codec=Vorbis impl=libvorbis
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder in t=0 0:0 pts=- dts=-6500000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder in t=0 1:0 pts=13500000 dts=13500000
+[LowLevel] 02/11/2026 05:24:09 StormByte/Multimedia/Encoder in t=0 2:0 pts=33500000 dts=33500000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/floor1.c:820:24: runtime error: left shift of negative value -7
+[Debug   ] 02/11/2026 05:24:09 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=Opus dst=Vorbis impl=libvorbis
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7fc207083834 in floor1_encode /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/floor1.c:820:24
+    #1 0x7fc2070b0d9e in mapping0_forward /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/mapping0.c:617:20
+    #2 0x7fc20702e8a5 in vorbis_analysis /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/analysis.c:46:11
+    #3 0x7fc1f928d166 in libvorbis_encode_frame /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/libvorbisenc.c:382:20
+    #4 0x7fc1fe8445ea in ff_encode_encode_cb /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:298:11
+    #5 0x7fc1fe8581ac in encode_simple_internal /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:378:15
+    #6 0x7fc1fe85751c in encode_simple_receive_packet /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:391:15
+    #7 0x7fc1fe84b2ec in encode_receive_packet_internal /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:423:15
+    #8 0x7fc1fe848c49 in avcodec_send_frame /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:567:15
+    #9 0x7fc1f6f93eaa in StormByte::Multimedia::FFmpeg::AVEncoder::SendFrame(StormByte::Multimedia::FFmpeg::AVFrame&, char*, unsigned long) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:758:12
+    #10 0x7fc1f6f92a77 in StormByte::Multimedia::FFmpeg::AVEncoder::SendFrame(StormByte::Multimedia::FFmpeg::AVFrame&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:699:9
+    #11 0x7fc1f6c43a4a in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Emit(StormByte::Multimedia::Pipeline::Encoder&, bool) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:336:28
+    #12 0x7fc1f6c471cf in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Push(StormByte::Multimedia::Pipeline::Encoder&, StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> const&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:432:7
+    #13 0x7fc1f6d7ae47 in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Encode::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:135:30
+    #14 0x7fc1f74ab3d2 in (anonymous namespace)::MountedWorker::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:90:15
+    #15 0x7fc1f6e2d533 in StormByte::Multimedia::Backend::Pipeline::Pumper::PumpPop() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:247:13
+    #16 0x7fc1f6d2e806 in StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through::Pump() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx:58:3
+    #17 0x7fc1f6e2f8ad in StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0::operator()() const /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:114:3
+    #18 0x7fc1f6e2eedc in std::__1::__invoke_result_impl<void, StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::type std::__1::__invoke[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&) /usr/include/c++/v1/__type_traits/invoke.h:90:27
+    #19 0x7fc1f6e2ee80 in decltype(auto) std::__1::__apply_tuple_impl[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&, std::__1::integer_sequence<unsigned long, ...>) /usr/include/c++/v1/tuple:1400:29
+    #20 0x7fc1f6e2ee22 in decltype(auto) std::__1::apply[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&) /usr/include/c++/v1/tuple:1404:29
+    #21 0x7fc1f6e2ed9a in StormByte::Safe::Detail::ThreadState<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::Run(void*) /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186:6
+    #22 0x7fc1c303cc3c in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) /home/stormbyte/Software/StormByte/StormByte/base/lib/private/StormByte/safe/detail/thread.cxx:72:5
+    #23 0x7fc226a085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #24 0x7fc1c25d3670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #25 0x7fc1c264c1db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/floor1.c:820:24 
+
+      Start 274: pipeline.test_mp3_tags_roundtrip_through_opus
+ 8/14 Test #215: pipeline.test_openh264_encodes_h264_matroska .......................   Passed    6.58 sec
+      Start 291: pipeline.test_fdk_aac_encodes_stereo_mp4
+ 9/14 Test #274: pipeline.test_mp3_tags_roundtrip_through_opus ......................   Passed    0.90 sec
+      Start 293: pipeline.test_fdk_aac_decodes_surround_to_flac
+10/14 Test #293: pipeline.test_fdk_aac_decodes_surround_to_flac .....................Subprocess aborted***Exception:   0.45 sec
+[Test] Starting test_fdk_aac_decodes_surround_to_flac
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_fdk_aac_decodes_surround_to_flac/pipeline/audio-codecs/fdk-decoded.mka
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_51.m4a
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder track 0 encode to FLAC
+[Test] CheckAudioCodec: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckAudioCodec: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_fdk_aac_decodes_surround_to_flac/pipeline/audio-codecs/fdk-decoded.mka
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_51.m4a
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 0:0 pts=-42666667 dts=-42666667 dur=21333333 key=1 bytes=1024
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=1.00 KiB raw=1024 fnv1a=378b3c8659f8b009
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 1:0 pts=-21333333 dts=-21333333 dur=21333333 key=1 bytes=1396
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=1.36 KiB raw=1396 fnv1a=4cc319c0a4ce4974
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 2:0 pts=0 dts=0 dur=21333333 key=1 bytes=1366
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=1.33 KiB raw=1366 fnv1a=2ef6b94114521c99
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 3:0 pts=21333333 dts=21333333 dur=21333333 key=1 bytes=1293
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=1.26 KiB raw=1293 fnv1a=7904e5e8ed88d914
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 4:0 pts=42666667 dts=42666667 dur=21333333 key=1 bytes=1256
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=1.23 KiB raw=1256 fnv1a=8636f77a9b1bcf7f
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 5:0 pts=64000000 dts=64000000 dur=21333333 key=1 bytes=1193
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=1.09 KiB raw=1115 fnv1a=0c69a26e283b2acb
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 8:0 pts=128000000 dts=128000000 dur=21333333 key=1 bytes=1096
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=1.07 KiB raw=1096 fnv1a=9557ba530894b59d
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 9:0 pts=149333333 dts=149333333 dur=21333333 key=1 bytes=1098
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder open t=0 impl=libfdk_aac
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 0:0 pts=-42666667 dts=-42666667 bytes=1.00 KiB raw=1024 fnv1a=378b3c8659f8b009
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 1:0 pts=-21333333 dts=-21333333 bytes=1.36 KiB raw=1396 fnv1a=4cc319c0a4ce4974
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/FDK_lpc.cpp:191:11: runtime error: left shift of negative value -4536925
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7fc371a8eca0 in CLpc_SynthesisLattice(int*, int, int, int, int, int const*, int, int*) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/FDK_lpc.cpp:191:11
+    #1 0x7fc37121f617 in CTns_Apply(CTnsData*, CIcsInfo const*, int*, SamplingRateInfo const*, int, unsigned char, unsigned char, unsigned int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACdec/src/aacdec_tns.cpp:350:13
+    #2 0x7fc37121445a in ApplyTools(CAacDecoderChannelInfo**, SamplingRateInfo const*, unsigned int, unsigned int, int, int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACdec/src/block.cpp:962:3
+    #3 0x7fc3712246b0 in CChannelElement_Decode(CAacDecoderChannelInfo**, CAacDecoderStaticChannelInfo**, SamplingRateInfo*, unsigned int, unsigned int, int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACdec/src/channel.cpp:335:9
+    #4 0x7fc3711a8b91 in CAacDecoder_DecodeFrame(AAC_DECODER_INSTANCE*, unsigned int, int*, int, int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACdec/src/aacdecoder.cpp:3126:13
+    #5 0x7fc371159737 in aacDecoder_DecodeFrame /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACdec/src/aacdecoder_lib.cpp:1344:19
+    #6 0x7fc369668964 in fdk_aac_decode_frame /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/libfdk-aacdec.c:432:11
+    #7 0x7fc36983336f in decode_simple_internal /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/decode.c:457:16
+    #8 0x7fc369811d88 in decode_simple_receive_frame /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/decode.c:617:15
+    #9 0x7fc36980d110 in ff_decode_receive_frame_internal /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/decode.c:653:15
+    #10 0x7fc369812d3b in decode_receive_frame_internal /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/decode.c:671:15
+    #11 0x7fc369812aca in avcodec_send_packet /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/decode.c:755:15
+    #12 0x7fc361f7d92e in StormByte::Multimedia::FFmpeg::AVDecoder::SendPacket(StormByte::Multimedia::FFmpeg::AVPacket&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx:177:18
+    #13 0x7fc361c138ab in StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Audio::Send(StormByte::Multimedia::Pipeline::Decoder&, StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> const&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx:152:33
+    #14 0x7fc361d32410 in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Decode::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx:211:30
+    #15 0x7fc3624ab3d2 in (anonymous namespace)::MountedWorker::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:90:15
+    #16 0x7fc361e2d533 in StormByte::Multimedia::Backend::Pipeline::Pumper::PumpPop() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:247:13
+    #17 0x7fc361d2e806 in StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through::Pump() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx:58:3
+    #18 0x7fc361e2f8ad in StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0::operator()() const /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:114:3
+    #19 0x7fc361e2eedc in std::__1::__invoke_result_impl<void, StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::type std::__1::__invoke[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&) /usr/include/c++/v1/__type_traits/invoke.h:90:27
+    #20 0x7fc361e2ee80 in decltype(auto) std::__1::__apply_tuple_impl[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&, std::__1::integer_sequence<unsigned long, ...>) /usr/include/c++/v1/tuple:1400:29
+    #21 0x7fc361e2ee22 in decltype(auto) std::__1::apply[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&) /usr/include/c++/v1/tuple:1404:29
+    #22 0x7fc361e2ed9a in StormByte::Safe::Detail::ThreadState<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::Run(void*) /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186:6
+    #23 0x7fc32e03cc3c in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) /home/stormbyte/Software/StormByte/StormByte/base/lib/private/StormByte/safe/detail/thread.cxx:72:5
+    #24 0x7fc391a085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #25 0x7fc32d5d3670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #26 0x7fc32d64c1db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/FDK_lpc.cpp:191:11 
+
+      Start 338: pipeline.test_audio_cover_mp3
+11/14 Test #291: pipeline.test_fdk_aac_encodes_stereo_mp4 ...........................Subprocess aborted***Exception:   1.08 sec
+[Test] Starting test_fdk_aac_encodes_stereo_mp4
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_fdk_aac_encodes_stereo_mp4/pipeline/audio-codecs/fdk-stereo.m4a
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_stereo.wav
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder track 0 encode to AAC
+[Test] CheckAudioCodec: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckAudioCodec: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_fdk_aac_encodes_stereo_mp4/pipeline/audio-codecs/fdk-stereo.m4a
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_stereo.wav
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 0:0 pts=0 dts=0 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=16.00 KiB raw=16384 fnv1a=7a3b6957aa854c61
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 1:0 pts=85333333 dts=85333333 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=16.00 KiB raw=16384 fnv1a=312bfa4a4c12c4c5
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 2:0 pts=170666667 dts=170666667 dur=85333333 key=1 bytes=16384
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=16.00 KiB raw=16384 fnv1a=eb130d2832950d29
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 3:0 pts=256000000 dts=256000000 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=0 bytes=16.00 KiB raw=16384 fnv1a=7a3b6957aa854c61
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=16.00 KiB raw=16384 fnv1a=30b84d09a0079b29
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 4:0 pts=341333333 dts=341333333 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=16.00 KiB raw=16384 fnv1a=624f57a49083f175
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 5:0 pts=426666667 dts=426666667 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 0:0 pts=0 dts=0 dur=85333333
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=16.00 KiB raw=16384 fnv1a=d1a30f5d03dd0041
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 8:0 pts=682666667 dts=682666667 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=16.00 KiB raw=16384 fnv1a=6065f1e9cb5849c9
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 1:0 pts=85333333 dts=85333333 bytes=16.00 KiB raw=16384 fnv1a=312bfa4a4c12c4c5
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer t=0 Audio 9:0 pts=768000000 dts=768000000 dur=85333333 key=1 bytes=16384
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer read t=0 9:0 bytes=16.00 KiB raw=16384 fnv1a=eaa660554bdec779
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/fixpoint_math.cpp:600:45: runtime error: left shift of negative value -5
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 1:0 pts=85333333 dts=85333333 dur=85333333
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 2:0 pts=170666667 dts=170666667 bytes=16.00 KiB raw=16384 fnv1a=eb130d2832950d29
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 2:0 pts=170666667 dts=170666667 dur=85333333
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 3:0 pts=256000000 dts=256000000 bytes=16.00 KiB raw=16384 fnv1a=30b84d09a0079b29
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 3:0 pts=256000000 dts=256000000 dur=85333333
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 4:0 pts=341333333 dts=341333333 bytes=16.00 KiB raw=16384 fnv1a=624f57a49083f175
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 4:0 pts=341333333 dts=341333333 dur=85333333
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 5:0 pts=426666667 dts=426666667 bytes=16.00 KiB raw=16384 fnv1a=9791a70fcabecd0d
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 7:0 pts=597333333 dts=597333333 dur=85333333
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 8:0 pts=682666667 dts=682666667 bytes=16.00 KiB raw=16384 fnv1a=6065f1e9cb5849c9
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 8:0 pts=682666667 dts=682666667 dur=85333333
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 05:24:10 StormByte/Multimedia/Demuxer eof
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder in t=0 9:0 pts=768000000 dts=768000000 bytes=16.00 KiB raw=16384 fnv1a=eaa660554bdec779
+[LowLevel] 02/11/2026 05:24:10 StormByte/Multimedia/Decoder out t=0 9:0 pts=768000000 dts=768000000 dur=85333333
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f4d3a52890e in f2Pow(int, int, int*) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/fixpoint_math.cpp:600:45
+    #1 0x7f4d3a529495 in fPow(int, int, int, int, int*) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/fixpoint_math.cpp:676:12
+    #2 0x7f4d39e39e90 in getMaskFactor(int, int, int, int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/psy_configuration.cpp:341:17
+    #3 0x7f4d39e371f6 in FDKaacEnc_initSpreading(int, int*, int*, int*, int*, int*, int, int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/psy_configuration.cpp:385:27
+    #4 0x7f4d39e34f37 in FDKaacEnc_InitPsyConfiguration(int, int, int, int, int, int, int, PSY_CONFIGURATION*, FB_TYPE) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/psy_configuration.cpp:584:3
+    #5 0x7f4d39df61e4 in FDKaacEnc_psyMainInit(PSY_INTERNAL*, AUDIO_OBJECT_TYPE, CHANNEL_MAPPING*, int, int, int, int, int, int, int, int, unsigned int, unsigned int) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/psy_main.cpp:336:17
+    #6 0x7f4d39d4ec5a in FDKaacEnc_Initialize /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/aacenc.cpp:569:17
+    #7 0x7f4d39d29a1b in aacEncInit(AACENCODER*, unsigned int, USER_PARAM*) /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/aacenc_lib.cpp:1418:9
+    #8 0x7f4d39d1c12b in aacEncEncode /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/aacenc_lib.cpp:1732:9
+    #9 0x7f4d2cc6208a in aac_encode_init /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/libfdk-aacenc.c:411:16
+    #10 0x7f4d320c732d in avcodec_open2 /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/ffmpeg/../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/avcodec.c:341:19
+    #11 0x7f4d2a98c0be in StormByte::Multimedia::FFmpeg::AVEncoder::Open(std::__1::basic_string_view<char, std::__1::char_traits<char>>, StormByte::Multimedia::FFmpeg::AVCodecParameters const&, int, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String, std::__1::less<StormByte::Safe::String>> const&, StormByte::Multimedia::Property::AVRational, StormByte::Multimedia::FFmpeg::AVFrame const*, int) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:603:21
+    #12 0x7f4d2a7a80e1 in StormByte::Multimedia::Backend::Pipeline::OpenCodec(StormByte::Multimedia::Pipeline::Encoder&, StormByte::Multimedia::FFmpeg::AVCodecParameters, StormByte::Multimedia::Property::AVRational, StormByte::Multimedia::Features, StormByte::Multimedia::FFmpeg::AVFrame const*) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/encoder.cxx:604:16
+    #13 0x7f4d2a6453fb in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Open(StormByte::Multimedia::Pipeline::Encoder&, StormByte::Multimedia::Pipeline::Frame const&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:377:16
+    #14 0x7f4d2a77a043 in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Encode::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:121:38
+    #15 0x7f4d2aeab3d2 in (anonymous namespace)::MountedWorker::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:90:15
+    #16 0x7f4d2a82d533 in StormByte::Multimedia::Backend::Pipeline::Pumper::PumpPop() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:247:13
+    #17 0x7f4d2a72e806 in StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through::Pump() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx:58:3
+    #18 0x7f4d2a82f8ad in StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0::operator()() const /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:114:3
+    #19 0x7f4d2a82eedc in std::__1::__invoke_result_impl<void, StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::type std::__1::__invoke[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&) /usr/include/c++/v1/__type_traits/invoke.h:90:27
+    #20 0x7f4d2a82ee80 in decltype(auto) std::__1::__apply_tuple_impl[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&, std::__1::integer_sequence<unsigned long, ...>) /usr/include/c++/v1/tuple:1400:29
+    #21 0x7f4d2a82ee22 in decltype(auto) std::__1::apply[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&) /usr/include/c++/v1/tuple:1404:29
+    #22 0x7f4d2a82ed9a in StormByte::Safe::Detail::ThreadState<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::Run(void*) /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186:6
+    #23 0x7f4cf6a3cc3c in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) /home/stormbyte/Software/StormByte/StormByte/base/lib/private/StormByte/safe/detail/thread.cxx:72:5
+    #24 0x7f4d5a4085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #25 0x7f4cf5ead670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #26 0x7f4cf5f261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libFDK/src/fixpoint_math.cpp:600:45 
+
+12/14 Test #222: pipeline.test_software_decode_x264_encodes_h264_matroska ...........   Passed    6.09 sec
+13/14 Test #338: pipeline.test_audio_cover_mp3 ......................................   Passed    0.96 sec
+14/14 Test  #96: pipeline.test_transcoder_vmaf_remux_matches_source_at_100 ..........   Passed   17.15 sec
+
+50% tests passed, 7 tests failed out of 14
+
+Label Time Summary:
+audio-codecs    =   2.94 sec*proc (4 tests)
+multimedia      =  48.29 sec*proc (14 tests)
+mux-policy      =   0.96 sec*proc (1 test)
+pipeline        =  48.29 sec*proc (14 tests)
+video-codecs    =  18.29 sec*proc (3 tests)
+
+Total Test time (real) =  17.15 sec
+
+The following tests FAILED:
+	104 - pipeline.test_transcoder_kvazaar_pads_unaligned_video (Subprocess aborted) multimedia pipeline
+	105 - pipeline.test_transcoder_hevc_encode_output_file_properties (Subprocess aborted) multimedia pipeline
+	109 - pipeline.test_transcoder_svt_av1_encode_preserves_hdr10_metadata (Subprocess aborted) multimedia pipeline
+	166 - pipeline.test_reencode_svt_av1_dovi_only (Subprocess aborted) multimedia pipeline
+	261 - pipeline.test_opus_tags_preserved_in_vorbis (Subprocess aborted) audio-codecs multimedia pipeline
+	291 - pipeline.test_fdk_aac_encodes_stereo_mp4 (Subprocess aborted) audio-codecs multimedia pipeline
+	293 - pipeline.test_fdk_aac_decodes_surround_to_flac (Subprocess aborted) audio-codecs multimedia pipeline
+Errors while running CTest

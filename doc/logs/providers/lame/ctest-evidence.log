@@ -1,0 +1,1097 @@
+
+==============================================================================
+XML: runs/baseline/multimedia-full-plain.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/baseline/multimedia-full-plain.xml
+TEST: pipeline.test_lame_encodes_stereo_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_lame_encodes_stereo_mp3
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineAudioCodecTests/test_lame_encodes_stereo_mp3/pipeline/audio-codecs/lame-stereo.mp3
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 04:44:23 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:44:23 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_stereo.wav
+[LowLevel] 02/11/2026 04:44:23 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:44:23 StormByte/Multimedia/Trans...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/baseline/multimedia-full-plain.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 04:44:26 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:44:26 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 04:44:26 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:44:26 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 04:44:26 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[Test]...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/baseline/multimedia-full-strict.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: FAIL
+==============================================================================
+
+		
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track().value() == 3
+[Test] CheckPlaceholderTags: assert tags.Disc() && tags.Disc().value() == 2
+[Test] CheckPlaceholderTags: assert !tags.Copyright()
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged.opus
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged.mp3
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder track 0 encode to Opus
+[Test] CheckAudioCodec: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckAudioCodec: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder running
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged.opus
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged.mp3
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 0:0 pts=0 dts=0 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=576 B raw=576 fnv1a=4ea759cc6fbf7907
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 1:0 pts=24000000 dts=24000000 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=576 B raw=576 fnv1a=a056da921e348c19
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 2:0 pts=48000000 dts=48000000 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=576 B raw=576 fnv1a=1c8258d32858a74f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 3:0 pts=72000000 dts=72000000 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=576 B raw=576 fnv1a=e2bf468ea36a523b
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 4:0 pts=96000000 dts=96000000 dur=24000000 key=1 bytes=576
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder open t=0 impl=auto
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=576 B raw=576 fnv1a=acc8cc1fbd657b2d
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 5:0 pts=120000000 dts=120000000 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=0 bytes=576 B raw=576 fnv1a=4ea759cc6fbf7907
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=576 B raw=576 fnv1a=b7361cf466eb231c
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 0:0 pts=0 dts=0 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 8:0 pts=192000000 dts=192000000 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=576 B raw=576 fnv1a=53f11ead5d85b4cc
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 1:0 pts=24000000 dts=24000000 bytes=576 B raw=576 fnv1a=a056da921e348c19
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 9:0 pts=216000000 dts=216000000 dur=24000000 key=1 bytes=576
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 1:0 pts=24000000 dts=24000000 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 2:0 pts=48000000 dts=48000000 bytes=576 B raw=576 fnv1a=1c8258d32858a74f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 2:0 pts=48000000 dts=48000000 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 3:0 pts=72000000 dts=72000000 bytes=576 B raw=576 fnv1a=e2bf468ea36a523b
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder open t=0 codec=Opus impl=libopus
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 0:0 pts=0 dts=0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 3:0 pts=72000000 dts=72000000 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 4:0 pts=96000000 dts=96000000 bytes=576 B raw=576 fnv1a=acc8cc1fbd657b2d
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 4:0 pts=96000000 dts=96000000 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 5:0 pts=120000000 dts=120000000 bytes=576 B raw=576 fnv1a=2d288f0b5e9c0d69
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 0:0 pts=-6500000 dts=-6500000 dur=20000000 key=1 bytes=845 B raw=845 fnv1a=07e2a76a4c1a099f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 1:0 pts=24000000 dts=24000000
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 7:0 pts=168000000 dts=168000000 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 0:0 pts=-6500000 dts=-6500000 pos=13500000 bytes=845 B raw=845 fnv1a=07e2a76a4c1a099f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 8:0 pts=192000000 dts=192000000 bytes=576 B raw=576 fnv1a=53f11ead5d85b4cc
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 1:0 pts=13500000 dts=13500000 dur=20000000 key=1 bytes=775 B raw=775 fnv1a=263aa47f79bb6470
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 8:0 pts=192000000 dts=192000000 dur=24000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 2:0 pts=48000000 dts=48000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 9:0 pts=216000000 dts=216000000 bytes=576 B raw=576 fnv1a=e129829031c20073
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 1:0 pts=13500000 dts=13500000 pos=13500000 bytes=775 B raw=775 fnv1a=263aa47f79bb6470
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 2:0 pts=33500000 dts=33500000 dur=20000000 key=1 bytes=367 B raw=367 fnv1a=92be5d79d5081702
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 3:0 pts=72000000 dts=72000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 2:0 pts=33500000 dts=33500000 pos=13500000 bytes=367 B raw=367 fnv1a=92be5d79d5081702
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 3:0 pts=53500000 dts=53500000 dur=20000000 key=1 bytes=343 B raw=343 fnv1a=f8a927850b49a893
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 4:0 pts=96000000 dts=96000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 4:0 pts=93500000 dts=93500000 pos=13500000 bytes=342 B raw=342 fnv1a=1bbfd38d9f799393
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 6:0 pts=144000000 dts=144000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 6:0 pts=133500000 dts=133500000 dur=20000000 key=1 bytes=343 B raw=343 fnv1a=9352bacf6ad433c5
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 7:0 pts=168000000 dts=168000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 7:0 pts=153500000 dts=153500000 dur=20000000 key=1 bytes=343 B raw=343 fnv1a=c646a84de67e4e6f
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=MP3 dst=Opus impl=libopus
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer eof
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer work n=86 min=60us max=11439us
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder work n=171 min=212us max=1399us
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder work n=86 min=435us max=2052us
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer closed
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer work n=104 min=54us max=3864us
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Info    ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder done tracks=1 89ms
+[Info    ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder process_rss(current=530571264 B,min=510640128 B,max=572129280 B,peak=572129280 B,samples=9)
+[Info    ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder Demuxer: origin=Demuxer state=stopped calls=86 in(frame=0,packet=0) out(frame=0,packet=85) process(total=53627us,mean=623us,min=60us,max=11439us) wait(n=0,total=0us,max=0us) setup=8011us elapsed=62444us
+[Info    ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder Muxer: origin=Muxer state=stopped calls=104 in(frame=0,packet=103) out(frame=0,packet=0) process(total=16335us,mean=157us,min=54us,max=3864us) wait(n=103,total=47273us,max=10552us) setup=991us elapsed=71414us
+[Info    ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder Decoder(t=0): origin=Decoder(t=0) state=stopped calls=86 in(frame=0,packet=85) out(frame=85,packet=0) process(total=51236us,mean=595us,min=300us,max=1399us) wait(n=1,total=1146us,max=1146us) setup=8532us elapsed=62670us
+[Info    ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder Encoder(Opus): origin=Encoder(Opus) state=stopped calls=86 in(frame=85,packet=0) out(frame=0,packet=103) process(total=56543us,mean=657us,min=435us,max=2052us) wait(n=1,total=8682us,max=8682us) setup=183us elapsed=67114us
+[Test] WaitForTranscoder: assert job.Plan()
+[Test] WaitForTranscoder: assert job.Plan()->State() == Plan::State::Finished
+[Test] WaitForTranscoder: assert !job.Plan()->Error()
+[Test] WaitForTranscoder: assert progress
+[Test] WaitForTranscoder: assert values.MainComplete
+[Test] WaitForTranscoder: assert values.Main == 100.0
+[Test] WaitForTranscoder: assert values.MeasureComplete
+[Test] WaitForTranscoder: assert values.AnalyticsComplete
+[Test] WaitForTranscoder: assert values.All == 100.0
+[Test] WaitForTranscoder: assert values.Current == Progress::Phase::Complete
+[Test] CheckAudioCodec: assert CheckSingleAudioOutput(output, containerName, codecName, channels, 48000) == 0
+[Test] CheckSingleAudioOutput: opening and checking audio output
+[Test] CheckSingleAudioOutput: opening media file for inspection
+[Test] CheckSingleAudioOutput: assert opened
+[Test] CheckSingleAudioOutput: assert opened.value().Container().Name() == container
+[Test] CheckSingleAudioOutput: assert streams.size() == 1
+[Test] CheckSingleAudioOutput: assert audioStream.Index() == 0
+[Test] CheckSingleAudioOutput: assert audioStream.Type() == StormByte::Multimedia::Type::Audio
+[Test] CheckSingleAudioOutput: assert audioStream.Codec().Name() == codec
+[Test] CheckSingleAudioOutput: assert audio
+[Test] CheckSingleAudioOutput: assert audio.value().Channels() == channels
+[Test] CheckSingleAudioOutput: assert audio.value().SampleRate() == sampleRate
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert encoded
+[Test] CheckAudioCodec: assert CheckOutputBranding(encoded.value()) == 0
+[Test] CheckOutputBranding: assert encoder
+[Test] CheckOutputBranding: assert encoder.value() == "StormByte-Multimedia " STORMBYTE_TEST_MULTIMEDIA_VERSION
+[Test] CheckAudioCodec: assert duration && duration.value().Nanoseconds().count() > 0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder destroy
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder coordinator join begin component=Transcoder instance=0x7b49ef4f53c0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder coordinator join end component=Transcoder instance=0x7b49ef4f53c0
+[Test] CheckTaggedAudioEncode: assert encoded
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(encoded.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track().value() == 3
+[Test] CheckPlaceholderTags: assert tags.Disc() && tags.Disc().value() == 2
+[Test] CheckPlaceholderTags: assert !tags.Copyright()
+[Test] CheckTaggedAudioEncode: assert CheckOutputBranding(encoded.value()) == 0
+[Test] CheckOutputBranding: assert encoder
+[Test] CheckOutputBranding: assert encoder.value() == "StormByte-Multimedia " STORMBYTE_TEST_MULTIMEDIA_VERSION
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged-roundtrip.mp3
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged.opus
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder probed source /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged.opus
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCodec: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckAudioCodec: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged-roundtrip.mp3
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer open /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_mp3_tags_roundtrip_through_opus/pipeline/audio-codecs/tagged.opus
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 0:0 pts=-6500000 dts=-6500000 dur=20000000 key=1 bytes=845
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=845 B raw=845 fnv1a=07e2a76a4c1a099f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 1:0 pts=13500000 dts=13500000 dur=20000000 key=1 bytes=775
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=775 B raw=775 fnv1a=263aa47f79bb6470
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 2:0 pts=33500000 dts=33500000 dur=20000000 key=1 bytes=367
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=367 B raw=367 fnv1a=92be5d79d5081702
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 3:0 pts=53500000 dts=53500000 dur=20000000 key=1 bytes=343
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=343 B raw=343 fnv1a=f8a927850b49a893
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 4:0 pts=73500000 dts=73500000 dur=20000000 key=1 bytes=343
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=343 B raw=343 fnv1a=ce2079a967614a46
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 5:0 pts=93500000 dts=93500000 dur=20000000 key=1 bytes=342
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=343 B raw=343 fnv1a=9352bacf6ad433c5
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 8:0 pts=153500000 dts=153500000 dur=20000000 key=1 bytes=343
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=343 B raw=343 fnv1a=c646a84de67e4e6f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer t=0 Audio 9:0 pts=173500000 dts=173500000 dur=20000000 key=1 bytes=342
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder ready
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 0:0 pts=-6500000 dts=-6500000 bytes=845 B raw=845 fnv1a=07e2a76a4c1a099f
+[opus @ 0x7cd9f043c880] Could not update timestamps for skipped samples.
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 0:0 pts=- dts=-6500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 1:0 pts=13500000 dts=13500000 bytes=775 B raw=775 fnv1a=263aa47f79bb6470
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 1:0 pts=13500000 dts=13500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 2:0 pts=33500000 dts=33500000 bytes=367 B raw=367 fnv1a=92be5d79d5081702
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 2:0 pts=33500000 dts=33500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 3:0 pts=53500000 dts=53500000 bytes=343 B raw=343 fnv1a=f8a927850b49a893
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 3:0 pts=53500000 dts=53500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 4:0 pts=73500000 dts=73500000 bytes=343 B raw=343 fnv1a=ce2079a967614a46
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder open t=0 codec=MP3 impl=libmp3lame
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 4:0 pts=73500000 dts=73500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 0:0 pts=- dts=-6500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 5:0 pts=93500000 dts=93500000 bytes=342 B raw=342 fnv1a=1bbfd38d9f799393
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 1:0 pts=13500000 dts=13500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 2:0 pts=33500000 dts=33500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 7:0 pts=133500000 dts=133500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 8:0 pts=153500000 dts=153500000 bytes=343 B raw=343 fnv1a=c646a84de67e4e6f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder out t=0 8:0 pts=153500000 dts=153500000 dur=20000000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 9:0 pts=173500000 dts=173500000 bytes=342 B raw=342 fnv1a=c5d192e45d79980d
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 3:0 pts=53500000 dts=53500000
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=Opus dst=MP3 impl=libmp3lame
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 3:0 pts=-23020833 dts=-23020833 dur=24000000 key=1 bytes=576 B raw=576 fnv1a=e765c7382b0ee1e9
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 4:0 pts=73500000 dts=73500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 5:0 pts=93500000 dts=93500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 3:0 pts=-23020833 dts=-23020833 pos=979167 bytes=576 B raw=576 fnv1a=e765c7382b0ee1e9
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 5:0 pts=979167 dts=979167 dur=24000000 key=1 bytes=576 B raw=576 fnv1a=b62f7fe2cad80655
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 6:0 pts=113500000 dts=113500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 5:0 pts=979167 dts=979167 pos=979167 bytes=576 B raw=576 fnv1a=b62f7fe2cad80655
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 6:0 pts=24979167 dts=24979167 pos=979167 bytes=576 B raw=576 fnv1a=d14309c912c29022
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 8:0 pts=72979167 dts=72979167 dur=24000000 key=1 bytes=576 B raw=576 fnv1a=3fa737cd289b7161
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 9:0 pts=173500000 dts=173500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer dropped 4 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 9:0 pts=96979167 dts=96979167 dur=24000000 key=1 bytes=576 B raw=576 fnv1a=6fd7f832dde63816
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder in t=0 10:0 pts=193500000 dts=193500000
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer written t=0 9:0 pts=96979167 dts=96979167 pos=979167 bytes=576 B raw=576 fnv1a=6fd7f832dde63816
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder dropped 117 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Encoder out t=0 74:0 pts=1392979167 dts=1392979167 dur=24000000 key=1 bytes=576 B raw=576 fnv1a=d8ee184e32e9e86f
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer dropped 159 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Muxer wake
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder dropped 149 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder in t=0 84:0 pts=1673500000 dts=1673500000 bytes=342 B raw=342 fnv1a=a088b28af2976b24
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer eof
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer work n=104 min=50us max=14641us
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer dropped 188 messages
+[LowLevel] 02/11/2026 04:39:23 StormByte/Multimedia/Demuxer pipe EOF input begin pipe=0x7c69f03ed6c0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Debug   ] 02/11/2026 04:39:23 StormByte/Multimedia/Decoder work n=207 min=162us max=2523us
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:181:50: runtime error: left shift of 155992262 by 4 places cannot be represented in type 'int'
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f4a35bcd74e in putbits2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:181:50
+    #1 0x7f4a35bd30dc in Huffmancode /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:627:9
+    #2 0x7f4a35bcf56c in ShortHuffmancodebits /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:649:12
+    #3 0x7f4a35bc91e2 in writeMainData /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:718:34
+    #4 0x7f4a35bbf0d1 in format_bitstream /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:932:13
+    #5 0x7f4a35bfcbff in lame_encode_mp3_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/encoder.c:544:12
+    #6 0x7f4a35bb8327 in lame_encode_buffer_sample_t /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1793:19
+    #7 0x7f4a35ba9707 in lame_encode_buffer_template /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1904:20
+    #8 0x7f4a35ba946f in lame_encode_buffer /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1915:12
+    #9 0x7f4a35bab896 in lame_encode_flush /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:2180:16
+    #10 0x7f4a2826f279 in mp3lame_encode_frame /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/libmp3lame.c:235:23
+    #11 0x7f4a2d84831a in ff_encode_encode_cb /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:298:11
+    #12 0x7f4a2d85bedc in encode_simple_internal /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:378:15
+    #13 0x7f4a2d85b24c in encode_simple_receive_packet /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:391:15
+    #14 0x7f4a2d84f01c in encode_receive_packet_internal /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:423:15
+    #15 0x7f4a2d84f7a9 in avcodec_receive_packet /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:590:15
+    #16 0x7f4a25f9c2ae in StormByte::Multimedia::FFmpeg::AVEncoder::ReceivePacket(StormByte::Multimedia::FFmpeg::AVPacket&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:812:12
+    #17 0x7f4a25c4888e in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::DrainOne(StormByte::Multimedia::Pipeline::Encoder&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:440:33
+    #18 0x7f4a25c4d524 in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Flush(StormByte::Multimedia::Pipeline::Encoder&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:533:9
+    #19 0x7f4a25d7fa32 in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Encode::Flush() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:159:23
+    #20 0x7f4a25d7d79f in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Encode::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:93:4
+    #21 0x7f4a264af572 in (anonymous namespace)::MountedWorker::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:90:15
+    #22 0x7f4a25e30e22 in StormByte::Multimedia::Backend::Pipeline::Pumper::PumpPop() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:229:15
+    #23 0x7f4a25d329a6 in StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through::Pump() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx:58:3
+    #24 0x7f4a25e33a4d in StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0::operator()() const /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:114:3
+    #25 0x7f4a25e3307c in std::__1::__invoke_result_impl<void, StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::type std::__1::__invoke[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&) /usr/include/c++/v1/__type_traits/invoke.h:90:27
+    #26 0x7f4a25e33020 in decltype(auto) std::__1::__apply_tuple_impl[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&, std::__1::integer_sequence<unsigned long, ...>) /usr/include/c++/v1/tuple:1400:29
+    #27 0x7f4a25e32fc2 in decltype(auto) std::__1::apply[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&) /usr/include/c++/v1/tuple:1404:29
+    #28 0x7f4a25e32f3a in StormByte::Safe::Detail::ThreadState<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::Run(void*) /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186:6
+    #29 0x7f49f203cc3c in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) /home/stormbyte/Software/StormByte/StormByte/base/lib/private/StormByte/safe/detail/thread.cxx:72:5
+    #30 0x7f4a55a085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #31 0x7f49f16ae670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #32 0x7f49f17271db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:181:50 
+
+	
+
+==============================================================================
+XML: runs/baseline/multimedia-full-strict.xml
+TEST: pipeline.test_lame_encodes_stereo_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_lame_encodes_stereo_mp3
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineAudioCodecTests/test_lame_encodes_stereo_mp3/pipeline/audio-codecs/lame-stereo.mp3
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 04:39:24 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:39:25 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_stereo.wav
+[LowLevel] 02/11/2026 04:39:25 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:39:25 StormByte/M...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/baseline/multimedia-full-strict.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: FAIL
+==============================================================================
+
+		
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckAudioCovers: assert WaitForTranscoder(job) == 0
+[Test] WaitForTranscoder: waiting for transcoder completion
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder running
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer created
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer launch
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer created
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer launch
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer bound remux origin
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder created
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder launch
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder created
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder launch
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer bind decoder t=0
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer bind encoder t=0
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder ready
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder wait
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer writer /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer ready
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Muxer wait
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer open /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer ready
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 0:0 pts=0 dts=0 dur=26122449 key=1 bytes=626
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 0:0 bytes=626 B raw=626 fnv1a=549d1ee6f9f2b06e
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 1:0 pts=26122449 dts=26122449 dur=26122449 key=1 bytes=627
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 1:0 bytes=627 B raw=627 fnv1a=4c4fd72035df8c83
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 2:0 pts=52244898 dts=52244898 dur=26122449 key=1 bytes=627
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 2:0 bytes=627 B raw=627 fnv1a=64ab74a6d2d740b9
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 3:0 pts=78367347 dts=78367347 dur=26122449 key=1 bytes=627
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 3:0 bytes=627 B raw=627 fnv1a=3ef587ee4cb5e9c5
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 4:0 pts=104489796 dts=104489796 dur=26122449 key=1 bytes=627
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 4:0 bytes=627 B raw=627 fnv1a=605e01332bf37fec
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 5:0 pts=130612245 dts=130612245 dur=26122449 key=1 bytes=627
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder open t=0 impl=auto
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder ready
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer dropped 4 messages
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 7:0 bytes=627 B raw=627 fnv1a=a146a6a10c3432da
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 8:0 pts=208979592 dts=208979592 dur=26122449 key=1 bytes=627
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 0:0 pts=0 dts=0 bytes=626 B raw=626 fnv1a=549d1ee6f9f2b06e
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer read t=0 8:0 bytes=627 B raw=627 fnv1a=ca7407a6086c0c85
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Demuxer t=0 Audio 9:0 pts=235102041 dts=235102041 dur=26122449 key=1 bytes=627
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 0:0 pts=0 dts=0 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder wake
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 1:0 pts=26122449 dts=26122449 bytes=627 B raw=627 fnv1a=4c4fd72035df8c83
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 1:0 pts=26122449 dts=26122449 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 2:0 pts=52244898 dts=52244898 bytes=627 B raw=627 fnv1a=64ab74a6d2d740b9
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 2:0 pts=52244898 dts=52244898 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 3:0 pts=78367347 dts=78367347 bytes=627 B raw=627 fnv1a=3ef587ee4cb5e9c5
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 3:0 pts=78367347 dts=78367347 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 4:0 pts=104489796 dts=104489796 bytes=627 B raw=627 fnv1a=605e01332bf37fec
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 4:0 pts=104489796 dts=104489796 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 5:0 pts=130612245 dts=130612245 bytes=627 B raw=627 fnv1a=b20f8867fb209a20
+[Notice  ] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder open t=0 codec=MP3 impl=libmp3lame
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder in t=0 0:0 pts=0 dts=0
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder dropped 4 messages
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 7:0 pts=182857143 dts=182857143 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 8:0 pts=208979592 dts=208979592 bytes=627 B raw=627 fnv1a=ca7407a6086c0c85
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Encoder in t=0 1:0 pts=26122449 dts=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder out t=0 8:0 pts=208979592 dts=208979592 dur=26122449
+[LowLevel] 02/11/2026 04:39:36 StormByte/Multimedia/Decoder in t=0 9:0 pts=235102041 dts=235102041 bytes=627 B raw=627 fnv1a=88186a57dd762784
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/quantize.c:898:43: runtime error: left shift of negative value -2
+[Debug   ] 02/11/2026 04:39:36 StormByte/Multimedia/Transcoder settled in=0 out=0 encode src=MP3 dst=MP3 impl=libmp3lame
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+[Test] WaitForTranscoder: assert values.Main >= lastMain
+[Test] WaitForTranscoder: assert values.Main <= 100.0
+    #0 0x7f1123ea8216 in inc_subblock_gain /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/quantize.c:898:43
+    #1 0x7f1123e9dd64 in balance_noise /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/quantize.c:978:26
+    #2 0x7f1123e96aba in outer_loop /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/quantize.c:1087:17
+    #3 0x7f1123e991a5 in CBR_iteration_loop /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/quantize.c:2061:24
+    #4 0x7f1123dfcb8a in lame_encode_mp3_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/encoder.c:523:9
+    #5 0x7f1123db8327 in lame_encode_buffer_sample_t /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1793:19
+    #6 0x7f1123da9707 in lame_encode_buffer_template /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1904:20
+    #7 0x7f1123da9aab in lame_encode_buffer_int /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1976:12
+    #8 0x7f111646dbd5 in mp3lame_encode_frame /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/libmp3lame.c:214:27
+    #9 0x7f111ba4831a in ff_encode_encode_cb /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:298:11
+    #10 0x7f111ba5bedc in encode_simple_internal /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:378:15
+    #11 0x7f111ba5b24c in encode_simple_receive_packet /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:391:15
+    #12 0x7f111ba4f01c in encode_receive_packet_internal /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:423:15
+    #13 0x7f111ba4c979 in avcodec_send_frame /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/bm/ffmpeg/../../../../../../../home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src/libavcodec/encode.c:567:15
+    #14 0x7f111419804a in StormByte::Multimedia::FFmpeg::AVEncoder::SendFrame(StormByte::Multimedia::FFmpeg::AVFrame&, char*, unsigned long) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:758:12
+    #15 0x7f1114196c17 in StormByte::Multimedia::FFmpeg::AVEncoder::SendFrame(StormByte::Multimedia::FFmpeg::AVFrame&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:699:9
+    #16 0x7f1113e47bea in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Emit(StormByte::Multimedia::Pipeline::Encoder&, bool) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:336:28
+    #17 0x7f1113e4b36f in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Push(StormByte::Multimedia::Pipeline::Encoder&, StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> const&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:432:7
+    #18 0x7f1113f7efe7 in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Encode::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:135:30
+    #19 0x7f11146af572 in (anonymous namespace)::MountedWorker::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:90:15
+    #20 0x7f11140316d3 in StormByte::Multimedia::Backend::Pipeline::Pumper::PumpPop() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:247:13
+    #21 0x7f1113f329a6 in StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through::Pump() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx:58:3
+    #22 0x7f1114033a4d in StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0::operator()() const /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:114:3
+    #23 0x7f111403307c in std::__1::__invoke_result_impl<void, StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::type std::__1::__invoke[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&) /usr/include/c++/v1/__type_traits/invoke.h:90:27
+    #24 0x7f1114033020 in decltype(auto) std::__1::__apply_tuple_impl[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&, std::__1::integer_sequence<unsigned long, ...>) /usr/include/c++/v1/tuple:1400:29
+    #25 0x7f1114032fc2 in decltype(auto) std::__1::apply[abi:sqe220108]<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0, std::__1::tuple<>>(StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0&&, std::__1::tuple<>&&) /usr/include/c++/v1/tuple:1404:29
+    #26 0x7f1114032f3a in StormByte::Safe::Detail::ThreadState<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::Run(void*) /tmp/BMDATA/sanitizer-validation/multimedia/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186:6
+    #27 0x7f10e023cc3c in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) /home/stormbyte/Software/StormByte/StormByte/base/lib/private/StormByte/safe/detail/thread.cxx:72:5
+    #28 0x7f1143c085af in asan_thread_start /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_interceptors.cpp:246:28
+    #29 0x7f10df788670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #30 0x7f10df8011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/quantize.c:898:43 
+
+	
+
+==============================================================================
+XML: runs/clean-final/clean-final-focused.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/clean-final/clean-final-focused.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 05:24:11 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:24:11 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 05:24:11 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:24:11 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:24:11 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/current/clean-current-focused.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/current/clean-current-focused.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 05:53:43 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:53:43 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 05:53:43 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:53:43 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:53:43 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/current/clean-current-full-strict.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/current/clean-current-full-strict.xml
+TEST: pipeline.test_lame_encodes_stereo_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_lame_encodes_stereo_mp3
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_lame_encodes_stereo_mp3/pipeline/audio-codecs/lame-stereo.mp3
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 06:00:25 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:00:25 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_stereo.wav
+[LowLevel] 02/11/2026 06:00:25 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:00:25 StormByte/Multimedia/...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/current/clean-current-full-strict.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 05:54:05 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:54:05 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 05:54:05 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:54:05 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:54:05 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/followup/clean-followup-focused.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/followup/clean-followup-focused.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 05:29:12 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:29:12 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 05:29:12 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:29:12 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:29:12 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/initial-patches/provider-patches-focused.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/initial-patches/provider-patches-focused.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-validation/multimedia/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 04:59:26 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 04:59:26 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 04:59:26 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 04:59:26 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 04:59:26 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(j...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/seventh/clean-seventh-focused.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/seventh/clean-seventh-focused.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 05:45:19 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:45:19 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 05:45:19 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:45:19 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:45:19 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/third/clean-third-focused.xml
+TEST: pipeline.test_mp3_tags_roundtrip_through_opus
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_mp3_tags_roundtrip_through_opus
+[Test] CheckTaggedAudioEncode: assert source
+[Test] CheckTaggedAudioEncode: assert CheckPlaceholderTags(source.value()) == 0
+[Test] CheckPlaceholderTags: assert tags.Title() && tags.Title().value() == "Placeholder Track"
+[Test] CheckPlaceholderTags: assert tags.Artist() && tags.Artist().value() == "Placeholder Artist"
+[Test] CheckPlaceholderTags: assert tags.Album() && tags.Album().value() == "Placeholder Album"
+[Test] CheckPlaceholderTags: assert tags.AlbumArtist() && tags.AlbumArtist().value() == "Placeholder Album Artist"
+[Test] CheckPlaceholderTags: assert tags.Composer() && tags.Composer().value() == "Placeholder Composer"
+[Test] CheckPlaceholderTags: assert tags.Genre() && tags.Genre().value() == "Test"
+[Test] CheckPlaceholderTags: assert tags.Comment() && tags.Comment().value() == "Synthetic noise fixture"
+[Test] CheckPlaceholderTags: assert tags.Date() && tags.Date().value() == "2026"
+[Test] CheckPlaceholderTags: assert tags.Track() && tags.Track()....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	
+
+==============================================================================
+XML: runs/third/clean-third-focused.xml
+TEST: pipeline.test_audio_cover_mp3
+STATUS: PASS
+==============================================================================
+
+		
+			
+		
+		[Test] Starting test_audio_cover_mp3
+[Test] CheckAudioCovers: assert source
+[Test] CheckAudioCovers: assert source->Attachments().size() == 2
+[Test] CheckAudioCovers: assert !source->Attachments()[0].FileName() || source->Attachments()[0].FileName()->empty()
+[Test] CheckAudioCovers: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineMuxPolicyTests/test_audio_cover_mp3/pipeline/mux-policy/covered.mp3
+[LowLevel] 02/11/2026 05:32:56 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 05:32:56 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_tagged_covers.mp3
+[LowLevel] 02/11/2026 05:32:56 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 05:32:56 StormByte/Multimedia/Transcoder mapped Audio 0 -> order 0
+[Debug   ] 02/11/2026 05:32:56 StormByte/Multimedia/Transcoder track 0 encode to MP3
+[Test] CheckAudioCovers: assert CheckTranscoderConfigured(job) == 0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+
+	

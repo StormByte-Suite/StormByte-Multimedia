@@ -1,0 +1,18 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/detail/locale.cxx:67:14: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+   67 |                         uselocale(LC_GLOBAL_LOCALE);
+      |                                   ^
+/usr/include/locale.h:191:28: note: expanded from macro 'LC_GLOBAL_LOCALE'
+  191 | # define LC_GLOBAL_LOCALE       ((locale_t) -1L)
+      |                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/detail/locale.cxx:86:28: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+   86 |         locale_t base = duplocale(LC_GLOBAL_LOCALE);
+      |                                   ^
+/usr/include/locale.h:191:28: note: expanded from macro 'LC_GLOBAL_LOCALE'
+  191 | # define LC_GLOBAL_LOCALE       ((locale_t) -1L)
+      |                                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/detail/locale.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

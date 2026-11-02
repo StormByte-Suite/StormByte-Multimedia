@@ -1,0 +1,91 @@
+[0/2] Re-checking globbed directories...
+[0/126] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip... (cached) OK
+[1/126] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip... (cached) OK
+[2/126] [BuildMaster/Core     ]: reset fail markers
+[3/126] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[4/126] [BuildMaster/Ninja    ]: Compiling OGG container
+[5/126] [BuildMaster/Ninja    ]: Installing libsamplerate
+[6/126] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[7/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[8/126] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+[9/126] [BuildMaster/Ninja    ]: Installing OGG container
+[10/126] [BuildMaster/CMake    ]: Configuring rubberband
+[BuildMaster/Meson    ]: 			Reconfiguring rubberband: mode, ABI or options changed
+[11/126] [BuildMaster/CMake    ]: Configuring vorbis
+[BuildMaster/CMake    ]: 			Reconfiguring Vorbis codec: mode, ABI or options changed
+[12/126] [BuildMaster/CMake    ]: Configuring x265
+[BuildMaster/CMake    ]: 				Reconfiguring X265 codec: mode, ABI or options changed
+[13/126] [BuildMaster/Ninja    ]: Compiling Opus codec
+[14/126] [BuildMaster/Ninja    ]: Compiling rubberband
+[15/126] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+[16/126] [BuildMaster/Ninja    ]: Compiling kvazaar
+[17/126] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[18/126] [BuildMaster/Ninja    ]: Compiling VPX codec
+[19/126] [BuildMaster/Ninja    ]: Compiling libwebp
+[20/126] [BuildMaster/Ninja    ]: Compiling X264 codec
+[21/126] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+[22/126] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+[23/126] [BuildMaster/Ninja    ]: Compiling X265 codec
+[24/126] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+[25/126] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[26/126] [BuildMaster/Ninja    ]: Compiling leptonica
+[27/126] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[28/126] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[29/126] [BuildMaster/Ninja    ]: Installing Opus codec
+[30/126] [BuildMaster/Ninja    ]: Installing rubberband
+[31/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[32/126] [BuildMaster/Ninja    ]: Installing Vorbis codec
+[33/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[34/126] [BuildMaster/Ninja    ]: Compiling libaom
+[35/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[36/126] [BuildMaster/Ninja    ]: Compiling dav1d
+[37/126] [BuildMaster/Ninja    ]: Installing kvazaar
+[38/126] [BuildMaster/Ninja    ]: Compiling openh264
+[39/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[40/126] [BuildMaster/Ninja    ]: Installing SVT-AV1
+[41/126] [BuildMaster/Ninja    ]: Installing VPX codec
+[42/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[43/126] [BuildMaster/Ninja    ]: Installing libwebp
+[44/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[45/126] [BuildMaster/Ninja    ]: Installing X264 codec
+[46/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[47/126] [BuildMaster/Ninja    ]: Installing X265 codec
+[48/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[49/126] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[50/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[51/126] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+[52/126] [BuildMaster/Ninja    ]: Installing zlib compression library
+[53/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[54/126] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[55/126] [BuildMaster/Ninja    ]: Installing leptonica
+[56/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[57/126] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+[58/126] [BuildMaster/Git      ]: Resetting git source tree after install
+[59/126] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+[60/126] [BuildMaster/Ninja    ]: Installing libaom
+[61/126] [BuildMaster/Ninja    ]: Installing dav1d
+[62/126] [BuildMaster/Ninja    ]: Installing openh264
+[63/126] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+CMake Error at /usr/share/cmake/StormByte-BuildMaster/modules/log.cmake:287 (message):
+  [1;31m[FATAL ][BuildMaster/Component]: write_pc:
+  '/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/lib64/pkgconfig/bzip2.pc'
+  already exists (upstream .pc).  BuildMaster will not overwrite it.  Use
+  PC={ENABLED=FALSE} or drop PC={…}.[0m
+Call Stack (most recent call first):
+  /usr/share/cmake/StormByte-BuildMaster/modules/component/pkgconfig/write_pc.cmake:42 (_bm_log_message)
+
+
+CMake Error at /usr/share/cmake/StormByte-BuildMaster/modules/log.cmake:287 (message):
+  [1;31m[FATAL ][BuildMaster/CMake ]: helper .pc failed for bzip2
+  compression library (exit 1)[0m
+Call Stack (most recent call first):
+  /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/scripts/install_rules/bzip2_pc.cmake:24 (_bm_log_message)
+  /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/scripts/install_rules/bzip2_install_rules.cmake:4 (include)
+  /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/scripts/cmake/bzip2_install_library.cmake:78 (include)
+
+
+FAILED: [code=1] CMakeFiles/bzip2_install stormbyte-buildmaster/install/lib64/libbz2.a /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/CMakeFiles/bzip2_install /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/lib64/libbz2.a 
+cd /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/bzip2 && /usr/bin/cmake -P /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/scripts/cmake/bzip2_install_library.cmake
+ninja: build stopped: subcommand failed.

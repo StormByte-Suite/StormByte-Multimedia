@@ -13,6 +13,18 @@ CTest requirements.
 **The audit is not complete. Releases and tag/retag operations remain on hold.**
 No upstream PR has been opened automatically.
 
+The complete available evidence is now retained in the repository under
+[doc/logs](logs/README.md), organized by build, test run and provider rather
+than depending on temporary build/session directories. It includes
+[full-suite results](logs/runs/current/test-results.tsv),
+[remaining failures](logs/runs/current/failures.tsv),
+[all 48 patch mappings](logs/reproduce/patches.tsv),
+[existing triggering tests](logs/reproduce/ctest-reproducers.tsv),
+[standalone mains and runnable commands](logs/reproduce/README.md),
+original diagnostics, fixture hashes and integrity checks.
+This preservation work does not close the audit: subsequent validation should
+target the failed cases, including leaks, without rerunning the whole suite.
+
 ## Application and base revisions
 
 Apply patches from the respective source repository root, not from Multimedia.
@@ -338,9 +350,12 @@ write lengths 1-32 with ASan and UBSan.
 - [0001: Empty/full-word shifts](../thirdparty/ffmpeg/plugins/codecs/video/openh264/0001-golomb-avoid-empty-word-shifts.patch)
 - [0002: Unsigned trailing-bit mask](../thirdparty/ffmpeg/plugins/codecs/video/openh264/0002-golomb-use-unsigned-trailing-mask.patch)
 
-## Local evidence and remaining work
+## Preserved evidence and remaining work
 
-Logs are local build outputs, not part of the upstream submission archive:
+Original log names below are retained under categorized folders in
+[doc/logs](logs/README.md). Build-directory paths are provenance, not the only
+remaining copies. Consult the [inventory](logs/inventory.tsv) for their exact
+archived locations:
 
 - `build/sanitizer-validation/clean-final-{configure,build}.log`: initial
   from-scratch build.
@@ -360,6 +375,14 @@ The submission archive also includes the four isolated validation sources under
 `fdk-scale-check.cxx` and `kvazaar-sad-check.cxx`. They require the corresponding
 patched source headers, Clang sanitizer flags, and SSE4.1 for the SAD check;
 they are not installed as Multimedia tests.
+
+The same sources now live persistently under the relevant
+[provider folders](logs/providers/), with captured compiler/runtime output and
+a [standalone runner](logs/reproduce/run-standalone.sh). The
+[reproduction guide](logs/reproduce/README.md) records setup, limitations,
+dirty Transcoder snapshot and the original dependency-instrumentation boundary.
+Raw historical recover-mode logs are explicitly separated from current strict
+validation; they are not passing evidence or a waiver.
 
 Remaining release gates include FDK threshold adjustment, full-suite failures,
 preview behavior, complete Transcoder OOM handling and remaining static-analysis

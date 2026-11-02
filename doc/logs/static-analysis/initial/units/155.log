@@ -1,0 +1,195 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/log.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:7:5: warning: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape]
+    7 | int main() {
+      |     ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2391:7: note: frame #2: function '__get_amortized_growth_capacity' calls function '__throw_length_error' here
+ 2391 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2764:54: note: frame #3: function '__grow_by' calls function '__get_amortized_growth_capacity' here
+ 2764 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                                                      ^
+/usr/include/c++/v1/string:2792:3: note: frame #4: function '__grow_by_without_replace' calls function '__grow_by' here
+ 2792 |   __grow_by(__old_cap, __delta_cap, __old_sz, __n_copy, __n_del, __n_add);
+      |   ^
+/usr/include/c++/v1/string:3062:5: note: frame #5: function 'append' calls function '__grow_by_without_replace' here
+ 3062 |     __grow_by_without_replace(__cap, __sz + __n - __cap, __sz, __sz, 0);
+      |     ^
+/usr/include/c++/v1/string:3405:5: note: frame #6: function 'resize' calls function 'append' here
+ 3405 |     append(__n - __sz, __c);
+      |     ^
+/usr/include/c++/v1/string:1319:84: note: frame #7: function 'resize' calls function 'resize' here
+ 1319 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 void resize(size_type __n) { resize(__n, value_type()); }
+      |                                                                                    ^
+/usr/include/c++/v1/sstream:724:5: note: frame #8: function '__init_buf_ptrs' calls function 'resize' here
+  724 |     __str_.resize(__str_.capacity());
+      |     ^
+/usr/include/c++/v1/sstream:372:5: note: frame #9: function 'basic_stringbuf' calls function '__init_buf_ptrs' here
+  372 |     __init_buf_ptrs();
+      |     ^
+/usr/include/c++/v1/sstream:1022:64: note: frame #10: function 'basic_ostringstream' calls function 'basic_stringbuf' here
+ 1022 |       : basic_ostream<_CharT, _Traits>(std::addressof(__sb_)), __sb_(ios_base::out) {}
+      |                                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:11:21: note: frame #11: function 'main' calls function 'basic_ostringstream' here
+   11 |         std::ostringstream firstOutput, secondOutput;
+      |                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:18:51: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   18 |         *duration << Level::Error << "first-duration" << std::endl;
+      |                                                          ^~~~~~~~~
+      |                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:19:48: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   19 |         *encoder << Level::Error << "first-encode" << std::endl;
+      |                                                       ^~~~~~~~~
+      |                                                       '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:20:48: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   20 |         *decoder << Level::Error << "first-decode" << std::endl;
+      |                                                       ^~~~~~~~~
+      |                                                       '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:21:47: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   21 |         *other << Level::Error << "second-encode" << std::endl;
+      |                                                      ^~~~~~~~~
+      |                                                      '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:22:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   22 |         TEST_REQUIRE(firstOutput.str().find("first-duration") != std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:23:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   23 |         TEST_REQUIRE(firstOutput.str().find("first-encode") != std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:24:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   24 |         TEST_REQUIRE(firstOutput.str().find("second-encode") == std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:25:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   25 |         TEST_REQUIRE(secondOutput.str().find("second-encode") != std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:26:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   26 |         TEST_REQUIRE(secondOutput.str().find("first-") == std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:27:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   27 |         TEST_REQUIRE(firstOutput.str().find("StormByte/Multimedia/Decoder") != std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:28:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   28 |         TEST_REQUIRE(firstOutput.str().find("Encoder/StormByte") == std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:31:48: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   31 |         *nested << Level::Error << "second-decode" << std::endl;
+      |                                                       ^~~~~~~~~
+      |                                                       '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:32:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   32 |         TEST_REQUIRE(secondOutput.str().find("StormByte/Multimedia/Decoder") != std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:33:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   33 |         TEST_REQUIRE(secondOutput.str().find("Multimedia/StormByte") == std::string::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/log_test.cxx:34:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   34 |         TEST_REQUIRE(!UseLog({}, "Decoder"));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^

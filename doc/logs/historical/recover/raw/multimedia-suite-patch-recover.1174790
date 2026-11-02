@@ -1,0 +1,24 @@
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23: runtime error: shift exponent -1 is negative
+    #0 0x7f1a36ff631f in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23
+    #1 0x7f1a36ff631f in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1527:29
+    #2 0x7f1a36fce90f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x7f1a36fd7f2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x7f1a36f243f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x7f1a36f1e2f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x7f1a3722d933 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f1a04aad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f1a04b261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-exponent ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36: runtime error: shift exponent -3 is negative
+    #0 0x7f1a36ff8dd1 in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36
+    #1 0x7f1a36ff8dd1 in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1549:29
+    #2 0x7f1a36fce90f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x7f1a36fd7f2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x7f1a36f243f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x7f1a36f1e2f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x7f1a3722d933 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f1a04aad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f1a04b261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-exponent ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36 

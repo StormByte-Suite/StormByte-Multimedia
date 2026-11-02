@@ -1,0 +1,389 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '3' provided to the cast expression is not in the valid range of values for 'Operation' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:100:42: note: enum declared here
+  100 |                 enum class STORMBYTE_MULTIMEDIA_PUBLIC Operation: std::uint8_t {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+  101 |                         None    = 0,                    ///< No access
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  102 |                         Read    = 1 << 0,               ///< Decode / demux is available
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  103 |                         Write   = 1 << 1,               ///< At least one encoder / muxer exists
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |                         Attach  = 1 << 2                ///< Container can hold real attachments (covers, fonts)
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |                 };
+      |                 ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:100:18: note: Calling default constructor for 'Registry'
+  100 |         static Registry instance;
+      |                         ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:94:2: note: Calling 'Registry::Initialize'
+   94 |         Initialize();
+      |         ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:267:2: note: Calling 'Registry::Load'
+  267 |         Load();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:262:2: note: Calling 'Registry::LoadCodecs'
+  262 |         LoadCodecs();
+      |         ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:174:2: note: Calling 'Registry::LoadCodecs'
+  174 |         LoadCodecs(Type::Video, video);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:159:3: note: Calling 'Registry::Add'
+  159 |                 Add(type, def);
+      |                 ^~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:145:47: note: Calling 'ProbeAccess'
+  145 |         Codec codec(type, def.name, def.description, ProbeAccess(type, def));
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:74:7: note: 'type' is not equal to Attachment
+   74 |                 if (type == StormByte::Multimedia::Type::Attachment)
+      |                     ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:74:3: note: Taking false branch
+   74 |                 if (type == StormByte::Multimedia::Type::Attachment)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:77:3: note: Loop condition is true.  Entering loop body
+   77 |                 for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:79:8: note: Assuming 'id' is non-null
+   79 |                         if (!id)
+      |                             ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:79:4: note: Taking false branch
+   79 |                         if (!id)
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:8: note: Assuming 'descriptor' is non-null
+   82 |                         if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+      |                             ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:8: note: Left side of '&&' is true
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:22: note: Assuming the condition is true
+   82 |                         if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:82:4: note: Taking true branch
+   82 |                         if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:84:5: note:  Execution continues on line 87
+   84 |                                 break;
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:7: note: Assuming field 'name' is non-null
+   87 |                 if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+      |                     ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:7: note: Left side of '&&' is true
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:19: note: Assuming the condition is true
+   87 |                 if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:87:3: note: Taking true branch
+   87 |                 if (def.name && Tables::Encoder::PickEncoder(def.name, {}, {}) != nullptr)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:88:4: note: Calling 'Bitmask::operator|='
+   88 |                         access |= Access(Operation::Write);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.txx:78:13: note: Calling 'operator|<StormByte::Multimedia::Operation>'
+   78 |                 m_value = m_value | other.m_value;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '3' provided to the cast expression is not in the valid range of values for 'Operation'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: warning: The value '5' provided to the cast expression is not in the valid range of values for 'Operation' [clang-analyzer-optin.core.EnumCastOutOfRange]
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:100:42: note: enum declared here
+  100 |                 enum class STORMBYTE_MULTIMEDIA_PUBLIC Operation: std::uint8_t {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+  101 |                         None    = 0,                    ///< No access
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  102 |                         Read    = 1 << 0,               ///< Decode / demux is available
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  103 |                         Write   = 1 << 1,               ///< At least one encoder / muxer exists
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |                         Attach  = 1 << 2                ///< Container can hold real attachments (covers, fonts)
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |                 };
+      |                 ~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:100:18: note: Calling default constructor for 'Registry'
+  100 |         static Registry instance;
+      |                         ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:94:2: note: Calling 'Registry::Initialize'
+   94 |         Initialize();
+      |         ^~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:267:2: note: Calling 'Registry::Load'
+  267 |         Load();
+      |         ^~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:263:2: note: Calling 'Registry::LoadContainers'
+  263 |         LoadContainers();
+      |         ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:256:3: note: Calling 'Registry::Add'
+  256 |                 Add(def);
+      |                 ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:201:3: note: Assuming 'ext' is null
+  201 |                 ext ? std::string_view{ext} : std::string_view{},
+      |                 ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:201:3: note: '?' condition is false
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:202:3: note: Calling 'Registry::ProbeContainer'
+  202 |                 ProbeContainer(def)
+      |                 ^~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:182:2: note: Loop condition is true.  Entering loop body
+  182 |         for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:184:7: note: Assuming 'id' is non-null
+  184 |                 if (!id)
+      |                     ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:184:3: note: Taking false branch
+  184 |                 if (!id)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:186:7: note: Assuming the condition is true
+  186 |                 if (av_find_input_format(id) != nullptr)
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:186:3: note: Taking true branch
+  186 |                 if (av_find_input_format(id) != nullptr)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:182:2: note: Loop condition is false. Execution continues on line 190
+  182 |         for (std::size_t i = 0; i < def.FfmpegIdCount(); ++i) {
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:190:6: note: Assuming field 'attachments' is true
+  190 |         if (def.attachments)
+      |             ^~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:190:2: note: Taking true branch
+  190 |         if (def.attachments)
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:191:3: note: Calling 'Bitmask::operator|='
+  191 |                 access |= Access(Operation::Attach);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.txx:78:13: note: Calling 'operator|<StormByte::Multimedia::Operation>'
+   78 |                 m_value = m_value | other.m_value;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/bitmask.hxx:55:9: note: The value '5' provided to the cast expression is not in the valid range of values for 'Operation'
+   55 |         return static_cast<E>(Type::ToUnderlying(a) | Type::ToUnderlying(b));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/muxer_format.hxx:50:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   50 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:127:25: warning: an exception may be thrown in function 'FindCodec' which should not throw exceptions [bugprone-exception-escape]
+  127 | ExpectedCodec Registry::FindCodec(std::string_view name) const noexcept {
+      |                         ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #4: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:130:45: note: frame #5: function 'FindCodec' calls function 'basic_string<std::string_view, 0>' here
+  130 |                 return Unexpected<CodecNotFoundException>(std::string(name));
+      |                                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:135:29: warning: an exception may be thrown in function 'FindContainer' which should not throw exceptions [bugprone-exception-escape]
+  135 | ExpectedContainer Registry::FindContainer(std::string_view name) const noexcept {
+      |                             ^
+/usr/include/c++/v1/stdexcept:243:3: note: frame #0: unhandled exception of type 'length_error' may be thrown in function '__throw_length_error' here
+  243 |   throw length_error(__msg);
+      |   ^
+/usr/include/c++/v1/string:2561:5: note: frame #1: function '__throw_length_error' calls function '__throw_length_error' here
+ 2561 |     std::__throw_length_error("basic_string");
+      |     ^
+/usr/include/c++/v1/string:2303:7: note: frame #2: function '__init_internal_buffer' calls function '__throw_length_error' here
+ 2303 |       __throw_length_error();
+      |       ^
+/usr/include/c++/v1/string:2663:17: note: frame #3: function '__init' calls function '__init_internal_buffer' here
+ 2663 |   pointer __p = __init_internal_buffer(__sz);
+      |                 ^
+/usr/include/c++/v1/string:1158:5: note: frame #4: function 'basic_string<std::string_view, 0>' calls function '__init' here
+ 1158 |     __init(__sv.data(), __sv.size());
+      |     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:138:49: note: frame #5: function 'FindContainer' calls function 'basic_string<std::string_view, 0>' here
+  138 |                 return Unexpected<ContainerNotFoundException>(std::string(name));
+      |                                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:143:16: warning: an exception may be thrown in function 'Add' which should not throw exceptions [bugprone-exception-escape]
+  143 | void Registry::Add(Type type, const Tables::Codec::CodecDef& def) noexcept {
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:175:4: note: frame #0: unhandled exception of type 'AllocationError' may be thrown in function 'emplace<StormByte::Safe::String, StormByte::Size>' here
+  175 |                         throw AllocationError();
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:150:2: note: frame #1: function 'Add' calls function 'emplace<StormByte::Safe::String, StormByte::Size>' here
+  150 |         m_by_name.emplace(StormByte::Safe::String(storedCodec.Name()), StormByte::Size{i});
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:155:16: warning: an exception may be thrown in function 'LoadCodecs' which should not throw exceptions [bugprone-exception-escape]
+  155 | void Registry::LoadCodecs(Type type, std::span<const Tables::Codec::CodecDef> table) noexcept {
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:175:4: note: frame #0: unhandled exception of type 'AllocationError' may be thrown in function 'emplace<const StormByte::Multimedia::Type &, StormByte::Size>' here
+  175 |                         throw AllocationError();
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:207:10: note: frame #1: function 'try_emplace<>' calls function 'emplace<const StormByte::Multimedia::Type &, StormByte::Size>' here
+  207 |                 return emplace(key, V(std::forward<Args>(args)...));
+      |                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:326:26: note: frame #2: function 'operator[]' calls function 'try_emplace<>' here
+  326 |                 insert_result result = try_emplace(key);
+      |                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:156:17: note: frame #3: function 'LoadCodecs' calls function 'operator[]' here
+  156 |         m_by_type_start[type] = StormByte::Size{m_codecs.size()};
+      |                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:162:16: warning: an exception may be thrown in function 'LoadCodecs' which should not throw exceptions [bugprone-exception-escape]
+  162 | void Registry::LoadCodecs() noexcept {
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:429:4: note: frame #0: unhandled exception of type 'AllocationError' may be thrown in function 'AllocateBuckets' here
+  429 |                         throw AllocationError();
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:375:18: note: frame #1: function 'rehash' calls function 'AllocateBuckets' here
+  375 |                 Node** fresh = AllocateBuckets(count);
+      |                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:398:4: note: frame #2: function 'reserve' calls function 'rehash' here
+  398 |                         rehash(Size{static_cast<std::size_t>(needed)} + 1);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:170:2: note: frame #3: function 'LoadCodecs' calls function 'reserve' here
+  170 |         m_by_name.reserve((video.size() + audio.size() + subtitle.size() + attachment.size()) * 2);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:195:16: warning: an exception may be thrown in function 'Add' which should not throw exceptions [bugprone-exception-escape]
+  195 | void Registry::Add(const Tables::Container::ContainerDef& def) noexcept {
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:175:4: note: frame #0: unhandled exception of type 'AllocationError' may be thrown in function 'emplace<StormByte::Safe::String, StormByte::Size>' here
+  175 |                         throw AllocationError();
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:208:2: note: frame #1: function 'Add' calls function 'emplace<StormByte::Safe::String, StormByte::Size>' here
+  208 |         m_container_by_name.emplace(StormByte::Safe::String(storedContainer.Name()), StormByte::Size{i});
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:220:16: warning: an exception may be thrown in function 'Resolve' which should not throw exceptions [bugprone-exception-escape]
+  220 | void Registry::Resolve(const Tables::Container::ContainerDef& def, Container& container) noexcept {
+      |                ^
+/usr/include/c++/v1/__expected/expected.h:78:3: note: frame #0: unhandled exception of type 'std::bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::CodecNotFoundException>>' may be thrown in function '__throw_bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::CodecNotFoundException>, const StormByte::Safe::Shared<StormByte::Multimedia::CodecNotFoundException> &>' here
+   78 |   throw bad_expected_access<_Err>(std::forward<_Arg>(__arg));
+      |   ^
+/usr/include/c++/v1/__expected/expected.h:840:7: note: frame #1: function 'value' calls function '__throw_bad_expected_access<StormByte::Safe::Shared<StormByte::Multimedia::CodecNotFoundException>, const StormByte::Safe::Shared<StormByte::Multimedia::CodecNotFoundException> &>' here
+  840 |       std::__throw_bad_expected_access<_Err>(std::as_const(error()));
+      |       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:234:24: note: frame #2: function 'Resolve' calls function 'value' here
+  234 |                 const Codec& codec = found.value().get();
+      |                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:250:16: warning: an exception may be thrown in function 'LoadContainers' which should not throw exceptions [bugprone-exception-escape]
+  250 | void Registry::LoadContainers() noexcept {
+      |                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:429:4: note: frame #0: unhandled exception of type 'AllocationError' may be thrown in function 'AllocateBuckets' here
+  429 |                         throw AllocationError();
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:375:18: note: frame #1: function 'rehash' calls function 'AllocateBuckets' here
+  375 |                 Node** fresh = AllocateBuckets(count);
+      |                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/unordered_map.txx:398:4: note: frame #2: function 'reserve' calls function 'rehash' here
+  398 |                         rehash(Size{static_cast<std::size_t>(needed)} + 1);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.cxx:254:2: note: frame #3: function 'LoadContainers' calls function 'reserve' here
+  254 |         m_container_by_name.reserve(all.size() * 3);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/../tables/codec/catalog.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/../tables/codec/table.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/../tables/container/catalog.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/../tables/container/table.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/../tables/encoder/table.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

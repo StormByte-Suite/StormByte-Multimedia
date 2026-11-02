@@ -1,0 +1,13 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/runners.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/visibility.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+[1/1] (1/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.
+[1/1] (2/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.
+[1/1] (3/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.
+[1/1] (4/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.
+[1/1] (5/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.
+[1/1] (6/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.
+[1/1] (7/7) Processing file /home/stormbyte/Software/StormByte/StormByte/multimedia/test/runner_main.cxx.

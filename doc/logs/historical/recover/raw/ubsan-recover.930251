@@ -1,0 +1,23 @@
+../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:346:53: runtime error: applying non-zero offset 3840 to null pointer
+    #0 0x7f29a5a0c436 in opus_decode_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:346:53
+    #1 0x7f29a5a04b1d in opus_decode_subpacket /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:452:23
+    #2 0x7f29a5a04b1d in opus_decode_packet /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:581:15
+    #3 0x7f29a5cc33eb in decode_simple_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:457:16
+    #4 0x7f29a5cc33eb in decode_simple_receive_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:617:15
+    #5 0x7f29a5cc33eb in ff_decode_receive_frame_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:653:15
+    #6 0x7f29a5cc74d2 in decode_receive_frame_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:671:15
+    #7 0x7f29a5cc71f0 in avcodec_send_packet /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/decode.c:755:15
+    #8 0x7f29a61307a8 in try_decode_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavformat/demux.c:2206:19
+    #9 0x7f29a6123bee in avformat_find_stream_info /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavformat/demux.c:2946:9
+    #10 0x7f29a20d497a in StormByte::Multimedia::Backend::SimplePlayer::Context::OpenFormat(bool) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:579:10
+    #11 0x7f29a20cbba7 in StormByte::Multimedia::Backend::SimplePlayer::Open(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1689:10
+    #12 0x7f29a20cebe0 in StormByte::Multimedia::SimplePlayer::Open(StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1891:20
+    #13 0x7f29a20cea78 in StormByte::Multimedia::SimplePlayer::Open(std::__1::basic_string_view<char, std::__1::char_traits<char>>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/simple_player.cxx:1887:9
+    #14 0x565172115e8c in test_live_audio_backpressure_errors() /home/stormbyte/Software/StormByte/StormByte/multimedia/test/simple_player_test.cxx:1253:22
+    #15 0x565172137a84 in RunOneTest(TestEntry const&, std::__1::basic_string_view<char, std::__1::char_traits<char>>) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:115:21
+    #16 0x56517212fe63 in RunSelectedTest(int, char**, std::__1::span<TestEntry const, 18446744073709551615ul>) /home/stormbyte/Software/StormByte/StormByte/multimedia/test/test_helpers.hxx:139:11
+    #17 0x7f2976b17354 in __libc_start_call_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../sysdeps/nptl/libc_start_call_main.h:59:16
+    #18 0x7f2976b1747a in __libc_start_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../csu/libc-start.c:372:3
+    #19 0x5651720ff4d4 in _start (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/test/MultimediaSimplePlayerTests+0x224d4)
+
+SUMMARY: UndefinedBehaviorSanitizer: nullptr-with-nonzero-offset ../../../../../thirdparty/ffmpeg/src/libavcodec/opus/dec.c:346:53 

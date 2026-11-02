@@ -1,0 +1,210 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/packet.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:132:12: warning: an exception may be thrown in function 'Close' which should not throw exceptions [bugprone-exception-escape]
+  132 | void Pipe::Close(void* owner, void (*trace)(void*, std::string_view) noexcept) noexcept {
+      |            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2838:5: note: frame #7: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:2847:89: note: frame #8: function 'assign' calls function '__assign_external' here
+ 2847 |   return (__builtin_constant_p(__n) && __fits_in_sso(__n)) ? __assign_short(__s, __n) : __assign_external(__s, __n);
+      |                                                                                         ^
+/usr/include/c++/v1/string:1503:12: note: frame #9: function 'assign<std::string_view, 0>' calls function 'assign' here
+ 1503 |     return assign(__sv.data(), __sv.size());
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:316:4: note: frame #10: function 'FormatReplaceToken<char, std::string_view &>' calls function 'assign<std::string_view, 0>' here
+  316 |                         out.assign(std::basic_string_view<Char>(std::forward<T>(value)));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:643:12: note: frame #11: function 'operator()<std::string_view &>' calls function 'FormatReplaceToken<char, std::string_view &>' here
+  643 |                                                 if (!FormatReplaceToken<char>(scratch[index], std::forward<decltype(value)>(value), places[index].spec)) {
+      |                                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/string.hxx:657:7: note: frame #12: function 'ReplaceToken<std::string_view &, const void *>' calls function 'operator()<std::string_view &>' here
+  657 |                                         (store(std::forward<Args>(args)), ...);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:135:17: note: frame #13: function 'operator()' calls function 'ReplaceToken<std::string_view &, const void *>' here
+  135 |                         trace(owner, StormByte::Safe::String::ReplaceToken("pipe EOF {} pipe={}", phase, static_cast<const void*>(this)));
+      |                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:137:5: note: frame #14: function 'Close' calls function 'operator()' here
+  137 |         log("input begin");
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:181:13: warning: an exception may be thrown in function 'CloneTo' which should not throw exceptions [bugprone-exception-escape]
+  181 | Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) noexcept {
+      |             ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator_traits.h:259:12: note: frame #2: function 'allocate' calls function 'allocate' here
+  259 |     return __a.allocate(__n);
+      |            ^
+/usr/include/c++/v1/__tree:1949:21: note: frame #3: function '__construct_node<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' calls function 'allocate' here
+ 1949 |   __node_holder __h(__node_traits::allocate(__na, 1), _Dp(__na));
+      |                     ^
+/usr/include/c++/v1/__tree:1043:33: note: frame #4: function 'operator()' calls function '__construct_node<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' here
+ 1043 |             __node_holder __h = __construct_node(std::forward<_Args>(__args2)...);
+      |                                 ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:69:10: note: frame #5: function '__try_key_extraction_impl<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, std::pair<std::__tree_iterator<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, std::__tree_node<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, void *> *, long>, bool>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size, 0>' calls function 'operator()' here
+   69 |   return __with_key(__arg1, std::forward<_Arg1>(__arg1), std::forward<_Arg2>(__arg2));
+      |          ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:108:10: note: frame #6: function '__try_key_extraction<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' calls function '__try_key_extraction_impl<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, std::pair<std::__tree_iterator<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, std::__tree_node<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, void *> *, long>, bool>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size, 0>' here
+  108 |   return std::__try_key_extraction_impl<_KeyT, _Ret>(
+      |          ^
+/usr/include/c++/v1/__tree:1037:12: note: frame #7: function '__emplace_unique<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' calls function '__try_key_extraction<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' here
+ 1037 |     return std::__try_key_extraction<key_type>(
+      |            ^
+/usr/include/c++/v1/map:1132:12: note: frame #8: function 'emplace<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' calls function '__emplace_unique<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' here
+ 1132 |     return __tree_.__emplace_unique(std::forward<_Args>(__args)...);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:187:2: note: frame #9: function 'CloneTo' calls function 'emplace<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, StormByte::Size>' here
+  187 |         m_forkDestinations.emplace(std::make_tuple(track, &dest, output), m_forks.size());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:200:12: warning: an exception may be thrown in function 'RedirectCloneTo' which should not throw exceptions [bugprone-exception-escape]
+  200 | bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
+      |            ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator_traits.h:259:12: note: frame #2: function 'allocate' calls function 'allocate' here
+  259 |     return __a.allocate(__n);
+      |            ^
+/usr/include/c++/v1/__tree:1949:21: note: frame #3: function '__construct_node<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' calls function 'allocate' here
+ 1949 |   __node_holder __h(__node_traits::allocate(__na, 1), _Dp(__na));
+      |                     ^
+/usr/include/c++/v1/__tree:1043:33: note: frame #4: function 'operator()' calls function '__construct_node<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' here
+ 1043 |             __node_holder __h = __construct_node(std::forward<_Args>(__args2)...);
+      |                                 ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:69:10: note: frame #5: function '__try_key_extraction_impl<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, std::pair<std::__tree_iterator<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, std::__tree_node<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, void *> *, long>, bool>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &, 0>' calls function 'operator()' here
+   69 |   return __with_key(__arg1, std::forward<_Arg1>(__arg1), std::forward<_Arg2>(__arg2));
+      |          ^
+/usr/include/c++/v1/__utility/try_key_extraction.h:108:10: note: frame #6: function '__try_key_extraction<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' calls function '__try_key_extraction_impl<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, std::pair<std::__tree_iterator<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, std::__tree_node<std::__value_type<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, unsigned long>, void *> *, long>, bool>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &, 0>' here
+  108 |   return std::__try_key_extraction_impl<_KeyT, _Ret>(
+      |          ^
+/usr/include/c++/v1/__tree:1037:12: note: frame #7: function '__emplace_unique<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' calls function '__try_key_extraction<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, (lambda at /usr/include/c++/v1/__tree:1038:9), (lambda at /usr/include/c++/v1/__tree:1050:9), std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' here
+ 1037 |     return std::__try_key_extraction<key_type>(
+      |            ^
+/usr/include/c++/v1/map:1132:12: note: frame #8: function 'emplace<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' calls function '__emplace_unique<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' here
+ 1132 |     return __tree_.__emplace_unique(std::forward<_Args>(__args)...);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:214:2: note: frame #9: function 'RedirectCloneTo' calls function 'emplace<std::tuple<int, StormByte::Multimedia::Backend::Pipeline::Pipe *, int>, const unsigned long &>' here
+  214 |         m_forkDestinations.emplace(std::make_tuple(track, &dest, track), index);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:200:39: warning: 2 adjacent parameters of 'RedirectCloneTo' of similar type ('Pipe &') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  200 | bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:200:45: note: the first parameter in the range is 'previous'
+  200 | bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
+      |                                             ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx:200:61: note: the last parameter in the range is 'dest'
+  200 | bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
+      |                                                             ^~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pipe.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVCodecParameters.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/item.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/packet.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

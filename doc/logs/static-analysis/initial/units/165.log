@@ -1,0 +1,994 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/codec.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/container.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFilterGraph.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPacket.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/file.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/metadata/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/config/base.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/exception.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/filters/report.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/frame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/item.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/packet.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/plan.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/progress.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/resource_usage.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/telemetry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/track.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/transcoder.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/dovi.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/duration.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/resolution.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/video.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/registry.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/stream.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/typedefs.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/decoder/table.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/encoder/table.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:117:9: warning: an exception may be thrown in function 'Process' which should not throw exceptions [bugprone-exception-escape]
+  117 |                         void Process(const Frame& frame) noexcept override {
+      |                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:168:5: note: frame #0: unhandled exception of type 'BadOptionalAccess' may be thrown in function 'value' here
+  168 |                                 throw BadOptionalAccess();
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:144:44: note: frame #1: function 'Process' calls function 'value' here
+  144 |                                 Sample sample{pts, std::move(payload), frame.Video().value()};
+      |                                                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:169:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  169 |                 TEST_REQUIRE(after.HDR10() && before.HDR10());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:172:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  172 |                 TEST_REQUIRE(actual.Origin() == Property::HDR10::Source::Metadata);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:173:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  173 |                 TEST_REQUIRE(actual.IsHDR10Plus());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:175:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  175 |                 TEST_REQUIRE(SamePoint(original.Red(), actual.Red(), chromaTolerance, chromaTolerance));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:176:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  176 |                 TEST_REQUIRE(SamePoint(original.Green(), actual.Green(), chromaTolerance, chromaTolerance));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:177:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  177 |                 TEST_REQUIRE(SamePoint(original.Blue(), actual.Blue(), chromaTolerance, chromaTolerance));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:178:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  178 |                 TEST_REQUIRE(SamePoint(original.White(), actual.White(), chromaTolerance, chromaTolerance));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:179:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  179 |                 TEST_REQUIRE(SamePoint(original.Luminance(), actual.Luminance(), av1 ? 1 : 0, av1 ? 20 : 0));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:180:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  180 |                 TEST_REQUIRE(original.LightLevel() && actual.LightLevel());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:181:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  181 |                 TEST_REQUIRE(SamePoint(original.LightLevel().value(), actual.LightLevel().value()));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:182:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  182 |                 TEST_REQUIRE(after.Resolution().Width() == before.Resolution().Width());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:183:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  183 |                 TEST_REQUIRE(after.Resolution().Height() == before.Resolution().Height());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:184:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  184 |                 TEST_REQUIRE(SameEncodedPixelFormat(before.Color().PixelFormat(), after.Color().PixelFormat()));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:185:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  185 |                 TEST_REQUIRE(after.Color().Primaries() == before.Color().Primaries());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:186:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  186 |                 TEST_REQUIRE(after.Color().Transfer() == before.Color().Transfer());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:187:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  187 |                 TEST_REQUIRE(after.Color().Space() == before.Color().Space());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:188:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  188 |                 TEST_REQUIRE(after.Color().Range() == before.Color().Range());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:196:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  196 |                 TEST_REQUIRE(source.size() == 48);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:197:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  197 |                 TEST_REQUIRE(destination.size() == 48);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:200:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  200 |                                 TEST_REQUIRE(sample.m_pts);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:202:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |                                 TEST_REQUIRE(sample.m_pts);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:206:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  206 |                 TEST_REQUIRE(ExpectedPayload(0) != ExpectedPayload(1));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:208:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  208 |                         TEST_REQUIRE(source[index].m_payload == ExpectedPayload(index));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:209:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                         TEST_REQUIRE(destination[index].m_payload == source[index].m_payload);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:211:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                                 TEST_REQUIRE(std::abs(*destination[index].m_pts - *source[index].m_pts) <= 1000000);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:211:28: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  211 |                                 TEST_REQUIRE(std::abs(*destination[index].m_pts - *source[index].m_pts) <= 1000000);
+      |                                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:211:56: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  211 |                                 TEST_REQUIRE(std::abs(*destination[index].m_pts - *source[index].m_pts) <= 1000000);
+      |                                                                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:212:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  212 |                                 TEST_REQUIRE(std::abs(*source[index].m_pts - static_cast<std::int64_t>(index) * 1000000000 / 24) <= 1000000);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:212:28: warning: unchecked access to optional value [bugprone-unchecked-optional-access]
+  212 |                                 TEST_REQUIRE(std::abs(*source[index].m_pts - static_cast<std::int64_t>(index) * 1000000000 / 24) <= 1000000);
+      |                                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:214:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  214 |                                         TEST_REQUIRE(source[index].m_pts > source[index - 1].m_pts);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:215:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  215 |                                         TEST_REQUIRE(destination[index].m_pts > destination[index - 1].m_pts);
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:218:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  218 |                         TEST_REQUIRE(CheckVideo(source[index].m_video, destination[index].m_video, av1) == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:225:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |                 TEST_REQUIRE(file && file.value().Streams().size() == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:227:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  227 |                 TEST_REQUIRE(video && video->HDR10());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:228:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |                 TEST_REQUIRE(video->HDR10()->Origin() == Property::HDR10::Source::Metadata);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:229:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  229 |                 TEST_REQUIRE(video->HDR10()->IsHDR10Plus() == plus);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:230:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  230 |                 TEST_REQUIRE(video->Resolution().Width() == 1920);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:231:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  231 |                 TEST_REQUIRE(video->Resolution().Height() == 1080);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:236:34: warning: the parameter 'trace' of type 'StormByte::Safe::Shared<Trace>' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param]
+  236 |                 StormByte::Safe::Shared<Trace> trace, std::string_view codecName = {},
+      |                                                ^
+      |                 const                         &
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:236:41: warning: 2 adjacent parameters of 'Run' of similar type ('std::string_view') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  236 |                 StormByte::Safe::Shared<Trace> trace, std::string_view codecName = {},
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  237 |                 std::string_view implementation = {}, std::string_view decoder = {}, bool raw = false) {
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:236:58: note: the first parameter in the range is 'codecName'
+  236 |                 StormByte::Safe::Shared<Trace> trace, std::string_view codecName = {},
+      |                                                                        ^~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:237:20: note: the last parameter in the range is 'implementation'
+  237 |                 std::string_view implementation = {}, std::string_view decoder = {}, bool raw = false) {
+      |                                  ^~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:252:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  252 |                         TEST_REQUIRE(codec);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:269:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  269 |                 TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:274:49: warning: 2 adjacent parameters of 'CheckPipeline' of similar type ('std::string_view') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  274 |         int CheckPipeline(std::string_view codec = {}, std::string_view encoder = {}, std::string_view decoder = {}) {
+      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:274:66: note: the first parameter in the range is 'encoder'
+  274 |         int CheckPipeline(std::string_view codec = {}, std::string_view encoder = {}, std::string_view decoder = {}) {
+      |                                                                         ^~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:274:97: note: the last parameter in the range is 'decoder'
+  274 |         int CheckPipeline(std::string_view codec = {}, std::string_view encoder = {}, std::string_view decoder = {}) {
+      |                                                                                                        ^~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:280:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  280 |                 TEST_REQUIRE(CheckSamples(trace->m_source, trace->m_destination, av1) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:281:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  281 |                 TEST_REQUIRE(CheckFile(output, true) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:285:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  285 |                 TEST_REQUIRE(CheckSamples(trace->m_source, reopened->m_source, av1) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:286:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  286 |                 TEST_REQUIRE(CheckSamples(trace->m_source, reopened->m_destination, av1) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:296:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  296 |         TEST_REQUIRE(CheckFile(FixturePath(Fixture), true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:297:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  297 |         TEST_REQUIRE(CheckFile(FixturePath("video/hdr10_metadata_source.mkv"), false) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:310:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  310 |                 TEST_REQUIRE(row.features.Has(Feature::HDR10Plus)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:315:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  315 |                 TEST_REQUIRE(row.features.Has(Feature::HDR10Plus)
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:335:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  335 |         TEST_REQUIRE(CheckSamples(first->m_source, first->m_destination, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:339:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  339 |         TEST_REQUIRE(CheckSamples(first->m_source, second->m_source, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:340:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  340 |         TEST_REQUIRE(CheckSamples(first->m_source, second->m_destination, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:341:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  341 |         TEST_REQUIRE(CheckFile(av1, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:342:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  342 |         TEST_REQUIRE(CheckFile(hevc, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:344:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  344 |         TEST_REQUIRE(Run(hevc, OutputPath("roundtrip-reopened.mkv"), reopened) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:345:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  345 |         TEST_REQUIRE(CheckSamples(first->m_source, reopened->m_source, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:346:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  346 |         TEST_REQUIRE(CheckSamples(first->m_source, reopened->m_destination, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:349:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  349 |         TEST_REQUIRE(Run(hevc, elementary, extracted) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:350:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  350 |         TEST_REQUIRE(CheckSamples(first->m_source, extracted->m_source, true) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:358:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  358 |         TEST_REQUIRE(opened == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:359:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  359 |         TEST_REQUIRE(avformat_find_stream_info(input, nullptr) >= 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:360:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  360 |         TEST_REQUIRE(input->nb_streams == 1);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:361:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  361 |         TEST_REQUIRE(input->streams[0]->codecpar->codec_id == AV_CODEC_ID_HEVC);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:363:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  363 |         TEST_REQUIRE(codec);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:365:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  365 |         TEST_REQUIRE(decoder);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:366:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  366 |         TEST_REQUIRE(avcodec_parameters_to_context(decoder.get(), input->streams[0]->codecpar) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:367:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  367 |         TEST_REQUIRE(avcodec_open2(decoder.get(), codec, nullptr) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:370:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  370 |         TEST_REQUIRE(packet && frame);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:373:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  373 |                 TEST_REQUIRE(count < first->m_source.size());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:373:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  373 |                 TEST_REQUIRE(count < first->m_source.size());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:378:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  378 |                 TEST_REQUIRE(dynamicCount == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:378:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  378 |                 TEST_REQUIRE(dynamicCount == 1);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:380:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  380 |                 TEST_REQUIRE(dynamic && dynamic->data && dynamic->size >= sizeof(AVDynamicHDRPlus));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:380:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  380 |                 TEST_REQUIRE(dynamic && dynamic->data && dynamic->size >= sizeof(AVDynamicHDRPlus));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:382:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  382 |                 TEST_REQUIRE(payload == ExpectedPayload(count));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:382:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  382 |                 TEST_REQUIRE(payload == ExpectedPayload(count));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:383:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  383 |                 TEST_REQUIRE(payload == first->m_source[count].m_payload);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:383:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  383 |                 TEST_REQUIRE(payload == first->m_source[count].m_payload);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:386:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  386 |                 TEST_REQUIRE(mastering && mastering->data && mastering->size >= sizeof(AVMasteringDisplayMetadata));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:386:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  386 |                 TEST_REQUIRE(mastering && mastering->data && mastering->size >= sizeof(AVMasteringDisplayMetadata));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:387:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  387 |                 TEST_REQUIRE(light && light->data && light->size >= sizeof(AVContentLightMetadata));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:387:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  387 |                 TEST_REQUIRE(light && light->data && light->size >= sizeof(AVContentLightMetadata));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:390:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  390 |                 TEST_REQUIRE(display.has_primaries && display.has_luminance);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:390:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  390 |                 TEST_REQUIRE(display.has_primaries && display.has_luminance);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:394:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  394 |                                 TEST_REQUIRE(av_cmp_q(display.display_primaries[channel][coordinate],
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:394:5: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  394 |                                 TEST_REQUIRE(av_cmp_q(display.display_primaries[channel][coordinate],
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:396:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  396 |                 TEST_REQUIRE(av_cmp_q(display.white_point[0], ::AVRational{15635, 50000}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:396:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  396 |                 TEST_REQUIRE(av_cmp_q(display.white_point[0], ::AVRational{15635, 50000}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:397:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  397 |                 TEST_REQUIRE(av_cmp_q(display.white_point[1], ::AVRational{16450, 50000}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:397:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  397 |                 TEST_REQUIRE(av_cmp_q(display.white_point[1], ::AVRational{16450, 50000}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:398:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  398 |                 TEST_REQUIRE(av_cmp_q(display.max_luminance, ::AVRational{1000, 1}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:398:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  398 |                 TEST_REQUIRE(av_cmp_q(display.max_luminance, ::AVRational{1000, 1}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:399:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  399 |                 TEST_REQUIRE(av_cmp_q(display.min_luminance, ::AVRational{1, 200}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:399:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  399 |                 TEST_REQUIRE(av_cmp_q(display.min_luminance, ::AVRational{1, 200}) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:400:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  400 |                 TEST_REQUIRE(levels.MaxCLL == 1000 && levels.MaxFALL == 400);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:400:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  400 |                 TEST_REQUIRE(levels.MaxCLL == 1000 && levels.MaxFALL == 400);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:401:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  401 |                 TEST_REQUIRE(frame->width == 1920 && frame->height == 1080);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:401:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  401 |                 TEST_REQUIRE(frame->width == 1920 && frame->height == 1080);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:402:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  402 |                 TEST_REQUIRE(frame->format == AV_PIX_FMT_YUV420P10LE);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:402:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  402 |                 TEST_REQUIRE(frame->format == AV_PIX_FMT_YUV420P10LE);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:403:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  403 |                 TEST_REQUIRE(frame->color_primaries == AVCOL_PRI_BT2020);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:403:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  403 |                 TEST_REQUIRE(frame->color_primaries == AVCOL_PRI_BT2020);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:404:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  404 |                 TEST_REQUIRE(frame->color_trc == AVCOL_TRC_SMPTE2084);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:404:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  404 |                 TEST_REQUIRE(frame->color_trc == AVCOL_TRC_SMPTE2084);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:405:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  405 |                 TEST_REQUIRE(frame->colorspace == AVCOL_SPC_BT2020_NCL);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:405:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  405 |                 TEST_REQUIRE(frame->colorspace == AVCOL_SPC_BT2020_NCL);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:406:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  406 |                 TEST_REQUIRE(frame->color_range == AVCOL_RANGE_MPEG);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:406:3: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  406 |                 TEST_REQUIRE(frame->color_range == AVCOL_RANGE_MPEG);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:413:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  413 |                         TEST_REQUIRE(audit() == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:413:4: warning: inside a lambda, '__func__' expands to the name of the function call operator; consider capturing the name of the enclosing function explicitly [bugprone-lambda-function-name]
+  413 |                         TEST_REQUIRE(audit() == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:29: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                           ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:420:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  420 |                 TEST_REQUIRE(packet->stream_index == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:422:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  422 |                 TEST_REQUIRE(!av_packet_get_side_data(packet.get(), AV_PKT_DATA_DYNAMIC_HDR10_PLUS, &metadataSize));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:423:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  423 |                 TEST_REQUIRE(avcodec_send_packet(decoder.get(), packet.get()) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:424:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  424 |                 TEST_REQUIRE(receive() == AVERROR(EAGAIN));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:427:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  427 |         TEST_REQUIRE(read == AVERROR_EOF);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:428:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  428 |         TEST_REQUIRE(avcodec_send_packet(decoder.get(), nullptr) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:429:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  429 |         TEST_REQUIRE(receive() == AVERROR_EOF);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/hdr10plus_test.cxx:430:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  430 |         TEST_REQUIRE(count == 48);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/hdr10plus/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/runners.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/visibility.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

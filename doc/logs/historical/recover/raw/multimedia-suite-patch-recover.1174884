@@ -1,0 +1,69 @@
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1348:27: runtime error: passing zero to __builtin_clz(), which is not a valid argument
+    #0 0x55a29a970b0c in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1348:13
+    #1 0x55a29a970b0c in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1507:29
+    #2 0x55a29a94a80f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x55a29a953e2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x55a29a8a02f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x55a29a89a1f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x55a29abaa003 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f6c566ad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f6c567261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-builtin-use ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1348:27 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23: runtime error: shift exponent 1697443457 is too large for 32-bit type 'int'
+    #0 0x55a29a970ba4 in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23
+    #1 0x55a29a970ba4 in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1507:29
+    #2 0x55a29a94a80f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x55a29a953e2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x55a29a8a02f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x55a29a89a1f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x55a29abaa003 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f6c566ad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f6c567261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-exponent ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:23 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36: runtime error: shift exponent 1697443458 is too large for 32-bit type 'uint32_t' (aka 'unsigned int')
+    #0 0x55a29a970c41 in get_best15_from32 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36
+    #1 0x55a29a970c41 in adm_decouple_s123_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1507:29
+    #2 0x55a29a94a80f in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c
+    #3 0x55a29a953e2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #4 0x55a29a8a02f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #5 0x55a29a89a1f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #6 0x55a29abaa003 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #7 0x7f6c566ad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #8 0x7f6c567261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-exponent ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:1350:36 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2923:79: runtime error: left shift of negative value -4240
+    #0 0x55a29a9c7921 in adm_dwt2_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2923:79
+    #1 0x55a29a94a68d in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:2941:21
+    #2 0x55a29a953e2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #3 0x55a29a8a02f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #4 0x55a29a89a1f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #5 0x55a29abaa003 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #6 0x7f6c566ad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f6c567261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-base ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2923:79 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2924:79: runtime error: left shift of negative value -7345
+    #0 0x55a29a9c7950 in adm_dwt2_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2924:79
+    #1 0x55a29a94a68d in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:2941:21
+    #2 0x55a29a953e2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #3 0x55a29a8a02f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #4 0x55a29a89a1f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #5 0x55a29abaa003 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #6 0x7f6c566ad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f6c567261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-base ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2924:79 
+../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2925:79: runtime error: left shift of negative value -15826
+    #0 0x55a29a9c799e in adm_dwt2_16_avx2 /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2925:79
+    #1 0x55a29a94a68d in integer_compute_adm /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:2941:21
+    #2 0x55a29a953e2a in extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/integer_adm.c:3288:5
+    #3 0x55a29a8a02f2 in vmaf_feature_extractor_context_extract /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/feature/feature_extractor.c:228:15
+    #4 0x55a29a89a1f4 in threaded_extract_batch_func /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/libvmaf.c:565:19
+    #5 0x55a29abaa003 in vmaf_thread_pool_runner /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/vmaf/../../../../../thirdparty/vmaf/src/libvmaf/src/thread_pool.c:94:13
+    #6 0x7f6c566ad670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #7 0x7f6c567261db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-base ../../../../../thirdparty/vmaf/src/libvmaf/src/feature/x86/adm_avx2.c:2925:79 

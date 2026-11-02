@@ -1,0 +1,48 @@
+test	status	seconds	sanitizer_reports
+preview.test_av_seek_switch_epochs	FAIL	1.93504	
+preview.test_hdr_preview_tone_mapping	FAIL	8.88929	
+preview.test_hdr_preview_preserves_signal	FAIL	6.53036	
+preview.test_live_audio_selection	FAIL	15.7318	
+preview.test_live_audio_tracks	FAIL	8.1251	
+preview.test_live_audio_backpressure_errors	FAIL	5.06432	==2169597==ERROR: LeakSanitizer: detected memory leaks
+preview.test_explicit_errors	FAIL	3.9895	==2169628==ERROR: LeakSanitizer: detected memory leaks
+preview.test_recovers_rejected_initial_avi_mp3_packet	FAIL	6.50121	==2169858==ERROR: LeakSanitizer: detected memory leaks
+preview.test_recovers_rejected_avi_mp3_packet	FAIL	6.76486	==2169862==ERROR: LeakSanitizer: detected memory leaks
+preview.test_recovers_rejected_avi_video_packet	FAIL	6.76693	==2169886==ERROR: LeakSanitizer: detected memory leaks
+preview.test_subtitle_decode	FAIL	9.57161	
+preview.test_faulted_reader_retained	FAIL	9.50395	
+file.test_progress_duration_hint_skips_scan	FAIL	20.0551	
+pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata	FAIL	1.52534	
+pipeline.test_hardware_h264_nvenc_capability	FAIL	0.317738	
+pipeline.test_hardware_h264_nvenc_10bit_capability	FAIL	0.354633	
+pipeline.test_hardware_hevc_nvenc_capability	FAIL	0.293709	
+pipeline.test_reencode_dovi_only	FAIL	1.05864	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_reencoded_dovi_audit_and_vmaf_frame_counts	FAIL	1.21802	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_reencode_dovi_hdr10	FAIL	1.05229	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_watermark_dovi_only	FAIL	1.6706	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_watermark_dovi_hdr10	FAIL	1.92895	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_replace_frame_dovi_only	FAIL	1.12883	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_replace_frame_dovi_hdr10	FAIL	1.21052	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.h:128:64: runtime error: shift exponent 64 is too large for 64-bit type 'uint64_t' (aka 'unsigned long')
+pipeline.test_watermark_svt_av1_dovi_only	FAIL	2.55713	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/pic_operators_intrin_avx2.c:300:71: runtime error: load of misaligned address 0x7b5475ce597f for type 'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
+pipeline.test_hevc_av1_hevc_hdr10plus	FAIL	56.029	
+pipeline.test_svt_av1_cancel_repeated	FAIL	1.70182	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/convolve_avx2.h:126:55: runtime error: load of misaligned address 0x7f9dc4adf386 for type 'const int32_t' (aka 'const int'), which requires 4 byte alignment
+pipeline.test_nvenc_encodes_h264_mp4	FAIL	0.376934	
+pipeline.test_nvenc_encodes_h264_10bit_matroska	FAIL	1.43362	
+pipeline.test_nvenc_encodes_hevc_main_matroska	FAIL	0.390009	
+pipeline.test_nvenc_encodes_hevc_main10_matroska	FAIL	0.436278	
+pipeline.test_watermark_path_and_embedded_binary	FAIL	15.8193	==2196915==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_watermark_sdr_hdr_opacity_matches	FAIL	26.8012	
+pipeline.test_watermark_preserves_uncovered_samples	FAIL	13.1299	==2197320==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_watermark_svg_path_buffer_and_scaling	FAIL	24.1535	
+pipeline.test_watermark_svg_alpha_and_hdr	FAIL	7.12147	==2198932==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_watermark_svg_invalid_passthrough	FAIL	11.6633	==2199123==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_libvorbis_encodes_surround_matroska	FAIL	1.13919	==2202173==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_libvorbis_decode_roundtrip	FAIL	1.56982	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/sharedbook.c:425:30: runtime error: left shift of 16 by 27 places cannot be represented in type 'int'
+pipeline.test_fdk_aac_encodes_stereo_mp4	FAIL	1.06825	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/adj_thr.cpp:527:57: runtime error: left shift of negative value -5543480
+pipeline.test_fdk_aac_encodes_surround_mp4	FAIL	0.458565	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/fdk-aac/src/libAACenc/src/intensity.cpp:403:27: runtime error: left shift of negative value -196038
+pipeline.test_filter_decimate	FAIL	2.6532	==2206307==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_filter_degrain	FAIL	3.67524	==2206580==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_filter_analytics_cancel_mid_encode	FAIL	6.26797	==2208130==ERROR: LeakSanitizer: detected memory leaks
+pipeline.test_interleave_encoded_video_and_audio	FAIL	1.37991	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/convolve_avx2.c:378:45: runtime error: load of misaligned address 0x7b373b085f97 for type 'int32_t' (aka 'int'), which requires 4 byte alignment
+pipeline.test_interleave_encoded_video_remuxed_audio	FAIL	1.35527	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/convolve_avx2.c:378:45: runtime error: load of misaligned address 0x7bbe7d7def97 for type 'int32_t' (aka 'int'), which requires 4 byte alignment
+pipeline.test_interleave_encoded_video_loudnorm_audio	FAIL	2.34235	/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/svt-av1/src/Source/Lib/ASM_AVX2/convolve_avx2.c:378:45: runtime error: load of misaligned address 0x7be2a5956f97 for type 'int32_t' (aka 'int'), which requires 4 byte alignment

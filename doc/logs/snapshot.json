@@ -1,0 +1,117 @@
+{
+  "captured_at": "2026-11-02T05:08:36.881314+00:00",
+  "multimedia_head_before_evidence_commit": "e27e3560610f87ae04e34f6bcdee0c656cb3c755",
+  "multimedia_worktree_scope": "Three pre-existing Transcoder OOM files dirty; exact patch preserved separately.",
+  "provider_revisions": {
+    "ffmpeg": {
+      "base": "5a215d7ce4de21ec5c34214994eea0ac13dc9054",
+      "patched_commit": "a91ed5a0c4d5b99db20164fcfc72a7e5f9155249",
+      "patched_tree": "30cc5571ffc79e335487f9bd680139e38efb8d25"
+    },
+    "svt-av1": {
+      "base": "9292ec8e32bce26f781f277ec8739b53426c4300",
+      "patched_commit": "d3444dbfb909937511cb066bd05cda31f3fed657",
+      "patched_tree": "107b0deb84feecf8edb29d50b943ab6bc1c1b897"
+    },
+    "kvazaar": {
+      "base": "6040962bed5cc68c5ad01234c38c08b8b2822068",
+      "patched_commit": "22d90014fc9ae4c4204ddb4ff91b0665c3bb90ef",
+      "patched_tree": "64081d4612b8f5e32948ddb9ef93e53637115eb2"
+    },
+    "x265": {
+      "base": "e444744c03978c1fb4e037168967020cf2648427",
+      "patched_commit": "ddd324790cdf4191f45aca0ac6e46a39b07c3bca",
+      "patched_tree": "28bda6feb13f07e328d2463ded9ed6b1e6c2b5ed"
+    },
+    "vorbis": {
+      "base": "0657aee69dec8508a0011f47f3b69d7538e9d262",
+      "patched_commit": "3888e0046427e76880e0cccce049a0369d8a4ba7",
+      "patched_tree": "6a0d512110e2323e19990ca575ed0ef05811cc99"
+    },
+    "vmaf": {
+      "base": "74f930d17de8c58e7c2ce55e2b897b0030ebd8ef",
+      "patched_commit": "99314d050e9ef11a0dca494ed313721299898371",
+      "patched_tree": "81806ab13d9ad4c75b7206208c1daf2acad093dc"
+    },
+    "fdk-aac": {
+      "base": "716f4394641d53f0d79c9ddac3fa93b03a49f278",
+      "patched_commit": "63e28cc956cff490e381920302d2c9ea29e24e6f",
+      "patched_tree": "9975117fbaf1e752c8d2487b3a30c78b8552a133"
+    },
+    "x264": {
+      "base": "00852f599572d10798b2dafd2c5286213d0ce795",
+      "patched_commit": "d463c0f026c611ad92a2580c6bad2b83951207c8",
+      "patched_tree": "040669d3708b5f1409ad47cab4ad2fa1aa3d84ad"
+    },
+    "lame": {
+      "base": "1f5cc9487284d5950343aa5d4f70de433468070a",
+      "patched_commit": "71877a6223161ff0cee78a3a7e5a9edf2a48e86d",
+      "patched_tree": "1f1daac6250bd6718939a1b5f159be44e416062f"
+    },
+    "openh264": {
+      "base": "652bdb7719f30b52b08e506645a7322ff1b2cc6f",
+      "patched_commit": "f867a28e11e3ea18dc38732ee9bf12be38286717",
+      "patched_tree": "7f3be2286a7bd2c35172efb5161698bc8d0dfa0f"
+    }
+  },
+  "tools": {
+    "clang": "clang version 22.1.8+libcxx",
+    "cmake": "cmake version 4.3.5",
+    "git": "git version 2.56.0",
+    "clang_tidy": "LLVM (http://llvm.org/):"
+  },
+  "build_flags": [
+    "BUILD_SHARED_LIBS:BOOL=ON",
+    "CMAKE_CXX_COMPILER:STRING=/usr/lib/llvm/22/bin/clang++-22",
+    "CMAKE_CXX_FLAGS:STRING=-stdlib=libc++ -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "CMAKE_C_COMPILER:STRING=/usr/lib/llvm/22/bin/clang-22",
+    "CMAKE_C_FLAGS:STRING= -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "CMAKE_EXE_LINKER_FLAGS:STRING=-shared-libasan -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "CMAKE_SHARED_LINKER_FLAGS:STRING=-shared-libasan -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ENABLE_ASAN:BOOL=ON",
+    "ENABLE_LTO:BOOL=OFF",
+    "ENABLE_PGO:BOOL=OFF",
+    "ENABLE_TEST:BOOL=ON",
+    "WITH_GPL:BOOL=ON",
+    "WITH_NONFREE:BOOL=ON",
+    "WITH_STORMBYTE:STRING=BUNDLED"
+  ],
+  "local_stormbyte_zip_files_available_now": [
+    {
+      "filename": "StormByte-2.2.3-linux-x64-libc++.zip",
+      "bytes": 8769499,
+      "sha256": "4d61a000aaaf67f92adf1b7adddebdea407dbab7136d80727c2421641294f851"
+    },
+    {
+      "filename": "StormByte-Buffer-2.0.6-linux-x64-libc++.zip",
+      "bytes": 1622047,
+      "sha256": "0931771d7e28a1214e4e479255d7e9ff6084e31cca70420a42665d3b9be685a9"
+    },
+    {
+      "filename": "StormByte-Logger-2.0.6-linux-x64-libc++.zip",
+      "bytes": 835153,
+      "sha256": "3d7b513c5d5f2ddb1e3bbf399182c50d62e3244a96a6806830b6aebb67124db4"
+    },
+    {
+      "filename": "StormByte-System-2.1.3-linux-x64-libc++.zip",
+      "bytes": 742981,
+      "sha256": "bb0aed174e696565a3b5ad681930cc2916afdde9158791e3f97c8269dfcd2eda"
+    }
+  ],
+  "package_warning": "Hashes describe files available at preservation time, not independently authenticated historic build inputs.",
+  "provider_batch": {
+    "passed": 13,
+    "failed": 1,
+    "skipped": 0,
+    "exit_code": 8
+  },
+  "full_strict": {
+    "passed": 377,
+    "failed": 47,
+    "skipped": 11,
+    "exit_code": 8,
+    "seconds": 680.17
+  },
+  "upstream_patch_count": 48,
+  "source_archives_and_binaries_included": false
+}

@@ -1,0 +1,31 @@
+[0/2] Re-checking globbed directories...
+[0/327] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip... (cached) OK
+[1/327] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip... (cached) OK
+[2/327] [BuildMaster/Core     ]: reset fail markers
+[3/327] [BuildMaster/Ninja    ]: Compiling libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[4/327] [BuildMaster/Ninja    ]: Compiling OGG container
+-- [BuildMaster/Component]: stamp hit ogg (build)
+[5/327] [BuildMaster/Ninja    ]: Installing libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[6/327] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[7/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[8/327] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+[9/327] [BuildMaster/Ninja    ]: Installing OGG container
+[10/327] [BuildMaster/CMake    ]: Configuring rubberband
+[11/327] [BuildMaster/CMake    ]: Configuring vorbis
+[12/327] [BuildMaster/CMake    ]: Configuring x265
+[13/327] [BuildMaster/Ninja    ]: Compiling Opus codec
+[14/327] [BuildMaster/Ninja    ]: Compiling rubberband
+[15/327] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+[16/327] [BuildMaster/Ninja    ]: Compiling kvazaar
+[17/327] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[18/327] [BuildMaster/Ninja    ]: Compiling VPX codec
+[19/327] [BuildMaster/Ninja    ]: Compiling libwebp
+[20/327] [BuildMaster/Ninja    ]: Compiling X264 codec
+[21/327] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+[22/327] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+[23/327] [BuildMaster/Ninja    ]: Compiling X265 codec
+ninja: build stopped: interrupted by user.

@@ -1,0 +1,33 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:181:50: runtime error: left shift of 155992262 by 4 places cannot be represented in type 'int'
+    #0 0x7f27677247bf in putbits2 /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:181:50
+    #1 0x7f2767726f58 in Huffmancode /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:627:9
+    #2 0x7f27677259df in ShortHuffmancodebits /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:649:12
+    #3 0x7f276771efcb in writeMainData /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:718:34
+    #4 0x7f276771efcb in format_bitstream /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:932:13
+    #5 0x7f2767745da8 in lame_encode_mp3_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/encoder.c:544:12
+    #6 0x7f2767713197 in lame_encode_buffer_sample_t /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1793:19
+    #7 0x7f2767713197 in lame_encode_buffer_template /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1904:20
+    #8 0x7f2767715059 in lame_encode_buffer /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:1915:12
+    #9 0x7f2767715059 in lame_encode_flush /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/lame.c:2180:16
+    #10 0x7f2760657685 in mp3lame_encode_frame /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/libmp3lame.c:235:23
+    #11 0x7f27630df735 in ff_encode_encode_cb /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/encode.c:298:11
+    #12 0x7f27630e2d4e in encode_simple_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/encode.c:378:15
+    #13 0x7f27630e2d4e in encode_simple_receive_packet /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/encode.c:391:15
+    #14 0x7f27630e2d4e in encode_receive_packet_internal /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/encode.c:423:15
+    #15 0x7f27630e37ff in avcodec_receive_packet /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavcodec/encode.c:590:15
+    #16 0x7f275f516024 in StormByte::Multimedia::FFmpeg::AVEncoder::ReceivePacket(StormByte::Multimedia::FFmpeg::AVPacket&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx:812:12
+    #17 0x7f275f43fb87 in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::DrainOne(StormByte::Multimedia::Pipeline::Encoder&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:440:33
+    #18 0x7f275f440d5a in StormByte::Multimedia::Backend::Pipeline::Detail::Encoder::Audio::Flush(StormByte::Multimedia::Pipeline::Encoder&) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx:533:9
+    #19 0x7f275f492210 in StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Encode::Flush() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx:159:23
+    #20 0x7f275f676d46 in (anonymous namespace)::MountedWorker::Process(StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Item>) /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/step.cxx:89:15
+    #21 0x7f275f4bd960 in StormByte::Multimedia::Backend::Pipeline::Pumper::PumpPop() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:228:15
+    #22 0x7f275f4bdeb3 in operator() /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:114:3
+    #23 0x7f275f4bdeb3 in __invoke<(lambda at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:91:37)> /usr/include/c++/v1/__type_traits/invoke.h:90:27
+    #24 0x7f275f4bdeb3 in __apply_tuple_impl<(lambda at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:91:37), std::__1::tuple<> > /usr/include/c++/v1/tuple:1400:29
+    #25 0x7f275f4bdeb3 in apply<(lambda at /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/pumper.cxx:91:37), std::__1::tuple<> > /usr/include/c++/v1/tuple:1404:29
+    #26 0x7f275f4bdeb3 in StormByte::Safe::Detail::ThreadState<StormByte::Multimedia::Backend::Pipeline::Pumper::Launch()::$_0>::Run(void*) /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include/StormByte/safe/thread.hxx:186:6
+    #27 0x7f27343b5cba in StormByte::Safe::Detail::(anonymous namespace)::RunLaunch(void*) thread.cxx
+    #28 0x7f2733f88670 in start_thread /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/pthread_create.c:454:8
+    #29 0x7f27340011db in __GI___clone3 /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:78
+
+SUMMARY: UndefinedBehaviorSanitizer: invalid-shift-base /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/mp3lame/cmake-port/src/libmp3lame/bitstream.c:181:50 

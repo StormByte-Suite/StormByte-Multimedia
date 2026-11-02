@@ -1,0 +1,454 @@
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  1%] [BuildMaster/Core     ]: reset fail markers
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+[  1%] Built target _bm_bin_StormByte-System_dl
+[  1%] Built target _bm_bin_StormByte-Logger_dl
+[  1%] Built target _bm_bin_StormByte-Buffer_dl
+[  1%] Built target _bm_bin_StormByte-Base_dl
+[  1%] Built target buildmaster_build_init
+[  2%] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  2%] Built target StormByte-System_build
+[  2%] Built target StormByte-Buffer_build
+[  2%] Built target StormByte-Logger_build
+[  2%] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[  2%] Built target StormByte-Base_build
+[  3%] [BuildMaster/Ninja    ]: Compiling zimg
+[  3%] [BuildMaster/Ninja    ]: Compiling VMAF library
+[  4%] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[  5%] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[  5%] [BuildMaster/Ninja    ]: Compiling OGG container
+[  5%] [BuildMaster/Ninja    ]: Compiling dav1d
+[  5%] [BuildMaster/Ninja    ]: Compiling openh264
+[  6%] [BuildMaster/Ninja    ]: Compiling libebur128
+[  7%] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+[  7%] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[  7%] [BuildMaster/Ninja    ]: Compiling LunaSVG
+[  7%] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+[  7%] [BuildMaster/Ninja    ]: Compiling kvazaar
+[  7%] [BuildMaster/Ninja    ]: Compiling X264 codec
+[  8%] [BuildMaster/Ninja    ]: Compiling libaom
+[  8%] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[  8%] [BuildMaster/Ninja    ]: Compiling leptonica
+[  9%] [BuildMaster/Ninja    ]: Compiling VPX codec
+[ 10%] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[ 10%] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+[ 10%] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[ 10%] [BuildMaster/Ninja    ]: Compiling Opus codec
+[ 10%] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[ 10%] [BuildMaster/Ninja    ]: Compiling libwebp
+[ 10%] Built target _bm_bin_StormByte-Base_unpack
+[ 10%] Built target ffnvcodec-headers_build
+[ 10%] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+[ 10%] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[ 10%] Built target StormByte-Base_install
+[ 10%] Built target _bm_bin_StormByte-Logger_unpack
+[ 11%] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[ 11%] Built target StormByte-Logger_install
+[ 11%] Built target ffnvcodec-headers_install
+[ 11%] Built target _bm_bin_StormByte-System_unpack
+[ 11%] Built target ogg_build
+[ 11%] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[ 11%] Built target StormByte-System_install
+[ 11%] [BuildMaster/Ninja    ]: Installing OGG container
+[ 11%] Built target _bm_bin_StormByte-Buffer_unpack
+[ 11%] Built target StormByte-Buffer_install
+[ 11%] Built target ogg_install
+[ 11%] Built target bzip2_build
+[ 11%] [BuildMaster/CMake    ]: Configuring vorbis
+[ 12%] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+[ 12%] Built target bzip2_install
+[ 12%] Built target mp3lame_build
+[ 12%] Built target zlib_build
+[ 12%] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+[ 13%] [BuildMaster/Ninja    ]: Installing zlib compression library
+[ 13%] Built target ebur128_build
+[ 13%] [BuildMaster/Ninja    ]: Installing libebur128
+[ 13%] Built target lzma_build
+[ 13%] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+[ 13%] Built target samplerate_build
+[ 13%] [BuildMaster/Ninja    ]: Installing libsamplerate
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 13%] Built target ebur128_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 13%] Built target lunasvg_build
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 13%] Built target zlib_install
+[ 14%] [BuildMaster/Ninja    ]: Installing LunaSVG
+[ 14%] Built target lunasvg_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 14%] Built target samplerate_install
+[ 14%] [BuildMaster/CMake    ]: Configuring rubberband
+[ 14%] Built target mp3lame_install
+[ 14%] Built target vorbis_configure
+[ 14%] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+[ 14%] Built target lzma_install
+[ 14%] Built target opus_build
+[ 14%] Built target kvazaar_build
+[ 14%] [BuildMaster/Ninja    ]: Installing Opus codec
+[ 15%] [BuildMaster/Ninja    ]: Installing kvazaar
+[ 15%] Built target leptonica_build
+[ 15%] Built target tessdata_build
+[ 15%] [BuildMaster/Ninja    ]: Installing leptonica
+[ 15%] [BuildMaster/Ninja    ]: Installing Tesseract traineddata
+[ 15%] Built target webp_build
+[ 17%] [BuildMaster/Ninja    ]: Installing libwebp
+[ 17%] Built target fdk-aac_build
+[ 17%] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 17%] Built target opus_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 17%] Built target kvazaar_install
+[ 17%] Built target vorbis_build
+[ 17%] [BuildMaster/Ninja    ]: Installing Vorbis codec
+[ 17%] Built target fdk-aac_install
+[ 17%] Built target webp_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 17%] Built target leptonica_install
+[ 18%] [BuildMaster/CMake    ]: Configuring tesseract
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 18%] Built target vorbis_install
+[ 18%] Built target tessdata_install
+[ 18%] Built target vmaf_build
+[ 19%] [BuildMaster/Ninja    ]: Installing VMAF library
+[ 19%] Built target openh264_build
+[ 20%] [BuildMaster/Ninja    ]: Installing openh264
+[ 20%] Built target rubberband_configure
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 21%] [BuildMaster/Ninja    ]: Compiling rubberband
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 21%] Built target openh264_install
+[ 21%] Built target vmaf_install
+[ 21%] Built target tesseract_configure
+[ 21%] [BuildMaster/Ninja    ]: Compiling tesseract
+[ 21%] Built target zimg_build
+[ 21%] [BuildMaster/Ninja    ]: Installing zimg
+[ 21%] Built target zimg_install
+[ 21%] Built target rubberband_build
+[ 21%] [BuildMaster/Ninja    ]: Installing rubberband
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 21%] Built target rubberband_install
+[ 21%] Built target tesseract_build
+[ 21%] [BuildMaster/Ninja    ]: Installing tesseract
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 21%] Built target tesseract_install
+[ 21%] Built target aom_build
+[ 22%] [BuildMaster/Ninja    ]: Installing libaom
+[ 22%] Built target aom_install
+[ 22%] Built target svt-av1_build
+[ 22%] [BuildMaster/Ninja    ]: Installing SVT-AV1
+[ 22%] Built target dav1d_build
+[ 22%] [BuildMaster/Ninja    ]: Installing dav1d
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 22%] Built target dav1d_install
+[ 22%] Built target svt-av1_install
+[ 22%] Built target x264_build
+[ 22%] [BuildMaster/Ninja    ]: Installing X264 codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 22%] Built target x264_install
+[ 22%] Built target vpx_build
+[ 22%] [BuildMaster/Ninja    ]: Installing VPX codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 22%] Built target vpx_install
+[ 22%] Built target x265-12bit_build
+[ 22%] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+[ 22%] Built target x265-12bit_install
+[ 22%] Built target x265-10bit_build
+[ 22%] [BuildMaster/CMake    ]: Configuring x265
+[ 22%] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+[ 22%] Built target x265-10bit_install
+[ 22%] Built target x265_configure
+[ 23%] [BuildMaster/Ninja    ]: Compiling X265 codec
+[ 23%] Built target x265_build
+[ 23%] [BuildMaster/Ninja    ]: Installing X265 codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 23%] Built target x265_install
+[ 23%] Built target ffmpeg-plugins_install
+[ 23%] [BuildMaster/CMake    ]: Configuring ffmpeg
+[ 23%] Built target ffmpeg_configure
+[ 24%] [BuildMaster/Ninja    ]: Compiling FFmpeg
+[ 24%] Built target ffmpeg_build
+[ 24%] [BuildMaster/Ninja    ]: Installing FFmpeg
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 24%] Built target ffmpeg_install
+[ 24%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o
+[ 24%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/audio.cxx.o
+[ 24%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o
+[ 24%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/passthrough.cxx.o
+[ 24%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/content.cxx.o
+[ 24%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o
+[ 25%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/file_avio.cxx.o
+[ 25%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o
+[ 25%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/generic.cxx.o
+[ 26%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o
+[ 26%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o
+[ 26%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/mux.cxx.o
+[ 27%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx.o
+[ 27%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx.o
+[ 28%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/source.cxx.o
+[ 28%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx.o
+[ 28%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/sink.cxx.o
+[ 28%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/video.cxx.o
+[ 28%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx.o
+[ 29%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o
+[ 30%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.o
+[ 30%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o
+[ 31%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.cxx.o
+[ 31%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx.o
+[ 31%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx.o
+[ 31%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/filter.cxx.o
+[ 31%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.cxx.o
+[ 31%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/matroska.cxx.o
+[ 32%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/factory.cxx.o
+[ 34%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/muxer_format.cxx.o
+[ 34%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/mp4.cxx.o
+[ 34%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/webm.cxx.o
+[ 35%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx.o
+[ 35%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/encoder.cxx.o
+[ 35%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/frame.cxx.o
+[ 36%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/packet.cxx.o
+[ 36%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pipe.cxx.o
+[ 36%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pumper.cxx.o
+[ 36%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o
+[ 37%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/worker.cxx.o
+[ 37%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/simple_player.cxx.o
+[ 37%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/zimg/zimg.cxx.o
+[ 38%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/detail/locale.cxx.o
+[ 38%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/detail/probe.cxx.o
+[ 38%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSF.cxx.o
+[ 39%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.cxx.o
+[ 39%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVCodecParameters.cxx.o
+[ 39%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx.o
+[ 40%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx.o
+[ 40%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx.o
+[ 40%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVStream.cxx.o
+[ 40%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx.o
+[ 41%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AudioFifo.cxx.o
+[ 41%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Dictionary.cxx.o
+[ 41%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Swr.cxx.o
+[ 42%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/video_input.cxx.o
+[ 42%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Sws.cxx.o
+[ 42%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/log.cxx.o
+[ 42%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/bitmap.cxx.o
+[ 43%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/engine.cxx.o
+[ 43%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/exception.cxx.o
+[ 43%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/tessdata.cxx.o
+[ 44%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/pipeline/route.cxx.o
+[ 44%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/attachment.cxx.o
+[ 44%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/codec.cxx.o
+[ 45%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/container.cxx.o
+[ 45%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/exception.cxx.o
+[ 45%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/encoder_info.cxx.o
+[ 45%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/features.cxx.o
+[ 46%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVChannelLayout.cxx.o
+[ 46%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx.o
+[ 46%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFrame.cxx.o
+[ 47%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVPacket.cxx.o
+[ 47%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/exception.cxx.o
+[ 47%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/property.cxx.o
+[ 48%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/typedefs.cxx.o
+[ 48%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/file.cxx.o
+[ 48%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/metadata/file.cxx.o
+[ 48%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/metadata/stream.cxx.o
+[ 50%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/attachment.cxx.o
+[ 50%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/audio.cxx.o
+[ 50%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/base.cxx.o
+[ 51%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/subtitle.cxx.o
+[ 51%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/video.cxx.o
+[ 51%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/decoder.cxx.o
+[ 52%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/demuxer.cxx.o
+[ 52%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/encoder.cxx.o
+[ 52%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/exception.cxx.o
+[ 52%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters.cxx.o
+[ 53%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx.o
+[ 53%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx.o
+[ 53%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx.o
+[ 54%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx.o
+[ 54%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx.o
+[ 54%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx.o
+[ 55%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx.o
+[ 55%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx.o
+[ 55%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx.o
+[ 55%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx.o
+[ 56%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx.o
+[ 56%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx.o
+[ 56%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/rubberband.cxx.o
+[ 57%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/upmix.cxx.o
+[ 57%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx.o
+[ 57%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/report.cxx.o
+[ 57%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/atadenoise.cxx.o
+[ 58%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/bm3d.cxx.o
+[ 58%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/bwdif.cxx.o
+[ 58%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/cas.cxx.o
+[ 59%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/crop.cxx.o
+[ 59%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deband.cxx.o
+[ 59%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/decimate.cxx.o
+[ 60%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx.o
+[ 60%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx.o
+[ 60%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fftdnoiz.cxx.o
+[ 60%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx.o
+[ 61%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/format.cxx.o
+[ 61%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fps.cxx.o
+[ 61%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/hqdn3d.cxx.o
+[ 62%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/interpolate.cxx.o
+[ 62%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/nlmeans.cxx.o
+[ 62%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/pad.cxx.o
+[ 63%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/scale.cxx.o
+[ 63%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/tonemap.cxx.o
+[ 63%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/vaguedenoiser.cxx.o
+[ 63%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx.o
+[ 64%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/yadif.cxx.o
+[ 64%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/frame.cxx.o
+[ 64%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/muxer.cxx.o
+[ 65%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/packet.cxx.o
+[ 65%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/plan.cxx.o
+[ 65%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/progress.cxx.o
+[ 67%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/remuxer.cxx.o
+[ 67%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/side_data.cxx.o
+[ 67%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/step.cxx.o
+[ 67%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/telemetry.cxx.o
+[ 68%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/track.cxx.o
+[ 68%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/transcoder.cxx.o
+[ 68%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/audio.cxx.o
+[ 69%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/av_rational.cxx.o
+[ 69%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/color.cxx.o
+[ 69%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/dovi.cxx.o
+[ 70%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/duration.cxx.o
+[ 70%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/hdr10.cxx.o
+[ 70%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/point.cxx.o
+[ 70%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/resolution.cxx.o
+[ 71%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/video.cxx.o
+[ 71%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/registry.cxx.o
+[ 71%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/stream.cxx.o
+[ 72%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/tables/tables_unity.cxx.o
+[ 72%] Linking CXX shared library libStormByte-Multimedia.so
+[ 72%] Built target StormByte-Multimedia
+[ 72%] Building CXX object test/pipeline/CMakeFiles/multimedia_pipeline_test_support.dir/helpers.cxx.o
+[ 72%] Building CXX object test/CMakeFiles/MultimediaSimplePlayerTests.dir/simple_player_test.cxx.o
+[ 72%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/file/file_avio_test.cxx.o
+[ 72%] Building CXX object test/file/CMakeFiles/MultimediaFileTests.dir/file_test.cxx.o
+[ 72%] Building CXX object test/registry/CMakeFiles/MultimediaRegistryTests.dir/registry_test.cxx.o
+[ 73%] Building CXX object test/CMakeFiles/MultimediaLogTests.dir/log_test.cxx.o
+[ 73%] Building CXX object test/pipeline/analytics/CMakeFiles/MultimediaPipelineVmafApiTests.dir/vmaf_api_test.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/video_input/video_input_test.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/helpers.cxx.o
+[ 74%] Building CXX object test/registry/CMakeFiles/MultimediaRegistryAllocationTests.dir/allocation_failure_test.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/MultimediaLogTests.dir/__/lib/private/StormByte/multimedia/log.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/tables/encoder/video.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/interleave/interleave_test.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/hdr10plus/hdr10plus_test.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/video/video_test.cxx.o
+[ 74%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/video_codecs/video_codec_test.cxx.o
+[ 75%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/filters/content_video_test.cxx.o
+[ 76%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.o
+[ 76%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx.o
+[ 76%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/private/StormByte/multimedia/backend/file_avio.cxx.o
+[ 77%] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/tables/decoder/video.cxx.o
+[ 77%] Linking CXX executable MultimediaPipelineVmafApiTests
+[ 77%] Built target MultimediaPipelineVmafApiTests
+[ 77%] Linking CXX executable MultimediaRegistryTests
+[ 77%] Built target MultimediaRegistryTests
+[ 77%] Linking CXX executable MultimediaFileTests
+[ 77%] Built target MultimediaFileTests
+[ 78%] Linking CXX static library libmultimedia_pipeline_test_support.a
+[ 78%] Built target multimedia_pipeline_test_support
+[ 78%] Building CXX object test/pipeline/audio_codecs/CMakeFiles/MultimediaPipelineAudioCodecTests.dir/audio_codec_test.cxx.o
+[ 78%] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineFilterTests.dir/filter_test.cxx.o
+[ 79%] Building CXX object test/pipeline/subtitle_header/CMakeFiles/MultimediaPipelineSubtitleHeaderTests.dir/subtitle_header_test.cxx.o
+[ 79%] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaOcrModelTests.dir/model_reader_test.cxx.o
+[ 79%] Building CXX object test/pipeline/implementation/CMakeFiles/MultimediaPipelineImplementationTests.dir/implementation_test.cxx.o
+[ 79%] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineNlMeansTests.dir/nlmeans_plane_test.cxx.o
+[ 79%] Building CXX object test/pipeline/mux_policy/CMakeFiles/MultimediaPipelineMuxPolicyTests.dir/mux_policy_test.cxx.o
+[ 79%] Building CXX object test/pipeline/CMakeFiles/MultimediaPipelineCeilingTests.dir/ceiling_test.cxx.o
+[ 79%] Building CXX object test/pipeline/subtitle_codecs/CMakeFiles/MultimediaPipelineSubtitleCodecTests.dir/subtitle_codec_test.cxx.o
+[ 80%] Building CXX object test/pipeline/audio/CMakeFiles/MultimediaPipelineAudioTests.dir/audio_test.cxx.o
+[ 80%] Building CXX object test/pipeline/dovi/CMakeFiles/MultimediaPipelineDoviTests.dir/dovi_test.cxx.o
+[ 80%] Building CXX object test/file/CMakeFiles/MultimediaDurationTests.dir/duration_test.cxx.o
+[ 81%] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaPipelineOcrTests.dir/ocr_test.cxx.o
+[ 81%] Building CXX object test/pipeline/CMakeFiles/MultimediaPipelineCeilingTests.dir/__/__/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o
+[ 82%] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineAllocationTests.dir/allocation_failure_test.cxx.o
+[ 84%] Building CXX object test/pipeline/watermark/CMakeFiles/MultimediaPipelineWatermarkTests.dir/watermark_test.cxx.o
+[ 84%] Building CXX object test/pipeline/remux/CMakeFiles/MultimediaPipelineRemuxTests.dir/remux_test.cxx.o
+[ 84%] Building CXX object test/pipeline/analytics/CMakeFiles/MultimediaPipelineAnalyticsTests.dir/analytics_test.cxx.o
+[ 84%] Building CXX object test/pipeline/mp4_policy/CMakeFiles/MultimediaPipelineMp4PolicyTests.dir/mp4_policy_test.cxx.o
+[ 85%] Building CXX object test/pipeline/negative/CMakeFiles/MultimediaPipelineNegativeTests.dir/negative_test.cxx.o
+[ 86%] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaOcrModelTests.dir/__/__/__/lib/private/StormByte/multimedia/ocr/engine.cxx.o
+[ 86%] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaOcrModelTests.dir/__/__/__/lib/private/StormByte/multimedia/ocr/exception.cxx.o
+[ 87%] Building CXX object test/pipeline/analytics/CMakeFiles/MultimediaPipelineAnalyticsTests.dir/__/__/__/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o
+[ 88%] Linking CXX executable MultimediaRegistryAllocationTests
+[ 88%] Building CXX object test/pipeline/dovi/CMakeFiles/MultimediaPipelineDoviTests.dir/__/__/__/lib/tables/decoder/video.cxx.o
+[ 88%] Built target MultimediaRegistryAllocationTests
+[ 88%] Building CXX object test/pipeline/dovi/CMakeFiles/MultimediaPipelineDoviTests.dir/__/__/__/lib/tables/encoder/video.cxx.o
+[ 88%] Linking CXX executable MultimediaLogTests
+[ 88%] Built target MultimediaLogTests
+[ 88%] Linking CXX executable MultimediaPipelineOcrTests
+[ 88%] Linking CXX shared library ../lib/libStormByte-Multimedia-Test.so
+[ 88%] Built target MultimediaPipelineOcrTests
+[ 88%] Linking CXX executable MultimediaPipelineAllocationTests
+[ 88%] Built target MultimediaPipelineAllocationTests
+[ 88%] Linking CXX executable MultimediaOcrModelTests
+[ 88%] Linking CXX executable MultimediaPipelineAudioCodecTests
+[ 88%] Built target MultimediaPipelineAudioCodecTests
+[ 88%] Linking CXX executable MultimediaPipelineNegativeTests
+[ 88%] Built target MultimediaPipelineNegativeTests
+[ 88%] Built target MultimediaOcrModelTests
+[ 88%] Linking CXX executable MultimediaPipelineAudioTests
+[ 89%] Linking CXX executable MultimediaPipelineNlMeansTests
+[ 89%] Built target MultimediaPipelineAudioTests
+[ 89%] Built target MultimediaPipelineNlMeansTests
+[ 89%] Linking CXX executable MultimediaDurationTests
+[ 90%] Linking CXX executable MultimediaPipelineRemuxTests
+[ 90%] Built target MultimediaDurationTests
+[ 90%] Linking CXX executable MultimediaPipelineSubtitleCodecTests
+[ 90%] Built target MultimediaPipelineRemuxTests
+[ 91%] Linking CXX executable MultimediaSimplePlayerTests
+[ 91%] Built target MultimediaPipelineSubtitleCodecTests
+[ 92%] Linking CXX executable MultimediaPipelineMp4PolicyTests
+[ 92%] Built target MultimediaSimplePlayerTests
+[ 92%] Linking CXX executable MultimediaPipelineSubtitleHeaderTests
+[ 92%] Built target MultimediaPipelineMp4PolicyTests
+[ 92%] Linking CXX executable MultimediaPipelineCeilingTests
+[ 92%] Built target MultimediaPipelineSubtitleHeaderTests
+[ 92%] Built target MultimediaPipelineCeilingTests
+[ 92%] Built target StormByte-Multimedia-Test
+[ 92%] Linking CXX executable MultimediaPipelineMuxPolicyTests
+[ 92%] Building CXX object test/file/CMakeFiles/MultimediaFileAvioTests.dir/__/runner_main.cxx.o
+[ 92%] Building CXX object test/pipeline/video_codecs/CMakeFiles/MultimediaPipelineVideoCodecTests.dir/__/__/runner_main.cxx.o
+[ 92%] Building CXX object test/pipeline/interleave/CMakeFiles/MultimediaPipelineInterleaveTests.dir/__/__/runner_main.cxx.o
+[ 92%] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineContentVideoTests.dir/__/__/runner_main.cxx.o
+[ 92%] Building CXX object test/pipeline/video/CMakeFiles/MultimediaPipelineVideoTests.dir/__/__/runner_main.cxx.o
+[ 93%] Building CXX object test/pipeline/hdr10plus/CMakeFiles/MultimediaPipelineHdr10PlusTests.dir/__/__/runner_main.cxx.o
+[ 93%] Building CXX object test/pipeline/video_input/CMakeFiles/MultimediaPipelineVideoInputTests.dir/__/__/runner_main.cxx.o
+[ 93%] Linking CXX executable MultimediaPipelineInterleaveTests
+[ 94%] Linking CXX executable MultimediaPipelineWatermarkTests
+[ 94%] Linking CXX executable MultimediaPipelineContentVideoTests
+[ 95%] Linking CXX executable MultimediaPipelineVideoTests
+[ 95%] Linking CXX executable MultimediaPipelineHdr10PlusTests
+[ 96%] Linking CXX executable MultimediaFileAvioTests
+[ 97%] Linking CXX executable MultimediaPipelineVideoCodecTests
+[ 97%] Linking CXX executable MultimediaPipelineVideoInputTests
+[ 97%] Built target MultimediaPipelineMuxPolicyTests
+[ 97%] Built target MultimediaPipelineInterleaveTests
+[ 97%] Built target MultimediaPipelineContentVideoTests
+[ 97%] Built target MultimediaPipelineVideoTests
+[ 97%] Built target MultimediaPipelineVideoCodecTests
+[ 97%] Built target MultimediaPipelineHdr10PlusTests
+[ 97%] Built target MultimediaPipelineWatermarkTests
+[ 97%] Built target MultimediaFileAvioTests
+[ 97%] Built target MultimediaPipelineVideoInputTests
+[ 97%] Linking CXX executable MultimediaPipelineAnalyticsTests
+[ 98%] Linking CXX executable MultimediaPipelineImplementationTests
+[ 98%] Built target MultimediaPipelineAnalyticsTests
+[ 98%] Built target MultimediaPipelineImplementationTests
+[ 98%] Linking CXX executable MultimediaPipelineFilterTests
+[ 98%] Built target MultimediaPipelineFilterTests
+[100%] Linking CXX executable MultimediaPipelineDoviTests
+[100%] Built target MultimediaPipelineDoviTests

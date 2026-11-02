@@ -1,0 +1,897 @@
+Test project /home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/test
+        Start   1: logging.test_independent_job_destinations
+  1/431 Test   #1: logging.test_independent_job_destinations ......................................   Passed    0.04 sec
+        Start   2: preview.test_empty_display
+  2/431 Test   #2: preview.test_empty_display .....................................................   Passed    0.05 sec
+        Start   3: preview.test_audio_adapter_mapping
+  3/431 Test   #3: preview.test_audio_adapter_mapping .............................................   Passed    0.05 sec
+        Start   4: preview.test_audio_adapter_samples
+  4/431 Test   #4: preview.test_audio_adapter_samples .............................................   Passed    0.05 sec
+        Start   5: preview.test_audio_native_51
+  5/431 Test   #5: preview.test_audio_native_51 ...................................................   Passed    0.29 sec
+        Start   6: preview.test_audio_native_mono
+  6/431 Test   #6: preview.test_audio_native_mono .................................................   Passed    0.16 sec
+        Start   7: preview.test_audio_native_opus
+  7/431 Test   #7: preview.test_audio_native_opus .................................................   Passed    0.24 sec
+        Start   8: preview.test_audio_native_stereo
+  8/431 Test   #8: preview.test_audio_native_stereo ...............................................   Passed    0.22 sec
+        Start   9: preview.test_audio_pacing_pause_drain
+  9/431 Test   #9: preview.test_audio_pacing_pause_drain ..........................................   Passed    2.33 sec
+        Start  10: preview.test_audio_paused_seek
+ 10/431 Test  #10: preview.test_audio_paused_seek .................................................   Passed    1.09 sec
+        Start  11: preview.test_av_seek_switch_epochs
+ 11/431 Test  #11: preview.test_av_seek_switch_epochs .............................................   Passed    1.92 sec
+        Start  12: preview.test_hdr_preview_tone_mapping
+ 12/431 Test  #12: preview.test_hdr_preview_tone_mapping ..........................................   Passed    1.37 sec
+        Start  13: preview.test_hdr_preview_preserves_signal
+ 13/431 Test  #13: preview.test_hdr_preview_preserves_signal ......................................   Passed    1.34 sec
+        Start  14: preview.test_live_audio_selection
+ 14/431 Test  #14: preview.test_live_audio_selection ..............................................   Passed    2.53 sec
+        Start  15: preview.test_live_audio_tracks
+ 15/431 Test  #15: preview.test_live_audio_tracks .................................................   Passed    0.71 sec
+        Start  16: preview.test_live_audio_backpressure_errors
+ 16/431 Test  #16: preview.test_live_audio_backpressure_errors ....................................   Passed    1.06 sec
+        Start  17: preview.test_av_seek_within_frame
+ 17/431 Test  #17: preview.test_av_seek_within_frame ..............................................   Passed    0.61 sec
+        Start  18: preview.test_explicit_errors
+ 18/431 Test  #18: preview.test_explicit_errors ...................................................   Passed    0.60 sec
+        Start  19: preview.test_long_subtitle_duration
+ 19/431 Test  #19: preview.test_long_subtitle_duration ............................................   Passed    0.05 sec
+        Start  20: preview.test_opus_without_video
+ 20/431 Test  #20: preview.test_opus_without_video ................................................   Passed    1.06 sec
+        Start  21: preview.test_packed_avi_seek
+ 21/431 Test  #21: preview.test_packed_avi_seek ...................................................   Passed    1.09 sec
+        Start  22: preview.test_recovers_rejected_initial_avi_mp3_packet
+ 22/431 Test  #22: preview.test_recovers_rejected_initial_avi_mp3_packet ..........................   Passed    4.30 sec
+        Start  23: preview.test_recovers_rejected_avi_mp3_packet
+ 23/431 Test  #23: preview.test_recovers_rejected_avi_mp3_packet ..................................   Passed    4.41 sec
+        Start  24: preview.test_recovers_rejected_avi_video_packet
+ 24/431 Test  #24: preview.test_recovers_rejected_avi_video_packet ................................   Passed    4.43 sec
+        Start  25: preview.test_subtitle_decode
+ 25/431 Test  #25: preview.test_subtitle_decode ...................................................   Passed    3.25 sec
+        Start  26: preview.test_subtitle_paused_seek
+ 26/431 Test  #26: preview.test_subtitle_paused_seek ..............................................   Passed    1.40 sec
+        Start  27: preview.test_unknown_duration_seek
+ 27/431 Test  #27: preview.test_unknown_duration_seek .............................................   Passed    0.83 sec
+        Start  28: preview.test_faulted_reader_retained
+ 28/431 Test  #28: preview.test_faulted_reader_retained ...........................................   Passed    1.44 sec
+        Start  29: preview.test_preview_to_transcoder
+ 29/431 Test  #29: preview.test_preview_to_transcoder .............................................   Passed    0.25 sec
+        Start  30: preview.test_rewind_close_failures
+ 30/431 Test  #30: preview.test_rewind_close_failures .............................................   Passed    0.07 sec
+        Start  31: preview.test_stop_transfer_destructor
+ 31/431 Test  #31: preview.test_stop_transfer_destructor ..........................................   Passed    0.29 sec
+        Start  32: configuration.test_ffmpeg_vmaf_modes_match
+ 32/431 Test  #32: configuration.test_ffmpeg_vmaf_modes_match .....................................   Passed    0.02 sec
+        Start  33: configuration.test_bundled_checkout_includes
+ 33/431 Test  #33: configuration.test_bundled_checkout_includes ...................................   Passed    0.03 sec
+        Start  34: configuration.test_tessdata_language_selection
+ 34/431 Test  #34: configuration.test_tessdata_language_selection .................................   Passed    0.01 sec
+        Start  35: configuration.test_tessdata_modes
+ 35/431 Test  #35: configuration.test_tessdata_modes ..............................................   Passed    0.04 sec
+        Start  36: configuration.test_simd_options
+ 36/431 Test  #36: configuration.test_simd_options ................................................   Passed    0.02 sec
+        Start  37: configuration.test_x265_shallow_version
+ 37/431 Test  #37: configuration.test_x265_shallow_version ........................................   Passed    0.03 sec
+        Start  38: configuration.test_shallow_codec_versions
+ 38/431 Test  #38: configuration.test_shallow_codec_versions ......................................   Passed    0.16 sec
+        Start  39: configuration.test_ocr_raw_options
+ 39/431 Test  #39: configuration.test_ocr_raw_options .............................................   Passed    0.00 sec
+        Start  40: registry.test_matroska_extensions_resolve_to_same_container
+ 40/431 Test  #40: registry.test_matroska_extensions_resolve_to_same_container ....................   Passed    0.05 sec
+        Start  41: registry.test_mov_extensions_resolve_to_same_container
+ 41/431 Test  #41: registry.test_mov_extensions_resolve_to_same_container .........................   Passed    0.05 sec
+        Start  42: registry.test_mp4_extensions_resolve_to_same_container
+ 42/431 Test  #42: registry.test_mp4_extensions_resolve_to_same_container .........................   Passed    0.04 sec
+        Start  43: registry.test_mp4_registry_exposes_read_and_write_access
+ 43/431 Test  #43: registry.test_mp4_registry_exposes_read_and_write_access .......................   Passed    0.04 sec
+        Start  44: registry.test_codec_names_resolve_by_public_identity
+ 44/431 Test  #44: registry.test_codec_names_resolve_by_public_identity ...........................   Passed    0.05 sec
+        Start  45: registry.test_subtitle_kind_classifies_text_and_bitmap
+ 45/431 Test  #45: registry.test_subtitle_kind_classifies_text_and_bitmap .........................   Passed    0.04 sec
+        Start  46: registry.test_subtitle_kind_distinguishes_unknown_from_not_applicable
+ 46/431 Test  #46: registry.test_subtitle_kind_distinguishes_unknown_from_not_applicable ..........   Passed    0.05 sec
+        Start  47: registry.test_empty_codec_features_preserve_generic_access
+ 47/431 Test  #47: registry.test_empty_codec_features_preserve_generic_access .....................   Passed    0.05 sec
+        Start  48: registry.test_codec_features_do_not_combine_unrelated_capabilities
+ 48/431 Test  #48: registry.test_codec_features_do_not_combine_unrelated_capabilities .............   Passed    0.05 sec
+        Start  49: registry.test_eac3_encoder_features_preserve_surround_sound
+ 49/431 Test  #49: registry.test_eac3_encoder_features_preserve_surround_sound ....................   Passed    0.05 sec
+        Start  50: registry.test_codec_without_implementation_rows_keeps_only_generic_access
+ 50/431 Test  #50: registry.test_codec_without_implementation_rows_keeps_only_generic_access ......   Passed    0.04 sec
+        Start  51: registry.test_codec_access_matches_pipeline_implementations
+ 51/431 Test  #51: registry.test_codec_access_matches_pipeline_implementations ....................   Passed    0.05 sec
+        Start  52: registry.test_container_compatibility_follows_its_muxer
+ 52/431 Test  #52: registry.test_container_compatibility_follows_its_muxer ........................   Passed    0.04 sec
+        Start  53: registry.test_decoder_info_is_a_safe_read_only_value
+ 53/431 Test  #53: registry.test_decoder_info_is_a_safe_read_only_value ...........................   Passed    0.04 sec
+        Start  54: registry.test_encoder_hardware_metadata_matches_ffmpeg_and_copies
+ 54/431 Test  #54: registry.test_encoder_hardware_metadata_matches_ffmpeg_and_copies ..............   Passed    0.04 sec
+        Start  55: registry.test_decoders_filter_each_implementation_without_combining_features
+ 55/431 Test  #55: registry.test_decoders_filter_each_implementation_without_combining_features ...   Passed    0.06 sec
+        Start  56: registry.test_decoders_preserve_generic_and_subtitle_fallbacks
+ 56/431 Test  #56: registry.test_decoders_preserve_generic_and_subtitle_fallbacks .................   Passed    0.04 sec
+        Start  57: registry.test_surround_decoder_features_describe_input_channels
+ 57/431 Test  #57: registry.test_surround_decoder_features_describe_input_channels ................   Passed    0.05 sec
+        Start  58: registry.test_decoders_exclude_native_hardware_only_av1
+ 58/431 Test  #58: registry.test_decoders_exclude_native_hardware_only_av1 ........................   Passed    0.04 sec
+        Start  59: file.test_bluray_like_mkv_streams_and_cover
+ 59/431 Test  #59: file.test_bluray_like_mkv_streams_and_cover ....................................   Passed    0.24 sec
+        Start  60: file.test_anime_like_mkv_languages_and_font
+ 60/431 Test  #60: file.test_anime_like_mkv_languages_and_font ....................................   Passed    0.38 sec
+        Start  61: file.test_vp9_mp4_and_avi_container_snapshots
+ 61/431 Test  #61: file.test_vp9_mp4_and_avi_container_snapshots ..................................   Passed    0.38 sec
+        Start  62: file.test_stereo_and_51_audio_fixtures
+ 62/431 Test  #62: file.test_stereo_and_51_audio_fixtures .........................................   Passed    0.23 sec
+        Start  63: file.test_pgs_fixture_subtitles_are_bitmap
+ 63/431 Test  #63: file.test_pgs_fixture_subtitles_are_bitmap .....................................   Passed    0.57 sec
+        Start  64: file.test_mp4_fixture_packed_subtitles_are_text
+ 64/431 Test  #64: file.test_mp4_fixture_packed_subtitles_are_text ................................   Passed    0.24 sec
+        Start  65: file.test_srt_fixture_subtitles_are_text
+ 65/431 Test  #65: file.test_srt_fixture_subtitles_are_text .......................................   Passed    0.05 sec
+        Start  66: file.test_random_invalid_file_is_rejected
+ 66/431 Test  #66: file.test_random_invalid_file_is_rejected ......................................   Passed    0.04 sec
+        Start  67: file.test_truncated_file_is_rejected
+ 67/431 Test  #67: file.test_truncated_file_is_rejected ...........................................   Passed    0.04 sec
+        Start  68: file.test_duration_cancel_rewinds_and_retries
+ 68/431 Test  #68: file.test_duration_cancel_rewinds_and_retries ..................................   Passed    1.72 sec
+        Start  69: file.test_unknown_size_duration_cancel_rewinds_and_retries
+ 69/431 Test  #69: file.test_unknown_size_duration_cancel_rewinds_and_retries .....................   Passed    1.79 sec
+        Start  70: file.test_duration_pause_and_resume
+ 70/431 Test  #70: file.test_duration_pause_and_resume ............................................   Passed    0.72 sec
+        Start  71: file.test_duration_cancel_while_paused
+ 71/431 Test  #71: file.test_duration_cancel_while_paused .........................................   Passed    0.59 sec
+        Start  72: file.test_duration_cancel_while_running
+ 72/431 Test  #72: file.test_duration_cancel_while_running ........................................   Passed    0.40 sec
+        Start  73: file.test_supplied_duration_skips_scan_control
+ 73/431 Test  #73: file.test_supplied_duration_skips_scan_control .................................   Passed    0.10 sec
+        Start  74: file.test_duration_hint_does_not_scan
+ 74/431 Test  #74: file.test_duration_hint_does_not_scan ..........................................   Passed    0.16 sec
+        Start  75: file.test_progress_duration_hint_skips_scan
+ 75/431 Test  #75: file.test_progress_duration_hint_skips_scan ....................................   Passed    0.79 sec
+        Start  76: file.test_missing_container_duration_scans
+ 76/431 Test  #76: file.test_missing_container_duration_scans .....................................   Passed    0.33 sec
+        Start  77: file.test_file_avio_read_retry_before_data
+ 77/431 Test  #77: file.test_file_avio_read_retry_before_data .....................................   Passed    0.07 sec
+        Start  78: file.test_file_avio_read_retry_between_blocks
+ 78/431 Test  #78: file.test_file_avio_read_retry_between_blocks ..................................   Passed    0.07 sec
+        Start  79: file.test_file_avio_read_error_is_not_retry
+ 79/431 Test  #79: file.test_file_avio_read_error_is_not_retry ....................................   Passed    0.07 sec
+        Start  80: file.test_file_avio_read_seek_and_invalid_buffer
+ 80/431 Test  #80: file.test_file_avio_read_seek_and_invalid_buffer ...............................   Passed    0.07 sec
+        Start  81: file.test_file_avio_write_backpressure_and_seek
+ 81/431 Test  #81: file.test_file_avio_write_backpressure_and_seek ................................   Passed    0.07 sec
+        Start  82: file.test_file_avio_write_flush_error
+ 82/431 Test  #82: file.test_file_avio_write_flush_error ..........................................   Passed    0.07 sec
+        Start  83: file.test_file_avio_write_origin_error
+ 83/431 Test  #83: file.test_file_avio_write_origin_error .........................................   Passed    0.06 sec
+        Start  84: pipeline.test_packet_ceilings_do_not_query_memory
+ 84/431 Test  #84: pipeline.test_packet_ceilings_do_not_query_memory ..............................   Passed    0.40 sec
+        Start  85: pipeline.test_resource_budget_resolution_and_minima
+ 85/431 Test  #85: pipeline.test_resource_budget_resolution_and_minima ............................   Passed    0.04 sec
+        Start  86: pipeline.test_full_resources_keep_bounded_video_capacity
+ 86/431 Test  #86: pipeline.test_full_resources_keep_bounded_video_capacity .......................   Passed    0.40 sec
+        Start  87: pipeline.test_transcoder_remuxes_same_video_twice
+ 87/431 Test  #87: pipeline.test_transcoder_remuxes_same_video_twice ..............................   Passed    5.53 sec
+        Start  88: pipeline.test_transcoder_remuxes_and_encodes_same_video
+ 88/431 Test  #88: pipeline.test_transcoder_remuxes_and_encodes_same_video ........................   Passed    7.47 sec
+        Start  89: pipeline.test_transcoder_remux_preserves_pgs_and_attachments
+ 89/431 Test  #89: pipeline.test_transcoder_remux_preserves_pgs_and_attachments ...................   Passed    0.75 sec
+        Start  90: pipeline.test_transcoder_remux_omits_unselected_attachments
+ 90/431 Test  #90: pipeline.test_transcoder_remux_omits_unselected_attachments ....................   Passed    0.74 sec
+        Start  91: pipeline.test_transcoder_remuxes_mp4_audio_into_matroska
+ 91/431 Test  #91: pipeline.test_transcoder_remuxes_mp4_audio_into_matroska .......................   Passed    0.71 sec
+        Start  92: pipeline.test_hand_built_pipe_remux_preserves_pgs_and_attachments
+ 92/431 Test  #92: pipeline.test_hand_built_pipe_remux_preserves_pgs_and_attachments ..............   Passed    0.58 sec
+        Start  93: pipeline.test_transcoder_vmaf_kvazaar_padding
+ 93/431 Test  #93: pipeline.test_transcoder_vmaf_kvazaar_padding ..................................   Passed    1.86 sec
+        Start  94: pipeline.test_transcoder_vmaf_remux_matches_source_at_100
+ 94/431 Test  #94: pipeline.test_transcoder_vmaf_remux_matches_source_at_100 ......................   Passed    2.67 sec
+        Start  95: pipeline.test_transcoder_vmaf_hevc_remux_matches_source_at_100
+ 95/431 Test  #95: pipeline.test_transcoder_vmaf_hevc_remux_matches_source_at_100 .................   Passed    3.41 sec
+        Start  96: pipeline.test_transcoder_vmaf_reduced_resources_clamp_explicit_workers
+ 96/431 Test  #96: pipeline.test_transcoder_vmaf_reduced_resources_clamp_explicit_workers .........   Passed    2.25 sec
+        Start  97: pipeline.test_transcoder_vmaf_low_resources_clamp_automatic_workers
+ 97/431 Test  #97: pipeline.test_transcoder_vmaf_low_resources_clamp_automatic_workers ............   Passed    2.22 sec
+        Start  98: pipeline.test_transcoder_vmaf_medium_resources_clamp_explicit_workers
+ 98/431 Test  #98: pipeline.test_transcoder_vmaf_medium_resources_clamp_explicit_workers ..........   Passed    0.77 sec
+        Start  99: pipeline.test_transcoder_vmaf_medium_resources_clamp_automatic_workers
+ 99/431 Test  #99: pipeline.test_transcoder_vmaf_medium_resources_clamp_automatic_workers .........   Passed    0.78 sec
+        Start 100: pipeline.test_transcoder_vmaf_full_resources_honor_explicit_workers
+100/431 Test #100: pipeline.test_transcoder_vmaf_full_resources_honor_explicit_workers ............   Passed    0.79 sec
+        Start 101: pipeline.test_vmaf_picture_api_contract
+101/431 Test #101: pipeline.test_vmaf_picture_api_contract ........................................   Passed    0.10 sec
+        Start 102: pipeline.test_transcoder_kvazaar_pads_unaligned_video
+102/431 Test #102: pipeline.test_transcoder_kvazaar_pads_unaligned_video ..........................   Passed    1.63 sec
+        Start 103: pipeline.test_transcoder_hevc_encode_output_file_properties
+103/431 Test #103: pipeline.test_transcoder_hevc_encode_output_file_properties ....................   Passed    1.52 sec
+        Start 104: pipeline.test_transcoder_hevc_encode_preserves_hdr10_metadata
+104/431 Test #104: pipeline.test_transcoder_hevc_encode_preserves_hdr10_metadata ..................   Passed    1.86 sec
+        Start 105: pipeline.test_transcoder_without_enforce_features_drops_hdr10
+105/431 Test #105: pipeline.test_transcoder_without_enforce_features_drops_hdr10 ..................   Passed    1.87 sec
+        Start 106: pipeline.test_transcoder_vp9_encode_preserves_hdr10_metadata
+106/431 Test #106: pipeline.test_transcoder_vp9_encode_preserves_hdr10_metadata ...................   Passed    1.77 sec
+        Start 107: pipeline.test_transcoder_svt_av1_encode_preserves_hdr10_metadata
+107/431 Test #107: pipeline.test_transcoder_svt_av1_encode_preserves_hdr10_metadata ...............   Passed    1.70 sec
+        Start 108: pipeline.test_transcoder_aom_av1_encode_preserves_hdr10_metadata
+108/431 Test #108: pipeline.test_transcoder_aom_av1_encode_preserves_hdr10_metadata ...............   Passed    7.95 sec
+        Start 109: pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata
+109/431 Test #109: pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata ............   Passed    1.53 sec
+        Start 110: pipeline.test_transcoder_hevc_qsv_encode_preserves_hdr10_metadata
+110/431 Test #110: pipeline.test_transcoder_hevc_qsv_encode_preserves_hdr10_metadata ..............***Skipped   0.59 sec
+        Start 111: pipeline.test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata
+111/431 Test #111: pipeline.test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata ............***Skipped   0.27 sec
+        Start 112: pipeline.test_transcoder_enforce_features_rejects_hdr10_loss
+112/431 Test #112: pipeline.test_transcoder_enforce_features_rejects_hdr10_loss ...................   Passed    0.41 sec
+        Start 113: pipeline.test_encoder_dimension_alignment
+113/431 Test #113: pipeline.test_encoder_dimension_alignment ......................................   Passed    0.07 sec
+        Start 114: pipeline.test_encoder_black_padding_is_sample_exact
+114/431 Test #114: pipeline.test_encoder_black_padding_is_sample_exact ............................   Passed    0.08 sec
+        Start 115: pipeline.test_encoder_configs
+115/431 Test #115: pipeline.test_encoder_configs ..................................................   Passed    0.07 sec
+        Start 116: pipeline.test_hardware_capability_classifier
+116/431 Test #116: pipeline.test_hardware_capability_classifier ...................................   Passed    0.07 sec
+        Start 117: pipeline.test_hardware_h264_nvenc_capability
+117/431 Test #117: pipeline.test_hardware_h264_nvenc_capability ...................................   Passed    0.38 sec
+        Start 118: pipeline.test_hardware_h264_nvenc_10bit_capability
+118/431 Test #118: pipeline.test_hardware_h264_nvenc_10bit_capability .............................***Skipped   0.31 sec
+        Start 119: pipeline.test_hardware_hevc_nvenc_capability
+119/431 Test #119: pipeline.test_hardware_hevc_nvenc_capability ...................................   Passed    0.39 sec
+        Start 120: pipeline.test_hardware_av1_nvenc_capability
+120/431 Test #120: pipeline.test_hardware_av1_nvenc_capability ....................................***Skipped   0.07 sec
+        Start 121: pipeline.test_hardware_hevc_qsv_capability
+121/431 Test #121: pipeline.test_hardware_hevc_qsv_capability .....................................***Skipped   0.07 sec
+        Start 122: pipeline.test_hardware_hevc_vaapi_capability
+122/431 Test #122: pipeline.test_hardware_hevc_vaapi_capability ...................................***Skipped   0.07 sec
+        Start 123: pipeline.test_hardware_plan_selection
+123/431 Test #123: pipeline.test_hardware_plan_selection ..........................................   Passed    0.07 sec
+        Start 124: pipeline.test_cpu_context_preference
+124/431 Test #124: pipeline.test_cpu_context_preference ...........................................   Passed    0.08 sec
+        Start 125: pipeline.test_invalid_hardware_context
+125/431 Test #125: pipeline.test_invalid_hardware_context .........................................   Passed    0.07 sec
+        Start 126: pipeline.test_hardware_transfer
+126/431 Test #126: pipeline.test_hardware_transfer ................................................***Skipped   0.08 sec
+        Start 127: pipeline.test_format_negotiation
+127/431 Test #127: pipeline.test_format_negotiation ...............................................   Passed    0.07 sec
+        Start 128: pipeline.test_invalid_input
+128/431 Test #128: pipeline.test_invalid_input ....................................................   Passed    0.07 sec
+        Start 129: pipeline.test_rawvideo_retry
+129/431 Test #129: pipeline.test_rawvideo_retry ...................................................   Passed    0.07 sec
+        Start 130: pipeline.test_roundtrip
+130/431 Test #130: pipeline.test_roundtrip ........................................................   Passed    0.07 sec
+        Start 131: pipeline.test_supported_input_shares_pixels
+131/431 Test #131: pipeline.test_supported_input_shares_pixels ....................................   Passed    0.07 sec
+        Start 132: pipeline.test_wrapper_attachments
+132/431 Test #132: pipeline.test_wrapper_attachments ..............................................   Passed    0.07 sec
+        Start 133: pipeline.test_file_dovi_only_configuration_and_metadata
+133/431 Test #133: pipeline.test_file_dovi_only_configuration_and_metadata ........................   Passed    0.09 sec
+        Start 134: pipeline.test_file_hdr10_only_without_dovi
+134/431 Test #134: pipeline.test_file_hdr10_only_without_dovi .....................................   Passed    0.21 sec
+        Start 135: pipeline.test_file_dovi_hdr10_configuration_and_metadata
+135/431 Test #135: pipeline.test_file_dovi_hdr10_configuration_and_metadata .......................   Passed    0.09 sec
+        Start 136: pipeline.test_remux_dovi_only
+136/431 Test #136: pipeline.test_remux_dovi_only ..................................................   Passed    0.54 sec
+        Start 137: pipeline.test_remux_hdr10_only
+137/431 Test #137: pipeline.test_remux_hdr10_only .................................................   Passed    1.32 sec
+        Start 138: pipeline.test_remux_dovi_hdr10
+138/431 Test #138: pipeline.test_remux_dovi_hdr10 .................................................   Passed    0.48 sec
+        Start 139: pipeline.test_remux_dovi_to_mp4_keeps_configuration
+139/431 Test #139: pipeline.test_remux_dovi_to_mp4_keeps_configuration ............................   Passed    0.39 sec
+        Start 140: pipeline.test_video_and_frame_copy_move_preserve_dovi
+140/431 Test #140: pipeline.test_video_and_frame_copy_move_preserve_dovi ..........................   Passed    0.29 sec
+        Start 141: pipeline.test_dovi_owned_rpu_and_invalid_loads_preserve_configuration
+141/431 Test #141: pipeline.test_dovi_owned_rpu_and_invalid_loads_preserve_configuration ..........   Passed    0.09 sec
+        Start 142: pipeline.test_dovi_metadata_rejects_invalid_extension_offsets
+142/431 Test #142: pipeline.test_dovi_metadata_rejects_invalid_extension_offsets ..................   Passed    0.30 sec
+        Start 143: pipeline.test_dovi_metadata_rejects_invalid_extension_strides
+143/431 Test #143: pipeline.test_dovi_metadata_rejects_invalid_extension_strides ..................   Passed    0.19 sec
+        Start 144: pipeline.test_dovi_metadata_validates_extension_counts_and_extent
+144/431 Test #144: pipeline.test_dovi_metadata_validates_extension_counts_and_extent ..............   Passed    0.34 sec
+        Start 145: pipeline.test_dovi_metadata_accepts_unaligned_storage_and_offsets
+145/431 Test #145: pipeline.test_dovi_metadata_accepts_unaligned_storage_and_offsets ..............   Passed    0.18 sec
+        Start 146: pipeline.test_dovi_feature_string_conversion
+146/431 Test #146: pipeline.test_dovi_feature_string_conversion ...................................   Passed    0.04 sec
+        Start 147: pipeline.test_dovi_decoder_table_capabilities
+147/431 Test #147: pipeline.test_dovi_decoder_table_capabilities ..................................   Passed    0.05 sec
+        Start 148: pipeline.test_dovi_encoder_table_capabilities
+148/431 Test #148: pipeline.test_dovi_encoder_table_capabilities ..................................   Passed    0.04 sec
+        Start 149: pipeline.test_reencode_dovi_only
+149/431 Test #149: pipeline.test_reencode_dovi_only ...............................................   Passed    0.75 sec
+        Start 150: pipeline.test_reencoded_dovi_audit_and_vmaf_frame_counts
+150/431 Test #150: pipeline.test_reencoded_dovi_audit_and_vmaf_frame_counts .......................   Passed    0.81 sec
+        Start 151: pipeline.test_reencode_hdr10_only
+151/431 Test #151: pipeline.test_reencode_hdr10_only ..............................................   Passed    2.37 sec
+        Start 152: pipeline.test_reencode_dovi_hdr10
+152/431 Test #152: pipeline.test_reencode_dovi_hdr10 ..............................................   Passed    0.77 sec
+        Start 153: pipeline.test_watermark_dovi_only
+153/431 Test #153: pipeline.test_watermark_dovi_only ..............................................   Passed    0.85 sec
+        Start 154: pipeline.test_watermark_hdr10_only
+154/431 Test #154: pipeline.test_watermark_hdr10_only .............................................   Passed    3.96 sec
+        Start 155: pipeline.test_watermark_dovi_hdr10
+155/431 Test #155: pipeline.test_watermark_dovi_hdr10 .............................................   Passed    0.71 sec
+        Start 156: pipeline.test_replace_frame_dovi_only
+156/431 Test #156: pipeline.test_replace_frame_dovi_only ..........................................   Passed    0.71 sec
+        Start 157: pipeline.test_replace_frame_hdr10_only
+157/431 Test #157: pipeline.test_replace_frame_hdr10_only .........................................   Passed    2.28 sec
+        Start 158: pipeline.test_replace_frame_dovi_hdr10
+158/431 Test #158: pipeline.test_replace_frame_dovi_hdr10 .........................................   Passed    0.62 sec
+        Start 159: pipeline.test_unsupported_hevc_dovi_only
+159/431 Test #159: pipeline.test_unsupported_hevc_dovi_only .......................................   Passed    0.16 sec
+        Start 160: pipeline.test_unsupported_hevc_dovi_hdr10
+160/431 Test #160: pipeline.test_unsupported_hevc_dovi_hdr10 ......................................   Passed    0.17 sec
+        Start 161: pipeline.test_reencode_dovi_without_preservation_discards_side_data
+161/431 Test #161: pipeline.test_reencode_dovi_without_preservation_discards_side_data ............   Passed    0.42 sec
+        Start 162: pipeline.test_unsupported_vp9_dovi_only
+162/431 Test #162: pipeline.test_unsupported_vp9_dovi_only ........................................   Passed    0.13 sec
+        Start 163: pipeline.test_unsupported_vp9_dovi_hdr10
+163/431 Test #163: pipeline.test_unsupported_vp9_dovi_hdr10 .......................................   Passed    0.13 sec
+        Start 164: pipeline.test_reencode_svt_av1_dovi_only
+164/431 Test #164: pipeline.test_reencode_svt_av1_dovi_only .......................................   Passed    0.88 sec
+        Start 165: pipeline.test_watermark_svt_av1_dovi_only
+165/431 Test #165: pipeline.test_watermark_svt_av1_dovi_only ......................................   Passed    0.90 sec
+        Start 166: pipeline.test_replace_frame_svt_av1_dovi_only
+166/431 Test #166: pipeline.test_replace_frame_svt_av1_dovi_only ..................................   Passed    0.91 sec
+        Start 167: pipeline.test_reencode_svt_av1_hdr10_only
+167/431 Test #167: pipeline.test_reencode_svt_av1_hdr10_only ......................................   Passed    2.39 sec
+        Start 168: pipeline.test_watermark_svt_av1_hdr10_only
+168/431 Test #168: pipeline.test_watermark_svt_av1_hdr10_only .....................................   Passed    3.87 sec
+        Start 169: pipeline.test_replace_frame_svt_av1_hdr10_only
+169/431 Test #169: pipeline.test_replace_frame_svt_av1_hdr10_only .................................   Passed    2.17 sec
+        Start 170: pipeline.test_reencode_svt_av1_dovi_hdr10
+170/431 Test #170: pipeline.test_reencode_svt_av1_dovi_hdr10 ......................................   Passed    0.59 sec
+        Start 171: pipeline.test_watermark_svt_av1_dovi_hdr10
+171/431 Test #171: pipeline.test_watermark_svt_av1_dovi_hdr10 .....................................   Passed    0.84 sec
+        Start 172: pipeline.test_replace_frame_svt_av1_dovi_hdr10
+172/431 Test #172: pipeline.test_replace_frame_svt_av1_dovi_hdr10 .................................   Passed    0.66 sec
+        Start 173: pipeline.test_reencode_aom_av1_dovi_only
+173/431 Test #173: pipeline.test_reencode_aom_av1_dovi_only .......................................   Passed    3.36 sec
+        Start 174: pipeline.test_watermark_aom_av1_dovi_only
+174/431 Test #174: pipeline.test_watermark_aom_av1_dovi_only ......................................   Passed    4.11 sec
+        Start 175: pipeline.test_replace_frame_aom_av1_dovi_only
+175/431 Test #175: pipeline.test_replace_frame_aom_av1_dovi_only ..................................   Passed    4.45 sec
+        Start 176: pipeline.test_reencode_aom_av1_hdr10_only
+176/431 Test #176: pipeline.test_reencode_aom_av1_hdr10_only ......................................   Passed    8.99 sec
+        Start 177: pipeline.test_watermark_aom_av1_hdr10_only
+177/431 Test #177: pipeline.test_watermark_aom_av1_hdr10_only .....................................   Passed    9.46 sec
+        Start 178: pipeline.test_replace_frame_aom_av1_hdr10_only
+178/431 Test #178: pipeline.test_replace_frame_aom_av1_hdr10_only .................................   Passed    8.53 sec
+        Start 179: pipeline.test_reencode_aom_av1_dovi_hdr10
+179/431 Test #179: pipeline.test_reencode_aom_av1_dovi_hdr10 ......................................   Passed    3.24 sec
+        Start 180: pipeline.test_watermark_aom_av1_dovi_hdr10
+180/431 Test #180: pipeline.test_watermark_aom_av1_dovi_hdr10 .....................................   Passed    3.38 sec
+        Start 181: pipeline.test_replace_frame_aom_av1_dovi_hdr10
+181/431 Test #181: pipeline.test_replace_frame_aom_av1_dovi_hdr10 .................................   Passed    4.46 sec
+        Start 182: pipeline.test_file_hdr10plus_detection
+182/431 Test #182: pipeline.test_file_hdr10plus_detection .........................................   Passed    0.35 sec
+        Start 183: pipeline.test_hdr10plus_capabilities
+183/431 Test #183: pipeline.test_hdr10plus_capabilities ...........................................   Passed    0.08 sec
+        Start 184: pipeline.test_remux_hdr10plus
+184/431 Test #184: pipeline.test_remux_hdr10plus ..................................................   Passed    0.84 sec
+        Start 185: pipeline.test_aom_hdr10plus
+185/431 Test #185: pipeline.test_aom_hdr10plus ....................................................   Passed    7.16 sec
+        Start 186: pipeline.test_hevc_av1_hevc_hdr10plus
+186/431 Test #186: pipeline.test_hevc_av1_hevc_hdr10plus ..........................................   Passed    8.61 sec
+        Start 187: pipeline.test_native_vp9_hdr10plus
+187/431 Test #187: pipeline.test_native_vp9_hdr10plus .............................................   Passed    1.75 sec
+        Start 188: pipeline.test_vp9_hdr10plus
+188/431 Test #188: pipeline.test_vp9_hdr10plus ....................................................   Passed    1.77 sec
+        Start 189: pipeline.test_x265_hdr10plus
+189/431 Test #189: pipeline.test_x265_hdr10plus ...................................................   Passed    1.68 sec
+        Start 190: pipeline.test_nvenc_feature_contract
+190/431 Test #190: pipeline.test_nvenc_feature_contract ...........................................   Passed    0.07 sec
+        Start 191: pipeline.test_hevc_feature_access_matches_available_encoders
+191/431 Test #191: pipeline.test_hevc_feature_access_matches_available_encoders ...................   Passed    0.08 sec
+        Start 192: pipeline.test_feature_access_checks_each_direction_independently
+192/431 Test #192: pipeline.test_feature_access_checks_each_direction_independently ...............   Passed    0.07 sec
+        Start 193: pipeline.test_discovered_video_decoders_have_software_formats
+193/431 Test #193: pipeline.test_discovered_video_decoders_have_software_formats ..................   Passed    0.07 sec
+        Start 194: pipeline.test_svt_av1_encodes_matroska
+194/431 Test #194: pipeline.test_svt_av1_encodes_matroska .........................................   Passed    1.16 sec
+        Start 195: pipeline.test_svt_av1_encodes_mp4
+195/431 Test #195: pipeline.test_svt_av1_encodes_mp4 ..............................................   Passed    1.12 sec
+        Start 196: pipeline.test_low_resources_converts_with_svt_parallelism_level
+196/431 Test #196: pipeline.test_low_resources_converts_with_svt_parallelism_level ................   Passed    1.15 sec
+        Start 197: pipeline.test_medium_resources_converts_with_svt_parallelism_level
+197/431 Test #197: pipeline.test_medium_resources_converts_with_svt_parallelism_level .............   Passed    1.08 sec
+        Start 198: pipeline.test_medium_resources_converts_with_aom_threads_bounded
+198/431 Test #198: pipeline.test_medium_resources_converts_with_aom_threads_bounded ...............   Passed    1.17 sec
+        Start 199: pipeline.test_low_resources_converts_with_vpx_threads_bounded
+199/431 Test #199: pipeline.test_low_resources_converts_with_vpx_threads_bounded ..................   Passed    1.01 sec
+        Start 200: pipeline.test_low_resources_converts_with_x264_thread_options
+200/431 Test #200: pipeline.test_low_resources_converts_with_x264_thread_options ..................   Passed    0.96 sec
+        Start 201: pipeline.test_low_resources_converts_with_x265_thread_options
+201/431 Test #201: pipeline.test_low_resources_converts_with_x265_thread_options ..................   Passed    1.09 sec
+        Start 202: pipeline.test_low_resources_converts_with_kvazaar_threads_bounded
+202/431 Test #202: pipeline.test_low_resources_converts_with_kvazaar_threads_bounded ..............   Passed    1.44 sec
+        Start 203: pipeline.test_resource_policy_rejects_finetune_thread_override
+203/431 Test #203: pipeline.test_resource_policy_rejects_finetune_thread_override .................   Passed    0.69 sec
+        Start 204: pipeline.test_resource_policy_rejects_kvazaar_thread_override
+204/431 Test #204: pipeline.test_resource_policy_rejects_kvazaar_thread_override ..................   Passed    0.72 sec
+        Start 205: pipeline.test_svt_av1_cancel_repeated
+205/431 Test #205: pipeline.test_svt_av1_cancel_repeated ..........................................   Passed    3.46 sec
+        Start 206: pipeline.test_aom_av1_encodes_webm
+206/431 Test #206: pipeline.test_aom_av1_encodes_webm .............................................   Passed    1.21 sec
+        Start 207: pipeline.test_dav1d_decodes_svt_av1
+207/431 Test #207: pipeline.test_dav1d_decodes_svt_av1 ............................................   Passed    1.24 sec
+        Start 208: pipeline.test_discovered_av1_decoders_convert_without_hardware
+208/431 Test #208: pipeline.test_discovered_av1_decoders_convert_without_hardware .................   Passed    1.21 sec
+        Start 209: pipeline.test_aom_decodes_svt_av1
+209/431 Test #209: pipeline.test_aom_decodes_svt_av1 ..............................................   Passed    1.25 sec
+        Start 210: pipeline.test_libvpx_encodes_vp8_webm
+210/431 Test #210: pipeline.test_libvpx_encodes_vp8_webm ..........................................   Passed    1.03 sec
+        Start 211: pipeline.test_libvpx_encodes_vp9_webm
+211/431 Test #211: pipeline.test_libvpx_encodes_vp9_webm ..........................................   Passed    1.21 sec
+        Start 212: pipeline.test_libvpx_vp9_honors_explicit_threads
+212/431 Test #212: pipeline.test_libvpx_vp9_honors_explicit_threads ...............................   Passed    1.11 sec
+        Start 213: pipeline.test_openh264_encodes_h264_matroska
+213/431 Test #213: pipeline.test_openh264_encodes_h264_matroska ...................................   Passed    1.19 sec
+        Start 214: pipeline.test_openh264_rejects_ten_bit_input
+214/431 Test #214: pipeline.test_openh264_rejects_ten_bit_input ...................................   Passed    0.77 sec
+        Start 215: pipeline.test_openh264_encodes_ten_bit_after_format
+215/431 Test #215: pipeline.test_openh264_encodes_ten_bit_after_format ............................   Passed    0.94 sec
+        Start 216: pipeline.test_kvazaar_encodes_hevc_matroska
+216/431 Test #216: pipeline.test_kvazaar_encodes_hevc_matroska ....................................   Passed    1.34 sec
+        Start 217: pipeline.test_vaapi_encodes_hevc_main_matroska
+217/431 Test #217: pipeline.test_vaapi_encodes_hevc_main_matroska .................................***Skipped   0.08 sec
+        Start 218: pipeline.test_libwebp_anim_encodes_webp
+218/431 Test #218: pipeline.test_libwebp_anim_encodes_webp ........................................   Passed    0.97 sec
+        Start 219: pipeline.test_libwebp_decodes_animated_webp
+219/431 Test #219: pipeline.test_libwebp_decodes_animated_webp ....................................   Passed    1.06 sec
+        Start 220: pipeline.test_software_decode_x264_encodes_h264_matroska
+220/431 Test #220: pipeline.test_software_decode_x264_encodes_h264_matroska .......................   Passed    1.02 sec
+        Start 221: pipeline.test_nvenc_encodes_h264_mp4
+221/431 Test #221: pipeline.test_nvenc_encodes_h264_mp4 ...........................................   Passed    0.62 sec
+        Start 222: pipeline.test_nvenc_encodes_h264_10bit_matroska
+222/431 Test #222: pipeline.test_nvenc_encodes_h264_10bit_matroska ................................***Skipped   0.47 sec
+        Start 223: pipeline.test_nvenc_encodes_hevc_main_matroska
+223/431 Test #223: pipeline.test_nvenc_encodes_hevc_main_matroska .................................   Passed    0.60 sec
+        Start 224: pipeline.test_nvenc_encodes_hevc_main10_matroska
+224/431 Test #224: pipeline.test_nvenc_encodes_hevc_main10_matroska ...............................   Passed    1.26 sec
+        Start 225: pipeline.test_nvenc_encodes_av1_matroska
+225/431 Test #225: pipeline.test_nvenc_encodes_av1_matroska .......................................***Skipped   0.30 sec
+        Start 226: pipeline.test_x264_encodes_h264_mp4
+226/431 Test #226: pipeline.test_x264_encodes_h264_mp4 ............................................   Passed    1.04 sec
+        Start 227: pipeline.test_x265_encodes_hevc_matroska
+227/431 Test #227: pipeline.test_x265_encodes_hevc_matroska .......................................   Passed    1.10 sec
+        Start 228: pipeline.test_watermark_path_and_embedded_binary
+228/431 Test #228: pipeline.test_watermark_path_and_embedded_binary ...............................   Passed    1.95 sec
+        Start 229: pipeline.test_watermark_sdr_hdr_opacity_matches
+229/431 Test #229: pipeline.test_watermark_sdr_hdr_opacity_matches ................................   Passed    2.79 sec
+        Start 230: pipeline.test_watermark_preserves_uncovered_samples
+230/431 Test #230: pipeline.test_watermark_preserves_uncovered_samples ............................   Passed    1.18 sec
+        Start 231: pipeline.test_watermark_svg_path_buffer_and_scaling
+231/431 Test #231: pipeline.test_watermark_svg_path_buffer_and_scaling ............................   Passed    2.61 sec
+        Start 232: pipeline.test_watermark_svg_alpha_and_hdr
+232/431 Test #232: pipeline.test_watermark_svg_alpha_and_hdr ......................................   Passed    0.77 sec
+        Start 233: pipeline.test_watermark_svg_invalid_passthrough
+233/431 Test #233: pipeline.test_watermark_svg_invalid_passthrough ................................   Passed    1.33 sec
+        Start 234: pipeline.test_transcoder_recovers_rejected_initial_avi_mp3_packet
+234/431 Test #234: pipeline.test_transcoder_recovers_rejected_initial_avi_mp3_packet ..............   Passed    0.44 sec
+        Start 235: pipeline.test_transcoder_recovers_rejected_avi_mp3_packet_with_loudnorm
+235/431 Test #235: pipeline.test_transcoder_recovers_rejected_avi_mp3_packet_with_loudnorm ........   Passed    0.47 sec
+        Start 236: pipeline.test_transcoder_recovers_rejected_avi_video_packet
+236/431 Test #236: pipeline.test_transcoder_recovers_rejected_avi_video_packet ....................   Passed    0.39 sec
+        Start 237: pipeline.test_transcoder_remuxes_video_with_two_original_and_encoded_audios
+237/431 Test #237: pipeline.test_transcoder_remuxes_video_with_two_original_and_encoded_audios ....   Passed    0.57 sec
+        Start 238: pipeline.test_transcoder_remuxes_and_encodes_same_audio
+238/431 Test #238: pipeline.test_transcoder_remuxes_and_encodes_same_audio ........................   Passed    0.30 sec
+        Start 239: pipeline.test_transcoder_encodes_and_remuxes_same_audio
+239/431 Test #239: pipeline.test_transcoder_encodes_and_remuxes_same_audio ........................   Passed    0.30 sec
+        Start 240: pipeline.test_transcoder_encodes_same_audio_twice_with_remux
+240/431 Test #240: pipeline.test_transcoder_encodes_same_audio_twice_with_remux ...................   Passed    0.36 sec
+        Start 241: pipeline.test_transcoder_remuxes_audio_while_measuring_encode
+241/431 Test #241: pipeline.test_transcoder_remuxes_audio_while_measuring_encode ..................   Passed    0.48 sec
+        Start 242: pipeline.test_transcoder_duplicates_nonzero_audio_origin
+242/431 Test #242: pipeline.test_transcoder_duplicates_nonzero_audio_origin .......................   Passed    0.77 sec
+        Start 243: pipeline.test_transcoder_measures_only_one_duplicate_encode
+243/431 Test #243: pipeline.test_transcoder_measures_only_one_duplicate_encode ....................   Passed    0.52 sec
+        Start 244: pipeline.test_transcoder_measures_both_duplicate_encodes
+244/431 Test #244: pipeline.test_transcoder_measures_both_duplicate_encodes .......................   Passed    0.52 sec
+        Start 245: pipeline.test_transcoder_extracts_single_ac3_track_from_bluray_mkv
+245/431 Test #245: pipeline.test_transcoder_extracts_single_ac3_track_from_bluray_mkv .............   Passed    0.45 sec
+        Start 246: pipeline.test_transcoder_extracts_single_aac_track_from_bluray_mkv
+246/431 Test #246: pipeline.test_transcoder_extracts_single_aac_track_from_bluray_mkv .............   Passed    0.49 sec
+        Start 247: pipeline.test_transcoder_remuxes_single_opus_file_to_mka
+247/431 Test #247: pipeline.test_transcoder_remuxes_single_opus_file_to_mka .......................   Passed    0.24 sec
+        Start 248: pipeline.test_transcoder_remuxes_wav_file_to_wav
+248/431 Test #248: pipeline.test_transcoder_remuxes_wav_file_to_wav ...............................   Passed    0.21 sec
+        Start 249: pipeline.test_transcoder_opus_encode_output_file_properties
+249/431 Test #249: pipeline.test_transcoder_opus_encode_output_file_properties ....................   Passed    0.26 sec
+        Start 250: pipeline.test_transcoder_aac_encode_from_stereo_wav
+250/431 Test #250: pipeline.test_transcoder_aac_encode_from_stereo_wav ............................   Passed    0.59 sec
+        Start 251: pipeline.test_transcoder_rejects_51_audio_to_mp3_without_downmix
+251/431 Test #251: pipeline.test_transcoder_rejects_51_audio_to_mp3_without_downmix ...............   Passed    0.25 sec
+        Start 252: pipeline.test_transcoder_allows_71_to_ac3_51_without_downmix_filter
+252/431 Test #252: pipeline.test_transcoder_allows_71_to_ac3_51_without_downmix_filter ............   Passed    0.62 sec
+        Start 253: pipeline.test_transcoder_allows_71_to_eac3_51_without_downmix_filter
+253/431 Test #253: pipeline.test_transcoder_allows_71_to_eac3_51_without_downmix_filter ...........   Passed    0.64 sec
+        Start 254: pipeline.test_transcoder_encodes_stereo_audio_to_mp3
+254/431 Test #254: pipeline.test_transcoder_encodes_stereo_audio_to_mp3 ...........................   Passed    0.11 sec
+        Start 255: pipeline.test_tagged_mp3_fixture_metadata
+255/431 Test #255: pipeline.test_tagged_mp3_fixture_metadata ......................................   Passed    0.05 sec
+        Start 256: pipeline.test_tagged_opus_fixture_metadata
+256/431 Test #256: pipeline.test_tagged_opus_fixture_metadata .....................................   Passed    0.06 sec
+        Start 257: pipeline.test_mp3_tags_preserved_in_remux
+257/431 Test #257: pipeline.test_mp3_tags_preserved_in_remux ......................................   Passed    0.09 sec
+        Start 258: pipeline.test_opus_tags_preserved_in_remux
+258/431 Test #258: pipeline.test_opus_tags_preserved_in_remux .....................................   Passed    0.09 sec
+        Start 259: pipeline.test_opus_tags_preserved_in_vorbis
+259/431 Test #259: pipeline.test_opus_tags_preserved_in_vorbis ....................................   Passed    0.31 sec
+        Start 260: pipeline.test_opus_tags_preserved_in_opus
+260/431 Test #260: pipeline.test_opus_tags_preserved_in_opus ......................................   Passed    0.09 sec
+        Start 261: pipeline.test_opus_tags_preserved_in_flac
+261/431 Test #261: pipeline.test_opus_tags_preserved_in_flac ......................................   Passed    0.08 sec
+        Start 262: pipeline.test_opus_tags_preserved_in_alac
+262/431 Test #262: pipeline.test_opus_tags_preserved_in_alac ......................................   Passed    0.08 sec
+        Start 263: pipeline.test_opus_tags_preserved_in_aac
+263/431 Test #263: pipeline.test_opus_tags_preserved_in_aac .......................................   Passed    0.23 sec
+        Start 264: pipeline.test_opus_tags_preserved_in_mp3
+264/431 Test #264: pipeline.test_opus_tags_preserved_in_mp3 .......................................   Passed    0.12 sec
+        Start 265: pipeline.test_mp3_tags_preserved_in_vorbis
+265/431 Test #265: pipeline.test_mp3_tags_preserved_in_vorbis .....................................   Passed    0.28 sec
+        Start 266: pipeline.test_mp3_tags_preserved_in_opus
+266/431 Test #266: pipeline.test_mp3_tags_preserved_in_opus .......................................   Passed    0.09 sec
+        Start 267: pipeline.test_mp3_tags_preserved_in_flac
+267/431 Test #267: pipeline.test_mp3_tags_preserved_in_flac .......................................   Passed    0.09 sec
+        Start 268: pipeline.test_mp3_tags_preserved_in_alac
+268/431 Test #268: pipeline.test_mp3_tags_preserved_in_alac .......................................   Passed    0.09 sec
+        Start 269: pipeline.test_mp3_tags_preserved_in_aac
+269/431 Test #269: pipeline.test_mp3_tags_preserved_in_aac ........................................   Passed    0.12 sec
+        Start 270: pipeline.test_mp3_tags_preserved_in_mp3
+270/431 Test #270: pipeline.test_mp3_tags_preserved_in_mp3 ........................................   Passed    0.12 sec
+        Start 271: pipeline.test_mp3_tags_roundtrip_through_vorbis
+271/431 Test #271: pipeline.test_mp3_tags_roundtrip_through_vorbis ................................   Passed    0.45 sec
+        Start 272: pipeline.test_mp3_tags_roundtrip_through_opus
+272/431 Test #272: pipeline.test_mp3_tags_roundtrip_through_opus ..................................   Passed    0.30 sec
+        Start 273: pipeline.test_untagged_audio_does_not_gain_music_tags
+273/431 Test #273: pipeline.test_untagged_audio_does_not_gain_music_tags ..........................   Passed    0.22 sec
+        Start 274: pipeline.test_libvorbis_encodes_stereo_ogg
+274/431 Test #274: pipeline.test_libvorbis_encodes_stereo_ogg .....................................   Passed    0.42 sec
+        Start 275: pipeline.test_libvorbis_encodes_surround_matroska
+275/431 Test #275: pipeline.test_libvorbis_encodes_surround_matroska ..............................   Passed    0.41 sec
+        Start 276: pipeline.test_libvorbis_decode_roundtrip
+276/431 Test #276: pipeline.test_libvorbis_decode_roundtrip .......................................   Passed    0.47 sec
+        Start 277: pipeline.test_libopus_encodes_stereo_opus
+277/431 Test #277: pipeline.test_libopus_encodes_stereo_opus ......................................   Passed    0.23 sec
+        Start 278: pipeline.test_libopus_decodes_surround_to_flac
+278/431 Test #278: pipeline.test_libopus_decodes_surround_to_flac .................................   Passed    0.24 sec
+        Start 279: pipeline.test_lame_encodes_stereo_mp3
+279/431 Test #279: pipeline.test_lame_encodes_stereo_mp3 ..........................................   Passed    0.26 sec
+        Start 280: pipeline.test_flac_encodes_stereo_matroska
+280/431 Test #280: pipeline.test_flac_encodes_stereo_matroska .....................................   Passed    0.23 sec
+        Start 281: pipeline.test_flac_encodes_surround_matroska
+281/431 Test #281: pipeline.test_flac_encodes_surround_matroska ...................................   Passed    0.24 sec
+        Start 282: pipeline.test_flac_decode_roundtrip
+282/431 Test #282: pipeline.test_flac_decode_roundtrip ............................................   Passed    0.25 sec
+        Start 283: pipeline.test_discovered_surround_flac_decoders_preserve_channels
+283/431 Test #283: pipeline.test_discovered_surround_flac_decoders_preserve_channels ..............   Passed    0.12 sec
+        Start 284: pipeline.test_alac_encodes_stereo_mp4
+284/431 Test #284: pipeline.test_alac_encodes_stereo_mp4 ..........................................   Passed    0.22 sec
+        Start 285: pipeline.test_alac_encodes_surround_mp4
+285/431 Test #285: pipeline.test_alac_encodes_surround_mp4 ........................................   Passed    0.27 sec
+        Start 286: pipeline.test_alac_decode_roundtrip
+286/431 Test #286: pipeline.test_alac_decode_roundtrip ............................................   Passed    0.26 sec
+        Start 287: pipeline.test_ac3_fixed_encodes_stereo_matroska
+287/431 Test #287: pipeline.test_ac3_fixed_encodes_stereo_matroska ................................   Passed    0.22 sec
+        Start 288: pipeline.test_eac3_encodes_stereo_matroska
+288/431 Test #288: pipeline.test_eac3_encodes_stereo_matroska .....................................   Passed    0.20 sec
+        Start 289: pipeline.test_fdk_aac_encodes_stereo_mp4
+289/431 Test #289: pipeline.test_fdk_aac_encodes_stereo_mp4 .......................................   Passed    0.43 sec
+        Start 290: pipeline.test_fdk_aac_encodes_surround_mp4
+290/431 Test #290: pipeline.test_fdk_aac_encodes_surround_mp4 .....................................   Passed    0.42 sec
+        Start 291: pipeline.test_fdk_aac_decodes_surround_to_flac
+291/431 Test #291: pipeline.test_fdk_aac_decodes_surround_to_flac .................................   Passed    0.29 sec
+        Start 292: pipeline.test_rubberband_stretches_stereo_wav
+292/431 Test #292: pipeline.test_rubberband_stretches_stereo_wav ..................................   Passed    0.31 sec
+        Start 293: pipeline.test_transcoder_remuxes_and_encodes_same_subtitle
+293/431 Test #293: pipeline.test_transcoder_remuxes_and_encodes_same_subtitle .....................   Passed    0.08 sec
+        Start 294: pipeline.test_srt_encodes_srt
+294/431 Test #294: pipeline.test_srt_encodes_srt ..................................................   Passed    0.08 sec
+        Start 295: pipeline.test_ass_encodes_matroska
+295/431 Test #295: pipeline.test_ass_encodes_matroska .............................................   Passed    0.08 sec
+        Start 296: pipeline.test_webvtt_encodes_vtt
+296/431 Test #296: pipeline.test_webvtt_encodes_vtt ...............................................   Passed    0.08 sec
+        Start 297: pipeline.test_mov_text_encodes_mp4
+297/431 Test #297: pipeline.test_mov_text_encodes_mp4 .............................................   Passed    0.08 sec
+        Start 298: pipeline.test_ttml_encodes_mp4
+298/431 Test #298: pipeline.test_ttml_encodes_mp4 .................................................   Passed    0.08 sec
+        Start 299: pipeline.test_ttml_rejects_matroska
+299/431 Test #299: pipeline.test_ttml_rejects_matroska ............................................   Passed    0.08 sec
+        Start 300: pipeline.test_pgssub_remuxes_sup
+300/431 Test #300: pipeline.test_pgssub_remuxes_sup ...............................................   Passed    0.08 sec
+        Start 301: pipeline.test_ocr_embedded_secondary_model
+301/431 Test #301: pipeline.test_ocr_embedded_secondary_model .....................................   Passed    0.24 sec
+        Start 302: pipeline.test_ocr_missing_pinned_model
+302/431 Test #302: pipeline.test_ocr_missing_pinned_model .........................................   Passed    0.04 sec
+        Start 303: pipeline.test_ocr_image_size_limits
+303/431 Test #303: pipeline.test_ocr_image_size_limits ............................................   Passed    0.04 sec
+        Start 304: pipeline.test_transcoder_ocr_japanese_pgs_to_subrip
+304/431 Test #304: pipeline.test_transcoder_ocr_japanese_pgs_to_subrip ............................   Passed    0.79 sec
+        Start 305: pipeline.test_hand_built_pipe_rejects_random_invalid_source
+305/431 Test #305: pipeline.test_hand_built_pipe_rejects_random_invalid_source ....................   Passed    0.05 sec
+        Start 306: pipeline.test_hand_built_pipe_rejects_truncated_source
+306/431 Test #306: pipeline.test_hand_built_pipe_rejects_truncated_source .........................   Passed    0.05 sec
+        Start 307: pipeline.test_transcoder_rejects_random_invalid_source
+307/431 Test #307: pipeline.test_transcoder_rejects_random_invalid_source .........................   Passed    0.04 sec
+        Start 308: pipeline.test_transcoder_rejects_truncated_source
+308/431 Test #308: pipeline.test_transcoder_rejects_truncated_source ..............................   Passed    0.04 sec
+        Start 309: pipeline.test_transcoder_rejects_negative_stream_index
+309/431 Test #309: pipeline.test_transcoder_rejects_negative_stream_index .........................   Passed    0.39 sec
+        Start 310: pipeline.test_transcoder_rejects_missing_stream_index
+310/431 Test #310: pipeline.test_transcoder_rejects_missing_stream_index ..........................   Passed    0.39 sec
+        Start 311: pipeline.test_transcoder_rejects_wrong_stream_type
+311/431 Test #311: pipeline.test_transcoder_rejects_wrong_stream_type .............................   Passed    0.39 sec
+        Start 312: pipeline.test_transcoder_rejects_wrong_codec_type
+312/431 Test #312: pipeline.test_transcoder_rejects_wrong_codec_type ..............................   Passed    0.40 sec
+        Start 313: pipeline.test_transcoder_rejects_invalid_attachment_pattern
+313/431 Test #313: pipeline.test_transcoder_rejects_invalid_attachment_pattern ....................   Passed    0.38 sec
+        Start 314: pipeline.test_transcoder_rejects_missing_logger
+314/431 Test #314: pipeline.test_transcoder_rejects_missing_logger ................................   Passed    0.04 sec
+        Start 315: pipeline.test_transcoder_rejects_empty_mapping
+315/431 Test #315: pipeline.test_transcoder_rejects_empty_mapping .................................   Passed    0.57 sec
+        Start 316: pipeline.test_transcoder_rejects_unknown_destination_container
+316/431 Test #316: pipeline.test_transcoder_rejects_unknown_destination_container .................   Passed    0.40 sec
+        Start 317: pipeline.test_transcoder_rejects_video_in_wav
+317/431 Test #317: pipeline.test_transcoder_rejects_video_in_wav ..................................   Passed    0.59 sec
+        Start 318: pipeline.test_transcoder_rejects_multiple_audio_tracks_in_wav
+318/431 Test #318: pipeline.test_transcoder_rejects_multiple_audio_tracks_in_wav ..................   Passed    0.44 sec
+        Start 319: pipeline.test_transcoder_rejects_aac_remux_in_mp3
+319/431 Test #319: pipeline.test_transcoder_rejects_aac_remux_in_mp3 ..............................   Passed    0.08 sec
+        Start 320: pipeline.test_transcoder_rejects_pgs_remux_in_mp4
+320/431 Test #320: pipeline.test_transcoder_rejects_pgs_remux_in_mp4 ..............................   Passed    0.59 sec
+        Start 321: pipeline.test_transcoder_rejects_attachments_in_mp4
+321/431 Test #321: pipeline.test_transcoder_rejects_attachments_in_mp4 ............................   Passed    0.59 sec
+        Start 322: pipeline.test_transcoder_rejects_missing_destination_parent
+322/431 Test #322: pipeline.test_transcoder_rejects_missing_destination_parent ....................   Passed    0.16 sec
+        Start 323: pipeline.test_vp9_workers_follow_output_resolution
+323/431 Test #323: pipeline.test_vp9_workers_follow_output_resolution .............................   Passed    0.04 sec
+        Start 324: pipeline.test_transcoder_selects_decoder_implementation
+324/431 Test #324: pipeline.test_transcoder_selects_decoder_implementation ........................   Passed    0.16 sec
+        Start 325: pipeline.test_transcoder_rejects_missing_decoder_implementation
+325/431 Test #325: pipeline.test_transcoder_rejects_missing_decoder_implementation ................   Passed    0.20 sec
+        Start 326: pipeline.test_transcoder_rejects_mismatched_decoder_implementation
+326/431 Test #326: pipeline.test_transcoder_rejects_mismatched_decoder_implementation .............   Passed    0.16 sec
+        Start 327: pipeline.test_manual_selects_plan_decoder_implementation
+327/431 Test #327: pipeline.test_manual_selects_plan_decoder_implementation .......................   Passed    0.12 sec
+        Start 328: pipeline.test_manual_rejects_missing_decoder_implementation
+328/431 Test #328: pipeline.test_manual_rejects_missing_decoder_implementation ....................   Passed    0.12 sec
+        Start 329: pipeline.test_manual_rejects_mismatched_decoder_implementation
+329/431 Test #329: pipeline.test_manual_rejects_mismatched_decoder_implementation .................   Passed    0.12 sec
+        Start 330: pipeline.test_audio_cover_unsupported_caf
+330/431 Test #330: pipeline.test_audio_cover_unsupported_caf ......................................   Passed    0.08 sec
+        Start 331: pipeline.test_ogg_policy_rejects_non_image_attachments
+331/431 Test #331: pipeline.test_ogg_policy_rejects_non_image_attachments .........................   Passed    0.59 sec
+        Start 332: pipeline.test_audio_cover_opus
+332/431 Test #332: pipeline.test_audio_cover_opus .................................................   Passed    0.16 sec
+        Start 333: pipeline.test_audio_cover_vorbis
+333/431 Test #333: pipeline.test_audio_cover_vorbis ...............................................   Passed    0.39 sec
+        Start 334: pipeline.test_audio_cover_ogg_flac
+334/431 Test #334: pipeline.test_audio_cover_ogg_flac .............................................   Passed    0.16 sec
+        Start 335: pipeline.test_audio_cover_flac
+335/431 Test #335: pipeline.test_audio_cover_flac .................................................   Passed    0.17 sec
+        Start 336: pipeline.test_audio_cover_mp3
+336/431 Test #336: pipeline.test_audio_cover_mp3 ..................................................   Passed    0.36 sec
+        Start 337: pipeline.test_audio_cover_aiff
+337/431 Test #337: pipeline.test_audio_cover_aiff .................................................   Passed    0.17 sec
+        Start 338: pipeline.test_audio_cover_aac_m4a
+338/431 Test #338: pipeline.test_audio_cover_aac_m4a ..............................................   Passed    0.28 sec
+        Start 339: pipeline.test_audio_cover_alac_m4a
+339/431 Test #339: pipeline.test_audio_cover_alac_m4a .............................................   Passed    0.16 sec
+        Start 340: pipeline.test_audio_cover_matroska
+340/431 Test #340: pipeline.test_audio_cover_matroska .............................................   Passed    0.15 sec
+        Start 341: pipeline.test_generic_muxer_writes_flac
+341/431 Test #341: pipeline.test_generic_muxer_writes_flac ........................................   Passed    0.16 sec
+        Start 342: pipeline.test_generic_muxer_writes_flac_in_oga
+342/431 Test #342: pipeline.test_generic_muxer_writes_flac_in_oga .................................   Passed    0.16 sec
+        Start 343: pipeline.test_generic_muxer_writes_vorbis_in_ogg
+343/431 Test #343: pipeline.test_generic_muxer_writes_vorbis_in_ogg ...............................   Passed    0.38 sec
+        Start 344: pipeline.test_generic_muxer_writes_vorbis_in_ogv
+344/431 Test #344: pipeline.test_generic_muxer_writes_vorbis_in_ogv ...............................   Passed    0.37 sec
+        Start 345: pipeline.test_generic_muxer_writes_alac_in_caf
+345/431 Test #345: pipeline.test_generic_muxer_writes_alac_in_caf .................................   Passed    0.18 sec
+        Start 346: pipeline.test_generic_muxer_writes_eac3
+346/431 Test #346: pipeline.test_generic_muxer_writes_eac3 ........................................   Passed    0.16 sec
+        Start 347: pipeline.test_generic_flac_rejects_aac_remux
+347/431 Test #347: pipeline.test_generic_flac_rejects_aac_remux ...................................   Passed    0.08 sec
+        Start 348: pipeline.test_webm_policy_rejects_attachments
+348/431 Test #348: pipeline.test_webm_policy_rejects_attachments ..................................   Passed    2.01 sec
+        Start 349: pipeline.test_muxer_declares_ass_without_cues
+349/431 Test #349: pipeline.test_muxer_declares_ass_without_cues ..................................   Passed    0.42 sec
+        Start 350: pipeline.test_muxer_declares_mov_text_without_cues
+350/431 Test #350: pipeline.test_muxer_declares_mov_text_without_cues .............................   Passed    0.35 sec
+        Start 351: pipeline.test_subtitle_first_cue_after_one_hour
+351/431 Test #351: pipeline.test_subtitle_first_cue_after_one_hour ................................   Passed    0.08 sec
+        Start 352: pipeline.test_nlmeans_rolling_sums_match_reference
+352/431 Test #352: pipeline.test_nlmeans_rolling_sums_match_reference .............................   Passed    0.11 sec
+        Start 353: pipeline.test_nlmeans_full_range_samples
+353/431 Test #353: pipeline.test_nlmeans_full_range_samples .......................................   Passed    0.04 sec
+        Start 354: pipeline.test_video_content_keeps_compatible_hdr_and_dovi
+354/431 Test #354: pipeline.test_video_content_keeps_compatible_hdr_and_dovi ......................   Passed    0.07 sec
+        Start 355: pipeline.test_video_content_drops_hdr_and_dovi_after_tonemap
+355/431 Test #355: pipeline.test_video_content_drops_hdr_and_dovi_after_tonemap ...................   Passed    0.07 sec
+        Start 356: pipeline.test_video_content_restores_compatible_missing_metadata
+356/431 Test #356: pipeline.test_video_content_restores_compatible_missing_metadata ...............   Passed    0.09 sec
+        Start 357: pipeline.test_video_content_keeps_profile5_color_encoding
+357/431 Test #357: pipeline.test_video_content_keeps_profile5_color_encoding ......................   Passed    0.07 sec
+        Start 358: pipeline.test_filter_graph_delayed_output_and_eof
+358/431 Test #358: pipeline.test_filter_graph_delayed_output_and_eof ..............................   Passed    0.04 sec
+        Start 359: pipeline.test_filter_decimate_cadence_metadata_and_lifecycle
+359/431 Test #359: pipeline.test_filter_decimate_cadence_metadata_and_lifecycle ...................   Passed    0.04 sec
+        Start 360: pipeline.test_filter_decimate_cadence_rejects_invalid_timing
+360/431 Test #360: pipeline.test_filter_decimate_cadence_rejects_invalid_timing ...................   Passed    0.04 sec
+        Start 361: pipeline.test_filter_decimate_cadence_source_timing
+361/431 Test #361: pipeline.test_filter_decimate_cadence_source_timing ............................   Passed    0.04 sec
+        Start 362: pipeline.test_filter_graph_fps_count_and_timestamps
+362/431 Test #362: pipeline.test_filter_graph_fps_count_and_timestamps ............................   Passed    0.03 sec
+        Start 363: pipeline.test_filter_graph_decimate_uses_nominal_cadence
+363/431 Test #363: pipeline.test_filter_graph_decimate_uses_nominal_cadence .......................   Passed    0.04 sec
+        Start 364: pipeline.test_filter_graph_adeclick_flush_is_bounded
+364/431 Test #364: pipeline.test_filter_graph_adeclick_flush_is_bounded ...........................   Passed    0.04 sec
+        Start 365: pipeline.test_filter_zimg_cache_tracks_input_color
+365/431 Test #365: pipeline.test_filter_zimg_cache_tracks_input_color .............................   Passed    0.05 sec
+        Start 366: pipeline.test_filter_degrain_extreme_aspect_ratios
+366/431 Test #366: pipeline.test_filter_degrain_extreme_aspect_ratios .............................   Passed    0.05 sec
+        Start 367: pipeline.test_filter_adeclick
+367/431 Test #367: pipeline.test_filter_adeclick ..................................................   Passed    0.27 sec
+        Start 368: pipeline.test_filter_afftdn
+368/431 Test #368: pipeline.test_filter_afftdn ....................................................   Passed    0.20 sec
+        Start 369: pipeline.test_filter_denoise
+369/431 Test #369: pipeline.test_filter_denoise ...................................................   Passed    0.20 sec
+        Start 370: pipeline.test_filter_downmix
+370/431 Test #370: pipeline.test_filter_downmix ...................................................   Passed    0.25 sec
+        Start 371: pipeline.test_filter_limiter
+371/431 Test #371: pipeline.test_filter_limiter ...................................................   Passed    0.19 sec
+        Start 372: pipeline.test_filter_loudnorm
+372/431 Test #372: pipeline.test_filter_loudnorm ..................................................   Passed    0.23 sec
+        Start 373: pipeline.test_filter_resample
+373/431 Test #373: pipeline.test_filter_resample ..................................................   Passed    0.18 sec
+        Start 374: pipeline.test_filter_rubberband
+374/431 Test #374: pipeline.test_filter_rubberband ................................................   Passed    0.25 sec
+        Start 375: pipeline.test_filter_upmix
+375/431 Test #375: pipeline.test_filter_upmix .....................................................   Passed    0.21 sec
+        Start 376: pipeline.test_filter_atadenoise
+376/431 Test #376: pipeline.test_filter_atadenoise ................................................   Passed    0.39 sec
+        Start 377: pipeline.test_filter_bm3d
+377/431 Test #377: pipeline.test_filter_bm3d ......................................................   Passed    6.47 sec
+        Start 378: pipeline.test_filter_bwdif
+378/431 Test #378: pipeline.test_filter_bwdif .....................................................   Passed    0.42 sec
+        Start 379: pipeline.test_filter_cas
+379/431 Test #379: pipeline.test_filter_cas .......................................................   Passed    0.43 sec
+        Start 380: pipeline.test_filter_crop
+380/431 Test #380: pipeline.test_filter_crop ......................................................   Passed    0.27 sec
+        Start 381: pipeline.test_filter_deband
+381/431 Test #381: pipeline.test_filter_deband ....................................................   Passed    0.45 sec
+        Start 382: pipeline.test_filter_decimate
+382/431 Test #382: pipeline.test_filter_decimate ..................................................   Passed    0.49 sec
+        Start 383: pipeline.test_filter_deflicker
+383/431 Test #383: pipeline.test_filter_deflicker .................................................   Passed    0.38 sec
+        Start 384: pipeline.test_filter_degrain
+384/431 Test #384: pipeline.test_filter_degrain ...................................................   Passed    0.54 sec
+        Start 385: pipeline.test_filter_fftdnoiz
+385/431 Test #385: pipeline.test_filter_fftdnoiz ..................................................   Passed    0.75 sec
+        Start 386: pipeline.test_filter_fieldmatch
+386/431 Test #386: pipeline.test_filter_fieldmatch ................................................   Passed    0.40 sec
+        Start 387: pipeline.test_filter_format
+387/431 Test #387: pipeline.test_filter_format ....................................................   Passed    0.38 sec
+        Start 388: pipeline.test_filter_fps
+388/431 Test #388: pipeline.test_filter_fps .......................................................   Passed    0.39 sec
+        Start 389: pipeline.test_filter_hqdn3d
+389/431 Test #389: pipeline.test_filter_hqdn3d ....................................................   Passed    0.64 sec
+        Start 390: pipeline.test_filter_interpolate
+390/431 Test #390: pipeline.test_filter_interpolate ...............................................   Passed   11.61 sec
+        Start 391: pipeline.test_filter_nlmeans
+391/431 Test #391: pipeline.test_filter_nlmeans ...................................................   Passed   14.50 sec
+        Start 392: pipeline.test_filter_pad
+392/431 Test #392: pipeline.test_filter_pad .......................................................   Passed    0.81 sec
+        Start 393: pipeline.test_filter_scale
+393/431 Test #393: pipeline.test_filter_scale .....................................................   Passed    0.30 sec
+        Start 394: pipeline.test_filter_vaguedenoiser
+394/431 Test #394: pipeline.test_filter_vaguedenoiser .............................................   Passed    1.10 sec
+        Start 395: pipeline.test_filter_watermark
+395/431 Test #395: pipeline.test_filter_watermark .................................................   Passed    0.52 sec
+        Start 396: pipeline.test_filter_yadif
+396/431 Test #396: pipeline.test_filter_yadif .....................................................   Passed    0.42 sec
+        Start 397: pipeline.test_filter_count_frames
+397/431 Test #397: pipeline.test_filter_count_frames ..............................................   Passed    0.09 sec
+        Start 398: pipeline.test_filter_psnr
+398/431 Test #398: pipeline.test_filter_psnr ......................................................   Passed    0.13 sec
+        Start 399: pipeline.test_filter_ssim
+399/431 Test #399: pipeline.test_filter_ssim ......................................................   Passed    0.17 sec
+        Start 400: pipeline.test_filter_xpsnr
+400/431 Test #400: pipeline.test_filter_xpsnr .....................................................   Passed    0.21 sec
+        Start 401: pipeline.test_filter_analytics_cancel_mid_encode
+401/431 Test #401: pipeline.test_filter_analytics_cancel_mid_encode ...............................   Passed    8.58 sec
+        Start 402: pipeline.test_filter_two_pass_waits_for_slow_upstream
+402/431 Test #402: pipeline.test_filter_two_pass_waits_for_slow_upstream ..........................   Passed    0.37 sec
+        Start 403: pipeline.test_mp4_video_only
+403/431 Test #403: pipeline.test_mp4_video_only ...................................................   Passed    0.97 sec
+        Start 404: pipeline.test_mp4_audio_only_m4a
+404/431 Test #404: pipeline.test_mp4_audio_only_m4a ...............................................   Passed    0.59 sec
+        Start 405: pipeline.test_mp4_audio_only_m4b
+405/431 Test #405: pipeline.test_mp4_audio_only_m4b ...............................................   Passed    0.56 sec
+        Start 406: pipeline.test_mp4_two_audio_tracks
+406/431 Test #406: pipeline.test_mp4_two_audio_tracks .............................................   Passed    0.56 sec
+        Start 407: pipeline.test_mp4_reordered_audio_tracks
+407/431 Test #407: pipeline.test_mp4_reordered_audio_tracks .......................................   Passed    0.58 sec
+        Start 408: pipeline.test_mp4_video_and_audio
+408/431 Test #408: pipeline.test_mp4_video_and_audio ..............................................   Passed    0.86 sec
+        Start 409: pipeline.test_mp4_video_and_subtitle
+409/431 Test #409: pipeline.test_mp4_video_and_subtitle ...........................................   Passed    0.85 sec
+        Start 410: pipeline.test_mp4_video_and_two_audio_tracks
+410/431 Test #410: pipeline.test_mp4_video_and_two_audio_tracks ...................................   Passed    0.84 sec
+        Start 411: pipeline.test_mp4_video_and_two_subtitle_tracks
+411/431 Test #411: pipeline.test_mp4_video_and_two_subtitle_tracks ................................   Passed    0.81 sec
+        Start 412: pipeline.test_mp4_all_five_tracks
+412/431 Test #412: pipeline.test_mp4_all_five_tracks ..............................................   Passed    0.80 sec
+        Start 413: pipeline.test_mp4_subtitles_only
+413/431 Test #413: pipeline.test_mp4_subtitles_only ...............................................   Passed    0.53 sec
+        Start 414: pipeline.test_mp4_remux_video_and_encode_audio
+414/431 Test #414: pipeline.test_mp4_remux_video_and_encode_audio .................................   Passed    1.12 sec
+        Start 415: pipeline.test_mp4_audio_and_encode_timed_text
+415/431 Test #415: pipeline.test_mp4_audio_and_encode_timed_text ..................................   Passed    0.53 sec
+        Start 416: pipeline.test_mp4_hevc_aac_without_attachments
+416/431 Test #416: pipeline.test_mp4_hevc_aac_without_attachments .................................   Passed    0.52 sec
+        Start 417: pipeline.test_mp4_preserves_image_as_cover
+417/431 Test #417: pipeline.test_mp4_preserves_image_as_cover .....................................   Passed    0.80 sec
+        Start 418: pipeline.test_m4a_preserves_image_as_cover
+418/431 Test #418: pipeline.test_m4a_preserves_image_as_cover .....................................   Passed    0.67 sec
+        Start 419: pipeline.test_matroska_preserves_image_as_attachment
+419/431 Test #419: pipeline.test_matroska_preserves_image_as_attachment ...........................   Passed    0.80 sec
+        Start 420: pipeline.test_mp4_rejects_font_attachment
+420/431 Test #420: pipeline.test_mp4_rejects_font_attachment ......................................   Passed    0.77 sec
+        Start 421: pipeline.test_avi_missing_pts_preserves_timeline_and_progress
+421/431 Test #421: pipeline.test_avi_missing_pts_preserves_timeline_and_progress ..................   Passed    0.45 sec
+        Start 422: pipeline.test_mov_text_preserves_long_gaps
+422/431 Test #422: pipeline.test_mov_text_preserves_long_gaps .....................................   Passed    0.07 sec
+        Start 423: pipeline.test_mov_text_preserves_long_gaps_mixed_time_bases
+423/431 Test #423: pipeline.test_mov_text_preserves_long_gaps_mixed_time_bases ....................   Passed    0.07 sec
+        Start 424: pipeline.test_mov_text_preserves_long_gaps_fragmented
+424/431 Test #424: pipeline.test_mov_text_preserves_long_gaps_fragmented ..........................   Passed    0.07 sec
+        Start 425: pipeline.test_interleave_sparse_ocr_with_remux
+425/431 Test #425: pipeline.test_interleave_sparse_ocr_with_remux .................................   Passed    0.90 sec
+        Start 426: pipeline.test_interleave_empty_ocr_with_remux
+426/431 Test #426: pipeline.test_interleave_empty_ocr_with_remux ..................................   Passed    0.90 sec
+        Start 427: pipeline.test_interleave_cancel_pending_ocr
+427/431 Test #427: pipeline.test_interleave_cancel_pending_ocr ....................................   Passed    0.38 sec
+        Start 428: pipeline.test_interleave_encoded_video_and_audio
+428/431 Test #428: pipeline.test_interleave_encoded_video_and_audio ...............................   Passed    0.56 sec
+        Start 429: pipeline.test_interleave_encoded_video_remuxed_audio
+429/431 Test #429: pipeline.test_interleave_encoded_video_remuxed_audio ...........................   Passed    0.54 sec
+        Start 430: pipeline.test_interleave_remuxed_video_loudnorm_audio
+430/431 Test #430: pipeline.test_interleave_remuxed_video_loudnorm_audio ..........................   Passed    0.68 sec
+        Start 431: pipeline.test_interleave_encoded_video_loudnorm_audio
+431/431 Test #431: pipeline.test_interleave_encoded_video_loudnorm_audio ..........................   Passed    0.85 sec
+
+100% tests passed, 0 tests failed out of 431
+
+Label Time Summary:
+audio-codecs       =   8.19 sec*proc (34 tests)
+configuration      =   0.31 sec*proc (8 tests)
+file               =   9.26 sec*proc (25 tests)
+interleave         =   5.49 sec*proc (11 tests)
+io                 =   0.48 sec*proc (7 tests)
+logging            =   0.04 sec*proc (1 test)
+mp4-policy         =  13.18 sec*proc (18 tests)
+multimedia         = 360.12 sec*proc (431 tests)
+mux-policy         =   6.17 sec*proc (19 tests)
+ocr                =   0.05 sec*proc (3 tests)
+pipeline           = 318.76 sec*proc (357 tests)
+preview            =  37.48 sec*proc (30 tests)
+registry           =   0.87 sec*proc (19 tests)
+subtitle-codecs    =   0.62 sec*proc (8 tests)
+video-codecs       =  36.08 sec*proc (34 tests)
+watermark          =   1.95 sec*proc (1 test)
+
+Total Test time (real) = 360.21 sec
+
+The following tests did not run:
+	110 - pipeline.test_transcoder_hevc_qsv_encode_preserves_hdr10_metadata (Skipped)
+	111 - pipeline.test_transcoder_hevc_vaapi_encode_preserves_hdr10_metadata (Skipped)
+	118 - pipeline.test_hardware_h264_nvenc_10bit_capability (Skipped)
+	120 - pipeline.test_hardware_av1_nvenc_capability (Skipped)
+	121 - pipeline.test_hardware_hevc_qsv_capability (Skipped)
+	122 - pipeline.test_hardware_hevc_vaapi_capability (Skipped)
+	126 - pipeline.test_hardware_transfer (Skipped)
+	217 - pipeline.test_vaapi_encodes_hevc_main_matroska (Skipped)
+	222 - pipeline.test_nvenc_encodes_h264_10bit_matroska (Skipped)
+	225 - pipeline.test_nvenc_encodes_av1_matroska (Skipped)

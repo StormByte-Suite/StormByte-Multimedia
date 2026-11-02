@@ -1,0 +1,158 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/attachment.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/decode_policy.hxx:35:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   35 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/display.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/color.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/pixel_format.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/simple_player.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/type.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_audio.hxx:159:43: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  159 |                         || !audio.m_frames || audio.m_frames > 16 * 1024 * 1024 / width / channels
+      |                                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_audio.hxx:159:43: note: make conversion explicit to silence this warning
+   57 |                         || !audio.m_frames || audio.m_frames > 16 * 1024 * 1024 / width / channels
+      |                                                                ^~~~~~~~~~~~~~~~
+      |                                                                static_cast<std::size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_audio.hxx:159:43: note: perform multiplication in a wider type
+  159 |                         || !audio.m_frames || audio.m_frames > 16 * 1024 * 1024 / width / channels
+      |                                                                ^~~~~~~~~
+      |                                                                static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:190:73: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  190 |                                                 << " duration=" << image->m_duration << " image-hash=" << hash << std::endl;
+      |                                                                                                                   ^~~~~~~~~
+      |                                                                                                                   '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:210:53: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  210 |                                         << " channels=" << audio->m_channels.size() << std::endl;
+      |                                                                                        ^~~~~~~~~
+      |                                                                                        '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:243:46: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions]
+  243 |                                 start_device = m_priming && !m_paused && m_audio_size >= m_rate * channels * 0.08;
+      |                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:243:62: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions]
+  243 |                                 start_device = m_priming && !m_paused && m_audio_size >= m_rate * channels * 0.08;
+      |                                                                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:252:43: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  252 |                         if (m_dump.is_open() && m_dump_bytes < 32 * 1024 * 1024) {
+      |                                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:252:43: note: make conversion explicit to silence this warning
+   59 |                         if (m_dump.is_open() && m_dump_bytes < 32 * 1024 * 1024) {
+      |                                                                ^~~~~~~~~~~~~~~~
+      |                                                                static_cast<std::size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:252:43: note: perform multiplication in a wider type
+  252 |                         if (m_dump.is_open() && m_dump_bytes < 32 * 1024 * 1024) {
+      |                                                                ^~~~~~~~~
+      |                                                                static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:255:7: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  255 |                                         (32 * 1024 * 1024 - m_dump_bytes) / frame_bytes * frame_bytes);
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:255:7: note: make conversion explicit to silence this warning
+  255 |                                         (32 * 1024 * 1024 - m_dump_bytes) / frame_bytes * frame_bytes);
+      |                                          ^~~~~~~~~~~~~~~~
+      |                                          static_cast<std::size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:255:7: note: perform multiplication in a wider type
+  255 |                                         (32 * 1024 * 1024 - m_dump_bytes) / frame_bytes * frame_bytes);
+      |                                          ^~~~~~~~~
+      |                                          static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:297:71: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions]
+  297 |                         const double queued = m_rate ? static_cast<double>(m_audio_size) / (m_rate * m_channel_count) : 0;
+      |                                                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:310:17: warning: 2 adjacent parameters of 'Position' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  310 |                 void Position(double position, std::uint64_t epoch) override {
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:310:24: note: the first parameter in the range is 'position'
+  310 |                 void Position(double position, std::uint64_t epoch) override {
+      |                                      ^~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:310:48: note: the last parameter in the range is 'epoch'
+  310 |                 void Position(double position, std::uint64_t epoch) override {
+      |                                                              ^~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:310:17: note: 
+  310 |                 void Position(double position, std::uint64_t epoch) override {
+      |                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:310:34: note: 'double' and 'std::uint64_t' may be implicitly converted: 'double' -> 'std::uint64_t' (as 'unsigned long'), 'std::uint64_t' (as 'unsigned long') -> 'double'
+  310 |                 void Position(double position, std::uint64_t epoch) override {
+      |                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:350:36: warning: narrowing conversion from 'std::uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  350 |                                                 SDL_TEXTUREACCESS_STREAMING, image->m_width, image->m_height);
+      |                                                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:350:52: warning: narrowing conversion from 'std::uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  350 |                                                 SDL_TEXTUREACCESS_STREAMING, image->m_width, image->m_height);
+      |                                                                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:355:76: warning: narrowing conversion from 'std::uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  355 |                                 CheckSDL(SDL_UpdateTexture(m_texture, nullptr, image->m_pixels.data(), m_width * 4) == 0);
+      |                                                                                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:385:59: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  385 |                                 << " max-submit-timestamp-gap=" << m_timestamp_gap << std::endl;
+      |                                                                                       ^~~~~~~~~
+      |                                                                                       '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:431:20: warning: narrowing conversion from 'std::uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  431 |                                 desired.freq = audio->m_rate;
+      |                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:477:18: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  477 |                                 std::cout << std::endl;
+      |                                              ^~~~~~~~~
+      |                                              '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:480:8: warning: performing an implicit widening conversion to type 'std::size_t' (aka 'unsigned long') of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  480 |                                 && 32 * 1024 * 1024 - m_dump_bytes >= m_channel_count * sizeof(float)) {
+      |                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:480:8: note: make conversion explicit to silence this warning
+  480 |                                 && 32 * 1024 * 1024 - m_dump_bytes >= m_channel_count * sizeof(float)) {
+      |                                    ^~~~~~~~~~~~~~~~
+      |                                    static_cast<std::size_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:480:8: note: perform multiplication in a wider type
+  480 |                                 && 32 * 1024 * 1024 - m_dump_bytes >= m_channel_count * sizeof(float)) {
+      |                                    ^~~~~~~~~
+      |                                    static_cast<long>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:526:59: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions]
+  526 |                         self.m_audio_position += static_cast<double>(copied) / (self.m_rate * self.m_channel_count);
+      |                                                                                ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:614:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  614 |                 std::cerr << "Unknown playback mode: " << argv[2] << std::endl;
+      |                                                                      ^~~~~~~~~
+      |                                                                      '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:620:34: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  620 |                 std::cerr << SDL_GetError() << std::endl;
+      |                                                ^~~~~~~~~
+      |                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:632:73: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  632 |                 std::cout << "Opened duration=" << player.Duration() << " seconds" << std::endl;
+      |                                                                                       ^~~~~~~~~
+      |                                                                                       '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:634:94: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  634 |                         std::cout << "Track " << track.m_index << " codec=" << std::string_view(track.m_codec) << std::endl;
+      |                                                                                                                   ^~~~~~~~~
+      |                                                                                                                   '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:679:40: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  679 |                                         std::cout << "Seek " << target << std::endl;
+      |                                                                           ^~~~~~~~~
+      |                                                                           '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:695:52: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  695 |                 std::cerr << "Preview demo: " << error.what() << std::endl;
+      |                                                                  ^~~~~~~~~
+      |                                                                  '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:699:52: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  699 |                 std::cerr << "Preview demo: " << error.what() << std::endl;
+      |                                                                  ^~~~~~~~~
+      |                                                                  '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/preview_demo.cxx:703:51: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  703 |                 std::cerr << "Preview demo: unknown failure" << std::endl;
+      |                                                                 ^~~~~~~~~
+      |                                                                 '\n'

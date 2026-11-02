@@ -1,0 +1,914 @@
+Start testing: Nov 02 04:04 CET
+----------------------------------------------------------
+1/57 Testing: Base64Tests
+1/57 Test: Base64Tests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Base64Tests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"Base64Tests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"Base64Tests" end time: Nov 02 04:04 CET
+"Base64Tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/57 Testing: ByteSizeTests
+2/57 Test: ByteSizeTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/ByteSizeTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"ByteSizeTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ByteSizeTests" end time: Nov 02 04:04 CET
+"ByteSizeTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/57 Testing: ErrorTests
+3/57 Test: ErrorTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/ErrorTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"ErrorTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ErrorTests" end time: Nov 02 04:04 CET
+"ErrorTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/57 Testing: ExceptionTests
+4/57 Test: ExceptionTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/ExceptionTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"ExceptionTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ExceptionTests" end time: Nov 02 04:04 CET
+"ExceptionTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/57 Testing: SerializableTests
+5/57 Test: SerializableTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/SerializableTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"SerializableTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"SerializableTests" end time: Nov 02 04:04 CET
+"SerializableTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/57 Testing: SizeTests
+6/57 Test: SizeTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/SizeTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"SizeTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SizeTests" end time: Nov 02 04:04 CET
+"SizeTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/57 Testing: TelemetryTests
+7/57 Test: TelemetryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/TelemetryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"TelemetryTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"TelemetryTests" end time: Nov 02 04:04 CET
+"TelemetryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/57 Testing: ThreadLockTests
+8/57 Test: ThreadLockTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/ThreadLockTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"ThreadLockTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"ThreadLockTests" end time: Nov 02 04:04 CET
+"ThreadLockTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/57 Testing: UUIDTest
+9/57 Test: UUIDTest
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/UUIDTest"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test
+"UUIDTest" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"UUIDTest" end time: Nov 02 04:04 CET
+"UUIDTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/57 Testing: AtomicTests
+10/57 Test: AtomicTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/AtomicTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"AtomicTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"AtomicTests" end time: Nov 02 04:04 CET
+"AtomicTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/57 Testing: BinaryTests
+11/57 Test: BinaryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/BinaryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"BinaryTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"BinaryTests" end time: Nov 02 04:04 CET
+"BinaryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/57 Testing: CallbackTests
+12/57 Test: CallbackTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/CallbackTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"CallbackTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"CallbackTests" end time: Nov 02 04:04 CET
+"CallbackTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/57 Testing: ClonableTests
+13/57 Test: ClonableTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ClonableTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ClonableTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ClonableTests" end time: Nov 02 04:04 CET
+"ClonableTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/57 Testing: ConditionVariableAnyTests
+14/57 Test: ConditionVariableAnyTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ConditionVariableAnyTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ConditionVariableAnyTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.34 sec
+----------------------------------------------------------
+Test Passed.
+"ConditionVariableAnyTests" end time: Nov 02 04:04 CET
+"ConditionVariableAnyTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/57 Testing: ConditionVariableTests
+15/57 Test: ConditionVariableTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ConditionVariableTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ConditionVariableTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"ConditionVariableTests" end time: Nov 02 04:04 CET
+"ConditionVariableTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/57 Testing: DequeTests
+16/57 Test: DequeTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/DequeTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"DequeTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"DequeTests" end time: Nov 02 04:04 CET
+"DequeTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/57 Testing: DLLBoundaryTests
+17/57 Test: DLLBoundaryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/DLLBoundaryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"DLLBoundaryTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"DLLBoundaryTests" end time: Nov 02 04:04 CET
+"DLLBoundaryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/57 Testing: ExclusiveLockTests
+18/57 Test: ExclusiveLockTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ExclusiveLockTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ExclusiveLockTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ExclusiveLockTests" end time: Nov 02 04:04 CET
+"ExclusiveLockTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/57 Testing: SafeExceptionTests
+19/57 Test: SafeExceptionTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/SafeExceptionTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"SafeExceptionTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SafeExceptionTests" end time: Nov 02 04:04 CET
+"SafeExceptionTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/57 Testing: FunctionTests
+20/57 Test: FunctionTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/FunctionTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"FunctionTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"FunctionTests" end time: Nov 02 04:04 CET
+"FunctionTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/57 Testing: HashTests
+21/57 Test: HashTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/HashTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"HashTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"HashTests" end time: Nov 02 04:04 CET
+"HashTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/57 Testing: HeapTests
+22/57 Test: HeapTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/HeapTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"HeapTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"HeapTests" end time: Nov 02 04:04 CET
+"HeapTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/57 Testing: IterableTests
+23/57 Test: IterableTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/IterableTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"IterableTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"IterableTests" end time: Nov 02 04:04 CET
+"IterableTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/57 Testing: ListTests
+24/57 Test: ListTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ListTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ListTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ListTests" end time: Nov 02 04:04 CET
+"ListTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/57 Testing: MapTests
+25/57 Test: MapTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/MapTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"MapTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"MapTests" end time: Nov 02 04:04 CET
+"MapTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/57 Testing: MutexTests
+26/57 Test: MutexTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/MutexTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"MutexTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"MutexTests" end time: Nov 02 04:04 CET
+"MutexTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/57 Testing: OptionalTests
+27/57 Test: OptionalTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/OptionalTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"OptionalTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"OptionalTests" end time: Nov 02 04:04 CET
+"OptionalTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/57 Testing: OwnerTests
+28/57 Test: OwnerTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/OwnerTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"OwnerTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"OwnerTests" end time: Nov 02 04:04 CET
+"OwnerTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/57 Testing: PairTests
+29/57 Test: PairTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/PairTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"PairTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"PairTests" end time: Nov 02 04:04 CET
+"PairTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/57 Testing: PointerTests
+30/57 Test: PointerTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/PointerTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"PointerTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"PointerTests" end time: Nov 02 04:04 CET
+"PointerTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/57 Testing: QueueTests
+31/57 Test: QueueTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/QueueTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"QueueTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"QueueTests" end time: Nov 02 04:04 CET
+"QueueTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/57 Testing: SecureBinaryTests
+32/57 Test: SecureBinaryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/SecureBinaryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"SecureBinaryTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+  (skipped: AddressSanitizer intercepts mlock/munlock without locking pages)
+All tests passed!
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"SecureBinaryTests" end time: Nov 02 04:04 CET
+"SecureBinaryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/57 Testing: SetTests
+33/57 Test: SetTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/SetTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"SetTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SetTests" end time: Nov 02 04:04 CET
+"SetTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/57 Testing: SharedLockTests
+34/57 Test: SharedLockTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/SharedLockTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"SharedLockTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SharedLockTests" end time: Nov 02 04:04 CET
+"SharedLockTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/57 Testing: SharedMutexTests
+35/57 Test: SharedMutexTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/SharedMutexTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"SharedMutexTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SharedMutexTests" end time: Nov 02 04:04 CET
+"SharedMutexTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/57 Testing: PerformanceTests
+36/57 Test: PerformanceTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/PerformanceTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"PerformanceTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+Full PGO instrumentation completed (200 iterations)
+<end of output>
+Test time =   1.61 sec
+----------------------------------------------------------
+Test Passed.
+"PerformanceTests" end time: Nov 02 04:04 CET
+"PerformanceTests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+37/57 Testing: StringTests
+37/57 Test: StringTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/StringTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"StringTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"StringTests" end time: Nov 02 04:04 CET
+"StringTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/57 Testing: StringAllocationFailureTests
+38/57 Test: StringAllocationFailureTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/StringAllocationFailureTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"StringAllocationFailureTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+Allocation interposition requires Linux/glibc without AddressSanitizer; compile-time contracts were checked.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"StringAllocationFailureTests" end time: Nov 02 04:04 CET
+"StringAllocationFailureTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+39/57 Testing: ThreadTests
+39/57 Test: ThreadTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ThreadTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ThreadTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ThreadTests" end time: Nov 02 04:04 CET
+"ThreadTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/57 Testing: ThreadLifetimeTests
+40/57 Test: ThreadLifetimeTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/ThreadLifetimeTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"ThreadLifetimeTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ThreadLifetimeTests" end time: Nov 02 04:04 CET
+"ThreadLifetimeTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+41/57 Testing: UniqueLockTests
+41/57 Test: UniqueLockTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/UniqueLockTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"UniqueLockTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"UniqueLockTests" end time: Nov 02 04:04 CET
+"UniqueLockTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/57 Testing: UnorderedMapTests
+42/57 Test: UnorderedMapTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/UnorderedMapTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"UnorderedMapTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"UnorderedMapTests" end time: Nov 02 04:04 CET
+"UnorderedMapTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/57 Testing: UnorderedSetTests
+43/57 Test: UnorderedSetTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/UnorderedSetTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"UnorderedSetTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"UnorderedSetTests" end time: Nov 02 04:04 CET
+"UnorderedSetTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/57 Testing: VariantTests
+44/57 Test: VariantTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/VariantTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"VariantTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"VariantTests" end time: Nov 02 04:04 CET
+"VariantTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/57 Testing: VectorTests
+45/57 Test: VectorTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/VectorTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"VectorTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.39 sec
+----------------------------------------------------------
+Test Passed.
+"VectorTests" end time: Nov 02 04:04 CET
+"VectorTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/57 Testing: WStringTests
+46/57 Test: WStringTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe/WStringTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/safe
+"WStringTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"WStringTests" end time: Nov 02 04:04 CET
+"WStringTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/57 Testing: CategoriesTests
+47/57 Test: CategoriesTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/CategoriesTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"CategoriesTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"CategoriesTests" end time: Nov 02 04:04 CET
+"CategoriesTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+48/57 Testing: ComparisonTests
+48/57 Test: ComparisonTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/ComparisonTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"ComparisonTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ComparisonTests" end time: Nov 02 04:04 CET
+"ComparisonTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/57 Testing: ContainersTests
+49/57 Test: ContainersTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/ContainersTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"ContainersTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ContainersTests" end time: Nov 02 04:04 CET
+"ContainersTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/57 Testing: ConversionsTests
+50/57 Test: ConversionsTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/ConversionsTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"ConversionsTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ConversionsTests" end time: Nov 02 04:04 CET
+"ConversionsTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+51/57 Testing: DetailTests
+51/57 Test: DetailTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/DetailTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"DetailTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"DetailTests" end time: Nov 02 04:04 CET
+"DetailTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+52/57 Testing: EnumsTests
+52/57 Test: EnumsTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/EnumsTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"EnumsTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"EnumsTests" end time: Nov 02 04:04 CET
+"EnumsTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/57 Testing: ObjectSemanticsTests
+53/57 Test: ObjectSemanticsTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/ObjectSemanticsTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"ObjectSemanticsTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ObjectSemanticsTests" end time: Nov 02 04:04 CET
+"ObjectSemanticsTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+54/57 Testing: RangesTests
+54/57 Test: RangesTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/RangesTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"RangesTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"RangesTests" end time: Nov 02 04:04 CET
+"RangesTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+55/57 Testing: RelationsTests
+55/57 Test: RelationsTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/RelationsTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"RelationsTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"RelationsTests" end time: Nov 02 04:04 CET
+"RelationsTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+56/57 Testing: SafeTraitsTests
+56/57 Test: SafeTraitsTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/SafeTraitsTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"SafeTraitsTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"SafeTraitsTests" end time: Nov 02 04:04 CET
+"SafeTraitsTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+57/57 Testing: WrappersTests
+57/57 Test: WrappersTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits/WrappersTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/type_traits
+"WrappersTests" start time: Nov 02 04:04 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"WrappersTests" end time: Nov 02 04:04 CET
+"WrappersTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 02 04:04 CET

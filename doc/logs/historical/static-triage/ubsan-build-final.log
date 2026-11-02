@@ -1,0 +1,462 @@
+[0/2] Re-checking globbed directories...
+[0/327] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip... (cached) OK
+[1/327] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip... (cached) OK
+[2/327] [BuildMaster/Core     ]: reset fail markers
+[3/327] [BuildMaster/Ninja    ]: Compiling libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[4/327] [BuildMaster/Ninja    ]: Compiling OGG container
+-- [BuildMaster/Component]: stamp hit ogg (build)
+[5/327] [BuildMaster/Ninja    ]: Installing libsamplerate
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[6/327] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+-- [BuildMaster/Component]: stamp hit x265-12bit (build)
+[7/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[8/327] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+-- [BuildMaster/Component]: stamp hit x265-10bit (build)
+[9/327] [BuildMaster/Ninja    ]: Installing OGG container
+-- [BuildMaster/Component]: stamp hit ogg (install)
+[10/327] [BuildMaster/CMake    ]: Configuring rubberband
+[BuildMaster/Component]: stamp hit rubberband (configure)
+[11/327] [BuildMaster/CMake    ]: Configuring vorbis
+[BuildMaster/Component]: stamp hit vorbis (configure)
+[12/327] [BuildMaster/CMake    ]: Configuring x265
+[13/327] [BuildMaster/Ninja    ]: Compiling Opus codec
+-- [BuildMaster/Component]: stamp hit opus (build)
+[14/327] [BuildMaster/Ninja    ]: Compiling rubberband
+-- [BuildMaster/Component]: stamp hit rubberband (build)
+[15/327] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+-- [BuildMaster/Component]: stamp hit vorbis (build)
+[16/327] [BuildMaster/Ninja    ]: Compiling kvazaar
+-- [BuildMaster/Component]: stamp hit kvazaar (build)
+[17/327] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[18/327] [BuildMaster/Ninja    ]: Compiling VPX codec
+-- [BuildMaster/Component]: stamp hit vpx (build)
+[19/327] [BuildMaster/Ninja    ]: Compiling libwebp
+-- [BuildMaster/Component]: stamp hit webp (build)
+[20/327] [BuildMaster/Ninja    ]: Compiling X264 codec
+-- [BuildMaster/Component]: stamp hit x264 (build)
+[21/327] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+-- [BuildMaster/Component]: stamp hit x265-12bit (install)
+[22/327] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+-- [BuildMaster/Component]: stamp hit x265-10bit (install)
+[23/327] [BuildMaster/Ninja    ]: Compiling X265 codec
+[24/327] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+[25/327] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[26/327] [BuildMaster/Ninja    ]: Compiling leptonica
+[27/327] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[28/327] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[29/327] [BuildMaster/Ninja    ]: Installing Opus codec
+[30/327] [BuildMaster/Ninja    ]: Installing rubberband
+[31/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[32/327] [BuildMaster/Ninja    ]: Installing Vorbis codec
+[33/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[34/327] [BuildMaster/Ninja    ]: Compiling libaom
+[35/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[36/327] [BuildMaster/Ninja    ]: Compiling dav1d
+[37/327] [BuildMaster/Ninja    ]: Installing kvazaar
+[38/327] [BuildMaster/Ninja    ]: Compiling openh264
+[39/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[40/327] [BuildMaster/Ninja    ]: Installing SVT-AV1
+[41/327] [BuildMaster/Ninja    ]: Installing VPX codec
+[42/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[43/327] [BuildMaster/Ninja    ]: Installing libwebp
+[44/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[45/327] [BuildMaster/Ninja    ]: Installing X264 codec
+[46/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[47/327] [BuildMaster/Ninja    ]: Installing X265 codec
+[48/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[49/327] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[50/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[51/327] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+[52/327] [BuildMaster/Ninja    ]: Installing zlib compression library
+[53/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[54/327] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[55/327] [BuildMaster/Ninja    ]: Installing leptonica
+[56/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[57/327] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+[58/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[59/327] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+[60/327] [BuildMaster/Ninja    ]: Installing libaom
+[61/327] [BuildMaster/Ninja    ]: Installing dav1d
+[62/327] [BuildMaster/Ninja    ]: Installing openh264
+[63/327] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+[64/327] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+[65/327] [BuildMaster/CMake    ]: Configuring tesseract
+[66/327] [BuildMaster/CMake    ]: Configuring ffmpeg
+[67/327] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.2-linux-x64-libc++.zip
+[68/327] [BuildMaster/Ninja    ]: Compiling FFmpeg
+[69/327] [BuildMaster/Ninja    ]: Compiling tesseract
+[70/327] [BuildMaster/Ninja    ]: Compiling VMAF library
+[71/327] [BuildMaster/Ninja    ]: Compiling libebur128
+[72/327] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.5-linux-x64-libc++.zip
+[73/327] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.2-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.2-linux-x64-libc++.zip... (cached) OK
+[74/327] [BuildMaster/Ninja    ]: Installing FFmpeg
+[75/327] [BuildMaster/Ninja    ]: Installing tesseract
+[76/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[77/327] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+[78/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[79/327] [BuildMaster/Ninja    ]: Installing VMAF library
+[80/327] [BuildMaster/Ninja    ]: Compiling zimg
+[81/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[82/327] [BuildMaster/Ninja    ]: Installing libebur128
+[83/327] [BuildMaster/Ninja    ]: Compiling LunaSVG
+[84/327] [BuildMaster/Git      ]: Resetting git source tree after install
+[85/327] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.2-linux-x64-libc++.zip
+[86/327] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.5-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.5-linux-x64-libc++.zip... (cached) OK
+[87/327] [BuildMaster/Ninja    ]: Installing Tesseract traineddata
+[88/327] [BuildMaster/Ninja    ]: Installing zimg
+[89/327] [BuildMaster/Ninja    ]: Installing LunaSVG
+[90/327] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.5-linux-x64-libc++.zip
+[92/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/content.cxx.o
+[93/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/audio.cxx.o
+[94/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/passthrough.cxx.o
+[95/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/sink.cxx.o
+[96/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.o
+[97/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/filter.cxx.o
+[98/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o
+[99/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o
+[100/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx.o
+[101/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/file_avio.cxx.o
+[102/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/generic.cxx.o
+[103/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/muxer_format.cxx.o
+[104/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/factory.cxx.o
+[105/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/detail/locale.cxx.o
+[106/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/source.cxx.o
+[107/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/webm.cxx.o
+[108/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o
+[109/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o
+[110/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx.o
+[111/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/matroska.cxx.o
+[112/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/mp4.cxx.o
+[113/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o
+[114/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx.o
+[115/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o
+[116/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/video.cxx.o
+[117/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx.o
+[118/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx.o
+[119/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o
+[120/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/mux.cxx.o
+[121/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Dictionary.cxx.o
+[122/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.cxx.o
+[123/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o
+[124/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.cxx.o
+[125/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx.o
+[126/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx.o
+[127/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.cxx.o
+[128/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/frame.cxx.o
+[129/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/packet.cxx.o
+[130/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pumper.cxx.o
+[131/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVStream.cxx.o
+[132/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/exception.cxx.o
+[133/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVCodecParameters.cxx.o
+[134/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx.o
+[135/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/detail/probe.cxx.o
+[136/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/bitmap.cxx.o
+[137/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/worker.cxx.o
+[138/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AudioFifo.cxx.o
+[139/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Swr.cxx.o
+[140/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Sws.cxx.o
+[141/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/tessdata.cxx.o
+[142/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/encoder.cxx.o
+[143/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/video_input.cxx.o
+[144/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVPacket.cxx.o
+[145/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/engine.cxx.o
+[146/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVChannelLayout.cxx.o
+[147/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/zimg/zimg.cxx.o
+[148/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/encoder_info.cxx.o
+[149/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pipe.cxx.o
+[150/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/log.cxx.o
+[151/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/features.cxx.o
+[152/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/exception.cxx.o
+[153/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/exception.cxx.o
+[154/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/container.cxx.o
+[155/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/typedefs.cxx.o
+[156/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/attachment.cxx.o
+[157/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/metadata/stream.cxx.o
+[158/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/codec.cxx.o
+[159/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/metadata/file.cxx.o
+[160/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o
+[161/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/base.cxx.o
+[162/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSF.cxx.o
+[163/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/audio.cxx.o
+[164/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/subtitle.cxx.o
+[165/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/attachment.cxx.o
+[166/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/simple_player.cxx.o
+[167/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx.o
+[168/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFrame.cxx.o
+[169/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx.o
+[170/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/pipeline/route.cxx.o
+[171/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/video.cxx.o
+[172/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/property.cxx.o
+[173/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/exception.cxx.o
+[174/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx.o
+[175/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx.o
+[176/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/report.cxx.o
+[177/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/decoder.cxx.o
+[178/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx.o
+[179/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx.o
+[180/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/file.cxx.o
+[181/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx.o
+[182/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx.o
+[183/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx.o
+[184/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx.o
+[185/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx.o
+[186/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/upmix.cxx.o
+[187/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx.o
+[188/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx.o
+[189/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/demuxer.cxx.o
+[190/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/cas.cxx.o
+[191/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx.o
+[192/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters.cxx.o
+[193/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx.o
+[194/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/atadenoise.cxx.o
+[195/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/encoder.cxx.o
+[196/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/rubberband.cxx.o
+[197/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deband.cxx.o
+[198/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx.o
+[199/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/bm3d.cxx.o
+[200/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/decimate.cxx.o
+[201/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/bwdif.cxx.o
+[202/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/crop.cxx.o
+[203/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/format.cxx.o
+[204/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx.o
+[205/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fps.cxx.o
+[206/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fftdnoiz.cxx.o
+[207/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/av_rational.cxx.o
+[208/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx.o
+[209/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/color.cxx.o
+[210/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx.o
+[211/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/hqdn3d.cxx.o
+[212/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/track.cxx.o
+[213/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/progress.cxx.o
+[214/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/point.cxx.o
+[215/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/side_data.cxx.o
+[216/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/audio.cxx.o
+[217/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/tonemap.cxx.o
+[218/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx.o
+[219/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/pad.cxx.o
+[220/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/vaguedenoiser.cxx.o
+[221/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/hdr10.cxx.o
+[222/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/interpolate.cxx.o
+[223/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/frame.cxx.o
+[224/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/dovi.cxx.o
+[225/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/telemetry.cxx.o
+[226/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/nlmeans.cxx.o
+[227/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/yadif.cxx.o
+[228/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/resolution.cxx.o
+[229/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/packet.cxx.o
+[230/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/duration.cxx.o
+[231/327] Building CXX object test/file/CMakeFiles/MultimediaFileAvioTests.dir/__/runner_main.cxx.o
+[232/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/remuxer.cxx.o
+[233/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/scale.cxx.o
+[234/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx.o
+[235/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/video.cxx.o
+[236/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/muxer.cxx.o
+[237/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/stream.cxx.o
+[238/327] Building CXX object test/pipeline/video/CMakeFiles/MultimediaPipelineVideoTests.dir/__/__/runner_main.cxx.o
+[239/327] Building CXX object test/pipeline/video_input/CMakeFiles/MultimediaPipelineVideoInputTests.dir/__/__/runner_main.cxx.o
+[240/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/tables/encoder/video.cxx.o
+[241/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/tables/decoder/video.cxx.o
+[242/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/filters/content_video_test.cxx.o
+[243/327] Building CXX object test/pipeline/hdr10plus/CMakeFiles/MultimediaPipelineHdr10PlusTests.dir/__/__/runner_main.cxx.o
+[244/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/transcoder.cxx.o
+[245/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/step.cxx.o
+[246/327] Building CXX object test/pipeline/video_codecs/CMakeFiles/MultimediaPipelineVideoCodecTests.dir/__/__/runner_main.cxx.o
+[247/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/tables/tables_unity.cxx.o
+[248/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/plan.cxx.o
+[249/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/file/file_avio_test.cxx.o
+[250/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.o
+[251/327] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/registry.cxx.o
+[252/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/private/StormByte/multimedia/backend/file_avio.cxx.o
+[253/327] Building CXX object test/CMakeFiles/MultimediaLogTests.dir/log_test.cxx.o
+[254/327] Building CXX object test/pipeline/CMakeFiles/MultimediaPipelineCeilingTests.dir/__/__/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o
+[255/327] Building CXX object test/pipeline/CMakeFiles/multimedia_pipeline_test_support.dir/helpers.cxx.o
+[256/327] Building CXX object test/CMakeFiles/MultimediaLogTests.dir/__/lib/private/StormByte/multimedia/log.cxx.o
+[257/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/helpers.cxx.o
+[258/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/video/video_test.cxx.o
+[259/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/__/lib/private/StormByte/multimedia/ffmpeg/video_input.cxx.o
+[260/327] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineContentVideoTests.dir/__/__/runner_main.cxx.o
+[261/327] Building CXX object test/pipeline/analytics/CMakeFiles/MultimediaPipelineVmafApiTests.dir/vmaf_api_test.cxx.o
+[262/327] Building CXX object test/pipeline/interleave/CMakeFiles/MultimediaPipelineInterleaveTests.dir/__/__/runner_main.cxx.o
+[263/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/video_codecs/video_codec_test.cxx.o
+[264/327] Building CXX object test/pipeline/dovi/CMakeFiles/MultimediaPipelineDoviTests.dir/__/__/__/lib/tables/encoder/video.cxx.o
+[265/327] Building CXX object test/pipeline/dovi/CMakeFiles/MultimediaPipelineDoviTests.dir/__/__/__/lib/tables/decoder/video.cxx.o
+[266/327] Linking CXX shared library lib/libStormByte-Multimedia.so.1.0.1
+FAILED: [code=1] lib/libStormByte-Multimedia.so.1.0.1 
+: && /usr/lib/llvm/22/bin/clang++-22 -fPIC -stdlib=libc++ -fsanitize=undefined -fno-omit-frame-pointer -I/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/include -O1 -gline-tables-only -DNDEBUG  -shared -fsanitize=undefined -Wl,--exclude-libs,ALL -Wl,--no-undefined -Xlinker --dependency-file=lib/CMakeFiles/StormByte-Multimedia.dir/link.d -Wl,-soname,libStormByte-Multimedia.so.1.0.1 -o lib/libStormByte-Multimedia.so.1.0.1 lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/file_avio.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/muxer_format.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/content.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/audio.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/passthrough.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/content/video.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/video.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/audio.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/encoder/video.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/attachment.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/factory.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/generic.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/matroska.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/mp4.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/policy/webm.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/sink.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/source.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/pumper/through.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/decode.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/demux.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/encode.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/filter.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/mux.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/worker/remux.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/encoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/frame.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/packet.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pipe.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/pumper.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/worker.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/simple_player.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/zimg/zimg.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/detail/locale.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/detail/probe.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSF.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVBSFPipeline.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVCodecParameters.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVDecoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVEncoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVFormatContext.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVStream.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AVSubtitle.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/AudioFifo.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Dictionary.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Swr.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/Sws.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ffmpeg/video_input.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/log.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/bitmap.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/engine.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/exception.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/ocr/tessdata.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/pipeline/route.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/attachment.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/codec.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/container.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/encoder_info.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/exception.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/features.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVChannelLayout.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFilterGraph.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVFrame.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/AVPacket.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/exception.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/property.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/ffmpeg/typedefs.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/file.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/metadata/file.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/metadata/stream.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/attachment.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/audio.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/base.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/subtitle.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/config/video.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/decoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/demuxer.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/encoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/exception.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/frames.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/psnr.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/ssim.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/vmaf.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/analytics/xpsnr.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/adeclick.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/afftdn.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/denoise.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/downmix.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/limiter.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/loudnorm.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/resample.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/rubberband.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/audio/upmix.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/ffmpeg.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/report.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/atadenoise.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/bm3d.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/bwdif.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/cas.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/crop.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deband.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/decimate.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/deflicker.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/degrain.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fftdnoiz.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fieldmatch.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/format.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/fps.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/hqdn3d.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/interpolate.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/nlmeans.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/pad.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/scale.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/tonemap.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/vaguedenoiser.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/watermark.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/filters/video/yadif.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/frame.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/muxer.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/packet.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/plan.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/progress.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/remuxer.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/side_data.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/step.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/telemetry.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/track.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/transcoder.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/audio.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/av_rational.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/color.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/dovi.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/duration.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/hdr10.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/point.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/resolution.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/property/video.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/registry.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/stream.cxx.o lib/CMakeFiles/StormByte-Multimedia.dir/tables/tables_unity.cxx.o -L/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/lib64 -Wl,-rpath,/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/install/lib64:  -Xlinker --start-group  stormbyte-buildmaster/install/lib64/libavutil.a  stormbyte-buildmaster/install/lib64/libavcodec.a  stormbyte-buildmaster/install/lib64/libavformat.a  stormbyte-buildmaster/install/lib64/libswscale.a  stormbyte-buildmaster/install/lib64/libswresample.a  stormbyte-buildmaster/install/lib64/libavfilter.a  -Xlinker --end-group  stormbyte-buildmaster/install/lib64/libStormByte-Logger.so  stormbyte-buildmaster/install/lib64/libStormByte.so  stormbyte-buildmaster/install/lib64/libStormByte-System.so  stormbyte-buildmaster/install/lib64/libStormByte-Buffer.so  stormbyte-buildmaster/install/lib64/libtesseract.a  stormbyte-buildmaster/install/lib64/libleptonica.a  stormbyte-buildmaster/install/lib64/libtessdata.a  stormbyte-buildmaster/install/lib64/libvmaf.a  stormbyte-buildmaster/install/lib64/libzimg.a  stormbyte-buildmaster/install/lib64/libebur128.a  stormbyte-buildmaster/install/lib64/liblunasvg.a  stormbyte-buildmaster/install/lib64/libplutovg.a  stormbyte-buildmaster/install/lib64/libfdk-aac.a  stormbyte-buildmaster/install/lib64/libmp3lame.a  stormbyte-buildmaster/install/lib64/libopus.a  stormbyte-buildmaster/install/lib64/librubberband.a  stormbyte-buildmaster/install/lib64/libvorbis.a  stormbyte-buildmaster/install/lib64/libvorbisenc.a  stormbyte-buildmaster/install/lib64/libvorbisfile.a  stormbyte-buildmaster/install/lib64/libaom.a  stormbyte-buildmaster/install/lib64/libdav1d.a  stormbyte-buildmaster/install/lib64/libkvazaar.a  stormbyte-buildmaster/install/lib64/libopenh264.a  stormbyte-buildmaster/install/lib64/libSvtAv1Enc.a  stormbyte-buildmaster/install/lib64/libvpx.a  stormbyte-buildmaster/install/lib64/libwebpdemux.a  stormbyte-buildmaster/install/lib64/libwebpmux.a  stormbyte-buildmaster/install/lib64/libwebp.a  stormbyte-buildmaster/install/lib64/libsharpyuv.a  stormbyte-buildmaster/install/lib64/libx264.a  stormbyte-buildmaster/install/lib64/libx265.a  stormbyte-buildmaster/install/lib64/libbz2.a  stormbyte-buildmaster/install/lib64/liblzma.a  stormbyte-buildmaster/install/lib64/libz.a  stormbyte-buildmaster/install/lib64/libogg.a  stormbyte-buildmaster/install/lib64/libsamplerate.a  /usr/lib64/libva-drm.so  /usr/lib64/libva.so  /usr/lib64/libdrm.so && :
+ld.lld: error: undefined symbol: __ubsan_handle_type_mismatch_v1
+>>> referenced by optional.txx:225 (stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:225)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Audio::~Audio())
+>>> referenced by optional.txx:225 (stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:225)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Audio::~Audio())
+>>> referenced by optional.txx:225 (stormbyte-buildmaster/install/include/StormByte/safe/optional.txx:225)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Audio::operator=(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Audio&&))
+>>> referenced 1866268 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_builtin_unreachable
+>>> referenced by string_view:470 (/usr/include/c++/v1/string_view:470)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:((anonymous namespace)::SplitMime(std::__1::basic_string_view<char, std::__1::char_traits<char>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&))
+>>> referenced by vector.txx:256 (stormbyte-buildmaster/install/include/StormByte/safe/vector.txx:256)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(StormByte::Safe::Vector<StormByte::Multimedia::Attachment>::at(StormByte::Size) const)
+>>> referenced by string_view:470 (/usr/include/c++/v1/string_view:470)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o:(unsigned long StormByte::Safe::FindReplaceTokens<char>(std::__1::basic_string_view<char, std::__1::char_traits<char>>, StormByte::Safe::ReplaceTokenPlace<char>*, unsigned long))
+>>> referenced 3061 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_pointer_overflow
+>>> referenced by string_view:471 (/usr/include/c++/v1/string_view:471)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:((anonymous namespace)::SplitMime(std::__1::basic_string_view<char, std::__1::char_traits<char>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&))
+>>> referenced by char_traits.h:366 (/usr/include/c++/v1/__string/char_traits.h:366)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:((anonymous namespace)::SplitMime(std::__1::basic_string_view<char, std::__1::char_traits<char>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&))
+>>> referenced by binary.hxx:818 (stormbyte-buildmaster/install/include/StormByte/safe/binary.hxx:818)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Receive(StormByte::Multimedia::Pipeline::Decoder&))
+>>> referenced 893860 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_load_invalid_value
+>>> referenced by packet.hxx:232 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/packet.hxx:232)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Send(StormByte::Multimedia::Pipeline::Decoder&, StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> const&))
+>>> referenced by subtitle.cxx:151 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx:151)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Send(StormByte::Multimedia::Pipeline::Decoder&, StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> const&))
+>>> referenced by subtitle.cxx:159 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx:159)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Send(StormByte::Multimedia::Pipeline::Decoder&, StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> const&))
+>>> referenced 15617 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_function_type_mismatch
+>>> referenced by pointers.txx:303 (stormbyte-buildmaster/install/include/StormByte/safe/pointers.txx:303)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Demuxer::~Demuxer())
+>>> referenced by pointers.txx:303 (stormbyte-buildmaster/install/include/StormByte/safe/pointers.txx:303)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Audio::Receive(StormByte::Multimedia::Pipeline::Decoder&))
+>>> referenced by pointers.txx:303 (stormbyte-buildmaster/install/include/StormByte/safe/pointers.txx:303)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Receive(StormByte::Multimedia::Pipeline::Decoder&))
+>>> referenced 17676 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_out_of_bounds
+>>> referenced by replace_token.hxx:186 (stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:186)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o:(StormByte::Safe::(anonymous namespace)::AppendHexDigits(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, unsigned long, bool))
+>>> referenced by replace_token.hxx:190 (stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:190)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o:(StormByte::Safe::(anonymous namespace)::AppendHexDigits(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, unsigned long, bool))
+>>> referenced by replace_token.hxx:186 (stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:186)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/audio.cxx.o:(StormByte::Safe::(anonymous namespace)::AppendHexDigits(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, unsigned long, bool))
+>>> referenced 85128 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_mul_overflow
+>>> referenced by replace_token.hxx:127 (stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:127)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o:(bool StormByte::Safe::ParseReplaceTokenSpec<char>(char const*, unsigned long, StormByte::Safe::ReplaceTokenSpec&))
+>>> referenced by avsscanf.c:780 (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavutil/avsscanf.c:780)
+>>>               libavutil_avsscanf.c.o:(ff_vfscanf) in archive stormbyte-buildmaster/install/lib64/libavutil.a
+>>> referenced by avsscanf.c:569 (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavutil/avsscanf.c:569)
+>>>               libavutil_avsscanf.c.o:(fffloatscan) in archive stormbyte-buildmaster/install/lib64/libavutil.a
+>>> referenced 100002 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_add_overflow
+>>> referenced by replace_token.hxx:127 (stormbyte-buildmaster/install/include/StormByte/safe/replace_token.hxx:127)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/decoder.cxx.o:(bool StormByte::Safe::ParseReplaceTokenSpec<char>(char const*, unsigned long, StormByte::Safe::ReplaceTokenSpec&))
+>>> referenced by AVPool.cxx:121 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx:121)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o:(StormByte::Multimedia::Backend::FFmpeg::AVPool::For(AVCodecContext&, AVFrame const&))
+>>> referenced by AVPool.cxx:132 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx:132)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o:(StormByte::Multimedia::Backend::FFmpeg::AVPool::For(AVCodecContext&, AVFrame const&))
+>>> referenced 131661 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_divrem_overflow
+>>> referenced by AVPool.cxx:113 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx:113)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o:(StormByte::Multimedia::Backend::FFmpeg::AVPool::For(AVCodecContext&, AVFrame const&))
+>>> referenced by __hash_table:170 (/usr/include/c++/v1/__hash_table:170)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<int, unsigned long>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<int, unsigned long>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, unsigned long>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, unsigned long>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, unsigned long>>>::__emplace_unique[abi:sqe220108]<int, unsigned long&>(int&&, unsigned long&)::'lambda'(int const&, int&&, unsigned long&)::operator()(int const&, int&&, unsigned long&) const)
+>>> referenced by __hash_table:170 (/usr/include/c++/v1/__hash_table:170)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<int, unsigned long>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<int, unsigned long>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, unsigned long>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, unsigned long>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, unsigned long>>>::__emplace_unique[abi:sqe220108]<int, unsigned long&>(int&&, unsigned long&)::'lambda'(int const&, int&&, unsigned long&)::operator()(int const&, int&&, unsigned long&) const)
+>>> referenced 6999 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_negate_overflow
+>>> referenced by AVPool.cxx:118 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx:118)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o:(StormByte::Multimedia::Backend::FFmpeg::AVPool::For(AVCodecContext&, AVFrame const&))
+>>> referenced by avsscanf.c:237 (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavutil/avsscanf.c:237)
+>>>               libavutil_avsscanf.c.o:(scanexp) in archive stormbyte-buildmaster/install/lib64/libavutil.a
+>>> referenced by get_bits.h:285 (../../../../../thirdparty/ffmpeg/src/libavcodec/get_bits.h:285)
+>>>               libavcodec_dca_parser.c.o:(skip_bits_long) in archive stormbyte-buildmaster/install/lib64/libavcodec.a
+>>> referenced 13458 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_sub_overflow
+>>> referenced by AVPool.cxx:119 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx:119)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/ffmpeg/AVPool.cxx.o:(StormByte::Multimedia::Backend::FFmpeg::AVPool::For(AVCodecContext&, AVFrame const&))
+>>> referenced by duration.h:413 (/usr/include/c++/v1/__chrono/duration.h:413)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Receive(StormByte::Multimedia::Pipeline::Decoder&))
+>>> referenced by avsscanf.c:780 (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavutil/avsscanf.c:780)
+>>>               libavutil_avsscanf.c.o:(ff_vfscanf) in archive stormbyte-buildmaster/install/lib64/libavutil.a
+>>> referenced 60148 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_float_cast_overflow
+>>> referenced by __hash_table:801 (/usr/include/c++/v1/__hash_table:801)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<int, unsigned long>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<int, unsigned long>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, unsigned long>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, unsigned long>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, unsigned long>>>::__emplace_unique[abi:sqe220108]<int, unsigned long&>(int&&, unsigned long&)::'lambda'(int const&, int&&, unsigned long&)::operator()(int const&, int&&, unsigned long&) const)
+>>> referenced by __hash_table:1723 (/usr/include/c++/v1/__hash_table:1723)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(void std::__1::__hash_table<std::__1::__hash_value_type<int, unsigned long>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, unsigned long>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, unsigned long>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, unsigned long>>>::__rehash<true>(unsigned long))
+>>> referenced by __hash_table:1722 (/usr/include/c++/v1/__hash_table:1722)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(void std::__1::__hash_table<std::__1::__hash_value_type<int, unsigned long>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, unsigned long>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, unsigned long>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, unsigned long>>>::__rehash<true>(unsigned long))
+>>> referenced 5646 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_shift_out_of_bounds
+>>> referenced by __hash_table:174 (/usr/include/c++/v1/__hash_table:174)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/cover.cxx.o:(void std::__1::__hash_table<std::__1::__hash_value_type<int, unsigned long>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, unsigned long>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, unsigned long>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, unsigned long>>>::__rehash<true>(unsigned long))
+>>> referenced by __hash_table:174 (/usr/include/c++/v1/__hash_table:174)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o:(void std::__1::__hash_table<int, std::__1::hash<int>, std::__1::equal_to<int>, std::__1::allocator<int>>::__rehash<true>(unsigned long))
+>>> referenced by __hash_table:174 (/usr/include/c++/v1/__hash_table:174)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/demuxer.cxx.o:(void std::__1::__hash_table<std::__1::__hash_value_type<int, StormByte::Multimedia::Property::AVRational>, std::__1::__unordered_map_hasher<int, std::__1::pair<int const, StormByte::Multimedia::Property::AVRational>, std::__1::hash<int>, std::__1::equal_to<int>>, std::__1::__unordered_map_equal<int, std::__1::pair<int const, StormByte::Multimedia::Property::AVRational>, std::__1::equal_to<int>, std::__1::hash<int>>, std::__1::allocator<std::__1::pair<int const, StormByte::Multimedia::Property::AVRational>>>::__rehash<true>(unsigned long))
+>>> referenced 42666 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_nonnull_arg
+>>> referenced by file_avio.cxx:173 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/file_avio.cxx:173)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/file_avio.cxx.o:(StormByte::Multimedia::Backend::FileAvio::Read(void*, unsigned char*, int))
+>>> referenced by subtitle.cxx:197 (/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx:197)
+>>>               lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.cxx.o:(StormByte::Multimedia::Backend::Pipeline::Detail::Decoder::Subtitle::Receive(StormByte::Multimedia::Pipeline::Decoder&))
+>>> referenced by avsscanf.c:66 (/home/stormbyte/Software/StormByte/StormByte/multimedia/build/ubsan/stormbyte-buildmaster/bm/ffmpeg/../../../../../thirdparty/ffmpeg/src/libavutil/avsscanf.c:66)
+>>>               libavutil_avsscanf.c.o:(ffstring_read) in archive stormbyte-buildmaster/install/lib64/libavutil.a
+>>> referenced 12359 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_alignment_assumption
+>>> referenced by tuklib_integer.h:678 (/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/compressors/lzma/src/src/common/tuklib_integer.h:678)
+>>>               crc32_fast.c.o:(lzma_crc32_generic) in archive stormbyte-buildmaster/install/lib64/liblzma.a
+>>> referenced by tuklib_integer.h:678 (/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/compressors/lzma/src/src/common/tuklib_integer.h:678)
+>>>               crc64_fast.c.o:(lzma_crc64_generic) in archive stormbyte-buildmaster/install/lib64/liblzma.a
+>>> referenced by vector.h:817 (/usr/include/c++/v1/__vector/vector.h:817)
+>>>               json11.cpp.o:(json11::Value<(json11::Json::Type)4, std::__1::vector<json11::Json, std::__1::allocator<json11::Json>>>::less(json11::JsonValue const*) const) in archive stormbyte-buildmaster/install/lib64/libx265.a
+>>> referenced 1270 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_invalid_builtin
+>>> referenced by quant.cpp:296 (/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.cpp:296)
+>>>               quant.cpp.o:(x265_10bit::Quant::signBitHidingHDQ(short*, int*, unsigned int, x265_10bit::TUEntropyCodingParameters const&, unsigned int)) in archive stormbyte-buildmaster/install/lib64/libx265.a
+>>> referenced by quant.cpp:299 (/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/quant.cpp:299)
+>>>               quant.cpp.o:(x265_10bit::Quant::signBitHidingHDQ(short*, int*, unsigned int, x265_10bit::TUEntropyCodingParameters const&, unsigned int)) in archive stormbyte-buildmaster/install/lib64/libx265.a
+>>> referenced by bitstream.cpp:121 (/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/video/x265/src/source/common/bitstream.cpp:121)
+>>>               bitstream.cpp.o:(x265_10bit::SyntaxElementWriter::writeUvlc(unsigned int)) in archive stormbyte-buildmaster/install/lib64/libx265.a
+>>> referenced 228 more times
+clang++-22: error: linker command failed with exit code 1 (use -v to see invocation)
+[267/327] Building CXX object test/file/CMakeFiles/MultimediaDurationTests.dir/duration_test.cxx.o
+[268/327] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaOcrModelTests.dir/__/__/__/lib/private/StormByte/multimedia/ocr/exception.cxx.o
+[269/327] Building CXX object test/pipeline/analytics/CMakeFiles/MultimediaPipelineAnalyticsTests.dir/__/__/__/lib/private/StormByte/multimedia/backend/pipeline/ceiling.cxx.o
+[270/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/interleave/interleave_test.cxx.o
+[271/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/video_input/video_input_test.cxx.o
+[272/327] Building CXX object test/pipeline/CMakeFiles/MultimediaPipelineCeilingTests.dir/ceiling_test.cxx.o
+[273/327] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaOcrModelTests.dir/__/__/__/lib/private/StormByte/multimedia/ocr/engine.cxx.o
+[274/327] Building CXX object test/registry/CMakeFiles/MultimediaRegistryTests.dir/registry_test.cxx.o
+[275/327] Building CXX object test/pipeline/analytics/CMakeFiles/MultimediaPipelineAnalyticsTests.dir/analytics_test.cxx.o
+[276/327] Building CXX object test/file/CMakeFiles/MultimediaFileTests.dir/file_test.cxx.o
+[277/327] Building CXX object test/pipeline/subtitle_codecs/CMakeFiles/MultimediaPipelineSubtitleCodecTests.dir/subtitle_codec_test.cxx.o
+[278/327] Building CXX object test/pipeline/remux/CMakeFiles/MultimediaPipelineRemuxTests.dir/remux_test.cxx.o
+[279/327] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaOcrModelTests.dir/model_reader_test.cxx.o
+[280/327] Building CXX object test/pipeline/ocr/CMakeFiles/MultimediaPipelineOcrTests.dir/ocr_test.cxx.o
+[281/327] Building CXX object test/CMakeFiles/StormByte-Multimedia-Test.dir/pipeline/hdr10plus/hdr10plus_test.cxx.o
+[282/327] Building CXX object test/pipeline/audio_codecs/CMakeFiles/MultimediaPipelineAudioCodecTests.dir/audio_codec_test.cxx.o
+[283/327] Building CXX object test/pipeline/implementation/CMakeFiles/MultimediaPipelineImplementationTests.dir/implementation_test.cxx.o
+[284/327] Building CXX object test/pipeline/watermark/CMakeFiles/MultimediaPipelineWatermarkTests.dir/watermark_test.cxx.o
+[285/327] Building CXX object test/pipeline/subtitle_header/CMakeFiles/MultimediaPipelineSubtitleHeaderTests.dir/subtitle_header_test.cxx.o
+[286/327] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineNlMeansTests.dir/nlmeans_plane_test.cxx.o
+[287/327] Building CXX object test/pipeline/mp4_policy/CMakeFiles/MultimediaPipelineMp4PolicyTests.dir/mp4_policy_test.cxx.o
+[288/327] Building CXX object test/pipeline/dovi/CMakeFiles/MultimediaPipelineDoviTests.dir/dovi_test.cxx.o
+[289/327] Building CXX object test/pipeline/negative/CMakeFiles/MultimediaPipelineNegativeTests.dir/negative_test.cxx.o
+[290/327] Building CXX object test/pipeline/audio/CMakeFiles/MultimediaPipelineAudioTests.dir/audio_test.cxx.o
+[291/327] Building CXX object test/pipeline/mux_policy/CMakeFiles/MultimediaPipelineMuxPolicyTests.dir/mux_policy_test.cxx.o
+[292/327] Building CXX object test/CMakeFiles/MultimediaSimplePlayerTests.dir/simple_player_test.cxx.o
+[293/327] Building CXX object test/pipeline/filters/CMakeFiles/MultimediaPipelineFilterTests.dir/filter_test.cxx.o
+ninja: build stopped: subcommand failed.

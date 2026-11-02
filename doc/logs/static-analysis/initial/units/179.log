@@ -1,0 +1,1486 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:198:13: warning: an exception may be thrown in function 'Negotiate' which should not throw exceptions [bugprone-exception-escape]
+  198 |         inline int Negotiate(const AVCodec* codec, int source, std::string& error) noexcept {
+      |                    ^
+/usr/include/c++/v1/__new/exceptions.h:72:3: note: frame #0: unhandled exception of type 'bad_array_new_length' may be thrown in function '__throw_bad_array_new_length' here
+   72 |   throw bad_array_new_length();
+      |   ^
+/usr/include/c++/v1/__memory/allocator.h:88:7: note: frame #1: function 'allocate' calls function '__throw_bad_array_new_length' here
+   88 |       std::__throw_bad_array_new_length();
+      |       ^
+/usr/include/c++/v1/__memory/allocator.h:99:13: note: frame #2: function 'allocate_at_least' calls function 'allocate' here
+   99 |     return {allocate(__n), __n};
+      |             ^
+/usr/include/c++/v1/__memory/allocator_traits.h:280:14: note: frame #3: function 'allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least' here
+  280 |       return __alloc.allocate_at_least(__n);
+      |              ^
+/usr/include/c++/v1/__memory/allocate_at_least.h:36:16: note: frame #4: function '__allocate_at_least<std::allocator<char>>' calls function 'allocate_at_least<std::allocator<char>>' here
+   36 |   auto __res = std::allocator_traits<_Alloc>::allocate_at_least(__alloc, __n);
+      |                ^
+/usr/include/c++/v1/string:2278:21: note: frame #5: function '__allocate_long_buffer' calls function '__allocate_at_least<std::allocator<char>>' here
+ 2278 |     auto __buffer = std::__allocate_at_least(__alloc, __align_allocation_size(__capacity));
+      |                     ^
+/usr/include/c++/v1/string:2731:21: note: frame #6: function '__grow_by_and_replace' calls function '__allocate_long_buffer' here
+ 2731 |   __long __buffer = __allocate_long_buffer(__alloc_, __get_amortized_growth_capacity(__old_cap + __delta_cap));
+      |                     ^
+/usr/include/c++/v1/string:2838:5: note: frame #7: function '__assign_external' calls function '__grow_by_and_replace' here
+ 2838 |     __grow_by_and_replace(__cap, __n - __cap, __size, 0, __size, __n, __s);
+      |     ^
+/usr/include/c++/v1/string:3017:10: note: frame #8: function '__assign_external' calls function '__assign_external' here
+ 3017 |   return __assign_external(__s, traits_type::length(__s));
+      |          ^
+/usr/include/c++/v1/string:3026:10: note: frame #9: function 'assign' calls function '__assign_external' here
+ 3026 |   return __assign_external(__s);
+      |          ^
+/usr/include/c++/v1/string:1241:12: note: frame #10: function 'operator=' calls function 'assign' here
+ 1241 |     return assign(__s);
+      |            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/ffmpeg/video_input.hxx:204:10: note: frame #11: function 'Negotiate' calls function 'operator=' here
+  204 |                         error = "failed to query encoder CPU pixel formats";
+      |                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVChannelLayout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVFrame.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVPointer.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/AVRational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/ffmpeg/fwd.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/pipeline/side_data.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:27: warning: 2 adjacent parameters of 'AVRational' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                              ^~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:31: note: the first parameter in the range is 'num'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                  ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/av_rational.hxx:100:40: note: the last parameter in the range is 'den'
+  100 |                                         constexpr AVRational(int num, int den) noexcept
+      |                                                                           ^~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/hdr10.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/point.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:76:57: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+   76 |         std::cout << "[Test] " << function << ": " << phase << std::endl;
+      |                                                                ^~~~~~~~~
+      |                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:114:50: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  114 |         std::cout << "[Test] Starting " << test.name << std::endl;
+      |                                                         ^~~~~~~~~
+      |                                                         '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:117:63: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  117 |                 std::cout << "[Test] Finished " << test.name << ": SKIP" << std::endl;
+      |                                                                             ^~~~~~~~~
+      |                                                                             '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:120:89: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  120 |         std::cout << "[Test] Finished " << test.name << (result == 0 ? ": PASS" : ": FAIL") << std::endl;
+      |                                                                                                ^~~~~~~~~
+      |                                                                                                '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:142:56: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  142 |         std::cerr << "Unknown test function: " << selected << std::endl;
+      |                                                               ^~~~~~~~~
+      |                                                               '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:157:67: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  157 |         std::cout << "[Test] OutputPath: preparing " << path.string() << std::endl;
+      |                                                                          ^~~~~~~~~
+      |                                                                          '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:161:62: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  161 |                 std::cerr << "[ASSERT] OutputPath: " << error.message() << std::endl;
+      |                                                                            ^~~~~~~~~
+      |                                                                            '\n'
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:199:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  199 |         TEST_REQUIRE(source);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:202:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  202 |         TEST_REQUIRE(marker != std::string_view::npos);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:209:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  209 |                 TEST_REQUIRE(size <= bytes.size() - offset - 8);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:211:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  211 |                         TEST_REQUIRE(size > 19);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:212:39: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to signed type 'difference_type' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  212 |                         const auto first = bytes.begin() + offset + 8;
+      |                                                            ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(replaced);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:228:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  228 |         TEST_REQUIRE(destination.good());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../hardware_capability.hxx:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:85:20: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+   85 |                                         auto* bytes = data + column * step;
+      |                                                       ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:85:27: note: make conversion explicit to silence this warning
+    9 |                                         auto* bytes = data + column * step;
+      |                                                              ^~~~~~~~~~~~~
+      |                                                              static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:85:27: note: perform multiplication in a wider type
+   85 |                                         auto* bytes = data + column * step;
+      |                                                              ^~~~~~       
+      |                                                              static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:170:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  170 |                         TEST_REQUIRE(selected == AV_PIX_FMT_NONE && !error.empty());
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:191:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  191 |                 TEST_REQUIRE(selected == expected);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:192:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  192 |                 TEST_REQUIRE((selected == AV_PIX_FMT_NONE) == !error.empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:195:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  195 |         TEST_REQUIRE(checked > 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:212:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  212 |         TEST_REQUIRE(Input::SelectHardware(vaapiFormats, hardware) == AV_PIX_FMT_VAAPI);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:213:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  213 |         TEST_REQUIRE(Input::SelectHardware(cudaFormats, hardware) == AV_PIX_FMT_CUDA);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:214:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  214 |         TEST_REQUIRE(Input::SelectHardware(qsvFormats, hardware) == AV_PIX_FMT_QSV);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:215:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  215 |         TEST_REQUIRE(Input::SelectHardware({}, unsupported) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:216:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  216 |         TEST_REQUIRE(Input::SelectHardware({}, {}) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:217:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  217 |         TEST_REQUIRE(Input::SelectHardware({}, hardware) == AV_PIX_FMT_VAAPI);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:218:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  218 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, cudaFormats) == AV_PIX_FMT_P010LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:219:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  219 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV422P10LE, cudaFormats) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:221:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  221 |         TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, deviceFormats) == AV_PIX_FMT_YUV420P10LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:223:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  223 |         TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, p010Only) == AV_PIX_FMT_P010LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:224:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  224 |         TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV422P10LE, deviceFormats) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:225:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  225 |         TEST_REQUIRE(Input::SelectTransfer(AV_PIX_FMT_YUV420P10LE, {}) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:247:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  247 |                 TEST_REQUIRE(context);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:252:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  252 |                 TEST_REQUIRE(Input::Configure(context.get(), codec, nullptr, error));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:253:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  253 |                 TEST_REQUIRE(error.empty() && context->pix_fmt == cpu && context->sw_pix_fmt == cpu);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:254:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  254 |                 TEST_REQUIRE(!context->hw_device_ctx && !context->hw_frames_ctx);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:257:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  257 |         TEST_REQUIRE(checked > 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:263:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  263 |         TEST_REQUIRE(codec);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:266:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  266 |         TEST_REQUIRE(context);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:277:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  277 |         TEST_REQUIRE(!Input::Configure(context.get(), codec, source.Raw(), error));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:278:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  278 |         TEST_REQUIRE(error == "hardware source has no valid software representation or frames context");
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:279:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  279 |         TEST_REQUIRE(!Input::Frames(source.Raw()) && !Input::Download(source.Raw(), destination.Raw()));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:281:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  281 |         TEST_REQUIRE(source.Raw()->hw_frames_ctx);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:282:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  282 |         TEST_REQUIRE(!Input::Configure(context.get(), codec, source.Raw(), error));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:283:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  283 |         TEST_REQUIRE(error == "hardware source has no valid software representation or frames context");
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:284:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  284 |         TEST_REQUIRE(!Input::Frames(source.Raw()) && !Input::Download(source.Raw(), destination.Raw()));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:285:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  285 |         TEST_REQUIRE(!Input::Upload(context.get(), source.Raw(), destination.Raw()));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:286:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  286 |         TEST_REQUIRE(source.Pts() == 91 && source.Format() == AV_PIX_FMT_VAAPI);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:287:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  287 |         TEST_REQUIRE(!context->hw_device_ctx && !context->hw_frames_ctx);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:288:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  288 |         TEST_REQUIRE(!Input::Configure(nullptr, codec, nullptr, error));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:302:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  302 |                         TEST_REQUIRE(!HardwareCapabilityUnavailable(device, status, true));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:303:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  303 |                         TEST_REQUIRE(!HardwareCapabilityUnavailable(device, status, false));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:305:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  305 |                 TEST_REQUIRE(!HardwareCapabilityUnavailable(device, 0, true));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:306:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  306 |                 TEST_REQUIRE(!HardwareCapabilityUnavailable(device, AVERROR(EINVAL), false, true));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:307:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  307 |                 TEST_REQUIRE(!HardwareCapabilityUnavailable(device, AVERROR(ENOMEM), false, true));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:308:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  308 |                 TEST_REQUIRE(HardwareCapabilityUnavailable(device, AVERROR(ENODEV), false));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:309:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  309 |                 TEST_REQUIRE(HardwareCapabilityUnavailable(device, AVERROR(ENOENT), false));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:310:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  310 |                 TEST_REQUIRE(!HardwareCapabilityUnavailable(device, AVERROR(ENODEV), true));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:312:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  312 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_QSV, AVERROR_EXTERNAL, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:313:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  313 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_QSV, AVERROR(ENOSYS), true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:314:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  314 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(ENOSYS), true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:315:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  315 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(ENOSYS), true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:316:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  316 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(ENOSYS), false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:317:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  317 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(EPERM), false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:318:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  318 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR(EPERM), true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:319:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  319 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_QSV, AVERROR(EPERM), false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:320:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  320 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EPERM), false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:321:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  321 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, true, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:322:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  322 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:323:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  323 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:324:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  324 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_EXTERNAL, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:325:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  325 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_CUDA, AVERROR_UNKNOWN, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:326:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  326 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EIO), false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:327:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  327 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EIO), false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:328:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  328 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR(EIO), true, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:329:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  329 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VAAPI, AVERROR_EXTERNAL, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:330:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  330 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VULKAN, AVERROR_EXTERNAL, false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:331:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  331 |         TEST_REQUIRE(HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VULKAN, AVERROR_EXTERNAL, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:332:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  332 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_VULKAN, AVERROR(EINVAL), false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:333:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  333 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_DRM, AVERROR_EXTERNAL, false, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:334:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  334 |         TEST_REQUIRE(!HardwareCapabilityUnavailable(AV_HWDEVICE_TYPE_NONE, AVERROR(ENOSYS), true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:335:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  335 |         TEST_REQUIRE(CheckHardwareEncoderCapability(nullptr, 1920, 1080) == 1);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:336:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  336 |         TEST_REQUIRE(CheckHardwareEncoderCapability(avcodec_find_encoder_by_name("hevc_qsv"), 0, 1080) == 1);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:337:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  337 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_NV12) == AV_PROFILE_HEVC_MAIN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:338:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  338 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_YUV420P) == AV_PROFILE_HEVC_MAIN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:339:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  339 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_P010LE) == AV_PROFILE_HEVC_MAIN_10);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:340:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  340 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_YUV420P10LE) == AV_PROFILE_HEVC_MAIN_10);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:341:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  341 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_NONE) == AV_PROFILE_UNKNOWN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:342:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  342 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_VAAPI) == AV_PROFILE_UNKNOWN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:343:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  343 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_YUV420P12LE) == AV_PROFILE_UNKNOWN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:344:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  344 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_YUV422P) == AV_PROFILE_UNKNOWN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:345:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  345 |         TEST_REQUIRE(HardwareHevcProfile(AV_PIX_FMT_RGB24) == AV_PROFILE_UNKNOWN);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:422:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  422 |                 TEST_REQUIRE(configuration);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:429:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  429 |                         TEST_REQUIRE(capability == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:433:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  433 |                 TEST_REQUIRE(context);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:457:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  457 |                         TEST_REQUIRE(HardwareCapabilityUnavailable(configuration->device_type, available, false,
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:459:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  459 |                         TEST_REQUIRE(!configured && error.starts_with("hardware device unavailable ("));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:460:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  460 |                         TEST_REQUIRE(!context->hw_device_ctx && !context->hw_frames_ctx);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:465:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  465 |                         TEST_REQUIRE(!configured);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:466:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  466 |                         TEST_REQUIRE(error == (!constraintsKnown ? "hardware device cannot validate exact frame constraints"
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:472:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  472 |                 TEST_REQUIRE(configured && error.empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:473:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  473 |                 TEST_REQUIRE(context->hw_device_ctx && context->hw_frames_ctx && context->pix_fmt == format);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:479:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  479 |                 TEST_REQUIRE(source.AllocVideo(64, 64, AV_PIX_FMT_YUV420P10LE) && Samples(source, true) && Metadata(source));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:480:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  480 |                 TEST_REQUIRE(Input::Prepare(source, context->sw_pix_fmt, upload));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:481:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  481 |                 TEST_REQUIRE(Input::Upload(context.get(), upload.Raw(), hardware.Raw()));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:482:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  482 |                 TEST_REQUIRE(Input::Frames(hardware.Raw()) && SameMetadata(source, hardware));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:483:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  483 |                 TEST_REQUIRE(Input::Download(hardware.Raw(), downloaded.Raw()));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:484:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  484 |                 TEST_REQUIRE(Input::Prepare(downloaded, source.Format(), roundtrip));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:485:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  485 |                 TEST_REQUIRE(Samples(roundtrip, false) && SameMetadata(source, roundtrip));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:486:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  486 |                 TEST_REQUIRE(Samples(source, false) && source.Pts() == 91 && source.Format() == AV_PIX_FMT_YUV420P10LE);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:488:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  488 |                 TEST_REQUIRE(reused);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:491:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  491 |                 TEST_REQUIRE(Input::Configure(reused.get(), codec, hardware.Raw(), error));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:492:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  492 |                 TEST_REQUIRE(reused->hw_frames_ctx->data == context->hw_frames_ctx->data);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:494:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  494 |                 TEST_REQUIRE(Input::Upload(reused.get(), upload.Raw(), hardware.Raw()));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:495:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  495 |                 TEST_REQUIRE(Input::Download(hardware.Raw(), downloaded.Raw()) && SameMetadata(source, downloaded));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:510:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  510 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, planar) == AV_PIX_FMT_YUV420P10LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:511:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  511 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, packed) == AV_PIX_FMT_P010LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:512:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  512 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_P010LE, std::span{planar}.subspan(1)) == AV_PIX_FMT_YUV420P10LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:513:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  513 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, loss) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:514:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  514 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P12LE, packed) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:515:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  515 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV422P10LE, packed) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:516:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  516 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10BE, packed) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:517:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  517 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_NV12, eightBit) == AV_PIX_FMT_YUV420P);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:518:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  518 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_NV21, eightBit) == AV_PIX_FMT_YUV420P);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:519:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  519 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_VAAPI, {}) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:520:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  520 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_NONE, {}) == AV_PIX_FMT_NONE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:521:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  521 |         TEST_REQUIRE(Input::Select(AV_PIX_FMT_YUV420P10LE, {}) == AV_PIX_FMT_YUV420P10LE);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:523:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  523 |         TEST_REQUIRE(Input::Negotiate(nullptr, AV_PIX_FMT_YUV420P10LE, error) == AV_PIX_FMT_NONE && !error.empty());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:536:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  536 |         TEST_REQUIRE(source.AllocVideo(width, height, AV_PIX_FMT_NV12, 64));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:543:19: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  543 |                         auto* sample = source.Data(1) + row * source.Linesize(1) + column * 2;
+      |                                        ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:543:63: note: make conversion explicit to silence this warning
+  543 |                         auto* sample = source.Data(1) + row * source.Linesize(1) + column * 2;
+      |                                                                                    ^~~~~~~~~~
+      |                                                                                    static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:543:63: note: perform multiplication in a wider type
+  543 |                         auto* sample = source.Data(1) + row * source.Linesize(1) + column * 2;
+      |                                                                                    ^~~~~~    
+      |                                                                                    static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:548:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  548 |         TEST_REQUIRE(Input::Prepare(source, AV_PIX_FMT_YUV420P, planar));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:550:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  550 |                 TEST_REQUIRE(std::memcmp(source.Data(0) + row * source.Linesize(0),
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:550:28: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  550 |                 TEST_REQUIRE(std::memcmp(source.Data(0) + row * source.Linesize(0),
+      |                                          ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:550:45: note: make conversion explicit to silence this warning
+  550 |                 TEST_REQUIRE(std::memcmp(source.Data(0) + row * source.Linesize(0),
+      |                                                           ^
+      |                                                           static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:550:45: note: perform multiplication in a wider type
+  550 |                 TEST_REQUIRE(std::memcmp(source.Data(0) + row * source.Linesize(0),
+      |                                                           ^
+      |                                                           static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:551:4: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  551 |                         planar.Data(0) + row * planar.Linesize(0), width) == 0);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:551:21: note: make conversion explicit to silence this warning
+  551 |                         planar.Data(0) + row * planar.Linesize(0), width) == 0);
+      |                                          ^
+      |                                          static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:551:21: note: perform multiplication in a wider type
+  551 |                         planar.Data(0) + row * planar.Linesize(0), width) == 0);
+      |                                          ^
+      |                                          static_cast<ptrdiff_t>(
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:190:9: note: expanded from macro 'TEST_REQUIRE'
+  190 |                 if (!(expression)) { \
+      |                       ^~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:554:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  554 |                         TEST_REQUIRE(planar.Data(1)[row * planar.Linesize(1) + column]
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:556:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  556 |                         TEST_REQUIRE(planar.Data(2)[row * planar.Linesize(2) + column]
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:560:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  560 |         TEST_REQUIRE(Input::Prepare(planar, AV_PIX_FMT_NV21, nv21));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:561:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  561 |         TEST_REQUIRE(Input::Prepare(nv21, AV_PIX_FMT_NV12, restored));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:564:25: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  564 |                         const auto* actual = restored.Data(1) + row * restored.Linesize(1) + column * 2;
+      |                                              ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:564:73: note: make conversion explicit to silence this warning
+  564 |                         const auto* actual = restored.Data(1) + row * restored.Linesize(1) + column * 2;
+      |                                                                                              ^~~~~~~~~~
+      |                                                                                              static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:564:73: note: perform multiplication in a wider type
+  564 |                         const auto* actual = restored.Data(1) + row * restored.Linesize(1) + column * 2;
+      |                                                                                              ^~~~~~    
+      |                                                                                              static_cast<ptrdiff_t>( )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:565:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  565 |                         TEST_REQUIRE(actual[0] == static_cast<std::uint8_t>(32 + row * 8 + column));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:566:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  566 |                         TEST_REQUIRE(actual[1] == static_cast<std::uint8_t>(128 + row * 8 + column));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:575:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  575 |         TEST_REQUIRE(source.AllocVideo(5, 3, AV_PIX_FMT_YUV420P10LE, 64));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:576:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  576 |         TEST_REQUIRE(Samples(source, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:577:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  577 |         TEST_REQUIRE(!Input::Prepare(source, AV_PIX_FMT_YUV420P, destination));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:578:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  578 |         TEST_REQUIRE(!Input::Prepare(source, AV_PIX_FMT_YUV422P10LE, destination));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:579:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  579 |         TEST_REQUIRE(!Input::Prepare(source, AV_PIX_FMT_P010BE, destination));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:580:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  580 |         TEST_REQUIRE(!Input::Prepare(source, source.Format(), source));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:583:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  583 |         TEST_REQUIRE(!Input::Prepare(source, AV_PIX_FMT_P010LE, destination));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:584:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  584 |         TEST_REQUIRE(source.Data(0)[1] == 4);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:590:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  590 |         TEST_REQUIRE(codec);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:593:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  593 |         TEST_REQUIRE(context);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:599:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  599 |         TEST_REQUIRE(avcodec_open2(context.get(), codec, nullptr) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:602:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  602 |         TEST_REQUIRE(source.AllocVideo(5, 3, AV_PIX_FMT_YUV420P10LE, 64));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:603:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  603 |         TEST_REQUIRE(Samples(source, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:606:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  606 |         TEST_REQUIRE(Input::Prepare(source, context->pix_fmt, prepared));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:609:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  609 |         TEST_REQUIRE(!expected.empty());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:615:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  615 |         TEST_REQUIRE(result == AVERROR(EAGAIN));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:616:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  616 |         TEST_REQUIRE(prepared.Raw() == header && prepared.Data(0) == pixels && prepared.Pts() == 91);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:617:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  617 |         TEST_REQUIRE(Samples(prepared, false) && Samples(source, false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:620:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  620 |         TEST_REQUIRE(packet);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:622:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  622 |                 TEST_REQUIRE(avcodec_receive_packet(context.get(), packet.get()) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:623:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  623 |                 TEST_REQUIRE(packet->size == static_cast<int>(expected.size()));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:624:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  624 |                 TEST_REQUIRE(std::memcmp(packet->data, expected.data(), static_cast<std::size_t>(packet->size)) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:626:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  626 |                 TEST_REQUIRE(result == 0 || result == AVERROR(EAGAIN));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:627:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  627 |                 TEST_REQUIRE(prepared.Raw() == header && prepared.Data(0) == pixels && prepared.Pts() == 91);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:629:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  629 |         TEST_REQUIRE(result == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:630:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  630 |         TEST_REQUIRE(prepared.Raw() == header && prepared.Data(0) == pixels && prepared.Pts() == 91);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:631:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  631 |         TEST_REQUIRE(source.Format() == AV_PIX_FMT_YUV420P10LE && source.Pts() == 91 && source.DurationTicks() == 7);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:632:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  632 |         TEST_REQUIRE(Samples(source, false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:640:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  640 |                         TEST_REQUIRE(source.AllocVideo(5, 3, format, 64));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:641:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  641 |                         TEST_REQUIRE(source.Linesize(0) > source.Width() * 2);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:644:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  644 |                         TEST_REQUIRE(Samples(source, true));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:645:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  645 |                         TEST_REQUIRE(Metadata(source));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:651:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  651 |                         TEST_REQUIRE(Input::Prepare(source, other, converted));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:652:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  652 |                         TEST_REQUIRE(converted.Format() == other && converted.Data(0) != sourcePixels);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:653:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  653 |                         TEST_REQUIRE(Samples(converted, false));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:654:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  654 |                         TEST_REQUIRE(SameMetadata(source, converted));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:655:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  655 |                         TEST_REQUIRE(Input::Prepare(converted, format, roundtrip));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:656:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  656 |                         TEST_REQUIRE(Samples(roundtrip, false));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:657:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  657 |                         TEST_REQUIRE(SameMetadata(source, roundtrip));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:658:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  658 |                         TEST_REQUIRE(source.Data(0) == sourcePixels && source.Linesize(0) == sourceStride);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:659:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  659 |                         TEST_REQUIRE(source.Format() == format && Samples(source, false));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:664:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  664 |                         TEST_REQUIRE(source.Pts() == 91 && source.DurationTicks() == 7 && source.ColorRange() == AVCOL_RANGE_JPEG);
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:665:4: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  665 |                         TEST_REQUIRE(source.SideData(AV_FRAME_DATA_DOVI_METADATA));
+      |                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:674:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  674 |         TEST_REQUIRE(source.AllocVideo(5, 3, AV_PIX_FMT_YUV420P10LE, 64));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:675:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  675 |         TEST_REQUIRE(Samples(source, true) && Metadata(source));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:676:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  676 |         TEST_REQUIRE(Input::Prepare(source, source.Format(), prepared));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:677:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  677 |         TEST_REQUIRE(prepared.Data(0) == source.Data(0) && prepared.Data(1) == source.Data(1));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:678:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  678 |         TEST_REQUIRE(SameMetadata(source, prepared));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:682:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  682 |         TEST_REQUIRE(source.Pts() == 91 && source.TimeBase() == FFmpeg::AVRational(1, 1000));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:683:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  683 |         TEST_REQUIRE(source.SideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:684:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  684 |         TEST_REQUIRE(Samples(source, false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:719:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  719 |                 TEST_REQUIRE(Input::Align(&context, &codec, error));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:720:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  720 |                 TEST_REQUIRE(error.empty());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:721:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  721 |                 TEST_REQUIRE(context.width == test.expectedWidth && context.height == test.expectedHeight);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:730:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  730 |         TEST_REQUIRE(!Input::Align(&context, &codec, error) && !error.empty());
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:737:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  737 |                 TEST_REQUIRE(source.AllocVideo(704, 396, AV_PIX_FMT_YUV420P, 64));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:745:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  745 |                 TEST_REQUIRE(Input::Pad(source, 704, 400, padded));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:746:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  746 |                 TEST_REQUIRE(padded.SampleAspectRatio() == source.SampleAspectRatio());
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:752:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  752 |                                         TEST_REQUIRE(std::memcmp(pixels, source.Data(plane)
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:755:6: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  755 |                                         TEST_REQUIRE(std::all_of(pixels, pixels + padded.PlaneWidth(plane),
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:764:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  764 |                                 TEST_REQUIRE(source.AllocVideo(5, 3, format, 64));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:767:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  767 |                                 TEST_REQUIRE(Samples(source, true) && Metadata(source));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:770:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  770 |                                 TEST_REQUIRE(Input::Pad(source, 8, 8, padded));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:771:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  771 |                                 TEST_REQUIRE(padded.Width() == 8 && padded.Height() == 8 && padded.Data(0) != original);
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:780:27: warning: result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t' [bugprone-implicit-widening-of-multiplication-result]
+  780 |                                                 const auto* bytes = padded.Data(plane) + static_cast<std::ptrdiff_t>(row) * padded.Linesize(plane)
+      |                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:781:10: note: make conversion explicit to silence this warning
+  781 |                                                         + (padded.PlaneWidth(plane) - 1) * step + offset;
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                           static_cast<ptrdiff_t>(              )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:781:10: note: perform multiplication in a wider type
+  781 |                                                         + (padded.PlaneWidth(plane) - 1) * step + offset;
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                            static_cast<ptrdiff_t>(             )
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:782:7: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  782 |                                                 TEST_REQUIRE(bytes[0] == static_cast<std::uint8_t>(black)
+      |                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:786:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  786 |                                 TEST_REQUIRE(Input::Crop(padded.Raw(), 5, 3));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:787:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  787 |                                 TEST_REQUIRE(Samples(padded, false) && SameMetadata(source, padded));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:788:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  788 |                                 TEST_REQUIRE(source.Data(0) == original && Samples(source, false));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:790:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  790 |                                 TEST_REQUIRE(Input::Pad(source, 5, 3, unchanged));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:791:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  791 |                                 TEST_REQUIRE(unchanged.Data(0) == original && SameMetadata(source, unchanged));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:792:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  792 |                                 TEST_REQUIRE(!Input::Pad(source, 4, 3, unchanged));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:793:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  793 |                                 TEST_REQUIRE(!Input::Pad(source, 8, 8, source));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:794:5: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  794 |                                 TEST_REQUIRE(!Input::Crop(padded.Raw(), 9, 3));
+      |                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:824:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  824 |         TEST_REQUIRE(source.AllocVideo(5, 3, AV_PIX_FMT_YUV420P10LE, 64) && Samples(source, true));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:825:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  825 |         TEST_REQUIRE(Input::Prepare(source, AV_PIX_FMT_P010LE, prepared));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:826:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  826 |         TEST_REQUIRE(Input::Attach(attachments, prepared));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:827:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  827 |         TEST_REQUIRE(Input::Prepare(prepared, source.Format(), restored));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:833:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  833 |                 TEST_REQUIRE(attachments[index].Payload().Peek(size, bytes));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:835:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  835 |                 TEST_REQUIRE(side && side->size == static_cast<std::size_t>(size));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:836:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  836 |                 TEST_REQUIRE(std::memcmp(side->data, bytes.data(), side->size) == 0);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:837:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  837 |                 TEST_REQUIRE(attachments[index].Payload().Available() == size);
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:838:3: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  838 |                 TEST_REQUIRE(!source.SideData(types[index]));
+      |                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:840:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  840 |         TEST_REQUIRE(Samples(source, false) && Samples(restored, false));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:843:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  843 |         TEST_REQUIRE(!Input::Attach(attachments, source));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:844:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  844 |         TEST_REQUIRE(!source.SideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:845:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  845 |         TEST_REQUIRE(Input::Attach(attachments, prepared));
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/video_input_test.cxx:846:2: warning: do not use 'std::endl' with streams; use '\n' instead [performance-avoid-endl]
+  846 |         TEST_REQUIRE(std::memcmp(prepared.SideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL)->data, &light, sizeof(light)) == 0);
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/pipeline/video_input/../../test_helpers.hxx:189:71: note: expanded from macro 'TEST_REQUIRE'
+  189 |                 std::cout << "[Test] " << __func__ << ": assert " << #expression << std::endl; \
+      |                                                                                     ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/runners.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/test/visibility.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

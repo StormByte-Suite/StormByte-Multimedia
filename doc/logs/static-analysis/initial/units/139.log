@@ -1,0 +1,56 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:57:36: warning: 3 adjacent parameters of 'Audio' of convertible types are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   57 | Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   58 |         std::uint64_t bitrate, StormByte::Safe::Optional<StormByte::Safe::String> profile) noexcept:
+      |         ~~~~~~~~~~~~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:57:50: note: the first parameter in the range is 'sample_rate'
+   57 | Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+      |                                                  ^~~~~~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:58:16: note: the last parameter in the range is 'bitrate'
+   58 |         std::uint64_t bitrate, StormByte::Safe::Optional<StormByte::Safe::String> profile) noexcept:
+      |                       ^~~~~~~
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:57:36: note: 
+   57 | Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+      |                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:57:63: note: 'std::uint32_t' and 'std::uint8_t' may be implicitly converted: 'std::uint32_t' (as 'unsigned int') -> 'std::uint8_t' (as 'unsigned char'), 'std::uint8_t' (as 'unsigned char') -> 'std::uint32_t' (as 'unsigned int')
+   57 | Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+      |                                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:57:36: note: 
+   57 | Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+      |                                    ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:58:2: note: 'std::uint32_t' and 'std::uint64_t' may be implicitly converted: 'std::uint32_t' (as 'unsigned int') -> 'std::uint64_t' (as 'unsigned long'), 'std::uint64_t' (as 'unsigned long') -> 'std::uint32_t' (as 'unsigned int')
+   58 |         std::uint64_t bitrate, StormByte::Safe::Optional<StormByte::Safe::String> profile) noexcept:
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:57:63: note: 
+   57 | Audio::Audio(ChannelLayout layout, std::uint32_t sample_rate, std::uint8_t channels,
+      |                                                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.cxx:58:2: note: 'std::uint8_t' and 'std::uint64_t' may be implicitly converted: 'std::uint8_t' (as 'unsigned char') -> 'std::uint64_t' (as 'unsigned long'), 'std::uint64_t' (as 'unsigned long') -> 'std::uint8_t' (as 'unsigned char')
+   58 |         std::uint64_t bitrate, StormByte::Safe::Optional<StormByte::Safe::String> profile) noexcept:
+      |         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/audio.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:125:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  125 |                                         case ChannelLayout::TwoPointOne:                return 3;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:126:51: note: last of these clones ends here
+  126 |                                         case ChannelLayout::ThreePointZero:             return 3;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:127:6: warning: switch has 2 consecutive identical branches [bugprone-branch-clone]
+  127 |                                         case ChannelLayout::FourPointZero:              return 4;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:128:42: note: last of these clones ends here
+  128 |                                         case ChannelLayout::Quad:                       return 4;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:132:6: warning: switch has 3 consecutive identical branches [bugprone-branch-clone]
+  132 |                                         case ChannelLayout::SevenPointOne:              return 8;
+      |                                         ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/property/channel_layout.hxx:134:47: note: last of these clones ends here
+  134 |                                         case ChannelLayout::Octagonal:                  return 8;
+      |                                                                                                 ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^

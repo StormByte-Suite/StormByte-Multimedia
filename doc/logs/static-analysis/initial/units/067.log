@@ -1,0 +1,21 @@
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.cxx:120:17: warning: multilevel pointer conversion from 'const ::AVClass **' (aka 'const struct AVClass **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  120 |                 ? av_opt_find(&owner, key.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ) : nullptr;
+      |                               ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.cxx:123:24: warning: multilevel pointer conversion from 'const ::AVClass **' (aka 'const struct AVClass **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  123 |                 option = av_opt_find(&owner, key.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ);
+      |                                      ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.cxx:137:31: warning: multilevel pointer conversion from 'const ::AVClass **' (aka 'const struct AVClass **') to 'const void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  137 |                 while ((entry = av_opt_next(&owner, entry))) {
+      |                                             ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/encoder_info.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/feature.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/features.hxx:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public/StormByte/multimedia/visibility.h:51:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   51 | #pragma once
+      | ^
