@@ -86,10 +86,13 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
   audio (respectively video) packet is stored where the other stream is already
   three seconds ahead. Preview tests require continuous A/V sync and bounded
   live audio re-enable silence with decoded read-ahead limits.
-  SHA-256: `af2d8367b4a1a7e3b012f082ebd99421c115ed5830d32d37e2ea862094661b4b`
-  (546,292 bytes) and
-  `c8a06b565b6767b67409627377a688a4b9130aa6401990f77d6308659a26ac15`
-  (546,294 bytes). Authored once with the bit-exact authoring tool
+  Every source packet below 20 seconds is kept, including the leading IDR and
+  P frame that Matroska demuxing reports without a decode timestamp, so both
+  files start at their IDR and decode without missing references.
+  SHA-256: `00beb685a8c2b0af73f3cb746880bd977e1b5a287be7e4371067b7be2613d768`
+  (550,278 bytes) and
+  `879fde8b3af4ce66e8497a4fc57329f0573952b5d46b7e1029c9496ce9c0ec95`
+  (550,298 bytes). Authored once with the bit-exact authoring tool
   `tools/skew_interleave.cxx` (system libavformat 63.1.102; not built by tests):
 
   ```sh

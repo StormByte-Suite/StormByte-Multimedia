@@ -1,0 +1,157 @@
+# Skew fixtures: missing leading IDR (macOS CI run 41442006838) - cause and regenerated fixtures
+CI: job 125266925957 (macOS, Auto decode): both preview.test_skewed_* failed in ~0.09 s with
+h264 'co located POCs unavailable', VideoToolbox null image buffer (-12909), hw decode failure,
+'send preview packet: Unknown error' -> StateError. All other preview tests passed.
+Cause: Matroska demuxing of the B-frame source reports dts=N/A for its first two video packets
+(IDR pts 0 and P pts 125 ms); skew_interleave.cxx dropped every dts=N/A packet, so the old
+fixtures began with B frames referencing a missing IDR. Software h264 conceals; VideoToolbox fails.
+Fix: tool keeps those packets (position = dts, else pts, else previous). No library change.
+Tool: system libavformat 63.1.102, offline only; CI consumes committed files.
+
+## Source first video packets (pts,dts,flags)
+0,N/A,K__
+125,N/A,___
+42,0,___
+83,42,___
+
+## HEAD 91d737a3:old_audio.mkv sha256 af2d8367b4a1a7e3b012f082ebd99421c115ed5830d32d37e2ea862094661b4b bytes 546292
+first video packets (pts,dts,flags): 42,N/A,___ 83,42,___ 209,N/A,___ 
+video packets/keyframes: 480 20
+video (pts,flags) set md5 (pts<20000): 506b3a4b17b03b7db42f0fb9f41cef2c
+audio (pts,size) md5: f228f356ca84ae18f0a1c709c32d9a4a
+decoded video framemd5 (first 470) md5: a8c7e9034165e1a2b6c31e292802e627
+physical skew by file order (max video-over-audio, audio-over-video s): 3.24 0
+ffmpeg -xerror -err_detect explode decode diagnostics:
+       3 [h264 @ 0x?] co located POCs unavailable
+ (end)
+
+## HEAD 91d737a3:old_video.mkv sha256 c8a06b565b6767b67409627377a688a4b9130aa6401990f77d6308659a26ac15 bytes 546294
+first video packets (pts,dts,flags): 42,N/A,___ 83,42,___ 209,N/A,___ 
+video packets/keyframes: 480 20
+video (pts,flags) set md5 (pts<20000): 506b3a4b17b03b7db42f0fb9f41cef2c
+audio (pts,size) md5: f228f356ca84ae18f0a1c709c32d9a4a
+decoded video framemd5 (first 470) md5: a8c7e9034165e1a2b6c31e292802e627
+physical skew by file order (max video-over-audio, audio-over-video s): 0.17 3.039
+ffmpeg -xerror -err_detect explode decode diagnostics:
+       3 [h264 @ 0x?] co located POCs unavailable
+ (end)
+
+## test/files/video/skew_audio_late.mkv sha256 00beb685a8c2b0af73f3cb746880bd977e1b5a287be7e4371067b7be2613d768 bytes 550278
+first video packets (pts,dts,flags): 0,N/A,K__ 125,N/A,___ 42,0,___ 
+video packets/keyframes: 482 21
+video (pts,flags) set md5 (pts<20000): d9b52b3487c3bbb76782c343627b86e0
+audio (pts,size) md5: f228f356ca84ae18f0a1c709c32d9a4a
+decoded video framemd5 (first 470) md5: c4bddde5f7864dae4b286936948c38bd
+physical skew by file order (max video-over-audio, audio-over-video s): 3.24 0
+ffmpeg -xerror -err_detect explode decode diagnostics:
+ (end)
+
+## test/files/video/skew_video_late.mkv sha256 879fde8b3af4ce66e8497a4fc57329f0573952b5d46b7e1029c9496ce9c0ec95 bytes 550298
+first video packets (pts,dts,flags): 0,N/A,K__ 125,N/A,___ 42,0,___ 
+video packets/keyframes: 482 21
+video (pts,flags) set md5 (pts<20000): d9b52b3487c3bbb76782c343627b86e0
+audio (pts,size) md5: f228f356ca84ae18f0a1c709c32d9a4a
+decoded video framemd5 (first 470) md5: c4bddde5f7864dae4b286936948c38bd
+physical skew by file order (max video-over-audio, audio-over-video s): 0.17 3.099
+ffmpeg -xerror -err_detect explode decode diagnostics:
+ (end)
+
+## Source reference (<20 s)
+video (pts,flags) set md5 (pts<20000): d9b52b3487c3bbb76782c343627b86e0
+audio (pts,size) md5: f228f356ca84ae18f0a1c709c32d9a4a
+decoded video framemd5 (first 470) md5: c4bddde5f7864dae4b286936948c38bd
+Rebuild twice: audio 00beb685... x2, video 879fde8b... x2 (bit-exact).
+
+## Regenerated fixtures still discriminate: library f68d4361 (global cap), UBSan
+video/skew_audio_late.mkv playback underrun=0.0762377 video_lead=0.956333 video_late=0 -> FAIL underrun<0.05
+video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=1.10402 -> FAIL video_late<0.10
+
+## Library 91d737a3 with regenerated fixtures (build/ubsan clang 22 UBSan, build/pgo-instr Release)
+== ubsan ctest -L preview
+ 1/32 Test #2: preview.test_empty_display .............................. Passed 0.04 sec
+ 2/32 Test #3: preview.test_audio_adapter_mapping ...................... Passed 0.04 sec
+ 3/32 Test #4: preview.test_audio_adapter_samples ...................... Passed 0.04 sec
+ 4/32 Test #5: preview.test_audio_native_51 ............................ Passed 0.27 sec
+ 5/32 Test #6: preview.test_audio_native_mono .......................... Passed 0.15 sec
+ 6/32 Test #7: preview.test_audio_native_opus .......................... Passed 0.05 sec
+ 7/32 Test #8: preview.test_audio_native_stereo ........................ Passed 0.19 sec
+ 8/32 Test #9: preview.test_audio_pacing_pause_drain ................... Passed 2.28 sec
+ 9/32 Test #10: preview.test_audio_paused_seek .......................... Passed 1.08 sec
+10/32 Test #11: preview.test_av_seek_switch_epochs ...................... Passed 1.69 sec
+11/32 Test #12: preview.test_hdr_preview_tone_mapping ................... Passed 1.01 sec
+12/32 Test #13: preview.test_hdr_preview_preserves_signal ............... Passed 1.31 sec
+13/32 Test #14: preview.test_live_audio_selection ....................... Passed 2.26 sec
+14/32 Test #15: preview.test_live_audio_tracks .......................... Passed 6.24 sec
+15/32 Test #16: preview.test_skewed_audio_late .......................... Passed 8.15 sec
+16/32 Test #17: preview.test_skewed_video_late .......................... Passed 11.61 sec
+17/32 Test #18: preview.test_live_audio_backpressure_errors ............. Passed 0.74 sec
+18/32 Test #19: preview.test_av_seek_within_frame ....................... Passed 0.34 sec
+19/32 Test #20: preview.test_explicit_errors ............................ Passed 0.40 sec
+20/32 Test #21: preview.test_long_subtitle_duration ..................... Passed 0.05 sec
+21/32 Test #22: preview.test_opus_without_video ......................... Passed 1.05 sec
+22/32 Test #23: preview.test_packed_avi_seek ............................ Passed 1.01 sec
+23/32 Test #24: preview.test_recovers_rejected_initial_avi_mp3_packet ... Passed 4.28 sec
+24/32 Test #25: preview.test_recovers_rejected_avi_mp3_packet ........... Passed 4.42 sec
+25/32 Test #26: preview.test_recovers_rejected_avi_video_packet ......... Passed 4.41 sec
+26/32 Test #27: preview.test_subtitle_decode ............................ Passed 3.06 sec
+27/32 Test #28: preview.test_subtitle_paused_seek ....................... Passed 1.21 sec
+28/32 Test #29: preview.test_unknown_duration_seek ...................... Passed 0.80 sec
+29/32 Test #30: preview.test_faulted_reader_retained .................... Passed 1.28 sec
+30/32 Test #31: preview.test_preview_to_transcoder ...................... Passed 0.25 sec
+31/32 Test #32: preview.test_rewind_close_failures ...................... Passed 0.07 sec
+32/32 Test #33: preview.test_stop_transfer_destructor ................... Passed 0.27 sec
+100% tests passed, 0 tests failed out of 32
+== pgo-instr ctest -L preview
+ 1/32 Test #2: preview.test_empty_display .............................. Passed 0.01 sec
+ 2/32 Test #3: preview.test_audio_adapter_mapping ...................... Passed 0.01 sec
+ 3/32 Test #4: preview.test_audio_adapter_samples ...................... Passed 0.01 sec
+ 4/32 Test #5: preview.test_audio_native_51 ............................ Passed 0.23 sec
+ 5/32 Test #6: preview.test_audio_native_mono .......................... Passed 0.12 sec
+ 6/32 Test #7: preview.test_audio_native_opus .......................... Passed 0.02 sec
+ 7/32 Test #8: preview.test_audio_native_stereo ........................ Passed 0.14 sec
+ 8/32 Test #9: preview.test_audio_pacing_pause_drain ................... Passed 2.21 sec
+ 9/32 Test #10: preview.test_audio_paused_seek .......................... Passed 1.03 sec
+10/32 Test #11: preview.test_av_seek_switch_epochs ...................... Passed 1.63 sec
+11/32 Test #12: preview.test_hdr_preview_tone_mapping ................... Passed 0.49 sec
+12/32 Test #13: preview.test_hdr_preview_preserves_signal ............... Passed 0.88 sec
+13/32 Test #14: preview.test_live_audio_selection ....................... Passed 2.40 sec
+14/32 Test #15: preview.test_live_audio_tracks .......................... Passed 6.23 sec
+15/32 Test #16: preview.test_skewed_audio_late .......................... Passed 8.09 sec
+16/32 Test #17: preview.test_skewed_video_late .......................... Passed 11.61 sec
+17/32 Test #18: preview.test_live_audio_backpressure_errors ............. Passed 0.69 sec
+18/32 Test #19: preview.test_av_seek_within_frame ....................... Passed 0.28 sec
+19/32 Test #20: preview.test_explicit_errors ............................ Passed 0.33 sec
+20/32 Test #21: preview.test_long_subtitle_duration ..................... Passed 0.01 sec
+21/32 Test #22: preview.test_opus_without_video ......................... Passed 1.02 sec
+22/32 Test #23: preview.test_packed_avi_seek ............................ Passed 0.99 sec
+23/32 Test #24: preview.test_recovers_rejected_initial_avi_mp3_packet ... Passed 4.24 sec
+24/32 Test #25: preview.test_recovers_rejected_avi_mp3_packet ........... Passed 4.38 sec
+25/32 Test #26: preview.test_recovers_rejected_avi_video_packet ......... Passed 4.39 sec
+26/32 Test #27: preview.test_subtitle_decode ............................ Passed 3.02 sec
+27/32 Test #28: preview.test_subtitle_paused_seek ....................... Passed 1.16 sec
+28/32 Test #29: preview.test_unknown_duration_seek ...................... Passed 0.77 sec
+29/32 Test #30: preview.test_faulted_reader_retained .................... Passed 1.24 sec
+30/32 Test #31: preview.test_preview_to_transcoder ...................... Passed 0.15 sec
+31/32 Test #32: preview.test_rewind_close_failures ...................... Passed 0.03 sec
+32/32 Test #33: preview.test_stop_transfer_destructor ................... Passed 0.21 sec
+100% tests passed, 0 tests failed out of 32
+ubsan test_skewed_audio_late #1 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00303207 video/skew_audio_late.mkv re-enable silence=1.55399 wall_ms=1410 
+ubsan test_skewed_audio_late #2 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00305153 video/skew_audio_late.mkv re-enable silence=1.55668 wall_ms=1410 
+ubsan test_skewed_audio_late #3 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00303442 video/skew_audio_late.mkv re-enable silence=1.55559 wall_ms=1406 
+ubsan test_skewed_audio_late #4 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00306256 video/skew_audio_late.mkv re-enable silence=1.55265 wall_ms=1402 
+ubsan test_skewed_audio_late #5 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304949 video/skew_audio_late.mkv re-enable silence=1.55175 wall_ms=1402 
+ubsan test_skewed_video_late #1 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0153155 video/skew_video_late.mkv re-enable silence=5.07509 wall_ms=4926 
+ubsan test_skewed_video_late #2 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0183451 video/skew_video_late.mkv re-enable silence=5.10541 wall_ms=4958 
+ubsan test_skewed_video_late #3 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0153094 video/skew_video_late.mkv re-enable silence=5.07633 wall_ms=4927 
+ubsan test_skewed_video_late #4 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0153376 video/skew_video_late.mkv re-enable silence=5.07631 wall_ms=4930 
+ubsan test_skewed_video_late #5 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0153465 video/skew_video_late.mkv re-enable silence=5.07646 wall_ms=4930 
+pgo-instr test_skewed_audio_late #1 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00327611 video/skew_audio_late.mkv re-enable silence=1.55601 wall_ms=1406 
+pgo-instr test_skewed_audio_late #2 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.0030469 video/skew_audio_late.mkv re-enable silence=1.55675 wall_ms=1411 
+pgo-instr test_skewed_audio_late #3 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00303583 video/skew_audio_late.mkv re-enable silence=1.55481 wall_ms=1405 
+pgo-instr test_skewed_audio_late #4 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00310733 video/skew_audio_late.mkv re-enable silence=1.55137 wall_ms=1402 
+pgo-instr test_skewed_audio_late #5 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00372491 video/skew_audio_late.mkv re-enable silence=1.55205 wall_ms=1404 
+pgo-instr test_skewed_video_late #1 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0154579 video/skew_video_late.mkv re-enable silence=5.10635 wall_ms=4956 
+pgo-instr test_skewed_video_late #2 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.015327 video/skew_video_late.mkv re-enable silence=5.10663 wall_ms=4959 
+pgo-instr test_skewed_video_late #3 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0152956 video/skew_video_late.mkv re-enable silence=5.10654 wall_ms=4957 
+pgo-instr test_skewed_video_late #4 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0152873 video/skew_video_late.mkv re-enable silence=5.10281 wall_ms=4953 
+pgo-instr test_skewed_video_late #5 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0183434 video/skew_video_late.mkv re-enable silence=5.07606 wall_ms=4927 

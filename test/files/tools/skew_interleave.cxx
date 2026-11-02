@@ -17,6 +17,8 @@ extern "C" {
 #include <cstdlib>
 #include <cstring>
 #include <deque>
+#include <utility>
+#include <vector>
 
 int main(int argc, char** argv) {
 	if (argc != 6) {
@@ -40,9 +42,17 @@ int main(int argc, char** argv) {
 	out->flags |= AVFMT_FLAG_BITEXACT;
 	if (avio_open(&out->pb, argv[2], AVIO_FLAG_WRITE) < 0 || avformat_write_header(out, nullptr) < 0)
 		return 1;
-	std::deque<AVPacket*> held;
+	// Each packet is paired with its decode position in seconds. Matroska
+	// demuxing leaves dts unset on the leading packets of B-frame streams
+	// (including the first IDR); those packets must be kept, so the position
+	// falls back to pts and then to the stream's previous position.
+	std::deque<std::pair<AVPacket*, double>> held;
+	std::vector<double> last(in->nb_streams, 0.0);
 	const auto seconds = [&](const AVPacket* packet) {
-		return packet->dts * av_q2d(in->streams[packet->stream_index]->time_base);
+		const int64_t ts = packet->dts != AV_NOPTS_VALUE ? packet->dts : packet->pts;
+		if (ts != AV_NOPTS_VALUE)
+			last[packet->stream_index] = ts * av_q2d(in->streams[packet->stream_index]->time_base);
+		return last[packet->stream_index];
 	};
 	const auto write = [&](AVPacket* packet) {
 		av_packet_rescale_ts(packet, in->streams[packet->stream_index]->time_base,
@@ -54,7 +64,8 @@ int main(int argc, char** argv) {
 	};
 	AVPacket* packet = av_packet_alloc();
 	while (packet && av_read_frame(in, packet) >= 0) {
-		if (packet->dts == AV_NOPTS_VALUE || seconds(packet) >= limit) {
+		const double position = seconds(packet);
+		if (position >= limit) {
 			av_packet_unref(packet);
 			continue;
 		}
@@ -63,19 +74,19 @@ int main(int argc, char** argv) {
 		if (!owned)
 			return 1;
 		if (in->streams[owned->stream_index]->codecpar->codec_type == lagging) {
-			held.push_back(owned);
+			held.emplace_back(owned, position);
 			continue;
 		}
-		while (!held.empty() && seconds(held.front()) + skew <= seconds(owned)) {
-			if (!write(held.front()))
+		while (!held.empty() && held.front().second + skew <= position) {
+			if (!write(held.front().first))
 				return 1;
 			held.pop_front();
 		}
 		if (!write(owned))
 			return 1;
 	}
-	for (AVPacket* rest : held)
-		if (!write(rest))
+	for (const auto& rest : held)
+		if (!write(rest.first))
 			return 1;
 	av_packet_free(&packet);
 	if (av_write_trailer(out) < 0)
