@@ -115,7 +115,7 @@ namespace {
 		return StormByte::Multimedia::Backend::MakeLocalFileWriter(path);
 	}
 
-	std::string ExtensionOf(std::string_view location) noexcept {
+	std::string ExtensionOf(std::string_view location) {
 		const auto end = location.find_first_of("?#");
 		if (end != std::string_view::npos)
 			location = location.substr(0, end);
@@ -130,7 +130,7 @@ namespace {
 	}
 
 	const StormByte::Multimedia::Container* ContainerFromWriter(
-		const BufferedLocationWriter& writer) noexcept {
+		const BufferedLocationWriter& writer) {
 		const auto ext = ExtensionOf(std::string_view{writer.Path()});
 		if (ext.empty())
 			return nullptr;
@@ -140,7 +140,7 @@ namespace {
 		return &found.value().get();
 	}
 
-	StormByte::Multimedia::Backend::MuxerChoice IdentityFormat(const StormByte::Multimedia::Container& container) noexcept {
+	StormByte::Multimedia::Backend::MuxerChoice IdentityFormat(const StormByte::Multimedia::Container& container) {
 		const auto& registry = StormByte::Multimedia::Registry::Instance();
 		const auto registered = registry.FindContainer(container.Name());
 		if (!registered || registered.value().get().Name() != container.Name()
@@ -212,61 +212,61 @@ namespace {
 
 Plan::Plan(const StormByte::Safe::String& source,
 	const StormByte::Safe::String& destination,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(LocalReader(source), LocalWriter(destination), std::move(duration)) {}
 
 Plan::Plan(const StormByte::Safe::String& source,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(LocalReader(source), std::move(writer), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	const StormByte::Safe::String& destination,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(std::move(reader), LocalWriter(destination), std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(std::move(reader), std::move(writer), std::move(duration), nullptr) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer,
 	StormByte::Safe::Optional<std::int64_t> duration,
-	const StormByte::Safe::Function<void(double)>* progress) noexcept
+	const StormByte::Safe::Function<void(double)>* progress)
 : Plan(std::move(reader), std::move(writer), static_cast<const class Container*>(nullptr),
 	std::move(duration), progress) {}
 
 Plan::Plan(const StormByte::Safe::String& source,
 	const StormByte::Safe::String& destination, const class Container& container,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(LocalReader(source), LocalWriter(destination), container, std::move(duration)) {}
 
 Plan::Plan(const StormByte::Safe::String& source,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container& container,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(LocalReader(source), std::move(writer), container, std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	const StormByte::Safe::String& destination, const class Container& container,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(std::move(reader), LocalWriter(destination), container, std::move(duration)) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container& container,
-	StormByte::Safe::Optional<std::int64_t> duration) noexcept
+	StormByte::Safe::Optional<std::int64_t> duration)
 : Plan(std::move(reader), std::move(writer), container, std::move(duration), nullptr) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container& container,
 	StormByte::Safe::Optional<std::int64_t> duration,
-	const StormByte::Safe::Function<void(double)>* progress) noexcept
+	const StormByte::Safe::Function<void(double)>* progress)
 : Plan(std::move(reader), std::move(writer), &container, std::move(duration), progress) {}
 
 Plan::Plan(StormByte::Safe::Unique<BufferedLocationReader> reader,
 	StormByte::Safe::Unique<BufferedLocationWriter> writer, const class Container* container,
 	StormByte::Safe::Optional<std::int64_t> duration,
-	const StormByte::Safe::Function<void(double)>* progress) noexcept
+	const StormByte::Safe::Function<void(double)>* progress)
 : m_input_telemetry(reader ? reader->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::ReadTelemetry>{}),
 	m_output_telemetry(writer ? writer->Telemetry() : StormByte::Safe::Shared<StormByte::Buffer::WriteTelemetry>{}),
 	m_reader(std::move(reader)),
@@ -311,7 +311,7 @@ enum Plan::State Plan::State() const noexcept {
 }
 
 enum Plan::State Plan::State(enum State desired,
-	StormByte::Safe::Optional<StormByte::Safe::String> reason) const noexcept {
+	StormByte::Safe::Optional<StormByte::Safe::String> reason) const {
 	if (desired == State::Running && !Check())
 		return State();
 	StormByte::Safe::UniqueLock lock(m_state_mutex);
@@ -330,12 +330,12 @@ enum Plan::State Plan::State(enum State desired,
 	return accepted ? desired : current;
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> Plan::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Plan::Error() const {
 	StormByte::Safe::UniqueLock lock(m_state_mutex);
 	return m_error;
 }
 
-void Plan::Observe(Step& step) noexcept {
+void Plan::Observe(Step& step) {
 	StormByte::Safe::UniqueLock lock(m_state_mutex);
 	if (!m_observers)
 		m_observers = StormByte::Safe::Unique<Observers>::MakePointer<Observers>();
@@ -344,7 +344,7 @@ void Plan::Observe(Step& step) noexcept {
 		stages.push_back(&step);
 }
 
-void Plan::Hold(bool held) noexcept {
+void Plan::Hold(bool held) {
 	Observers* observers = nullptr;
 	{
 		StormByte::Safe::UniqueLock lock(m_state_mutex);
@@ -384,7 +384,7 @@ void Plan::Unobserve(Step& step) noexcept {
 		stages.erase(found);
 }
 
-void Plan::Complete(Step& step, bool success) noexcept {
+void Plan::Complete(Step& step, bool success) {
 	if (!success) {
 		State(State::Failed, step.Error().value_or(StormByte::Safe::String{"pipeline stage stopped before completion"}));
 		return;
@@ -430,7 +430,7 @@ const StormByte::Multimedia::File& Plan::Snapshot() const noexcept {
 	return *m_snapshot;
 }
 
-Plan::operator bool() const noexcept {
+Plan::operator bool() const {
 	return Check().has_value();
 }
 

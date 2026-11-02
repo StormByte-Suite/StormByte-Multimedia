@@ -42,6 +42,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Registry initialization, lookups and owned list snapshots propagate allocation failures instead of terminating through incorrect `noexcept` contracts. Private codec/container catalogs, stored identity construction and muxer resolution preserve that propagation; failed singleton initialization can be retried.
 - Telemetry label/error operations, filter and step telemetry, stage registration, and owned snapshots propagate allocation failures, including the heap-backed optional memory counters, instead of terminating under incorrect `noexcept` contracts.
 - File probing, container resolution, attachment capture and lazy duration scans propagate allocation failures; duration observers that throw are reported as interrupted scans and remain retryable.
+- Plan construction, format resolution, validation and owned failure snapshots propagate allocation failures instead of terminating under incorrect `noexcept` contracts.
 
 ### Changed
 

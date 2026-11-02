@@ -8,6 +8,7 @@
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/safe/exception.hxx>
@@ -36,6 +37,10 @@ static_assert(!noexcept(std::declval<const Registry&>().FindCodec("hevc")));
 static_assert(!noexcept(std::declval<const Registry&>().FindContainer("mkv")));
 static_assert(!noexcept(StormByte::Multimedia::File::Open(std::declval<const String&>())));
 static_assert(!noexcept(std::declval<const StormByte::Multimedia::File&>().Duration()));
+static_assert(!noexcept(StormByte::Multimedia::Pipeline::Plan(
+	std::declval<const String&>(), std::declval<const String&>())));
+static_assert(!noexcept(static_cast<bool>(std::declval<const StormByte::Multimedia::Pipeline::Plan&>())));
+static_assert(!noexcept(std::declval<const StormByte::Multimedia::Pipeline::Plan&>().Error()));
 static_assert(!noexcept(std::declval<const StageTelemetry&>().Origin()));
 static_assert(!noexcept(std::declval<const StageTelemetry&>().Error()));
 static_assert(!noexcept(std::declval<const StageTelemetry&>().SetOrigin("stage")));
@@ -187,7 +192,12 @@ int CheckTelemetry() {
 
 int CheckFile() {
 	const String path{std::string(4096, 'x')};
-	return ExpectAllocationFailure("file open", [&] { StormByte::Multimedia::File::Open(path); });
+	int errors = ExpectAllocationFailure("file open", [&] { StormByte::Multimedia::File::Open(path); });
+	const String destination{std::string(4096, 'y')};
+	errors += ExpectAllocationFailure("plan construction", [&] {
+		StormByte::Multimedia::Pipeline::Plan plan{path, destination};
+	});
+	return errors;
 }
 
 int main() {
