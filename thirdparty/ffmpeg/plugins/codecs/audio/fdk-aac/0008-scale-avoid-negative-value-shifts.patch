@@ -1,0 +1,60 @@
+From 8e8789eb4a27ae7cb288a03a9be6b51be09b864b Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:34:10 +0100
+Subject: [PATCH] libFDK: scale signed values without undefined negative shifts
+
+The generic scalar and in-place scaling helpers left-shift signed sample
+values. Convert their bit patterns to ULONG for modulo scaling and
+convert back to the original width. In the saturating helper use widened
+multiplication only after its existing headroom check, preserving the
+special lower limit. Reproduced in scaleValueSaturate by surround AAC
+decoding with UBSan; the scalar and in-place helpers perform the same
+signed shift.
+---
+ libFDK/include/scale.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/libFDK/include/scale.h b/libFDK/include/scale.h
+index 8a19999..7e464a4 100644
+--- a/libFDK/include/scale.h
++++ b/libFDK/include/scale.h
+@@ -154,7 +154,7 @@ inline FIXP_DBL scaleValue(const FIXP_DBL value, /*!< Value */
+                            INT scalefactor       /*!< Scalefactor */
+ ) {
+   if (scalefactor > 0)
+-    return (value << scalefactor);
++    return (FIXP_DBL)((ULONG)value << scalefactor);
+   else
+     return (value >> (-scalefactor));
+ }
+@@ -162,7 +162,7 @@ inline FIXP_SGL scaleValue(const FIXP_SGL value, /*!< Value */
+                            INT scalefactor       /*!< Scalefactor */
+ ) {
+   if (scalefactor > 0)
+-    return (value << scalefactor);
++    return (FIXP_SGL)((ULONG)value << scalefactor);
+   else
+     return (value >> (-scalefactor));
+ }
+@@ -191,7 +191,8 @@ inline FIXP_DBL scaleValueSaturate(const FIXP_DBL value,
+       else
+         return (FIXP_DBL)MINVAL_DBL + (FIXP_DBL)1; /* 0x8000.0001 */
+     } else {
+-      return fMax((value << scalefactor), (FIXP_DBL)MINVAL_DBL + (FIXP_DBL)1);
++      return fMax((FIXP_DBL)((INT64)value * ((INT64)1 << scalefactor)),
++                  (FIXP_DBL)MINVAL_DBL + (FIXP_DBL)1);
+     }
+   } else {
+     scalefactor = -scalefactor;
+@@ -221,7 +222,7 @@ inline void scaleValueInPlace(FIXP_DBL *value, /*!< Value */
+   /* Note: The assignment inside the if conditional allows combining a load with
+    * the compare to zero (on ARM and maybe others) */
+   if ((newscale = (scalefactor)) >= 0) {
+-    *(value) <<= newscale;
++    *(value) = (FIXP_DBL)((ULONG)*(value) << newscale);
+   } else {
+     *(value) >>= -newscale;
+   }
+-- 
+2.56.0
+
