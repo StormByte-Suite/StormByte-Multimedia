@@ -1,0 +1,47 @@
+From 95f1e4af3bb19c74ab78ee27ae23420b896c6b1b Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:30:39 +0100
+Subject: [PATCH] avx2: copy four-pixel intra reference edges without alignment
+ assumptions
+
+Four-pixel planar and filtered DC predictors read byte-addressed
+reference edges at offset one through uint32_t pointers. Copy each exact
+four-byte fragment into the existing scalar temporary, retaining its
+native representation and all later SIMD packing. Reproduced in the
+planar predictor by the existing unaligned-video test with UBSan; the DC
+predictor has the same access and preconditions.
+---
+ src/strategies/avx2/intra-avx2.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/strategies/avx2/intra-avx2.c b/src/strategies/avx2/intra-avx2.c
+index 2ee67b13..03e8f5f0 100644
+--- a/src/strategies/avx2/intra-avx2.c
++++ b/src/strategies/avx2/intra-avx2.c
+@@ -1015,8 +1015,9 @@ static void kvz_intra_pred_planar_avx2(
+     const __m128i tr    = _mm_set1_epi8   (top_right);
+     const __m128i bl    = _mm_set1_epi8   (bottom_left);
+ 
+-    uint32_t rt14    = *(const uint32_t *)(ref_top  + 1);
+-    uint32_t rl14    = *(const uint32_t *)(ref_left + 1);
++    uint32_t rt14, rl14;
++    memcpy(&rt14, ref_top + 1, sizeof(rt14));
++    memcpy(&rl14, ref_left + 1, sizeof(rl14));
+     uint64_t rt14_64 = (uint64_t)rt14;
+     uint64_t rl14_64 = (uint64_t)rl14;
+     uint64_t rtl14   = rt14_64 | (rl14_64 << 32);
+@@ -1063,8 +1064,9 @@ static void pred_filtered_dc_4x4(const uint8_t *ref_top,
+                                  const uint8_t *ref_left,
+                                        uint8_t *out_block)
+ {
+-  const uint32_t rt_u32 = *(const uint32_t *)(ref_top  + 1);
+-  const uint32_t rl_u32 = *(const uint32_t *)(ref_left + 1);
++  uint32_t rt_u32, rl_u32;
++  memcpy(&rt_u32, ref_top + 1, sizeof(rt_u32));
++  memcpy(&rl_u32, ref_left + 1, sizeof(rl_u32));
+ 
+   const __m128i zero    = _mm_setzero_si128();
+   const __m128i twos    = _mm_set1_epi8(2);
+-- 
+2.56.0
+
