@@ -11,6 +11,7 @@ set(KVAZAAR_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0008-clang-cl-sse41-target.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0009-avx2-unaligned-eight-pixel-loads.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0010-avx2-unaligned-reconstruction-stores.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0011-avx2-unaligned-dc-reference-loads.patch"
 )
 
 set(KVAZAAR_OPTIONS

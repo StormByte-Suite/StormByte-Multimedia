@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled Kvazaar reads filtered 8x8 DC-prediction reference edges with unaligned-safe eight-byte SIMD loads.
 - Bundled Vorbis doubles bounded negative floor-post deviations with multiplication, preserving their encoded mapping without undefined signed shifts.
 - Bundled x265 accesses temporal-filter estimator scratch only when temporal filtering is enabled, avoiding an uninitialized pointer in ordinary lookahead workers.
 - Bundled FDK-AAC normalizes signed power-function exponent mantissas through widened multiplication instead of undefined negative left shifts.
