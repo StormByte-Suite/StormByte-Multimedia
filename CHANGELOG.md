@@ -38,6 +38,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Bundled FFmpeg releases generated Dolby Vision RPU buffers after x265 consumes them, fixing a per-frame leak.
 - Bundled x265 releases owned Dolby Vision RPU copies when frames are reused or destroyed, fixing a separate per-frame leak.
 - Bundled SVT-AV1 stores the second short SIMD row without signed halfword-assembly overflow or scalar alignment requirements.
+- Bundled FDK-AAC normalizes signed channel correlations and in-phase/out-of-phase mixed intensity spectra through unsigned bit patterns.
 - Bundled Vorbis reuses each residue configuration shared between short and long encoding modes, avoiding a 2,848-byte leak during surround encoder setup even when the encoder is correctly cleared.
 - Bundled FDK-AAC widens negated MDCT folding samples through bounded multiplication, preserving the full PCM range without undefined signed left shifts.
 - Bundled FDK-AAC converts signed scalefactor estimates and bit-cost differences to fixed-point values through unsigned bit patterns instead of negative signed shifts.

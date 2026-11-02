@@ -1,0 +1,64 @@
+From 3bc82f5d8a1c6ee977af327761406802ed843bee Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:24:01 +0100
+Subject: [PATCH] intensity: normalize signed correlation and mixed spectra
+ safely
+
+Perform left shifts on unsigned fixed-point bit patterns for signed correlation and the in-phase and out-of-phase mixed spectra. Restore FIXP_DBL after scaling so subsequent arithmetic shifts retain their meaning. The surround encoder reproduces a negative channelCorr shift under UBSan.
+---
+ libAACenc/src/intensity.cpp | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/libAACenc/src/intensity.cpp b/libAACenc/src/intensity.cpp
+index 8524f5f..ae8a4a0 100644
+--- a/libAACenc/src/intensity.cpp
++++ b/libAACenc/src/intensity.cpp
+@@ -445,8 +445,8 @@ static void FDKaacEnc_prepareIntensityDecision(
+               else
+                 channelCorr[sfb + sfboffs] = (FIXP_DBL)MAXVAL_DBL;
+             } else {
+-              channelCorr[sfb + sfboffs] = channelCorr[sfb + sfboffs]
+-                                           << channelCorrSF;
++              channelCorr[sfb + sfboffs] =
++                  (FIXP_DBL)((UINT)channelCorr[sfb + sfboffs] << channelCorrSF);
+             }
+           }
+         }
+@@ -703,7 +703,7 @@ void FDKaacEnc_IntensityStereoProcessing(
+             fMultDiv2((FIXP_DBL)((UINT)mdctSpectrumLeft[j] << sL),
+                       (FIXP_DBL)((UINT)mdctSpectrumRight[j] << sR)),
+             inv_n);
+-      lr = lr << 1;
++      lr = (FIXP_DBL)((UINT)lr << 1);
+ 
+       if (lr < FL2FXCONST_DBL(0.0f)) {
+         /* This means OUT OF phase intensity stereo, cf. standard */
+@@ -739,9 +739,9 @@ void FDKaacEnc_IntensityStereoProcessing(
+         } else {
+           for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1];
+                j++) {
+-            mdctSpectrumLeft[j] = (fMultDiv2(mdctSpectrumLeft[j], scale) -
+-                                   fMultDiv2(mdctSpectrumRight[j], scale))
+-                                  << s2;
++            mdctSpectrumLeft[j] = (FIXP_DBL)((UINT)(
++                fMultDiv2(mdctSpectrumLeft[j], scale) -
++                fMultDiv2(mdctSpectrumRight[j], scale)) << s2);
+             mdctSpectrumRight[j] = FL2FXCONST_DBL(0.0f);
+           }
+         }
+@@ -781,9 +781,9 @@ void FDKaacEnc_IntensityStereoProcessing(
+         } else {
+           for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1];
+                j++) {
+-            mdctSpectrumLeft[j] = (fMultDiv2(mdctSpectrumLeft[j], scale) +
+-                                   fMultDiv2(mdctSpectrumRight[j], scale))
+-                                  << s2;
++            mdctSpectrumLeft[j] = (FIXP_DBL)((UINT)(
++                fMultDiv2(mdctSpectrumLeft[j], scale) +
++                fMultDiv2(mdctSpectrumRight[j], scale)) << s2);
+             mdctSpectrumRight[j] = FL2FXCONST_DBL(0.0f);
+           }
+         }
+-- 
+2.56.0
+
