@@ -9,7 +9,11 @@ set(X264_OPTIONS
 	asm=enabled
 )
 
-set(X264_OPTSTR "GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-shallow-revision.patch;TITLE=x264 shallow revision}")
+set(X264_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-shallow-revision.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-threadpool-type-correct-worker-callbacks.patch"
+)
+set(X264_OPTSTR "GIT={RESET;PATCH={${X264_PATCHES}};TITLE=x264 compatibility patches}")
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR APPLE)
 	# GCC: x264 uses -mpreferred-stack-boundary=6 (64 bytes). LTO can apply
 	# that assumption to other dependencies and omit required AVX2 stack

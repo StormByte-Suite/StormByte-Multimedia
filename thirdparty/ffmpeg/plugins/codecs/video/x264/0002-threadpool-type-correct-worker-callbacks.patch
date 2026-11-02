@@ -1,0 +1,144 @@
+From d463c0f026c611ad92a2580c6bad2b83951207c8 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] threadpool: give worker callbacks the declared function
+ pointer type
+
+The pool invokes jobs through void *(*)(void *), but slicetype_slice_cost
+and slices_write are submitted through casts from incompatible function
+types. The lookahead callback also returns void instead of void *.
+UBSan reports both calls when these threaded paths are exercised.
+
+Use the pool signature for these callbacks and convert the object pointer
+inside each function. Return NULL from the lookahead callback, whose
+result is unused. Preserve the slices_write result used by the encoder.
+
+Apply the same contract to the input worker and the pthread pool entry
+point, and remove the now-unnecessary function pointer casts.
+
+Reproduced with UBSan in existing threaded H.264 encoder tests.
+---
+ common/threadpool.c | 5 +++--
+ encoder/encoder.c   | 7 ++++---
+ encoder/slicetype.c | 6 ++++--
+ input/thread.c      | 6 ++++--
+ 4 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/common/threadpool.c b/common/threadpool.c
+index fadd02a..3479407 100644
+--- a/common/threadpool.c
++++ b/common/threadpool.c
+@@ -45,8 +45,9 @@ struct x264_threadpool_t
+     x264_sync_frame_list_t done;   /* list of jobs that have finished processing */
+ };
+ 
+-REALIGN_STACK static void *threadpool_thread( x264_threadpool_t *pool )
++REALIGN_STACK static void *threadpool_thread( void *arg )
+ {
++    x264_threadpool_t *pool = arg;
+     while( !pool->exit )
+     {
+         x264_threadpool_job_t *job = NULL;
+@@ -95,7 +96,7 @@ int x264_threadpool_init( x264_threadpool_t **p_pool, int threads )
+        x264_sync_frame_list_push( &pool->uninit, (void*)job );
+     }
+     for( int i = 0; i < pool->threads; i++ )
+-        if( x264_pthread_create( pool->thread_handle+i, NULL, (void*)threadpool_thread, pool ) )
++        if( x264_pthread_create( pool->thread_handle+i, NULL, threadpool_thread, pool ) )
+             goto fail;
+ 
+     return 0;
+diff --git a/encoder/encoder.c b/encoder/encoder.c
+index 20e620a..7793114 100644
+--- a/encoder/encoder.c
++++ b/encoder/encoder.c
+@@ -3156,8 +3156,9 @@ static void thread_sync_stat( x264_t *dst, x264_t *src )
+         memcpy( &dst->stat, &src->stat, offsetof(x264_t, stat.frame) - offsetof(x264_t, stat) );
+ }
+ 
+-static void *slices_write( x264_t *h )
++static void *slices_write( void *arg )
+ {
++    x264_t *h = arg;
+     int i_slice_num = 0;
+     int last_thread_mb = h->sh.i_last_mb;
+     int round_bias = h->param.i_avcintra_class ? 0 : h->param.i_slice_count/2;
+@@ -3249,7 +3250,7 @@ static int threaded_slices_write( x264_t *h )
+     }
+     /* dispatch */
+     for( int i = 0; i < h->param.i_threads; i++ )
+-        x264_threadpool_run( h->threadpool, (void*)slices_write, h->thread[i] );
++        x264_threadpool_run( h->threadpool, slices_write, h->thread[i] );
+     /* wait */
+     for( int i = 0; i < h->param.i_threads; i++ )
+         x264_threadslice_cond_wait( h->thread[i], 1 );
+@@ -3886,7 +3887,7 @@ int     x264_encoder_encode( x264_t *h,
+     h->i_threadslice_end = h->mb.i_mb_height;
+     if( h->i_thread_frames > 1 )
+     {
+-        x264_threadpool_run( h->threadpool, (void*)slices_write, h );
++        x264_threadpool_run( h->threadpool, slices_write, h );
+         h->b_thread_active = 1;
+     }
+     else if( h->param.b_sliced_threads )
+diff --git a/encoder/slicetype.c b/encoder/slicetype.c
+index 160d979..48a7b63 100644
+--- a/encoder/slicetype.c
++++ b/encoder/slicetype.c
+@@ -811,8 +811,9 @@ typedef struct
+     int *output_intra;
+ } x264_slicetype_slice_t;
+ 
+-static void slicetype_slice_cost( x264_slicetype_slice_t *s )
++static void *slicetype_slice_cost( void *arg )
+ {
++    x264_slicetype_slice_t *s = arg;
+     x264_t *h = s->h;
+ 
+     /* Lowres lookahead goes backwards because the MVs are used as predictors in the main encode.
+@@ -831,6 +832,7 @@ static void slicetype_slice_cost( x264_slicetype_slice_t *s )
+         for( h->mb.i_mb_x = start_x; h->mb.i_mb_x >= end_x; h->mb.i_mb_x-- )
+             slicetype_mb_cost( h, s->a, s->frames, s->p0, s->p1, s->b, s->dist_scale_factor,
+                                s->do_search, s->w, s->output_inter, s->output_intra );
++    return NULL;
+ }
+ 
+ static int slicetype_frame_cost( x264_t *h, x264_mb_analysis_t *a,
+@@ -926,7 +928,7 @@ static int slicetype_frame_cost( x264_t *h, x264_mb_analysis_t *a,
+                     output_inter[i+1] = output_inter[i] + thread_output_size + PAD_SIZE;
+                     output_intra[i+1] = output_intra[i] + thread_output_size + PAD_SIZE;
+ 
+-                    x264_threadpool_run( h->lookaheadpool, (void*)slicetype_slice_cost, &s[i] );
++                    x264_threadpool_run( h->lookaheadpool, slicetype_slice_cost, &s[i] );
+                 }
+                 for( int i = 0; i < h->param.i_lookahead_threads; i++ )
+                     x264_threadpool_wait( h->lookaheadpool, &s[i] );
+diff --git a/input/thread.c b/input/thread.c
+index b235f0c..761c1ef 100644
+--- a/input/thread.c
++++ b/input/thread.c
+@@ -70,9 +70,11 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
+     return 0;
+ }
+ 
+-static void read_frame_thread_int( thread_input_arg_t *i )
++static void *read_frame_thread_int( void *arg )
+ {
++    thread_input_arg_t *i = arg;
+     i->status = i->h->input.read_frame( i->pic, i->h->p_handle, i->i_frame );
++    return NULL;
+ }
+ 
+ static int read_frame( cli_pic_t *p_pic, hnd_t handle, int i_frame )
+@@ -100,7 +102,7 @@ static int read_frame( cli_pic_t *p_pic, hnd_t handle, int i_frame )
+         h->next_frame =
+         h->next_args->i_frame = i_frame+1;
+         h->next_args->pic = &h->pic;
+-        x264_threadpool_run( h->pool, (void*)read_frame_thread_int, h->next_args );
++        x264_threadpool_run( h->pool, read_frame_thread_int, h->next_args );
+     }
+     else
+         h->next_frame = -1;
+-- 
+2.56.0
+
