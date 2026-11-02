@@ -10,6 +10,7 @@ set(KVAZAAR_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0007-version-header-in-binary-dir.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0008-clang-cl-sse41-target.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0009-avx2-unaligned-eight-pixel-loads.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0010-avx2-unaligned-reconstruction-stores.patch"
 )
 
 set(KVAZAAR_OPTIONS

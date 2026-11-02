@@ -1,0 +1,73 @@
+From 238e4a888ec4aa5584577f922d3df457999128bc Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] avx2: store reconstructed pixels without scalar alignment
+ assumptions
+
+The reconstructed output may not satisfy int64_t alignment, even when
+residual and prediction loads are unaligned-safe. Copy each four- or
+eight-pixel packed row through memcpy instead of dereferencing scalar
+output casts. Preserve pixel order and exact write widths for all
+transform sizes. Reproduced by the existing unaligned-video encoding
+test with UBSan.
+---
+ src/strategies/avx2/quant-avx2.c | 35 +++++++++-----------------------
+ 1 file changed, 10 insertions(+), 25 deletions(-)
+
+diff --git a/src/strategies/avx2/quant-avx2.c b/src/strategies/avx2/quant-avx2.c
+index c20c7c07..a47ad928 100644
+--- a/src/strategies/avx2/quant-avx2.c
++++ b/src/strategies/avx2/quant-avx2.c
+@@ -39,6 +39,7 @@
+ #if COMPILE_INTEL_AVX2 && defined X86_64
+ #include <immintrin.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #include "strategies/missing-intel-intrinsics.h"
+ 
+@@ -596,32 +597,16 @@ static void get_residual_avx2(const uint8_t *ref_in, const uint8_t *pred_in, int
+ }
+ 
+ static void get_quantized_recon_avx2(int16_t *residual, const uint8_t *pred_in, int in_stride, uint8_t *rec_out, int out_stride, int width){
+-
+-  switch (width) {
+-    case 4:
+-      *(int32_t*)&(rec_out[0 * out_stride]) = get_quantized_recon_4x1_avx2(residual + 0 * width, pred_in + 0 * in_stride);
+-      *(int32_t*)&(rec_out[1 * out_stride]) = get_quantized_recon_4x1_avx2(residual + 1 * width, pred_in + 1 * in_stride);
+-      *(int32_t*)&(rec_out[2 * out_stride]) = get_quantized_recon_4x1_avx2(residual + 2 * width, pred_in + 2 * in_stride);
+-      *(int32_t*)&(rec_out[3 * out_stride]) = get_quantized_recon_4x1_avx2(residual + 3 * width, pred_in + 3 * in_stride);
+-      break;
+-    case 8:
+-      *(int64_t*)&(rec_out[0 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 0 * width, pred_in + 0 * in_stride);
+-      *(int64_t*)&(rec_out[1 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 1 * width, pred_in + 1 * in_stride);
+-      *(int64_t*)&(rec_out[2 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 2 * width, pred_in + 2 * in_stride);
+-      *(int64_t*)&(rec_out[3 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 3 * width, pred_in + 3 * in_stride);
+-      *(int64_t*)&(rec_out[4 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 4 * width, pred_in + 4 * in_stride);
+-      *(int64_t*)&(rec_out[5 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 5 * width, pred_in + 5 * in_stride);
+-      *(int64_t*)&(rec_out[6 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 6 * width, pred_in + 6 * in_stride);
+-      *(int64_t*)&(rec_out[7 * out_stride]) = get_quantized_recon_8x1_avx2(residual + 7 * width, pred_in + 7 * in_stride);
+-      break;
+-    default:
+-      for (int y = 0; y < width; ++y) {
+-        for (int x = 0; x < width; x += 16) {
+-          *(int64_t*)&(rec_out[x + y * out_stride]) = get_quantized_recon_8x1_avx2(residual + x + y * width, pred_in + x + y  * in_stride);
+-          *(int64_t*)&(rec_out[(x + 8) + y * out_stride]) = get_quantized_recon_8x1_avx2(residual + (x + 8) + y * width, pred_in + (x + 8) + y  * in_stride);
+-        }
++  for (int y = 0; y < width; ++y) {
++    if (width == 4) {
++      int32_t row = get_quantized_recon_4x1_avx2(residual + y * width, pred_in + y * in_stride);
++      memcpy(rec_out + y * out_stride, &row, sizeof(row));
++    } else {
++      for (int x = 0; x < width; x += 8) {
++        int64_t row = get_quantized_recon_8x1_avx2(residual + x + y * width, pred_in + x + y * in_stride);
++        memcpy(rec_out + x + y * out_stride, &row, sizeof(row));
+       }
+-      break;
++    }
+   }
+ }
+ 
+-- 
+2.56.0
+
