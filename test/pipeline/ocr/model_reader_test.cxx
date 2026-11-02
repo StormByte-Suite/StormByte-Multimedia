@@ -17,7 +17,7 @@ namespace {
 }
 
 namespace StormByte::Multimedia::OCR {
-	ExpectedTessData TessData(std::string_view language) noexcept {
+	ExpectedTessData TessData(std::string_view language) {
 		const auto bytes = tessdata::blob(language);
 		if (language == "jpn_vert") {
 			requestedVertical = true;

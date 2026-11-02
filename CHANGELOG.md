@@ -33,6 +33,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- The embedded OCR model-reader test matches the allocating `TessData` exception contract, fixing its compilation with bundled language data.
 - The private scoped-logger declaration exposes its allocating contract consistently with its implementation and guarded stage callers.
 - Pipeline runtime and graph-wiring allocation failures mark stages/jobs as failed and wake their peers without formatting another allocating error; partially registered stage links are rolled back, and teardown continues when diagnostics cannot allocate.
 - Codec configuration and settled-track moves propagate their allocating map construction contracts, including vendor-option forwarding.
