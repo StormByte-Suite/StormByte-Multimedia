@@ -1,5 +1,5 @@
 path	bytes	sha256	category	preservation	origin
-README.md	9593	f0d13c90104910b0833b9a31fc41f6ddea14987c31ffd45a20f5f49db05528c4	README.md	authored-or-captured	Evidence preservation/reproduction
+README.md	9783	ba54349e0deca2cda0c6a68272371aad9b4e432c34a8f61dc562e1e9065073ae	README.md	authored-or-captured	Evidence preservation/reproduction
 builds/base-oom-install.log	6765	a0b78ed0104ec58444027a6f754e77b417acaba03fa4e2966781e14c392e137f	builds	authored-or-captured	Evidence preservation/reproduction
 builds/baseline/multimedia-build.log	22093	81aa4fec0d1fe3d4e219080dd55f338e0f35384c847630900ad0429b0a6b847a	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-build.log
 builds/baseline/multimedia-configure.log	15132	5ef677617d9f97f7ec745562db0b039fb2bcd759702e4aea8fed91a06d12edf5	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-configure.log
@@ -421,6 +421,10 @@ historical/static-triage/ubsan-tests.log	911502	60de0b7ac82febf2324666119a958040
 historical/static-triage/ubsan-validation.json	58655	9b36a1b649710b9dc6682a456a1ef2f4c320df353656ea6a2382987415bc6576	historical	verbatim	/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan-validation.json
 historical/static-triage/ubsan_runtime_probe.cxx	112	a2b38e4d0df6c4086d50334c90434371c4c120f8149559db9257763ac5a7f3c9	historical	verbatim	/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/static-audit/ubsan_runtime_probe.cxx
 origins.json	112740	e3b703593f258851791b53e8862fd231f955b819456816f844977e27976aabe9	origins.json	authored-or-captured	Evidence preservation/reproduction
+preview/live-audio-readahead-causal.txt	2366	26dd2b58ffe6a09750bff0f333ef5adc0b9b1cf60ed981553155bc40848b2011	preview	authored-or-captured	Evidence preservation/reproduction
+preview/live-audio-readahead-pgo-instr.txt	1653	86e9f627af9cf708ea78aebad3bd5235a675923f8343f92d6d58460a76b60d6a	preview	authored-or-captured	Evidence preservation/reproduction
+preview/live-audio-readahead-ubsan-repeat.txt	291	2e1dd7be935fdb4aef54b23b2206f12d245f0c387fed1d32be51b120afc74501	preview	authored-or-captured	Evidence preservation/reproduction
+preview/live-audio-readahead-ubsan.txt	1614	e42643a26b9026c66d28268957b2ad6ba807eefe42eedb88cc3c32b2af61154a	preview	authored-or-captured	Evidence preservation/reproduction
 providers/fdk-aac/ctest-evidence.log	412307	089c63ee0d1fc74ad4bcf8b0234940e2bfcee95d57d7435f6814443a550bbc0b	providers	generated	Exact testcase itertext extracted from preserved JUnit XML
 providers/fdk-aac/ctest-index.tsv	2732	34f8048d1e5cff0c47dfcdbe8cb49b64cb4ffc992280f943c7421988375d9467	providers	extracted	Preserved runs/**/*.xml; provider/test-name and diagnostic-path association
 providers/fdk-aac/standalone/fdk-fixed-multiply-check.cxx	1642	6f3c55afa8026faf0b9b9fa2827545da743661882f3b0878ee34f9c6c68611d2	providers	verbatim	/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/fdk-fixed-multiply-check.cxx

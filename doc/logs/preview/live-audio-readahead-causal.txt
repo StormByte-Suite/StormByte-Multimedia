@@ -1,0 +1,35 @@
+# test_live_audio_tracks CI failure (run 41430978396, job 125230233611) - causal evidence
+Fixture video/live_audio_switch_long.mkv: h264 320x180 23.976fps + AC-3 48kHz stereo, 96s.
+Display is the headless FakeDisplay (no audio device/system service involved).
+
+Temporary diagnostics (not committed): DIAG_FORCE_SOFTWARE forced DecodeAcceleration::Software;
+wait extended to 15s only to measure. UBSan RelWithDebInfo build, local machine.
+
+## Before fix (live re-enable resumes at demux cursor; queue capped only by 256 events/64MiB)
+== Auto (local hardware decode)
+diag track=1 ok=1 new_videos=137 first_audio_pos=5.888 position=5.89106   (switched at 0.168)
+diag track=1 ok=1 new_videos=176 first_audio_pos=13.296 position=13.296   (switched at 5.925)
+== Software (forced, matches CI fallback)
+diag track=1 ok=1 new_videos=133 first_audio_pos=5.728 position=5.73113   (switched at 0.169)
+diag track=1 ok=1 new_videos=187 first_audio_pos=13.584 position=13.5871  (switched at 5.762)
+Video kept flowing in both modes; first new audio arrived 5.6-7.4 s after re-enable,
+exceeding the 5 s wait. Independent of hardware/software decode.
+Unmodified test, unmodified source, run directly: FAIL at the first audio re-enable (reproduced).
+
+## After fix (decoded read-ahead bounded to clock + 2 s; subtitles/preview/stop exempt)
+== fixed auto
+diag track=-1 ok=1 new_videos=1 first_audio_pos=-1 position=0.171297 state=2
+diag track=1 ok=1 new_videos=50 first_audio_pos=2.272 position=2.27201 state=2
+diag track=-1 ok=1 new_videos=1 first_audio_pos=-1 position=2.29644 state=2
+diag track=1 ok=1 new_videos=50 first_audio_pos=4.384 position=4.38708 state=2
+diag track=-1 ok=1 new_videos=1 first_audio_pos=-1 position=4.42387 state=2
+diag track=1 ok=1 new_videos=50 first_audio_pos=6.528 position=6.52806 state=2
+[Test] Finished test_live_audio_tracks: PASS
+== fixed soft
+diag track=-1 ok=1 new_videos=1 first_audio_pos=-1 position=0.168593 state=2
+diag track=1 ok=1 new_videos=49 first_audio_pos=2.24 position=2.24308 state=2
+diag track=-1 ok=1 new_videos=1 first_audio_pos=-1 position=2.25227 state=2
+diag track=1 ok=1 new_videos=49 first_audio_pos=4.32 position=4.32311 state=2
+diag track=-1 ok=1 new_videos=1 first_audio_pos=-1 position=4.33842 state=2
+diag track=1 ok=1 new_videos=49 first_audio_pos=6.4 position=6.40003 state=2
+[Test] Finished test_live_audio_tracks: PASS

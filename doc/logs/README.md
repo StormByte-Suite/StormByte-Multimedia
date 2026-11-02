@@ -15,6 +15,7 @@ It is a snapshot, **not a passing release gate**.
 | [Provider evidence](providers/) | Subfolders for all ten upstream repositories, with standalone sources where available and indexed CTest output |
 | [Static analysis](static-analysis/) | Current clang-tidy output plus initial per-unit diagnostics and historical triage |
 | [Dependency tests](dependencies/) | Available Base/Buffer/Logger/System CTest records |
+| [Preview live-audio read-ahead](preview/) | CI run 41430978396 causal evidence (Auto vs forced Software), UBSan/Release preview suites and repeats for the bounded decoded read-ahead fix |
 | [Reproduction commands](reproduce/) | Build/test recipe and isolated-main runner |
 | [Historical recovery](historical/) | Earlier UBSan/recover-mode runs and probes, not current strict validation |
 | [Snapshot metadata](snapshot.json) | Revisions, tool versions, dirty-file hashes and validation scope |

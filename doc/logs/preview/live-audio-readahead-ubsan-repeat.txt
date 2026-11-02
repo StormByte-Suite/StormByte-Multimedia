@@ -1,0 +1,7 @@
+test_live_audio_tracks pass=10 fail=0
+test_live_audio_selection pass=10 fail=0
+test_live_audio_backpressure_errors pass=10 fail=0
+test_audio_paused_seek pass=10 fail=0
+test_audio_pacing_pause_drain pass=10 fail=0
+test_av_seek_switch_epochs pass=10 fail=0
+test_subtitle_decode pass=10 fail=0

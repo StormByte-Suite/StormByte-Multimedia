@@ -100,6 +100,9 @@ namespace {
 	constexpr std::size_t MaxBytes = 64 * 1024 * 1024;
 	constexpr std::size_t MaxEvents = 256;
 	constexpr double AudioAhead = 0.150;
+	// Live audio replacement resumes at the demux cursor, so bound decoded
+	// read-ahead to keep the bridged silence short.
+	constexpr double DecodeAhead = 2.0;
 
 	/**
 	 * @brief Resolve a selectable media kind to its decoder slot.
@@ -644,7 +647,9 @@ class Backend::SimplePlayer::Context {
 				throw Exception("paused preview exceeds bounded presentation storage");
 			m_ready.wait(lock, [&] {
 				return m_cancel || (m_decode_stop && event.m_audio)
-					|| (m_queue.size() < MaxEvents && m_bytes + event.m_bytes <= MaxBytes);
+					|| (m_queue.size() < MaxEvents && m_bytes + event.m_bytes <= MaxBytes
+						&& (m_preview || m_decode_stop || event.m_subtitle
+							|| event.m_start <= m_position + DecodeAhead));
 			});
 			if (m_cancel)
 				return false;
@@ -1364,8 +1369,11 @@ class Backend::SimplePlayer::Context {
 					lock.unlock();
 					const double clock = preview ? m_target : MediaClock();
 					lock.lock();
-					if (!preview)
-						m_position = std::max(m_position, clock);
+					bool advanced = false;
+					if (!preview && clock > m_position) {
+						m_position = clock;
+						advanced = true;
+					}
 					auto found = std::find_if(m_queue.begin(), m_queue.end(), [&](const Event& event) {
 						if (preview)
 							return static_cast<bool>(event.m_video) || static_cast<bool>(event.m_hdr_video)
@@ -1410,6 +1418,8 @@ class Backend::SimplePlayer::Context {
 						return;
 					}
 					delivery.unlock();
+					if (advanced)
+						m_ready.notify_all();
 					lock.lock();
 					m_ready.wait_for(lock, std::chrono::milliseconds(3), [&] { return m_cancel.load(); });
 				}
