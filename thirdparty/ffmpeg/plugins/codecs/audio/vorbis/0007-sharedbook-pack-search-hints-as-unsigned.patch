@@ -1,0 +1,27 @@
+From c11ed2b6e35e232957ca8d22b6d4edc59419c485 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:15:19 +0100
+Subject: [PATCH] sharedbook: construct decode search words in unsigned
+ arithmetic
+
+The first-level decode table index is signed. Packing index 16 with a 27-bit left shift overflows int before assignment to ogg_uint32_t. Cast the index before shifting so codebook hint construction retains the intended 32-bit pattern. Reproduced by the existing Vorbis encode/decode roundtrip under UBSan.
+---
+ lib/sharedbook.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sharedbook.c b/lib/sharedbook.c
+index 62a9a00..164a702 100644
+--- a/lib/sharedbook.c
++++ b/lib/sharedbook.c
+@@ -422,7 +422,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
+         long lo=0,hi=0;
+ 
+         for(i=0;i<tabn;i++){
+-          ogg_uint32_t word=i<<(32-c->dec_firsttablen);
++          ogg_uint32_t word=(ogg_uint32_t)i<<(32-c->dec_firsttablen);
+           if(c->dec_firsttable[bitreverse(word)]==0){
+             while((lo+1)<n && c->codelist[lo+1]<=word)lo++;
+             while(    hi<n && word>=(c->codelist[hi]&mask))hi++;
+-- 
+2.56.0
+

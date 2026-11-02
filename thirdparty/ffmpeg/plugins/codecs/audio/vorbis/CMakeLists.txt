@@ -7,6 +7,7 @@ set(VORBIS_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0004-psy-bound-noise-offset-interpolation.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0005-floor1-avoid-negative-deviation-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0006-vorbisenc-reuse-shared-mode-residue-allocation.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0007-sharedbook-pack-search-hints-as-unsigned.patch"
 )
 
 set(VORBIS_OPTIONS
