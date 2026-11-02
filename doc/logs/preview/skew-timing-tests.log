@@ -1,0 +1,21 @@
+Test project /home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/test
+    Start 19: preview.test_skewed_video_late_auto
+    Start 17: preview.test_skewed_video_late
+    Start 18: preview.test_skewed_audio_late_auto
+    Start 16: preview.test_skewed_audio_late
+    Start 15: preview.test_live_audio_tracks
+    Start 14: preview.test_live_audio_selection
+1/6 Test #14: preview.test_live_audio_selection .....   Passed    2.67 sec
+2/6 Test #15: preview.test_live_audio_tracks ........   Passed    6.37 sec
+3/6 Test #16: preview.test_skewed_audio_late ........   Passed    7.97 sec
+4/6 Test #18: preview.test_skewed_audio_late_auto ...   Passed    8.35 sec
+5/6 Test #17: preview.test_skewed_video_late ........   Passed   11.51 sec
+6/6 Test #19: preview.test_skewed_video_late_auto ...   Passed   11.82 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+multimedia    =  48.69 sec*proc (6 tests)
+preview       =  48.69 sec*proc (6 tests)
+
+Total Test time (real) =  11.83 sec

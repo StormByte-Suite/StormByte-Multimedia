@@ -1,0 +1,49 @@
+Test project /home/stormbyte/Software/StormByte/StormByte/multimedia/build/pgo-instr/test
+    Start 19: preview.test_skewed_video_late_auto
+    Start 17: preview.test_skewed_video_late
+    Start 18: preview.test_skewed_audio_late_auto
+    Start 16: preview.test_skewed_audio_late
+    Test #16: preview.test_skewed_audio_late ........   Passed    7.97 sec
+    Start 16: preview.test_skewed_audio_late
+    Test #18: preview.test_skewed_audio_late_auto ...   Passed    8.20 sec
+    Start 18: preview.test_skewed_audio_late_auto
+    Test #17: preview.test_skewed_video_late ........   Passed   11.48 sec
+    Start 17: preview.test_skewed_video_late
+    Test #19: preview.test_skewed_video_late_auto ...   Passed   11.74 sec
+    Start 19: preview.test_skewed_video_late_auto
+    Test #16: preview.test_skewed_audio_late ........   Passed    7.97 sec
+    Start 16: preview.test_skewed_audio_late
+    Test #18: preview.test_skewed_audio_late_auto ...   Passed    8.12 sec
+    Start 18: preview.test_skewed_audio_late_auto
+    Test #17: preview.test_skewed_video_late ........   Passed   11.51 sec
+    Start 17: preview.test_skewed_video_late
+    Test #19: preview.test_skewed_video_late_auto ...   Passed   11.61 sec
+    Start 19: preview.test_skewed_video_late_auto
+    Test #16: preview.test_skewed_audio_late ........   Passed    7.96 sec
+    Start 16: preview.test_skewed_audio_late
+    Test #18: preview.test_skewed_audio_late_auto ...   Passed    8.13 sec
+    Start 18: preview.test_skewed_audio_late_auto
+    Test #16: preview.test_skewed_audio_late ........   Passed    7.97 sec
+    Start 16: preview.test_skewed_audio_late
+    Test #18: preview.test_skewed_audio_late_auto ...   Passed    8.13 sec
+    Start 18: preview.test_skewed_audio_late_auto
+    Test #17: preview.test_skewed_video_late ........   Passed   11.54 sec
+    Start 17: preview.test_skewed_video_late
+    Test #19: preview.test_skewed_video_late_auto ...   Passed   11.60 sec
+    Start 19: preview.test_skewed_video_late_auto
+1/4 Test #16: preview.test_skewed_audio_late ........   Passed    7.98 sec
+2/4 Test #18: preview.test_skewed_audio_late_auto ...   Passed    8.12 sec
+    Test #17: preview.test_skewed_video_late ........   Passed   11.52 sec
+    Start 17: preview.test_skewed_video_late
+    Test #19: preview.test_skewed_video_late_auto ...   Passed   11.61 sec
+    Start 19: preview.test_skewed_video_late_auto
+3/4 Test #17: preview.test_skewed_video_late ........   Passed   11.53 sec
+4/4 Test #19: preview.test_skewed_video_late_auto ...   Passed   11.64 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+multimedia    =  39.27 sec*proc (4 tests)
+preview       =  39.27 sec*proc (4 tests)
+
+Total Test time (real) =  58.20 sec

@@ -1,0 +1,56 @@
+Skewed preview timing and failure diagnostics, 2026-11-02
+
+Observed CI: run 41449067720, macOS job 125291046055, HEAD 61b633d8.
+Cancellation verified: completed / cancelled.
+Both repaired fixtures now open and decode without the missing-reference errors.
+Audio-late: playback underrun=0, video_late=0.035596, re-enable silence=1.44712,
+same epoch and two audio invalidations. Failure: a wall delivery gap >=500 ms.
+Video-late: playback underrun=0, video_late=0.212437. Failure: limit <100 ms.
+The Apple scaler diagnostic alone does not establish the cause of the delay.
+No macOS execution environment is available locally. This is NOT a verified
+fix for VideoToolbox performance or proof that the delays are harmless.
+
+Change in test scope:
+- Software scheduler cases retain all original numeric timing thresholds.
+- Separate Auto cases retain decoding, playing-state, live switching, <=5.5 s
+  media-timestamp silence and epoch/reset checks for both fixtures.
+- Both policies additionally require consecutive video PTS deltas below 50 ms.
+- Auto cases inject one 600 ms Display::Video stall at picture 12. They require
+  a measured wall gap >=600 ms while retaining timestamp/functional checks.
+  This reproduces a failure of the old delivery-gap criterion without broken
+  media, read-ahead or dropped pictures, and makes the test-scope split explicit.
+- Production library, hardware selection and fixture payloads are unchanged.
+  Auto is a policy, not proof hardware ran: this Linux host falls back to CPU.
+
+Diagnostics:
+Phase markers include fixture, policy, elapsed time, player position/state
+and selected A/V tracks; each marker is flushed before the next operation.
+Callbacks only buffer per-picture wall time, video PTS, audible audio time,
+queued audio end, audio-block count, audio invalidation count and epoch.
+These snapshots and final phase/state/counters print after the assertion
+body returns, including early failure. No per-picture I/O in callbacks.
+CTest hides successful output unless verbose and shows failure output with
+--output-on-failure. A process kill cannot run the final dump; flushed phase
+markers still identify the operation reached.
+
+Validation on Linux, existing pgo-instr Release build, clang 22 / libc++:
+cmake --build build/pgo-instr --target MultimediaSimplePlayerTests -j"$(nproc)"
+PASS.
+ctest --test-dir build/pgo-instr/test --no-tests=error --output-on-failure \
+  -R '^preview\.test_(skewed_.*|live_audio_tracks|live_audio_selection)$' -j6
+6/6 PASS, 11.83 s wall (four skew cases and two unchanged live-audio cases).
+ctest --test-dir build/pgo-instr/test --no-tests=error --output-on-failure \
+  -R '^preview\.test_skewed_' --repeat until-fail:5 -j4
+20/20 executions PASS, 58.20 s wall.
+
+Failure-path negative control (temporary, not installed or committed):
+Compile the same test translation unit using its existing flags and library,
+with TEST_REQUIRE forced to return 1 at the initial video-lateness assertion.
+Real software playback runs for six seconds before that injected failure.
+PASS: process exit 1, final phase=initial playback, result=1, Playing state,
+144 buffered picture/audio snapshots printed after assertion failure.
+The temporary override is not part of the production test executable.
+
+No whole-project suite, UBSan rebuild, remote macOS pass or CI wait claimed.
+The first CTest command at the build root found zero tests and exited 8 with
+--no-tests=error; validation above uses the actual configured test directory.

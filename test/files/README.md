@@ -84,8 +84,15 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
   20 seconds of `live_audio_switch_long.mkv`, stream-copied (H.264 320x180 and
   AC-3 stereo) with unchanged timestamps but skewed physical interleave: each
   audio (respectively video) packet is stored where the other stream is already
-  three seconds ahead. Preview tests require continuous A/V sync and bounded
-  live audio re-enable silence with decoded read-ahead limits.
+  three seconds ahead. Software preview regressions retain strict A/V timing
+  and delivery-gap limits to isolate the decoded read-ahead scheduler.
+  Separate Auto cases cover decoding and live audio switching with an
+  intentional 600 ms display stall, without assuming real-time hardware
+  delivery. Both policies require consecutive video timestamps, bounded
+  live audio re-enable silence and unchanged epochs. Phase logs and buffered
+  per-picture timestamps, audio-clock/queue snapshots and reset counters are
+  printed even when an assertion returns early; CTest normally hides passing
+  test output and shows it with `--output-on-failure`.
   Every source packet below 20 seconds is kept, including the leading IDR and
   P frame that Matroska demuxing reports without a decode timestamp, so both
   files start at their IDR and decode without missing references.

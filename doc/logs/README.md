@@ -15,7 +15,7 @@ It is a snapshot, **not a passing release gate**.
 | [Provider evidence](providers/) | Subfolders for all ten upstream repositories, with standalone sources where available and indexed CTest output |
 | [Static analysis](static-analysis/) | Current clang-tidy output plus initial per-unit diagnostics and historical triage |
 | [Dependency tests](dependencies/) | Available Base/Buffer/Logger/System CTest records |
-| [Preview live-audio read-ahead](preview/) | CI run 41430978396 causal evidence (Auto vs forced Software), UBSan/Release preview suites and repeats for the bounded decoded read-ahead fix; skewed A/V interleave baseline (0d7c2c1c, f68d4361) vs per-lane horizon fix (`live-audio-skew-interleave.txt`); regenerated skew fixtures keeping the leading IDR (`skew-fixture-idr.txt`) |
+| [Preview live-audio read-ahead](preview/) | CI run 41430978396 causal evidence (Auto vs forced Software), UBSan/Release preview suites and repeats for the bounded decoded read-ahead fix; skewed A/V interleave baseline (0d7c2c1c, f68d4361) vs per-lane horizon fix (`live-audio-skew-interleave.txt`); regenerated skew fixtures keeping the leading IDR (`skew-fixture-idr.txt`); strict Software timing vs slow-device Auto coverage, buffered failure diagnostics and forced-failure qualification (`skew-timing-qualification.txt`, `skew-timing-*.log`) |
 | [Reproduction commands](reproduce/) | Build/test recipe and isolated-main runner |
 | [Historical recovery](historical/) | Earlier UBSan/recover-mode runs and probes, not current strict validation |
 | [Snapshot metadata](snapshot.json) | Revisions, tool versions, dirty-file hashes and validation scope |

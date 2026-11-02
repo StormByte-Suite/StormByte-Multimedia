@@ -77,6 +77,7 @@ using StormByte::ByteSize;
 using StormByte::Multimedia::AudioPresentation;
 using StormByte::Multimedia::AudioLayout;
 using StormByte::Multimedia::AudioSample;
+using StormByte::Multimedia::DecodeAcceleration;
 using StormByte::Multimedia::Display;
 using StormByte::Multimedia::HDRDisplay;
 using StormByte::Multimedia::PlaybackState;
@@ -178,11 +179,15 @@ class FakeDisplay final: public Display, public HDRDisplay {
 				throw StormByte::Exception("test display failure");
 			if (image->m_epoch != m_epoch || image->m_pixels.empty())
 				throw StormByte::Exception("invalid image");
+			if (m_videos == 12 && m_video_delay.count())
+				std::this_thread::sleep_for(m_video_delay);
 			m_image = image;
 			if (m_capture_deferred)
 				m_deferred.push_back(image);
 			m_video_positions.push_back(image->m_position);
 			m_video_times.push_back(TestClock::now());
+			if (m_capture_timing)
+				m_video_timing.push_back({Played(), m_pending_end, m_audios, m_audio_invalidations, m_epoch});
 			if (m_audio_valid && !m_paused) {
 				m_max_video_lead = std::max(m_max_video_lead, image->m_position - Played());
 				m_max_video_late = std::max(m_max_video_late, Played() - image->m_position);
@@ -342,6 +347,15 @@ class FakeDisplay final: public Display, public HDRDisplay {
 		std::vector<Safe::Shared<const PreviewSubtitle>> m_cues;	///< Active cues.
 		std::vector<double> m_video_positions;						///< Captured decode timestamps.
 		std::vector<TestClock::time_point> m_video_times;			///< Delivery wall timestamps.
+		struct VideoTiming {
+			double m_audio;
+			double m_pending_end;
+			unsigned m_audios;
+			unsigned m_audio_invalidations;
+			std::uint64_t m_epoch;
+		};
+		std::vector<VideoTiming> m_video_timing;
+		bool m_capture_timing = false;
 		TestClock::time_point m_started = TestClock::now();			///< Simulated device anchor.
 		std::uint64_t m_epoch = 0;									///< Active generation.
 		double m_audible = 0;										///< Frozen audio cursor.
@@ -354,6 +368,7 @@ class FakeDisplay final: public Display, public HDRDisplay {
 		bool m_capture_audio = false;								///< Capture short deterministic fixtures.
 		double m_max_audio_ahead = 0;								///< Worst queued audio lead.
 		double m_max_audio_gap = 0;									///< Worst sample-boundary discontinuity within an epoch.
+		std::chrono::milliseconds m_video_delay{0};					///< Optional one-shot slow-device callback.
 		double m_speed = 1;											///< Device clock speed.
 		unsigned m_videos = 0;										///< Delivered images.
 		unsigned m_audios = 0;										///< Delivered audio blocks.
@@ -1248,20 +1263,43 @@ int test_live_audio_tracks() {
 /**
  * @brief Play an input whose audio or video packets are stored three seconds late.
  * @param name Fixture path.
+ * @param acceleration Decoder policy; software isolates scheduler timing from device latency.
  * @return Test status.
  */
-int SkewedInterleavePlayback(const char* name) {
+int SkewedInterleavePlayback(const char* name, DecodeAcceleration acceleration) {
+	const bool check_timing = acceleration == DecodeAcceleration::Software;
 	// Media time must pass in real time, so these waits scale with the skew.
 	const double deadline = std::max(DefaultDeadline, 15.0);
-	{
-		auto display = Safe::MakeShared<FakeDisplay>();
-		display->m_live_audio = true;
-		display->m_capture_deferred = false;
-		SimplePlayer player(display);
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_live_audio = true;
+	display->m_capture_deferred = false;
+	display->m_capture_timing = true;
+	// Auto exercises a slow device without turning its latency into a
+	// scheduler guarantee. Software retains the strict timing assertions.
+	if (!check_timing)
+		display->m_video_delay = std::chrono::milliseconds(600);
+	SimplePlayer player(display);
+	player.Acceleration(acceleration);
+	const auto test_started = TestClock::now();
+	const char* phase = "open";
+	const auto enter_phase = [&](const char* next) {
+		phase = next;
+		std::cout << "[skew phase] fixture=" << name
+			<< " policy=" << (check_timing ? "Software" : "Auto") << " phase=" << next
+			<< " elapsed=" << std::chrono::duration<double>(TestClock::now() - test_started).count()
+			<< " position=" << player.Position()
+			<< " state_code=" << static_cast<int>(player.State())
+			<< " video_track=" << player.SelectedTrack(MediaType::Video)
+			<< " audio_track=" << player.SelectedTrack(MediaType::Audio) << std::endl;
+	};
+	const int result = [&]() -> int {
+		enter_phase("open");
 		TEST_REQUIRE(player.Open(Fixture(name)));
 		const int audio = player.SelectedTrack(MediaType::Audio);
 		TEST_REQUIRE(audio >= 0 && player.SelectedTrack(MediaType::Video) >= 0);
+		enter_phase("play");
 		TEST_REQUIRE(player.Play());
+		enter_phase("initial playback");
 		TEST_REQUIRE(Wait([&] { return player.Position() > 6 || player.State() != PlaybackState::Playing; }, deadline));
 		TEST_REQUIRE(player.State() == PlaybackState::Playing);
 		std::uint64_t epoch;
@@ -1271,12 +1309,15 @@ int SkewedInterleavePlayback(const char* name) {
 			std::cout << name << " playback underrun=" << display->m_max_audio_underrun
 				<< " video_lead=" << display->m_max_video_lead
 				<< " video_late=" << display->m_max_video_late << '\n';
-			TEST_REQUIRE(display->m_max_audio_underrun < 0.05);
-			TEST_REQUIRE(display->m_max_video_lead < 0.10);
-			TEST_REQUIRE(display->m_max_video_late < 0.10);
+			if (check_timing) {
+				TEST_REQUIRE(display->m_max_audio_underrun < 0.05);
+				TEST_REQUIRE(display->m_max_video_lead < 0.10);
+				TEST_REQUIRE(display->m_max_video_late < 0.10);
+			}
 			epoch = display->m_epoch;
 			resets = display->m_audio_invalidations;
 		}
+		enter_phase("disable audio");
 		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
 		{
 			std::lock_guard lock(display->m_mutex);
@@ -1288,6 +1329,7 @@ int SkewedInterleavePlayback(const char* name) {
 		}));
 		const double switched = player.Position();
 		const auto started = TestClock::now();
+		enter_phase("re-enable audio");
 		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, audio));
 		TEST_REQUIRE(Wait([&] {
 			{
@@ -1309,13 +1351,47 @@ int SkewedInterleavePlayback(const char* name) {
 			TEST_REQUIRE(display->m_epoch == epoch);
 			TEST_REQUIRE(display->m_audio_invalidations == resets + 2);
 		}
+		enter_phase("close");
 		TEST_REQUIRE(player.Close());
+		enter_phase("video continuity");
+		TEST_REQUIRE(display->m_video_positions.size() > 12);
+		double max_gap = 0;
 		for (std::size_t i = 1; i < display->m_video_positions.size(); ++i) {
 			TEST_REQUIRE(display->m_video_positions[i] > display->m_video_positions[i - 1]);
-			TEST_REQUIRE(display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500));
+			TEST_REQUIRE(display->m_video_positions[i] - display->m_video_positions[i - 1] < 0.05);
+			max_gap = std::max(max_gap, std::chrono::duration<double>(
+				display->m_video_times[i] - display->m_video_times[i - 1]).count());
+			if (check_timing)
+				TEST_REQUIRE(display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500));
 		}
+		std::cout << name << " max_delivery_gap=" << max_gap << '\n';
+		if (!check_timing)
+			TEST_REQUIRE(max_gap >= 0.6);
+		return 0;
+	}();
+	const auto state = player.State();
+	const double position = player.Position();
+	std::lock_guard lock(display->m_mutex);
+	std::cout << "[skew diagnostics] fixture=" << name
+		<< " policy=" << (check_timing ? "Software" : "Auto")
+		<< " phase=" << phase << " result=" << result
+		<< " state_code=" << static_cast<int>(state) << " position=" << position
+		<< " elapsed=" << std::chrono::duration<double>(TestClock::now() - test_started).count()
+		<< " videos=" << display->m_videos << " audios=" << display->m_audios
+		<< " epoch=" << display->m_epoch << " audio_resets=" << display->m_audio_invalidations
+		<< " underrun=" << display->m_max_audio_underrun
+		<< " video_lead=" << display->m_max_video_lead
+		<< " video_late=" << display->m_max_video_late << '\n';
+	std::cout << "[skew video] index pts wall_s gap_s audio_pts queued_audio_end audio_blocks audio_resets epoch\n";
+	for (std::size_t i = 0; i < display->m_video_timing.size(); ++i) {
+		const auto& sample = display->m_video_timing[i];
+		std::cout << "[skew video] " << i << ' ' << display->m_video_positions[i] << ' '
+			<< std::chrono::duration<double>(display->m_video_times[i] - test_started).count() << ' '
+			<< (i ? std::chrono::duration<double>(display->m_video_times[i] - display->m_video_times[i - 1]).count() : 0)
+			<< ' ' << sample.m_audio << ' ' << sample.m_pending_end << ' ' << sample.m_audios
+			<< ' ' << sample.m_audio_invalidations << ' ' << sample.m_epoch << '\n';
 	}
-	return 0;
+	return result;
 }
 
 /**
@@ -1323,7 +1399,7 @@ int SkewedInterleavePlayback(const char* name) {
  * @return Test status.
  */
 int test_skewed_audio_late() {
-	return SkewedInterleavePlayback("video/skew_audio_late.mkv");
+	return SkewedInterleavePlayback("video/skew_audio_late.mkv", DecodeAcceleration::Software);
 }
 
 /**
@@ -1331,7 +1407,15 @@ int test_skewed_audio_late() {
  * @return Test status.
  */
 int test_skewed_video_late() {
-	return SkewedInterleavePlayback("video/skew_video_late.mkv");
+	return SkewedInterleavePlayback("video/skew_video_late.mkv", DecodeAcceleration::Software);
+}
+
+int test_skewed_audio_late_auto() {
+	return SkewedInterleavePlayback("video/skew_audio_late.mkv", DecodeAcceleration::Auto);
+}
+
+int test_skewed_video_late_auto() {
+	return SkewedInterleavePlayback("video/skew_video_late.mkv", DecodeAcceleration::Auto);
 }
 
 /**
@@ -1885,6 +1969,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_live_audio_tracks", test_live_audio_tracks},
 		TestEntry{"test_skewed_audio_late", test_skewed_audio_late},
 		TestEntry{"test_skewed_video_late", test_skewed_video_late},
+		TestEntry{"test_skewed_audio_late_auto", test_skewed_audio_late_auto},
+		TestEntry{"test_skewed_video_late_auto", test_skewed_video_late_auto},
 		TestEntry{"test_live_audio_backpressure_errors", test_live_audio_backpressure_errors},
 		TestEntry{"test_av_seek_within_frame", test_av_seek_within_frame},
 		TestEntry{"test_explicit_errors", test_explicit_errors},

@@ -50,6 +50,8 @@ if(ENABLE_TEST)
 		test_live_audio_tracks
 		test_skewed_audio_late
 		test_skewed_video_late
+		test_skewed_audio_late_auto
+		test_skewed_video_late_auto
 		test_live_audio_backpressure_errors
 		test_av_seek_within_frame
 		test_explicit_errors
