@@ -1,0 +1,27 @@
+From 735ab609907331c10a77e19b622ea4e5bfef2077 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:24:01 +0100
+Subject: [PATCH] avcodec/libx265: free generated RPU after encoder consumption
+
+The generated Dolby Vision RPU is copied by x265 during encoder_encode. Release the temporary allocation after that call on both success and failure, as already done for quantOffsets. Keep reordered frame opaque ownership unchanged. LSan reports one leaked RPU allocation per encoded frame without this cleanup.
+---
+ libavcodec/libx265.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libavcodec/libx265.c b/libavcodec/libx265.c
+index c5e6b8c150..0ec4f87f5f 100644
+--- a/libavcodec/libx265.c
++++ b/libavcodec/libx265.c
+@@ -878,6 +878,9 @@ static int libx265_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
+     for (i = 0; i < sei->numPayloads; i++)
+         av_free(sei->payloads[i].payload);
+     av_freep(&x265pic.quantOffsets);
++#if X265_BUILD >= 167
++    av_freep(&x265pic.rpu.payload);
++#endif
+ 
+     if (ret < 0)
+         return AVERROR_EXTERNAL;
+-- 
+2.56.0
+

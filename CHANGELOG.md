@@ -35,6 +35,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Bundled FDK-AAC scales signed minimum-SNR logarithms through unsigned bit patterns.
 - Bundled FDK-AAC normalizes signed intensity-stereo correlation products and input spectra without negative left shifts.
 - Bundled SVT-AV1 loads four-byte convolution and packing fragments with its existing unaligned-safe helper.
+- Bundled FFmpeg releases generated Dolby Vision RPU buffers after x265 consumes them, fixing a per-frame leak.
 - Bundled Vorbis reuses each residue configuration shared between short and long encoding modes, avoiding a 2,848-byte leak during surround encoder setup even when the encoder is correctly cleared.
 - Bundled FDK-AAC widens negated MDCT folding samples through bounded multiplication, preserving the full PCM range without undefined signed left shifts.
 - Bundled FDK-AAC converts signed scalefactor estimates and bit-cost differences to fixed-point values through unsigned bit patterns instead of negative signed shifts.

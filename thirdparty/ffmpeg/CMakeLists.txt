@@ -270,6 +270,7 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0009-opusdec-initialize-active-channel-delay-pointers.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0010-itut35-pad-dolby-vision-payloads.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0011-libopenh264enc-map-constrained-baseline.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0012-libx265-free-generated-rpu-after-encode.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"
