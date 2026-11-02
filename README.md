@@ -21,7 +21,7 @@ There are two independent workflows:
 
 `Transcoder` is a complete facade over the processing pipeline, not a reduced encoder. Manual wiring exposes the same machinery when a graph needs more control. `SimplePlayer` handles real-time playback independently; it is a **preview service, not a replacement for a professional media player**, an editor or a bundled Qt/SDL widget.
 
-It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.2) 2.2.2, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.5) 2.0.5, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.5) 2.0.5 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.2) 2.1.2. Each is a release archive. Public headers live under `StormByte/multimedia/`.
+It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.3) 2.2.3, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.6) 2.0.6, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.6) 2.0.6 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.3) 2.1.3. Each is a release archive. Public headers live under `StormByte/multimedia/`.
 
 The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, Network and System are **other repositories**. This one does not implement them.
 

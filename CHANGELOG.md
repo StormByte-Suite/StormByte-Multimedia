@@ -11,7 +11,7 @@ StormByte Multimedia provides checked asynchronous media processing and real-tim
 
 The C++26 API includes codec and container registries, `File` inspection, owned `Plan`s, pipeline stages, filters, analytics, progress and telemetry. Backend codec and format contexts remain private; filter-facing frame, packet and graph adapters are available when needed. Cross-module values and lifetimes use StormByte Base's `Safe` APIs and require compatible provider/consumer ABIs.
 
-The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.2) 2.2.2, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.5) 2.0.5, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.5) 2.0.5 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.2) 2.1.2, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
+The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.3) 2.2.3, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.6) 2.0.6, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.6) 2.0.6 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.3) 2.1.3, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
 
 Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. Third-party dependencies and redistributed fixtures keep their own licenses; neither option grants codec patent rights. GPL/nonfree FFmpeg build options affect the resulting binary's redistribution requirements, not the license of the original Multimedia source.
 
@@ -39,6 +39,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Degrain measurement widens luma-to-chroma coordinate multiplication before division, preventing signed overflow and incorrect chroma reads on valid frames with extreme aspect ratios; regression coverage includes wide and tall frames verified with undefined-behavior sanitization.
 - NLMeans uses 64-bit squared sample differences and preserves the full range of native-endian 16-bit samples instead of treating them as 12-bit; full-range regression samples reproduce the original overflow under UBSan and match the scalar reference after correction.
 - Sanitizer builds disable the unused bundled liblzma command-line sandbox, avoiding its Landlock configuration error when sanitizer flags are propagated to dependencies.
+
+### Changed
+
+- Bundled builds use Base 2.2.3, Buffer 2.0.6, Logger 2.0.6 and System 2.1.3.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...HEAD
 
