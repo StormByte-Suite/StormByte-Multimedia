@@ -1,0 +1,39 @@
+From 62775be151bacd5bbbea640f5f73601413ca6a96 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] libvmaf/adm_avx2: handle small coefficients before clz and
+ rounding shifts
+
+The AVX2 decoupling loop calls get_best15_from32() for every lane before
+blending the result with the unshifted small coefficients. Unlike the
+scalar call sites, it does not restrict calls to values >= 32768.
+Zero therefore reaches __builtin_clz(), and small nonzero values can
+produce a negative rounding shift.
+
+Return small inputs unchanged with a zero shift before computing clz.
+This matches the scalar branch and initializes both outputs for all
+lanes without changing the large-coefficient rounding path.
+
+Reproduced with UBSan during existing integer ADM/VMAF pipeline tests.
+---
+ libvmaf/src/feature/x86/adm_avx2.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/libvmaf/src/feature/x86/adm_avx2.c b/libvmaf/src/feature/x86/adm_avx2.c
+index 27ba2148..dd8d400d 100644
+--- a/libvmaf/src/feature/x86/adm_avx2.c
++++ b/libvmaf/src/feature/x86/adm_avx2.c
+@@ -1345,6 +1345,10 @@ void adm_dwt2_8_avx2(const uint8_t *src, const adm_dwt_band_t *dst,
+ 
+ static inline uint16_t get_best15_from32(uint32_t temp, int *x)
+ {
++    if (temp < 32768) {
++        *x = 0;
++        return temp;
++    }
+     int k = __builtin_clz(temp);    //built in for intel
+     k = 17 - k;
+     temp = (temp + (1 << (k - 1))) >> k;
+-- 
+2.56.0
+
