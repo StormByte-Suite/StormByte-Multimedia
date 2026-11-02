@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC performs checked saturating left conversions with widened multiplication, preserving both saturation limits without shifting negative signed samples.
 - Bundled FDK-AAC reconstructs signed power-of-two exponent integer parts through widened multiplication instead of undefined negative left shifts.
 - Bundled SVT-AV1 loads and stores four-pixel CDEF row fragments through existing unaligned-safe eight-byte helpers, preserving row and SIMD lane order.
 - Bundled Kvazaar reads filtered 8x8 DC-prediction reference edges with unaligned-safe eight-byte SIMD loads.

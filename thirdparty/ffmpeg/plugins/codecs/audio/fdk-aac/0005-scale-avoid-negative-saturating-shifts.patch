@@ -1,0 +1,41 @@
+From 24f427687681afcb64924c582bf80ef8242249d9 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:26:43 +0100
+Subject: [PATCH] libFDK: avoid negative shifts in checked saturating
+ conversions
+
+The saturating left-shift macros check the result against the
+destination limits but still shift negative signed inputs in their non-
+saturating branch. Multiply in INT64 only after the existing saturation
+checks. Preserve both normal and alternate lower saturation limits.
+Reproduced in LPC synthesis during the surround AAC decoding test with
+UBSan.
+---
+ libFDK/include/scale.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libFDK/include/scale.h b/libFDK/include/scale.h
+index a58614e..8a19999 100644
+--- a/libFDK/include/scale.h
++++ b/libFDK/include/scale.h
+@@ -252,7 +252,7 @@ inline void scaleValueInPlace(FIXP_DBL *value, /*!< Value */
+        ? (LONG)(((1U) << ((dBits)-1)) - 1)                               \
+        : ((LONG)(src) < ~((LONG)(((1U) << ((dBits)-1)) - 1) >> (scale))) \
+              ? ~((LONG)(((1U) << ((dBits)-1)) - 1))                      \
+-             : ((LONG)(src) << (scale)))
++             : (LONG)((INT64)(LONG)(src) * ((INT64)1 << (scale))))
+ #endif
+ 
+ #ifndef SATURATE_SHIFT
+@@ -271,7 +271,7 @@ inline void scaleValueInPlace(FIXP_DBL *value, /*!< Value */
+        ? (LONG)(((1U) << ((dBits)-1)) - 1)                                \
+        : ((LONG)(src) <= ~((LONG)(((1U) << ((dBits)-1)) - 1) >> (scale))) \
+              ? ~((LONG)(((1U) << ((dBits)-1)) - 2))                       \
+-             : ((LONG)(src) << (scale)))
++             : (LONG)((INT64)(LONG)(src) * ((INT64)1 << (scale))))
+ #endif
+ 
+ #ifndef SATURATE_RIGHT_SHIFT_ALT
+-- 
+2.56.0
+

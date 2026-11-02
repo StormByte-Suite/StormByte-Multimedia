@@ -7,6 +7,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0002-log2-avoid-negative-exponent-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0003-pow-avoid-negative-mantissa-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0004-pow2-avoid-negative-integral-part-shift.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0005-scale-avoid-negative-saturating-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS
