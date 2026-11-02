@@ -1,0 +1,30 @@
+From d59f6a8581107b628bdc7953ee27f5f2baf35f2d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:29:28 +0100
+Subject: [PATCH] SSE4.1: load short rows without scalar alignment
+
+Combine two xx_loadl_32 results instead of dereferencing byte-addressed input through int32_t pointers. Preserve row order and zero upper lanes. UBSan reproduces the misaligned read during encoded video and audio interleave tests.
+---
+ Source/Lib/ASM_SSE4_1/memory_sse4_1.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Source/Lib/ASM_SSE4_1/memory_sse4_1.h b/Source/Lib/ASM_SSE4_1/memory_sse4_1.h
+index 1fd46ef54..75d0110ce 100644
+--- a/Source/Lib/ASM_SSE4_1/memory_sse4_1.h
++++ b/Source/Lib/ASM_SSE4_1/memory_sse4_1.h
+@@ -14,10 +14,10 @@
+ 
+ #include "definitions.h"
+ #include <smmintrin.h>
++#include "synonyms.h"
+ 
+ static INLINE __m128i load8bit_4x2_sse4_1(const void* const src, const ptrdiff_t strideInByte) {
+-    const __m128i s = _mm_cvtsi32_si128(*(int32_t*)((uint8_t*)src));
+-    return _mm_insert_epi32(s, *(int32_t*)((uint8_t*)src + strideInByte), 1);
++    return _mm_unpacklo_epi32(xx_loadl_32(src), xx_loadl_32((const uint8_t*)src + strideInByte));
+ }
+ 
+ static INLINE __m128i load_u8_4x2_sse4_1(const uint8_t* const src, const ptrdiff_t stride) {
+-- 
+2.56.0
+

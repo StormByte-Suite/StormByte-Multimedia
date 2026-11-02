@@ -10,6 +10,7 @@ set(SVTAV1_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0007-avx2-unaligned-four-byte-convolution-and-packing.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0008-sse2-store-second-row-without-alignment-or-overflow.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0009-avx2-load-four-byte-sad-rows-without-alignment.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0010-sse41-load-short-rows-without-scalar-alignment.patch"
 )
 
 set(SVTAV1_OPTIONS
