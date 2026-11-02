@@ -183,8 +183,10 @@ class FakeDisplay final: public Display, public HDRDisplay {
 				m_deferred.push_back(image);
 			m_video_positions.push_back(image->m_position);
 			m_video_times.push_back(TestClock::now());
-			if (m_audio_valid && !m_paused)
+			if (m_audio_valid && !m_paused) {
 				m_max_video_lead = std::max(m_max_video_lead, image->m_position - Played());
+				m_max_video_late = std::max(m_max_video_late, Played() - image->m_position);
+			}
 			++m_videos;
 		}
 
@@ -227,6 +229,9 @@ class FakeDisplay final: public Display, public HDRDisplay {
 				m_first_audio = audio;
 			if (m_capture_audio)
 				m_audio_blocks.push_back(audio);
+			if (m_audio_valid && !m_paused)
+				m_max_audio_underrun = std::max(m_max_audio_underrun, m_audible - m_pending_end
+					+ std::chrono::duration<double>(TestClock::now() - m_started).count() * m_speed);
 			if (!m_audio_valid) {
 				m_audio_valid = true;
 				m_audible = audio->m_position;
@@ -342,6 +347,8 @@ class FakeDisplay final: public Display, public HDRDisplay {
 		double m_audible = 0;										///< Frozen audio cursor.
 		double m_pending_end = 0;									///< Last queued sample time.
 		double m_max_video_lead = 0;								///< Worst video lead over audible samples.
+		double m_max_video_late = 0;								///< Worst picture delivery behind audible samples.
+		double m_max_audio_underrun = 0;							///< Worst device starvation before the next block.
 		Safe::Shared<const PreviewAudio> m_first_audio;				///< Retained native block for contract assertions.
 		std::vector<Safe::Shared<const PreviewAudio>> m_audio_blocks;	///< Optional full fixture capture.
 		bool m_capture_audio = false;								///< Capture short deterministic fixtures.
@@ -554,14 +561,15 @@ class TokenReader final: public IO::BufferedLocationReader {
  * @param seconds Deadline.
  * @return Whether the condition occurred.
  */
-template<class Predicate>
-bool Wait(Predicate predicate, double seconds =
+constexpr double DefaultDeadline =
 #ifdef STORMBYTE_MM_TEST_DEADLINE_SEC
-	STORMBYTE_MM_TEST_DEADLINE_SEC
+	STORMBYTE_MM_TEST_DEADLINE_SEC;
 #else
-	5
+	5;
 #endif
-) {
+
+template<class Predicate>
+bool Wait(Predicate predicate, double seconds = DefaultDeadline) {
 	const auto start = TestClock::now();
 	while (!predicate()) {
 		if (std::chrono::duration<double>(TestClock::now() - start).count() >= seconds)
@@ -1238,6 +1246,95 @@ int test_live_audio_tracks() {
 }
 
 /**
+ * @brief Play an input whose audio or video packets are stored three seconds late.
+ * @param name Fixture path.
+ * @return Test status.
+ */
+int SkewedInterleavePlayback(const char* name) {
+	// Media time must pass in real time, so these waits scale with the skew.
+	const double deadline = std::max(DefaultDeadline, 15.0);
+	{
+		auto display = Safe::MakeShared<FakeDisplay>();
+		display->m_live_audio = true;
+		display->m_capture_deferred = false;
+		SimplePlayer player(display);
+		TEST_REQUIRE(player.Open(Fixture(name)));
+		const int audio = player.SelectedTrack(MediaType::Audio);
+		TEST_REQUIRE(audio >= 0 && player.SelectedTrack(MediaType::Video) >= 0);
+		TEST_REQUIRE(player.Play());
+		TEST_REQUIRE(Wait([&] { return player.Position() > 6 || player.State() != PlaybackState::Playing; }, deadline));
+		TEST_REQUIRE(player.State() == PlaybackState::Playing);
+		std::uint64_t epoch;
+		unsigned videos, resets;
+		{
+			std::lock_guard lock(display->m_mutex);
+			std::cout << name << " playback underrun=" << display->m_max_audio_underrun
+				<< " video_lead=" << display->m_max_video_lead
+				<< " video_late=" << display->m_max_video_late << '\n';
+			TEST_REQUIRE(display->m_max_audio_underrun < 0.05);
+			TEST_REQUIRE(display->m_max_video_lead < 0.10);
+			TEST_REQUIRE(display->m_max_video_late < 0.10);
+			epoch = display->m_epoch;
+			resets = display->m_audio_invalidations;
+		}
+		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
+		{
+			std::lock_guard lock(display->m_mutex);
+			videos = display->m_videos;
+		}
+		TEST_REQUIRE(Wait([&] {
+			std::lock_guard lock(display->m_mutex);
+			return display->m_videos > videos + 12;
+		}));
+		const double switched = player.Position();
+		const auto started = TestClock::now();
+		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, audio));
+		TEST_REQUIRE(Wait([&] {
+			{
+				std::lock_guard lock(display->m_mutex);
+				if (display->m_first_audio)
+					return true;
+			}
+			return player.State() != PlaybackState::Playing;
+		}, deadline));
+		TEST_REQUIRE(player.State() == PlaybackState::Playing);
+		{
+			std::lock_guard lock(display->m_mutex);
+			const double silence = display->m_first_audio->m_position - switched;
+			std::cout << name << " re-enable silence=" << silence << " wall_ms="
+				<< std::chrono::duration_cast<std::chrono::milliseconds>(TestClock::now() - started).count() << '\n';
+			// The new decoder starts at the retained demux cursor: at most the
+			// read-ahead horizon plus the fixture's three-second storage skew.
+			TEST_REQUIRE(silence < 2 + 3 + 0.5);
+			TEST_REQUIRE(display->m_epoch == epoch);
+			TEST_REQUIRE(display->m_audio_invalidations == resets + 2);
+		}
+		TEST_REQUIRE(player.Close());
+		for (std::size_t i = 1; i < display->m_video_positions.size(); ++i) {
+			TEST_REQUIRE(display->m_video_positions[i] > display->m_video_positions[i - 1]);
+			TEST_REQUIRE(display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500));
+		}
+	}
+	return 0;
+}
+
+/**
+ * @brief Keep audio fed when its packets are stored three seconds after video.
+ * @return Test status.
+ */
+int test_skewed_audio_late() {
+	return SkewedInterleavePlayback("video/skew_audio_late.mkv");
+}
+
+/**
+ * @brief Keep video fed when its packets are stored three seconds after audio.
+ * @return Test status.
+ */
+int test_skewed_video_late() {
+	return SkewedInterleavePlayback("video/skew_video_late.mkv");
+}
+
+/**
  * @brief Flush a full audio-only queue and expose sink reset failures.
  * @return Test status.
  */
@@ -1786,6 +1883,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_hdr_preview_preserves_signal", test_hdr_preview_preserves_signal},
 		TestEntry{"test_live_audio_selection", test_live_audio_selection},
 		TestEntry{"test_live_audio_tracks", test_live_audio_tracks},
+		TestEntry{"test_skewed_audio_late", test_skewed_audio_late},
+		TestEntry{"test_skewed_video_late", test_skewed_video_late},
 		TestEntry{"test_live_audio_backpressure_errors", test_live_audio_backpressure_errors},
 		TestEntry{"test_av_seek_within_frame", test_av_seek_within_frame},
 		TestEntry{"test_explicit_errors", test_explicit_errors},

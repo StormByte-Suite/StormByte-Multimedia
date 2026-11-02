@@ -101,7 +101,9 @@ namespace {
 	constexpr std::size_t MaxEvents = 256;
 	constexpr double AudioAhead = 0.150;
 	// Live audio replacement resumes at the demux cursor, so bound decoded
-	// read-ahead to keep the bridged silence short.
+	// read-ahead to keep the bridged silence short. A lane may exceed it only
+	// while another selected lane still lacks data inside it, so serial demux
+	// can reach packets stored late; MaxEvents/MaxBytes still bound storage.
 	constexpr double DecodeAhead = 2.0;
 
 	/**
@@ -645,16 +647,22 @@ class Backend::SimplePlayer::Context {
 			std::unique_lock lock(m_mutex);
 			if (m_preview && (m_queue.size() >= MaxEvents || m_bytes + event.m_bytes > MaxBytes))
 				throw Exception("paused preview exceeds bounded presentation storage");
+			const int lane = event.m_audio ? 1 : event.m_subtitle ? 2 : 0;
 			m_ready.wait(lock, [&] {
-				return m_cancel || (m_decode_stop && event.m_audio)
-					|| (m_queue.size() < MaxEvents && m_bytes + event.m_bytes <= MaxBytes
-						&& (m_preview || m_decode_stop || event.m_subtitle
-							|| event.m_start <= m_position + DecodeAhead));
+				if (m_cancel || (m_decode_stop && event.m_audio))
+					return true;
+				if (m_queue.size() >= MaxEvents || m_bytes + event.m_bytes > MaxBytes)
+					return false;
+				const double horizon = m_position + DecodeAhead;
+				return m_preview || m_decode_stop || lane == 2 || event.m_start <= horizon
+					|| (m_selected[1 - lane] >= 0 && m_lane_end[1 - lane] < horizon);
 			});
 			if (m_cancel)
 				return false;
 			if (m_decode_stop && event.m_audio)
 				return false;
+			if (lane < 2)
+				m_lane_end[lane] = std::max(m_lane_end[lane], std::isfinite(event.m_end) ? event.m_end : event.m_start);
 			if (std::isfinite(event.m_end))
 				m_end = std::max(m_end, event.m_end);
 			m_bytes += event.m_bytes;
@@ -1446,6 +1454,7 @@ class Backend::SimplePlayer::Context {
 			m_audio_switching = false;
 			m_audio_transition = false;
 			m_audio_target = m_target;
+			m_lane_end = {m_target, m_target};
 			m_preview = preview;
 			m_preview_done = false;
 			m_preview_video_ready = false;
@@ -1547,6 +1556,7 @@ class Backend::SimplePlayer::Context {
 					std::lock_guard lock(m_mutex);
 					m_audio_end = m_position;
 					m_audio_target = m_position;
+					m_lane_end[1] = m_position;
 					m_selected[1] = index;
 				}
 				OpenDecoder(1, index);
@@ -1653,6 +1663,7 @@ class Backend::SimplePlayer::Context {
 		double m_target = 0;										///< Current seek target.
 		double m_audio_target = 0;									///< Audio trim boundary after a live selection.
 		double m_end = 0;											///< Last scheduled presentation end.
+		std::array<double, 2> m_lane_end{};							///< Latest decoded video/audio end since launch or switch.
 		double m_audio_end = 0;										///< Last submitted audio end.
 		double m_anchor = 0;										///< Monotonic clock media anchor.
 		PlaybackClock::time_point m_start = PlaybackClock::now();	///< Monotonic clock wall anchor.

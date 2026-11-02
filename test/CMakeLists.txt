@@ -48,6 +48,8 @@ if(ENABLE_TEST)
 		test_hdr_preview_preserves_signal
 		test_live_audio_selection
 		test_live_audio_tracks
+		test_skewed_audio_late
+		test_skewed_video_late
 		test_live_audio_backpressure_errors
 		test_av_seek_within_frame
 		test_explicit_errors

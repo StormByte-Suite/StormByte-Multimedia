@@ -80,6 +80,27 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
     test/files/video/live_audio_switch_long.mkv
   ```
 
+- `video/skew_audio_late.mkv` and `video/skew_video_late.mkv`: the first
+  20 seconds of `live_audio_switch_long.mkv`, stream-copied (H.264 320x180 and
+  AC-3 stereo) with unchanged timestamps but skewed physical interleave: each
+  audio (respectively video) packet is stored where the other stream is already
+  three seconds ahead. Preview tests require continuous A/V sync and bounded
+  live audio re-enable silence with decoded read-ahead limits.
+  SHA-256: `af2d8367b4a1a7e3b012f082ebd99421c115ed5830d32d37e2ea862094661b4b`
+  (546,292 bytes) and
+  `c8a06b565b6767b67409627377a688a4b9130aa6401990f77d6308659a26ac15`
+  (546,294 bytes). Authored once with the bit-exact authoring tool
+  `tools/skew_interleave.cxx` (system libavformat 63.1.102; not built by tests):
+
+  ```sh
+  c++ -std=c++20 test/files/tools/skew_interleave.cxx \
+    $(pkg-config --cflags --libs libavformat libavcodec libavutil) -o skew_interleave
+  ./skew_interleave test/files/video/live_audio_switch_long.mkv \
+    test/files/video/skew_audio_late.mkv audio 3 20
+  ./skew_interleave test/files/video/live_audio_switch_long.mkv \
+    test/files/video/skew_video_late.mkv video 3 20
+  ```
+
 - `video/missing_pts_bframes.avi`: synthetic two-second 96x64 MPEG-4/AC-3
   fixture with reordered frames and missing video packet PTS. Its regression
   verifies all 50 decoded/output video timestamps, intermediate encode progress

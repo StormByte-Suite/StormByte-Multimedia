@@ -1,0 +1,231 @@
+# Skewed A/V storage interleave vs decoded read-ahead bound - baseline and fix
+Fixtures (test/files/video, authored with test/files/tools/skew_interleave.cxx, bit-exact rebuild verified):
+  skew_audio_late.mkv  sha256 af2d8367b4a1a7e3b012f082ebd99421c115ed5830d32d37e2ea862094661b4b  audio stored ~3.0 s after video of equal dts
+  skew_video_late.mkv  sha256 c8a06b565b6767b67409627377a688a4b9130aa6401990f77d6308659a26ac15  video stored ~3.0 s after audio of equal dts
+Libraries: 0d7c2c1c (no decoded read-ahead bound), f68d4361 (global 2 s hard cap),
+fixed (per-lane 2 s horizon; a lane may exceed it only while the other selected A/V lane's
+decoded frontier is still inside it; 256-event/64 MiB queue limits unchanged).
+Build: build/ubsan (clang 22, libc++, -fsanitize=undefined, RelWithDebInfo), headless FakeDisplay.
+Test bounds (unchanged across libraries): underrun<0.05 s, video lead/late<0.10 s,
+re-enable silence < horizon 2 + skew 3 + 0.5 s, same epoch, monotonic video, wall gaps<500 ms.
+
+## Baseline vs fix outputs
+== library 0d7c2c1c test_skewed_audio_late
+[Test] Starting test_skewed_audio_late
+video/skew_audio_late.mkv playback underrun=0 video_late=0.00301559
+video/skew_audio_late.mkv re-enable silence=7.77668 wall_ms=7633
+[ASSERT] SkewedInterleavePlayback: silence < 2 + 3 + 0.5
+[Test] Finished test_skewed_audio_late: FAIL
+== library 0d7c2c1c test_skewed_video_late
+[Test] Starting test_skewed_video_late
+video/skew_video_late.mkv playback underrun=0 video_late=0.00305297
+[ASSERT] SkewedInterleavePlayback: player.State() == PlaybackState::Playing
+[Test] Finished test_skewed_video_late: FAIL
+== library 0d7c2c1c test_live_audio_tracks
+live audio track=-1 position=0.17115 switch+delivery_ms=15
+live audio track=1 position=5.15511 switch+delivery_ms=4835
+live audio track=-1 position=5.17654 switch+delivery_ms=21
+live audio track=1 position=10.208 switch+delivery_ms=4884
+live audio track=-1 position=10.2202 switch+delivery_ms=11
+live audio track=1 position=15.344 switch+delivery_ms=4977
+[Test] Finished test_live_audio_tracks: PASS
+== library f68d4361 test_skewed_audio_late
+[Test] Starting test_skewed_audio_late
+video/skew_audio_late.mkv playback underrun=0.0744849 video_late=0
+[ASSERT] SkewedInterleavePlayback: display->m_max_audio_underrun < 0.05
+[Test] Finished test_skewed_audio_late: FAIL
+== library f68d4361 test_skewed_video_late
+[Test] Starting test_skewed_video_late
+video/skew_video_late.mkv playback underrun=0 video_late=1.04691
+[ASSERT] SkewedInterleavePlayback: display->m_max_video_late < 0.10
+[Test] Finished test_skewed_video_late: FAIL
+== library f68d4361 test_live_audio_tracks
+live audio track=-1 position=0.171844 switch+delivery_ms=20
+live audio track=1 position=2.27203 switch+delivery_ms=1951
+live audio track=-1 position=2.29959 switch+delivery_ms=27
+live audio track=1 position=4.38405 switch+delivery_ms=1938
+live audio track=-1 position=4.42695 switch+delivery_ms=41
+live audio track=1 position=6.52805 switch+delivery_ms=1953
+[Test] Finished test_live_audio_tracks: PASS
+== library f68d4361 test_skewed_audio_late
+[Test] Starting test_skewed_audio_late
+video/skew_audio_late.mkv playback underrun=0.0759782 video_lead=0.956333 video_late=0
+[ASSERT] SkewedInterleavePlayback: display->m_max_audio_underrun < 0.05
+[Test] Finished test_skewed_audio_late: FAIL
+== library f68d4361 test_skewed_video_late
+[Test] Starting test_skewed_video_late
+video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=1.04858
+[ASSERT] SkewedInterleavePlayback: display->m_max_video_late < 0.10
+[Test] Finished test_skewed_video_late: FAIL
+== library fixed test_skewed_audio_late
+[Test] Starting test_skewed_audio_late
+video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00305767
+video/skew_audio_late.mkv re-enable silence=1.55565 wall_ms=1409
+[Test] Finished test_skewed_audio_late: PASS
+== library fixed test_skewed_video_late
+[Test] Starting test_skewed_video_late
+video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00303339
+video/skew_video_late.mkv re-enable silence=5.07218 wall_ms=4925
+[Test] Finished test_skewed_video_late: PASS
+== library fixed test_live_audio_tracks (UBSan)
+live audio track=-1 position=0.171121 switch+delivery_ms=15
+live audio track=1 position=2.27511 switch+delivery_ms=1954
+live audio track=-1 position=2.29959 switch+delivery_ms=25
+live audio track=1 position=4.38708 switch+delivery_ms=1937
+live audio track=-1 position=4.42678 switch+delivery_ms=40
+live audio track=1 position=6.52805 switch+delivery_ms=1954
+[Test] Finished test_live_audio_tracks: PASS
+== library fixed test_live_audio_tracks (pgo-instr Release)
+live audio track=-1 position=0.171785 switch+delivery_ms=20
+live audio track=1 position=2.27508 switch+delivery_ms=1953
+live audio track=-1 position=2.29958 switch+delivery_ms=25
+live audio track=1 position=4.38402 switch+delivery_ms=1934
+live audio track=-1 position=4.4238 switch+delivery_ms=40
+live audio track=1 position=6.52805 switch+delivery_ms=1955
+[Test] Finished test_live_audio_tracks: PASS
+
+## Full preview list (32 tests): UBSan then pgo-instr Release
+test_empty_display rc=0 ubsan_errors=0 41ms
+test_audio_adapter_mapping rc=0 ubsan_errors=0 39ms
+test_audio_adapter_samples rc=0 ubsan_errors=0 40ms
+test_audio_native_51 rc=0 ubsan_errors=0 292ms
+test_audio_native_mono rc=0 ubsan_errors=0 151ms
+test_audio_native_opus rc=0 ubsan_errors=0 48ms
+test_audio_native_stereo rc=0 ubsan_errors=0 188ms
+test_audio_pacing_pause_drain rc=0 ubsan_errors=0 2296ms
+test_audio_paused_seek rc=0 ubsan_errors=0 1093ms
+test_av_seek_switch_epochs rc=0 ubsan_errors=0 1779ms
+test_hdr_preview_tone_mapping rc=0 ubsan_errors=0 1282ms
+test_hdr_preview_preserves_signal rc=0 ubsan_errors=0 1332ms
+test_live_audio_selection rc=0 ubsan_errors=0 2440ms
+test_live_audio_tracks rc=0 ubsan_errors=0 6288ms
+test_skewed_audio_late rc=0 ubsan_errors=0 8150ms
+test_skewed_video_late rc=0 ubsan_errors=0 11623ms
+test_live_audio_backpressure_errors rc=0 ubsan_errors=0 750ms
+test_av_seek_within_frame rc=0 ubsan_errors=0 345ms
+test_explicit_errors rc=0 ubsan_errors=0 405ms
+test_long_subtitle_duration rc=0 ubsan_errors=0 46ms
+test_opus_without_video rc=0 ubsan_errors=0 1068ms
+test_packed_avi_seek rc=0 ubsan_errors=0 1084ms
+test_recovers_rejected_initial_avi_mp3_packet rc=0 ubsan_errors=0 4305ms
+test_recovers_rejected_avi_mp3_packet rc=0 ubsan_errors=0 4427ms
+test_recovers_rejected_avi_video_packet rc=0 ubsan_errors=0 4429ms
+test_subtitle_decode rc=0 ubsan_errors=0 3074ms
+test_subtitle_paused_seek rc=0 ubsan_errors=0 1212ms
+test_unknown_duration_seek rc=0 ubsan_errors=0 808ms
+test_faulted_reader_retained rc=0 ubsan_errors=0 1271ms
+test_preview_to_transcoder rc=0 ubsan_errors=0 263ms
+test_rewind_close_failures rc=0 ubsan_errors=0 75ms
+test_stop_transfer_destructor rc=0 ubsan_errors=0 299ms
+test_empty_display rc=0 ubsan_errors=0 9ms
+test_audio_adapter_mapping rc=0 ubsan_errors=0 7ms
+test_audio_adapter_samples rc=0 ubsan_errors=0 6ms
+test_audio_native_51 rc=0 ubsan_errors=0 247ms
+test_audio_native_mono rc=0 ubsan_errors=0 116ms
+test_audio_native_opus rc=0 ubsan_errors=0 15ms
+test_audio_native_stereo rc=0 ubsan_errors=0 138ms
+test_audio_pacing_pause_drain rc=0 ubsan_errors=0 2236ms
+test_audio_paused_seek rc=0 ubsan_errors=0 1046ms
+test_av_seek_switch_epochs rc=0 ubsan_errors=0 1634ms
+test_hdr_preview_tone_mapping rc=0 ubsan_errors=0 493ms
+test_hdr_preview_preserves_signal rc=0 ubsan_errors=0 899ms
+test_live_audio_selection rc=0 ubsan_errors=0 2525ms
+test_live_audio_tracks rc=0 ubsan_errors=0 6234ms
+test_skewed_audio_late rc=0 ubsan_errors=0 8103ms
+test_skewed_video_late rc=0 ubsan_errors=0 11634ms
+test_live_audio_backpressure_errors rc=0 ubsan_errors=0 700ms
+test_av_seek_within_frame rc=0 ubsan_errors=0 277ms
+test_explicit_errors rc=0 ubsan_errors=0 316ms
+test_long_subtitle_duration rc=0 ubsan_errors=0 12ms
+test_opus_without_video rc=0 ubsan_errors=0 1016ms
+test_packed_avi_seek rc=0 ubsan_errors=0 974ms
+test_recovers_rejected_initial_avi_mp3_packet rc=0 ubsan_errors=0 4269ms
+test_recovers_rejected_avi_mp3_packet rc=0 ubsan_errors=0 4399ms
+test_recovers_rejected_avi_video_packet rc=0 ubsan_errors=0 4381ms
+test_subtitle_decode rc=0 ubsan_errors=0 3048ms
+test_subtitle_paused_seek rc=0 ubsan_errors=0 1160ms
+test_unknown_duration_seek rc=0 ubsan_errors=0 776ms
+test_faulted_reader_retained rc=0 ubsan_errors=0 1236ms
+test_preview_to_transcoder rc=0 ubsan_errors=0 148ms
+test_rewind_close_failures rc=0 ubsan_errors=0 26ms
+test_stop_transfer_destructor rc=0 ubsan_errors=0 215ms
+
+## Repeats (78 runs, all rc=0 ubsan=0)
+ubsan test_skewed_audio_late #1 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00298339vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #2 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00299268vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #3 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00301886vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #4 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00306902vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #5 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304907vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #6 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304913vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #7 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304428vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_audio_late #8 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00302916vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audio_la
+ubsan test_skewed_video_late #1 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00307361vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_la
+ubsan test_skewed_video_late #2 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00304218vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_la
+ubsan test_skewed_video_late #3 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00304001vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_la
+ubsan test_skewed_video_late #4 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00304899vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_la
+ubsan test_skewed_video_late #5 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0030532vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_lat
+ubsan test_skewed_video_late #6 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0030298vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_lat
+ubsan test_skewed_video_late #7 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00304829vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_la
+ubsan test_skewed_video_late #8 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00306205vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video_la
+ubsan test_live_audio_tracks #1 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #2 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #3 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #4 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #5 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #6 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #7 rc=0 ubsan=0 
+ubsan test_live_audio_tracks #8 rc=0 ubsan=0 
+ubsan test_live_audio_selection #1 rc=0 ubsan=0
+ubsan test_live_audio_selection #2 rc=0 ubsan=0
+ubsan test_live_audio_selection #3 rc=0 ubsan=0
+ubsan test_live_audio_backpressure_errors #1 rc=0 ubsan=0
+ubsan test_live_audio_backpressure_errors #2 rc=0 ubsan=0
+ubsan test_live_audio_backpressure_errors #3 rc=0 ubsan=0
+ubsan test_audio_paused_seek #1 rc=0 ubsan=0
+ubsan test_audio_paused_seek #2 rc=0 ubsan=0
+ubsan test_audio_paused_seek #3 rc=0 ubsan=0
+ubsan test_audio_pacing_pause_drain #1 rc=0 ubsan=0
+ubsan test_audio_pacing_pause_drain #2 rc=0 ubsan=0
+ubsan test_audio_pacing_pause_drain #3 rc=0 ubsan=0
+ubsan test_av_seek_switch_epochs #1 rc=0 ubsan=0
+ubsan test_av_seek_switch_epochs #2 rc=0 ubsan=0
+ubsan test_av_seek_switch_epochs #3 rc=0 ubsan=0
+pgo-instr test_skewed_audio_late #1 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00308342vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #2 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00301745vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #3 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304504vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #4 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304707vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #5 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00304726vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #6 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00306099vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #7 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00306423vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_audio_late #8 rc=0 ubsan=0 video/skew_audio_late.mkv playback underrun=0 video_lead=0 video_late=0.00306653vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_audi
+pgo-instr test_skewed_video_late #1 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00303669vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_vide
+pgo-instr test_skewed_video_late #2 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00302462vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_vide
+pgo-instr test_skewed_video_late #3 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00305913vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_vide
+pgo-instr test_skewed_video_late #4 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00302672vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_vide
+pgo-instr test_skewed_video_late #5 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00307871vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_vide
+pgo-instr test_skewed_video_late #6 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0031212vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video
+pgo-instr test_skewed_video_late #7 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.00300833vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_vide
+pgo-instr test_skewed_video_late #8 rc=0 ubsan=0 video/skew_video_late.mkv playback underrun=0 video_lead=0 video_late=0.0030878vePlayback: assert display->m_max_audio_underrun < 0.05 video/skew_video
+pgo-instr test_live_audio_tracks #1 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #2 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #3 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #4 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #5 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #6 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #7 rc=0 ubsan=0 
+pgo-instr test_live_audio_tracks #8 rc=0 ubsan=0 
+pgo-instr test_live_audio_selection #1 rc=0 ubsan=0
+pgo-instr test_live_audio_selection #2 rc=0 ubsan=0
+pgo-instr test_live_audio_selection #3 rc=0 ubsan=0
+pgo-instr test_live_audio_backpressure_errors #1 rc=0 ubsan=0
+pgo-instr test_live_audio_backpressure_errors #2 rc=0 ubsan=0
+pgo-instr test_live_audio_backpressure_errors #3 rc=0 ubsan=0
+pgo-instr test_audio_paused_seek #1 rc=0 ubsan=0
+pgo-instr test_audio_paused_seek #2 rc=0 ubsan=0
+pgo-instr test_audio_paused_seek #3 rc=0 ubsan=0
+pgo-instr test_audio_pacing_pause_drain #1 rc=0 ubsan=0
+pgo-instr test_audio_pacing_pause_drain #2 rc=0 ubsan=0
+pgo-instr test_audio_pacing_pause_drain #3 rc=0 ubsan=0
+pgo-instr test_av_seek_switch_epochs #1 rc=0 ubsan=0
+pgo-instr test_av_seek_switch_epochs #2 rc=0 ubsan=0
+pgo-instr test_av_seek_switch_epochs #3 rc=0 ubsan=0
