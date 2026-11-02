@@ -1,5 +1,8 @@
 set(MP3LAME_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake-port")
 set(MP3LAME_COMPONENT "MP3 encoder LAME")
+set(MP3LAME_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-bitstream-use-unsigned-reservoir-shifts.patch"
+)
 
 set(MP3LAME_OPTIONS "")
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
@@ -21,7 +24,7 @@ buildmaster_component(
 	"${MP3LAME_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"mp3lame"
-	""
+	"GIT={ROOT=src;RESET;PATCH={${MP3LAME_PATCHES}};TITLE=LAME signed-shift fixes}"
 )
 buildmaster_group_add(ff-audio mp3lame)
 register_plugin(mp3lame "libmp3lame=enabled")
