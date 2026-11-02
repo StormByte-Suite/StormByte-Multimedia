@@ -1,0 +1,38 @@
+From 910f03b37d9f69d1f6adc8e1a59fc2cacb05b869 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:30:39 +0100
+Subject: [PATCH] mv: use bounded multiplication for signed motion-vector
+ scaling
+
+Motion vectors routinely have negative components. Their left-shift
+operators invoke undefined behavior in ordinary builds even though the
+same operators already use multiplication under USING_FTRAPV. Use that
+existing implementation for all configurations. Encoder callers scale
+bounded motion coordinates by one or two bits, with representable
+results. Reproduced by the HEVC output-properties test with UBSan.
+---
+ source/common/mv.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/source/common/mv.h b/source/common/mv.h
+index 5a8872cdd..abf9f7e14 100644
+--- a/source/common/mv.h
++++ b/source/common/mv.h
+@@ -56,14 +56,8 @@ public:
+ 
+     MV& operator >>=(int i)                    { x >>= i; y >>= i; return *this; }
+ 
+-#if USING_FTRAPV
+-    /* avoid signed left-shifts when -ftrapv is enabled */
+     MV& operator <<=(int i)                    { x *= (1 << i); y *= (1 << i); return *this; }
+     MV operator <<(int i) const                { return MV(x * (1 << i), y * (1 << i)); }
+-#else
+-    MV& operator <<=(int i)                    { x <<= i; y <<= i; return *this; }
+-    MV operator <<(int i) const                { return MV(x << i, y << i); }
+-#endif
+ 
+     MV operator >>(int i) const                { return MV(x >> i, y >> i); }
+ 
+-- 
+2.56.0
+

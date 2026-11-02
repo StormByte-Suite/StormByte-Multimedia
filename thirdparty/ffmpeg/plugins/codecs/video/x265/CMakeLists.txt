@@ -90,6 +90,7 @@ set(X265_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0003-nal-skip-empty-buffer-copy.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0004-bitstream-avoid-full-width-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0005-lookahead-guard-temporal-estimator-access.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0006-mv-scale-signed-vectors-with-multiplication.patch"
 )
 set(X265_12_OPTSTR "SOURCE=source;NOINSTALL;IPO=off;GIT={RESET;PATCH={${X265_PATCHES}};TITLE=x265 compatibility}")
 set(X265_10_OPTSTR "SOURCE=source;NOINSTALL;IPO=off")
