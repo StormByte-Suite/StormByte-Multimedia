@@ -1,0 +1,34 @@
+From 7d38ddfd0fd639ed3c2e13718fdbe1486f6f8f1c Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] bitstream: guard full-width partial-byte shifts in every
+ build
+
+Writing a 32-bit value can make topword equal 32. Shifting the promoted
+partial byte by that count is undefined even when it is zero. Use the
+existing USING_FTRAPV guarded expression in every build; the other bit-
+packing operations are unchanged. Reproduced by the existing HEVC
+output-properties test with UBSan.
+---
+ source/common/bitstream.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/source/common/bitstream.cpp b/source/common/bitstream.cpp
+index d4a5c2da9..3bf9b5aa2 100644
+--- a/source/common/bitstream.cpp
++++ b/source/common/bitstream.cpp
+@@ -56,11 +56,7 @@ void Bitstream::write(uint32_t val, uint32_t numBits)
+     {
+         /* topword aligns m_partialByte with the msb of val */
+         uint32_t topword = (numBits - nextPartialBits) & ~7;
+-#if USING_FTRAPV
+         uint32_t write_bits = (topword < 32 ? m_partialByte << topword : 0) | (val >> nextPartialBits);
+-#else
+-        uint32_t write_bits = (m_partialByte << topword) | (val >> nextPartialBits);
+-#endif
+ 
+         switch (writeBytes)
+         {
+-- 
+2.56.0
+

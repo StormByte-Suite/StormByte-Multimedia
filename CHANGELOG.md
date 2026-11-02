@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled x265 guards full-width partial-byte shifts in every build, not only builds configured with signed-overflow trapping.
 - Bundled LAME computes negative subblock scalefactor gain adjustments using bounded multiplication instead of undefined signed left shifts.
 - Bundled LAME writes bit-reservoir values through unsigned shifts rather than overflowing signed intermediates while packing MP3 output bytes.
 - Bundled x264 worker callbacks use their declared thread-pool and pthread signatures, preserving encoder return values and avoiding calls through incompatible function-pointer casts.
