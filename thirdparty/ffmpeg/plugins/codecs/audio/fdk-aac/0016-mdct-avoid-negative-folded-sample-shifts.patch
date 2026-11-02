@@ -1,0 +1,44 @@
+From 63e28cc956cff490e381920302d2c9ea29e24e6f Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:51:20 +0100
+Subject: [PATCH] libFDK: widen folded MDCT samples without negative shifts
+
+The simplified left and right MDCT folding paths negate PCM samples
+before widening them with a signed left shift. Replace that shift with
+multiplication by the same positive scale. The full signed PCM range
+remains representable after negation and half-scaled widening, including
+the minimum sample. Reproduced by stereo AAC encoding with UBSan in the
+left folding path; the right folding path uses the same conversion.
+---
+ libFDK/src/mdct.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libFDK/src/mdct.cpp b/libFDK/src/mdct.cpp
+index 0062b27..e85f751 100644
+--- a/libFDK/src/mdct.cpp
++++ b/libFDK/src/mdct.cpp
+@@ -184,8 +184,8 @@ INT mdct_block(H_MDCT hMdct, const INT_PCM *RESTRICT timeData,
+ #if SAMPLE_BITS == DFRACT_BITS /* SPC_BITS and DFRACT_BITS should be equal. */
+       mdctData[(tl / 2) + i] = -((FIXP_DBL)timeData[tl - i - 1] >> (1));
+ #else
+-      mdctData[(tl / 2) + i] = -(FIXP_DBL)timeData[tl - i - 1]
+-                               << (DFRACT_BITS - SAMPLE_BITS - 1); /* 0(A)-Br */
++      mdctData[(tl / 2) + i] = -(FIXP_DBL)timeData[tl - i - 1] *
++                               ((FIXP_DBL)1 << (DFRACT_BITS - SAMPLE_BITS - 1)); /* 0(A)-Br */
+ #endif
+     }
+ 
+@@ -224,8 +224,8 @@ INT mdct_block(H_MDCT hMdct, const INT_PCM *RESTRICT timeData,
+       mdctData[(tl / 2) - 1 - i] = -((FIXP_DBL)timeData[tl + i] >> (1));
+ #else
+       mdctData[(tl / 2) - 1 - i] =
+-          -(FIXP_DBL)timeData[tl + i]
+-          << (DFRACT_BITS - SAMPLE_BITS - 1); /* -C flipped at placing */
++          -(FIXP_DBL)timeData[tl + i] *
++          ((FIXP_DBL)1 << (DFRACT_BITS - SAMPLE_BITS - 1)); /* -C flipped at placing */
+ #endif
+     }
+ 
+-- 
+2.56.0
+
