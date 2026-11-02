@@ -1,0 +1,47 @@
+From 6674d44430ca7b9a374e06502f27b5e3e3401163 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] avx2: load eight-pixel residual and prediction rows without
+ alignment assumptions
+
+Pixel block addresses can be four-byte aligned without being eight-byte
+aligned. Casting these pointers to int64_t and dereferencing them is
+undefined even on x86, where the generated instruction tolerates it.
+
+Use the unaligned-capable 64-bit load intrinsic already used for residual
+data in this file. Apply it to both residual inputs and the matching
+eight-pixel reconstruction prediction load, preserving the load width
+and zeroed upper lanes.
+
+Reproduced with UBSan in existing HEVC transcode tests.
+---
+ src/strategies/avx2/quant-avx2.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/strategies/avx2/quant-avx2.c b/src/strategies/avx2/quant-avx2.c
+index 582823da..c20c7c07 100644
+--- a/src/strategies/avx2/quant-avx2.c
++++ b/src/strategies/avx2/quant-avx2.c
+@@ -530,8 +530,8 @@ static INLINE __m128i get_residual_4x1_avx2(const uint8_t *a_in, const uint8_t *
+ }
+ 
+ static INLINE __m128i get_residual_8x1_avx2(const uint8_t *a_in, const uint8_t *b_in){
+-  __m128i a = _mm_cvtsi64_si128(*(int64_t*)a_in);
+-  __m128i b = _mm_cvtsi64_si128(*(int64_t*)b_in);
++  __m128i a = _mm_loadl_epi64((const __m128i*)a_in);
++  __m128i b = _mm_loadl_epi64((const __m128i*)b_in);
+   __m128i diff = _mm_sub_epi16(_mm_cvtepu8_epi16(a), _mm_cvtepu8_epi16(b) );
+   return diff;
+ }
+@@ -545,7 +545,7 @@ static INLINE int32_t get_quantized_recon_4x1_avx2(int16_t *residual, const uint
+ 
+ static INLINE int64_t get_quantized_recon_8x1_avx2(int16_t *residual, const uint8_t *pred_in){
+   __m128i res = _mm_loadu_si128((__m128i*)residual);
+-  __m128i pred = _mm_cvtsi64_si128(*(int64_t*)pred_in);
++  __m128i pred = _mm_loadl_epi64((const __m128i*)pred_in);
+   __m128i rec = _mm_add_epi16(res, _mm_cvtepu8_epi16(pred));
+   return _mm_cvtsi128_si64(_mm_packus_epi16(rec, rec));
+ }
+-- 
+2.56.0
+

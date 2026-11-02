@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled Kvazaar reads eight-pixel residual and prediction rows with unaligned-safe SIMD loads rather than dereferencing potentially misaligned `int64_t` pointers.
 - Bundled SVT-AV1 uses unaligned-safe loads when packing level neighborhoods and reading two-tap interpolation coefficients, without changing row order or load width.
 - Bundled FFmpeg translates constrained-baseline H.264 profiles to OpenH264's `PRO_BASELINE` rather than passing FFmpeg constraint flags as an invalid `EProfileIdc` value.
 - Bundled FFmpeg pads externally owned Dolby Vision T.35 payloads before bitstream parsing, preventing out-of-bounds EMDF footer reads when AV1 metadata is supplied by libdav1d.
