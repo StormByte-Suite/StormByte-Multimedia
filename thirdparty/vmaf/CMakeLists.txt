@@ -25,6 +25,7 @@ elseif(WITH_VMAF STREQUAL "BUNDLED")
 		"${CMAKE_CURRENT_LIST_DIR}/0001-clang-cl-math-and-warnings.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0002-libvmaf-rename-static-close.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0003-adm-avx2-handle-small-coefficients.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0004-adm-avx2-pack-coefficients-with-unsigned-shifts.patch"
 	)
 	set(VMAF_OPTIONS
 		"-Denable_tests=false"

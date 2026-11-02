@@ -1,0 +1,37 @@
+From 99314d050e9ef11a0dca494ed313721299898371 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] libvmaf/adm_avx2: convert coefficients to unsigned before
+ packing
+
+The high half of a packed wavelet coefficient can be negative. Casting
+the result of its signed left shift does not make the shift defined.
+Cast the coefficient before shifting, preserving the packed
+modulo-32-bit value and the existing signed low-half correction.
+Reproduced by the integer ADM picture contract test with UBSan.
+---
+ libvmaf/src/feature/x86/adm_avx2.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libvmaf/src/feature/x86/adm_avx2.c b/libvmaf/src/feature/x86/adm_avx2.c
+index dd8d400d..4793e5e9 100644
+--- a/libvmaf/src/feature/x86/adm_avx2.c
++++ b/libvmaf/src/feature/x86/adm_avx2.c
+@@ -2923,10 +2923,10 @@ void adm_dwt2_16_avx2(const uint16_t *src, const adm_dwt_band_t *dst, AdmBuffer
+     int16_t *tmphi = tmplo + w;
+     int32_t accum;
+ 
+-    __m256i f01_lo = _mm256_set1_epi32(filter_lo[0] + (uint32_t)(filter_lo[1] << 16) /* + (1 << 16) */);
+-    __m256i f23_lo = _mm256_set1_epi32(filter_lo[2] + (uint32_t)(filter_lo[3] << 16) /* + (1 << 16) */);
+-    __m256i f01_hi = _mm256_set1_epi32(filter_hi[0] + (uint32_t)(filter_hi[1] << 16) + (1 << 16));
+-    __m256i f23_hi = _mm256_set1_epi32(filter_hi[2] + (uint32_t)(filter_hi[3] << 16) /*+ (1 << 16)*/);
++    __m256i f01_lo = _mm256_set1_epi32(filter_lo[0] + ((uint32_t)filter_lo[1] << 16) /* + (1 << 16) */);
++    __m256i f23_lo = _mm256_set1_epi32(filter_lo[2] + ((uint32_t)filter_lo[3] << 16) /* + (1 << 16) */);
++    __m256i f01_hi = _mm256_set1_epi32(filter_hi[0] + ((uint32_t)filter_hi[1] << 16) + (1 << 16));
++    __m256i f23_hi = _mm256_set1_epi32(filter_hi[2] + ((uint32_t)filter_hi[3] << 16) /*+ (1 << 16)*/);
+ 
+     __m256i  accum0_lo, accum0_hi;
+ 
+-- 
+2.56.0
+
