@@ -21,9 +21,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.2.0...HEAD
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/2.0.0...HEAD
 
-## [1.2.0] - 2026-11-02
+## [2.0.0] - 2026-11-02
 
 ### Added
 
@@ -132,9 +132,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Changed
 
+- **Breaking:** allocating public constructors, owning-value helpers and report interfaces no longer promise `noexcept`. Allocation failures may propagate to callers instead of terminating. Consumers must rebuild against the updated headers and review code that relies on nothrow construction, exception specifications or function-pointer types. Runtime worker callbacks retain their documented guarded failure behavior.
 - Bundled builds use Base 2.2.3, Buffer 2.0.6, Logger 2.0.6 and System 2.1.3.
 
-[1.2.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...1.2.0
+[2.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/1.1.0...2.0.0
 
 ## [1.1.0] - 2026-11-01
 
