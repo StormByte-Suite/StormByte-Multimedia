@@ -515,7 +515,7 @@ void VMAF::Eof() noexcept {
 		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
 }
 
-class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const {
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	data.emplace(StormByte::Safe::String("model"), m_modelName);
 	data.emplace(StormByte::Safe::String("input_ceiling"), std::to_string(InputCeiling()));

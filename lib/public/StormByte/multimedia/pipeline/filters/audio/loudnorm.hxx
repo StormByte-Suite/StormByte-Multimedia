@@ -183,7 +183,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Measured I/LRA, per-channel TP, targets and program gain.
 			 * @return Ok after a successful measure, else Failed.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			/**

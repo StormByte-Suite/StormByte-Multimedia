@@ -142,7 +142,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Flat or prefixed frame counts.
 			 * @return Ok with frames, or Failed if none arrived.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			Safe::Map<int, std::uint64_t> m_frames;	///< Per-track destination counts with provider-owned nodes.

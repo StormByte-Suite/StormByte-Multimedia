@@ -218,7 +218,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * No mean of means. `threads` reports effective workers per track;
 			 * `input_ceiling` reports the shared pending-input cap.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		protected:
 			/**

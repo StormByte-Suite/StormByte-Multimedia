@@ -223,7 +223,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * Missing chroma planes omit `psnr_u` / `psnr_v`.
 			 * No mean of means.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			/**

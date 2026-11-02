@@ -356,7 +356,7 @@ void Denoise::Eof() noexcept {
 	m_graph.reset();
 }
 
-class StormByte::Multimedia::Pipeline::Filter::Report Denoise::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report Denoise::Report() const {
 	if (!m_voted)
 		return { Filter::Report::Status::Failed, {} };
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;

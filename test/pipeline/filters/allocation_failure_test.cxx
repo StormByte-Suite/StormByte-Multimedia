@@ -67,6 +67,8 @@ namespace {
 	};
 
 	static_assert(!noexcept(TestStep{}));
+	static_assert(!noexcept(std::declval<const Pipeline::Filter::Video::VMAF&>().Report()));
+	static_assert(!noexcept(std::declval<const Pipeline::Filter::Video::CountFrames&>().Report()));
 
 	int TestFactoryAllocationFailure() {
 		unsigned caught = 0;
@@ -97,6 +99,29 @@ namespace {
 			reject_after = std::numeric_limits<std::size_t>::max();
 		}
 		TEST_REQUIRE(caught > 0);
+		return 0;
+	}
+
+	int TestReportAllocationFailure() {
+		Pipeline::Filter::Video::CountFrames frames({});
+		Pipeline::Frame frame{0, StormByte::Multimedia::Type::Video, Pipeline::Producer::Encoder,
+			{}, {}, {}, {}, {}, {}, 0, 0};
+		frames.Process(frame);
+		Pipeline::Filter::Video::VMAF vmaf({}, StormByte::Safe::String{"vmaf_v0.6.1"});
+		unsigned caught = 0;
+		for (const Pipeline::Filter::FFmpeg* filter : {static_cast<const Pipeline::Filter::FFmpeg*>(&frames),
+			static_cast<const Pipeline::Filter::FFmpeg*>(&vmaf)}) {
+			reject_after = 0;
+			try {
+				static_cast<void>(filter->Report());
+			} catch (const StormByte::Safe::AllocationError&) {
+				++caught;
+			} catch (const std::bad_alloc&) {
+				++caught;
+			}
+			reject_after = std::numeric_limits<std::size_t>::max();
+		}
+		TEST_REQUIRE(caught == 2);
 		return 0;
 	}
 
@@ -342,6 +367,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_cancel_without_allocations", TestCoordinatorCancelExhaustion},
 		TestEntry{"test_writer_destruction_without_allocations", TestWriterDestructionExhaustion},
 		TestEntry{"test_stage_factory_allocation_failure", TestFactoryAllocationFailure},
+		TestEntry{"test_filter_report_allocation_failure", TestReportAllocationFailure},
 		TestEntry{"test_subtitle_allocation_failure", TestSubtitleAllocationFailure}
 	};
 	return RunSelectedTest(argc, argv, tests);

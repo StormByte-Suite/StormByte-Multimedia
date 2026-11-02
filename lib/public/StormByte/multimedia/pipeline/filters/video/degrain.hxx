@@ -250,7 +250,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Reports regional-target status, frame counts, filtering and strength.
 			 * @return Measurement and processing summary.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			friend struct DegrainMeasurementTest;

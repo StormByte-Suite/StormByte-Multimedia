@@ -393,7 +393,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @ref Analytics overrides this. A process or packet
 			 * leaf may leave the default.
 			 */
-			virtual class Report Report() const noexcept;
+			virtual class Report Report() const;
 
 			/**
 			 * @brief Current lifecycle value.

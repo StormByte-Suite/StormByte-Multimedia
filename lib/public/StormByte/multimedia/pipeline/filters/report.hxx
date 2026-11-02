@@ -93,7 +93,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param status Measurement result.
 			 * @param data Key/value payload (owned).
 			 */
-			Report(Status status, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data) noexcept;
+			Report(Status status, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data);
 
 			/**
 			 * @brief Copy constructor.
@@ -105,7 +105,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief Move constructor.
 			 * @param other Source report.
 			 */
-			Report(Report&& other) noexcept;
+			Report(Report&& other);
 
 			/**
 			 * @brief Destructor.

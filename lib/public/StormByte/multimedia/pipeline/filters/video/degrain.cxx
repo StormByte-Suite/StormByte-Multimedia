@@ -746,7 +746,7 @@ void Degrain::Eof() noexcept {
 	m_state->previousRow.reset();
 }
 
-class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const {
 	const bool ok = m_voted && m_ran > 0;
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	data.emplace(StormByte::Safe::String("status"), StormByte::Safe::String(ok ? "ok" : "noop"));

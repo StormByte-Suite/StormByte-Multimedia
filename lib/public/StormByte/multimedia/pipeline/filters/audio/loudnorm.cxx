@@ -400,7 +400,7 @@ void Loudnorm::Eof() noexcept {
 		CloseMeter();
 }
 
-class StormByte::Multimedia::Pipeline::Filter::Report Loudnorm::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report Loudnorm::Report() const {
 	if (!m_ready)
 		return { Filter::Report::Status::Failed, {} };
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;

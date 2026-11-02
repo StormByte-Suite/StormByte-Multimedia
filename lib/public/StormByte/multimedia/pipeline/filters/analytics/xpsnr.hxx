@@ -217,7 +217,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * Several: `0.xpsnr_mean` (origin index).
 			 * Missing chroma planes omit `xpsnr_u` / `xpsnr_v`.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			/**

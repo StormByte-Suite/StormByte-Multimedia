@@ -252,7 +252,7 @@ void FFmpeg::Process(const Pipeline::Frame&) noexcept {}
 
 void FFmpeg::Process(const Pipeline::Packet&) noexcept {}
 
-class StormByte::Multimedia::Pipeline::Filter::Report FFmpeg::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report FFmpeg::Report() const {
 	return {};
 }
 

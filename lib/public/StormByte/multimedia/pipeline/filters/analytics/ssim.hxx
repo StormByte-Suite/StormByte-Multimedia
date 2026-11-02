@@ -213,7 +213,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * Several: `0.ssim_mean` (origin index).
 			 * Missing chroma planes omit `ssim_u` / `ssim_v`.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			/**

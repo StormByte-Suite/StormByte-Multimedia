@@ -57,12 +57,12 @@ using namespace StormByte::Multimedia::Pipeline::Filter;
 Report::Report()
 : m_status(Status::None), m_data() {}
 
-Report::Report(Status status, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data) noexcept
+Report::Report(Status status, StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data)
 : m_status(status), m_data(std::move(data)) {}
 
 Report::Report(const Report& other) = default;
 
-Report::Report(Report&& other) noexcept = default;
+Report::Report(Report&& other) = default;
 
 Report::~Report() noexcept = default;
 

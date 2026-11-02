@@ -397,7 +397,7 @@ void SSIM::Eof() noexcept {
 		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
 }
 
-class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const {
 	StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> data;
 	bool failed = m_lanes.empty();
 	unsigned ok = 0;

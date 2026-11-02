@@ -99,7 +99,7 @@ void CountFrames::Eof() noexcept {
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={}", m_frames.size()));
 }
 
-class StormByte::Multimedia::Pipeline::Filter::Report CountFrames::Report() const noexcept {
+class StormByte::Multimedia::Pipeline::Filter::Report CountFrames::Report() const {
 	if (m_frames.empty())
 		return { Filter::Report::Status::Failed, {} };
 

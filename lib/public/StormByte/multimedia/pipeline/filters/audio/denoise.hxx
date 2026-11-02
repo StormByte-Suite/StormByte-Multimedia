@@ -199,7 +199,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Vote result and afftdn knobs.
 			 * @return Ok after measure (including skip), else Failed.
 			 */
-			class Filter::Report Report() const noexcept override;
+			class Filter::Report Report() const override;
 
 		private:
 			/**
