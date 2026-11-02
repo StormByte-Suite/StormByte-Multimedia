@@ -1,0 +1,49 @@
+From 86f048a7ff0312dbdcb71f16d423a4113c8febfb Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:46:01 +0100
+Subject: [PATCH] libFDK: scale signed LPC analysis and synthesis state without
+ negative shifts
+
+The LPC analysis residual and synthesis state are signed audio values.
+Scale their ULONG bit patterns before restoring FIXP_DBL rather than
+left-shifting negative signed operands. Preserve filter order, state
+updates and output scaling. Reproduced in CLpc_Analysis by stereo AAC
+encoding with UBSan; synthesis has the same signed-state scaling
+operations.
+---
+ libFDK/src/FDK_lpc.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libFDK/src/FDK_lpc.cpp b/libFDK/src/FDK_lpc.cpp
+index 892baf6..6a3fcf8 100644
+--- a/libFDK/src/FDK_lpc.cpp
++++ b/libFDK/src/FDK_lpc.cpp
+@@ -151,14 +151,14 @@ void CLpc_SynthesisLattice(FIXP_DBL *signal, const int signal_size,
+           fMultDiv2(*pCoeff--, *pState--);
+     for (j = order - 1; j != 0; j--) {
+       tmp = fMultSubDiv2(tmp, pCoeff[0], pState[0]);
+-      pState[1] = pState[0] + (fMultDiv2(*pCoeff--, tmp) << 2);
++      pState[1] = pState[0] + (FIXP_DBL)((ULONG)fMultDiv2(*pCoeff--, tmp) << 2);
+       pState--;
+     }
+ 
+     *pSignal = scaleValueSaturate(tmp, -shift - signal_e_out);
+ 
+     /* exponent of state[] is -1 */
+-    pState[1] = tmp << 1;
++    pState[1] = (FIXP_DBL)((ULONG)tmp << 1);
+     pSignal += inc;
+   }
+ }
+@@ -343,7 +343,7 @@ void CLpc_Analysis(FIXP_DBL *RESTRICT signal, const int signal_size,
+         ((stateIndex - 1) < 0) ? (stateIndex - 1 + order) : (stateIndex - 1);
+     filtState[stateIndex] = signal[j];
+ 
+-    signal[j] = tmp << shift;
++    signal[j] = (FIXP_DBL)((ULONG)tmp << shift);
+   }
+ 
+   if (filtStateIndex != NULL) {
+-- 
+2.56.0
+
