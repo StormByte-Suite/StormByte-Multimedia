@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC doubles generic fixed-point products without negative signed shifts, preserving full-scale bit patterns; an isolated sanitizer check covers all multiply variants against a widened reference.
 - Bundled Kvazaar copies four-pixel planar and filtered DC reference edges into scalar temporaries without assuming four-byte input alignment.
 - Bundled x265 uses its existing bounded multiplication implementation for signed motion-vector scaling in every build, avoiding left shifts of negative coordinates.
 - Bundled FDK-AAC performs checked saturating left conversions with widened multiplication, preserving both saturation limits without shifting negative signed samples.

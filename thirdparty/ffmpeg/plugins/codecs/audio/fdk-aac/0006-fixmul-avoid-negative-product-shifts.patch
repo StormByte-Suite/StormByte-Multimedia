@@ -1,0 +1,88 @@
+From f732f7f42aa88d773a2c08e40ce02e128958cf0d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:30:39 +0100
+Subject: [PATCH] libFDK: double signed fixed-point products without negative
+ shifts
+
+The generic fixed-point multiplication fallbacks double signed products
+with left shifts, including negative audio samples. Shift the 32-bit
+result in ULONG before converting back to LONG so the original modulo
+bit pattern is preserved, including full-scale inputs. For the bit-exact
+mixed-width variants use representable INT64 multiplication before
+narrowing. Reproduced in fixmul_SD by surround AAC decoding with UBSan;
+the other fallback variants share the same operation.
+---
+ libFDK/include/fixmul.h | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/libFDK/include/fixmul.h b/libFDK/include/fixmul.h
+index 8eeb7ab..d925bb6 100644
+--- a/libFDK/include/fixmul.h
++++ b/libFDK/include/fixmul.h
+@@ -143,14 +143,14 @@ inline LONG fixmuldiv2BitExact_DD(const LONG a, const LONG b) {
+ #if !defined(FUNCTION_fixmul_DD)
+ #define FUNCTION_fixmul_DD
+ inline LONG fixmul_DD(const LONG a, const LONG b) {
+-  return fixmuldiv2_DD(a, b) << 1;
++  return (LONG)((ULONG)fixmuldiv2_DD(a, b) << 1);
+ }
+ #endif
+ 
+ #if !defined(FUNCTION_fixmulBitExact_DD)
+ #define FUNCTION_fixmulBitExact_DD
+ inline LONG fixmulBitExact_DD(const LONG a, const LONG b) {
+-  return ((LONG)((((INT64)a) * b) >> 32)) << 1;
++  return (LONG)((ULONG)((((INT64)a) * b) >> 32) << 1);
+ }
+ #endif
+ 
+@@ -163,7 +163,9 @@ inline LONG fixmuldiv2_SS(const SHORT a, const SHORT b) {
+ 
+ #if !defined(FUNCTION_fixmul_SS)
+ #define FUNCTION_fixmul_SS
+-inline LONG fixmul_SS(const SHORT a, const SHORT b) { return (a * b) << 1; }
++inline LONG fixmul_SS(const SHORT a, const SHORT b) {
++  return (LONG)((ULONG)((LONG)a * b) << 1);
++}
+ #endif
+ 
+ #if !defined(FUNCTION_fixmuldiv2_SD)
+@@ -228,7 +230,7 @@ inline LONG fixmul_SD(const SHORT a, const LONG b) {
+ #ifdef FUNCTION_fixmul_DS
+   return fixmul_DS(b, a);
+ #else
+-  return fixmuldiv2_SD(a, b) << 1;
++  return (LONG)((ULONG)fixmuldiv2_SD(a, b) << 1);
+ #endif
+ }
+ #endif
+@@ -239,7 +241,7 @@ inline LONG fixmul_DS(const LONG a, const SHORT b) {
+ #ifdef FUNCTION_fixmul_SD
+   return fixmul_SD(b, a);
+ #else
+-  return fixmuldiv2_DS(a, b) << 1;
++  return (LONG)((ULONG)fixmuldiv2_DS(a, b) << 1);
+ #endif
+ }
+ #endif
+@@ -253,7 +255,7 @@ inline LONG fixmulBitExact_SD(const SHORT a, const LONG b)
+ }
+ #else
+ {
+-  return (LONG)(((((INT64)a) * b) >> 16) << 1);
++  return (LONG)(((((INT64)a) * b) >> 16) * 2);
+ }
+ #endif
+ #endif
+@@ -267,7 +269,7 @@ inline LONG fixmulBitExact_DS(const LONG a, const SHORT b)
+ }
+ #else
+ {
+-  return (LONG)(((((INT64)a) * b) >> 16) << 1);
++  return (LONG)(((((INT64)a) * b) >> 16) * 2);
+ }
+ #endif
+ #endif
+-- 
+2.56.0
+
