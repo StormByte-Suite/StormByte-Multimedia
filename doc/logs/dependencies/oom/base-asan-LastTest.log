@@ -1,0 +1,35 @@
+Start testing: Nov 02 07:09 CET
+----------------------------------------------------------
+7/58 Testing: TelemetryTests
+7/58 Test: TelemetryTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/base-asan/test/TelemetryTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/base-asan/test
+"TelemetryTests" start time: Nov 02 07:09 CET
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"TelemetryTests" end time: Nov 02 07:09 CET
+"TelemetryTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/58 Testing: TelemetryAllocationFailureTests
+8/58 Test: TelemetryAllocationFailureTests
+Command: "/home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/base-asan/test/TelemetryAllocationFailureTests"
+Directory: /home/stormbyte/Software/StormByte/StormByte/multimedia/build/oom-validation/base-asan/test
+"TelemetryAllocationFailureTests" start time: Nov 02 07:09 CET
+Output:
+----------------------------------------------------------
+Allocation interposition requires Linux/glibc without AddressSanitizer.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"TelemetryAllocationFailureTests" end time: Nov 02 07:09 CET
+"TelemetryAllocationFailureTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 02 07:09 CET

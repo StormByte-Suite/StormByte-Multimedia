@@ -8,6 +8,7 @@
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/nlmeans.hxx>
+#include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
@@ -68,6 +69,8 @@ namespace {
 						throw std::bad_alloc{};
 					} catch (const std::bad_alloc&) {
 					}
+					denied = 0;
+					exhausted = true;
 				}
 			}
 
@@ -83,24 +86,6 @@ namespace {
 				}
 			}
 
-			StormByte::Safe::Shared<Pipeline::Plan> EmptyPlan(
-				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> reader,
-				StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> writer,
-				StormByte::Safe::Optional<std::int64_t> duration,
-				const StormByte::Multimedia::Container* container) const override {
-				if (!ExhaustWorker)
-					return Transcoder::EmptyPlan(std::move(reader), std::move(writer), std::move(duration), container);
-				// Keep dependency-owned file teardown outside the exhausted coordinator thread.
-				m_reader = std::move(reader);
-				m_writer = std::move(writer);
-				denied = 0;
-				exhausted = true;
-				return Transcoder::EmptyPlan({}, {}, std::move(duration), container);
-			}
-
-		private:
-			mutable StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationReader> m_reader;
-			mutable StormByte::Safe::Unique<StormByte::Buffer::IO::BufferedLocationWriter> m_writer;
 	};
 
 	int TestCoordinatorExhaustion(bool worker) {
@@ -132,6 +117,19 @@ namespace {
 
 	int TestCoordinatorWorkerExhaustion() {
 		return TestCoordinatorExhaustion(true);
+	}
+
+	int TestWriterDestructionExhaustion() {
+		const auto path = TestLocation(OutputPath("pipeline/filters/unused-writer-oom.mkv"));
+		{
+			StormByte::Buffer::IO::BufferedFileWriter writer{path};
+			static_cast<void>(writer.Telemetry());
+			denied = 0;
+			exhausted = true;
+		}
+		exhausted = false;
+		TEST_REQUIRE(denied > 0);
+		return 0;
 	}
 
 	int TestCoordinatorCancelExhaustion() {
@@ -271,7 +269,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_nlmeans_scratch_failure_fails_job", TestNlMeansFailureJob},
 		TestEntry{"test_transcoder_start_without_allocations", TestCoordinatorStartExhaustion},
 		TestEntry{"test_transcoder_worker_without_allocations", TestCoordinatorWorkerExhaustion},
-		TestEntry{"test_transcoder_cancel_without_allocations", TestCoordinatorCancelExhaustion}
+		TestEntry{"test_transcoder_cancel_without_allocations", TestCoordinatorCancelExhaustion},
+		TestEntry{"test_writer_destruction_without_allocations", TestWriterDestructionExhaustion}
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

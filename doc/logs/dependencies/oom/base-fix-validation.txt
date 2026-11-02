@@ -1,0 +1,9 @@
+Base commit: ce1baac254e8cb20055398c1302d28930b445229
+Unpatched Base TelemetryAllocationFailureTests: SIGABRT (-6).
+Patched Base focused normal tests: 2 PASS.
+Patched Base strict ASan/UBSan/LSan: TelemetryTests PASS, glibc allocation-interposition test SKIP77.
+Multimedia isolated UBSan library + existing Buffer/Logger/System + patched Base: 9 PASS.
+Worker regression retains no reader/writer owners; actual dependency teardown runs on exhausted coordinator thread.
+Separate real BufferedFileWriter noexcept destructor test exhausts allocations with no active exception and passes.
+No shared Multimedia graph or dependency rebuild performed.
+Packaging: install/repackage ce1baac Base at existing version 2.2.3 into local BuildMaster cache; refresh its shared library in validation prefix; rebuild/relink consumers as parent coordinates. No push or tag.
