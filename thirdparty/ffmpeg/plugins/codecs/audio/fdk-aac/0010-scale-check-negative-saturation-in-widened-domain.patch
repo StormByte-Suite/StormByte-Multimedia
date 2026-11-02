@@ -1,0 +1,34 @@
+From 96e03c235ce150849af088584e8c76e1c43cd64d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:37:30 +0100
+Subject: [PATCH] libFDK: check negative saturation in the widened product
+ domain
+
+The normal left-saturation macro derives the lower source threshold by
+complementing a right-shifted positive limit. Once the shift reaches the
+destination width, that threshold stays at -1 instead of reaching zero,
+allowing -1 to produce values below the destination minimum. Compare the
+widened product directly with the lower output bound. An isolated
+strict-sanitizer reference check reproduces -1 shifted by 8 for an 8-bit
+destination returning -256 instead of -128.
+---
+ libFDK/include/scale.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libFDK/include/scale.h b/libFDK/include/scale.h
+index 7e464a4..7e3e529 100644
+--- a/libFDK/include/scale.h
++++ b/libFDK/include/scale.h
+@@ -251,7 +251,8 @@ inline void scaleValueInPlace(FIXP_DBL *value, /*!< Value */
+ #define SATURATE_LEFT_SHIFT(src, scale, dBits)                           \
+   (((LONG)(src) > ((LONG)(((1U) << ((dBits)-1)) - 1) >> (scale)))        \
+        ? (LONG)(((1U) << ((dBits)-1)) - 1)                               \
+-       : ((LONG)(src) < ~((LONG)(((1U) << ((dBits)-1)) - 1) >> (scale))) \
++       : ((INT64)(LONG)(src) * ((INT64)1 << (scale)) <                   \
++          ~((LONG)(((1U) << ((dBits)-1)) - 1)))                         \
+              ? ~((LONG)(((1U) << ((dBits)-1)) - 1))                      \
+              : (LONG)((INT64)(LONG)(src) * ((INT64)1 << (scale))))
+ #endif
+-- 
+2.56.0
+
