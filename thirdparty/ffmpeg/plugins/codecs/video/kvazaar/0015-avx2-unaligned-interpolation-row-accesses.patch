@@ -1,0 +1,210 @@
+From cccc3a43abdb99d176c76026d32c8a17cc6efd94 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:40:28 +0100
+Subject: [PATCH] avx2: access interpolation row fragments without scalar
+ alignment
+
+Vertical interpolation consumes 16-bit intermediate rows at offsets that
+need not be eight-byte aligned. Load each eight-byte row and filter
+fragment with _mm_loadl_epi64 before extracting its bits for
+broadcasting or insertion. Copy four-byte output fragments with memcpy
+instead of dereferencing scalar pointers. Preserve read widths, lane
+order and rounding. Reproduced in kvz_ipol_8tap_ver_im_px_avx2 by the
+unaligned-video test with UBSan; equivalent four-tap and high-precision
+paths share these accesses.
+---
+ src/strategies/avx2/ipol-avx2.c | 80 +++++++++++++++++----------------
+ 1 file changed, 42 insertions(+), 38 deletions(-)
+
+diff --git a/src/strategies/avx2/ipol-avx2.c b/src/strategies/avx2/ipol-avx2.c
+index 49ba29c6..b77be39c 100644
+--- a/src/strategies/avx2/ipol-avx2.c
++++ b/src/strategies/avx2/ipol-avx2.c
+@@ -260,7 +260,7 @@ static void kvz_ipol_8tap_ver_im_px_avx2(int8_t *filter,
+   int32_t wp_shift1 = 14 - KVZ_BIT_DEPTH;
+   int32_t wp_offset1 = 1 << (wp_shift1 - 1);
+ 
+-  __m128i weights_8b = _mm_set1_epi64x(*(uint64_t *)filter);
++  __m128i weights_8b = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)filter)));
+   __m256i weights_16b = _mm256_cvtepi8_epi16(weights_8b);
+   __m256i all_w01 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(0, 0, 0, 0));
+   __m256i all_w23 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(1, 1, 1, 1));
+@@ -275,13 +275,13 @@ static void kvz_ipol_8tap_ver_im_px_avx2(int8_t *filter,
+     // Broadcasted rows in both lanes
+     // __m256i r0; // Unused
+     // __m256i r1; // Unused
+-    __m256i r2 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 0 * src_stride));
+-    __m256i r3 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 1 * src_stride));
+-    __m256i r4 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 2 * src_stride));
+-    __m256i r5 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 3 * src_stride));
+-    __m256i r6 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 4 * src_stride));
+-    __m256i r7 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 5 * src_stride));
+-    __m256i r8 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 6 * src_stride));
++    __m256i r2 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 0 * src_stride))));
++    __m256i r3 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 1 * src_stride))));
++    __m256i r4 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 2 * src_stride))));
++    __m256i r5 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 3 * src_stride))));
++    __m256i r6 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 4 * src_stride))));
++    __m256i r7 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 5 * src_stride))));
++    __m256i r8 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 6 * src_stride))));
+ 
+     // Consecutive rows in low and high lanes
+     // __m256i r0_r1; // Unused
+@@ -308,8 +308,8 @@ static void kvz_ipol_8tap_ver_im_px_avx2(int8_t *filter,
+       r23_r34 = r45_r56;
+       r45_r56 = r67_r78;
+       r6 = r8;
+-      r7 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 7 * src_stride));
+-      r8 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 8 * src_stride));
++      r7 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 7 * src_stride))));
++      r8 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 8 * src_stride))));
+       r6_r7 = _mm256_blend_epi32(r6, r7, 0xF0);
+       r7_r8 = _mm256_blend_epi32(r7, r8, 0xF0);
+ 
+@@ -331,8 +331,10 @@ static void kvz_ipol_8tap_ver_im_px_avx2(int8_t *filter,
+ 
+       kvz_pixel *dst_addr0 = &dst[(y + 0) * dst_stride + x];
+       kvz_pixel *dst_addr1 = &dst[(y + 1) * dst_stride + x];
+-      *(uint32_t*)dst_addr0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum));
+-      *(uint32_t*)dst_addr1 = _mm_cvtsi128_si32(_mm256_extracti128_si256(sum, 1));
++      uint32_t row0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum));
++      uint32_t row1 = _mm_cvtsi128_si32(_mm256_extracti128_si256(sum, 1));
++      memcpy(dst_addr0, &row0, sizeof(row0));
++      memcpy(dst_addr1, &row1, sizeof(row1));
+     }
+   }
+ }
+@@ -347,7 +349,7 @@ int16_t dst_stride)
+ {
+   const int shift2 = 6;
+ 
+-  __m128i weights_8b = _mm_set1_epi64x(*(uint64_t *)filter);
++  __m128i weights_8b = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)filter)));
+   __m256i weights_16b = _mm256_cvtepi8_epi16(weights_8b);
+   __m256i all_w01 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(0, 0, 0, 0));
+   __m256i all_w23 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(1, 1, 1, 1));
+@@ -362,13 +364,13 @@ int16_t dst_stride)
+     // Broadcasted rows in both lanes
+     // __m256i r0; // Unused
+     // __m256i r1; // Unused
+-    __m256i r2 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 0 * src_stride));
+-    __m256i r3 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 1 * src_stride));
+-    __m256i r4 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 2 * src_stride));
+-    __m256i r5 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 3 * src_stride));
+-    __m256i r6 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 4 * src_stride));
+-    __m256i r7 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 5 * src_stride));
+-    __m256i r8 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 6 * src_stride));
++    __m256i r2 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 0 * src_stride))));
++    __m256i r3 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 1 * src_stride))));
++    __m256i r4 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 2 * src_stride))));
++    __m256i r5 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 3 * src_stride))));
++    __m256i r6 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 4 * src_stride))));
++    __m256i r7 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 5 * src_stride))));
++    __m256i r8 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 6 * src_stride))));
+ 
+     // Consecutive rows in low and high lanes
+     // __m256i r0_r1; // Unused
+@@ -395,8 +397,8 @@ int16_t dst_stride)
+       r23_r34 = r45_r56;
+       r45_r56 = r67_r78;
+       r6 = r8;
+-      r7 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 7 * src_stride));
+-      r8 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 8 * src_stride));
++      r7 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 7 * src_stride))));
++      r8 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 8 * src_stride))));
+       r6_r7 = _mm256_blend_epi32(r6, r7, 0xF0);
+       r7_r8 = _mm256_blend_epi32(r7, r8, 0xF0);
+ 
+@@ -457,8 +459,8 @@ static void kvz_ipol_4tap_hor_px_im_avx2(int8_t *filter,
+       kvz_pixel *chunk_ptr = top_left + src_stride * y + x;
+       __m128i r0r1 = _mm_loadl_epi64((__m128i*)(chunk_ptr + 0 * src_stride));
+       __m128i r2r3 = _mm_loadl_epi64((__m128i*)(chunk_ptr + 2 * src_stride));
+-      r0r1 = _mm_insert_epi64(r0r1, *(uint64_t*)(chunk_ptr + 1 * src_stride), 1);
+-      r2r3 = _mm_insert_epi64(r2r3, *(uint64_t*)(chunk_ptr + 3 * src_stride), 1);
++      r0r1 = _mm_insert_epi64(r0r1, _mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(chunk_ptr + 1 * src_stride))), 1);
++      r2r3 = _mm_insert_epi64(r2r3, _mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(chunk_ptr + 3 * src_stride))), 1);
+ 
+       __m256i r0r1_r2r3 = _mm256_castsi128_si256(r0r1);
+       r0r1_r2r3 = _mm256_inserti128_si256(r0r1_r2r3, r2r3, 1);
+@@ -500,7 +502,7 @@ static void kvz_ipol_4tap_ver_im_px_avx2(int8_t *filter,
+   int32_t wp_shift1 = 14 - KVZ_BIT_DEPTH;
+   int32_t wp_offset1 = 1 << (wp_shift1 - 1);
+ 
+-  __m128i weights_8b = _mm_set1_epi64x(*(uint64_t*)filter);
++  __m128i weights_8b = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)filter)));
+   __m256i weights_16b = _mm256_cvtepi8_epi16(weights_8b);
+   __m256i all_w01 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(0, 0, 0, 0));
+   __m256i all_w23 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(1, 1, 1, 1));
+@@ -513,9 +515,9 @@ static void kvz_ipol_4tap_ver_im_px_avx2(int8_t *filter,
+     // Broadcasted rows in both lanes
+     // __m256i r0; // Unused
+     // __m256i r1; // Unused
+-    __m256i r2 = _mm256_set1_epi64x(*(uint64_t*)(strip_ptr + 0 * src_stride));
+-    __m256i r3 = _mm256_set1_epi64x(*(uint64_t*)(strip_ptr + 1 * src_stride));
+-    __m256i r4 = _mm256_set1_epi64x(*(uint64_t*)(strip_ptr + 2 * src_stride));
++    __m256i r2 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 0 * src_stride))));
++    __m256i r3 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 1 * src_stride))));
++    __m256i r4 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 2 * src_stride))));
+ 
+     // Consecutive rows in low and high lanes
+     // __m256i r0_r1; // Unused
+@@ -534,8 +536,8 @@ static void kvz_ipol_4tap_ver_im_px_avx2(int8_t *filter,
+       // Slide window
+       r01_r12 = r23_r34;
+       r2 = r4;
+-      r3 = _mm256_set1_epi64x(*(uint64_t*)(strip_ptr + 3 * src_stride));
+-      r4 = _mm256_set1_epi64x(*(uint64_t*)(strip_ptr + 4 * src_stride));
++      r3 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 3 * src_stride))));
++      r4 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 4 * src_stride))));
+       r2_r3 = _mm256_blend_epi32(r2, r3, 0xF0);
+       r3_r4 = _mm256_blend_epi32(r3, r4, 0xF0);
+ 
+@@ -553,8 +555,10 @@ static void kvz_ipol_4tap_ver_im_px_avx2(int8_t *filter,
+ 
+       kvz_pixel *dst_addr0 = &dst[(y + 0) * dst_stride + x];
+       kvz_pixel *dst_addr1 = &dst[(y + 1) * dst_stride + x];
+-      *(uint32_t*)dst_addr0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum));
+-      *(uint32_t*)dst_addr1 = _mm_cvtsi128_si32(_mm256_extracti128_si256(sum, 1));
++      uint32_t row0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum));
++      uint32_t row1 = _mm_cvtsi128_si32(_mm256_extracti128_si256(sum, 1));
++      memcpy(dst_addr0, &row0, sizeof(row0));
++      memcpy(dst_addr1, &row1, sizeof(row1));
+     }
+   }
+ }
+@@ -569,7 +573,7 @@ static void kvz_ipol_4tap_ver_im_hi_avx2(int8_t *filter,
+ {
+   const int shift2 = 6;
+ 
+-  __m128i weights_8b = _mm_set1_epi64x(*(uint64_t *)filter);
++  __m128i weights_8b = _mm_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)filter)));
+   __m256i weights_16b = _mm256_cvtepi8_epi16(weights_8b);
+   __m256i all_w01 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(0, 0, 0, 0));
+   __m256i all_w23 = _mm256_shuffle_epi32(weights_16b, _MM_SHUFFLE(1, 1, 1, 1));
+@@ -582,9 +586,9 @@ static void kvz_ipol_4tap_ver_im_hi_avx2(int8_t *filter,
+     // Broadcasted rows in both lanes
+     // __m256i r0; // Unused
+     // __m256i r1; // Unused
+-    __m256i r2 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 0 * src_stride));
+-    __m256i r3 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 1 * src_stride));
+-    __m256i r4 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 2 * src_stride));
++    __m256i r2 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 0 * src_stride))));
++    __m256i r3 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 1 * src_stride))));
++    __m256i r4 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 2 * src_stride))));
+ 
+     // Consecutive rows in low and high lanes
+     // __m256i r0_r1; // Unused
+@@ -603,8 +607,8 @@ static void kvz_ipol_4tap_ver_im_hi_avx2(int8_t *filter,
+       // Slide window
+       r01_r12 = r23_r34;
+       r2 = r4;
+-      r3 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 3 * src_stride));
+-      r4 = _mm256_set1_epi64x(*(uint64_t *)(strip_ptr + 4 * src_stride));
++      r3 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 3 * src_stride))));
++      r4 = _mm256_set1_epi64x(_mm_cvtsi128_si64(_mm_loadl_epi64((const __m128i*)(strip_ptr + 4 * src_stride))));
+       r2_r3 = _mm256_blend_epi32(r2, r3, 0xF0);
+       r3_r4 = _mm256_blend_epi32(r3, r4, 0xF0);
+ 
+-- 
+2.56.0
+

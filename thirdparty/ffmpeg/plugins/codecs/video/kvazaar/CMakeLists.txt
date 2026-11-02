@@ -15,6 +15,7 @@ set(KVAZAAR_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0012-avx2-unaligned-four-pixel-reference-loads.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0013-avx2-match-quant-strategy-signature.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0014-avx2-match-sao-edge-strategy-signature.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0015-avx2-unaligned-interpolation-row-accesses.patch"
 )
 
 set(KVAZAAR_OPTIONS
