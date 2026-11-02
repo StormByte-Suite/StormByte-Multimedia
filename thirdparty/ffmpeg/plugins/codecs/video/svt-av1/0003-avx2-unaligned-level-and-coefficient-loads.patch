@@ -1,0 +1,68 @@
+From 1a4ca3105859916dad758173594d6c82f1d9f093 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] AVX2: use unaligned loads for level rows and two-tap
+ coefficients
+
+Level neighborhoods are addressed at byte offsets and are not guaranteed
+to satisfy the alignment of the int32_t and uint64_t pointer casts used
+by the row packing helpers. The two-tap coefficient pair at filter + 3
+is likewise only two-byte aligned.
+
+Use the existing xx_loadl_32 and xx_loadl_64 helpers, then unpack the
+loaded rows in their original order. Load the two-tap pair through
+xx_loadl_32 as well. These helpers preserve the exact load widths without
+requiring aligned scalar lvalues.
+
+Reproduced with UBSan during existing AV1 transcode tests.
+---
+ Source/Lib/ASM_AVX2/convolve_avx2.h  |  2 +-
+ Source/Lib/ASM_AVX2/encodetxb_avx2.c | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/Source/Lib/ASM_AVX2/convolve_avx2.h b/Source/Lib/ASM_AVX2/convolve_avx2.h
+index a33bded17..6a74372e6 100644
+--- a/Source/Lib/ASM_AVX2/convolve_avx2.h
++++ b/Source/Lib/ASM_AVX2/convolve_avx2.h
+@@ -207,7 +207,7 @@ static INLINE void prepare_half_coeffs_8tap_ssse3(const InterpFilterParams* cons
+ static INLINE void prepare_half_coeffs_2tap_avx2(const InterpFilterParams* const filter_params, const int32_t subpel_q4,
+                                                  __m256i* const coeffs /* [1] */) {
+     const int16_t* const filter        = av1_get_interp_filter_subpel_kernel(*filter_params, subpel_q4 & SUBPEL_MASK);
+-    const __m128i        coeffs_8      = _mm_cvtsi32_si128(*(const int32_t*)(filter + 3));
++    const __m128i        coeffs_8      = xx_loadl_32(filter + 3);
+     const __m256i        filter_coeffs = _mm256_broadcastsi128_si256(coeffs_8);
+ 
+     // right shift all filter co-efficients by 1 to reduce the bits required.
+diff --git a/Source/Lib/ASM_AVX2/encodetxb_avx2.c b/Source/Lib/ASM_AVX2/encodetxb_avx2.c
+index f9d67763d..5b23cb0a0 100644
+--- a/Source/Lib/ASM_AVX2/encodetxb_avx2.c
++++ b/Source/Lib/ASM_AVX2/encodetxb_avx2.c
+@@ -99,17 +99,17 @@ static INLINE __m256i set_128x2(__m128i val_lo, __m128i val_hi) {
+ }
+ 
+ static INLINE __m128i load_8bit_4x4_to_1_reg_sse2(const void* const src, const int32_t byte_stride) {
+-    return _mm_setr_epi32(*(const int32_t*)((int8_t*)src + 0 * byte_stride),
+-                          *(const int32_t*)((int8_t*)src + 1 * byte_stride),
+-                          *(const int32_t*)((int8_t*)src + 2 * byte_stride),
+-                          *(const int32_t*)((int8_t*)src + 3 * byte_stride));
++    const __m128i lo = _mm_unpacklo_epi32(xx_loadl_32((const int8_t*)src + 0 * byte_stride),
++                                         xx_loadl_32((const int8_t*)src + 1 * byte_stride));
++    const __m128i hi = _mm_unpacklo_epi32(xx_loadl_32((const int8_t*)src + 2 * byte_stride),
++                                         xx_loadl_32((const int8_t*)src + 3 * byte_stride));
++    return _mm_unpacklo_epi64(lo, hi);
+ }
+ 
+ static INLINE __m256i load_64x4(const uint8_t* const src, const int32_t stride) {
+-    return _mm256_setr_epi64x(*(uint64_t*)(src + 0 * stride),
+-                              *(uint64_t*)(src + 1 * stride),
+-                              *(uint64_t*)(src + 2 * stride),
+-                              *(uint64_t*)(src + 3 * stride));
++    const __m128i lo = _mm_unpacklo_epi64(xx_loadl_64(src + 0 * stride), xx_loadl_64(src + 1 * stride));
++    const __m128i hi = _mm_unpacklo_epi64(xx_loadl_64(src + 2 * stride), xx_loadl_64(src + 3 * stride));
++    return set_128x2(lo, hi);
+ }
+ 
+ static INLINE void load_levels_4x4x5_sse2(const uint8_t* const src, const int32_t stride,
+-- 
+2.56.0
+
