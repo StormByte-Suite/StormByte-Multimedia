@@ -6,6 +6,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-widen-fractional-samples-without-negative-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0002-log2-avoid-negative-exponent-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0003-pow-avoid-negative-mantissa-shift.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0004-pow2-avoid-negative-integral-part-shift.patch"
 )
 
 set(FDK_AAC_OPTIONS

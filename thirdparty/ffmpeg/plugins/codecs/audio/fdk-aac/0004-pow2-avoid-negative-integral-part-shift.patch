@@ -1,0 +1,31 @@
+From a41b47eafe52bf9c3b5990a4ca3dd07c5c36370e Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:26:43 +0100
+Subject: [PATCH] libFDK: reconstruct signed power integer parts with widened
+ multiplication
+
+f2Pow extracts a signed integer part from its exponent and shifts it
+back before subtracting it. Negative integer parts make this shift
+undefined. Reconstruct the exactly representable value using INT64
+multiplication by the positive scale factor. Reproduced in the stereo
+AAC encoding test with UBSan.
+---
+ libFDK/src/fixpoint_math.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libFDK/src/fixpoint_math.cpp b/libFDK/src/fixpoint_math.cpp
+index 9552b0c..4ee28b1 100644
+--- a/libFDK/src/fixpoint_math.cpp
++++ b/libFDK/src/fixpoint_math.cpp
+@@ -597,7 +597,7 @@ FIXP_DBL f2Pow(const FIXP_DBL exp_m, const INT exp_e, INT *result_e) {
+   if (exp_e > 0) {
+     INT exp_bits = DFRACT_BITS - 1 - exp_e;
+     int_part = exp_m >> exp_bits;
+-    frac_part = exp_m - (FIXP_DBL)(int_part << exp_bits);
++    frac_part = exp_m - (FIXP_DBL)((INT64)int_part * ((INT64)1 << exp_bits));
+     frac_part = frac_part << exp_e;
+   } else {
+     int_part = 0;
+-- 
+2.56.0
+
