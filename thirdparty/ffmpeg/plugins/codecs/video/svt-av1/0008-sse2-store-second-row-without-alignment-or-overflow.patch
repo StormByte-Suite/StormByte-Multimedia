@@ -1,0 +1,32 @@
+From 018175827345f459808975d72e484ff4ae81a50a Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:24:01 +0100
+Subject: [PATCH] SSE2: store second short row with unaligned-safe helper
+
+Shift the SIMD register by four bytes and use xx_storel_32 for the second row, matching the first row. Avoid signed overflow when assembling the upper halfword and avoid scalar int32 alignment requirements for byte- and halfword-addressed destinations. Confirmed by UBSan in repeated encoding and interleave tests.
+---
+ Source/Lib/ASM_SSE2/synonyms.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Source/Lib/ASM_SSE2/synonyms.h b/Source/Lib/ASM_SSE2/synonyms.h
+index c830d6b3d..5d6e0432c 100644
+--- a/Source/Lib/ASM_SSE2/synonyms.h
++++ b/Source/Lib/ASM_SSE2/synonyms.h
+@@ -80,12 +80,12 @@ static INLINE __m128i load_u16_4x2_sse2(const uint16_t* const src, const ptrdiff
+ 
+ SIMD_INLINE void store_u8_4x2_sse2(const __m128i src, uint8_t* const dst, const ptrdiff_t stride) {
+     xx_storel_32(dst, src);
+-    *(int32_t*)(dst + stride) = (_mm_extract_epi16(src, 3) << 16) | _mm_extract_epi16(src, 2);
++    xx_storel_32(dst + stride, _mm_srli_si128(src, 4));
+ }
+ 
+ SIMD_INLINE void store_u16_2x2_sse2(const __m128i src, uint16_t* const dst, const ptrdiff_t stride) {
+     xx_storel_32(dst, src);
+-    *(int32_t*)(dst + stride) = (_mm_extract_epi16(src, 3) << 16) | _mm_extract_epi16(src, 2);
++    xx_storel_32(dst + stride, _mm_srli_si128(src, 4));
+ }
+ 
+ SIMD_INLINE void store_s16_4x2_sse2(const __m128i src, int16_t* const dst, const ptrdiff_t stride) {
+-- 
+2.56.0
+

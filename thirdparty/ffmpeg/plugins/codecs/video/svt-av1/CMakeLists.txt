@@ -8,6 +8,7 @@ set(SVTAV1_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0005-sse2-unaligned-four-byte-deblock-stores.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0006-avx2-unaligned-cdef-row-accesses.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0007-avx2-unaligned-four-byte-convolution-and-packing.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0008-sse2-store-second-row-without-alignment-or-overflow.patch"
 )
 
 set(SVTAV1_OPTIONS
