@@ -1,0 +1,197 @@
+From 2bd35b3e10381c54d29b17f83d8f8f5bc46b7f40 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:31:42 +0100
+Subject: [PATCH] AVX2: load joint-convolution rows without scalar alignment
+
+Four-byte source fragments in joint convolution are byte addressed, including horizontal subpixel offsets. Reuse xx_loadl_32 for all matching four-pixel row loads instead of scalar int32_t dereferences. This preserves the four input bytes and zero upper SIMD lanes. UBSan reproduces the four-tap vertical path in three interleave tests.
+---
+ Source/Lib/ASM_AVX2/jnt_convolve_avx2.c | 96 ++++++++++++-------------
+ 1 file changed, 48 insertions(+), 48 deletions(-)
+
+diff --git a/Source/Lib/ASM_AVX2/jnt_convolve_avx2.c b/Source/Lib/ASM_AVX2/jnt_convolve_avx2.c
+index 1fa8f5445..57a724911 100644
+--- a/Source/Lib/ASM_AVX2/jnt_convolve_avx2.c
++++ b/Source/Lib/ASM_AVX2/jnt_convolve_avx2.c
+@@ -92,7 +92,7 @@ static void jnt_convolve_y_2tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)src_ptr);
++                    s_32[0] = xx_loadl_32(src_ptr);
+ 
+                     do {
+                         const __m128i res = y_convolve_2tap_4x2_ssse3(src_ptr, src_stride, coeffs_128, s_32);
+@@ -321,7 +321,7 @@ static void jnt_convolve_y_2tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)src_ptr);
++                    s_32[0] = xx_loadl_32(src_ptr);
+ 
+                     do {
+                         const __m128i res = y_convolve_2tap_4x2_ssse3(src_ptr, src_stride, coeffs_128, s_32);
+@@ -516,7 +516,7 @@ static void jnt_convolve_y_2tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                 assert(w == 4);
+ 
+-                s_32[0] = _mm_cvtsi32_si128(*(int32_t*)src_ptr);
++                s_32[0] = xx_loadl_32(src_ptr);
+ 
+                 do {
+                     const __m128i res = y_convolve_2tap_4x2_ssse3(src_ptr, src_stride, coeffs_128, s_32);
+@@ -720,9 +720,9 @@ void jnt_convolve_y_4tap_avx2(const uint8_t* const src, const int32_t src_stride
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                    s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                    s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
++                    s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                    s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                    s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
+ 
+                     const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                     const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -837,9 +837,9 @@ void jnt_convolve_y_4tap_avx2(const uint8_t* const src, const int32_t src_stride
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                    s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                    s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
++                    s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                    s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                    s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
+ 
+                     const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                     const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -949,9 +949,9 @@ void jnt_convolve_y_4tap_avx2(const uint8_t* const src, const int32_t src_stride
+ 
+                 assert(w == 4);
+ 
+-                s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
++                s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
+ 
+                 const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                 const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -1090,11 +1090,11 @@ static void jnt_convolve_y_6tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                    s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                    s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
+-                    s_32[3] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 3 * src_stride));
+-                    s_32[4] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 4 * src_stride));
++                    s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                    s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                    s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
++                    s_32[3] = xx_loadl_32(src_ptr + 3 * src_stride);
++                    s_32[4] = xx_loadl_32(src_ptr + 4 * src_stride);
+ 
+                     const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                     const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -1287,11 +1287,11 @@ static void jnt_convolve_y_6tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                    s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                    s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
+-                    s_32[3] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 3 * src_stride));
+-                    s_32[4] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 4 * src_stride));
++                    s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                    s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                    s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
++                    s_32[3] = xx_loadl_32(src_ptr + 3 * src_stride);
++                    s_32[4] = xx_loadl_32(src_ptr + 4 * src_stride);
+ 
+                     const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                     const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -1478,11 +1478,11 @@ static void jnt_convolve_y_6tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                 assert(w == 4);
+ 
+-                s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
+-                s_32[3] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 3 * src_stride));
+-                s_32[4] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 4 * src_stride));
++                s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
++                s_32[3] = xx_loadl_32(src_ptr + 3 * src_stride);
++                s_32[4] = xx_loadl_32(src_ptr + 4 * src_stride);
+ 
+                 const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                 const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -1694,13 +1694,13 @@ static void jnt_convolve_y_8tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                    s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                    s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
+-                    s_32[3] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 3 * src_stride));
+-                    s_32[4] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 4 * src_stride));
+-                    s_32[5] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 5 * src_stride));
+-                    s_32[6] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 6 * src_stride));
++                    s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                    s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                    s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
++                    s_32[3] = xx_loadl_32(src_ptr + 3 * src_stride);
++                    s_32[4] = xx_loadl_32(src_ptr + 4 * src_stride);
++                    s_32[5] = xx_loadl_32(src_ptr + 5 * src_stride);
++                    s_32[6] = xx_loadl_32(src_ptr + 6 * src_stride);
+ 
+                     const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                     const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -1927,13 +1927,13 @@ static void jnt_convolve_y_8tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                     assert(w == 4);
+ 
+-                    s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                    s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                    s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
+-                    s_32[3] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 3 * src_stride));
+-                    s_32[4] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 4 * src_stride));
+-                    s_32[5] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 5 * src_stride));
+-                    s_32[6] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 6 * src_stride));
++                    s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                    s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                    s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
++                    s_32[3] = xx_loadl_32(src_ptr + 3 * src_stride);
++                    s_32[4] = xx_loadl_32(src_ptr + 4 * src_stride);
++                    s_32[5] = xx_loadl_32(src_ptr + 5 * src_stride);
++                    s_32[6] = xx_loadl_32(src_ptr + 6 * src_stride);
+ 
+                     const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                     const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+@@ -2154,13 +2154,13 @@ static void jnt_convolve_y_8tap_avx2(const uint8_t* const src, const int32_t src
+ 
+                 assert(w == 4);
+ 
+-                s_32[0] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 0 * src_stride));
+-                s_32[1] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 1 * src_stride));
+-                s_32[2] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 2 * src_stride));
+-                s_32[3] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 3 * src_stride));
+-                s_32[4] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 4 * src_stride));
+-                s_32[5] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 5 * src_stride));
+-                s_32[6] = _mm_cvtsi32_si128(*(int32_t*)(src_ptr + 6 * src_stride));
++                s_32[0] = xx_loadl_32(src_ptr + 0 * src_stride);
++                s_32[1] = xx_loadl_32(src_ptr + 1 * src_stride);
++                s_32[2] = xx_loadl_32(src_ptr + 2 * src_stride);
++                s_32[3] = xx_loadl_32(src_ptr + 3 * src_stride);
++                s_32[4] = xx_loadl_32(src_ptr + 4 * src_stride);
++                s_32[5] = xx_loadl_32(src_ptr + 5 * src_stride);
++                s_32[6] = xx_loadl_32(src_ptr + 6 * src_stride);
+ 
+                 const __m128i src01 = _mm_unpacklo_epi32(s_32[0], s_32[1]);
+                 const __m128i src12 = _mm_unpacklo_epi32(s_32[1], s_32[2]);
+-- 
+2.56.0
+
