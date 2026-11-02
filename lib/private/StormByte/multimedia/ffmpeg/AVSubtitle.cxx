@@ -106,7 +106,7 @@ std::uint32_t FFmpeg::AVSubtitle::DisplayDurationMs() const noexcept {
 	return ms;
 }
 
-StormByte::Safe::String FFmpeg::AVSubtitle::Text() const noexcept {
+StormByte::Safe::String FFmpeg::AVSubtitle::Text() const {
 	StormByte::Safe::String out;
 	if (!m_sub)
 		return out;

@@ -137,14 +137,14 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Demuxer format name (`iformat->name`).
 			 * @return Owned name (may be comma-separated ids), or empty.
 			 */
-			Safe::String FormatName() const noexcept;
+			Safe::String FormatName() const;
 
 			/**
 			 * @brief Looks up a container metadata tag.
 			 * @param key Dictionary key (e.g. `"title"`).
 			 * @return Owned value, or empty if missing; independent of the context lifetime.
 			 */
-			Safe::Optional<Safe::String> Tag(const char* key) const noexcept;
+			Safe::Optional<Safe::String> Tag(const char* key) const;
 
 			/**
 			 * @brief Container duration in nanoseconds.
@@ -190,7 +190,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param params Codec parameters.
 			 * @return Base-heap filter owner, or empty if unnecessary or creation failed.
 			 */
-			Safe::Unique<AVBSF> Mp4ToAnnexB(int codec_id, int stream_id, const AVCodecParameters& params) const noexcept;
+			Safe::Unique<AVBSF> Mp4ToAnnexB(int codec_id, int stream_id, const AVCodecParameters& params) const;
 
 			/**
 			 * @brief Whether an input context is open.
@@ -228,7 +228,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 *
 			 * Defined in this TU so ConsumerIO stays incomplete at the call site.
 			 */
-			static AVFormatContext WrapBorrowed(::AVFormatContext* ctx) noexcept;
+			static AVFormatContext WrapBorrowed(::AVFormatContext* ctx);
 
 			/**
 			 * @brief Wrap custom AVIO with optional HDR side-data collection.
@@ -236,12 +236,12 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param harvest true to decode for missing side data; false to preserve the current position and buffered packets for timestamp scans or restored metadata.
 			 * @return Owned format wrapper.
 			 */
-			static AVFormatContext WrapBorrowed(::AVFormatContext* ctx, bool harvest) noexcept;
+			static AVFormatContext WrapBorrowed(::AVFormatContext* ctx, bool harvest);
 
 			/**
 			 * @brief Copies HDR side data from early decoded frames onto codecpar.
 			 */
-			void HarvestSideData() noexcept;
+			void HarvestSideData();
 
 			/**
 			 * @brief Seeks the origin to timestamp zero without closing the context.

@@ -53,7 +53,7 @@
 #include <tessdata.h>
 
 namespace StormByte::Multimedia::OCR {
-	ExpectedTessData TessData(std::string_view language) noexcept {
+	ExpectedTessData TessData(std::string_view language) {
 		const auto data = tessdata::blob(language);
 		if (data.empty())
 			return Unexpected<TessDataNotFoundException>(std::string(language));

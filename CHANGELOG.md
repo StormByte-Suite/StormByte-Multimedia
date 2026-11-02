@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- FFmpeg/OCR owning results and metadata helpers propagate allocation failures instead of terminating. Encoder contexts, filter graphs, HDR metadata buffers, decoder look parameters and OCR text retain RAII ownership during failed construction.
 - Analytics/filter report snapshots and their owning map constructors propagate allocation failures consistently through the virtual interface instead of terminating inside a `noexcept` override.
 - Allocating pipeline stage/filter constructors and attachment helpers propagate allocation failures instead of terminating; partial filter construction releases its private state, and worker/tap startup signals failure without allocating.
 - The live audio track cycling regression uses a fixed long synthetic stream instead of exhausting a two-second clip during instrumented decoding; all six track changes retain the same epoch, timestamp and inter-frame timing checks.

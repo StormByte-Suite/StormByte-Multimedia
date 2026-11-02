@@ -45,7 +45,7 @@ namespace {
 		return selected;
 	}
 
-	std::string AvError(int error) noexcept {
+	std::string AvError(int error) {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(error, message, sizeof(message));
 		return message;
@@ -57,7 +57,7 @@ namespace {
 	}
 }
 
-bool Input::Align(::AVCodecContext* context, const AVCodec* codec, std::string& error) noexcept {
+bool Input::Align(::AVCodecContext* context, const AVCodec* codec, std::string& error) {
 	if (!context || !codec || context->width <= 0 || context->height <= 0) {
 		error = "invalid encoder dimensions";
 		return false;
@@ -159,7 +159,7 @@ const AVHWFramesContext* Input::Frames(const ::AVFrame* source) noexcept {
 }
 
 bool Input::Configure(::AVCodecContext* context, const AVCodec* codec,
-	const ::AVFrame* source, std::string& error) noexcept {
+	const ::AVFrame* source, std::string& error) {
 	error.clear();
 	if (!context || !codec || context->hw_frames_ctx || context->hw_device_ctx) {
 		error = "invalid or already configured encoder input context";

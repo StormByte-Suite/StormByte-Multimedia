@@ -130,7 +130,7 @@ namespace StormByte::Multimedia::FFmpeg {
 		return m_raw ? static_cast<int>(m_raw->order) : 0;
 	}
 
-	StormByte::Safe::String AVChannelLayout::Describe() const noexcept {
+	StormByte::Safe::String AVChannelLayout::Describe() const {
 		if (!m_raw || m_raw->nb_channels <= 0)
 			return {};
 		char small[64];

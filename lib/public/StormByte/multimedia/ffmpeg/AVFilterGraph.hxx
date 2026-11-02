@@ -152,7 +152,7 @@ namespace StormByte {
 					 * before @c buffersink/@c abuffersink.
 					 * @return Open graph, or empty on failure.
 					 */
-					static AVFilterGraph Open(const AVFrame& src, std::string_view graph) noexcept;
+					static AVFilterGraph Open(const AVFrame& src, std::string_view graph);
 
 					/**
 					 * @brief Builds a graph with an explicit nominal video cadence.
@@ -161,7 +161,7 @@ namespace StormByte {
 					 * @param frameRate Nominal source cadence; invalid means derive from frame duration.
 					 * @return Configured graph, or empty on failure.
 					 */
-					static AVFilterGraph Open(const AVFrame& src, std::string_view graph, AVRational frameRate) noexcept;
+					static AVFilterGraph Open(const AVFrame& src, std::string_view graph, AVRational frameRate);
 
 					/**
 					 * @brief Rebuilds if geometry, format, layout or chain changed.
@@ -169,7 +169,7 @@ namespace StormByte {
 					 * @param graph Filterchain.
 					 * @return false if the graph could not be (re)opened.
 					 */
-					bool Ensure(const AVFrame& src, std::string_view graph) noexcept;
+					bool Ensure(const AVFrame& src, std::string_view graph);
 
 					/**
 					 * @brief Rebuilds for a changed frame description, chain or nominal cadence.
@@ -178,7 +178,7 @@ namespace StormByte {
 					 * @param frameRate Nominal source cadence.
 					 * @return False if the graph could not be configured.
 					 */
-					bool Ensure(const AVFrame& src, std::string_view graph, AVRational frameRate) noexcept;
+					bool Ensure(const AVFrame& src, std::string_view graph, AVRational frameRate);
 
 					/**
 					 * @brief Nominal video cadence negotiated at the sink.

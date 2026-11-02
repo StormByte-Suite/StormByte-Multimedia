@@ -84,7 +84,7 @@ namespace {
 	constexpr int ChromaDenominator = 50000;
 	constexpr int LumaDenominator = 10000;
 
-	AVCodecID ImageCodecFromHint(std::string_view hint) noexcept {
+	AVCodecID ImageCodecFromHint(std::string_view hint) {
 		std::string ext;
 		const auto slash = hint.find_last_of("/\\");
 		const auto base = slash == std::string_view::npos ? hint : hint.substr(slash + 1);
@@ -445,7 +445,7 @@ FFmpeg::AVFrame::VideoLayout FFmpeg::AVFrame::Layout() const noexcept {
 }
 
 FFmpeg::AVFrame FFmpeg::AVFrame::DecodeImage(const std::uint8_t* data, StormByte::Size size,
-	std::string_view hint) noexcept {
+	std::string_view hint) {
 	AVFrame out;
 	out.Reset(nullptr);
 	if (!data || size == 0 || size > static_cast<std::size_t>(INT_MAX))

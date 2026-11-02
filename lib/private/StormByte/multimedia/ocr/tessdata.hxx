@@ -60,5 +60,5 @@
 namespace StormByte::Multimedia::OCR {
 	using ExpectedTessData = Expected<std::span<const std::uint8_t>, TessDataNotFoundException>;
 
-	ExpectedTessData TessData(std::string_view language) noexcept;
+	ExpectedTessData TessData(std::string_view language);
 }

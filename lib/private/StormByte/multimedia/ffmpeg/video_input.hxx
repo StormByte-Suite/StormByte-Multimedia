@@ -24,7 +24,7 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	/**
 	 * @brief Rounds dimensions up only for verified concrete encoder restrictions.
 	 */
-	bool Align(::AVCodecContext* context, const AVCodec* codec, std::string& error) noexcept;
+	bool Align(::AVCodecContext* context, const AVCodec* codec, std::string& error);
 	/**
 	 * @brief Centers unchanged samples on a chroma-aligned black canvas, or shares compatible input.
 	 */
@@ -48,7 +48,7 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	 * @param error Explicit failure reason.
 	 * @return Whether input configuration succeeded.
 	 */
-	bool Configure(::AVCodecContext* context, const AVCodec* codec, const ::AVFrame* source, std::string& error) noexcept;
+	bool Configure(::AVCodecContext* context, const AVCodec* codec, const ::AVFrame* source, std::string& error);
 
 	/**
 	 * @brief Downloads hardware input to a proven software representation, including properties.
@@ -195,7 +195,7 @@ namespace StormByte::Multimedia::FFmpeg::VideoInput {
 	 * @param error Failure description, or nullptr on success.
 	 * @return Negotiated format, or AV_PIX_FMT_NONE on failure.
 	 */
-	inline int Negotiate(const AVCodec* codec, int source, std::string& error) noexcept {
+	inline int Negotiate(const AVCodec* codec, int source, std::string& error) {
 		error.clear();
 		const void* configurations = nullptr;
 		int count = 0;

@@ -145,12 +145,12 @@ FFmpeg::AVFilterGraph::operator bool() const noexcept {
 }
 
 FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
-	std::string_view graph) noexcept {
+	std::string_view graph) {
 	return Open(src, graph, FFmpeg::AVRational{0, 1});
 }
 
 FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
-	std::string_view graph, FFmpeg::AVRational frameRate) noexcept {
+	std::string_view graph, FFmpeg::AVRational frameRate) {
 	if (!src || graph.empty())
 		return AVFilterGraph(nullptr);
 	if (src.Hardware())
@@ -166,9 +166,11 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	if (!buffersrc || !buffersink)
 		return AVFilterGraph(nullptr);
 
+	const std::string chain(graph);
 	::AVFilterGraph* raw = avfilter_graph_alloc();
 	if (!raw)
 		return AVFilterGraph(nullptr);
+	AVFilterGraph wrap(raw);
 
 	char args[512];
 	const auto timeBase = src.TimeBase().Valid() ? src.TimeBase()
@@ -198,7 +200,7 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	} else {
 		const char* fmt = av_get_sample_fmt_name(static_cast<AVSampleFormat>(src.Format()));
 		if (!fmt) {
-			avfilter_graph_free(&raw);
+			wrap.Free();
 			return AVFilterGraph(nullptr);
 		}
 		char layout[128] = {};
@@ -222,7 +224,7 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	auto fail = [&]() {
 		avfilter_inout_free(&inputs);
 		avfilter_inout_free(&outputs);
-		avfilter_graph_free(&raw);
+		wrap.Free();
 		return AVFilterGraph(nullptr);
 	};
 
@@ -246,7 +248,6 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	inputs->pad_idx = 0;
 	inputs->next = nullptr;
 
-	const std::string chain(graph);
 	if (avfilter_graph_parse_ptr(raw, chain.c_str(), &inputs, &outputs, nullptr) < 0)
 		return fail();
 	if (avfilter_graph_config(raw, nullptr) < 0)
@@ -255,7 +256,6 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	avfilter_inout_free(&inputs);
 	avfilter_inout_free(&outputs);
 
-	AVFilterGraph wrap(raw);
 	wrap.m_src = in;
 	wrap.m_sink = out;
 	wrap.m_w = video ? src.Width() : 0;
@@ -271,11 +271,11 @@ FFmpeg::AVFilterGraph FFmpeg::AVFilterGraph::Open(const AVFrame& src,
 	return wrap;
 }
 
-bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) noexcept {
+bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph) {
 	return Ensure(src, graph, FFmpeg::AVRational{0, 1});
 }
 
-bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph, FFmpeg::AVRational frameRate) noexcept {
+bool FFmpeg::AVFilterGraph::Ensure(const AVFrame& src, std::string_view graph, FFmpeg::AVRational frameRate) {
 	const bool video = src.Width() > 0 && src.Height() > 0;
 	const auto timeBase = src.TimeBase().Valid() ? src.TimeBase()
 		: FFmpeg::AVRational{1, video ? 1 : src.SampleRate()};

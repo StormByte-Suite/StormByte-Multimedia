@@ -69,7 +69,7 @@ FFmpeg::AVBSF::~AVBSF() noexcept {
 	Free();
 }
 
-FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(std::string_view name, const AVCodecParameters& params, FFmpeg::AVRational time_base) noexcept {
+FFmpeg::ExpectedAVBSF FFmpeg::AVBSF::Create(std::string_view name, const AVCodecParameters& params, FFmpeg::AVRational time_base) {
 	if (name.empty() || !params.Get())
 		return Unexpected<BSFError>("Invalid BSF name or parameters");
 

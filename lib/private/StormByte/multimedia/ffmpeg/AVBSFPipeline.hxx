@@ -107,7 +107,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Appends a filter to the chain.
 			 * @param bsf Filter to take ownership of.
 			 */
-			void Add(AVBSF&& bsf) noexcept;
+			void Add(AVBSF&& bsf);
 
 			/**
 			 * @brief Runs @p pkt through all filters in order.

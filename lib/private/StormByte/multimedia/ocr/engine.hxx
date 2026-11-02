@@ -86,13 +86,13 @@ namespace StormByte::Multimedia::OCR {
 			/**
 			 * @brief Constructs an engine with no language pin (falls back to `eng`).
 			 */
-			Engine() noexcept;
+			Engine();
 
 			/**
 			 * @brief Constructs an engine pinned to @p language.
 			 * @param language Tesseract / tessdata key (`spa`, `eng`, …). Empty uses `eng`.
 			 */
-			explicit Engine(StormByte::Safe::String language) noexcept;
+			explicit Engine(StormByte::Safe::String language);
 
 			/**
 			 * @brief Move constructor.
@@ -167,7 +167,7 @@ namespace StormByte::Multimedia::OCR {
 				std::span<const std::uint8_t> gray,
 				int width,
 				int height,
-				int stride) noexcept;
+				int stride);
 
 			/**
 			 * @}

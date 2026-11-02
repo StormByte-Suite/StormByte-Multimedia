@@ -86,5 +86,5 @@ namespace StormByte::Multimedia::OCR {
 	 * @param sub Decoded AVSubtitle (PGS / DVD).
 	 * @return Image, or empty when there is no bitmap rect.
 	 */
-	StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept;
+	StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub);
 }

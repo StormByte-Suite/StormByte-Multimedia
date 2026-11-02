@@ -75,7 +75,7 @@ AVBSFPipeline& AVBSFPipeline::operator=(AVBSFPipeline&& other) noexcept {
 	return *this;
 }
 
-void AVBSFPipeline::Add(AVBSF&& bsf) noexcept {
+void AVBSFPipeline::Add(AVBSF&& bsf) {
 	auto filter = StormByte::Safe::Shared<AVBSF>::MakePointer<AVBSF>(std::move(bsf));
 	m_filters.push_back(std::move(filter));
 }

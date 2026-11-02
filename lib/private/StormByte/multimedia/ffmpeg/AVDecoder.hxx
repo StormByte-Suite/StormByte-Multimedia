@@ -111,11 +111,11 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @return Decoder or DecoderError.
 			 */
 			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
-				const AVFormatContext& fmt, int stream_index, int thread_count = 0) noexcept;
+				const AVFormatContext& fmt, int stream_index, int thread_count = 0);
 
 			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
 				const AVFormatContext& fmt, int stream_index, int thread_count,
-				DecodeAcceleration acceleration) noexcept;
+				DecodeAcceleration acceleration);
 
 			/**
 			 * @brief Opens a decoder from codec and parameters. No BSF.
@@ -130,10 +130,10 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * four-argument Open when the parent format is known.
 			 */
 			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
-				int stream_index, int thread_count = 0) noexcept;
+				int stream_index, int thread_count = 0);
 
 			static ExpectedAVDecoder Open(AVCodec* codec, const AVCodecParameters& params,
-				int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept;
+				int stream_index, int thread_count, DecodeAcceleration acceleration);
 
 			/**
 			 * @brief Whether FFmpeg opened this decoder with a hardware device.
@@ -227,7 +227,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @return Decoder or DecoderError. BSF is empty.
 			 */
 			static ExpectedAVDecoder OpenRaw(AVCodec* codec, const AVCodecParameters& params,
-				int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept;
+				int stream_index, int thread_count, DecodeAcceleration acceleration);
 
 			/**
 			 * @brief Frees the codec context.

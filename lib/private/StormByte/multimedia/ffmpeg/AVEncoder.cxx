@@ -63,6 +63,8 @@
 #include <cstdio>
 #include <cstring>
 #include <mutex>
+#include <memory>
+#include <new>
 #include <set>
 #include <string>
 #include <string_view>
@@ -92,6 +94,7 @@ namespace {
 		const void* context = nullptr;
 		const void* priv = nullptr;
 		std::vector<std::string> lines;
+		bool allocationFailed = false;
 	};
 
 	thread_local OpenCapture* t_capture = nullptr;
@@ -107,7 +110,9 @@ namespace {
 			try {
 				t_capture->lines.emplace_back(line);
 			}
-			catch (...) {}
+			catch (const std::bad_alloc&) {
+				t_capture->allocationFailed = true;
+			}
 		}
 		av_log_default_callback(avcl, level, fmt, vl);
 	}
@@ -142,10 +147,15 @@ namespace {
 			if (!option || option->type != AV_OPT_TYPE_DICT)
 				continue;
 			AVDictionary* parsed = nullptr;
-			if (av_dict_parse_string(&parsed, value.data(), "=", ":", 0) >= 0) {
-				const AVDictionaryEntry* entry = nullptr;
-				while ((entry = av_dict_iterate(parsed, entry)))
-					keys.emplace(entry->key);
+			try {
+				if (av_dict_parse_string(&parsed, value.data(), "=", ":", 0) >= 0) {
+					const AVDictionaryEntry* entry = nullptr;
+					while ((entry = av_dict_iterate(parsed, entry)))
+						keys.emplace(entry->key);
+				}
+			} catch (...) {
+				av_dict_free(&parsed);
+				throw;
 			}
 			av_dict_free(&parsed);
 		}
@@ -246,7 +256,7 @@ namespace {
 		"[Events]\n"
 		"Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n";
 
-	std::string AvError(int err) noexcept {
+	std::string AvError(int err) {
 		char buf[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(err, buf, sizeof(buf));
 		return buf;
@@ -286,7 +296,7 @@ namespace {
 		}
 	}
 
-	void PushSeiLength(std::vector<std::uint8_t>& out, std::size_t value) noexcept {
+	void PushSeiLength(std::vector<std::uint8_t>& out, std::size_t value) {
 		while (value >= 255) {
 			out.push_back(0xFF);
 			value -= 255;
@@ -295,7 +305,7 @@ namespace {
 		out.push_back(static_cast<std::uint8_t>(value));
 	}
 
-	void AppendRbsp(std::vector<std::uint8_t>& out, const std::uint8_t* src, std::size_t size) noexcept {
+	void AppendRbsp(std::vector<std::uint8_t>& out, const std::uint8_t* src, std::size_t size) {
 		int zeros = 0;
 		for (std::size_t i = 0; i < size; ++i) {
 			if (zeros >= 2 && src[i] <= 0x03) {
@@ -308,7 +318,7 @@ namespace {
 		}
 	}
 
-	std::vector<std::uint8_t> MakeHevcPrefixSeiT35(const std::vector<std::uint8_t>& t35) noexcept {
+	std::vector<std::uint8_t> MakeHevcPrefixSeiT35(const std::vector<std::uint8_t>& t35) {
 		std::vector<std::uint8_t> payload;
 		payload.push_back(4);
 		PushSeiLength(payload, t35.size());
@@ -330,7 +340,7 @@ namespace {
 		return size >= 4 && data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 1;
 	}
 
-	bool PrependHevcSei(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) noexcept {
+	bool PrependHevcSei(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) {
 		const auto* src = pkt.Data();
 		const int srcSize = pkt.Size();
 		if (!src || srcSize <= 0 || t35.empty())
@@ -365,7 +375,7 @@ namespace {
 		return true;
 	}
 
-	void PushLeb128(std::vector<std::uint8_t>& out, std::size_t value) noexcept {
+	void PushLeb128(std::vector<std::uint8_t>& out, std::size_t value) {
 		do {
 			std::uint8_t byte = static_cast<std::uint8_t>(value & 0x7F);
 			value >>= 7;
@@ -390,7 +400,7 @@ namespace {
 
 	// Inserts an ITU-T T.35 metadata OBU after the temporal delimiter and any
 	// sequence header, which is where AV1 requires metadata to precede frames.
-	bool InsertAv1Metadata(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) noexcept {
+	bool InsertAv1Metadata(FFmpeg::AVPacket& pkt, const std::vector<std::uint8_t>& t35) {
 		const auto* src = pkt.Data();
 		const int srcSize = pkt.Size();
 		if (!src || srcSize <= 0 || t35.empty())
@@ -442,7 +452,7 @@ namespace {
 			&& !(ctx->codec && ctx->codec->name && std::string_view{ctx->codec->name} == "libaom-av1");
 	}
 
-	std::vector<std::uint8_t> T35FromFrame(const FFmpeg::AVFrame& frame) noexcept {
+	std::vector<std::uint8_t> T35FromFrame(const FFmpeg::AVFrame& frame) {
 		std::vector<std::uint8_t> out;
 		const AVFrameSideData* sd = frame.SideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
 		if (!sd || !sd->data || sd->size <= 0)
@@ -452,6 +462,7 @@ namespace {
 		size_t size = 0;
 		if (av_dynamic_hdr_plus_to_t35(plus, &data, &size) < 0 || !data || size == 0)
 			return out;
+		const std::unique_ptr<std::uint8_t, decltype(&av_free)> owned{data, &av_free};
 		out = {
 			0xB5,
 			0x00, 0x3C,
@@ -459,15 +470,17 @@ namespace {
 			0x04
 		};
 		out.insert(out.end(), data, data + size);
-		av_free(data);
 		return out;
 	}
 }
 
-FFmpeg::AVEncoder::AVEncoder(::AVCodecContext* ctx) noexcept
+FFmpeg::AVEncoder::AVEncoder(::AVCodecContext* ctx)
 :AVPointer(ctx) {}
 
-FFmpeg::AVEncoder::AVEncoder(AVEncoder&& other) noexcept = default;
+FFmpeg::AVEncoder::AVEncoder(AVEncoder&& other)
+: AVEncoder(nullptr) {
+	*this = std::move(other);
+}
 
 FFmpeg::AVEncoder& FFmpeg::AVEncoder::operator=(AVEncoder&& other) noexcept = default;
 
@@ -477,18 +490,20 @@ FFmpeg::AVEncoder::~AVEncoder() noexcept {
 
 FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base,
-	const AVFrame* firstFrame, int thread_count) noexcept {
+	const AVFrame* firstFrame, int thread_count) {
 	const std::string codec_name_copy{codec_name};
 	const AVCodec* codec = avcodec_find_encoder_by_name(codec_name_copy.c_str());
 	if (!codec || !params.Get())
 		return Unexpected<FFmpeg::EncoderError>("Invalid codec or parameters");
 
+	AVEncoder enc(nullptr);
 	AVCodecContext* ctx = avcodec_alloc_context3(codec);
+	enc.m_ptr = ctx;
 	if (!ctx)
 		return Unexpected<FFmpeg::EncoderError>("Out of memory allocating codec context");
 
 	if (avcodec_parameters_to_context(ctx, params.Get()) < 0) {
-		avcodec_free_context(&ctx);
+		enc.Free();
 		return Unexpected<FFmpeg::EncoderError>("Failed to copy codec parameters to encoder context");
 	}
 	const int inputWidth = ctx->width;
@@ -502,7 +517,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 			const auto* metadata = firstFrame->SideData(type);
 			if (metadata && av_frame_side_data_clone(&ctx->decoded_side_data,
 				&ctx->nb_decoded_side_data, metadata, 0) < 0) {
-				avcodec_free_context(&ctx);
+				enc.Free();
 				return Unexpected<FFmpeg::EncoderError>("failed to preserve first-frame HDR10 metadata");
 			}
 		}
@@ -514,7 +529,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	if (needsDovi) {
 		const auto* metadata = firstFrame ? firstFrame->SideData(AV_FRAME_DATA_DOVI_METADATA) : nullptr;
 		if (!ValidDoviMetadata(metadata)) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("native Dolby Vision encoding requires parsed frame metadata");
 		}
 		const bool layered = HasEnhancementLayer(reinterpret_cast<const AVDOVIMetadata*>(metadata->data));
@@ -525,11 +540,11 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 			: av_frame_side_data_clone(&ctx->decoded_side_data, &ctx->nb_decoded_side_data, metadata, 0) >= 0;
 		av_buffer_unref(&single);
 		if (!kept) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("failed to preserve parsed Dolby Vision encoder metadata");
 		}
 		if (!ctx->priv_data || !av_opt_find(ctx->priv_data, "dolbyvision", nullptr, 0, 0)) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("encoder '{}' does not support native Dolby Vision", codec_name);
 		}
 	}
@@ -553,7 +568,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		const auto n = std::strlen(header);
 		ctx->subtitle_header = static_cast<std::uint8_t*>(av_malloc(n + 1));
 		if (!ctx->subtitle_header) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("Out of memory allocating subtitle header");
 		}
 
@@ -565,24 +580,24 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		if (key.empty())
 			continue;
 		if (av_opt_set(ctx, key.data(), value.empty() ? "" : value.data(), AV_OPT_SEARCH_CHILDREN) < 0) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("failed to set encoder option '{}'", static_cast<std::string_view>(key));
 		}
 	}
 
 	if (needsDovi && av_opt_set(ctx, "dolbyvision", "1", AV_OPT_SEARCH_CHILDREN) < 0) {
-		avcodec_free_context(&ctx);
+		enc.Free();
 		return Unexpected<FFmpeg::EncoderError>("failed to enable native Dolby Vision encoding");
 	}
 
 	if (ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
 		std::string error;
 		if (!VideoInput::Configure(ctx, codec, firstFrame ? firstFrame->Get() : nullptr, error)) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("encoder '{}' input: {}", codec_name, error);
 		}
 		if (!VideoInput::Align(ctx, codec, error)) {
-			avcodec_free_context(&ctx);
+			enc.Free();
 			return Unexpected<FFmpeg::EncoderError>("encoder '{}' geometry: {}", codec_name, error);
 		}
 	}
@@ -592,7 +607,7 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		packed = PackedKeys(ctx, options);
 	}
 	catch (...) {
-		avcodec_free_context(&ctx);
+		enc.Free();
 		return Unexpected<FFmpeg::EncoderError>("Out of memory reading encoder parameters");
 	}
 	OpenCapture capture{ctx, ctx->priv_data, {}};
@@ -602,15 +617,17 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	}
 	const int opened = avcodec_open2(ctx, codec, nullptr);
 	t_capture = nullptr;
+	if (capture.allocationFailed)
+		throw std::bad_alloc{};
 	if (opened < 0) {
 		const std::string why = AvError(opened);
-		avcodec_free_context(&ctx);
+		enc.Free();
 		return Unexpected<FFmpeg::EncoderError>("Failed to open encoder: " + why);
 	}
 	for (const auto& line : capture.lines) {
 		for (const auto& key : packed) {
 			if (MentionsKey(line, key)) {
-				avcodec_free_context(&ctx);
+				enc.Free();
 				std::string text = line;
 				while (!text.empty() && (text.back() == '\n' || text.back() == '\r'))
 					text.pop_back();
@@ -635,14 +652,13 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 		ctx->framerate.den = ctx->time_base.num;
 	}
 
-	AVEncoder enc(ctx);
 	enc.m_inputWidth = inputWidth;
 	enc.m_inputHeight = inputHeight;
 	enc.m_stream_index = stream_index;
 	return enc;
 }
 
-FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, const FFmpeg::AVFormatContext& fmt, int stream_index) noexcept {
+FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, const FFmpeg::AVFormatContext& fmt, int stream_index) {
 	auto opened = Open(codec_name, params, stream_index, {}, FFmpeg::AVRational{0, 1});
 	if (!opened.has_value())
 		return opened;
@@ -695,12 +711,12 @@ bool FFmpeg::AVEncoder::RestoreLook(AVFrame& frame) const noexcept {
 	return VideoInput::Crop(frame.Get(), m_inputWidth, m_inputHeight);
 }
 
-FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) noexcept {
+FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame) {
 	return SendFrame(frame, nullptr, 0);
 }
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error,
-	std::size_t errorSize) noexcept {
+	std::size_t errorSize) {
 	m_operation_error = 0;
 	if (error && errorSize > 0)
 		error[0] = '\0';
@@ -810,7 +826,7 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::EncodeSubtitle(AVSubtitle& sub, AVPac
 	return OperationResult::Success;
 }
 
-FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) noexcept {
+FFmpeg::OperationResult FFmpeg::AVEncoder::ReceivePacket(AVPacket& pkt) {
 	m_operation_error = 0;
 	AVPacket tmp;
 	int ret = avcodec_receive_packet(m_ptr, tmp.Get());

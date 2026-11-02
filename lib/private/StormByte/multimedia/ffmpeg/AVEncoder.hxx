@@ -89,7 +89,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Move constructor.
 			 * @param other Source encoder.
 			 */
-			AVEncoder(AVEncoder&& other) noexcept;
+			AVEncoder(AVEncoder&& other);
 
 			/**
 			 * @brief Destructor.
@@ -117,7 +117,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param stream_index Stream index.
 			 * @return Encoder or EncoderError.
 			 */
-			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, const AVFormatContext& fmt, int stream_index) noexcept;
+			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, const AVFormatContext& fmt, int stream_index);
 
 			/**
 			 * @brief Opens an encoder without a muxer (no BSF).
@@ -131,7 +131,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 */
 			static ExpectedAVEncoder Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 				const Safe::Map<Safe::String, Safe::String>& options, AVRational time_base,
-				const AVFrame* firstFrame = nullptr, int thread_count = 0) noexcept;
+				const AVFrame* firstFrame = nullptr, int thread_count = 0);
 
 			/**
 			 * @brief Prepares exact CPU input or transfers through validated hardware frame contexts.
@@ -158,7 +158,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * Captures HDR10+ (`AV_FRAME_DATA_DYNAMIC_HDR_PLUS`) and keeps the
 			 * ITU-T T.35 payload keyed by PTS so ReceivePacket can emit SEI.
 			 */
-			FFmpeg::OperationResult SendFrame(AVFrame& frame) noexcept;
+			FFmpeg::OperationResult SendFrame(AVFrame& frame);
 
 			/**
 			 * @brief Sends a frame and optionally writes a failure diagnostic.
@@ -167,7 +167,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param errorSize Size of @p error in bytes.
 			 * @return Operation result.
 			 */
-			FFmpeg::OperationResult SendFrame(AVFrame& frame, char* error, std::size_t errorSize) noexcept;
+			FFmpeg::OperationResult SendFrame(AVFrame& frame, char* error, std::size_t errorSize);
 
 			/**
 			 * @brief Encodes one text subtitle (`avcodec_encode_subtitle`).
@@ -184,7 +184,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 *
 			 * For HEVC, prepends a prefix SEI NAL with the matching HDR10+ T.35.
 			 */
-			FFmpeg::OperationResult ReceivePacket(AVPacket& pkt) noexcept;
+			FFmpeg::OperationResult ReceivePacket(AVPacket& pkt);
 
 			/**
 			 * @brief FFmpeg error from the last failed encoder operation, or zero.
@@ -298,7 +298,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Adopts an opened codec context.
 			 * @param ctx Opened codec context.
 			 */
-			explicit AVEncoder(AVCodecContext* ctx) noexcept;
+			explicit AVEncoder(AVCodecContext* ctx);
 
 			/**
 			 * @brief Frees the codec context.

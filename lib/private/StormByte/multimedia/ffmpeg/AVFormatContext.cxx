@@ -162,11 +162,11 @@ FFmpeg::AVFormatContext::AVFormatContext(::AVFormatContext* ctx, Safe::Unique<Co
 	bool avioBorrowed) noexcept
 : AVPointer(ctx), m_io(std::move(io)), m_avioBorrowed(avioBorrowed) {}
 
-FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext* ctx) noexcept {
+FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext* ctx) {
 	return WrapBorrowed(ctx, true);
 }
 
-FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext* ctx, bool harvest) noexcept {
+FFmpeg::AVFormatContext FFmpeg::AVFormatContext::WrapBorrowed(::AVFormatContext* ctx, bool harvest) {
 	AVFormatContext out(ctx, nullptr, true);
 	if (harvest)
 		out.HarvestSideData();
@@ -256,9 +256,10 @@ FFmpeg::ExpectedAVFormatContext FFmpeg::AVFormatContext::Open(Consumer consumer)
 
 	int ret = avformat_open_input(&fmt_ctx, nullptr, nullptr, nullptr);
 	if (ret < 0) {
-		av_free(fmt_ctx->pb->buffer);
-		avio_context_free(&fmt_ctx->pb);
-		avformat_free_context(fmt_ctx);
+		av_freep(&avio->buffer);
+		avio_context_free(&avio);
+		if (fmt_ctx)
+			avformat_free_context(fmt_ctx);
 		return Unexpected<DecoderError>("Could not open buffer: {}", ErrorToString(ret));
 	}
 
@@ -285,7 +286,7 @@ FFmpeg::ExpectedAVFormatContext FFmpeg::AVFormatContext::Open(Consumer consumer)
 	return ctx;
 }
 
-void FFmpeg::AVFormatContext::HarvestSideData() noexcept {
+void FFmpeg::AVFormatContext::HarvestSideData() {
 	if (!m_ptr)
 		return;
 
@@ -350,13 +351,13 @@ void FFmpeg::AVFormatContext::HarvestSideData() noexcept {
 	}
 }
 
-StormByte::Safe::String FFmpeg::AVFormatContext::FormatName() const noexcept {
+StormByte::Safe::String FFmpeg::AVFormatContext::FormatName() const {
 	if (!m_ptr || !m_ptr->iformat)
 		return {};
 	return StormByte::Safe::String(m_ptr->iformat->name);
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> FFmpeg::AVFormatContext::Tag(const char* key) const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> FFmpeg::AVFormatContext::Tag(const char* key) const {
 	if (!m_ptr || !m_ptr->metadata || !key)
 		return {};
 	const AVDictionaryEntry* entry = av_dict_get(m_ptr->metadata, key, nullptr, 0);
@@ -462,7 +463,7 @@ FFmpeg::Streams FFmpeg::AVFormatContext::Streams() const noexcept {
 	return out;
 }
 
-StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const noexcept {
+StormByte::Safe::Unique<FFmpeg::AVBSF> FFmpeg::AVFormatContext::Mp4ToAnnexB(int codec_id, int stream_index, const AVCodecParameters& params) const {
 	if (!m_ptr || !m_ptr->iformat || !m_ptr->iformat->name)
 		return {};
 

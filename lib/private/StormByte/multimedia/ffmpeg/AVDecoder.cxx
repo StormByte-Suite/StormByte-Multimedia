@@ -74,7 +74,7 @@ FFmpeg::AVDecoder::~AVDecoder() noexcept {
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCodecParameters& params,
-	int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
+	int stream_index, int thread_count, DecodeAcceleration acceleration) {
 	if (!codec || !params.Get())
 		return Unexpected<DecoderError>("cannot open decoder: codec or codec parameters are missing");
 
@@ -130,22 +130,22 @@ FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::OpenRaw(AVCodec* codec, const AVCod
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
-	const AVFormatContext&, int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
+	const AVFormatContext&, int stream_index, int thread_count, DecodeAcceleration acceleration) {
 	return OpenRaw(codec, params, stream_index, thread_count, acceleration);
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
-	const AVFormatContext& fmt, int stream_index, int thread_count) noexcept {
+	const AVFormatContext& fmt, int stream_index, int thread_count) {
 	return Open(codec, params, fmt, stream_index, thread_count, DecodeAcceleration::Software);
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
-	int stream_index, int thread_count, DecodeAcceleration acceleration) noexcept {
+	int stream_index, int thread_count, DecodeAcceleration acceleration) {
 	return OpenRaw(codec, params, stream_index, thread_count, acceleration);
 }
 
 FFmpeg::ExpectedAVDecoder FFmpeg::AVDecoder::Open(AVCodec* codec, const AVCodecParameters& params,
-	int stream_index, int thread_count) noexcept {
+	int stream_index, int thread_count) {
 	return Open(codec, params, stream_index, thread_count, DecodeAcceleration::Software);
 }
 

@@ -55,6 +55,7 @@
 #include <tesseract/baseapi.h>
 
 #include <utility>
+#include <memory>
 #include <vector>
 #include <algorithm>
 #include <limits>
@@ -134,7 +135,7 @@ namespace StormByte::Multimedia::OCR {
 			 * A non-empty pin must load that exact tessdata. There is no silent
 			 * fallback to another language when the requested model is missing.
 			 */
-			bool Open(std::string_view language) noexcept {
+			bool Open(std::string_view language) {
 				const StormByte::Safe::String key = language.empty()
 					? StormByte::Safe::String{FallbackLanguage}
 					: StormByte::Safe::String{language};
@@ -184,10 +185,10 @@ namespace StormByte::Multimedia::OCR {
 			bool m_open = false;			///< true after a successful Init.
 	};
 
-	Engine::Engine() noexcept
+	Engine::Engine()
 	: m_model(StormByte::Safe::MakeUnique<Model>()) {}
 
-	Engine::Engine(StormByte::Safe::String language) noexcept
+	Engine::Engine(StormByte::Safe::String language)
 	: m_model(StormByte::Safe::MakeUnique<Model>()), m_language(std::move(language)) {}
 
 	Engine::Engine(Engine&&) noexcept = default;
@@ -210,7 +211,7 @@ namespace StormByte::Multimedia::OCR {
 		std::span<const std::uint8_t> gray,
 		int width,
 		int height,
-		int stride) noexcept {
+		int stride) {
 		if (!m_model)
 			return Unexpected<OCRException>("OCR engine is not available");
 		constexpr int border = 10;
@@ -244,11 +245,10 @@ namespace StormByte::Multimedia::OCR {
 			return Unexpected<OCRException>("Could not allocate OCR image margins");
 		}
 		m_model->m_api.SetImage(pixels.data(), paddedWidth, paddedHeight, 1, paddedWidth);
-		char* raw = m_model->m_api.GetUTF8Text();
+		std::unique_ptr<char[]> raw{m_model->m_api.GetUTF8Text()};
 		if (!raw)
 			return Unexpected<OCRException>("tesseract returned no text");
-		StormByte::Safe::String text(raw);
-		delete[] raw;
+		StormByte::Safe::String text(raw.get());
 		while (!text.empty() && (text.back() == '\n' || text.back() == '\r' || text.back() == ' '))
 			text.pop_back();
 		return text;

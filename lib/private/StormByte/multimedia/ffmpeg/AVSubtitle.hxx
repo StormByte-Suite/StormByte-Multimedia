@@ -124,7 +124,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @brief Concatenated text / ASS from rects.
 			 * @return UTF-8 text, or empty.
 			 */
-			Safe::String Text() const noexcept;
+			Safe::String Text() const;
 
 			/**
 			 * @brief Builds one text or ASS rectangle for encoding.
@@ -160,7 +160,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			friend class AVDecoder;
 			friend class AVEncoder;
 			friend StormByte::Safe::Optional<StormByte::Multimedia::OCR::GrayBitmap>
-				StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub) noexcept;
+				StormByte::Multimedia::OCR::GrayFromSubtitle(const AVSubtitle& sub);
 	};
 }
 

@@ -397,7 +397,7 @@ namespace StormByte {
 					 * @p data must remain valid for the duration of the call.
 					 */
 					static AVFrame DecodeImage(const std::uint8_t* data, StormByte::Size size,
-						std::string_view hint = {}) noexcept;
+						std::string_view hint = {});
 
 					/**
 					 * @brief Presentation timestamp in stream ticks.

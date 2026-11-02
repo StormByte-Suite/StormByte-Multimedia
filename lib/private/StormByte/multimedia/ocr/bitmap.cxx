@@ -80,7 +80,7 @@ namespace StormByte::Multimedia::OCR {
 		return static_cast<std::uint8_t>(255u - y);
 	}
 
-	StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) noexcept {
+	StormByte::Safe::Optional<GrayBitmap> GrayFromSubtitle(const FFmpeg::AVSubtitle& sub) {
 		const auto* raw = sub.Get();
 		if (!raw)
 			return {};

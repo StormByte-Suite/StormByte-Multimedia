@@ -105,7 +105,7 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param time_base Input time base.
 			 * @return AVBSF or BSFError.
 			 */
-			static ExpectedAVBSF Create(std::string_view name, const AVCodecParameters& params, AVRational time_base) noexcept;
+			static ExpectedAVBSF Create(std::string_view name, const AVCodecParameters& params, AVRational time_base);
 
 			/**
 			 * @brief Sends a packet into the filter.

@@ -187,7 +187,7 @@ namespace StormByte {
 					 * @brief FFmpeg layout name (`av_channel_layout_describe`).
 					 * @return Name such as @c "stereo", or empty if there is no layout.
 					 */
-					Safe::String Describe() const noexcept;
+					Safe::String Describe() const;
 
 					/**
 					 * @brief `av_channel_layout_compare` == 0.
