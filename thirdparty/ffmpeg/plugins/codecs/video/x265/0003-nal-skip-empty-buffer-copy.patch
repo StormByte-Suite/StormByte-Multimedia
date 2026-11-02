@@ -1,0 +1,35 @@
+From 9b10e4cce06657683f5ddd5f753cf12aa520ff82 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] encoder: skip copying an empty NAL buffer during first
+ allocation
+
+The initial NALList buffer is NULL and its occupancy is zero. serialize()
+passes that pointer to memcpy when growing the buffer for the first
+NAL. A null source violates memcpy's contract even when the size is zero.
+
+Copy existing data only when the occupancy is nonzero. Buffer allocation,
+NAL pointer fixups and serialization remain unchanged.
+
+Reproduced with UBSan in existing HEVC encoder tests.
+---
+ source/encoder/nal.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/source/encoder/nal.cpp b/source/encoder/nal.cpp
+index fe9bb9086..c2620065f 100644
+--- a/source/encoder/nal.cpp
++++ b/source/encoder/nal.cpp
+@@ -72,7 +72,8 @@ void NALList::serialize(NalUnitType nalUnitType, const Bitstream& bs, int layerI
+         uint8_t *temp = X265_MALLOC(uint8_t, nextSize);
+         if (temp)
+         {
+-            memcpy(temp, m_buffer, m_occupancy);
++            if (m_occupancy)
++                memcpy(temp, m_buffer, m_occupancy);
+ 
+             /* fixup existing payload pointers */
+             for (uint32_t i = 0; i < m_numNal; i++)
+-- 
+2.56.0
+
