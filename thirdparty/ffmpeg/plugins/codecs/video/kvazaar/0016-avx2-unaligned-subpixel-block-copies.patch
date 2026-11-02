@@ -1,0 +1,241 @@
+From 7ddd47dcb138bbf8e8e3655f20532494f63a148b Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:43:01 +0100
+Subject: [PATCH] avx2: copy subpixel block fragments without scalar alignment
+
+Half- and quarter-pixel block preparation copies eight-byte pixel
+fragments at one-byte offsets through int64_t and uint64_t pointers. Use
+exact-width memcpy through the existing unsigned chunk temporaries. Keep
+the backwards traversal for overlapping in-place row shifts, and retain
+unsigned arithmetic when inserting the leading sample. Reproduced in
+kvz_filter_hpel_blocks_hor_ver_luma_avx2 by the unaligned-video test
+with UBSan; the quarter-pixel preparation uses the same byte-offset
+copies.
+---
+ src/strategies/avx2/ipol-avx2.c | 91 ++++++++++++++++++++-------------
+ 1 file changed, 56 insertions(+), 35 deletions(-)
+
+diff --git a/src/strategies/avx2/ipol-avx2.c b/src/strategies/avx2/ipol-avx2.c
+index b77be39c..65fbaef8 100644
+--- a/src/strategies/avx2/ipol-avx2.c
++++ b/src/strategies/avx2/ipol-avx2.c
+@@ -714,8 +714,13 @@ static void kvz_filter_hpel_blocks_hor_ver_luma_avx2(const encoder_control_t * e
+   // Copy from the right filtered block and filter the extra column
+   for (y = 0; y < height; ++y) {
+     x = 0;
+-    *(uint64_t*)&out_l[y * dst_stride + x] = *(uint64_t*)&out_r[y * dst_stride + x] << 8;
+-    for (x = 8; x < width; x += 8) *(int64_t*)&out_l[y * dst_stride + x] = *(int64_t*)&out_r[y * dst_stride + x - 1];
++    uint64_t row;
++    memcpy(&row, &out_r[y * dst_stride + x], sizeof(row));
++    row <<= 8;
++    memcpy(&out_l[y * dst_stride + x], &row, sizeof(row));
++    for (x = 8; x < width; x += 8) {
++      memcpy(&out_l[y * dst_stride + x], &out_r[y * dst_stride + x - 1], sizeof(row));
++    }
+     x = 0;
+     int16_t sample = 64 * col_pos2[y + 1 + KVZ_LUMA_FILTER_OFFSET] >> shift2;
+     sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+@@ -732,7 +737,7 @@ static void kvz_filter_hpel_blocks_hor_ver_luma_avx2(const encoder_control_t * e
+   // Then filter the last row from horizontal intermediate buffer.
+   for (y = 0; y < height - 1; ++y) {
+     for (x = 0; x + 7 < width; x += 8) {
+-      *(int64_t*)&out_b[(y + 0) * dst_stride + x] = *(int64_t*)&out_t[(y + 1) * dst_stride + x];
++      memcpy(&out_b[(y + 0) * dst_stride + x], &out_t[(y + 1) * dst_stride + x], sizeof(int64_t));
+     }
+   }
+ 
+@@ -912,17 +917,19 @@ static void kvz_filter_qpel_blocks_hor_ver_luma_avx2(const encoder_control_t * e
+   if (!off_x_fir_l) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_l[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_l[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_l[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_l[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_l, &col_pos_l[y + sample_off_y]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_l[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_l[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_l[y * dst_stride + x] = chunk;
++      memcpy(&out_l[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ 
+@@ -935,17 +942,19 @@ static void kvz_filter_qpel_blocks_hor_ver_luma_avx2(const encoder_control_t * e
+   if (!off_x_fir_r) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_r[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_r[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_r[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_r[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_r, &col_pos_r[y + sample_off_y]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_r[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_r[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_r[y * dst_stride + x] = chunk;
++      memcpy(&out_r[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ 
+@@ -961,17 +970,19 @@ static void kvz_filter_qpel_blocks_hor_ver_luma_avx2(const encoder_control_t * e
+   if (!sample_off_x) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_t[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_t[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_t[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_t[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_t, &col_pos_hor[y + off_y_fir_t]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_t[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_t[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_t[y * dst_stride + x] = chunk;
++      memcpy(&out_t[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ 
+@@ -985,17 +996,19 @@ static void kvz_filter_qpel_blocks_hor_ver_luma_avx2(const encoder_control_t * e
+   if (!sample_off_x) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_b[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_b[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_b[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_b[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_b, &col_pos_hor[y + off_y_fir_b]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_b[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_b[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_b[y * dst_stride + x] = chunk;
++      memcpy(&out_b[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ }
+@@ -1056,17 +1069,19 @@ static void kvz_filter_qpel_blocks_diag_luma_avx2(const encoder_control_t * enco
+   if (!off_x_fir_l) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_tl[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_tl[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_tl[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_tl[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_t, &col_pos_l[y + off_y_fir_t]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_tl[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_tl[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_tl[y * dst_stride + x] = chunk;
++      memcpy(&out_tl[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ 
+@@ -1080,17 +1095,19 @@ static void kvz_filter_qpel_blocks_diag_luma_avx2(const encoder_control_t * enco
+   if (!off_x_fir_r) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_tr[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_tr[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_tr[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_tr[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_t, &col_pos_r[y + off_y_fir_t]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_tr[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_tr[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_tr[y * dst_stride + x] = chunk;
++      memcpy(&out_tr[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ 
+@@ -1103,17 +1120,19 @@ static void kvz_filter_qpel_blocks_diag_luma_avx2(const encoder_control_t * enco
+   if (!off_x_fir_l) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_bl[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_bl[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_bl[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_bl[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_b, &col_pos_l[y + off_y_fir_b]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_bl[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_bl[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_bl[y * dst_stride + x] = chunk;
++      memcpy(&out_bl[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ 
+@@ -1126,17 +1145,19 @@ static void kvz_filter_qpel_blocks_diag_luma_avx2(const encoder_control_t * enco
+   if (!off_x_fir_r) {
+     for (y = 0; y < height; ++y) {
+       for (x = width - 8; x >= 8; x -= 8) {
+-        uint64_t chunk = *(uint64_t*)&out_br[y * dst_stride + x - 1];
+-        *(uint64_t*)&out_br[y * dst_stride + x] = chunk;
++        uint64_t chunk;
++        memcpy(&chunk, &out_br[y * dst_stride + x - 1], sizeof(chunk));
++        memcpy(&out_br[y * dst_stride + x], &chunk, sizeof(chunk));
+       }
+ 
+       x = 0;
+       int16_t sample = kvz_eight_tap_filter_hor_16bit_avx2(ver_fir_b, &col_pos_r[y + off_y_fir_b]) >> shift2;
+       sample = kvz_fast_clip_16bit_to_pixel((sample + wp_offset1) >> wp_shift1);
+       uint64_t first = sample;
+-      uint64_t rest = *(uint64_t*)&out_br[y * dst_stride + x];
++      uint64_t rest;
++      memcpy(&rest, &out_br[y * dst_stride + x], sizeof(rest));
+       uint64_t chunk = (rest << 8) | first;
+-      *(uint64_t*)&out_br[y * dst_stride + x] = chunk;
++      memcpy(&out_br[y * dst_stride + x], &chunk, sizeof(chunk));
+     }
+   }
+ }
+-- 
+2.56.0
+
