@@ -62,10 +62,12 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <initializer_list>
+#include <memory>
 #include <mutex>
 #include <sstream>
 #include <thread>
@@ -1201,7 +1203,16 @@ int test_live_audio_selection() {
  * @return Test status.
  */
 int test_live_audio_tracks() {
+	#ifdef _WIN32
+	char* environment = nullptr;
+	std::size_t environment_size = 0;
+	const auto result = _dupenv_s(&environment, &environment_size, "STORMBYTE_MM_LIVE_INPUT");
+	const std::unique_ptr<char, decltype(&std::free)> owned_input(environment, &std::free);
+	TEST_REQUIRE(result == 0);
+	const char* input = owned_input.get();
+	#else
 	const char* input = std::getenv("STORMBYTE_MM_LIVE_INPUT");
+	#endif
 	auto display = Safe::MakeShared<FakeDisplay>();
 	display->m_live_audio = true;
 	display->m_capture_deferred = false;

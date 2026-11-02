@@ -21,6 +21,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Fixed
+
+- The optional live-audio test input uses `_dupenv_s` with scoped CRT cleanup on Windows, avoiding the deprecated `getenv` warning without suppressing diagnostics or changing the default fixture.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/2.0.0...HEAD
 
 ## [2.0.0] - 2026-11-02
