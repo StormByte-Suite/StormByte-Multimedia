@@ -1,0 +1,48 @@
+From fa0369760d3d38e439a39c70a5b944c623c0b8cf Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:24:01 +0100
+Subject: [PATCH] frame: release owned Dolby Vision RPU on reuse and
+ destruction
+
+Each input RPU is copied into its Frame. Release a previous copy before accepting new frame metadata, including frames without an RPU, and release the final copy when destroying the frame. LSan identifies the copy in Encoder::encode as a per-frame leak.
+---
+ source/common/frame.cpp    | 3 +++
+ source/encoder/encoder.cpp | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/source/common/frame.cpp b/source/common/frame.cpp
+index ac54c3427..e9f28406a 100644
+--- a/source/common/frame.cpp
++++ b/source/common/frame.cpp
+@@ -261,6 +261,9 @@ void Frame::reinit(const SPS& sps)
+ 
+ void Frame::destroy()
+ {
++    delete[] m_rpu.payload;
++    m_rpu.payload = NULL;
++    m_rpu.payloadSize = 0;
+     if (m_encData)
+     {
+         m_encData->destroy();
+diff --git a/source/encoder/encoder.cpp b/source/encoder/encoder.cpp
+index b20a0b12a..3f5f4fcd6 100644
+--- a/source/encoder/encoder.cpp
++++ b/source/encoder/encoder.cpp
+@@ -1769,6 +1769,9 @@ int Encoder::encode(const x265_picture* pic_in, x265_picture* pic_out)
+         copyUserSEIMessages(inFrame[0], inputPic[0]);
+ 
+         /*Copy Dolby Vision RPU from inputPic to frame*/
++        delete[] inFrame[0]->m_rpu.payload;
++        inFrame[0]->m_rpu.payload = NULL;
++        inFrame[0]->m_rpu.payloadSize = 0;
+         if (inputPic[0]->rpu.payloadSize)
+         {
+             inFrame[0]->m_rpu.payloadSize = inputPic[0]->rpu.payloadSize;
+@@ -6518,4 +6521,3 @@ fail:
+     }
+     return false;
+ }
+-
+-- 
+2.56.0
+

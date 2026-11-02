@@ -94,6 +94,7 @@ set(X265_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0007-ratecontrol-skip-disabled-amortization-division.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0008-quant-guard-final-coefficient-group-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0009-motion-decode-diamond-directions-without-overflow.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0010-frame-release-owned-dolby-vision-rpu.patch"
 )
 set(X265_12_OPTSTR "SOURCE=source;NOINSTALL;IPO=off;GIT={RESET;PATCH={${X265_PATCHES}};TITLE=x265 compatibility}")
 set(X265_10_OPTSTR "SOURCE=source;NOINSTALL;IPO=off")
