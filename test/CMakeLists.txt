@@ -35,6 +35,7 @@ if(ENABLE_TEST)
 	target_link_libraries(MultimediaSimplePlayerTests PRIVATE multimedia_test_support)
 	foreach(test_name IN ITEMS
 		test_empty_display
+		test_buffering_policy
 		test_audio_adapter_mapping
 		test_audio_adapter_samples
 		test_audio_native_51

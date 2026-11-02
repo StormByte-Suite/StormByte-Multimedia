@@ -415,7 +415,20 @@ Without usable audio feedback, the player uses its steady clock, including audio
 
 `Drained(epoch)` returns true only when **all** pending audio and GUI deliveries for that generation are finished. This is how the player distinguishes accepted callbacks from completed presentation at EOF.
 
-Bound memory in the adapter too. Audio arrives at most 150 ms ahead plus one decoded block; keep enough device headroom without retaining the whole stream. Keep video and GUI queues short. The library's pending-event limit is 256 units/64 MiB, but in-flight conversion, decoder scratch, codec reference frames and your queues are additional storage.
+Bound memory in the adapter too. By default, audio arrives at most 500 ms ahead plus one decoded block; keep enough device headroom without retaining the whole stream. Keep video and GUI queues short. Playback targets a 750 ms decoded cushion before starting or resuming from a reconstructed seek, without advancing the media clock during that wait. It starts earlier at EOF or when queue limits prevent further filling. Pending events are bounded to 256 units/128 MiB during playback; individual units and paused previews retain the 64 MiB limit. Storage is allocated on demand, not reserved upfront. In-flight conversion, decoder scratch, codec reference frames and adapter queues are additional storage. This absorbs temporary scheduling stalls, not sustained decoding slower than real time.
+
+These are defaults, not fixed limits for every application. Pass a `PreviewBuffering`
+as the third constructor argument (`SimplePlayer(display, logger, buffering)`) to
+choose `Preload`, `ReadAhead` and `AudioAhead` as `std::chrono::milliseconds`, plus
+`MaxBytes` and `MaxEvents`. The policy is copied and immutable for that instance;
+the existing two-argument constructor uses the defaults. Zero preload disables
+the initial wait. Caps and read-ahead must be positive, and preload/audio advance
+must be nonnegative and no greater than read-ahead, otherwise construction throws.
+A decoded unit larger than the configured byte budget fails playback explicitly
+instead of waiting forever. Custom audio advance must fit the application's
+Display/device queues. Paused previews retain the smaller of the configured byte
+budget and 64 MiB. Embedded fonts, codec reference buffers and conversion scratch
+are separate from the pending-payload budget.
 
 ### Reader ownership and transfer to Transcoder
 

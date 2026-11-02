@@ -621,6 +621,72 @@ int test_empty_display() {
 	return 0;
 }
 
+int test_buffering_policy() {
+	using StormByte::Multimedia::PreviewBuffering;
+	const PreviewBuffering defaults;
+	TEST_REQUIRE(defaults.Preload == std::chrono::milliseconds(750));
+	TEST_REQUIRE(defaults.ReadAhead == std::chrono::milliseconds(2000));
+	TEST_REQUIRE(defaults.AudioAhead == std::chrono::milliseconds(500));
+	TEST_REQUIRE(defaults.MaxBytes == 128u * 1024 * 1024);
+	TEST_REQUIRE(defaults.MaxEvents == 256);
+	for (int invalid = 0; invalid < 7; ++invalid) {
+		auto policy = defaults;
+		switch (invalid) {
+			case 0: policy.MaxBytes = 0; break;
+			case 1: policy.MaxEvents = 0; break;
+			case 2: policy.ReadAhead = std::chrono::milliseconds(0); break;
+			case 3: policy.Preload = std::chrono::milliseconds(-1); break;
+			case 4: policy.AudioAhead = std::chrono::milliseconds(-1); break;
+			case 5: policy.Preload = policy.ReadAhead + std::chrono::milliseconds(1); break;
+			case 6: policy.AudioAhead = policy.ReadAhead + std::chrono::milliseconds(1); break;
+		}
+		bool rejected = false;
+		try { SimplePlayer player(Safe::MakeShared<FakeDisplay>(), {}, policy); }
+		catch (const StormByte::Exception&) { rejected = true; }
+		TEST_REQUIRE(rejected);
+	}
+	auto policy = defaults;
+	policy.MaxEvents = 1;
+	policy.MaxBytes = 1024 * 1024;
+	auto display = Safe::MakeShared<FakeDisplay>();
+	SimplePlayer player(display, {}, policy);
+	// Mutating the caller's copy must not change the running policy.
+	policy.MaxBytes = 0;
+	TEST_REQUIRE(player.Open(Fixture("audio/noise_stereo.wav")));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	TEST_REQUIRE(player.Seek(1.95));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	TEST_REQUIRE(player.Close());
+	policy = defaults;
+	policy.MaxBytes = 1;
+	SimplePlayer undersized(Safe::MakeShared<FakeDisplay>(), {}, policy);
+	TEST_REQUIRE(undersized.Open(Fixture("audio/noise_stereo.wav")));
+	TEST_REQUIRE(undersized.Play());
+	TEST_REQUIRE(Wait([&] { return undersized.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(std::string_view(undersized.Error()).find("configured queue byte limit") != std::string_view::npos);
+	TEST_REQUIRE(undersized.Close());
+	policy = defaults;
+	policy.Preload = std::chrono::milliseconds(0);
+	policy.ReadAhead = std::chrono::milliseconds(250);
+	policy.AudioAhead = std::chrono::milliseconds(50);
+	auto low_latency = Safe::MakeShared<FakeDisplay>();
+	SimplePlayer immediate(low_latency, {}, policy);
+	TEST_REQUIRE(immediate.Open(Fixture("audio/noise_stereo.wav")));
+	TEST_REQUIRE(immediate.Play());
+	TEST_REQUIRE(Wait([&] { return immediate.State() == PlaybackState::Ended || immediate.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(immediate.State() == PlaybackState::Ended);
+	TEST_REQUIRE(immediate.Close());
+	{
+		std::lock_guard lock(low_latency->m_mutex);
+		TEST_REQUIRE(low_latency->m_max_audio_ahead < .10);
+	}
+	return 0;
+}
+
 // -------------------
 // Playback
 // -------------------
@@ -964,7 +1030,7 @@ int test_audio_pacing_pause_drain() {
 	{
 		std::lock_guard lock(display->m_mutex);
 		TEST_REQUIRE(display->m_audios > 20);
-		TEST_REQUIRE(display->m_max_audio_ahead < 0.20);
+		TEST_REQUIRE(display->m_max_audio_ahead < 0.55);
 		display->m_hold_drain = false;
 	}
 	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended; }));
@@ -1129,7 +1195,12 @@ int test_live_audio_selection() {
 	auto display = Safe::MakeShared<FakeDisplay>();
 	display->m_live_audio = true;
 	auto stats = Safe::MakeShared<ReaderStats>();
-	SimplePlayer player(display);
+	// Keep the short fixture's demux cursor away from EOF during live switches.
+	StormByte::Multimedia::PreviewBuffering buffering;
+	buffering.Preload = std::chrono::milliseconds(100);
+	buffering.ReadAhead = std::chrono::milliseconds(250);
+	buffering.AudioAhead = std::chrono::milliseconds(100);
+	SimplePlayer player(display, {}, buffering);
 	TEST_REQUIRE(player.Open(Safe::MakeUnique<TokenReader>(Fixture("video/anime_like.mkv"), stats)));
 	TEST_REQUIRE(player.SelectTrack(MediaType::Subtitle, -1));
 	const int audio = player.SelectedTrack(MediaType::Audio);
@@ -1650,7 +1721,7 @@ int test_packed_avi_seek() {
 			for (std::size_t i = 0; i < channels.size(); ++i)
 				TEST_REQUIRE(std::string_view(display->m_first_audio->m_channels[i]) == channels[i]);
 			TEST_REQUIRE(display->m_max_audio_gap < 0.00001);
-			TEST_REQUIRE(display->m_max_audio_ahead < 0.20);
+			TEST_REQUIRE(display->m_max_audio_ahead < 0.55);
 		}
 	}
 	TEST_REQUIRE(player.Close());
@@ -1962,6 +2033,7 @@ int main(int argc, char** argv) {
 	// -------------------
 	static constexpr std::array tests{
 		TestEntry{"test_empty_display", test_empty_display},
+		TestEntry{"test_buffering_policy", test_buffering_policy},
 		// -------------------
 		// Playback
 		// -------------------

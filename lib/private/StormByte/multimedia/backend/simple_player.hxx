@@ -78,7 +78,8 @@ namespace StormByte {
 					 * @param display Nonempty sink.
 					 * @param logger Optional logger.
 					 */
-					SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger);
+					SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger,
+						PreviewBuffering buffering);
 
 					SimplePlayer(const SimplePlayer&) = delete;
 

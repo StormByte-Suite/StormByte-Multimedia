@@ -435,7 +435,8 @@ namespace StormByte {
 		 * Callbacks run on worker or control-caller threads and must be bounded
 		 * and thread-safe. Do not reenter any player method. Throw on device or
 		 * delivery failure. Maintain bounded audio and GUI queues; audio starts
-		 * at most 150 ms ahead, plus the duration of the submitted block.
+		 * at most the player's PreviewBuffering::AudioAhead (500 ms by default)
+		 * ahead, plus the duration of the submitted block.
 		 * Invalidate synchronously publishes a new epoch, flushes audio and cues,
 		 * and clears the old image even when video remains active. Queued GUI
 		 * deliveries must check that epoch at execution, not merely enqueue time.

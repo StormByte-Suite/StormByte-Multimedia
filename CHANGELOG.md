@@ -21,9 +21,9 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### Fixed
+### TODO
 
-- The optional live-audio test input uses `_dupenv_s` with scoped CRT cleanup on Windows, avoiding the deprecated `getenv` warning without suppressing diagnostics or changing the default fixture.
+- Measure preview buffering defaults with SDR/HDR, high-resolution video, small codec audio blocks and transient CPU contention; tune the current policy or retain it if measurements support it. Include startup/seek latency, peak memory, audio underruns and video continuity.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/2.0.0...HEAD
 
@@ -31,14 +31,17 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Added
 
+- Per-instance `PreviewBuffering` constructor policy configures initial preload, decoded read-ahead, audio delivery advance and hard byte/event limits. Defaults are 750 ms preload, two seconds read-ahead, 500 ms audio advance and 128 MiB/256 pending events, allocated on demand. Invalid policies are rejected; configuration is immutable for the player's lifetime and does not change `Display`'s virtual interface.
 - Independent `DecodeAcceleration::Auto`/`Software` policy for preview and transcode video decoders, configurable per transcode lane with `Track::Acceleration(...)`. Auto selects only FFmpeg-advertised hardware configurations supported by an initialized device (VideoToolbox, D3D11VA/DXVA2, CUDA/NVDEC or VA-API as built), then falls back to software if device creation or decoder opening fails. Hardware-decoded frames are downloaded with frame properties preserved before CPU preview/filter processing; decoder selection remains independent of encoder pins, feature enforcement and remux.
 - Optional `HDRDisplay` preview extension delivers PQ/HLG frames as RGBA16LE with colorimetry and available mastering/content-light metadata; the default `Display` interface remains unchanged.
 - SDR preview now tone-maps PQ/HLG frames through linear light and converts them to BT.709 before producing RGBA8. Neither preview mode claims Dolby Vision rendering.
 
 ### Fixed
 
+- Preview fills a bounded decoded cushion before starting playback or a reconstructed seek, keeping its timeline frozen during preparation. Default playback queues can retain up to 128 MiB/256 events, and audio delivery allows 500 ms of device headroom to absorb temporary CPU scheduling stalls; individual units and paused previews retain their 64 MiB limits. These buffers do not compensate for sustained decoding below real time.
+- The optional live-audio test input uses `_dupenv_s` with scoped CRT cleanup on Windows, avoiding the deprecated `getenv` warning without suppressing diagnostics or changing the default fixture.
 - Skewed-interleave scheduler regressions explicitly use software decoding while retaining their 50 ms audio-underrun, 100 ms A/V-alignment and 500 ms delivery-gap limits. Separate Auto cases retain both fixtures, playback, live audio switching, bounded re-enable silence and epoch checks, and both policies verify consecutive video timestamps without missing frames. Auto includes an intentional 600 ms display stall rather than treating hardware/device delivery latency as a scheduler timing guarantee; macOS CI decoded the repaired fixtures successfully but exceeded the original wall-clock limits. Phase logs and buffered per-picture wall/media timestamps, audio-clock/queue snapshots and reset counters are printed on assertion failure as well as success without logging inside delivery callbacks.
-- Decoded preview read-ahead is bounded per stream rather than globally: a stream may run past the two-second horizon only while another selected audio/video stream still lacks data inside it, so files whose audio or video packets are stored seconds later than the other stream stay in sync instead of drifting about one second (audio stored 3 s late) or presenting video one second late (video stored 3 s late). The existing 256-event/64 MiB queue limits still bound memory, and live audio re-enable latency stays at the horizon plus any storage skew. New skewed-interleave fixtures cover both directions. Their authoring tool now keeps the leading H.264 packets that Matroska demuxing leaves without a decode timestamp, so both fixtures start at their IDR frame and decode without missing references under hardware decoders such as VideoToolbox.
+- Decoded preview read-ahead is bounded per stream rather than globally: a stream may run past the two-second horizon only while another selected audio/video stream still lacks data inside it, so files whose audio or video packets are stored seconds later than the other stream stay in sync instead of drifting about one second (audio stored 3 s late) or presenting video one second late (video stored 3 s late). Queue limits still bound memory, and live audio re-enable latency stays at the horizon plus any storage skew. New skewed-interleave fixtures cover both directions. Their authoring tool now keeps the leading H.264 packets that Matroska demuxing leaves without a decode timestamp, so both fixtures start at their IDR frame and decode without missing references under hardware decoders such as VideoToolbox.
 - Live audio re-enable and track changes no longer leave many seconds of silence: decoded read-ahead is bounded to two seconds of presentation time (subtitles, paused previews and switch stops are exempt), so new audio from the retained demux cursor arrives within that window instead of after up to 256 queued small video frames (over 10 s). Video continuity, epochs and the no-seek live-switch contract are unchanged; the effect is independent of hardware or software decoding.
 - The embedded OCR model-reader test matches the allocating `TessData` exception contract, fixing its compilation with bundled language data.
 - The private scoped-logger declaration exposes its allocating contract consistently with its implementation and guarded stage callers.

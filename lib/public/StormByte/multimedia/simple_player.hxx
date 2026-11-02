@@ -56,6 +56,8 @@
 #include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/type.hxx>
 
+#include <chrono>
+#include <cstddef>
 #include <string_view>
 
 /**
@@ -91,6 +93,22 @@ namespace StormByte {
 	 * @brief Portable multimedia services.
 	 */
 	namespace Multimedia {
+		/**
+		 * @brief Per-player buffering policy, fixed for the engine's lifetime.
+		 *
+		 * Durations are coverage goals, not memory reservations. Byte/event limits
+		 * are hard caps; playback starts with less coverage at EOF or a full queue.
+		 * Individual decoded units and paused previews remain capped at 64 MiB.
+		 * Display adapters must accept AudioAhead plus one decoded audio block.
+		 */
+		struct PreviewBuffering {
+			std::chrono::milliseconds Preload{750};	///< Initial and reconstructed-seek coverage goal.
+			std::chrono::milliseconds ReadAhead{2000};	///< Decoded timeline horizon, except interleave skew.
+			std::chrono::milliseconds AudioAhead{500};	///< Maximum advance of PCM delivery to Display.
+			std::size_t MaxBytes = 128 * 1024 * 1024;	///< Pending decoded payload bytes, allocated on demand.
+			std::size_t MaxEvents = 256;				///< Maximum pending decoded units.
+		};
+
 		/**
 		 * @enum PlaybackState
 		 * @brief Observable preview lifecycle.
@@ -188,6 +206,17 @@ namespace StormByte {
 				 * @throws StormByte::Exception If display is empty.
 				 */
 				explicit SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger = {});
+
+				/**
+				 * @brief Construct with an immutable, per-instance buffering policy.
+				 * @param display Nonempty combined presentation sink.
+				 * @param logger Optional shared logger.
+				 * @param buffering Positive caps and read horizon; nonnegative preload/audio
+				 * advance no greater than ReadAhead. Zero preload disables initial buffering.
+				 * @throws StormByte::Exception If the sink or policy is invalid.
+				 */
+				SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger,
+					PreviewBuffering buffering);
 
 				SimplePlayer(const SimplePlayer&) = delete;
 

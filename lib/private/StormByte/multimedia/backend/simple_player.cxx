@@ -98,13 +98,10 @@ namespace Safe = StormByte::Safe;
 namespace {
 	using PlaybackClock = std::chrono::steady_clock;
 	constexpr std::size_t MaxBytes = 64 * 1024 * 1024;
-	constexpr std::size_t MaxEvents = 256;
-	constexpr double AudioAhead = 0.150;
 	// Live audio replacement resumes at the demux cursor, so bound decoded
 	// read-ahead to keep the bridged silence short. A lane may exceed it only
 	// while another selected lane still lacks data inside it, so serial demux
-	// can reach packets stored late; MaxEvents/MaxBytes still bound storage.
-	constexpr double DecodeAhead = 2.0;
+	// can reach packets stored late; the configured caps still bound storage.
 
 	/**
 	 * @brief Resolve a selectable media kind to its decoder slot.
@@ -332,9 +329,9 @@ class Backend::SimplePlayer::Context {
 		 * @param display Presentation owner.
 		 * @param logger Optional logger.
 		 */
-		Context(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
+		Context(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger, PreviewBuffering buffering):
 			m_display(std::move(display)), m_hdr_display(dynamic_cast<HDRDisplay*>(m_display.get())),
-			m_logger(UseLog(std::move(logger), "SimplePlayer")) {}
+			m_logger(UseLog(std::move(logger), "SimplePlayer")), m_buffering_policy(buffering) {}
 
 		Context(const Context&) = delete;
 
@@ -644,16 +641,23 @@ class Backend::SimplePlayer::Context {
 		bool Enqueue(Event event) {
 			if (event.m_bytes > MaxBytes)
 				throw Exception("decoded preview unit exceeds bounded storage");
+			if (event.m_bytes > m_buffering_policy.MaxBytes)
+				throw Exception("decoded preview unit exceeds configured queue byte limit");
 			std::unique_lock lock(m_mutex);
-			if (m_preview && (m_queue.size() >= MaxEvents || m_bytes + event.m_bytes > MaxBytes))
+			const auto byte_limit = m_preview ? std::min(MaxBytes, m_buffering_policy.MaxBytes) : m_buffering_policy.MaxBytes;
+			if (m_preview && (m_queue.size() >= m_buffering_policy.MaxEvents || event.m_bytes > byte_limit - m_bytes))
 				throw Exception("paused preview exceeds bounded presentation storage");
 			const int lane = event.m_audio ? 1 : event.m_subtitle ? 2 : 0;
 			m_ready.wait(lock, [&] {
 				if (m_cancel || (m_decode_stop && event.m_audio))
 					return true;
-				if (m_queue.size() >= MaxEvents || m_bytes + event.m_bytes > MaxBytes)
+				if (m_queue.size() >= m_buffering_policy.MaxEvents || event.m_bytes > byte_limit - m_bytes) {
+					// Start with the available cushion if queue limits prevent a full prebuffer.
+					m_buffer_ready = true;
+					m_ready.notify_all();
 					return false;
-				const double horizon = m_position + DecodeAhead;
+				}
+				const double horizon = m_position + std::chrono::duration<double>(m_buffering_policy.ReadAhead).count();
 				return m_preview || m_decode_stop || lane == 2 || event.m_start <= horizon
 					|| (m_selected[1 - lane] >= 0 && m_lane_end[1 - lane] < horizon);
 			});
@@ -669,6 +673,10 @@ class Backend::SimplePlayer::Context {
 			const auto at = std::upper_bound(m_queue.begin(), m_queue.end(), event.m_start,
 				[](double start, const Event& queued) { return start < queued.m_start; });
 			m_queue.insert(at, std::move(event));
+			const double preload = std::chrono::duration<double>(m_buffering_policy.Preload).count();
+			if ((m_selected[0] < 0 || m_lane_end[0] >= m_position + preload)
+				&& (m_selected[1] < 0 || m_lane_end[1] >= m_position + preload))
+				m_buffer_ready = true;
 			m_ready.notify_all();
 			return !m_decode_stop;
 		}
@@ -1329,6 +1337,8 @@ class Backend::SimplePlayer::Context {
 		 */
 		double MediaClock() {
 			std::lock_guard lock(m_mutex);
+			if (m_buffering)
+				return m_position;
 			const double wall = m_anchor + std::chrono::duration<double>(PlaybackClock::now() - m_start).count();
 			if (m_audio_switching)
 				return wall;
@@ -1368,6 +1378,16 @@ class Backend::SimplePlayer::Context {
 						m_ready.wait(lock, [&] { return m_cancel || !m_paused || (m_preview && !m_preview_done); });
 						continue;
 					}
+					if (m_buffering) {
+						if (!m_buffer_ready && !m_eof) {
+							delivery.unlock();
+							m_ready.wait(lock, [&] { return m_cancel || m_paused || m_buffer_ready || m_eof; });
+							continue;
+						}
+						m_buffering = false;
+						m_anchor = m_position;
+						m_start = PlaybackClock::now();
+					}
 					if (m_preview && !m_eof) {
 						delivery.unlock();
 						m_ready.wait(lock, [&] { return m_cancel || m_eof; });
@@ -1387,7 +1407,8 @@ class Backend::SimplePlayer::Context {
 							return static_cast<bool>(event.m_video) || static_cast<bool>(event.m_hdr_video)
 								|| (event.m_subtitle && event.m_start <= m_target);
 						return (!event.m_audio || !m_audio_switching)
-							&& event.m_start <= clock + (event.m_audio ? AudioAhead : 0);
+							&& event.m_start <= clock + (event.m_audio
+								? std::chrono::duration<double>(m_buffering_policy.AudioAhead).count() : 0);
 					});
 					if (found != m_queue.end()) {
 						Event event = std::move(*found);
@@ -1456,6 +1477,8 @@ class Backend::SimplePlayer::Context {
 			m_audio_target = m_target;
 			m_lane_end = {m_target, m_target};
 			m_preview = preview;
+			m_buffering = !preview && !m_eof && m_buffering_policy.Preload.count() > 0;
+			m_buffer_ready = false;
 			m_preview_done = false;
 			m_preview_video_ready = false;
 			m_preview_subtitle_ready = false;
@@ -1633,6 +1656,7 @@ class Backend::SimplePlayer::Context {
 		Safe::Shared<Display> m_display;							///< Application presentation owner.
 		HDRDisplay* m_hdr_display = nullptr;						///< Borrowed optional HDR extension.
 		Safe::Shared<Logger::Log> m_logger;							///< Scoped diagnostic owner.
+		const PreviewBuffering m_buffering_policy;					///< Immutable per-instance queue policy.
 		Safe::Unique<Buffer::IO::BufferedLocationReader> m_reader;	///< Exclusive dynamic input owner.
 		std::optional<FileAvio> m_avio;								///< Borrowed-reader custom AVIO owner.
 		AVFormatContext* m_format = nullptr;						///< Private demux context.
@@ -1668,6 +1692,8 @@ class Backend::SimplePlayer::Context {
 		double m_anchor = 0;										///< Monotonic clock media anchor.
 		PlaybackClock::time_point m_start = PlaybackClock::now();	///< Monotonic clock wall anchor.
 		bool m_paused = false;										///< Frozen presentation.
+		bool m_buffering = false;									///< Hold the timeline while filling the initial cushion.
+		bool m_buffer_ready = false;								///< Target coverage reached, or bounded queue is full.
 		bool m_audio_switching = false;								///< Use wall timing while replacing audio.
 		bool m_audio_transition = false;							///< Wait for fresh device timing to catch up.
 		bool m_preview = false;										///< Paused seek decode.
@@ -1683,8 +1709,9 @@ class Backend::SimplePlayer::Context {
 		PreviewColorMode m_color_mode = PreviewColorMode::SDR;		///< Preview signal output policy.
 };
 
-Backend::SimplePlayer::SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
-	m_ctx(Safe::MakeUnique<Context>(std::move(display), std::move(logger))) {}
+Backend::SimplePlayer::SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger,
+	PreviewBuffering buffering):
+	m_ctx(Safe::MakeUnique<Context>(std::move(display), std::move(logger), buffering)) {}
 
 Backend::SimplePlayer::~SimplePlayer() noexcept {
 	try { static_cast<void>(Close()); }
@@ -1896,10 +1923,18 @@ Safe::Unique<Buffer::IO::BufferedLocationReader> Backend::SimplePlayer::ReleaseR
 	}
 }
 
-Multimedia::SimplePlayer::SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger) {
+Multimedia::SimplePlayer::SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger):
+	SimplePlayer(std::move(display), std::move(logger), PreviewBuffering{}) {}
+
+Multimedia::SimplePlayer::SimplePlayer(Safe::Shared<Display> display, Safe::Shared<Logger::Log> logger,
+	PreviewBuffering buffering) {
 	if (!display)
 		throw Exception("SimplePlayer requires a nonempty Display");
-	m_backend = Safe::MakeUnique<Backend::SimplePlayer>(std::move(display), std::move(logger));
+	if (!buffering.MaxBytes || !buffering.MaxEvents || buffering.ReadAhead.count() <= 0
+		|| buffering.Preload.count() < 0 || buffering.AudioAhead.count() < 0
+		|| buffering.Preload > buffering.ReadAhead || buffering.AudioAhead > buffering.ReadAhead)
+		throw Exception("Invalid preview buffering policy: positive caps/read horizon and nonnegative preload/audio advance within the horizon are required");
+	m_backend = Safe::MakeUnique<Backend::SimplePlayer>(std::move(display), std::move(logger), buffering);
 }
 
 Multimedia::SimplePlayer::~SimplePlayer() noexcept = default;
