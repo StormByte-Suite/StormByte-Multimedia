@@ -32,6 +32,9 @@ foreach(test_name IN ITEMS
 )
 	add_test(NAME "file.${test_name}" COMMAND MultimediaDurationTests "${test_name}")
 	set_tests_properties("file.${test_name}" PROPERTIES TIMEOUT 20 LABELS "multimedia;file;pipeline")
+	if(PGO_STAGE STREQUAL "generate" OR ENABLE_ASAN)
+		set_tests_properties("file.${test_name}" PROPERTIES TIMEOUT 480)
+	endif()
 endforeach()
 
 add_ffmpeg_test_executable(MultimediaFileAvioTests RunFileAvioTests)
