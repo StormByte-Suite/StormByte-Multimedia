@@ -1,0 +1,13 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+    Start 277: pipeline.test_libvorbis_encodes_surround_matroska
+1/1 Test #277: pipeline.test_libvorbis_encodes_surround_matroska ...   Passed    0.97 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+audio-codecs    =   0.97 sec*proc (1 test)
+multimedia      =   0.97 sec*proc (1 test)
+pipeline        =   0.97 sec*proc (1 test)
+
+Total Test time (real) =   0.97 sec
+exit_code: 0

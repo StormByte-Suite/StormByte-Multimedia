@@ -1,0 +1,28 @@
+From 0be3365cdd4758693842fa44d055639456ba0bcf Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:10:25 +0100
+Subject: [PATCH] vorbisenc: reuse residue allocations shared by encoding modes
+
+Short and long mapping modes can reference the same residue index. Reinitializing that index replaced its allocation, which vorbis_info_clear could no longer release. Reuse the owned residue object before copying the template; preserve the final configuration and eliminate the 2848-byte six-channel setup leak confirmed by LeakSanitizer.
+---
+ lib/vorbisenc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/vorbisenc.c b/lib/vorbisenc.c
+index cf3806a..a614942 100644
+--- a/lib/vorbisenc.c
++++ b/lib/vorbisenc.c
+@@ -459,8 +459,8 @@ static void vorbis_encode_residue_setup(vorbis_info *vi,
+   codec_setup_info *ci=vi->codec_setup;
+   int i;
+ 
+-  vorbis_info_residue0 *r=ci->residue_param[number]=
+-    _ogg_malloc(sizeof(*r));
++  vorbis_info_residue0 *r=ci->residue_param[number];
++  if(!r)r=ci->residue_param[number]=_ogg_malloc(sizeof(*r));
+ 
+   memcpy(r,res->res,sizeof(*r));
+   if(ci->residues<=number)ci->residues=number+1;
+-- 
+2.56.0
+

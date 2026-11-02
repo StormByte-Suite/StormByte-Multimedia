@@ -1,7 +1,7 @@
 # Audit evidence
 
 This directory preserves the available evidence for the static/sanitizer audit
-and the 48 upstream fixes described in [PR-DRAFTS.md](../PR-DRAFTS.md).
+and the upstream fixes described in [PR-DRAFTS.md](../PR-DRAFTS.md).
 It is a snapshot, **not a passing release gate**.
 
 ## Start here
@@ -27,6 +27,15 @@ It is a snapshot, **not a passing release gate**.
 - Current complete suite: **377 passed, 47 failed, 11 skipped** out of 435,
   exit code **8**, 680.17 seconds.
 - All four standalone reference checks pass with ASan/UBSan.
+- Vorbis follow-up: the minimal residue ownership reproducer, all 144
+  setup/clear configurations and the formerly failing surround encode pass
+  with unsuppressed ASan/UBSan/LSan. See
+  [Vorbis standalone evidence](providers/vorbis/standalone/).
+- All twelve tests affected by proprietary NVIDIA `cuInit` leaks pass with the
+  user-approved [narrow driver exception](reproduce/nvidia-driver.lsan),
+  exit **0**. Leak detection remains enabled for all other allocations;
+  [new results](runs/followup/nvidia-driver.xml) do not replace the original
+  unsuppressed full-suite evidence or waive hardware capability failures.
 - All 48 mail patches apply in filename order from their ten documented bases;
   resulting Git trees exactly match their authoring trees. See
   [mail-patch verification](reproduce/git-am-verification.log).
@@ -78,7 +87,7 @@ subsequent different failures and passing output where available. Their
 `ctest-index.tsv` files point back to the authoritative XML. Some old runs did
 not produce XML; their complete text logs are still preserved under `runs/`.
 
-The [patch index](reproduce/patches.tsv) lists all 48 patches, bases, authoring
+The [patch index](reproduce/patches.tsv) lists all patches, bases, authoring
 trees and provider evidence. Not every fix has a small standalone upstream-only
 reproducer: most were discovered by existing multi-stage Multimedia tests.
 Removal of a diagnostic is not proof of end-to-end success when a later

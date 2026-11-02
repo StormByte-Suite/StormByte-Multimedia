@@ -1,0 +1,2 @@
+Surround setup and clear completed; LSan checks allocation ownership.
+exit_code: 0

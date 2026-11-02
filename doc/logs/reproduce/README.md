@@ -16,6 +16,7 @@ compiler/runtime output and records the real exit status.
 bash doc/logs/reproduce/run-standalone.sh openh264 /path/to/patched/openh264 /tmp/check-openh264
 bash doc/logs/reproduce/run-standalone.sh fdk-aac /path/to/patched/fdk-aac /tmp/check-fdk
 bash doc/logs/reproduce/run-standalone.sh kvazaar /path/to/patched/kvazaar /tmp/check-kvazaar
+bash doc/logs/providers/vorbis/standalone/run-residue-check.sh "$PWD" /tmp/BMDATA/sanitizer-clean-final /tmp/check-vorbis
 ```
 
 The final argument is a new or existing output directory. Set `CXX` to a
@@ -28,6 +29,7 @@ Kvazaar's check requires an x86 CPU with SSE4.1.
 | [FDK multiply](../providers/fdk-aac/standalone/fdk-fixed-multiply-check.cxx) | 100,008 trials, extrema, mixed widths vs widened arithmetic | Generic fixed-point multiply helpers |
 | [FDK scale](../providers/fdk-aac/standalone/fdk-scale-check.cxx) | 10,011 trials, shifts -31..31, normal/alternate saturation widths 8/16/24/32 | Scalar/in-place/saturating scaling; also reproduces original saturation error |
 | [Kvazaar SAD](../providers/kvazaar/standalone/kvazaar-sad-check.cxx) | 15,872 regular/vertical SAD comparisons, offsets 0-15, heights 1-31 | Widths 4/8 and residual-row handling |
+| [Vorbis residue ownership](../providers/vorbis/standalone/vorbis-residue-leak-check.cxx) | Minimal six-channel setup/clear and 144 configurations: six rates, eight channel counts, three qualities | Links the rebuilt instrumented Vorbis/Ogg static libraries |
 
 Captured compiler and run output is under each provider's `standalone/logs/`.
 These checks do not certify every architecture-specific implementation or every
@@ -57,10 +59,10 @@ ctest --test-dir /tmp/BMDATA/sanitizer-clean-final/test -j4 \
 # The fourteen-test provider selection:
 bash doc/logs/reproduce/run-provider-tests.sh /tmp/BMDATA/sanitizer-clean-final /tmp/provider-check
 
-# Complete existing suite; this is expected to FAIL at this snapshot.
-ctest --test-dir /tmp/BMDATA/sanitizer-clean-final/test -j4 \
-  --output-on-failure --output-junit /tmp/full-strict.xml
 ```
+
+Do not rerun the complete suite during this follow-up. Select failed names from
+[failures.tsv](../runs/current/failures.tsv) and directly related regressions.
 
 The CTest root is the build's `test` directory, not the build root. The current
 complete suite is 377 PASS / 47 FAIL / 11 SKIP, exit 8. `detect_leaks=0` is
@@ -110,8 +112,15 @@ intentional; do not replace it with a hard-coded smaller job count.
 - A different later sanitizer failure is not recurrence of an already fixed bug.
 - A warning in clang-tidy output is not automatically a confirmed bug.
 - Twelve failed test processes in the latest full run expose NVIDIA `cuInit`
-  allocation leaks. The distinct Vorbis residue allocation needs its own
-  ownership investigation.
+  allocation leaks. The user authorized excluding only these proprietary driver
+  allocations. For affected tests, add
+  `LSAN_OPTIONS=suppressions=/absolute/path/to/doc/logs/reproduce/nvidia-driver.lsan:print_suppressions=1`.
+  This matches `cuInit` stack frames, not general allocation functions or all of
+  CUDA/FFmpeg. Keep `ASAN_OPTIONS=detect_leaks=1:abort_on_error=1` and retain the
+  suppression statistics. It does not waive NVENC capability/encode failures.
+- The distinct 2,848-byte Vorbis leak was reproduced without FFmpeg or CUDA and
+  fixed by reusing the residue allocation shared by short/long encoding modes.
+  Both the minimal case and all 144 setup/clear configurations pass unsuppressed.
 - Earlier `historical/` runs used recover/suppression experiments. Their options
   do not apply to the current strict ASan/UBSan/LSan results.
 - Preview deadlines, hardware preflight failures, timeouts and unfinished OOM

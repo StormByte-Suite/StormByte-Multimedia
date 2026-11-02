@@ -1,6 +1,6 @@
 # Upstream patch submissions
 
-This collection contains **48 independent bug-fix commits for ten source
+This collection contains **49 independent bug-fix commits for ten source
 repositories**. Each patch is a `git format-patch` email with the configured
 repository author, integrated into Multimedia's bundled build in a separate
 commit with a changelog entry.
@@ -18,7 +18,7 @@ The complete available evidence is now retained in the repository under
 than depending on temporary build/session directories. It includes
 [full-suite results](logs/runs/current/test-results.tsv),
 [remaining failures](logs/runs/current/failures.tsv),
-[all 48 patch mappings](logs/reproduce/patches.tsv),
+[all patch mappings](logs/reproduce/patches.tsv),
 [existing triggering tests](logs/reproduce/ctest-reproducers.tsv),
 [standalone mains and runnable commands](logs/reproduce/README.md),
 original diagnostics, fixture hashes and integrity checks.
@@ -45,7 +45,7 @@ changes touch different files and have also been checked in authoring order.
 | SVT-AV1 | `9292ec8e32bce26f781f277ec8739b53426c4300` | 4 |
 | Kvazaar | `6040962bed5cc68c5ad01234c38c08b8b2822068` | 10 |
 | x265 | `e444744c03978c1fb4e037168967020cf2648427` | 5 |
-| Vorbis | `0657aee69dec8508a0011f47f3b69d7538e9d262` | 3 |
+| Vorbis | `0657aee69dec8508a0011f47f3b69d7538e9d262` | 4 |
 | VMAF | `74f930d17de8c58e7c2ce55e2b897b0030ebd8ef` | 2 |
 | FDK-AAC | `716f4394641d53f0d79c9ddac3fa93b03a49f278` | 16 |
 | x264 | `00852f599572d10798b2dafd2c5286213d0ce795` | 1 |
@@ -93,6 +93,10 @@ sources, not the build port.
 - Isolated Kvazaar SAD check: **15,872 cases**, both input offsets 0-15,
   widths 4/8 and heights 1-31, compared with scalar regular/vertical SAD.
 - All four isolated checks passed with strict ASan/UBSan, exit code **0**.
+- Follow-up Vorbis allocation fix: minimal six-channel setup/clear and **144**
+  rate/channel/quality configurations pass without leak suppressions, exit **0**.
+  The previously failing surround encode test also passes, exit **0**.
+  [Before/after evidence and runnable main](logs/providers/vorbis/standalone/).
 
 ### Provider-focused results
 
@@ -126,7 +130,6 @@ source-level investigation and validation:
 | FDK-AAC | `libAACenc/src/adj_thr.cpp:527` | Negative shift in minimum-SNR adjustment |
 | FDK-AAC | `libAACenc/src/intensity.cpp:403` | Negative shift in intensity-stereo processing |
 | Vorbis | `lib/sharedbook.c:425` | Signed overflow while packing codebook values |
-| Vorbis | `lib/vorbisenc.c:463` | 2,848-byte leak originating in residue setup; ownership still needs tracing |
 | SVT-AV1 | `Source/Lib/ASM_AVX2/convolve_avx2.h:126` | Misaligned SSSE3 two-tap coefficient read |
 | SVT-AV1 | `Source/Lib/ASM_AVX2/convolve_avx2.c:378` | Misaligned convolution fragment read |
 | SVT-AV1 | `Source/Lib/ASM_AVX2/pic_operators_intrin_avx2.c:300` | Misaligned four-byte pixel fragment read |
@@ -139,8 +142,12 @@ be considered separately.
 
 Twelve failing test processes also report allocations in the proprietary
 NVIDIA driver's `cuInit` path, in multiples of 456 bytes. They are distinct from
-the Vorbis residue allocation above. Neither these external leaks nor hardware
-preflight failures have been suppressed to obtain a passing total.
+the now-fixed Vorbis residue allocation. The original strict logs remain
+unchanged. With the user-approved [cuInit-only LSan exception](logs/reproduce/nvidia-driver.lsan),
+all twelve affected tests pass, exit **0**, with leak detection still enabled.
+See [selection](logs/runs/followup/nvidia-driver-selection.txt) and
+[JUnit evidence](logs/runs/followup/nvidia-driver.xml).
+Hardware preflight/encode failures are not covered by this exception.
 
 ## Suggested FFmpeg cover message
 
@@ -240,7 +247,7 @@ Patches:
 
 ## Suggested Vorbis PR
 
-**Title:** Fix final-band interpolation bounds and negative psychoacoustic shifts
+**Title:** Fix psychoacoustic bounds/shifts and shared residue allocation ownership
 
 Pack negative Bark-window bounds and bounded negative floor-post deviations
 using representable multiplication, not signed left shifts. Clamp both
@@ -250,10 +257,17 @@ out-of-bounds operand is still evaluated.
 The bundled sanitizer build succeeds. The existing Opus-to-Vorbis metadata
 test completes with strict UBSan and leak detection.
 
+Short and long mapping modes may initialize the same residue index. Reuse the
+owned residue object rather than overwriting its allocation. A six-channel
+encoder setup/clear reproduced a 2,848-byte leak before this fix. The minimal
+case, all 144 setup/clear configurations and the formerly failing surround
+encode now pass with ASan/UBSan/LSan and no suppression.
+
 Patches:
 - [0003: Negative Bark-window bound](../thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0003-psy-avoid-negative-bark-shift.patch)
 - [0004: Final noise-offset interpolation band](../thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0004-psy-bound-noise-offset-interpolation.patch)
 - [0005: Negative floor-post deviation](../thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0005-floor1-avoid-negative-deviation-shift.patch)
+- [0006: Shared residue allocation ownership](../thirdparty/ffmpeg/plugins/codecs/audio/vorbis/0006-vorbisenc-reuse-shared-mode-residue-allocation.patch)
 
 ## Suggested VMAF PR
 

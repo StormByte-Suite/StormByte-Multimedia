@@ -1,0 +1,4 @@
+Aplicando: vorbisenc: reuse residue allocations shared by encoding modes
+expected_tree: 9eca71111bc0c00e93d9788a9b818c3f93d264b8
+actual_tree: 9eca71111bc0c00e93d9788a9b818c3f93d264b8
+exit_code: 0

@@ -1,0 +1,17 @@
+
+=================================================================
+==2214841==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 2848 byte(s) in 1 object(s) allocated from:
+    #0 0x7fc84a60f3c8 in malloc /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_malloc_linux.cpp:67:3
+    #1 0x55948c627d22 in vorbis_encode_residue_setup /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/vorbisenc.c:463:5
+    #2 0x55948c61d8ce in vorbis_encode_map_n_res_setup /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/vorbisenc.c:612:7
+    #3 0x55948c60d41f in vorbis_encode_setup_init /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/vorbisenc.c:828:3
+    #4 0x55948c621d2b in vorbis_encode_init_vbr /home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/codecs/audio/vorbis/src/lib/vorbisenc.c:941:7
+    #5 0x55948c60794a in main (/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/evidence-checks/vorbis-residue-leak-check+0x19a94a)
+    #6 0x7fc84a03c354 in __libc_start_call_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../sysdeps/nptl/libc_start_call_main.h:59:16
+    #7 0x7fc84a03c47a in __libc_start_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../csu/libc-start.c:372:3
+
+SUMMARY: AddressSanitizer: 2848 byte(s) leaked in 1 allocation(s).
+
+exit_code=134

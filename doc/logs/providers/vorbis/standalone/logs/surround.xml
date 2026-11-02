@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="0"
+	timestamp="2026-11-02T06:12:58"
+	>
+	<testcase name="pipeline.test_libvorbis_encodes_surround_matroska" classname="pipeline.test_libvorbis_encodes_surround_matroska" time="0.965148" status="run">
+		<properties>
+			<property name="cmake_labels" value="audio-codecs;multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_libvorbis_encodes_surround_matroska
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineAudioCodecTests/test_libvorbis_encodes_surround_matroska/pipeline/audio-codecs/vorbis-surround.mka
+[Test] CheckAudioCodec: opening media file for inspection
+[Test] CheckAudioCodec: assert source
+[Test] CheckAudioCodec: assert source.value().Streams().size() == 1
+[Test] CheckAudioCodec: assert sourceAudio
+[Test] CheckAudioCodec: assert sourceAudio.value().Channels() == channels
+[Test] CheckAudioCodec: assert sourceAudio.value().SampleRate() == 48000
+[Test] CheckAudioCodec: assert codec
+[Test] CheckAudioCodec: creating transcoder
+[LowLevel] 02/11/2026 06:12:58 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:12:58 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/audio/noise_51.opus
+[LowLevel] 02/11/2026 06:12:58 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:12...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

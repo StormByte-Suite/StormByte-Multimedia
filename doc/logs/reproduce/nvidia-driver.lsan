@@ -1,0 +1,3 @@
+# User-approved exception: proprietary NVIDIA cuInit allocations only.
+# Do not suppress malloc, FFmpeg, Multimedia, Vorbis, or other open-source code.
+leak:cuInit

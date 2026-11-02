@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="12"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="24"
+	timestamp="2026-11-02T06:13:23"
+	>
+	<testcase name="preview.test_live_audio_backpressure_errors" classname="preview.test_live_audio_backpressure_errors" time="4.24571" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_live_audio_backpressure_errors
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaSimplePlayerTests/test_live_audio_backpressure_errors/live-audio-pressure.wav
+[Test] test_live_audio_backpressure_errors: assert player.Open(TestLocation(path))
+[Test] test_live_audio_backpressure_errors: assert player.Play()
+[Test] test_live_audio_backpressure_errors: assert Wait([&amp;] { std::lock_guard lock(display-&gt;m_mutex); return display-&gt;m_audios &gt; 0; })
+[Test] test_live_audio_backpressure_errors: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_backpressure_errors: assert display-&gt;m_audio_invalidations == 1
+[Test] test_live_audio_backpressure_errors: assert player.Close()
+[Test] test_live_audio_backpressure_errors: assert player.Open(Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7bde5c9e0cc0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bde5c9e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimpleP...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_explicit_errors" classname="preview.test_explicit_errors" time="3.5299" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_explicit_errors
+[Test] test_explicit_errors: assert !player.Open(Fixture("invalid/random_garbage.mkv"))
+StormByte: open preview input: Invalid data found when processing input
+[Test] test_explicit_errors: assert player.State() == PlaybackState::Error
+[Test] test_explicit_errors: assert !player.Error().empty()
+[Test] test_explicit_errors: assert player.Close()
+[Test] test_explicit_errors: assert player.Open(Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7bcc167e0cc0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bcc167e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_explicit_errors: assert player.Play()
+[Test] test_explicit_errors: assert Wait([&amp;] { return player.State() == PlaybackState::Error; })
+[in @ 0x7c3c16811780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c3c16811780] filter context - w: 1920 h: 1080 ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_recovers_rejected_initial_avi_mp3_packet" classname="preview.test_recovers_rejected_initial_avi_mp3_packet" time="6.66053" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_recovers_rejected_initial_avi_mp3_packet
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaSimplePlayerTests/test_recovers_rejected_initial_avi_mp3_packet/rejected-packet.avi
+[Test] CheckRejectedPreviewPacket: assert WriteRejectedAviPacket(input, chunk, rejectedIndex) == 0
+[Test] WriteRejectedAviPacket: assert source
+[Test] WriteRejectedAviPacket: assert marker != std::string_view::npos
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &gt; 19
+[Test] WriteRejectedAviPacket: assert replaced
+[Test] WriteRejectedAviPacket: assert destination.good()
+[Test] CheckRejectedPreviewPacket: assert player.Open(TestLocation(input))
+[mp3float @ 0x7cc4abde6e80] Header missing
+[mp3float @ 0x7cc4abde6e80] Header missing
+[CUDA @ 0x7bd4abde00c0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bd4abde0180] Failed to initialise VAAPI connection: -1 (unknown libva error).
+[Test] CheckRej...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_recovers_rejected_avi_mp3_packet" classname="preview.test_recovers_rejected_avi_mp3_packet" time="6.73243" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_recovers_rejected_avi_mp3_packet
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaSimplePlayerTests/test_recovers_rejected_avi_mp3_packet/rejected-packet.avi
+[Test] CheckRejectedPreviewPacket: assert WriteRejectedAviPacket(input, chunk, rejectedIndex) == 0
+[Test] WriteRejectedAviPacket: assert source
+[Test] WriteRejectedAviPacket: assert marker != std::string_view::npos
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteReject...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_recovers_rejected_avi_video_packet" classname="preview.test_recovers_rejected_avi_video_packet" time="6.66606" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_recovers_rejected_avi_video_packet
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaSimplePlayerTests/test_recovers_rejected_avi_video_packet/rejected-packet.avi
+[Test] CheckRejectedPreviewPacket: assert WriteRejectedAviPacket(input, chunk, rejectedIndex) == 0
+[Test] WriteRejectedAviPacket: assert source
+[Test] WriteRejectedAviPacket: assert marker != std::string_view::npos
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &lt;= bytes.size() - offset - 8
+[Test] WriteRejectedAviPacket: assert size &gt; 19
+[Test] WriteRejectedAviPacket: assert replaced
+[Test] WriteRejectedAviPacket: assert destination.good()
+[Test] CheckRejectedPreviewPacket: assert player.Open(TestLocation(input))
+[mpeg4 @ 0x7c9048be6480] header damaged
+[mpeg4 @ 0x7c9048be6480] time_increment_bits 0 is invalid in relation to the current bitstream, this is likely caused by a missing VOL header
+[mpeg4 @ 0x7c9048be6480] time_increme...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_watermark_path_and_embedded_binary" classname="pipeline.test_watermark_path_and_embedded_binary" time="14.7505" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline;watermark"/>
+		</properties>
+		<system-out>[Test] Starting test_watermark_path_and_embedded_binary
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineWatermarkTests/test_watermark_path_and_embedded_binary/pipeline/watermark/watermark-logo-path.webm
+[Test] CheckWatermarkOutput: assert codec
+[Test] CheckWatermarkOutput: creating transcoder
+[LowLevel] 02/11/2026 06:13:27 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:28 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/bluray_like_hdr10.mp4
+[LowLevel] 02/11/2026 06:13:28 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:28 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:13:28 StormByte/Multimedia/Transcoder track 0 encode to VP9
+[Test] CheckWatermarkOutput: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] CheckWatermarkOutput: starting transcoder r...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_watermark_preserves_uncovered_samples" classname="pipeline.test_watermark_preserves_uncovered_samples" time="13.0656" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_watermark_preserves_uncovered_samples
+[Test] test_watermark_preserves_uncovered_samples: assert decoded.ScaleTo(scaling, rgba, 96, 96, VideoFrame::Resample::Point, VideoFrame::Scaler::Sws)
+[Test] test_watermark_preserves_uncovered_samples: assert RenderComposite(transfer, format, 45u, result) == 0
+[Test] RenderComposite: assert codec &amp;&amp; codec-&gt;get().HasAccess(Access{Operation::Write})
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineWatermarkTests/test_watermark_preserves_uncovered_samples/pipeline/watermark/opacity.webm
+[LowLevel] 02/11/2026 06:13:29 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_watermark_svg_alpha_and_hdr" classname="pipeline.test_watermark_svg_alpha_and_hdr" time="7.22103" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_watermark_svg_alpha_and_hdr
+[Test] test_watermark_svg_alpha_and_hdr: assert RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 100u, sdr, &amp;svg) == 0
+[Test] RenderComposite: assert codec &amp;&amp; codec-&gt;get().HasAccess(Access{Operation::Write})
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineWatermarkTests/test_watermark_svg_alpha_and_hdr/pipeline/watermark/opacity.webm
+[LowLevel] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:13:30 StormByte/Multimedia/Transcoder track 0 encode to VP9
+[Test] RenderComposite: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfig...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_watermark_svg_invalid_passthrough" classname="pipeline.test_watermark_svg_invalid_passthrough" time="11.4025" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_watermark_svg_invalid_passthrough
+[Test] test_watermark_svg_invalid_passthrough: assert RenderComposite(AVCOL_TRC_BT709, AV_PIX_FMT_GBRPF32LE, 100u, result, &amp;svg) == 0
+[Test] RenderComposite: assert codec &amp;&amp; codec-&gt;get().HasAccess(Access{Operation::Write})
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineWatermarkTests/test_watermark_svg_invalid_passthrough/pipeline/watermark/opacity.webm
+[LowLevel] 02/11/2026 06:13:33 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:33 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:13:33 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:33 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:13:33 StormByte/Multimedia/Transcoder track 0 encode to VP9
+[Test] RenderComposite: assert CheckTranscoderConfigured(job) == 0
+[Test] ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_filter_decimate" classname="pipeline.test_filter_decimate" time="2.20505" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_filter_decimate
+[Test] RunVideo: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineFilterTests/test_filter_decimate/pipeline/filters/decimate.mkv
+[Test] RunVideo: creating transcoder
+[LowLevel] 02/11/2026 06:13:37 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:37 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:13:37 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:37 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:13:37 StormByte/Multimedia/Transcoder track 0 encode to VP9
+[Test] RunVideo: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] RunVideo: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for t...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_filter_degrain" classname="pipeline.test_filter_degrain" time="2.46584" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_filter_degrain
+[Test] RunVideo: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineFilterTests/test_filter_degrain/pipeline/filters/degrain.mkv
+[Test] RunVideo: creating transcoder
+[LowLevel] 02/11/2026 06:13:39 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:39 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:13:39 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:39 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:13:39 StormByte/Multimedia/Transcoder track 0 encode to VP9
+[Test] RunVideo: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] RunVideo: starting transcoder run
+[Test] WaitForOptionalCodec: waiting for optional codec result
+[Test] WaitForTranscoder: waiting for tran...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_filter_analytics_cancel_mid_encode" classname="pipeline.test_filter_analytics_cancel_mid_encode" time="5.82771" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_filter_analytics_cancel_mid_encode
+[Test] test_filter_analytics_cancel_mid_encode: assert codec
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineFilterTests/test_filter_analytics_cancel_mid_encode/pipeline/filters/cancel-mid-encode-0.mkv
+[LowLevel] 02/11/2026 06:13:41 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:13:42 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[LowLevel] 02/11/2026 06:13:42 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:13:42 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:13:42 StormByte/Multimedia/Transcoder track 0 encode to AV1
+[Test] test_filter_analytics_cancel_mid_encode: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Notice  ] 02/11/2026 06:13:42 StormByte/Multimedia/Transcoder ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

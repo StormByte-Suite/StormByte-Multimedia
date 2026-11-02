@@ -1,5 +1,5 @@
 path	bytes	sha256	category	preservation	origin
-README.md	6463	9eeb02bc5ff1045096c99e528f4012777ff2e6a833b9a5966e3543faa2655681	README.md	authored-or-captured	Evidence preservation/reproduction
+README.md	7080	442f49449ba210ff10cb753f5180bf9aa632ad810a048f8b0ad8fd0c62cde10e	README.md	authored-or-captured	Evidence preservation/reproduction
 builds/baseline/multimedia-build.log	22093	81aa4fec0d1fe3d4e219080dd55f338e0f35384c847630900ad0429b0a6b847a	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-build.log
 builds/baseline/multimedia-configure.log	15132	5ef677617d9f97f7ec745562db0b039fb2bcd759702e4aea8fed91a06d12edf5	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/multimedia-configure.log
 builds/baseline/plain-build.log	44024	292c64867e03e10ecdf83fce020ef66f90e8191de5a54bcded6502c291d19421	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/plain-build.log
@@ -31,6 +31,9 @@ builds/tenth/clean-tenth-build.log	16637	70532c774c225ad42195d2ea0c167afed94b9da
 builds/tenth/clean-tenth-configure.log	16957	fe78c2a83d344ca8185623d83727f8435ea928c9547e53f055f093d0726689da	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-tenth-configure.log
 builds/third/clean-third-build.log	16029	0e07fb6a66dcc5cbdba9e5bcfdf90c52e7c3d252e656fe5466564432f2893287	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-third-build.log
 builds/third/clean-third-configure.log	15411	9e6e4a136a1148c124a748c6b47eb723275e267e28f08f1786b1b9ec9d64f0c5	builds	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-third-configure.log
+builds/vorbis-leak-build.log	16508	eb79ec375fbd27872eaa47facf29bcdadd4d305694d23df03f18c7637fbc6f55	builds	authored-or-captured	Evidence preservation/reproduction
+builds/vorbis-leak-configure-resumed.log	17307	b1876efd7bfed5609138c392a40a2f7722bbf6ae18b35b76b0f15cbcddf202a4	builds	authored-or-captured	Evidence preservation/reproduction
+builds/vorbis-leak-configure.log	13388	45a29cc9cd1e919dad21f8b75d7977610ed5cc09e29f6f1d2a2c2c6a0c7743b4	builds	authored-or-captured	Evidence preservation/reproduction
 dependencies/base/CTestCostData.txt	1536	aa52f8787da4b65418865a11a4bf96adab81eed78b13e4028d4b747994f8877f	dependencies	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Testing/Temporary/CTestCostData.txt
 dependencies/base/LastTest.log	39399	ceac587ffb41d7362bd1298c6385557259dc57747a22df3fdebb90d249613d36	dependencies	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Testing/Temporary/LastTest.log
 dependencies/base/LastTestsDisabled.log	32	cade5b9f5face3bf7268d134b12f2e9f146d47e1b5c5679aec9ea82a086d53df	dependencies	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/build-base/test/Testing/Temporary/LastTestsDisabled.log
@@ -354,16 +357,26 @@ providers/vmaf/ctest-evidence.log	366726	fc4e6f658cc1a51d4d4de1cca3a56e7ca0a6a5e
 providers/vmaf/ctest-index.tsv	5036	713b500ae76579f2768f4675f0559ed486663ed95250cb6cff345b3e11465766	providers	extracted	Preserved runs/**/*.xml; provider/test-name and diagnostic-path association
 providers/vorbis/ctest-evidence.log	278001	a68f55aa342d0a69fe6fca2b2ba6c1955ffedaaff8458bfb0fccf63fb610749b	providers	generated	Exact testcase itertext extracted from preserved JUnit XML
 providers/vorbis/ctest-index.tsv	3308	67dacf116849bb00c7284a9fb72ca27828cfcb20afbe4b96d15de8285eabe7c2	providers	extracted	Preserved runs/**/*.xml; provider/test-name and diagnostic-path association
+providers/vorbis/standalone/logs/after.log	83	2667789a8b977cc0b54551600f5a46b78d79bc740d3287690d3d8ee4cdc8f1e6	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/logs/before.log	1564	c5c2bf877a9b9414649d7ea38709403cad149774413739a0c27ef4b3969d6655	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/logs/compile.log	13	849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/logs/git-am.log	196	2a61c5faf539c31cd7d4be517a0ac01ebe9706b24f49f78c28744d7e20d8e337	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/logs/matrix.log	70	ef9963091af145b1fd29d061c420fd031d24ab1dc066e1635df1816c03c13473	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/logs/surround.log	451	c4845ac2cd7a4b4ad1c9e5c6a9e81c3e86e41f1cf9ebb0b1ffb9fe2d8f7bfd5e	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/logs/surround.xml	1614	75b98bb0bdb5c5c999da18dc8c42dcd5dbbe9cf32b914083b067370b040dfae8	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/run-residue-check.sh	1538	5a674f122b6648722b676a3db2127696a056de45893cfc7ab1131e0eba1dfd3e	providers	authored-or-captured	Evidence preservation/reproduction
+providers/vorbis/standalone/vorbis-residue-leak-check.cxx	1144	8d38d154b57bb699bc39eff8abc5cddeb0bac25a8e3ea3026b0bd5036d636e36	providers	authored-or-captured	Evidence preservation/reproduction
 providers/x264/ctest-evidence.log	264315	37eb73d5889bc156bca493520652b642fe72ef15fab4811602b86330e86ca043	providers	generated	Exact testcase itertext extracted from preserved JUnit XML
 providers/x264/ctest-index.tsv	2244	f36925008fec2b5cec11d4a749830e405e11b0f4521d5b649a9eb028b9a82354	providers	extracted	Preserved runs/**/*.xml; provider/test-name and diagnostic-path association
 providers/x265/ctest-evidence.log	920936	cb098cf4dcabaf6e02d12722163edefc55e7bdec091ab2a379a5e2d21518bee8	providers	generated	Exact testcase itertext extracted from preserved JUnit XML
 providers/x265/ctest-index.tsv	4034	3a859b47964c5a2a85c11a324c968ecb4e1642a425f61d9caf9413372daf33c5	providers	extracted	Preserved runs/**/*.xml; provider/test-name and diagnostic-path association
-reproduce/README.md	6239	1e5a80b790f2122ecd2775b465cc55ddec7372f0cdc03bdda93eb24b25caad93	reproduce	authored-or-captured	Evidence preservation/reproduction
+reproduce/README.md	7201	8b1b37564677470c726aa77b075e1fdea05dbc1101037a9a3aea6320c1772c7c	reproduce	authored-or-captured	Evidence preservation/reproduction
 reproduce/ctest-reproducers.tsv	4337	cd3da3cd5efae69cf49d23137233f6d34235187db8bfa688bb685de2f583ea3b	reproduce	extracted	tracked test sources and CTest JSON discovery (no tests executed)
 reproduce/fixtures.tsv	5208	6148037215ecd9b758004d7038530da655805e9f4fd88ec58e052da2a206d21e	reproduce	extracted	Current tracked test/files tree; media not duplicated
 reproduce/git-am-verification.log	6355	7cab7a8ae43e4fae8b6330e7bb069706785b523a7001fb408f52ad47b26b6a0e	reproduce	authored-or-captured	Evidence preservation/reproduction
 reproduce/multimedia-transcoder-wip.patch	5098	c085b0cb986d237ecebe29ee8b808b54da5dd39cabb3241231f7831a757507c5	reproduce	generated	Uncommitted Transcoder OOM diff, provenance only, not an approved fix
-reproduce/patches.tsv	16157	e312b92af5a2ca4d1d3b16d3c5262543cb0d7f3371aa185316cd81dcf1f7d956	reproduce	extracted	doc/PR-DRAFTS.md and upstream authoring repositories
+reproduce/nvidia-driver.lsan	164	3e349b976014950faee200d3d0dc90eb1751aeb149d6fcd0eae7c4068a816b0b	reproduce	authored-or-captured	Evidence preservation/reproduction
+reproduce/patches.tsv	16510	204621fbb3363cefc0a77f00a9d1eb0f1d96bcc2e8aae506d3125782b3f9eb19	reproduce	extracted	doc/PR-DRAFTS.md and upstream authoring repositories
 reproduce/refresh-inventory.py	1478	e617cdd321cc73ca557f6943392576fa31b618f295797bc36d3573ece94177b3	reproduce	authored-or-captured	Evidence preservation/reproduction
 reproduce/run-provider-tests.sh	1265	ce7042fd8a4085ed38285d0679961c4eb5fc49d58c4dcb0d0f542fedac5b55ed	reproduce	authored-or-captured	Evidence preservation/reproduction
 reproduce/run-standalone.sh	1882	54cc197dd2449ac0ab63912b0e037c4b857a7cec6bf9483524d6dd3464f05884	reproduce	authored-or-captured	Evidence preservation/reproduction
@@ -391,6 +404,9 @@ runs/fifth/clean-fifth-focused.log	38120	0ba19e5c5ba4ac62410072c00cf072e879b19f3
 runs/fifth/clean-fifth-focused.xml	38805	8dc324356f42d623a2c38a32a2912454f5b8e5219dc772636d7adbe332cd73e2	runs	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fifth-focused.xml
 runs/followup/clean-followup-focused.log	87107	0cf43bfacb26b6bbb437a216f9029f556f6f4295145a4dd132ce01e78799082c	runs	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-followup-focused.log
 runs/followup/clean-followup-focused.xml	101608	13f83e57557f9991d7136a030489f913ab03500386505d707cbc27779fda6bb9	runs	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-followup-focused.xml
+runs/followup/nvidia-driver-selection.txt	520	3c545d6aac160601996a91fa8cdb5229a0335faf637334c3d8213fe4c2f6aef8	runs	authored-or-captured	Evidence preservation/reproduction
+runs/followup/nvidia-driver.log	2993	19a50eebd628b446f6ad199599a1e1e05103014f4ccf33bf1d5738a508434991	runs	authored-or-captured	Evidence preservation/reproduction
+runs/followup/nvidia-driver.xml	17106	43311339e8deb6099f17555ce4feac289f1953fc92657cc275e161ac60e7b743	runs	authored-or-captured	Evidence preservation/reproduction
 runs/fourth/clean-fourth-focused.log	37068	0e2d959baffcf41d90a9bb6956bd7000e7a0c96949385c0f68de49fe7ba6864d	runs	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fourth-focused.log
 runs/fourth/clean-fourth-focused.xml	40255	540d6713568e64a4b3e8465b37959114ae10bc1921742b17a2141081e579daac	runs	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/clean-fourth-focused.xml
 runs/initial-patches/ffmpeg-dovi-focused.log	383	dfd94f54cdb7e33a152351711eb06ebc24ddb53ffd8cdfc4702c97f4b7cb9bf7	runs	verbatim	/home/stormbyte/Software/StormByte/StormByte/multimedia/build/sanitizer-validation/ffmpeg-dovi-focused.log

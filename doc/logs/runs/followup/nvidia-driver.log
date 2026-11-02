@@ -1,0 +1,38 @@
+Command: ['ctest', '--test-dir', '/tmp/BMDATA/sanitizer-clean-final/test', '-j4', '--output-on-failure', '--output-junit', '/home/stormbyte/Software/StormByte/StormByte/multimedia/doc/logs/runs/followup/nvidia-driver.xml', '-R', '^(preview\\.test_live_audio_backpressure_errors|preview\\.test_explicit_errors|preview\\.test_recovers_rejected_initial_avi_mp3_packet|preview\\.test_recovers_rejected_avi_mp3_packet|preview\\.test_recovers_rejected_avi_video_packet|pipeline\\.test_watermark_path_and_embedded_binary|pipeline\\.test_watermark_preserves_uncovered_samples|pipeline\\.test_watermark_svg_alpha_and_hdr|pipeline\\.test_watermark_svg_invalid_passthrough|pipeline\\.test_filter_decimate|pipeline\\.test_filter_degrain|pipeline\\.test_filter_analytics_cancel_mid_encode)$']
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+      Start  16: preview.test_live_audio_backpressure_errors
+      Start  18: preview.test_explicit_errors
+      Start  22: preview.test_recovers_rejected_initial_avi_mp3_packet
+      Start  23: preview.test_recovers_rejected_avi_mp3_packet
+ 1/12 Test  #18: preview.test_explicit_errors ............................   Passed    3.53 sec
+      Start  24: preview.test_recovers_rejected_avi_video_packet
+ 2/12 Test  #16: preview.test_live_audio_backpressure_errors .............   Passed    4.25 sec
+      Start 230: pipeline.test_watermark_path_and_embedded_binary
+ 3/12 Test  #22: preview.test_recovers_rejected_initial_avi_mp3_packet ...   Passed    6.66 sec
+      Start 232: pipeline.test_watermark_preserves_uncovered_samples
+ 4/12 Test  #23: preview.test_recovers_rejected_avi_mp3_packet ...........   Passed    6.73 sec
+      Start 234: pipeline.test_watermark_svg_alpha_and_hdr
+ 5/12 Test  #24: preview.test_recovers_rejected_avi_video_packet .........   Passed    6.67 sec
+      Start 235: pipeline.test_watermark_svg_invalid_passthrough
+ 6/12 Test #234: pipeline.test_watermark_svg_alpha_and_hdr ...............   Passed    7.22 sec
+      Start 386: pipeline.test_filter_decimate
+ 7/12 Test #386: pipeline.test_filter_decimate ...........................   Passed    2.21 sec
+      Start 388: pipeline.test_filter_degrain
+ 8/12 Test #388: pipeline.test_filter_degrain ............................   Passed    2.47 sec
+      Start 405: pipeline.test_filter_analytics_cancel_mid_encode
+ 9/12 Test #230: pipeline.test_watermark_path_and_embedded_binary ........   Passed   14.75 sec
+10/12 Test #232: pipeline.test_watermark_preserves_uncovered_samples .....   Passed   13.07 sec
+11/12 Test #235: pipeline.test_watermark_svg_invalid_passthrough .........   Passed   11.40 sec
+12/12 Test #405: pipeline.test_filter_analytics_cancel_mid_encode ........   Passed    5.83 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Label Time Summary:
+multimedia    =  84.77 sec*proc (12 tests)
+pipeline      =  56.94 sec*proc (7 tests)
+preview       =  27.83 sec*proc (5 tests)
+watermark     =  14.75 sec*proc (1 test)
+
+Total Test time (real) =  24.46 sec
+
+exit_code: 0
