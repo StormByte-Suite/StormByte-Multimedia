@@ -5,26 +5,26 @@ pipeline.test_fdk_aac_encodes_surround_mp4	PASS	runs/followup/rpu-followup.xml
 pipeline.test_filter_analytics_cancel_mid_encode	PASS	runs/followup/nvidia-driver.xml	
 pipeline.test_filter_decimate	PASS	runs/followup/nvidia-driver.xml	
 pipeline.test_filter_degrain	PASS	runs/followup/nvidia-driver.xml	
-pipeline.test_hardware_h264_nvenc_10bit_capability	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
-pipeline.test_hardware_h264_nvenc_capability	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
-pipeline.test_hardware_hevc_nvenc_capability	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
+pipeline.test_hardware_h264_nvenc_10bit_capability	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
+pipeline.test_hardware_h264_nvenc_capability	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
+pipeline.test_hardware_hevc_nvenc_capability	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
 pipeline.test_hevc_av1_hevc_hdr10plus	PASS	runs/followup/remaining-paths.xml	
 pipeline.test_interleave_encoded_video_and_audio	PASS	runs/followup/svt-joint-followup.xml	
 pipeline.test_interleave_encoded_video_loudnorm_audio	PASS	runs/followup/svt-joint-followup.xml	
 pipeline.test_interleave_encoded_video_remuxed_audio	PASS	runs/followup/svt-joint-followup.xml	
 pipeline.test_libvorbis_decode_roundtrip	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_libvorbis_encodes_surround_matroska	PASS	providers/vorbis/standalone/logs/surround.xml	
-pipeline.test_nvenc_encodes_h264_10bit_matroska	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
-pipeline.test_nvenc_encodes_h264_mp4	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
-pipeline.test_nvenc_encodes_hevc_main10_matroska	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
-pipeline.test_nvenc_encodes_hevc_main_matroska	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
+pipeline.test_nvenc_encodes_h264_10bit_matroska	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
+pipeline.test_nvenc_encodes_h264_mp4	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
+pipeline.test_nvenc_encodes_hevc_main10_matroska	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
+pipeline.test_nvenc_encodes_hevc_main_matroska	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
 pipeline.test_reencode_dovi_hdr10	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_reencode_dovi_only	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_reencoded_dovi_audit_and_vmaf_frame_counts	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_replace_frame_dovi_hdr10	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_replace_frame_dovi_only	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_svt_av1_cancel_repeated	PASS	runs/followup/svt-tail-followup.xml	
-pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata	FAIL	runs/followup/remaining-paths.xml	External CUDA initialization failure reproduced by driver-only sanitized main; not waived
+pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata	EXTERNAL_EXCEPTION	runs/followup/nvenc-shadow-gap.xml	User-authorized proprietary NVIDIA leak; driver-only NVENC session reproduces 96 bytes; functional checks PASS or unsupported H264 10bit SKIP; CTest exit 8 retained; reproduce/nvidia-driver-exception.md
 pipeline.test_watermark_dovi_hdr10	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_watermark_dovi_only	PASS	runs/followup/rpu-followup.xml	
 pipeline.test_watermark_path_and_embedded_binary	PASS	runs/followup/nvidia-driver.xml	
@@ -41,7 +41,7 @@ preview.test_hdr_preview_preserves_signal	PASS	runs/followup/test-deadlines.xml
 preview.test_hdr_preview_tone_mapping	PASS	runs/followup/test-deadlines.xml	
 preview.test_live_audio_backpressure_errors	PASS	runs/followup/nvidia-driver.xml	
 preview.test_live_audio_selection	PASS	runs/followup/test-deadlines.xml	
-preview.test_live_audio_tracks	FAIL	runs/followup/test-deadlines.xml	Default fixture fails; 96-second alternate-input probe passes; canonical failure retained
+preview.test_live_audio_tracks	PASS	runs/followup/live-audio-canonical-direct.log	Canonical fixed long fixture, no input override; original six track changes and timing assertions retained; direct-run exit 0
 preview.test_recovers_rejected_avi_mp3_packet	PASS	runs/followup/nvidia-driver.xml	
 preview.test_recovers_rejected_avi_video_packet	PASS	runs/followup/nvidia-driver.xml	
 preview.test_recovers_rejected_initial_avi_mp3_packet	PASS	runs/followup/nvidia-driver.xml	

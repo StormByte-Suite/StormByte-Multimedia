@@ -1,0 +1,327 @@
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[  1%] [BuildMaster/Core     ]: reset fail markers
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+[  1%] Built target _bm_bin_StormByte-Buffer_dl
+[  1%] Built target _bm_bin_StormByte-Base_dl
+[  1%] Built target _bm_bin_StormByte-Logger_dl
+[  1%] Built target _bm_bin_StormByte-System_dl
+[  1%] Built target buildmaster_build_init
+[  2%] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  2%] Built target StormByte-Logger_build
+[  2%] Built target StormByte-System_build
+[  2%] Built target StormByte-Base_build
+[  2%] [BuildMaster/Ninja    ]: Compiling X264 codec
+[  4%] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[  4%] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+[  4%] Built target StormByte-Buffer_build
+[  4%] [BuildMaster/Ninja    ]: Compiling openh264
+[  5%] [BuildMaster/Ninja    ]: Compiling VPX codec
+[  5%] [BuildMaster/Ninja    ]: Compiling Opus codec
+[  7%] [BuildMaster/Ninja    ]: Compiling libebur128
+[  8%] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[  8%] [BuildMaster/Ninja    ]: Compiling VMAF library
+[  8%] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[ 10%] [BuildMaster/Ninja    ]: Compiling leptonica
+[ 10%] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[ 10%] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[ 10%] [BuildMaster/Ninja    ]: Compiling OGG container
+[ 10%] [BuildMaster/Ninja    ]: Compiling dav1d
+[ 10%] [BuildMaster/Ninja    ]: Compiling libwebp
+[ 10%] [BuildMaster/Ninja    ]: Compiling LunaSVG
+[ 11%] [BuildMaster/Ninja    ]: Compiling kvazaar
+[ 11%] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+[ 11%] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+[ 11%] [BuildMaster/Ninja    ]: Compiling libaom
+[ 11%] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[ 11%] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[ 13%] [BuildMaster/Ninja    ]: Compiling zimg
+[ 14%] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (build)
+-- [BuildMaster/Component]: stamp hit bzip2 (build)
+-- [BuildMaster/Component]: stamp hit lunasvg (build)
+-- [BuildMaster/Component]: stamp hit ogg (build)
+[ 14%] Built target ffnvcodec-headers_build
+[ 14%] Built target bzip2_build
+[ 14%] Built target lunasvg_build
+[ 14%] Built target ogg_build
+[ 14%] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+-- [BuildMaster/Component]: stamp hit dav1d (build)
+[ 15%] [BuildMaster/Ninja    ]: Installing LunaSVG
+[ 17%] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+[ 17%] [BuildMaster/Ninja    ]: Installing OGG container
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (install)
+-- [BuildMaster/Component]: stamp hit bzip2 (install)
+-- [BuildMaster/Component]: stamp hit lunasvg (install)
+[ 17%] Built target ffnvcodec-headers_install
+[ 17%] Built target dav1d_build
+-- [BuildMaster/Component]: stamp hit ogg (install)
+[ 17%] Built target lunasvg_install
+[ 17%] Built target bzip2_install
+[ 17%] Built target _bm_bin_StormByte-Base_unpack
+-- [BuildMaster/Component]: stamp hit zimg (build)
+[ 17%] Built target ogg_install
+[ 17%] [BuildMaster/Ninja    ]: Installing dav1d
+[ 17%] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[ 17%] Built target StormByte-Base_install
+[ 17%] [BuildMaster/CMake    ]: Configuring vorbis
+[ 17%] Built target zimg_build
+[ 17%] Built target _bm_bin_StormByte-Logger_unpack
+-- [BuildMaster/Component]: stamp hit dav1d (install)
+[ 17%] [BuildMaster/Ninja    ]: Installing zimg
+[ 18%] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[ 18%] Built target StormByte-Logger_install
+[ 18%] Built target dav1d_install
+[ 18%] Built target _bm_bin_StormByte-System_unpack
+-- [BuildMaster/Component]: stamp hit zlib (build)
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[ 18%] Built target zlib_build
+[ 18%] Built target StormByte-System_install
+-- [BuildMaster/Component]: stamp hit ebur128 (build)
+[ 18%] Built target samplerate_build
+[ 18%] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+[ 18%] Built target ebur128_build
+[ 20%] [BuildMaster/Ninja    ]: Installing zlib compression library
+-- [BuildMaster/Component]: stamp hit webp (build)
+[ 20%] [BuildMaster/Ninja    ]: Installing libsamplerate
+-- [BuildMaster/Component]: stamp hit zimg (install)
+[ 20%] Built target webp_build
+[ 20%] Built target _bm_bin_StormByte-Buffer_unpack
+[ 20%] [BuildMaster/Ninja    ]: Installing libebur128
+[ 20%] Built target zimg_install
+[ 21%] [BuildMaster/Ninja    ]: Installing libwebp
+[ 21%] Built target StormByte-Buffer_install
+-- [BuildMaster/Component]: stamp hit lzma (build)
+-- [BuildMaster/Component]: stamp hit x264 (build)
+-- [BuildMaster/Component]: stamp hit mp3lame (build)
+[ 21%] Built target lzma_build
+[ 21%] Built target x264_build
+[ 21%] Built target mp3lame_build
+[ 21%] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+[ 21%] [BuildMaster/Ninja    ]: Installing X264 codec
+[ 21%] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+-- [BuildMaster/Component]: stamp hit opus (build)
+-- [BuildMaster/Component]: stamp hit aom (build)
+-- [BuildMaster/Component]: stamp hit openh264 (build)
+[ 21%] Built target openh264_build
+[ 21%] Built target opus_build
+-- [BuildMaster/Component]: stamp hit zlib (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 23%] [BuildMaster/Ninja    ]: Installing openh264
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[ 23%] [BuildMaster/Ninja    ]: Installing Opus codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit ebur128 (install)
+[ 23%] Built target aom_build
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 24%] [BuildMaster/Ninja    ]: Installing libaom
+-- [BuildMaster/Component]: stamp hit vpx (build)
+-- [BuildMaster/Component]: stamp hit webp (install)
+-- [BuildMaster/Component]: stamp hit leptonica (build)
+[ 24%] Built target zlib_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 24%] Built target samplerate_install
+-- [BuildMaster/Component]: stamp hit vmaf (build)
+[ 24%] [BuildMaster/CMake    ]: Configuring rubberband
+[ 24%] Built target ebur128_install
+-- [BuildMaster/Component]: stamp hit tessdata (build)
+[ 24%] Built target vpx_build
+[ 24%] Built target tessdata_build
+[ 24%] Built target leptonica_build
+[ 24%] [BuildMaster/Ninja    ]: Installing VPX codec
+[ 24%] Built target vmaf_build
+[ 24%] [BuildMaster/Ninja    ]: Installing leptonica
+[ 24%] [BuildMaster/Ninja    ]: Installing Tesseract traineddata
+[ 24%] Built target webp_install
+-- [BuildMaster/Component]: stamp hit lzma (install)
+-- [BuildMaster/Component]: stamp hit x264 (install)
+[ 26%] [BuildMaster/Ninja    ]: Installing VMAF library
+-- [BuildMaster/Component]: stamp hit mp3lame (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 26%] Built target lzma_install
+[ 26%] Built target x264_install
+[BuildMaster/Component]: stamp hit vorbis (configure)
+[ 26%] Built target mp3lame_install
+[ 26%] Built target vorbis_configure
+[BuildMaster/Component]: stamp hit rubberband (configure)
+[ 26%] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+[ 26%] Built target rubberband_configure
+[ 27%] [BuildMaster/Ninja    ]: Compiling rubberband
+-- [BuildMaster/Component]: stamp hit x265-12bit (build)
+-- [BuildMaster/Component]: stamp hit opus (install)
+-- [BuildMaster/Component]: stamp hit openh264 (install)
+[ 27%] Built target x265-12bit_build
+[ 27%] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit aom (install)
+[ 27%] Built target opus_install
+[ 27%] Built target openh264_install
+[ 27%] Built target aom_install
+-- [BuildMaster/Component]: stamp hit rubberband (build)
+[ 27%] Built target rubberband_build
+[ 27%] [BuildMaster/Ninja    ]: Installing rubberband
+-- [BuildMaster/Component]: stamp hit leptonica (install)
+-- [BuildMaster/Component]: stamp hit vpx (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit vmaf (install)
+[ 27%] Built target leptonica_install
+[ 28%] [BuildMaster/CMake    ]: Configuring tesseract
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 28%] Built target vpx_install
+-- [BuildMaster/Component]: stamp hit kvazaar (build)
+[ 28%] Built target kvazaar_build
+-- [BuildMaster/Component]: stamp hit rubberband (install)
+-- [BuildMaster/Component]: stamp hit tessdata (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 30%] [BuildMaster/Ninja    ]: Installing kvazaar
+[ 30%] Built target tessdata_install
+[ 30%] Built target vmaf_install
+-- [BuildMaster/Component]: stamp hit svt-av1 (build)
+[ 30%] Built target rubberband_install
+-- [BuildMaster/Component]: stamp hit vorbis (build)
+[ 30%] Built target svt-av1_build
+[ 30%] Built target vorbis_build
+[ 30%] [BuildMaster/Ninja    ]: Installing SVT-AV1
+[ 30%] [BuildMaster/Ninja    ]: Installing Vorbis codec
+-- [BuildMaster/Component]: stamp hit fdk-aac (build)
+[ 30%] Built target fdk-aac_build
+[ 30%] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+-- [BuildMaster/Component]: stamp hit x265-12bit (install)
+[ 30%] Built target x265-12bit_install
+[BuildMaster/Component]: stamp hit tesseract (configure)
+[ 30%] Built target tesseract_configure
+[ 30%] [BuildMaster/Ninja    ]: Compiling tesseract
+-- [BuildMaster/Component]: stamp hit vorbis (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 30%] Built target vorbis_install
+-- [BuildMaster/Component]: stamp hit tesseract (build)
+[ 30%] Built target tesseract_build
+[ 30%] [BuildMaster/Ninja    ]: Installing tesseract
+-- [BuildMaster/Component]: stamp hit kvazaar (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit x265-10bit (build)
+[ 30%] Built target x265-10bit_build
+[ 30%] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+[ 30%] [BuildMaster/CMake    ]: Configuring x265
+[ 30%] Built target kvazaar_install
+-- [BuildMaster/Component]: stamp hit tesseract (install)
+-- [BuildMaster/Component]: stamp hit svt-av1 (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 30%] Built target tesseract_install
+[ 30%] Built target svt-av1_install
+-- [BuildMaster/Component]: stamp hit fdk-aac (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 30%] Built target fdk-aac_install
+-- [BuildMaster/Component]: stamp hit x265-10bit (install)
+[ 30%] Built target x265-10bit_install
+[BuildMaster/Component]: stamp hit x265 (configure)
+[ 30%] Built target x265_configure
+[ 31%] [BuildMaster/Ninja    ]: Compiling X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (build)
+[ 31%] Built target x265_build
+[ 31%] [BuildMaster/Ninja    ]: Installing X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 31%] Built target x265_install
+[ 31%] Built target ffmpeg-plugins_install
+[ 31%] [BuildMaster/CMake    ]: Configuring ffmpeg
+[BuildMaster/Component]: stamp hit ffmpeg (configure)
+[ 31%] Built target ffmpeg_configure
+[ 33%] [BuildMaster/Ninja    ]: Compiling FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (build)
+[ 33%] Built target ffmpeg_build
+[ 33%] [BuildMaster/Ninja    ]: Installing FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 33%] Built target ffmpeg_install
+[ 33%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o
+[ 33%] Building CXX object lib/CMakeFiles/StormByte-Multimedia.dir/public/StormByte/multimedia/pipeline/transcoder.cxx.o
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:297:18: error: exception specification in declaration does not match previous declaration
+  297 | void Transcoder::TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
+      |                  ^
+/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.hxx:247:9: note: previous declaration is here
+  247 |                         void TickHooks(StormByte::Multimedia::Pipeline::Transcoder& job,
+      |                              ^
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script.
+Stack dump:
+0.	Program arguments: /usr/lib/llvm/22/bin/clang++-22 -DLUNASVG_BUILD_STATIC -DSTORMBYTE_MULTIMEDIA_SHARED -DSTORMBYTE_MULTIMEDIA_VERSION=\"1.0.1\" -DStormByte_Multimedia_EXPORTS -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/lunasvg/src/include -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ebur128/src/ebur128 -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/zimg/cmake-wrapper/src/src/zimg/api -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/vmaf/src/libvmaf/include -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/tessdata/cmake-wrapper/include -I/tmp/BMDATA/sanitizer-clean-final/thirdparty/ocr/tesseract/include -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ocr/tesseract/src/include -I/tmp/BMDATA/sanitizer-clean-final/thirdparty/ocr/leptonica/leptonica-api -I/tmp/BMDATA/sanitizer-clean-final/thirdparty/ocr/leptonica/leptonica-gen -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/src -I/home/stormbyte/Software/StormByte/StormByte/multimedia/thirdparty/ffmpeg/plugins/deps/ffnvcodec/src/include -isystem /tmp/BMDATA/sanitizer-clean-final/lib/public -isystem /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/tables/.. -isystem /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private -isystem /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/public -isystem /tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include -isystem /usr/include/libdrm -stdlib=libc++ -fsanitize=address,undefined -fno-omit-frame-pointer -I/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/install/include -g -std=c++26 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -g -fvisibility=hidden -fvisibility-inlines-hidden -pipe -ggdb -Wall -Wextra -Wnon-virtual-dtor -pedantic -pedantic-errors -O0 -MD -MT lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o -MF CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o.d -o CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o -c /home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx
+1.	<unknown> parser at unknown location
+2.	/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:314:81: parsing function body 'StormByte::Multimedia::Backend::Pipeline::Transcoder::Run'
+3.	/home/stormbyte/Software/StormByte/StormByte/multimedia/lib/private/StormByte/multimedia/backend/pipeline/transcoder.cxx:314:81: in compound statement ('{}')
+ #0 0x00007f0ea1d3d79a __interceptor_backtrace /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:4556:13
+ #1 0x00007f0e986b739a llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) /tmp/portage/llvm-core/llvm-22.1.8/work/llvm/lib/Support/Unix/Signals.inc:842:13
+ #2 0x00007f0e986b3a2b llvm::sys::RunSignalHandlers() /tmp/portage/llvm-core/llvm-22.1.8/work/llvm/lib/Support/Signals.cpp:109:18
+ #3 0x00007f0e985b0570 (anonymous namespace)::CrashRecoveryContextImpl::HandleCrash(int, unsigned long) /tmp/portage/llvm-core/llvm-22.1.8/work/llvm/lib/Support/CrashRecoveryContext.cpp:73:5
+ #4 0x00007f0e985b0570 CrashRecoverySignalHandler(int) /tmp/portage/llvm-core/llvm-22.1.8/work/llvm/lib/Support/CrashRecoveryContext.cpp:390:51
+ #5 0x00007f0e93b2e500 (/usr/lib64/libc.so.6+0x3e500)
+ #6 0x00007f0e9e8cec84 clang::Lexer::SkipWhitespace(clang::Token&, char const*, bool&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Lex/Lexer.cpp:2512:24
+ #7 0x00007f0e9e8d30ed clang::Lexer::LexTokenInternal(clang::Token&, bool) /tmp/portage/llvm-core/clang-22.1.8/work/clang/include/clang/Lex/Token.h:0:11
+ #8 0x00007f0e9e9562dd clang::Preprocessor::Lex(clang::Token&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Lex/Preprocessor.cpp:896:3
+ #9 0x00007f0e9e97a643 clang::Parser::ConsumeBrace() /tmp/portage/llvm-core/clang-22.1.8/work/clang/include/clang/Parse/Parser.h:675:12
+#10 0x00007f0e9e9607a9 clang::BalancedDelimiterTracker::consumeClose() /tmp/portage/llvm-core/clang-22.1.8/work/clang/include/clang/Parse/RAIIObjectsForParser.h:0:0
+#11 0x00007f0e9ea455c9 clang::Parser::ParseCompoundStatementBody(bool) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/ParseStmt.cpp:1232:7
+#12 0x00007f0e9ea466fc clang::Parser::ParseFunctionStatementBody(clang::Decl*, clang::Parser::ParseScope&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/ParseStmt.cpp:0:0
+#13 0x00007f0e9ea65867 clang::Parser::ParseFunctionDefinition(clang::ParsingDeclarator&, clang::Parser::ParsedTemplateInfo const&, clang::Parser::LateParsedAttrList*) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/Parser.cpp:0:10
+#14 0x00007f0e9e97950f clang::Parser::ParseDeclGroup(clang::ParsingDeclSpec&, clang::DeclaratorContext, clang::ParsedAttributes&, clang::Parser::ParsedTemplateInfo&, clang::SourceLocation*, clang::Parser::ForRangeInit*) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/ParseDecl.cpp:0:17
+#15 0x00007f0e9ea64813 clang::Parser::ParseDeclOrFunctionDefInternal(clang::ParsedAttributes&, clang::ParsedAttributes&, clang::ParsingDeclSpec&, clang::AccessSpecifier) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/Parser.cpp:0:0
+#16 0x00007f0e9ea63ed6 clang::Parser::ParseDeclarationOrFunctionDefinition(clang::ParsedAttributes&, clang::ParsedAttributes&, clang::ParsingDeclSpec*, clang::AccessSpecifier) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/Parser.cpp:0:0
+#17 0x00007f0e9ea62e52 clang::Parser::ParseExternalDeclaration(clang::ParsedAttributes&, clang::ParsedAttributes&, clang::ParsingDeclSpec*) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/Parser.cpp:0:14
+#18 0x00007f0e9ea60fef clang::Parser::ParseTopLevelDecl(clang::OpaquePtr<clang::DeclGroupRef>&, clang::Sema::ModuleImportState&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/Parser.cpp:743:10
+#19 0x00007f0e9e95fabe clang::ParseAST(clang::Sema&, bool, bool) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Parse/ParseAST.cpp:169:5
+#20 0x00007f0ea0ff867f clang::CompilerInstance::shouldBuildGlobalModuleIndex() const /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Frontend/CompilerInstance.cpp:89:34
+#21 0x00007f0ea0ff867f clang::FrontendAction::Execute() /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Frontend/FrontendAction.cpp:1317:10
+#22 0x00007f0ea0f3c449 llvm::Error::getPtr() const /usr/lib/llvm/22/include/llvm/Support/Error.h:281:12
+#23 0x00007f0ea0f3c449 llvm::Error::operator bool() /usr/lib/llvm/22/include/llvm/Support/Error.h:241:16
+#24 0x00007f0ea0f3c449 clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Frontend/CompilerInstance.cpp:1006:23
+#25 0x00007f0ea109b81a clang::ExecuteCompilerInvocation(clang::CompilerInstance*) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/FrontendTool/ExecuteCompilerInvocation.cpp:0:0
+#26 0x0000559689615cad cc1_main(llvm::ArrayRef<char const*>, char const*, void*) /tmp/portage/llvm-core/clang-22.1.8/work/clang/tools/driver/cc1_main.cpp:0:0
+#27 0x00005596896129df ExecuteCC1Tool(llvm::SmallVectorImpl<char const*>&, llvm::ToolContext const&, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>) /tmp/portage/llvm-core/clang-22.1.8/work/clang/tools/driver/driver.cpp:0:12
+#28 0x00005596896147d1 llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>::retain() /usr/lib/llvm/22/include/llvm/ADT/IntrusiveRefCntPtr.h:227:9
+#29 0x00005596896147d1 llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>::IntrusiveRefCntPtr(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> const&) /usr/lib/llvm/22/include/llvm/ADT/IntrusiveRefCntPtr.h:181:66
+#30 0x00005596896147d1 clang_main(int, char**, llvm::ToolContext const&)::$_0::operator()(llvm::SmallVectorImpl<char const*>&) const /tmp/portage/llvm-core/clang-22.1.8/work/clang/tools/driver/driver.cpp:376:46
+#31 0x00005596896147d1 int llvm::function_ref<int (llvm::SmallVectorImpl<char const*>&)>::callback_fn<clang_main(int, char**, llvm::ToolContext const&)::$_0>(long, llvm::SmallVectorImpl<char const*>&) /usr/lib/llvm/22/include/llvm/ADT/STLFunctionalExtras.h:46:12
+#32 0x00007f0ea0af496d clang::driver::CC1Command::Execute(llvm::ArrayRef<std::__1::optional<llvm::StringRef>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, bool*) const::$_0::operator()() const /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Driver/Job.cpp:442:30
+#33 0x00007f0ea0af496d void llvm::function_ref<void ()>::callback_fn<clang::driver::CC1Command::Execute(llvm::ArrayRef<std::__1::optional<llvm::StringRef>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, bool*) const::$_0>(long) /usr/lib/llvm/22/include/llvm/ADT/STLFunctionalExtras.h:46:12
+#34 0x00007f0e985b0240 llvm::function_ref<void ()>::operator()() const /tmp/portage/llvm-core/llvm-22.1.8/work/llvm/include/llvm/ADT/STLFunctionalExtras.h:0:12
+#35 0x00007f0e985b0240 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) /tmp/portage/llvm-core/llvm-22.1.8/work/llvm/lib/Support/CrashRecoveryContext.cpp:426:3
+#36 0x00007f0ea0af3ec6 clang::driver::CC1Command::Execute(llvm::ArrayRef<std::__1::optional<llvm::StringRef>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, bool*) const /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Driver/Job.cpp:442:7
+#37 0x00007f0ea0aa7b33 clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Driver/Compilation.cpp:0:0
+#38 0x00007f0ea0aa7dfe clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::__1::pair<int, clang::driver::Command const*>>&, bool) const /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Driver/Compilation.cpp:246:13
+#39 0x00007f0ea0ad023c llvm::SmallVectorBase<unsigned int>::empty() const /usr/lib/llvm/22/include/llvm/ADT/SmallVector.h:83:46
+#40 0x00007f0ea0ad023c clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::__1::pair<int, clang::driver::Command const*>>&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/lib/Driver/Driver.cpp:2265:23
+#41 0x0000559689611cb1 clang_main(int, char**, llvm::ToolContext const&) /tmp/portage/llvm-core/clang-22.1.8/work/clang/tools/driver/driver.cpp:0:0
+#42 0x0000559689622e83 main /tmp/portage/llvm-core/clang-22.1.8/work/x/y/clang-abi_x86_64.amd64/tools/driver/clang-driver.cpp:0:0
+#43 0x00007f0e93b17355 __libc_start_call_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../sysdeps/nptl/libc_start_call_main.h:83:3
+#44 0x00007f0e93b1747b call_init /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../csu/libc-start.c:127:20
+#45 0x00007f0e93b1747b __libc_start_main /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/csu/../csu/libc-start.c:359:5
+#46 0x0000559689610025 _start (/usr/lib/llvm/22/bin/clang++-22+0xe025)
+clang++-22: error: clang frontend command failed with exit code 139 (use -v to see invocation)
+clang version 22.1.8+libcxx
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/lib/llvm/22/bin
+Configuration file: /etc/clang/22/x86_64-pc-linux-gnu-clang++.cfg
+clang++-22: note: diagnostic msg: 
+********************
+
+PLEASE ATTACH THE FOLLOWING FILES TO THE BUG REPORT:
+Preprocessed source(s) and associated run script(s) are located at:
+clang++-22: note: diagnostic msg: /tmp/transcoder-1f3306.cpp
+clang++-22: note: diagnostic msg: /tmp/transcoder-1f3306.sh
+clang++-22: note: diagnostic msg: 
+
+********************
+gmake[3]: *** [lib/CMakeFiles/StormByte-Multimedia.dir/build.make:611: lib/CMakeFiles/StormByte-Multimedia.dir/private/StormByte/multimedia/backend/pipeline/transcoder.cxx.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:4883: lib/CMakeFiles/StormByte-Multimedia.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:6442: test/CMakeFiles/MultimediaSimplePlayerTests.dir/rule] Error 2
+gmake: *** [Makefile:1691: MultimediaSimplePlayerTests] Error 2

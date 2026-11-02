@@ -97,6 +97,33 @@ sources, not the build port.
 
 #### Subsequent preview and duration investigation
 
+**Latest update:** the canonical live-audio cycling regression now uses a fixed
+96-second synthetic H.264/AC-3 fixture, committed with its generation command
+and SHA-256. It passes with no input override under strict ASan/UBSan/LSan;
+the six track changes and original epoch/timestamp/500 ms assertions remain.
+[Canonical direct-run evidence](logs/runs/followup/live-audio-canonical-direct.log).
+
+CUDA/NVENC is now reachable under ASan using `protect_shadow_gap=0`, which
+permits the driver's virtual-address mappings without disabling instrumented
+memory checks or leak detection. The eight NVENC paths complete as **six
+functional passes and two unsupported H.264 10-bit skips**, then LSan reports
+96/192-byte allocations. A new driver-only NVENC session main reproduces
+exactly the same 96-byte/two-allocation leak after successful encoder/context
+destruction, without linking FFmpeg or StormByte. These are covered by the
+user-authorized proprietary NVIDIA leak exception, not suppressed through
+broad libc allocation rules and not reported as clean sanitizer passes.
+[Named exception, all affected tests, commands and evidence](logs/reproduce/nvidia-driver-exception.md).
+The prior plain build provides an independent **6 passed / 2 skipped** control,
+exit **0**; the instrumented run remains exit **8** due to those driver leaks.
+
+The original 47 failing cases therefore now comprise **39 canonical passing
+follow-ups and 8 explicitly classified external-driver exceptions**, with
+functional checks passing or skipping appropriately for the available GPU.
+This closes that failed-test list under the authorized driver exception,
+not the separate pending OOM/static-analysis work or the release gate.
+
+Earlier iterations, retained for provenance:
+
 The deadline follow-up resolves six more original cases without changing their
 functional assertions: HDR SDR/HDR preview, live audio selection, subtitle
 decode, faulted reader ownership and duration-hint remux. The latter passes

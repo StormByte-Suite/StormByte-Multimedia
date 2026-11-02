@@ -1,0 +1,4 @@
+
+Diagnostic stopped: full malloc-stack unwinding consumed one CPU for over 90 seconds without producing output. Not a passing validation.
+
+exit_code=143

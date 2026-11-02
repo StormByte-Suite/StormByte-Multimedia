@@ -83,8 +83,17 @@ bash doc/logs/reproduce/run-followup-tests.sh \
 Other groups are `providers`, `remaining`, `preview` and `deadlines`.
 `providers` deliberately runs without suppressions; the others use only the
 approved NVIDIA allocation exception.
+The `nvenc` group additionally permits CUDA's address-space mapping with
+`protect_shadow_gap=0`; its raw failing LSan result is preserved as documented
+in the [driver exception](nvidia-driver-exception.md).
 
 ### NVIDIA sanitizer initialization constraint
+
+**Update:** `protect_shadow_gap=0` permits CUDA initialization and context
+creation while preserving ASan instrumented checks, UBSan and LSan. NVENC
+then exposes a separate driver-only session leak, reproduced without FFmpeg
+or StormByte. See the [named driver exception](nvidia-driver-exception.md);
+the eight affected CTest exits remain failing and are not rewritten as passes.
 
 The [isolated CUDA driver main](cuda-init-check.c) loads only `libcuda.so.1`;
 it does not link FFmpeg or StormByte. On this host the same program succeeds
@@ -111,6 +120,12 @@ an external sanitizer/driver constraint; the eight failed NVENC tests remain
 unvalidated and have not been reclassified as passed or waived.
 
 ### Live-audio fixture probes
+
+**Update:** the canonical cycling test now uses the fixed
+`test/files/video/live_audio_switch_long.mkv` fixture, generated once and
+documented in the [fixture inventory](../../../test/files/README.md).
+[Strict direct run without an override: exit 0](../runs/followup/live-audio-canonical-direct.log).
+The following probes document how the fixture problem was isolated.
 
 The default two-second 1080p fixture is still a failing case under instrumented
 decode/filter overhead. Merely extending its wait does not fix that result.

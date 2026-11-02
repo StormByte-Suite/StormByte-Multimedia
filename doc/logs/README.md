@@ -23,6 +23,17 @@ It is a snapshot, **not a passing release gate**.
 
 ### Results at this snapshot
 
+- Latest failed-case disposition: **39 canonical passing follow-ups and
+  8 external NVIDIA-driver exceptions**, not 47 clean sanitizer passes.
+  The fixed long live-audio fixture passes without environment overrides.
+  A driver-only NVENC session main reproduces the remaining 96-byte leak
+  after successful destruction; the eight hardware cases complete as six
+  functional passes and two unsupported-capability skips before LSan teardown.
+  [Exact exception and evidence](reproduce/nvidia-driver-exception.md).
+  OOM and final static triage are tracked separately and remain open.
+
+Earlier status snapshots:
+
 - Latest consolidated state after test deadline/readiness fixes:
   **38 original failures now pass; 9 remain unresolved**. The remaining cases
   are the default live-audio-track cycling fixture and eight NVENC tests.

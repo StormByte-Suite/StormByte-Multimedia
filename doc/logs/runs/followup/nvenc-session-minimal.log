@@ -1,0 +1,14 @@
+nvEncOpenEncodeSessionEx: 0
+nvEncDestroyEncoder: 0
+cuCtxDestroy_v2: 0
+
+=================================================================
+==2410051==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 96 byte(s) in 2 object(s) allocated from:
+    #0 0x7f983da0f4ed in calloc /tmp/portage/llvm-runtimes/compiler-rt-sanitizers-22.1.8/work/compiler-rt/lib/asan/asan_malloc_linux.cpp:74:3
+    #1 0x7f983d6ac1c3 in pthread_cond_broadcast /tmp/portage/sys-libs/glibc-2.44-r4/work/glibc-2.44/nptl/old_pthread_cond_broadcast.c:33:36
+
+SUMMARY: AddressSanitizer: 96 byte(s) leaked in 2 allocation(s).
+
+exit_code=134

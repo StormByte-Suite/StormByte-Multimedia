@@ -1,0 +1,6 @@
+cuInit: 0 (CUDA_SUCCESS)
+cuDeviceGetCount: 0; devices=1
+cuCtxCreate_v2: 0
+cuCtxDestroy_v2: 0
+
+exit_code=0

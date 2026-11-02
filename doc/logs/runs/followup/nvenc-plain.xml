@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="8"
+	failures="0"
+	disabled="0"
+	skipped="2"
+	hostname=""
+	time="4"
+	timestamp="2026-11-02T06:55:21"
+	>
+	<testcase name="pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata" classname="pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata" time="1.69952" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata
+[Test] CheckHdr10Encode: assert codec
+[Test] CheckHdr10Encode: assert source &amp;&amp; source.value().Streams().size() == 1
+[Test] CheckHdr10Encode: assert video
+[Hardware] hevc_nvenc: 10-bit yuv420p10le encoder preflight, profile 2
+[Hardware] hevc_nvenc: 10-bit encoder preflight available
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineVideoTests/test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata/pipeline/encoded-hevc-nvenc-hdr10.mkv
+[Test] CheckHdr10Encode: creating transcoder
+[LowLevel] 02/11/2026 06:55:21 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:55:21 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[LowLevel] 02/11/2026 06:55:21 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:55:21 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ]...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_hardware_h264_nvenc_capability" classname="pipeline.test_hardware_h264_nvenc_capability" time="0.435653" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_hardware_h264_nvenc_capability
+[Hardware] h264_nvenc: 8-bit nv12 encoder preflight, profile 1
+[Hardware] h264_nvenc: 8-bit encoder preflight available
+[Test] Finished test_hardware_h264_nvenc_capability: PASS
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_hardware_h264_nvenc_10bit_capability" classname="pipeline.test_hardware_h264_nvenc_10bit_capability" time="0.371847" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_hardware_h264_nvenc_10bit_capability
+[h264_nvenc @ 0x559548634480] 10 bit encode not supported
+[h264_nvenc @ 0x559548634480] No capable devices found
+[Hardware] h264_nvenc: 10-bit yuv420p10le encoder preflight, profile 2
+[Hardware] h264_nvenc: prepared 10-bit encoder open -542398533 (Generic error in an external library); unsupported backend encoding capability; SKIP
+[Test] Finished test_hardware_h264_nvenc_10bit_capability: SKIP
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_hardware_hevc_nvenc_capability" classname="pipeline.test_hardware_hevc_nvenc_capability" time="0.543721" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_hardware_hevc_nvenc_capability
+[Hardware] hevc_nvenc: 10-bit yuv420p10le encoder preflight, profile 2
+[Hardware] hevc_nvenc: 10-bit encoder preflight available
+[Test] Finished test_hardware_hevc_nvenc_capability: PASS
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_nvenc_encodes_h264_mp4" classname="pipeline.test_nvenc_encodes_h264_mp4" time="1.24493" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline;video-codecs"/>
+		</properties>
+		<system-out>[Test] Starting test_nvenc_encodes_h264_mp4
+[Hardware] h264_nvenc: 8-bit nv12 encoder preflight, profile 1
+[Hardware] h264_nvenc: 8-bit encoder preflight available
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineVideoCodecTests/test_nvenc_encodes_h264_mp4/pipeline/video-codecs/nvenc-h264.mp4
+[Test] CheckVideoCodec: opening media file for inspection
+[Test] CheckVideoCodec: assert source
+[Test] CheckVideoCodec: assert !source.value().Streams().empty()
+[Test] CheckVideoCodec: assert source.value().Streams()[0].Type() == StormByte::Multimedia::Type::Video
+[Test] CheckVideoCodec: assert codec
+[Test] CheckVideoCodec: creating transcoder
+[LowLevel] 02/11/2026 06:55:23 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:55:23 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:55:23 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:5...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_nvenc_encodes_h264_10bit_matroska" classname="pipeline.test_nvenc_encodes_h264_10bit_matroska" time="0.553177" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline;video-codecs"/>
+		</properties>
+		<system-out>[Test] Starting test_nvenc_encodes_h264_10bit_matroska
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineVideoCodecTests/test_nvenc_encodes_h264_10bit_matroska/pipeline/video-codecs/nvenc-h264-10bit.mkv
+[Test] CheckVideoCodec: opening media file for inspection
+[Test] CheckVideoCodec: assert source
+[Test] CheckVideoCodec: assert !source.value().Streams().empty()
+[Test] CheckVideoCodec: assert source.value().Streams()[0].Type() == StormByte::Multimedia::Type::Video
+[Test] CheckVideoCodec: assert codec
+[h264_nvenc @ 0x55e5ef9f6100] 10 bit encode not supported
+[h264_nvenc @ 0x55e5ef9f6100] No capable devices found
+[Hardware] h264_nvenc: 10-bit yuv420p10le encoder preflight, profile 2
+[Hardware] h264_nvenc: prepared 10-bit encoder open -542398533 (Generic error in an external library); unsupported backend encoding capability; SKIP
+[Test] Finished test_nvenc_encodes_h264_10bit_matroska: SKIP
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_nvenc_encodes_hevc_main_matroska" classname="pipeline.test_nvenc_encodes_hevc_main_matroska" time="1.22271" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline;video-codecs"/>
+		</properties>
+		<system-out>[Test] Starting test_nvenc_encodes_hevc_main_matroska
+[Hardware] hevc_nvenc: 8-bit nv12 encoder preflight, profile 1
+[Hardware] hevc_nvenc: 8-bit encoder preflight available
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineVideoCodecTests/test_nvenc_encodes_hevc_main_matroska/pipeline/video-codecs/nvenc-hevc-main.mkv
+[Test] CheckVideoCodec: opening media file for inspection
+[Test] CheckVideoCodec: assert source
+[Test] CheckVideoCodec: assert !source.value().Streams().empty()
+[Test] CheckVideoCodec: assert source.value().Streams()[0].Type() == StormByte::Multimedia::Type::Video
+[Test] CheckVideoCodec: assert codec
+[Test] CheckVideoCodec: creating transcoder
+[LowLevel] 02/11/2026 06:55:23 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:55:23 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/xvid_mp3_stereo.avi
+[LowLevel] 02/11/2026 06:55:23 StormByte/Multimedia/Transcoder add-track in=0
+[...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_nvenc_encodes_hevc_main10_matroska" classname="pipeline.test_nvenc_encodes_hevc_main10_matroska" time="1.68125" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;pipeline;video-codecs"/>
+		</properties>
+		<system-out>[Test] Starting test_nvenc_encodes_hevc_main10_matroska
+[Hardware] hevc_nvenc: 10-bit yuv420p10le encoder preflight, profile 2
+[Hardware] hevc_nvenc: 10-bit encoder preflight available
+[Test] OutputPath: preparing /tmp/BMDATA/plain-multimedia/test-output/MultimediaPipelineVideoCodecTests/test_nvenc_encodes_hevc_main10_matroska/pipeline/video-codecs/nvenc-hevc-main10.mkv
+[Test] CheckVideoCodec: opening media file for inspection
+[Test] CheckVideoCodec: assert source
+[Test] CheckVideoCodec: assert !source.value().Streams().empty()
+[Test] CheckVideoCodec: assert source.value().Streams()[0].Type() == StormByte::Multimedia::Type::Video
+[Test] CheckVideoCodec: assert codec
+[Test] CheckVideoCodec: creating transcoder
+[LowLevel] 02/11/2026 06:55:21 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:55:22 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/hdr10_metadata_source.mkv
+[LowLevel] 02/11/2026 06:55:22 StormByte/Multimedia/Transc...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,32 @@
+Test project /tmp/BMDATA/plain-multimedia/test
+    Start 111: pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata
+    Start 226: pipeline.test_nvenc_encodes_hevc_main10_matroska
+1/8 Test #226: pipeline.test_nvenc_encodes_hevc_main10_matroska ......................   Passed    1.68 sec
+    Start 225: pipeline.test_nvenc_encodes_hevc_main_matroska
+2/8 Test #111: pipeline.test_transcoder_hevc_nvenc_encode_preserves_hdr10_metadata ...   Passed    1.70 sec
+    Start 223: pipeline.test_nvenc_encodes_h264_mp4
+3/8 Test #225: pipeline.test_nvenc_encodes_hevc_main_matroska ........................   Passed    1.22 sec
+    Start 121: pipeline.test_hardware_hevc_nvenc_capability
+4/8 Test #223: pipeline.test_nvenc_encodes_h264_mp4 ..................................   Passed    1.24 sec
+    Start 119: pipeline.test_hardware_h264_nvenc_capability
+5/8 Test #119: pipeline.test_hardware_h264_nvenc_capability ..........................   Passed    0.44 sec
+    Start 120: pipeline.test_hardware_h264_nvenc_10bit_capability
+6/8 Test #121: pipeline.test_hardware_hevc_nvenc_capability ..........................   Passed    0.54 sec
+    Start 224: pipeline.test_nvenc_encodes_h264_10bit_matroska
+7/8 Test #120: pipeline.test_hardware_h264_nvenc_10bit_capability ....................***Skipped   0.37 sec
+8/8 Test #224: pipeline.test_nvenc_encodes_h264_10bit_matroska .......................***Skipped   0.55 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+multimedia      =   7.75 sec*proc (8 tests)
+pipeline        =   7.75 sec*proc (8 tests)
+video-codecs    =   4.70 sec*proc (4 tests)
+
+Total Test time (real) =   4.01 sec
+
+The following tests did not run:
+	120 - pipeline.test_hardware_h264_nvenc_10bit_capability (Skipped)
+	224 - pipeline.test_nvenc_encodes_h264_10bit_matroska (Skipped)
+
+exit_code=0

@@ -2,7 +2,7 @@
 set -uo pipefail
 
 if [[ $# != 3 ]]; then
-    echo "Usage: $0 BUILD_DIR {providers|svt|remaining|preview|deadlines} OUTPUT_DIR" >&2
+    echo "Usage: $0 BUILD_DIR {providers|svt|remaining|preview|deadlines|nvenc} OUTPUT_DIR" >&2
     exit 2
 fi
 
@@ -34,6 +34,11 @@ case "$scope" in
     deadlines)
         jobs=2
         regex='^(file.test_progress_duration_hint_skips_scan|preview.test_(av_seek_switch_epochs|hdr_preview_tone_mapping|hdr_preview_preserves_signal|live_audio_selection|live_audio_tracks|subtitle_decode|faulted_reader_retained))$'
+        ;;
+    nvenc)
+        jobs=2
+        export ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:protect_shadow_gap=0
+        regex='^pipeline.test_(hardware_h264_nvenc_10bit_capability|hardware_h264_nvenc_capability|hardware_hevc_nvenc_capability|nvenc_encodes_h264_10bit_matroska|nvenc_encodes_h264_mp4|nvenc_encodes_hevc_main10_matroska|nvenc_encodes_hevc_main_matroska|transcoder_hevc_nvenc_encode_preserves_hdr10_metadata)$'
         ;;
     *)
         echo "Unknown scope: $scope" >&2
