@@ -1,0 +1,44 @@
+From ddd324790cdf4191f45aca0ac6e46a39b07c3bca Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:34:10 +0100
+Subject: [PATCH] ratecontrol: skip residual-cost division when amortization is
+ disabled
+
+The rate-control update deliberately sets amortizeFrames and
+amortizeFraction to zero near the end of a known-length encode. Both
+partial and final residual accounting then divide zero by zero and
+convert NaN to int. Set the residual cost to zero when there are no
+frames over which to amortize, leaving all bits on the current frame.
+Reproduced in final accounting by the HEVC output-properties test with
+UBSan; the partial accounting has the same disabled state.
+---
+ source/encoder/ratecontrol.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/source/encoder/ratecontrol.cpp b/source/encoder/ratecontrol.cpp
+index d8f7327a0..38db26533 100644
+--- a/source/encoder/ratecontrol.cpp
++++ b/source/encoder/ratecontrol.cpp
+@@ -2452,7 +2452,8 @@ void RateControl::rateControlUpdateStats(RateControlEntry* rce)
+             rce->amortizeFrames = m_amortizeFrames;
+             rce->amortizeFraction = m_amortizeFraction;
+             m_partialResidualFrames = X265_MIN((int)rce->amortizeFrames, m_param->keyframeMax);
+-            m_partialResidualCost = (int)((rce->rowTotalBits * rce->amortizeFraction) / m_partialResidualFrames);
++            m_partialResidualCost = m_partialResidualFrames ?
++                (int)((rce->rowTotalBits * rce->amortizeFraction) / m_partialResidualFrames) : 0;
+             rce->rowTotalBits -= m_partialResidualCost * m_partialResidualFrames;
+         }
+         else if (m_partialResidualFrames)
+@@ -3198,7 +3199,8 @@ int RateControl::rateControlEnd(Frame* curFrame, int64_t bits, RateControlEntry*
+                 if (m_residualFrames)
+                     bits += m_residualCost * m_residualFrames;
+                 m_residualFrames = X265_MIN((int)rce->amortizeFrames, m_param->keyframeMax);
+-                m_residualCost = (int)((bits * rce->amortizeFraction) / m_residualFrames);
++                m_residualCost = m_residualFrames ?
++                    (int)((bits * rce->amortizeFraction) / m_residualFrames) : 0;
+                 bits -= m_residualCost * m_residualFrames;
+             }
+             else if (m_residualFrames)
+-- 
+2.56.0
+
