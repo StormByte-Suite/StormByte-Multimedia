@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled SVT-AV1 reads full-precision two-tap coefficient pairs through the same unaligned-safe helper as the half-precision interpolation path.
 - Bundled VMAF converts wavelet coefficients to unsigned before packing their high halves, avoiding signed left shifts while preserving the original packed coefficient values.
 - Bundled OpenH264 constructs trailing-bit masks with unsigned arithmetic, avoiding signed overflow when a write leaves 31 trailing bits; an isolated sanitizer check verifies 1,000 bitstreams against a bit-by-bit reference.
 - Bundled OpenH264 avoids shifting its bit accumulator by 32 when flushing an empty word or writing a full word into an empty accumulator.

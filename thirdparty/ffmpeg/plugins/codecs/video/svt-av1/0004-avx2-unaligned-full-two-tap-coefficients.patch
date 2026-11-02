@@ -1,0 +1,30 @@
+From 4112c73cf50fa1afeb9264179ca6ef6605418e4e Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] AVX2: load full two-tap coefficients without scalar alignment
+
+The non-halved two-tap coefficient helper reads filter + 3 through an
+int32_t pointer, despite its only guaranteed two-byte alignment. Use the
+existing unaligned-safe xx_loadl_32 helper, as in the corresponding
+half-coefficient path. Reproduced by the existing AV1 Dolby Vision
+reencode test with UBSan.
+---
+ Source/Lib/ASM_AVX2/convolve_avx2.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/Lib/ASM_AVX2/convolve_avx2.h b/Source/Lib/ASM_AVX2/convolve_avx2.h
+index 6a74372e6..1cda71eda 100644
+--- a/Source/Lib/ASM_AVX2/convolve_avx2.h
++++ b/Source/Lib/ASM_AVX2/convolve_avx2.h
+@@ -323,7 +323,7 @@ static INLINE void prepare_coeffs_2tap_avx2(const InterpFilterParams* const filt
+                                             __m256i* const coeffs /* [1] */) {
+     const int16_t* filter = av1_get_interp_filter_subpel_kernel(*filter_params, subpel_q4 & SUBPEL_MASK);
+ 
+-    const __m128i coeff_8 = _mm_cvtsi32_si128(*(const int32_t*)(filter + 3));
++    const __m128i coeff_8 = xx_loadl_32(filter + 3);
+     const __m256i coeff   = _mm256_broadcastsi128_si256(coeff_8);
+ 
+     // coeffs 3 4 3 4 3 4 3 4
+-- 
+2.56.0
+
