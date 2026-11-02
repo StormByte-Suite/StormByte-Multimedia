@@ -1,0 +1,27 @@
+From 194805d9859289cffdd56a009112596aefe68a9b Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:15:19 +0100
+Subject: [PATCH] motion: decode diamond directions without signed overflow
+
+Diamond search stores two signed two-bit directions in the low cost nibble. Extract positive and negative direction bits directly rather than left-shifting the entire signed cost into its sign bit. The four direction codes and all other costs are unchanged. UBSan reported the previous overflow in full-suite motion search.
+---
+ source/encoder/motion.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/encoder/motion.cpp b/source/encoder/motion.cpp
+index 1a8cf6371..939ab3613 100644
+--- a/source/encoder/motion.cpp
++++ b/source/encoder/motion.cpp
+@@ -1015,8 +1015,8 @@ int MotionEstimate::motionEstimate(ReferencePlanes *ref,
+             COPY1_IF_LT(bcost, (costs[3] << 4) + 12);
+             if (!(bcost & 15))
+                 break;
+-            bmv.x -= (bcost << 28) >> 30;
+-            bmv.y -= (bcost << 30) >> 30;
++            bmv.x -= ((bcost & 4) >> 2) - ((bcost & 8) >> 2);
++            bmv.y -= (bcost & 1) - (bcost & 2);
+             bcost &= ~15;
+         }
+         while (--i && bmv.checkRange(mvmin, mvmax));
+-- 
+2.56.0
