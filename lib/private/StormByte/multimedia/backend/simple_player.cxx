@@ -437,8 +437,14 @@ class Backend::SimplePlayer::Context {
 			m_ready.notify_all();
 			if (m_decode.joinable())
 				m_decode.join();
+			if (m_video.joinable())
+				m_video.join();
 			if (m_present.joinable())
 				m_present.join();
+			if (m_dropped_video) {
+				std::fprintf(stderr, "SimplePlayer: skipped %zu pending video frames under processing pressure\n", m_dropped_video);
+				m_dropped_video = 0;
+			}
 		}
 
 		/**
@@ -462,6 +468,7 @@ class Backend::SimplePlayer::Context {
 		void Clear() {
 			std::lock_guard lock(m_mutex);
 			m_queue.clear();
+			m_video_queue.clear();
 			m_bytes = 0;
 			m_end = m_position;
 			m_audio_end = m_position;
@@ -700,6 +707,39 @@ class Backend::SimplePlayer::Context {
 		 */
 		bool Video(AVFrame* frame) {
 			auto& decoder = m_decoders[0];
+			const double start = Timestamp(0, frame->best_effort_timestamp);
+			const auto rate = av_guess_frame_rate(m_format, m_format->streams[m_selected[0]], frame);
+			const double duration = frame->duration > 0
+				? frame->duration * av_q2d(m_format->streams[m_selected[0]]->time_base)
+				: (rate.num > 0 && rate.den > 0 ? av_q2d(av_inv_q(rate)) : 1.0 / 25);
+			decoder.m_next = start + duration;
+			if (start + duration <= m_target || (m_preview && m_preview_video_ready))
+				return true;
+			std::shared_ptr<AVFrame> owned(av_frame_clone(frame), [](AVFrame* value) { av_frame_free(&value); });
+			if (!owned)
+				throw Exception("preview video frame reference failed");
+			std::unique_lock lock(m_mutex);
+			m_ready.wait(lock, [&] {
+				if (m_cancel || m_video_queue.size() < 2)
+					return true;
+				if (!m_preview && !m_buffering && m_video_queue.front().Start <= m_position) {
+					m_video_queue.pop_front();
+					++m_dropped_video;
+					return true;
+				}
+				return false;
+			});
+			if (m_cancel)
+				return false;
+			m_video_queue.push_back({std::move(owned), start, duration});
+			if (m_preview)
+				m_preview_video_ready = true;
+			m_ready.notify_all();
+			return !m_decode_stop;
+		}
+
+		bool ConvertVideo(AVFrame* frame, double start, double duration) {
+			auto& decoder = m_decoders[0];
 			if (FFmpeg::HardwareDecode::Hardware(static_cast<AVPixelFormat>(frame->format))) {
 				if (!decoder.m_download)
 					throw Exception("preview hardware frame has no transfer destination");
@@ -708,17 +748,6 @@ class Backend::SimplePlayer::Context {
 					throw Exception("preview hardware frame transfer failed");
 				frame = decoder.m_download;
 			}
-			const double start = Timestamp(0, frame->best_effort_timestamp);
-			const auto rate = av_guess_frame_rate(m_format, m_format->streams[m_selected[0]], frame);
-			const double duration = frame->duration > 0
-				? frame->duration * av_q2d(m_format->streams[m_selected[0]]->time_base)
-				: (rate.num > 0 && rate.den > 0 ? av_q2d(av_inv_q(rate)) : 1.0 / 25);
-			decoder.m_next = start + duration;
-			if (start + duration <= m_target)
-				return true;
-			if (m_preview && m_preview_video_ready)
-				return true;
-
 			using PreviewFrame = FFmpeg::AVFrame;
 			const int transfer = frame->color_trc;
 			if (m_color_mode == PreviewColorMode::HDR
@@ -838,8 +867,6 @@ class Backend::SimplePlayer::Context {
 				event.m_bytes = bytes;
 				event.m_hdr_video = std::move(image);
 				const bool accepted = Enqueue(std::move(event));
-				if (accepted && m_preview)
-					m_preview_video_ready = true;
 				return accepted;
 			}
 			PreviewFrame display_rgb;
@@ -929,9 +956,28 @@ class Backend::SimplePlayer::Context {
 			event.m_bytes = static_cast<std::size_t>(image->m_pixels.size());
 			event.m_video = std::move(image);
 			const bool accepted = Enqueue(std::move(event));
-			if (accepted && m_preview)
-				m_preview_video_ready = true;
 			return accepted;
+		}
+
+		void ConvertVideoQueue() noexcept {
+			try {
+				std::unique_lock lock(m_mutex);
+				while (!m_cancel) {
+					m_ready.wait(lock, [&] { return m_cancel || !m_video_queue.empty(); });
+					if (m_cancel)
+						return;
+					auto pending = std::move(m_video_queue.front());
+					m_video_queue.pop_front();
+					m_video_busy = true;
+					m_ready.notify_all();
+					lock.unlock();
+					ConvertVideo(pending.Frame.get(), pending.Start, pending.Duration);
+					lock.lock();
+					m_video_busy = false;
+					m_ready.notify_all();
+				}
+			}
+			catch (...) { Failure(); }
 		}
 
 		/**
@@ -1314,7 +1360,10 @@ class Backend::SimplePlayer::Context {
 					m_open_cue = 0;
 				}
 				{
-					std::lock_guard lock(m_mutex);
+					std::unique_lock lock(m_mutex);
+					m_ready.wait(lock, [&] { return m_cancel || (!m_video_busy && m_video_queue.empty()); });
+					if (m_cancel)
+						return;
 					m_eof = true;
 				}
 				m_ready.notify_all();
@@ -1486,6 +1535,8 @@ class Backend::SimplePlayer::Context {
 			m_start = PlaybackClock::now();
 			m_present = std::thread([this] { Present(); });
 			try {
+				m_video_busy = false;
+				m_video = std::thread([this] { ConvertVideoQueue(); });
 				if (!m_eof)
 					m_decode = std::thread([this] { Decode(); });
 			}
@@ -1673,6 +1724,15 @@ class Backend::SimplePlayer::Context {
 		std::atomic<bool> m_decode_stop{false};						///< Stop demux at a decode boundary, retaining video state.
 		std::thread m_decode;										///< Decode worker.
 		std::thread m_present;										///< Presentation worker.
+		struct PendingVideo {
+			std::shared_ptr<AVFrame> Frame;
+			double Start;
+			double Duration;
+		};
+		std::thread m_video;										///< Color conversion worker, independent of PCM decoding.
+		std::deque<PendingVideo> m_video_queue;						///< At most two referenced decoded pictures, plus one conversion.
+		bool m_video_busy = false;									///< Conversion must finish before EOF is published.
+		std::size_t m_dropped_video = 0;							///< Reported once workers have joined.
 		std::deque<Event> m_queue;									///< Bounded scheduled presentation.
 		std::size_t m_bytes = 0;									///< Charged queue storage.
 		PlaybackState m_state = PlaybackState::Closed;				///< Observable lifecycle.

@@ -430,6 +430,16 @@ Display/device queues. Paused previews retain the smaller of the configured byte
 budget and 64 MiB. Embedded fonts, codec reference buffers and conversion scratch
 are separate from the pending-payload budget.
 
+Video color conversion and HDR tone mapping run on a separate worker so they do
+not serialize audio decoding. That worker retains at most two pending decoded
+frame references plus the frame being converted, outside the pending-payload
+budget. When conversion falls behind the playing timeline and the initial
+cushion is exhausted, overdue pending images may be skipped to let audio decoding
+continue. Paused seek previews and initial prebuffering do not use that policy.
+The player reports the number skipped when workers stop. This prioritizes audio
+continuity under processing pressure; it does not guarantee every video frame
+under sustained CPU starvation.
+
 ### Reader ownership and transfer to Transcoder
 
 `Open(std::string_view)` constructs a `BufferedFileReader`, copying the path into its `Safe::String`. `Open(Safe::Unique<Buffer::IO::BufferedLocationReader>)` takes exclusive ownership of a compatible buffered reader, preserving its subtype. It opens a not-yet-open reader once or rewinds a healthy already-open one. Failed Open retains the reader.

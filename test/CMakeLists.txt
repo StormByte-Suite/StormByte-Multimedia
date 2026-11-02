@@ -46,6 +46,7 @@ if(ENABLE_TEST)
 		test_audio_paused_seek
 		test_av_seek_switch_epochs
 		test_hdr_preview_tone_mapping
+		test_video_conversion_lifecycle
 		test_hdr_preview_preserves_signal
 		test_live_audio_selection
 		test_live_audio_tracks

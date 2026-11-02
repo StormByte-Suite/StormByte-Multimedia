@@ -1130,6 +1130,36 @@ int test_av_seek_switch_epochs() {
 }
 
 /**
+ * @brief Cancel and reconstruct queued HDR conversion without stale delivery or blocked joins.
+ * @return Test status.
+ */
+int test_video_conversion_lifecycle() {
+	auto display = Safe::MakeShared<FakeDisplay>();
+	SimplePlayer player(display);
+	player.Acceleration(DecodeAcceleration::Software);
+	TEST_REQUIRE(player.Open(Fixture("video/bluray_like_hdr10.mkv")));
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(player.Pause());
+	TEST_REQUIRE(player.Seek(.25));
+	TEST_REQUIRE(Wait([&] {
+		std::lock_guard lock(display->m_mutex);
+		return display->m_image && display->m_image->m_epoch == display->m_epoch;
+	}));
+	TEST_REQUIRE(player.State() == PlaybackState::Paused);
+	TEST_REQUIRE(player.Position() == .25);
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(player.Stop());
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(player.Close());
+	{
+		std::lock_guard lock(display->m_mutex);
+		TEST_REQUIRE(!display->m_image);
+		TEST_REQUIRE(display->m_paused);
+	}
+	return 0;
+}
+
+/**
  * @brief Verify SDR preview tone-maps a short PQ/BT.2020 clip.
  * @return Test status.
  */
@@ -2047,6 +2077,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_audio_paused_seek", test_audio_paused_seek},
 		TestEntry{"test_av_seek_switch_epochs", test_av_seek_switch_epochs},
 		TestEntry{"test_hdr_preview_tone_mapping", test_hdr_preview_tone_mapping},
+		TestEntry{"test_video_conversion_lifecycle", test_video_conversion_lifecycle},
 		TestEntry{"test_hdr_preview_preserves_signal", test_hdr_preview_preserves_signal},
 		TestEntry{"test_live_audio_selection", test_live_audio_selection},
 		TestEntry{"test_live_audio_tracks", test_live_audio_tracks},
