@@ -81,7 +81,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			/**
 			 * @brief Empty format context.
 			 */
-			Demuxer() noexcept;
+			Demuxer();
 
 			/**
 			 * @brief Closes the format context.
@@ -104,7 +104,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param owner Public demuxer.
 			 * @return false if owner.Fail() was called.
 			 */
-			bool Open(StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept;
+			bool Open(StormByte::Multimedia::Pipeline::Demuxer& owner);
 
 			/**
 			 * @brief Reads one compressed packet.
@@ -115,14 +115,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * owner.m_measureTracks are skipped (not treated as EOF).
 			 */
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Read(
-				StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept;
+				StormByte::Multimedia::Pipeline::Demuxer& owner);
 
 			/**
 			 * @brief Seeks the origin to the start. Hoppers stay open.
 			 * @param owner Public demuxer.
 			 * @return false if owner.Fail() was called.
 			 */
-			bool Rewind(StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept;
+			bool Rewind(StormByte::Multimedia::Pipeline::Demuxer& owner);
 
 			/**
 			 * @brief Opens a decode backend for @p decoder.Index().
@@ -132,7 +132,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			StormByte::Safe::Unique<Decoder> OpenDecoder(
 				StormByte::Multimedia::Pipeline::Demuxer& owner,
-				StormByte::Multimedia::Pipeline::Decoder& decoder) noexcept;
+				StormByte::Multimedia::Pipeline::Decoder& decoder);
 
 			/**
 			 * @brief Clones codec parameters and timing metadata of origin stream @p index.
@@ -143,7 +143,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return false if closed or @p index is missing.
 			 */
 			bool CloneStream(int index, ::AVCodecParameters*& params, AVRational& timeBase,
-				AVRational& averageFrameRate) noexcept;
+				AVRational& averageFrameRate);
 
 			/**
 			 * @brief Closes the format context.

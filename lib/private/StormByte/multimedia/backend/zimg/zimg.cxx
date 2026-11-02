@@ -55,6 +55,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <new>
+#include <StormByte/safe/exception.hxx>
 
 extern "C" {
 	#include <libavutil/pixdesc.h>
@@ -64,7 +66,7 @@ namespace StormByte::Multimedia::Backend {
 	namespace {
 		constexpr unsigned kAlign = 64;
 
-		void* Align64(std::vector<std::uint8_t>& buf, std::size_t bytes) noexcept {
+		void* Align64(std::vector<std::uint8_t>& buf, std::size_t bytes) {
 			buf.resize(bytes + kAlign);
 			const auto p = reinterpret_cast<std::uintptr_t>(buf.data());
 			return reinterpret_cast<void*>((p + (kAlign - 1)) & ~std::uintptr_t(kAlign - 1));
@@ -282,11 +284,11 @@ namespace StormByte::Multimedia::Backend {
 		m_jobSlot = nullptr;
 	}
 
-	void Zimg::EnsureWorkers(unsigned n) const noexcept {
+	bool Zimg::EnsureWorkers(unsigned n) const noexcept {
 		if (n <= 1)
-			return;
+			return true;
 		if (m_workers.size() == n - 1)
-			return;
+			return true;
 		const_cast<Zimg*>(this)->StopWorkers();
 		try {
 			m_workers.reserve(n - 1);
@@ -294,7 +296,9 @@ namespace StormByte::Multimedia::Backend {
 				m_workers.emplace_back([this, i]() { WorkerMain(i); });
 		} catch (...) {
 			const_cast<Zimg*>(this)->StopWorkers();
+			return false;
 		}
+		return true;
 	}
 
 	void Zimg::WorkerMain(unsigned id) const {
@@ -333,7 +337,7 @@ namespace StormByte::Multimedia::Backend {
 	bool Zimg::BuildStrip(Strip& strip, const FFmpeg::AVFrame& src,
 		const FFmpeg::AVFrame& dst, zimg_image_format in, zimg_image_format out,
 		FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height,
-		double peak) noexcept {
+		double peak) {
 		const double srcH = static_cast<double>(src.Height());
 		const double dstH = static_cast<double>(dst.Height());
 		in.active_region.left = 0;
@@ -360,6 +364,11 @@ namespace StormByte::Multimedia::Backend {
 			strip.graph = nullptr;
 			return false;
 		}
+		if (tmp > strip.scratch.max_size() - kAlign) {
+			zimg_filter_graph_free(strip.graph);
+			strip.graph = nullptr;
+			return false;
+		}
 		(void)Align64(strip.scratch, tmp ? tmp : 1);
 		strip.outTop = top;
 		strip.outHeight = height;
@@ -368,7 +377,7 @@ namespace StormByte::Multimedia::Backend {
 
 	bool Zimg::BuildSlot(Slot& slot, const FFmpeg::AVFrame& src,
 		const FFmpeg::AVFrame& dst, FFmpeg::AVFrame::Resample filter,
-		const Recolor* color) noexcept {
+		const Recolor* color) {
 		zimg_image_format in{};
 		zimg_image_format out{};
 		if (!FillFormat(src, in) || !FillFormat(dst, out))
@@ -438,9 +447,10 @@ namespace StormByte::Multimedia::Backend {
 			auto* base = static_cast<std::uint8_t*>(dst.plane[i].data);
 			dst.plane[i].data = base + dst.plane[i].stride * static_cast<int>(strip.outTop >> shift);
 		}
-		auto* tmp = Align64(const_cast<std::vector<std::uint8_t>&>(strip.scratch),
-			strip.scratch.empty() ? 1 : strip.scratch.size() > kAlign
-				? strip.scratch.size() - kAlign : 1);
+		if (strip.scratch.size() <= kAlign)
+			return false;
+		const auto address = reinterpret_cast<std::uintptr_t>(strip.scratch.data());
+		auto* tmp = reinterpret_cast<void*>((address + (kAlign - 1)) & ~std::uintptr_t(kAlign - 1));
 		return zimg_filter_graph_process(strip.graph, &srcBuf, &dst, tmp,
 			nullptr, nullptr, nullptr, nullptr) == 0;
 	}
@@ -465,7 +475,7 @@ namespace StormByte::Multimedia::Backend {
 	}
 
 	bool Zimg::Ensure(const FFmpeg::AVFrame& src, const FFmpeg::AVFrame& dst,
-		FFmpeg::AVFrame::Resample filter, Recolor color) noexcept {
+		FFmpeg::AVFrame::Resample filter, Recolor color) noexcept try {
 		const bool recolor = color.transfer >= 0;
 		const int srcW = src.Width();
 		const int srcH = src.Height();
@@ -492,11 +502,17 @@ namespace StormByte::Multimedia::Backend {
 				&& slot.outMatrix == matrix && slot.outRange == range
 				&& slot.outPeak == peak) {
 				m_current = &slot;
-				EnsureWorkers(static_cast<unsigned>(slot.strips.size()));
-				return true;
+				if (EnsureWorkers(static_cast<unsigned>(slot.strips.size())))
+					return true;
+				m_current = nullptr;
+				return false;
 			}
 		}
 
+		if (m_slots.size() == m_slots.max_size()) {
+			m_current = nullptr;
+			return false;
+		}
 		m_slots.emplace_back();
 		if (!BuildSlot(m_slots.back(), src, dst, filter, recolor ? &color : nullptr)) {
 			m_slots.pop_back();
@@ -504,11 +520,19 @@ namespace StormByte::Multimedia::Backend {
 			return false;
 		}
 		m_current = &m_slots.back();
-		EnsureWorkers(static_cast<unsigned>(m_current->strips.size()));
-		return true;
+		if (EnsureWorkers(static_cast<unsigned>(m_current->strips.size())))
+			return true;
+		m_current = nullptr;
+		return false;
+	} catch (const StormByte::Safe::AllocationError&) {
+		Free();
+		return false;
+	} catch (const std::bad_alloc&) {
+		Free();
+		return false;
 	}
 
-	bool Zimg::Scale(const FFmpeg::AVFrame& src, FFmpeg::AVFrame& dst) const noexcept {
+	bool Zimg::Scale(const FFmpeg::AVFrame& src, FFmpeg::AVFrame& dst) const noexcept try {
 		if (!m_current || m_current->strips.empty() || !dst.Data(0))
 			return false;
 
@@ -520,6 +544,8 @@ namespace StormByte::Multimedia::Backend {
 		auto& strips = m_current->strips;
 		if (strips.size() == 1)
 			return ProcessStrip(strips[0], srcBuf, dstBuf, m_current->subH);
+		if (strips.size() > m_jobOk.max_size())
+			return false;
 
 		{
 			std::unique_lock<std::mutex> lock(m_mu);
@@ -541,5 +567,9 @@ namespace StormByte::Multimedia::Backend {
 			});
 		}
 		return std::all_of(m_jobOk.begin(), m_jobOk.end(), [](int v) { return v != 0; });
+	} catch (const StormByte::Safe::AllocationError&) {
+		return false;
+	} catch (const std::bad_alloc&) {
+		return false;
 	}
 }

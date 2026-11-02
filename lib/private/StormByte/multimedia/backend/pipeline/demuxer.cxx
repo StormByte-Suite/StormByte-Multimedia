@@ -108,7 +108,7 @@ namespace {
 		return Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 
-	enum Type KindOf(FFmpeg::AVFormatContext& ctx, int index) noexcept {
+	enum Type KindOf(FFmpeg::AVFormatContext& ctx, int index) {
 		const auto streams = ctx.Streams();
 		for (const auto& stream : streams) {
 			if (stream.Index() != index)
@@ -134,7 +134,7 @@ class StormByte::Multimedia::Backend::Pipeline::Demuxer::Context {
 		std::unordered_set<int> wanted;
 };
 
-StormByte::Multimedia::Backend::Pipeline::Demuxer::Demuxer() noexcept
+StormByte::Multimedia::Backend::Pipeline::Demuxer::Demuxer()
 : m_ctx(StormByte::Safe::MakeUnique<Context>()) {}
 
 StormByte::Multimedia::Backend::Pipeline::Demuxer::~Demuxer() noexcept {
@@ -146,7 +146,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::IsOpen() const noexcept 
 }
 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
-	StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept {
+	StormByte::Multimedia::Pipeline::Demuxer& owner) {
 	if (!m_ctx)
 		m_ctx = StormByte::Safe::MakeUnique<Context>();
 	if (m_ctx->format) {
@@ -247,7 +247,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Open(
 
 StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>
 StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
-	StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept {
+	StormByte::Multimedia::Pipeline::Demuxer& owner) {
 	if (!m_ctx || !m_ctx->format) {
 		owner.Fail("demuxer is not open");
 		return {};
@@ -330,7 +330,7 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::Read(
 }
 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Rewind(
-	StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept {
+	StormByte::Multimedia::Pipeline::Demuxer& owner) {
 	if (!m_ctx || !m_ctx->format) {
 		owner.Fail("demuxer is not open");
 		return false;
@@ -349,7 +349,7 @@ bool StormByte::Multimedia::Backend::Pipeline::Demuxer::Rewind(
 StormByte::Safe::Unique<StormByte::Multimedia::Backend::Pipeline::Decoder>
 StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 	StormByte::Multimedia::Pipeline::Demuxer&,
-	StormByte::Multimedia::Pipeline::Decoder& decoder) noexcept {
+	StormByte::Multimedia::Pipeline::Decoder& decoder) {
 	if (!m_ctx || !m_ctx->format) {
 		decoder.Fail("demuxer is not open");
 		return {};
@@ -416,7 +416,7 @@ StormByte::Multimedia::Backend::Pipeline::Demuxer::OpenDecoder(
 
 bool StormByte::Multimedia::Backend::Pipeline::Demuxer::CloneStream(
 	int index, ::AVCodecParameters*& params, FFmpeg::AVRational& timeBase,
-	FFmpeg::AVRational& averageFrameRate) noexcept {
+	FFmpeg::AVRational& averageFrameRate) {
 	params = nullptr;
 	timeBase = FFmpeg::AVRational{0, 1};
 	averageFrameRate = FFmpeg::AVRational{0, 1};

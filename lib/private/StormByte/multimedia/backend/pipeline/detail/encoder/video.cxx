@@ -220,7 +220,7 @@ namespace {
 		return !plan || plan->Policies().Has(StormByte::Multimedia::Pipeline::Plan::Policy::EnforceFeatures);
 	}
 
-	bool RowKeeps(const StormByte::Multimedia::Pipeline::Encoder& owner, Feature feature) noexcept {
+	bool RowKeeps(const StormByte::Multimedia::Pipeline::Encoder& owner, Feature feature) {
 		const auto codec = owner.Destination().Name();
 		const auto& pin = owner.Implementation();
 		const std::string_view wanted = pin ? std::string_view{*pin} : std::string_view{};
@@ -263,11 +263,11 @@ namespace {
 
 Video::~Video() noexcept = default;
 
-Video::Video(Video&& other) noexcept = default;
+Video::Video(Video&& other) = default;
 
-Video& Video::operator=(Video&& other) noexcept = default;
+Video& Video::operator=(Video&& other) = default;
 
-Video::Video() noexcept
+Video::Video()
 : m_owner(nullptr), m_timeBase{0, 1}, m_index(0), m_flushed(false) {}
 
 bool Video::IsOpen() const noexcept {
@@ -299,7 +299,7 @@ void Video::StampOutgoing() noexcept {
 }
 
 bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	const StormByte::Multimedia::Pipeline::Frame& frame) {
 	if (m_encoder)
 		return true;
 	if (frame.Type() != Type::Video) {
@@ -364,7 +364,7 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
+	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) {
 	if (!frame) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"video encoder track {} received an empty frame handle",
@@ -478,7 +478,7 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	return true;
 }
 
-bool Video::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+bool Video::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	if (owner.Failed() || !m_encoder)
 		return false;
 	const auto result = m_encoder->ReceivePacket(m_scratch);
@@ -501,7 +501,7 @@ bool Video::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	return true;
 }
 
-void Video::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+void Video::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	if (owner.Failed() || !m_encoder || m_flushed)
 		return;
 	for (;;) {
@@ -538,7 +538,7 @@ void Video::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	m_flushed = true;
 }
 
-StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Video::Take() noexcept {
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Video::Take() {
 	if (m_pending.empty() && m_encoder && m_owner) {
 		const auto result = m_encoder->ReceivePacket(m_scratch);
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Success) {

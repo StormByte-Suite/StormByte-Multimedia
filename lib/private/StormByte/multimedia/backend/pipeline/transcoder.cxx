@@ -103,7 +103,7 @@ namespace {
 	StormByte::Safe::String ErrorText(const Optional& error, std::string_view fallback) noexcept {
 		try {
 			if (error)
-				return StormByte::Safe::String{std::string_view{error.value()}};
+				return StormByte::Safe::String{std::string_view{*error}};
 			return StormByte::Safe::String{fallback};
 		} catch (const StormByte::Safe::AllocationError&) {
 			return {};
@@ -113,7 +113,7 @@ namespace {
 	}
 
 	void JobLog(const StormByte::Safe::Shared<StormByte::Logger::Log>& log,
-		Level level, std::string_view text) noexcept {
+		Level level, std::string_view text) {
 		if (!log)
 			return;
 		*log << level << text << std::endl;
@@ -139,12 +139,13 @@ namespace {
 				Metrics->SampleMemory();
 				if (!Logger)
 					return;
-				const std::string report = static_cast<std::string>(*Metrics);
+				const auto ownedReport = static_cast<StormByte::Safe::String>(*Metrics);
+				const std::string_view report{ownedReport};
 				std::size_t begin = 0;
 				while (begin < report.size()) {
 					const std::size_t end = report.find('\n', begin);
 					const std::size_t length = end == std::string::npos ? report.size() - begin : end - begin;
-					JobLog(Logger, Level::Info, std::string_view{report}.substr(begin, length));
+					JobLog(Logger, Level::Info, report.substr(begin, length));
 					if (end == std::string::npos)
 						break;
 					begin = end + 1;
@@ -167,7 +168,7 @@ namespace {
 	}
 
 	void ConfigureEncoder(StormByte::Multimedia::Pipeline::Encoder& encoder,
-		const StormByte::Multimedia::Pipeline::Config::Base& config) noexcept {
+		const StormByte::Multimedia::Pipeline::Config::Base& config) {
 		if (config.Implementation().Encoder)
 			encoder.Implementation(config.Implementation().Encoder.value());
 		if (const auto* video = dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Video*>(&config)) {
@@ -204,7 +205,7 @@ namespace {
 
 	void StampMuxTags(StormByte::Multimedia::Pipeline::Muxer& mux, int out,
 		const StormByte::Multimedia::Pipeline::Config::Base& config,
-		const StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Stream>& origin) noexcept {
+		const StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Stream>& origin) {
 		if (config.Language())
 			mux.Language(out, config.Language().value());
 		else if (origin && origin->Language())
@@ -229,7 +230,7 @@ namespace {
 	}
 }
 
-Transcoder::Transcoder() noexcept
+Transcoder::Transcoder()
 : Metrics(StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::JobTelemetry>()) {}
 
 Transcoder::~Transcoder() noexcept {
@@ -252,7 +253,7 @@ void Transcoder::Start(StormByte::Multimedia::Pipeline::Transcoder& job) noexcep
 	{
 		StormByte::Safe::UniqueLock lock(Lock);
 			Clock = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Progress>();
-		if (!job.m_duration || job.m_duration.value() <= 0)
+		if (!job.m_duration || *job.m_duration <= 0)
 			Clock->BeginDurationCalculation();
 	}
 	Status.store(StormByte::Multimedia::Pipeline::Status::Running, StormByte::Safe::MemoryOrder::Release);

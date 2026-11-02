@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/mux.hxx>
+#include <new>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/muxer.hxx>
 #include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
@@ -65,7 +66,7 @@
 #include <string_view>
 
 namespace {
-	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) {
 		if (!value)
 			return "-";
 		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
@@ -84,12 +85,16 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
 		m_owner(owner) {}
 
-	void Mux::Setup() noexcept {
+	void Mux::Setup() noexcept try {
 		NameThread("STMM:Muxer");
 		static_cast<void>(m_owner.SetupPlan());
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Mux::Process(Item::PointerType item) noexcept {
+	void Mux::Process(Item::PointerType item) noexcept try {
 		if (!item) {
 			Flush();
 			return;
@@ -148,14 +153,22 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				track, packet->Serial().value_or(0), packet->Part(),
 				Ns(packet->Pts()), Ns(packet->Dts()),
 				pos, std::string_view{payloadLength}, payloadBytes, payloadDigest));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Mux::Flush() noexcept {
+	void Mux::Flush() noexcept try {
 		if (m_owner.m_backend && !m_owner.Failed())
 			m_owner.m_backend->Flush(m_owner);
 		m_owner.FlushOctets();
 		m_owner.m_closed.store(true, StormByte::Safe::MemoryOrder::Release);
 		m_owner.ClockMuxDone();
 		Log(Level::Notice, "closed");
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 }

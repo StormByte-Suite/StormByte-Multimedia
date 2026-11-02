@@ -101,6 +101,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Must be noexcept. Called once by the Pumper. On
 			 * error call @ref Fail and return. The Pumper sets
 			 * Ready only if it is still Created after return.
+			 * Allocating backend helpers may throw; concrete workers
+			 * catch allocation failures and call the message-free Fail().
 			 */
 			virtual void Setup() noexcept = 0;
 

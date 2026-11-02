@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/decode.hxx>
+#include <new>
 #include <StormByte/multimedia/backend/pipeline/detail/decoder/subtitle.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/decoder.hxx>
@@ -66,7 +67,7 @@
 #include <string_view>
 
 namespace {
-	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) {
 		if (!value)
 			return "-";
 		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
@@ -89,7 +90,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
 		m_owner(owner) {}
 
-	void Decode::Setup() noexcept {
+	void Decode::Setup() noexcept try {
 		NameThread("STMM:Decode:" + std::to_string(m_owner.m_index));
 		if (!m_owner.WaitForPlan() || !m_owner.SetupPlan())
 			return;
@@ -129,9 +130,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_inDts.reset();
 		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open t={} impl={}",
 			m_owner.m_index, std::string_view{m_owner.m_implementation.value_or(StormByte::Safe::String{"auto"})}));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Decode::Process(Item::PointerType item) noexcept {
+	void Decode::Process(Item::PointerType item) noexcept try {
 		if (!item) {
 			Flush();
 			return;
@@ -232,9 +237,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		(void)emitted;
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Decode::Flush() noexcept {
+	void Decode::Flush() noexcept try {
 		if (m_owner.Failed() || !m_owner.m_backend)
 			return;
 		const auto started = std::chrono::steady_clock::now();
@@ -277,5 +286,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_backend.reset();
 		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("decoder backend release end t={} look={} owner={}",
 			m_owner.m_index, m_owner.m_look, static_cast<const void*>(&m_owner)));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 }

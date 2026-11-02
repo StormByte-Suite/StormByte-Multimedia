@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
+#include <new>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
@@ -90,7 +91,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			m_thread.join();
 	}
 
-	Demux::Demux(Demuxer& owner) noexcept
+	Demux::Demux(Demuxer& owner)
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
 		m_owner(owner) {}
 
@@ -114,11 +115,12 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_feeds.clear();
 	}
 
-	void Demux::EnsureFeed(int track) noexcept {
+	void Demux::EnsureFeed(int track) {
 		if (std::find_if(m_feeds.begin(), m_feeds.end(), [track](const auto& feeder) {
 				return feeder->Track() == track;
 			}) != m_feeds.end())
 			return;
+		m_feeds.reserve(m_feeds.size() + 1);
 		m_feeds.push_back(StormByte::Safe::Shared<FeedThread>::MakePointer<FeedThread>(*this, track));
 	}
 
@@ -141,7 +143,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		return cap.Park() != 0 ? cap.Park() : ParkFallback;
 	}
 
-	void Demux::FeedTrack(int track) noexcept {
+	void Demux::FeedTrack(int track) noexcept try {
 		NameThread(StormByte::Safe::String::ReplaceToken("STMM:DmxF{}", track));
 		for (;;) {
 			Packet::PointerType packet;
@@ -168,6 +170,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			}
 			m_parkCv.notify_all();
 		}
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
 	void Demux::WaitFeedIdle() noexcept {
@@ -182,7 +188,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 	}
 
-	void Demux::Setup() noexcept {
+	void Demux::Setup() noexcept try {
 		NameThread("STMM:Demuxer");
 		m_owner.WaitForPlan();
 		if (Stopping() || !m_owner.Plan())
@@ -207,10 +213,17 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				m_subtitles.push_back(track->In());
 		}
 		m_feedStop.store(false, StormByte::Safe::MemoryOrder::Release);
-			Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open {}", std::string_view{m_owner.Origin().Path()}));
+		std::string_view path{m_owner.Origin().Path()};
+		if (path.size() > 4096)
+			path = std::string_view{path.data(), 4096};
+		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open {}", path));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Demux::Process(Item::PointerType) noexcept {
+	void Demux::Process(Item::PointerType) noexcept try {
 		if (!m_owner.m_backend || !m_owner.m_backend->IsOpen()) {
 			Ended();
 			return;
@@ -274,9 +287,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			}
 		}
 		Park(std::move(packet));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Demux::Park(Packet::PointerType packet) noexcept {
+	void Demux::Park(Packet::PointerType packet) noexcept try {
 		const int track = packet->Track();
 		const StormByte::Size ceiling = ParkCeiling(track);
 		{
@@ -291,6 +308,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			m_park[track].push_back(std::move(packet));
 		}
 		m_parkCv.notify_all();
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
 	void Demux::Flush() noexcept {}

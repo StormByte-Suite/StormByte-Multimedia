@@ -147,7 +147,7 @@ namespace {
 		return av_d2q(v, 100000);
 	}
 
-	void DropPlus(::AVFrame* raw, StormByte::Safe::String& warning, const char* why) noexcept {
+	void DropPlus(::AVFrame* raw, StormByte::Safe::String& warning, const char* why) {
 		if (!raw || !av_frame_get_side_data(raw, AV_FRAME_DATA_DYNAMIC_HDR_PLUS))
 			return;
 		av_frame_remove_side_data(raw, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
@@ -231,7 +231,7 @@ bool Video::DoviCompatible(const ::AVFrame* before, const ::AVFrame* after) noex
 		&& before->colorspace == after->colorspace && before->color_range == after->color_range;
 }
 
-void Video::Put(const ::AVFrame* before, ::AVFrame* after) noexcept {
+void Video::Put(const ::AVFrame* before, ::AVFrame* after) {
 	m_warning.clear();
 	m_diagnostic.clear();
 	ResolveColor(before, after);

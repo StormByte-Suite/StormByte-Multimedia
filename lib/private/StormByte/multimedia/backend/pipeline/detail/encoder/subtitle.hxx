@@ -87,7 +87,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			/**
 			 * @brief Default constructor.
 			 */
-			Subtitle() noexcept;
+			Subtitle();
 
 			/**
 			 * @brief Destructor.
@@ -111,14 +111,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @brief Move constructor.
 			 * @param other Backend to take.
 			 */
-			Subtitle(Subtitle&& other) noexcept;
+			Subtitle(Subtitle&& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Backend to take.
 			 * @return *this.
 			 */
-			Subtitle& operator=(Subtitle&& other) noexcept;
+			Subtitle& operator=(Subtitle&& other);
 
 			/**
 			 * @brief Whether the FFmpeg encoder is open.
@@ -131,7 +131,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @param owner Public encoder with completed output configuration.
 			 * @return False if codec selection or opening failed.
 			 */
-			bool PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept override;
+			bool PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) override;
 
 			/**
 			 * @brief Validates a subtitle frame and ensures header preparation has completed.
@@ -140,7 +140,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Multimedia::Pipeline::Frame& frame) noexcept override;
+				const StormByte::Multimedia::Pipeline::Frame& frame) override;
 
 			/**
 			 * @brief Encodes one subtitle cue using the codec prepared for the mux header.
@@ -149,13 +149,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return true if the cue was accepted (or skipped empty).
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) override;
 
 			/**
 			 * @brief Emits any held show packet, then marks flushed.
 			 * @param owner Public encoder.
 			 */
-			void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept override;
+			void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) override;
 
 			/**
 			 * @brief Pops one encoded subtitle packet.
@@ -187,7 +187,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @param endNs Cue end in nanoseconds.
 			 */
 			void EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
-				std::int64_t endNs) noexcept;
+				std::int64_t endNs);
 
 			mutable StormByte::Safe::Unique<StormByte::Safe::Mutex> m_openMutex;	///< Serializes mux preparation and first-cue opening.
 			StormByte::Safe::Optional<StormByte::Multimedia::FFmpeg::AVEncoder> m_encoder;	///< Opened encoder.

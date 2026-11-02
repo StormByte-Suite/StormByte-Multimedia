@@ -102,7 +102,7 @@ namespace {
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	bool Attachment::WriteCovers(StormByte::Multimedia::Pipeline::Muxer& owner,
 		AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments,
-		std::string_view format) noexcept {
+		std::string_view format) {
 		unsigned picture = 0;
 		for (const auto& attachment : attachments) {
 			const auto mime = attachment.MimeType();
@@ -154,7 +154,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Attachment::WriteCoverPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
-		AVFormatContext& context) noexcept {
+		AVFormatContext& context) {
 		for (unsigned index = 0; index < context.nb_streams; ++index) {
 			const auto* stream = context.streams[index];
 			if (!(stream->disposition & AV_DISPOSITION_ATTACHED_PIC))
@@ -180,7 +180,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Attachment::WritePictureComments(StormByte::Multimedia::Pipeline::Muxer& owner,
-		AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) noexcept {
+		AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) {
 		unsigned picture = 0;
 		for (const auto& attachment : attachments) {
 			const auto mime = attachment.MimeType();
@@ -243,7 +243,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Attachment::Write(StormByte::Multimedia::Pipeline::Muxer& owner,
-		AVFormatContext* ctx, const StormByte::Multimedia::Attachments& attachments) noexcept {
+		AVFormatContext* ctx, const StormByte::Multimedia::Attachments& attachments) {
 		if (!ctx)
 			return true;
 		if (attachments.empty())

@@ -188,7 +188,7 @@ namespace StormByte::Multimedia::Detail {
 	 * @param pattern MIME pattern.
 	 * @return true if usable as a filter.
 	 */
-	bool MimePatternOk(std::string_view pattern) noexcept;
+	bool MimePatternOk(std::string_view pattern);
 
 	/**
 	 * @brief true if @p mime matches @p pattern.
@@ -196,26 +196,26 @@ namespace StormByte::Multimedia::Detail {
 	 * @param pattern Exact type/subtype, type-star category, or star-star (all).
 	 * @return true on match.
 	 */
-	bool MimeMatches(std::string_view mime, std::string_view pattern) noexcept;
+	bool MimeMatches(std::string_view mime, std::string_view pattern);
 
 	/**
 	 * @brief Builds an attachment from a cover / attached stream.
 	 * @param stream Stream view.
 	 * @return Attachment (payload may be empty).
 	 */
-	Multimedia::Attachment MakeAttachment(const FFmpeg::AVStream& stream) noexcept;
+	Multimedia::Attachment MakeAttachment(const FFmpeg::AVStream& stream);
 
 	/**
 	 * @brief Collects covers and container attachments from an open context.
 	 * @param ctx Opened format context.
 	 * @return Catalogue.
 	 */
-	CollectedAttachments CollectAttachments(const FFmpeg::AVFormatContext& ctx) noexcept;
+	CollectedAttachments CollectAttachments(const FFmpeg::AVFormatContext& ctx);
 
 	/**
 	 * @brief Fills empty attachment payloads from packets.
 	 * @param ctx Opened format context.
 	 * @param items Catalogue from CollectAttachments.
 	 */
-	void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx, Multimedia::Attachments& items) noexcept;
+	void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx, Multimedia::Attachments& items);
 }

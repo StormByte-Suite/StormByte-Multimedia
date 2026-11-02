@@ -58,10 +58,11 @@
 #include <StormByte/safe/string.hxx>
 
 #include <string>
+#include <new>
 #include <string_view>
 
 namespace {
-	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) {
 		if (!value)
 			return "-";
 		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
@@ -78,7 +79,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
 		m_owner(owner) {}
 
-	void Remux::Setup() noexcept {
+	void Remux::Setup() noexcept try {
 		NameThread("STMM:Remuxer:" + std::to_string(m_owner.m_index));
 		if (!m_owner.WaitForPlan())
 			return;
@@ -91,9 +92,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		}
 
 		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("open t={}", m_owner.m_index));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Remux::Process(Item::PointerType item) noexcept {
+	void Remux::Process(Item::PointerType item) noexcept try {
 		if (dynamic_cast<const SubtitleProgress*>(item.get()))
 			return;
 		if (!item) {
@@ -125,6 +130,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				PacketDigest(packet->Payload())));
 		}
 		m_owner.Emit(std::move(packet));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
 	void Remux::Flush() noexcept {}

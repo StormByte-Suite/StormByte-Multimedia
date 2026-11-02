@@ -121,7 +121,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Video and Audio leaves land under Detail::Content.
 			 * Until those files exist every type is passthrough.
 			 */
-			static StormByte::Safe::Unique<Content> For(StormByte::Multimedia::Type type) noexcept;
+			static StormByte::Safe::Unique<Content> For(StormByte::Multimedia::Type type);
 
 			/**
 			 * @brief Make extras on @p after match the card of @p before.
@@ -132,7 +132,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Coupled extras that cannot be remapped are dropped and
 			 * described by @ref Warning.
 			 */
-			virtual void Put(const ::AVFrame* before, ::AVFrame* after) noexcept = 0;
+			virtual void Put(const ::AVFrame* before, ::AVFrame* after) = 0;
 
 			/**
 			 * @brief Why coupled extras were dropped, if they were.

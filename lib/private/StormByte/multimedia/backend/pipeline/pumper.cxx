@@ -90,7 +90,8 @@ void Pumper::Launch() noexcept {
 	try {
 	if (m_thread.joinable() || !m_worker || Stopping())
 		return;
-	m_thread = StormByte::Safe::Thread([this]() {
+	m_thread = StormByte::Safe::Thread([this]() noexcept {
+		try {
 		StormByte::Multimedia::Detail::UseCNumericLocale();
 		auto& telemetry = m_host.Telemetry();
 		telemetry.Start();
@@ -138,6 +139,15 @@ void Pumper::Launch() noexcept {
 		telemetry.SetState(Status());
 		telemetry.Finish();
 		m_host.Completed(success);
+		} catch (const StormByte::Safe::AllocationError&) {
+			m_host.Fail();
+			m_host.Telemetry().Finish();
+			m_host.Completed(false);
+		} catch (const std::bad_alloc&) {
+			m_host.Fail();
+			m_host.Telemetry().Finish();
+			m_host.Completed(false);
+		}
 	});
 	} catch (const StormByte::Safe::AllocationError&) {
 		m_host.Fail();
@@ -216,7 +226,7 @@ void Pumper::PumpSource() noexcept {
 	}
 }
 
-void Pumper::PumpPop() noexcept {
+void Pumper::PumpPop() noexcept try {
 	if (!m_worker)
 		return;
 	for (;;) {
@@ -256,6 +266,10 @@ void Pumper::PumpPop() noexcept {
 		if (Failed())
 			break;
 	}
+} catch (const StormByte::Safe::AllocationError&) {
+	m_host.Fail();
+} catch (const std::bad_alloc&) {
+	m_host.Fail();
 }
 
 Worker* Pumper::Bound() noexcept {

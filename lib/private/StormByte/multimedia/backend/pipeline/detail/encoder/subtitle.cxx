@@ -87,8 +87,10 @@ namespace {
 			if (fields[i] != ',')
 				continue;
 			++commas;
-			if (commas == need)
-				return fields.substr(i + 1);
+			if (commas == need) {
+				fields.remove_prefix(i + 1);
+				return fields;
+			}
 		}
 
 		return {};
@@ -104,7 +106,7 @@ namespace {
 		return commas >= PackedAssFieldsBeforeText;
 	}
 
-	std::string DialogueBody(std::string_view in) noexcept {
+	std::string DialogueBody(std::string_view in) {
 		while (!in.empty() && (in.front() == '\0' || in.front() == ' ' || in.front() == '\t'))
 			in.remove_prefix(1);
 		while (!in.empty() && (in.back() == '\0' || in.back() == '\n' || in.back() == '\r'))
@@ -129,7 +131,7 @@ namespace {
 		return std::string(in);
 	}
 
-	std::string StripAssTags(std::string_view in) noexcept {
+	std::string StripAssTags(std::string_view in) {
 		std::string out;
 		out.reserve(in.size());
 		bool tag = false;
@@ -145,7 +147,7 @@ namespace {
 		return out;
 	}
 
-	std::string NewlinesFromAss(std::string text) noexcept {
+	std::string NewlinesFromAss(std::string text) {
 		for (std::size_t i = 0; i + 1 < text.size(); ++i) {
 			if (text[i] == '\\' && (text[i + 1] == 'N' || text[i + 1] == 'n')) {
 				text[i] = '\n';
@@ -156,7 +158,7 @@ namespace {
 		return text;
 	}
 
-	std::string NewlinesToAss(std::string text) noexcept {
+	std::string NewlinesToAss(std::string text) {
 		std::string out;
 		out.reserve(text.size() + 8);
 		for (const char c : text) {
@@ -181,7 +183,7 @@ namespace {
 		return impl == "srt" || impl == "subrip" || impl == "webvtt" || impl == "text";
 	}
 
-	std::string ReadCue(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	std::string ReadCue(StormByte::Multimedia::Pipeline::Frame& frame) {
 		auto& pay = frame.Payload();
 		const auto n = pay.Available();
 		if (n == 0)
@@ -204,7 +206,7 @@ namespace {
 		return std::string(reinterpret_cast<const char*>(bytes.data() + begin), end - begin);
 	}
 
-	StormByte::Safe::Optional<GrayBitmap> ReadOcrBitmap(StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	StormByte::Safe::Optional<GrayBitmap> ReadOcrBitmap(StormByte::Multimedia::Pipeline::Frame& frame) {
 		auto& pay = frame.Payload();
 		const auto n = pay.Available();
 		if (n < 12)
@@ -231,7 +233,7 @@ namespace {
 		return out;
 	}
 
-	std::string TessLanguage(std::string_view tag) noexcept {
+	std::string TessLanguage(std::string_view tag) {
 		std::string out;
 		for (unsigned char c : tag)
 			out.push_back(static_cast<char>(std::tolower(c)));
@@ -256,7 +258,7 @@ namespace {
 	 * FFmpeg stores ASS events as `ReadOrder,Layer,Style,Name,MarginL,MarginR,MarginV,Effect,Text`;
 	 * timing travels in the packet, so a full `Dialogue:` line would end up verbatim in the output.
 	 */
-	std::string PackAss(std::string text, std::uint64_t readOrder) noexcept {
+	std::string PackAss(std::string text, std::uint64_t readOrder) {
 		return std::to_string(readOrder) + ",0,Default,,0,0,0,," + NewlinesToAss(std::move(text));
 	}
 
@@ -272,11 +274,11 @@ namespace {
 
 Subtitle::~Subtitle() noexcept = default;
 
-Subtitle::Subtitle(Subtitle&& other) noexcept = default;
+Subtitle::Subtitle(Subtitle&& other) = default;
 
-Subtitle& Subtitle::operator=(Subtitle&& other) noexcept = default;
+Subtitle& Subtitle::operator=(Subtitle&& other) = default;
 
-Subtitle::Subtitle() noexcept
+Subtitle::Subtitle()
 : m_openMutex(StormByte::Safe::MakeUnique<StormByte::Safe::Mutex>()),
 	m_timeBase{1, AV_TIME_BASE},
 	m_index(0),
@@ -301,7 +303,7 @@ FFmpeg::AVRational Subtitle::TimeBase() const noexcept {
 }
 
 bool Subtitle::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	const StormByte::Multimedia::Pipeline::Frame& frame) {
 	if (frame.Type() != Type::Subtitle) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"subtitle encoder track {} received a {} frame",
@@ -311,7 +313,7 @@ bool Subtitle::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	return PrepareForHeader(owner);
 }
 
-bool Subtitle::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+bool Subtitle::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	StormByte::Safe::UniqueLock lock(*m_openMutex);
 	if (m_encoder)
 		return true;
@@ -335,7 +337,7 @@ std::int64_t Subtitle::ProgressBoundary(std::int64_t boundary) const noexcept {
 }
 
 void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
-	std::int64_t endNs) noexcept {
+	std::int64_t endNs) {
 	if (m_heldText.empty() || m_heldPts == AV_NOPTS_VALUE)
 		return;
 
@@ -409,7 +411,7 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
+	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) {
 	if (!frame) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"subtitle encoder track {} received an empty frame handle",
@@ -474,7 +476,7 @@ bool Subtitle::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	return !owner.Failed();
 }
 
-void Subtitle::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+void Subtitle::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	if (!m_heldText.empty())
 		EmitHeld(owner, m_heldStartNs + FallbackCueNs);
 	m_flushed = true;

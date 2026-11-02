@@ -109,7 +109,7 @@ namespace {
 		return Property::Duration{std::chrono::nanoseconds{ns}};
 	}
 
-	std::vector<std::pair<std::string, std::string>> SplitBlob(std::string_view blob) noexcept {
+	std::vector<std::pair<std::string, std::string>> SplitBlob(std::string_view blob) {
 		std::vector<std::pair<std::string, std::string>> out;
 		std::string_view rest = blob;
 		while (!rest.empty()) {
@@ -126,7 +126,7 @@ namespace {
 		return out;
 	}
 
-	std::string JoinBlob(const std::map<std::string, std::string>& values) noexcept {
+	std::string JoinBlob(const std::map<std::string, std::string>& values) {
 		std::string out;
 		for (const auto& [key, value] : values) {
 			if (key.empty())
@@ -145,7 +145,7 @@ namespace {
 		return key && key[0] != '\0';
 	}
 
-	bool IsResourceThreadKey(std::string_view key) noexcept {
+	bool IsResourceThreadKey(std::string_view key) {
 		std::string normalized;
 		normalized.reserve(key.size());
 		for (const char c : key) {
@@ -197,11 +197,11 @@ namespace {
 	}
 }
 
-bool Encoder::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder&) noexcept {
+bool Encoder::PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder&) {
 	return true;
 }
 
-bool Encoder::PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+bool Encoder::PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	return owner.m_backend && owner.m_backend->PrepareForHeader(owner);
 }
 
@@ -219,7 +219,7 @@ std::int64_t Encoder::NsToTicks(std::int64_t ns, FFmpeg::AVRational timeBase) no
 StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Encoder::MakePacket(
 	StormByte::Multimedia::Pipeline::Encoder& owner,
 	enum Type type, int index, const StormByte::Multimedia::FFmpeg::AVPacket& raw,
-	AVRational timeBase, bool keepPacketHdrPlus) noexcept {
+	AVRational timeBase, bool keepPacketHdrPlus) {
 	StormByte::Safe::Binary bytes;
 	const auto* data = raw.Data();
 	const int size = raw.Size();
@@ -292,7 +292,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 	StormByte::Multimedia::Pipeline::Encoder& owner,
 	StormByte::Multimedia::FFmpeg::AVCodecParameters params,
 	StormByte::Multimedia::FFmpeg::AVRational timeBase,
-	Features need, const FFmpeg::AVFrame* firstFrame) noexcept {
+	Features need, const FFmpeg::AVFrame* firstFrame) {
 	if (!owner.Destination().HasAccess(Operation::Write)) {
 		owner.Fail("codec is not writable");
 		return std::nullopt;
@@ -640,7 +640,7 @@ const StormByte::Multimedia::FFmpeg::AVFrame* Encoder::FrameHandle(
 }
 
 void Encoder::CommitOpen(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const Opened& opened) noexcept {
+	const Opened& opened) {
 	const auto& handle = opened.Handle();
 	if (const auto* context = handle.Context(); context && context->codec_type == AVMEDIA_TYPE_VIDEO
 		&& (context->width != handle.InputWidth() || context->height != handle.InputHeight())) {

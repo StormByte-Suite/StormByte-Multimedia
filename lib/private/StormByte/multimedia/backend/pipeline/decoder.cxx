@@ -64,7 +64,7 @@ using PublicDecoder = StormByte::Multimedia::Pipeline::Decoder;
 using PublicFrame = StormByte::Multimedia::Pipeline::Frame;
 
 bool Decoder::RejectedPacket(PublicDecoder& owner,
-	const StormByte::Multimedia::Pipeline::Packet& packet, int error) noexcept {
+	const StormByte::Multimedia::Pipeline::Packet& packet, int error) {
 	const auto reason = error != 0 ? StormByte::Multimedia::FFmpeg::ErrorToString(error)
 		: StormByte::Safe::String{"bitstream filter failed"};
 	const auto message = StormByte::Safe::String::ReplaceToken(

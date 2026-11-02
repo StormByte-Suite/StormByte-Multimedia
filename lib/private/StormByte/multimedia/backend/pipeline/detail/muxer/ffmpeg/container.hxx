@@ -128,7 +128,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			/**
 			 * @brief Empty output context.
 			 */
-			Container() noexcept;
+			Container();
 
 			/**
 			 * @brief Writes trailer if needed and frees the context.
@@ -177,7 +177,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * Format comes from the identity resolved by Plan construction.
 			 * Bytes go to @ref Plan::Writer via FileAvio; the path is only a label.
 			 */
-			bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept override;
+			bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) override;
 
 			/**
 			 * @brief Reserves an encode track.
@@ -186,7 +186,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool ReserveEncoder(StormByte::Multimedia::Pipeline::Muxer& owner,
-				StormByte::Multimedia::Pipeline::Encoder& encoder) noexcept override;
+				StormByte::Multimedia::Pipeline::Encoder& encoder) override;
 
 			/**
 			 * @brief Reserves a remux output slot for origin stream @p inIndex.
@@ -195,7 +195,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool ReserveRemux(StormByte::Multimedia::Pipeline::Muxer& owner,
-				int inIndex) noexcept override;
+				int inIndex) override;
 
 			/**
 			 * @brief Binds a collected attachment catalogue for header time.
@@ -204,7 +204,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool BindAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-				const StormByte::Multimedia::Attachments& attachments) noexcept override;
+				const StormByte::Multimedia::Attachments& attachments) override;
 
 			/**
 			 * @brief Queues or writes one packet.
@@ -213,13 +213,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return true if the packet was accepted.
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Muxer& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) override;
 
 			/**
 			 * @brief Writes leftover packets and the trailer.
 			 * @param owner Public muxer.
 			 */
-			void Flush(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept override;
+			void Flush(StormByte::Multimedia::Pipeline::Muxer& owner) override;
 
 			/**
 			 * @brief Writes trailer if needed and frees AVIO + context.
@@ -240,7 +240,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @param owner Public muxer.
 			 * @return false if owner.Fail() was called.
 			 */
-			bool WriteHeaderIfReady(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept;
+			bool WriteHeaderIfReady(StormByte::Multimedia::Pipeline::Muxer& owner);
 
 			/**
 			 * @brief Writes one packet after the header.
@@ -249,7 +249,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool WritePacket(StormByte::Multimedia::Pipeline::Muxer& owner,
-				StormByte::Multimedia::Pipeline::Packet& packet) noexcept;
+				StormByte::Multimedia::Pipeline::Packet& packet);
 
 			/**
 			 * @brief Holds one packet after the header and writes whatever is now in order.
@@ -258,7 +258,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool Hold(StormByte::Multimedia::Pipeline::Muxer& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet);
 
 			/**
 			 * @brief Writes held packets in global timestamp order.
@@ -273,7 +273,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * never gate. A track that stays silent past the hold limit (ended, or never started)
 			 * stops gating so memory stays bounded.
 			 */
-			bool Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force) noexcept;
+			bool Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force);
 
 			/**
 			 * @brief Frees cloned remux codecpar.

@@ -117,7 +117,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Content {
 			 * @param before Raw frame that was in the holder. May be nullptr.
 			 * @param after Raw frame the leaf produced. May be nullptr.
 			 */
-			void Put(const ::AVFrame* before, ::AVFrame* after) noexcept override;
+			void Put(const ::AVFrame* before, ::AVFrame* after) override;
 
 			/**
 			 * @brief Inherits unspecified replacement color tags without overwriting explicit conversions.

@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/worker/encode.hxx>
+#include <new>
 #include <StormByte/multimedia/backend/pipeline/detail/encoder/subtitle.hxx>
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
@@ -63,7 +64,7 @@
 #include <thread>
 
 namespace {
-	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) noexcept {
+	std::string Ns(const StormByte::Safe::Optional<StormByte::Multimedia::Property::Duration>& value) {
 		if (!value)
 			return "-";
 		return std::string(StormByte::Safe::String::ReplaceToken("{}", value->Nanoseconds().count()));
@@ -81,14 +82,18 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
 		m_owner(owner) {}
 
-	void Encode::Setup() noexcept {
+	void Encode::Setup() noexcept try {
 		NameThread("STMM:Encode:" + std::to_string(m_owner.m_index));
 		if (!m_owner.WaitForPlan())
 			return;
 		static_cast<void>(m_owner.SetupPlan());
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Encode::Process(Item::PointerType item) noexcept {
+	void Encode::Process(Item::PointerType item) noexcept try {
 		if (!item) {
 			Flush();
 			return;
@@ -152,9 +157,13 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				break;
 			m_owner.Emit(std::move(packet));
 		}
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Encode::Flush() noexcept {
+	void Encode::Flush() noexcept try {
 		if (!m_owner.Failed() && m_owner.m_backend) {
 			m_owner.m_backend->Flush(m_owner);
 			for (;;) {
@@ -169,5 +178,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				m_owner.Emit(Packet::PointerType::MakePointer<SubtitlePacketProgress>(m_owner.m_index,
 					StormByte::Multimedia::Pipeline::Producer::Encoder, SubtitleProgress::End));
 		}
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 }

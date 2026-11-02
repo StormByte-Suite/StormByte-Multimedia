@@ -89,12 +89,12 @@ namespace {
 			}
 
 			bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept override {
+				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const override {
 				return Attachment::WriteCovers(owner, context, attachments, "MP4");
 			}
 
 			bool WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context) const noexcept override {
+				::AVFormatContext& context) const override {
 				return Attachment::WriteCoverPackets(owner, context);
 			}
 	};

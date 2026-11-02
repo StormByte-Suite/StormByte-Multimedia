@@ -60,14 +60,14 @@
 #include <utility>
 
 namespace {
-	std::string Lower(std::string_view view) noexcept {
+	std::string Lower(std::string_view view) {
 		std::string out(view);
 		for (char& ch : out)
 			ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 		return out;
 	}
 
-	bool SplitMime(std::string_view value, std::string& type, std::string& subtype) noexcept {
+	bool SplitMime(std::string_view value, std::string& type, std::string& subtype) {
 		const auto slash = value.find('/');
 		if (slash == std::string_view::npos || slash == 0 || slash + 1 == value.size())
 			return false;
@@ -78,14 +78,14 @@ namespace {
 		return !type.empty() && !subtype.empty();
 	}
 
-	StormByte::Safe::Optional<StormByte::Safe::String> StreamTag(const StormByte::Multimedia::FFmpeg::AVStream& stream, const char* key) noexcept {
+	StormByte::Safe::Optional<StormByte::Safe::String> StreamTag(const StormByte::Multimedia::FFmpeg::AVStream& stream, const char* key) {
 		auto value = stream.Tag(key);
 		if (!value || value->empty())
 			return std::nullopt;
 		return value;
 	}
 
-	StormByte::Safe::Optional<StormByte::Safe::String> GuessMime(int codecId) noexcept {
+	StormByte::Safe::Optional<StormByte::Safe::String> GuessMime(int codecId) {
 		switch (static_cast<AVCodecID>(codecId)) {
 			case AV_CODEC_ID_MJPEG:
 			case AV_CODEC_ID_MJPEGB:
@@ -107,7 +107,7 @@ namespace {
 		}
 	}
 
-	StormByte::Buffer::FIFO BytesToFifo(const std::uint8_t* data, int size) noexcept {
+	StormByte::Buffer::FIFO BytesToFifo(const std::uint8_t* data, int size) {
 		if (!data || size <= 0)
 			return StormByte::Buffer::FIFO{};
 		StormByte::Safe::Binary bytes;
@@ -119,7 +119,7 @@ namespace {
 }
 
 namespace StormByte::Multimedia::Detail {
-	bool MimePatternOk(std::string_view pattern) noexcept {
+	bool MimePatternOk(std::string_view pattern) {
 		std::string type;
 		std::string subtype;
 		if (!SplitMime(pattern, type, subtype))
@@ -132,7 +132,7 @@ namespace StormByte::Multimedia::Detail {
 		return true;
 	}
 
-	bool MimeMatches(std::string_view mime, std::string_view pattern) noexcept {
+	bool MimeMatches(std::string_view mime, std::string_view pattern) {
 		std::string mimeType;
 		std::string mimeSub;
 		std::string patType;
@@ -150,7 +150,7 @@ namespace StormByte::Multimedia::Detail {
 		return patSub == mimeSub;
 	}
 
-	Multimedia::Attachment MakeAttachment(const FFmpeg::AVStream& stream) noexcept {
+	Multimedia::Attachment MakeAttachment(const FFmpeg::AVStream& stream) {
 		auto name = StreamTag(stream, "filename");
 		if (!name)
 			name = StreamTag(stream, "title");
@@ -170,7 +170,7 @@ namespace StormByte::Multimedia::Detail {
 		return Multimedia::Attachment{std::move(name), std::move(mime), std::move(payload)};
 	}
 
-	CollectedAttachments CollectAttachments(const FFmpeg::AVFormatContext& ctx) noexcept {
+	CollectedAttachments CollectAttachments(const FFmpeg::AVFormatContext& ctx) {
 		CollectedAttachments out;
 		const bool hasPrimaryVideo = HasPrimaryVideo(ctx);
 		const auto streams = ctx.Streams();
@@ -182,7 +182,7 @@ namespace StormByte::Multimedia::Detail {
 		return out;
 	}
 
-	void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx, Multimedia::Attachments& items) noexcept {
+	void FillEmptyAttachmentPayloads(FFmpeg::AVFormatContext& ctx, Multimedia::Attachments& items) {
 		if (items.empty())
 			return;
 

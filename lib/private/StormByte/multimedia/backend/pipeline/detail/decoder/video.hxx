@@ -137,7 +137,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @return true if libav accepted it.
 			 */
 			bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) override;
 
 			/**
 			 * @brief Receives one video frame. Maps HDR10 and attachments.
@@ -145,14 +145,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @return Frame with Producer::Decoder, or empty if none ready.
 			 */
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Receive(
-				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
+				StormByte::Multimedia::Pipeline::Decoder& owner) override;
 
 			/**
 			 * @brief Requests EOF and keeps delayed frames available to Receive.
 			 * Receive retries EOF after draining pending output if submission needs a retry.
 			 * @param owner Public decoder.
 			 */
-			void Flush(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
+			void Flush(StormByte::Multimedia::Pipeline::Decoder& owner) override;
 
 			/**
 			 * @brief Drain leftover frames, then clear codec state.

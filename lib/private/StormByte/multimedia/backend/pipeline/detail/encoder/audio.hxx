@@ -87,7 +87,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			/**
 			 * @brief Default constructor.
 			 */
-			Audio() noexcept;
+			Audio();
 
 			/**
 			 * @brief Destructor. Frees swr and the sample fifo.
@@ -111,14 +111,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @brief Move constructor.
 			 * @param other Backend to take.
 			 */
-			Audio(Audio&& other) noexcept;
+			Audio(Audio&& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Backend to take.
 			 * @return *this.
 			 */
-			Audio& operator=(Audio&& other) noexcept;
+			Audio& operator=(Audio&& other);
 
 			/**
 			 * @brief Whether the FFmpeg encoder is open.
@@ -133,7 +133,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Multimedia::Pipeline::Frame& frame) noexcept override;
+				const StormByte::Multimedia::Pipeline::Frame& frame) override;
 
 			/**
 			 * @brief Encodes one audio frame. Opens lazily on first call.
@@ -142,19 +142,19 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return true if the frame was ingested.
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) override;
 
 			/**
 			 * @brief Signals EOF, flushes the fifo and drains.
 			 * @param owner Public encoder.
 			 */
-			void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept override;
+			void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) override;
 
 			/**
 			 * @brief Receives one packet from libav if needed, then pops the queue.
 			 * @return Packet with Producer::Encoder, or empty if none ready.
 			 */
-			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() noexcept override;
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() override;
 
 			/**
 			 * @brief Opened AVCodecContext, if any.
@@ -174,7 +174,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @param owner Public encoder.
 			 * @return true if a packet was queued.
 			 */
-			bool DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
+			bool DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner);
 
 			/**
 			 * @brief Builds swr and the sample fifo.
@@ -183,7 +183,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+				const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Converts @p src and writes samples into the fifo.
@@ -192,7 +192,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
-				StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+				StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Sends encoder-sized frames from the fifo.
@@ -200,7 +200,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @param last true to send a short tail frame.
 			 * @return false if owner.Fail() was called.
 			 */
-			bool Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) noexcept;
+			bool Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last);
 
 			/**
 			 * @brief Fills packet timestamps when libav omits them.

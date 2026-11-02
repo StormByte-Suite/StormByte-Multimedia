@@ -121,7 +121,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					Opened(StormByte::Multimedia::FFmpeg::AVEncoder encoder,
 						AVRational timeBase,
 						StormByte::Safe::String implementation,
-						StormByte::Multimedia::Features capabilities) noexcept
+						StormByte::Multimedia::Features capabilities)
 					: m_encoder(std::move(encoder)),
 					m_timeBase(timeBase),
 					m_implementation(std::move(implementation)),
@@ -227,14 +227,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param owner Public encoder with completed output configuration.
 			 * @return True when ready or when opening must remain frame-driven.
 			 */
-			virtual bool PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
+			virtual bool PrepareForHeader(StormByte::Multimedia::Pipeline::Encoder& owner);
 
 			/**
 			 * @brief Requests header preparation through the public encoder's private backend.
 			 * @param owner Public encoder being reserved by the muxer.
 			 * @return False if preparation failed or the backend is absent.
 			 */
-			static bool PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
+			static bool PrepareForMux(StormByte::Multimedia::Pipeline::Encoder& owner);
 
 			static bool RestoreLook(const StormByte::Multimedia::Pipeline::Encoder& owner,
 				StormByte::Multimedia::FFmpeg::AVFrame& frame) noexcept;
@@ -248,7 +248,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return false if owner.Fail() was called.
 			 */
 			virtual bool Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Multimedia::Pipeline::Frame& frame) noexcept = 0;
+				const StormByte::Multimedia::Pipeline::Frame& frame) = 0;
 
 			/**
 			 * @brief Encodes one frame. Opens lazily on first call if needed.
@@ -257,19 +257,19 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return true if libav accepted it.
 			 */
 			virtual bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept = 0;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) = 0;
 
 			/**
 			 * @brief Signals EOF and drains. No-op if already flushed.
 			 * @param owner Public encoder.
 			 */
-			virtual void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept = 0;
+			virtual void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) = 0;
 
 			/**
 			 * @brief Pops one pending encoded packet.
 			 * @return Packet with Producer::Encoder, or empty if none ready.
 			 */
-			virtual StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() noexcept = 0;
+			virtual StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() = 0;
 
 			/**
 			 * @brief Opened AVCodecContext, if any.
@@ -297,7 +297,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				StormByte::Multimedia::Pipeline::Encoder& owner,
 				enum StormByte::Multimedia::Type type, int index,
 				const StormByte::Multimedia::FFmpeg::AVPacket& raw,
-				AVRational timeBase, bool keepPacketHdrPlus = true) noexcept;
+				AVRational timeBase, bool keepPacketHdrPlus = true);
 
 			/**
 			 * @brief Converts nanoseconds to encoder ticks.
@@ -352,7 +352,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param opened Successful OpenCodec result.
 			 */
 			static void CommitOpen(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const Opened& opened) noexcept;
+				const Opened& opened);
 	};
 }
 
@@ -380,5 +380,5 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		StormByte::Multimedia::FFmpeg::AVCodecParameters params,
 		AVRational timeBase,
 		StormByte::Multimedia::Features need,
-		const StormByte::Multimedia::FFmpeg::AVFrame* firstFrame = nullptr) noexcept;
+		const StormByte::Multimedia::FFmpeg::AVFrame* firstFrame = nullptr);
 }

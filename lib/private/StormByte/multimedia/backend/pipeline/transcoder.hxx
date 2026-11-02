@@ -157,7 +157,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			/**
 			 * @brief Idle coordinator.
 			 */
-			Transcoder() noexcept;
+			Transcoder();
 
 			~Transcoder() noexcept;
 

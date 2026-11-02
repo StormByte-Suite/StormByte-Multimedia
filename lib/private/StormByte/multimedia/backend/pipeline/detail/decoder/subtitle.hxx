@@ -132,7 +132,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @return true if libav accepted it.
 			 */
 			bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) override;
 
 			/**
 			 * @brief Receives one subtitle frame (text or OCR-prefixed bitmap).
@@ -140,7 +140,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 			 * @return Frame with Producer::Decoder, or empty if none ready.
 			 */
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Receive(
-				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept override;
+				StormByte::Multimedia::Pipeline::Decoder& owner) override;
 
 			/**
 			 * @brief Signals EOF. Held cues stay available to Receive.

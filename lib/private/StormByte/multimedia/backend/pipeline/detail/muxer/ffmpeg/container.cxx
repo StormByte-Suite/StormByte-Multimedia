@@ -101,7 +101,7 @@ namespace {
 	constexpr std::int64_t InterleaveHoldNs = InterleaveMixedUs * 1000;
 
 	bool CopyFileTags(AVDictionary*& destination,
-		const StormByte::Multimedia::Metadata::File& source) noexcept {
+		const StormByte::Multimedia::Metadata::File& source) {
 		const auto text = [&destination](const char* key,
 			const StormByte::Safe::Optional<StormByte::Safe::String>& value) {
 			return !value || av_dict_set(&destination, key, value->data(), 0) >= 0;
@@ -325,7 +325,7 @@ namespace {
 		return false;
 	}
 
-	StormByte::Buffer::FIFO CopyPayload(const StormByte::Buffer::FIFO& fifo) noexcept {
+	StormByte::Buffer::FIFO CopyPayload(const StormByte::Buffer::FIFO& fifo) {
 		const auto view = UnreadSpan(fifo);
 		if (view.empty())
 			return StormByte::Buffer::FIFO{};
@@ -338,7 +338,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	namespace {
 	}
 
-	Container::Container() noexcept
+	Container::Container()
 	: m_ctx(nullptr),
 	m_header(false), m_trailer(false), m_customIo(false) {}
 
@@ -377,7 +377,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		return -1;
 	}
 
-	bool Container::BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
+	bool Container::BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) {
 		if (m_ctx) {
 			owner.Fail("muxer destination is already bound");
 			return false;
@@ -436,7 +436,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Container::ReserveEncoder(StormByte::Multimedia::Pipeline::Muxer& owner,
-		StormByte::Multimedia::Pipeline::Encoder& encoder) noexcept {
+		StormByte::Multimedia::Pipeline::Encoder& encoder) {
 		if (m_header) {
 			owner.Fail("cannot add a track after the header");
 			return false;
@@ -465,7 +465,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Container::ReserveRemux(StormByte::Multimedia::Pipeline::Muxer& owner,
-		int inIndex) noexcept {
+		int inIndex) {
 		if (m_header) {
 			owner.Fail("cannot add a track after the header");
 			return false;
@@ -506,7 +506,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Container::BindAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-		const StormByte::Multimedia::Attachments& attachments) noexcept {
+		const StormByte::Multimedia::Attachments& attachments) {
 		if (m_header) {
 			owner.Fail("cannot bind attachments after the header");
 			return false;
@@ -553,7 +553,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Container::Push(StormByte::Multimedia::Pipeline::Muxer& owner,
-		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) {
 		if (!packet) {
 			owner.Fail("muxer received an empty packet handle");
 			return false;
@@ -588,7 +588,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		return true;
 	}
 
-	bool Container::WriteHeaderIfReady(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
+	bool Container::WriteHeaderIfReady(StormByte::Multimedia::Pipeline::Muxer& owner) {
 		if (owner.Failed() || m_header)
 			return !owner.Failed();
 		if (!m_ctx)
@@ -799,7 +799,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Container::Hold(StormByte::Multimedia::Pipeline::Muxer& owner,
-		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) {
 		const auto it = m_tracks.find(Resolve(*packet));
 		if (it == m_tracks.end() || it->second.avIndex < 0) {
 			owner.Fail("packet stream index is not a mux track");
@@ -823,7 +823,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		return Drain(owner, false);
 	}
 
-	bool Container::Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force) noexcept {
+	bool Container::Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force) {
 		while (!owner.Failed()) {
 			Track* oldest = nullptr;
 			std::int64_t oldestKey = 0;
@@ -864,7 +864,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 	}
 
 	bool Container::WritePacket(StormByte::Multimedia::Pipeline::Muxer& owner,
-		StormByte::Multimedia::Pipeline::Packet& packet) noexcept {
+		StormByte::Multimedia::Pipeline::Packet& packet) {
 		if (owner.Failed() || !m_header)
 			return false;
 		const int out = Resolve(packet);
@@ -957,7 +957,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		return true;
 	}
 
-	void Container::Flush(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept {
+	void Container::Flush(StormByte::Multimedia::Pipeline::Muxer& owner) {
 		if (owner.Failed() || m_trailer)
 			return;
 		for (const auto& [index, track] : m_tracks) {

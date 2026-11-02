@@ -59,6 +59,7 @@
 #include <StormByte/multimedia/type.hxx>
 
 #include <cstdint>
+#include <new>
 
 extern "C" {
 	#include <libavutil/channel_layout.h>
@@ -192,7 +193,7 @@ catch (...) {
 	m_warning = std::string_view("failed to bind preserved frame metadata");
 }
 
-void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) noexcept {
+void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) noexcept try {
 	m_warning.clear();
 	m_contentValid = true;
 	const ::AVFrame* before = m_handle.Get();
@@ -239,6 +240,14 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 	m_handle.Reset(raw);
 	m_payloadReady = false;
 	BindProperties(owner);
+} catch (const StormByte::Safe::AllocationError&) {
+	m_handle.Reset(raw);
+	m_payloadReady = false;
+	m_contentValid = false;
+} catch (const std::bad_alloc&) {
+	m_handle.Reset(raw);
+	m_payloadReady = false;
+	m_contentValid = false;
 }
 
 const StormByte::Safe::String& Frame::Warning() const noexcept {

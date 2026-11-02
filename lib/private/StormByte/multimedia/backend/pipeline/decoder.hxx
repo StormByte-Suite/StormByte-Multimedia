@@ -104,7 +104,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * false if the codec is full or the stage failed.
 			 */
 			virtual bool Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) = 0;
 
 			/**
 			 * @brief Receives one decoded frame.
@@ -112,13 +112,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return Frame with Producer::Decoder, or empty if none ready.
 			 */
 			virtual StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Receive(
-				StormByte::Multimedia::Pipeline::Decoder& owner) noexcept = 0;
+				StormByte::Multimedia::Pipeline::Decoder& owner) = 0;
 
 			/**
 			 * @brief Signals EOF to libavcodec. Drain with Receive afterwards.
 			 * @param owner Public decoder.
 			 */
-			virtual void Flush(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept = 0;
+			virtual void Flush(StormByte::Multimedia::Pipeline::Decoder& owner) = 0;
 
 			/**
 			 * @brief Drain, then return the codec to a clean open state.
@@ -154,7 +154,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @return true only for recoverable invalid packet data.
 			 */
 			bool RejectedPacket(StormByte::Multimedia::Pipeline::Decoder& owner,
-				const StormByte::Multimedia::Pipeline::Packet& packet, int error) noexcept;
+				const StormByte::Multimedia::Pipeline::Packet& packet, int error);
 
 			/**
 			 * @brief Binds a decoded handle onto @p frame through the public decoder.

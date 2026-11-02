@@ -109,7 +109,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	bool Subtitle::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) {
 		if (!packet) {
 			owner.Fail(StormByte::Safe::String::ReplaceToken(
 				"subtitle decoder track {} received an empty packet handle",
@@ -162,7 +162,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Subtitle::Receive(
-		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
+		StormByte::Multimedia::Pipeline::Decoder& owner) {
 		if (!m_pendingSub.has_value()) {
 			if (m_flushed && m_heldSubtitle)
 				return std::move(m_heldSubtitle);

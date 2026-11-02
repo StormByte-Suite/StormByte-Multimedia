@@ -84,7 +84,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			/**
 			 * @brief Default constructor.
 			 */
-			Video() noexcept;
+			Video();
 
 			/**
 			 * @brief Destructor.
@@ -108,14 +108,14 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @brief Move constructor.
 			 * @param other Backend to take.
 			 */
-			Video(Video&& other) noexcept;
+			Video(Video&& other);
 
 			/**
 			 * @brief Move assignment.
 			 * @param other Backend to take.
 			 * @return *this.
 			 */
-			Video& operator=(Video&& other) noexcept;
+			Video& operator=(Video&& other);
 
 			/**
 			 * @brief Whether the FFmpeg encoder is open.
@@ -134,7 +134,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return false if owner.Fail() was called.
 			 */
 			bool Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Multimedia::Pipeline::Frame& frame) noexcept override;
+				const StormByte::Multimedia::Pipeline::Frame& frame) override;
 
 			/**
 			 * @brief Encodes one video frame. Opens lazily on first call.
@@ -143,19 +143,19 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @return true if libav accepted it.
 			 */
 			bool Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept override;
+				const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) override;
 
 			/**
 			 * @brief Signals EOF and drains. No-op if already flushed.
 			 * @param owner Public encoder.
 			 */
-			void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept override;
+			void Flush(StormByte::Multimedia::Pipeline::Encoder& owner) override;
 
 			/**
 			 * @brief Receives one packet from libav if needed, then pops the queue.
 			 * @return Packet with Producer::Encoder, or empty if none ready.
 			 */
-			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() noexcept override;
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Take() override;
 
 			/**
 			 * @brief Opened AVCodecContext, if any.
@@ -175,7 +175,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			 * @param owner Public encoder.
 			 * @return true if a packet was queued.
 			 */
-			bool DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept;
+			bool DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner);
 
 			/**
 			 * @brief Shifts pts/dts so the first PTS is 0 and fills duration.

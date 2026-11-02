@@ -142,7 +142,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return True on success, false if the owner failed.
 			 */
 			virtual bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept;
+				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const;
 
 			/**
 			 * @brief Emits static resources once after libavformat writes the header.
@@ -151,7 +151,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * @return True on success, false if a resource packet could not be written.
 			 */
 			virtual bool WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context) const noexcept;
+				::AVFormatContext& context) const;
 
 			/**
 			 * @brief Applies header adaptations; the default preserves FFmpeg settings.

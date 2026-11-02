@@ -154,7 +154,7 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			 * @brief Demux body bound to @p owner.
 			 * @param owner Public demuxer (also the Host).
 			 */
-			explicit Demux(StormByte::Multimedia::Pipeline::Demuxer& owner) noexcept;
+			explicit Demux(StormByte::Multimedia::Pipeline::Demuxer& owner);
 
 			Demux(const Demux&) = delete;
 			Demux(Demux&&) noexcept = delete;
@@ -182,7 +182,7 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			 * @brief Starts a feeder for @p track if missing.
 			 * @param track Origin stream index.
 			 */
-			void EnsureFeed(int track) noexcept;
+			void EnsureFeed(int track);
 
 			void Park(StormByte::Multimedia::Pipeline::Packet::PointerType packet) noexcept;
 

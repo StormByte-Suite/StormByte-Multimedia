@@ -205,7 +205,7 @@ namespace StormByte::Multimedia::Backend {
 
 			void Free() noexcept;
 			void StopWorkers() noexcept;
-			void EnsureWorkers(unsigned n) const noexcept;
+			bool EnsureWorkers(unsigned n) const noexcept;
 
 			/**
 			 * @brief Frees every graph in @p slot.
@@ -228,7 +228,7 @@ namespace StormByte::Multimedia::Backend {
 			static bool BuildStrip(Strip& strip, const FFmpeg::AVFrame& src,
 				const FFmpeg::AVFrame& dst, zimg_image_format in, zimg_image_format out,
 				FFmpeg::AVFrame::Resample filter, unsigned top, unsigned height,
-				double peak) noexcept;
+				double peak);
 
 			/**
 			 * @brief Builds strip graphs into @p slot.
@@ -241,7 +241,7 @@ namespace StormByte::Multimedia::Backend {
 			 */
 			static bool BuildSlot(Slot& slot, const FFmpeg::AVFrame& src,
 				const FFmpeg::AVFrame& dst, FFmpeg::AVFrame::Resample filter,
-				const Recolor* color) noexcept;
+				const Recolor* color);
 
 			/**
 			 * @brief Runs one strip. Destination pointers are offset.

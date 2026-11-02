@@ -143,7 +143,7 @@ namespace {
 		}
 	}
 
-	StormByte::Safe::Vector<SideData> MapAttachments(const StormByte::Multimedia::FFmpeg::AVFrame& av) noexcept {
+	StormByte::Safe::Vector<SideData> MapAttachments(const StormByte::Multimedia::FFmpeg::AVFrame& av) {
 		StormByte::Safe::Vector<SideData> out;
 		for (int i = 0; i < av.SideDataCount(); ++i) {
 			const AVFrameSideData* sd = av.SideDataAt(i);
@@ -168,7 +168,7 @@ namespace {
 	}
 
 	std::optional<StormByte::Multimedia::Property::HDR10> MapFrameHDR10(
-		const StormByte::Multimedia::FFmpeg::AVFrame& av, bool heuristics, const StormByte::Multimedia::Property::Video& video) noexcept {
+		const StormByte::Multimedia::FFmpeg::AVFrame& av, bool heuristics, const StormByte::Multimedia::Property::Video& video) {
 		const AVFrameSideData* mdmSd = av.SideData(AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
 		const AVFrameSideData* cllSd = av.SideData(AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
 		const AVFrameSideData* plusSd = av.SideData(AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
@@ -243,7 +243,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	bool Video::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) {
 		if (!packet) {
 			owner.Fail(StormByte::Safe::String::ReplaceToken(
 				"video decoder track {} received an empty packet handle",
@@ -294,7 +294,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Video::Receive(
-		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
+		StormByte::Multimedia::Pipeline::Decoder& owner) {
 		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Frame>();
 		auto result = m_decoder.ReceiveFrame(holder->Handle());
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain && m_draining && !m_flushed) {
@@ -359,7 +359,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		return frame;
 	}
 
-	void Video::Flush(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
+	void Video::Flush(StormByte::Multimedia::Pipeline::Decoder& owner) {
 		if (owner.Failed() || m_flushed)
 			return;
 		m_draining = true;

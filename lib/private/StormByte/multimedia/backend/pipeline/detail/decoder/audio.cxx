@@ -114,7 +114,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	bool Audio::Send(StormByte::Multimedia::Pipeline::Decoder& owner,
-		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept {
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) {
 		if (!packet) {
 			owner.Fail(StormByte::Safe::String::ReplaceToken(
 				"audio decoder track {} received an empty packet handle",
@@ -159,7 +159,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 	}
 
 	StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame> Audio::Receive(
-		StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
+		StormByte::Multimedia::Pipeline::Decoder& owner) {
 		auto holder = StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Frame>();
 		const auto result = m_decoder.ReceiveFrame(holder->Handle());
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::TryAgain
@@ -193,7 +193,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 		return frame;
 	}
 
-	void Audio::Flush(StormByte::Multimedia::Pipeline::Decoder& owner) noexcept {
+	void Audio::Flush(StormByte::Multimedia::Pipeline::Decoder& owner) {
 		if (owner.Failed() || m_flushed)
 			return;
 		for (;;) {

@@ -130,9 +130,9 @@ void Pipe::Wait(void* owner, bool (*ready)(void*) noexcept,
 }
 
 void Pipe::Close(void* owner, void (*trace)(void*, std::string_view) noexcept) noexcept {
-	auto log = [this, owner, trace](std::string_view phase) {
+	auto log = [owner, trace](std::string_view phase) noexcept {
 		if (trace)
-			trace(owner, StormByte::Safe::String::ReplaceToken("pipe EOF {} pipe={}", phase, static_cast<const void*>(this)));
+			trace(owner, phase);
 	};
 	log("input begin");
 	m_in.Eof();
@@ -144,12 +144,10 @@ void Pipe::Close(void* owner, void (*trace)(void*, std::string_view) noexcept) n
 	m_closed = true;
 	for (auto& fork : m_forks) {
 		if (trace)
-			trace(owner, StormByte::Safe::String::ReplaceToken("pipe EOF fork begin pipe={} track={} sink={}",
-				static_cast<const void*>(this), fork.first, static_cast<const void*>(fork.second.get())));
+			trace(owner, "pipe EOF fork begin");
 		fork.second->Eof();
 		if (trace)
-			trace(owner, StormByte::Safe::String::ReplaceToken("pipe EOF fork end pipe={} track={} sink={}",
-				static_cast<const void*>(this), fork.first, static_cast<const void*>(fork.second.get())));
+			trace(owner, "pipe EOF fork end");
 	}
 	log("complete");
 }
@@ -167,30 +165,49 @@ void Pipe::Abort() noexcept {
 	Wake();
 }
 
-Pipe& Pipe::CloneTo(int track, Pipe& dest) noexcept {
+Pipe& Pipe::CloneTo(int track, Pipe& dest) {
 	return CloneTo(track, dest, track);
 }
 
-Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) noexcept {
+Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) {
 	dest.Listen();
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
 	if (m_forkDestinations.contains({track, &dest, output}))
 		return dest;
-	m_forkDestinations.emplace(std::make_tuple(track, &dest, output), m_forks.size());
-	m_forks.emplace_back(output, std::move(hopper));
-	auto& fork = m_forks.back();
-	if (dest.m_inTracks.contains(output))
-		dest.In().To(output) >> *fork.second;
-	else
-		fork.second->To(output) >> dest.In();
-	dest.m_inTracks.insert(output);
-	if (m_closed)
-		fork.second->Eof();
+	const auto destination = m_forkDestinations.emplace(
+		std::make_tuple(track, &dest, output), m_forks.size()).first;
+	try {
+		m_forks.emplace_back(output, std::move(hopper));
+	} catch (...) {
+		m_forkDestinations.erase(destination);
+		throw;
+	}
+	const bool wired = dest.m_inTracks.contains(output);
+	bool registered = false;
+	try {
+		if (!wired) {
+			dest.m_inTracks.insert(output);
+			registered = true;
+		}
+		auto& fork = m_forks.back();
+		if (wired)
+			dest.In().To(output) >> *fork.second;
+		else
+			fork.second->To(output) >> dest.In();
+		if (m_closed)
+			fork.second->Eof();
+	} catch (...) {
+		if (registered)
+			dest.m_inTracks.erase(output);
+		m_forks.pop_back();
+		m_forkDestinations.erase(destination);
+		throw;
+	}
 	return dest;
 }
 
-bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
+bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) {
 	dest.Listen();
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
@@ -198,13 +215,22 @@ bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept {
 	if (found == m_forkDestinations.end() || m_forkDestinations.contains({track, &dest, track}))
 		return false;
 	const auto index = found->second;
-	hopper->To(track) >> dest.In();
-	dest.m_inTracks.insert(track);
-	if (m_closed)
-		hopper->Eof();
+	const auto destination = m_forkDestinations.emplace(
+		std::make_tuple(track, &dest, track), index).first;
+	bool registered = false;
+	try {
+		registered = dest.m_inTracks.insert(track).second;
+		hopper->To(track) >> dest.In();
+		if (m_closed)
+			hopper->Eof();
+	} catch (...) {
+		if (registered)
+			dest.m_inTracks.erase(track);
+		m_forkDestinations.erase(destination);
+		throw;
+	}
 	m_forks[index].second = std::move(hopper);
 	m_forkDestinations.erase(found);
-	m_forkDestinations.emplace(std::make_tuple(track, &dest, track), index);
 	return true;
 }
 
@@ -227,7 +253,7 @@ Pipe::Lane Pipe::To(int track) noexcept {
 	return Lane(*this, track);
 }
 
-Pipe& Pipe::Lane::operator>>(Pipe& dest) noexcept {
+Pipe& Pipe::Lane::operator>>(Pipe& dest) {
 	if (dest.m_inTracks.contains(m_track)) {
 		dest.m_in.To(m_track) >> m_from->m_out;
 		return dest;
@@ -239,7 +265,7 @@ Pipe& Pipe::Lane::operator>>(Pipe& dest) noexcept {
 	return dest;
 }
 
-Pipe& Pipe::operator>>(Pipe& dest) noexcept {
+Pipe& Pipe::operator>>(Pipe& dest) {
 	dest.Listen();
 	m_out >> dest.m_in;
 	return dest;

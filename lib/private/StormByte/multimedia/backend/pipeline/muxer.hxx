@@ -116,7 +116,7 @@ namespace StormByte {
 						 * Format is guessed from the actual Plan writer filename.
 						 * Bytes go to @ref Plan::Writer through FileAvio.
 						 */
-						virtual bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept = 0;
+						virtual bool BindSink(StormByte::Multimedia::Pipeline::Muxer& owner) = 0;
 
 						/**
 						 * @brief Reserves an encode track at Encoder::Index().
@@ -125,7 +125,7 @@ namespace StormByte {
 						 * @return false if owner.Fail() was called.
 						 */
 						virtual bool ReserveEncoder(StormByte::Multimedia::Pipeline::Muxer& owner,
-							StormByte::Multimedia::Pipeline::Encoder& encoder) noexcept = 0;
+							StormByte::Multimedia::Pipeline::Encoder& encoder) = 0;
 
 						/**
 						 * @brief Reserves a remux slot for origin stream @p inIndex.
@@ -134,7 +134,7 @@ namespace StormByte {
 						 * @return false if owner.Fail() was called.
 						 */
 						virtual bool ReserveRemux(StormByte::Multimedia::Pipeline::Muxer& owner,
-							int inIndex) noexcept = 0;
+							int inIndex) = 0;
 
 						/**
 						 * @brief Binds a collected attachment catalogue.
@@ -143,7 +143,7 @@ namespace StormByte {
 						 * @return false if owner.Fail() was called.
 						 */
 						virtual bool BindAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-							const StormByte::Multimedia::Attachments& attachments) noexcept = 0;
+							const StormByte::Multimedia::Attachments& attachments) = 0;
 
 						/**
 						 * @brief Queues or writes one packet.
@@ -152,13 +152,13 @@ namespace StormByte {
 						 * @return true if the packet was accepted.
 						 */
 						virtual bool Push(StormByte::Multimedia::Pipeline::Muxer& owner,
-							const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) noexcept = 0;
+							const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>& packet) = 0;
 
 						/**
 						 * @brief Flushes leftover packets and the trailer.
 						 * @param owner Public muxer.
 						 */
-						virtual void Flush(StormByte::Multimedia::Pipeline::Muxer& owner) noexcept = 0;
+						virtual void Flush(StormByte::Multimedia::Pipeline::Muxer& owner) = 0;
 
 						/**
 						 * @brief Writes trailer if needed and frees AVIO + context.

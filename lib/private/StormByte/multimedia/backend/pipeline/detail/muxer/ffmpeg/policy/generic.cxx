@@ -66,11 +66,11 @@ Policy::~Policy() noexcept = default;
 void Policy::PrepareStream(::AVStream&, bool&, bool&) const noexcept {}
 
 bool Policy::WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-	::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept {
+	::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const {
 	return Attachment::Write(owner, &context, attachments);
 }
 
-bool Policy::WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer&, ::AVFormatContext&) const noexcept {
+bool Policy::WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer&, ::AVFormatContext&) const {
 	return true;
 }
 
@@ -102,7 +102,7 @@ namespace {
 			bool CopiesCoverMetadata() const noexcept override { return true; }
 
 			bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept override {
+				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const override {
 				if (std::string_view{context.oformat->name} == "aiff") {
 					const int result = av_opt_set_int(context.priv_data, "write_id3v2", 1, 0);
 					if (result < 0) {
@@ -117,7 +117,7 @@ namespace {
 			}
 
 			bool WriteHeaderPackets(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context) const noexcept override {
+				::AVFormatContext& context) const override {
 				return Attachment::WriteCoverPackets(owner, context);
 			}
 	};
@@ -127,7 +127,7 @@ namespace {
 			bool CopiesCoverMetadata() const noexcept override { return true; }
 
 			bool WriteAttachments(StormByte::Multimedia::Pipeline::Muxer& owner,
-				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const noexcept override {
+				::AVFormatContext& context, const StormByte::Multimedia::Attachments& attachments) const override {
 				return Attachment::WritePictureComments(owner, context, attachments);
 			}
 	};

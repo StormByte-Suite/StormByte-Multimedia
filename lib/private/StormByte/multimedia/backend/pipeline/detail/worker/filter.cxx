@@ -52,6 +52,7 @@
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 
 #include <utility>
+#include <new>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	using StormByte::Multimedia::Pipeline::Filter::FFmpeg;
@@ -61,20 +62,32 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
 		m_owner(owner) {}
 
-	void Filter::Setup() noexcept {
+	void Filter::Setup() noexcept try {
 		m_owner.Open();
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Filter::Process(Item::PointerType item) noexcept {
+	void Filter::Process(Item::PointerType item) noexcept try {
 		if (!item) {
 			Flush();
 			return;
 		}
 
 		m_owner.Work(std::move(item));
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 
-	void Filter::Flush() noexcept {
+	void Filter::Flush() noexcept try {
 		m_owner.Finish();
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
 	}
 }

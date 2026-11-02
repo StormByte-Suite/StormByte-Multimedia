@@ -247,7 +247,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * Notify dest In, Bind a clone hopper. Several CloneTo
 			 * calls fork to several dests. Call before Emit.
 			 */
-			Pipe& CloneTo(int track, Pipe& dest) noexcept;
+			Pipe& CloneTo(int track, Pipe& dest);
 
 			/**
 			 * @brief Clones one source track under a consumer-specific identity.
@@ -256,7 +256,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param output Consumer hopper key.
 			 * @return Consumer pipe.
 			 */
-			Pipe& CloneTo(int track, Pipe& dest, int output) noexcept;
+			Pipe& CloneTo(int track, Pipe& dest, int output);
 
 			/**
 			 * @brief Inserts a filter chain before an existing clone destination.
@@ -265,7 +265,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param dest First consumer of the replacement chain.
 			 * @return false if the original clone connection does not exist.
 			 */
-			bool RedirectCloneTo(int track, Pipe& previous, Pipe& dest) noexcept;
+			bool RedirectCloneTo(int track, Pipe& previous, Pipe& dest);
 
 			/**
 			 * @brief Allows this consumer to receive measurement-pass packet clones.
@@ -311,7 +311,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					 * Dest In already wired (CloneTo): extra producer
 					 * (In onto Out). Bind is not a Route API.
 					 */
-					Pipe& operator>>(Pipe& dest) noexcept;
+					Pipe& operator>>(Pipe& dest);
 
 				private:
 					/**
@@ -342,7 +342,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @param dest Consumer pipe.
 			 * @return @p dest.
 			 */
-			Pipe& operator>>(Pipe& dest) noexcept;
+			Pipe& operator>>(Pipe& dest);
 
 			/**
 			 * @brief Pop one unit from In into @p item. Does not Wait.

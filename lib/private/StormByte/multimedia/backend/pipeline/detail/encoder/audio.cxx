@@ -111,14 +111,14 @@ namespace {
 	}
 }
 
-Audio::Audio() noexcept
+Audio::Audio()
 : m_owner(nullptr), m_timeBase{0, 1},
 	m_inFormat(-1), m_outFormat(-1), m_frameSize(0), m_channels(0),
 	m_index(0), m_nextPts(0), m_flushed(false), m_pktPts(0) {}
 
 Audio::~Audio() noexcept = default;
 
-Audio::Audio(Audio&& other) noexcept
+Audio::Audio(Audio&& other)
 :	m_encoder(std::move(other.m_encoder)), m_scratch(std::move(other.m_scratch)),
 	m_converted(std::move(other.m_converted)), m_pending(std::move(other.m_pending)),
 	m_owner(other.m_owner), m_timeBase(other.m_timeBase), m_swr(std::move(other.m_swr)), m_fifo(std::move(other.m_fifo)),
@@ -129,7 +129,7 @@ Audio::Audio(Audio&& other) noexcept
 	other.m_owner = nullptr;
 }
 
-Audio& Audio::operator=(Audio&& other) noexcept {
+Audio& Audio::operator=(Audio&& other) {
 	if (this == &other)
 		return *this;
 	m_encoder = std::move(other.m_encoder);
@@ -165,7 +165,7 @@ FFmpeg::AVRational Audio::TimeBase() const noexcept {
 }
 
 bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept {
+	const StormByte::Multimedia::FFmpeg::AVFrame& src) {
 	if (!src || !m_encoder) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"audio encoder track {} cannot prepare conversion: source={} encoder={}",
@@ -232,7 +232,7 @@ bool Audio::PrepareConvert(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Audio::Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
-	StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept {
+	StormByte::Multimedia::FFmpeg::AVFrame& src) {
 	if (!src || !m_fifo || !m_encoder) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"audio encoder track {} cannot ingest samples: source={} fifo={} encoder={}",
@@ -292,7 +292,7 @@ bool Audio::Ingest(StormByte::Multimedia::Pipeline::Encoder& owner,
 	return true;
 }
 
-bool Audio::Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) noexcept {
+bool Audio::Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) {
 	if (!m_encoder || !m_fifo)
 		return true;
 
@@ -360,7 +360,7 @@ bool Audio::Emit(StormByte::Multimedia::Pipeline::Encoder& owner, bool last) noe
 }
 
 bool Audio::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	const StormByte::Multimedia::Pipeline::Frame& frame) {
 	if (m_encoder)
 		return true;
 	if (frame.Type() != Type::Audio) {
@@ -390,7 +390,7 @@ bool Audio::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 }
 
 bool Audio::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
-	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) noexcept {
+	const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Frame>& frame) {
 	if (!frame) {
 		owner.Fail(StormByte::Safe::String::ReplaceToken(
 			"audio encoder track {} received an empty frame handle",
@@ -434,7 +434,7 @@ bool Audio::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 	return true;
 }
 
-bool Audio::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+bool Audio::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	if (owner.Failed() || !m_encoder)
 		return false;
 	const auto result = m_encoder->ReceivePacket(m_scratch);
@@ -456,7 +456,7 @@ bool Audio::DrainOne(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	return true;
 }
 
-void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
+void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) {
 	if (owner.Failed() || !m_encoder || m_flushed)
 		return;
 	if (m_swr) {
@@ -535,7 +535,7 @@ void Audio::Flush(StormByte::Multimedia::Pipeline::Encoder& owner) noexcept {
 	m_flushed = true;
 }
 
-StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Audio::Take() noexcept {
+StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet> Audio::Take() {
 	if (m_pending.empty() && m_encoder && m_owner) {
 		const auto result = m_encoder->ReceivePacket(m_scratch);
 		if (result == StormByte::Multimedia::FFmpeg::OperationResult::Success) {

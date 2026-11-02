@@ -59,7 +59,7 @@ using StormByte::Multimedia::Backend::Pipeline::Detail::Content::Passthrough;
 using StormByte::Multimedia::Backend::Pipeline::Detail::Content::Video;
 using StormByte::Multimedia::Type;
 
-StormByte::Safe::Unique<Content> Content::For(Type type) noexcept {
+StormByte::Safe::Unique<Content> Content::For(Type type) {
 	switch (type) {
 		case Type::Video:
 			return StormByte::Safe::MakeUnique<Video>();
