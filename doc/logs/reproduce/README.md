@@ -38,6 +38,106 @@ of interest; use predecessor patches to isolate an individual fix.
 
 ## Existing Multimedia reproducers
 
+### Latest narrowed follow-up
+
+Do not repeat the full suite to reproduce the remaining issues.
+[Failed-path selection](../runs/followup/failed-paths-selection.txt) lists the
+fifteen provider cases that now pass across the RPU, restoration and
+joint-convolution follow-ups. The earlier failed-path run preserves both real
+Dolby Vision leaks. The RPU follow-up uses no suppressions; subsequent SVT
+runs use only `nvidia-driver.lsan`, with leak detection still enabled.
+
+The [remaining-path selection](../runs/followup/remaining-selection.txt) was
+derived from the original full-suite failures minus passing follow-ups.
+Its Vorbis surround entry was already validated separately in the provider
+standalone folder and was explicitly excluded from the nineteen-test command.
+That run has three passes and sixteen failures; the seven preview failures
+also reproduce serially. Full `LastTest.log` copies are preserved alongside
+each XML because CTest truncates verbose per-test output in JUnit.
+
+For the x265 helper reference main:
+
+```sh
+clang++-22 -std=c++17 -DX265_DEPTH=8 -DX265_NS=x265 -DHIGH_BIT_DEPTH=0 \
+  -fsanitize=address,undefined -shared-libasan -fno-omit-frame-pointer \
+  -I/path/to/patched/x265/source/common -I/path/to/patched/x265/source \
+  -I/tmp/BMDATA/sanitizer-clean-final/stormbyte-buildmaster/bm/x265 \
+  doc/logs/providers/x265/standalone/x265-coefficient-context-check.cxx \
+  -o /tmp/x265-context-check
+LD_LIBRARY_PATH="$(clang-22 --print-runtime-dir):/usr/lib/llvm/22/lib64" \
+  ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 \
+  UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 /tmp/x265-context-check
+```
+
+The main compares 4,368,000 real helper results against a reference, including
+the final coefficient-group boundary. It is not a new CTest dependency.
+
+Repeat one narrowed group, preserving the command, exit code, XML and complete
+CTest log (choose a new output directory):
+
+```sh
+bash doc/logs/reproduce/run-followup-tests.sh \
+  /tmp/BMDATA/sanitizer-clean-final svt /tmp/svt-followup
+```
+
+Other groups are `providers`, `remaining`, `preview` and `deadlines`.
+`providers` deliberately runs without suppressions; the others use only the
+approved NVIDIA allocation exception.
+
+### NVIDIA sanitizer initialization constraint
+
+The [isolated CUDA driver main](cuda-init-check.c) loads only `libcuda.so.1`;
+it does not link FFmpeg or StormByte. On this host the same program succeeds
+without sanitizers and returns `CUDA_ERROR_OUT_OF_MEMORY` from `cuInit` with
+ASan/UBSan. The CUDA return code is a real availability failure, not an LSan
+report, so the leak suppression cannot make NVENC available.
+
+```sh
+clang-22 -Wall -Wextra -Werror doc/logs/reproduce/cuda-init-check.c \
+  -ldl -o /tmp/cuda-init-plain
+clang-22 -Wall -Wextra -Werror -g -fsanitize=address,undefined -shared-libasan \
+  doc/logs/reproduce/cuda-init-check.c -ldl -o /tmp/cuda-init-sanitized
+/tmp/cuda-init-plain
+LD_LIBRARY_PATH="$(clang-22 --print-runtime-dir):/usr/lib/llvm/22/lib64" \
+  ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 \
+  UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
+  LSAN_OPTIONS="suppressions=$PWD/doc/logs/reproduce/nvidia-driver.lsan:print_suppressions=1" \
+  /tmp/cuda-init-sanitized
+```
+
+Captured outcomes: [plain: exit 0](../runs/followup/cuda-init-plain.log),
+[instrumented: exit 1](../runs/followup/cuda-init-sanitized.log). This isolates
+an external sanitizer/driver constraint; the eight failed NVENC tests remain
+unvalidated and have not been reclassified as passed or waived.
+
+### Live-audio fixture probes
+
+The default two-second 1080p fixture is still a failing case under instrumented
+decode/filter overhead. Merely extending its wait does not fix that result.
+The [deadline run](../runs/followup/test-deadlines-LastTest.log) records the
+switching sequence and the terminal wait. A twelve-second low-resolution
+override also fails an epoch assertion; a longer stream-copy repeat passes
+all original assertions, including the 500 ms inter-frame limit:
+
+```sh
+ffmpeg -v error -nostdin -n -stream_loop 7 \
+  -i test/files/video/interleave_long.mkv -map 0 -c copy /tmp/live-audio-96s.mkv
+```
+
+For just the cycling case, use the same sanitizer environment documented above:
+
+```sh
+STORMBYTE_MM_LIVE_INPUT=/tmp/live-audio-96s.mkv \
+  ctest --test-dir /tmp/BMDATA/sanitizer-clean-final/test -j1 \
+  -R '^preview.test_live_audio_tracks$' --output-on-failure
+```
+
+The generated media is not duplicated here; its source fixture is tracked and
+the command above regenerates it without re-encoding.
+[Twelve-second probe: exit 8](../runs/followup/live-audio-long-fixture-probe.xml),
+[96-second probe: exit 0](../runs/followup/live-audio-extended-fixture-probe.xml).
+The alternate-input result does not mark the canonical fixture as passing.
+
 [ctest-reproducers.tsv](ctest-reproducers.tsv) maps the provider-focused cases
 to existing source functions/dispatch entries, CTest executable commands and
 the recorded test result. The test tree supplies its own `main` and fixtures.

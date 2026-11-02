@@ -10,7 +10,7 @@ It is a snapshot, **not a passing release gate**.
 |---|---|
 | [Current results](runs/current/) | Complete strict suite and fourteen-provider batch, both log and JUnit XML |
 | [Clean build](builds/clean-final/) | Configure/build from a new directory; initial 21-fix state |
-| [Follow-up builds](builds/) | Subsequent configure/build logs through the current 48-fix state |
+| [Follow-up builds](builds/) | Subsequent configure/build logs through the current 64-fix state |
 | [Test progression](runs/) | Original baseline, provider batches and narrowed follow-ups |
 | [Provider evidence](providers/) | Subfolders for all ten upstream repositories, with standalone sources where available and indexed CTest output |
 | [Static analysis](static-analysis/) | Current clang-tidy output plus initial per-unit diagnostics and historical triage |
@@ -22,6 +22,33 @@ It is a snapshot, **not a passing release gate**.
 | [Integrity checks](SHA256SUMS) | Checksums for every other evidence file |
 
 ### Results at this snapshot
+
+- Latest consolidated state after test deadline/readiness fixes:
+  **38 original failures now pass; 9 remain unresolved**. The remaining cases
+  are the default live-audio-track cycling fixture and eight NVENC tests.
+  [Per-case status](runs/followup/latest-original-failures.tsv) and
+  [details](../PR-DRAFTS.md#subsequent-preview-and-duration-investigation).
+  CUDA initialization fails in an instrumented standalone driver-only main
+  but succeeds without instrumentation. A longer live-audio fixture passes
+  all timing/epoch assertions; that does not erase the default-fixture failure.
+
+Earlier focused iterations (retained for progression):
+
+- Latest narrowed work closes all fifteen selected provider paths, including
+  both real Dolby Vision RPU leaks, FDK stereo/surround, Vorbis decode and SVT
+  cancellation/interleave. Seven Dolby Vision cases pass without suppressions;
+  only NVIDIA `cuInit` is suppressed where needed in subsequent SVT runs.
+  See [follow-up results](runs/followup/) and the
+  [current PR summary](../PR-DRAFTS.md#validation-summary).
+- Of the original 47 failed cases, 31 now have passing focused follow-up
+  results; 16 remain unresolved. The latest other-failure batch is **3 passed,
+  16 failed**, exit **8**. Serial preview validation is **0 passed, 7 failed**,
+  exit **8**. No full-suite rerun was performed.
+- Fifteen new mail patches apply on clean predecessor trees with exact
+  resulting-tree comparisons; [verification](reproduce/git-am-followup-verification.log).
+  There are now 64 fixes in [the patch map](reproduce/patches.tsv).
+
+Original full-suite and provider-batch snapshot (unchanged):
 
 - Current provider batch: **13 passed, 1 failed**, exit code **8**.
 - Current complete suite: **377 passed, 47 failed, 11 skipped** out of 435,

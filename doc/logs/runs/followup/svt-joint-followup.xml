@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="3"
+	timestamp="2026-11-02T06:33:36"
+	>
+	<testcase name="pipeline.test_interleave_encoded_video_and_audio" classname="pipeline.test_interleave_encoded_video_and_audio" time="2.7549" status="run">
+		<properties>
+			<property name="cmake_labels" value="interleave;multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_interleave_encoded_video_and_audio
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineInterleaveTests/test_interleave_encoded_video_and_audio/pipeline/interleave/encode-both.mkv
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/interleave_long.mkv
+[Test] ConfigureLaggingVideo: assert av1
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder track 0 encode to AV1
+[Test] ConfigureAac: assert aac
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder add-track in=1
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder mapped Audio 1 -&gt; order 1
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_interleave_encoded_video_remuxed_audio" classname="pipeline.test_interleave_encoded_video_remuxed_audio" time="2.51195" status="run">
+		<properties>
+			<property name="cmake_labels" value="interleave;multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_interleave_encoded_video_remuxed_audio
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineInterleaveTests/test_interleave_encoded_video_remuxed_audio/pipeline/interleave/encode-video.mkv
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/interleave_long.mkv
+[Test] ConfigureLaggingVideo: assert av1
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder track 0 encode to AV1
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder add-track in=1
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder mapped Audio 1 -&gt; order 1
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder track 1 ma...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="pipeline.test_interleave_encoded_video_loudnorm_audio" classname="pipeline.test_interleave_encoded_video_loudnorm_audio" time="3.7615" status="run">
+		<properties>
+			<property name="cmake_labels" value="interleave;multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_interleave_encoded_video_loudnorm_audio
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaPipelineInterleaveTests/test_interleave_encoded_video_loudnorm_audio/pipeline/interleave/encode-loudnorm.mkv
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder probed source /home/stormbyte/Software/StormByte/StormByte/multimedia/test/files/video/interleave_long.mkv
+[Test] ConfigureLaggingVideo: assert av1
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder mapped Video 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder track 0 encode to AV1
+[Test] ConfigureAac: assert aac
+[LowLevel] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder add-track in=1
+[Debug   ] 02/11/2026 06:33:37 StormByte/Multimedia/Transcoder mapped Audio 1 -&gt; order 1
+[Debug   ] 02/11/2026 06:33:37 Storm...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

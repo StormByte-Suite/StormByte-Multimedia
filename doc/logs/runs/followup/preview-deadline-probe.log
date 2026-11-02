@@ -1,0 +1,20 @@
+[Test] Starting test_hdr_preview_tone_mapping
+[Test] test_hdr_preview_tone_mapping: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_tone_mapping: assert player.Play()
+[Test] test_hdr_preview_tone_mapping: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7ce7f02113c0] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7ce7f02113c0] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_hdr_preview_tone_mapping: assert player.State() == PlaybackState::Ended
+[Test] test_hdr_preview_tone_mapping: assert display->m_videos > 0
+[Test] test_hdr_preview_tone_mapping: assert display->m_image
+[Test] test_hdr_preview_tone_mapping: assert display->m_image->m_pixels.size() == static_cast<std::size_t>(display->m_image->m_width) * display->m_image->m_height * 4
+[Test] test_hdr_preview_tone_mapping: assert minimum != display->m_image->m_pixels.end()
+[Test] test_hdr_preview_tone_mapping: assert *minimum < *maximum
+[Test] test_hdr_preview_tone_mapping: assert *maximum > std::byte{0}
+[Test] Finished test_hdr_preview_tone_mapping: PASS
+
+real	0m22,475s
+user	2m0,280s
+sys	0m0,564s
+
+exit_code=0

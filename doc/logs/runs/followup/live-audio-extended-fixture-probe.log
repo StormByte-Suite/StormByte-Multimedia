@@ -1,0 +1,13 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+    Start 15: preview.test_live_audio_tracks
+1/1 Test #15: preview.test_live_audio_tracks ...   Passed   33.85 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+multimedia    =  33.85 sec*proc (1 test)
+preview       =  33.85 sec*proc (1 test)
+
+Total Test time (real) =  33.85 sec
+
+exit_code=0

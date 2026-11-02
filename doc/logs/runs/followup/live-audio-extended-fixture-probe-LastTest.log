@@ -1,0 +1,1695 @@
+Start testing: Nov 02 06:52 CET
+----------------------------------------------------------
+15/435 Testing: preview.test_live_audio_tracks
+15/435 Test: preview.test_live_audio_tracks
+Command: "/tmp/BMDATA/sanitizer-clean-final/test/MultimediaSimplePlayerTests" "test_live_audio_tracks"
+Directory: /tmp/BMDATA/sanitizer-clean-final/test
+"preview.test_live_audio_tracks" start time: Nov 02 06:52 CET
+Output:
+----------------------------------------------------------
+[Test] Starting test_live_audio_tracks
+[Test] test_live_audio_tracks: assert player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7beefd9e0040] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7beefd9e00c0] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_tracks: assert tracks.size() >= 2
+[Test] test_live_audio_tracks: assert player.Play()
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > .15; })
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=-1 position=0.404804 switch+delivery_ms=251
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=1 position=11.1947 switch+delivery_ms=10669
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=-1 position=11.4452 switch+delivery_ms=236
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=1 position=22.2403 switch+delivery_ms=10660
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=-1 position=22.5043 switch+delivery_ms=260
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=1 position=33.3022 switch+delivery_ms=10657
+[Test] test_live_audio_tracks: assert player.Close()
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_tracks: assert display->m_video_positions[i] > display->m_video_positions[i - 1]
+[Test] test_live_audio_tracks: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] Finished test_live_audio_tracks: PASS
+<end of output>
+Test time =  33.85 sec
+----------------------------------------------------------
+Test Passed.
+"preview.test_live_audio_tracks" end time: Nov 02 06:52 CET
+"preview.test_live_audio_tracks" time elapsed: 00:00:33
+----------------------------------------------------------
+
+End testing: Nov 02 06:52 CET
+
+multimedia =  33.85 sec*proc
+
+preview =  33.85 sec*proc
+

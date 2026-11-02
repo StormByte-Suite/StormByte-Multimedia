@@ -1,0 +1,209 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+    Start 11: preview.test_av_seek_switch_epochs
+1/7 Test #11: preview.test_av_seek_switch_epochs ..........***Failed    1.93 sec
+[Test] Starting test_av_seek_switch_epochs
+[Test] test_av_seek_switch_epochs: assert player.Open(Fixture("video/anime_like.mkv"))
+[Test] test_av_seek_switch_epochs: assert video >= 0
+[Test] test_av_seek_switch_epochs: assert player.Play()
+[Test] test_av_seek_switch_epochs: assert Wait([&] { return player.Position() > 0.30 || player.State() == PlaybackState::Error; })
+[Test] test_av_seek_switch_epochs: assert player.State() != PlaybackState::Error
+[Test] test_av_seek_switch_epochs: assert player.Pause()
+[Test] test_av_seek_switch_epochs: assert before > 2
+[ASSERT] test_av_seek_switch_epochs: before > 2
+[in @ 0x7c76d9e11780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c76d9e11780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] Finished test_av_seek_switch_epochs: FAIL
+
+    Start 12: preview.test_hdr_preview_tone_mapping
+2/7 Test #12: preview.test_hdr_preview_tone_mapping .......***Failed    9.02 sec
+[Test] Starting test_hdr_preview_tone_mapping
+[Test] test_hdr_preview_tone_mapping: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_tone_mapping: assert player.Play()
+[Test] test_hdr_preview_tone_mapping: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7c95fb4113c0] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c95fb4113c0] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[ASSERT] test_hdr_preview_tone_mapping: Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_hdr_preview_tone_mapping: FAIL
+
+    Start 13: preview.test_hdr_preview_preserves_signal
+3/7 Test #13: preview.test_hdr_preview_preserves_signal ...***Failed    6.83 sec
+[Test] Starting test_hdr_preview_preserves_signal
+[Test] test_hdr_preview_preserves_signal: assert player.OutputColor(PreviewColorMode::HDR)
+[Test] test_hdr_preview_preserves_signal: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_preserves_signal: assert player.Play()
+[Test] test_hdr_preview_preserves_signal: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[ASSERT] test_hdr_preview_preserves_signal: Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_hdr_preview_preserves_signal: FAIL
+
+    Start 14: preview.test_live_audio_selection
+4/7 Test #14: preview.test_live_audio_selection ...........***Failed   14.52 sec
+[Test] Starting test_live_audio_selection
+[Test] test_live_audio_selection: assert player.Open(Safe::MakeUnique<TokenReader>(Fixture("video/anime_like.mkv"), stats))
+[CUDA @ 0x7b9c3cbe0cc0] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7b9c3cbe0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Subtitle, -1)
+[Test] test_live_audio_selection: assert audio >= 0
+[Test] test_live_audio_selection: assert player.Play()
+[Test] test_live_audio_selection: assert Wait([&] { return player.Position() > .15; })
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, selected)
+[in @ 0x7c0c3cc11780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c0c3cc11780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_live_audio_selection: assert player.SelectedTrack(MediaType::Audio) == selected
+[Test] test_live_audio_selection: assert stats->m_seeks == seeks
+[Test] test_live_audio_selection: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_selection: assert Wait([&] { std::lock_guard lock(display->m_mutex); return display->m_videos >= videos + 2; })
+[Test] test_live_audio_selection: assert player.Position() >= position
+[Test] test_live_audio_selection: assert display->m_epoch == epoch
+[Test] test_live_audio_selection: assert display->m_invalidations == invalidations
+[Test] test_live_audio_selection: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_selection: assert display->m_image
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, selected)
+[Test] test_live_audio_selection: assert player.SelectedTrack(MediaType::Audio) == selected
+[Test] test_live_audio_selection: assert stats->m_seeks == seeks
+[Test] test_live_audio_selection: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_selection: assert Wait([&] { std::lock_guard lock(display->m_mutex); return display->m_videos >= videos + 2; })
+[Test] test_live_audio_selection: assert player.Position() >= position
+[Test] test_live_audio_selection: assert display->m_epoch == epoch
+[Test] test_live_audio_selection: assert display->m_invalidations == invalidations
+[Test] test_live_audio_selection: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_selection: assert display->m_image
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, selected)
+[Test] test_live_audio_selection: assert player.SelectedTrack(MediaType::Audio) == selected
+[Test] test_live_audio_selection: assert stats->m_seeks == seeks
+[Test] test_live_audio_selection: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_selection: assert Wait([&] { std::lock_guard lock(display->m_mutex); return display->m_videos >= videos + 2; })
+[Test] test_live_audio_selection: assert player.Position() >= position
+[Test] test_live_audio_selection: assert display->m_epoch == epoch
+[Test] test_live_audio_selection: assert display->m_invalidations == invalidations
+[Test] test_live_audio_selection: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_selection: assert display->m_image
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, selected)
+[Test] test_live_audio_selection: assert player.SelectedTrack(MediaType::Audio) == selected
+[Test] test_live_audio_selection: assert stats->m_seeks == seeks
+[Test] test_live_audio_selection: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_selection: assert Wait([&] { std::lock_guard lock(display->m_mutex); return display->m_videos >= videos + 2; })
+[Test] test_live_audio_selection: assert player.Position() >= position
+[Test] test_live_audio_selection: assert display->m_epoch == epoch
+[Test] test_live_audio_selection: assert display->m_invalidations == invalidations
+[Test] test_live_audio_selection: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_selection: assert display->m_image
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, audio)
+[Test] test_live_audio_selection: assert stats->m_seeks == seeks
+[Test] test_live_audio_selection: assert display->m_epoch == epoch
+[Test] test_live_audio_selection: assert display->m_invalidations == invalidations
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500)
+[Test] test_live_audio_selection: assert player.Pause()
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_live_audio_selection: assert player.State() == PlaybackState::Paused
+[Test] test_live_audio_selection: assert player.Position() == paused
+[Test] test_live_audio_selection: assert player.Seek(.5)
+[Test] test_live_audio_selection: assert player.Play()
+[Test] test_live_audio_selection: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[ASSERT] test_live_audio_selection: Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_live_audio_selection: FAIL
+
+    Start 15: preview.test_live_audio_tracks
+5/7 Test #15: preview.test_live_audio_tracks ..............***Failed    8.00 sec
+[Test] Starting test_live_audio_tracks
+[Test] test_live_audio_tracks: assert player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7bc9adbe0cc0] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bc9adbe0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_tracks: assert tracks.size() >= 2
+[Test] test_live_audio_tracks: assert player.Play()
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > .15; })
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[in @ 0x7c39adc11780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c39adc11780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=-1 position=0.594387 switch+delivery_ms=440
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[ASSERT] test_live_audio_tracks: Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] Finished test_live_audio_tracks: FAIL
+
+    Start 25: preview.test_subtitle_decode
+6/7 Test #25: preview.test_subtitle_decode ................***Failed   10.16 sec
+[Test] Starting test_subtitle_decode
+[Test] test_subtitle_decode: assert player.Open(Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7c5b403e0cc0] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7c5b403e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_subtitle_decode: assert player.SelectTrack(MediaType::Subtitle, 2)
+[Test] test_subtitle_decode: assert player.Play()
+[Test] test_subtitle_decode: assert Wait([&] { std::lock_guard lock(display->m_mutex); return display->m_bitmaps > 0; })
+[Test] test_subtitle_decode: assert Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7ccb40411780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7ccb40411780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[ASSERT] test_subtitle_decode: Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] Finished test_subtitle_decode: FAIL
+
+    Start 28: preview.test_faulted_reader_retained
+7/7 Test #28: preview.test_faulted_reader_retained ........***Failed    9.69 sec
+[Test] Starting test_faulted_reader_retained
+[Test] test_faulted_reader_retained: assert player.Open(std::move(reader))
+[CUDA @ 0x7c0b9d3e0cc0] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7c0b9d3e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_faulted_reader_retained: assert player.Play()
+[Test] test_faulted_reader_retained: assert Wait([&] { return player.State() == PlaybackState::Error; })
+[in @ 0x7c7b9d411780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c7b9d411780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[ASSERT] test_faulted_reader_retained: Wait([&] { return player.State() == PlaybackState::Error; })
+[Test] Finished test_faulted_reader_retained: FAIL
+
+
+0% tests passed, 7 tests failed out of 7
+
+Label Time Summary:
+multimedia    =  60.14 sec*proc (7 tests)
+preview       =  60.14 sec*proc (7 tests)
+
+Total Test time (real) =  60.14 sec
+
+The following tests FAILED:
+	 11 - preview.test_av_seek_switch_epochs (Failed)       multimedia preview
+	 12 - preview.test_hdr_preview_tone_mapping (Failed)    multimedia preview
+	 13 - preview.test_hdr_preview_preserves_signal (Failed) multimedia preview
+	 14 - preview.test_live_audio_selection (Failed)        multimedia preview
+	 15 - preview.test_live_audio_tracks (Failed)           multimedia preview
+	 25 - preview.test_subtitle_decode (Failed)             multimedia preview
+	 28 - preview.test_faulted_reader_retained (Failed)     multimedia preview
+Errors while running CTest
+
+exit_code=8

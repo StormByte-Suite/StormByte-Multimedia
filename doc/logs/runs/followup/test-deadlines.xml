@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="8"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="395"
+	timestamp="2026-11-02T06:43:21"
+	>
+	<testcase name="preview.test_av_seek_switch_epochs" classname="preview.test_av_seek_switch_epochs" time="2.03328" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_av_seek_switch_epochs
+[Test] test_av_seek_switch_epochs: assert player.Open(Fixture("video/anime_like.mkv"))
+[Test] test_av_seek_switch_epochs: assert video &gt;= 0
+[Test] test_av_seek_switch_epochs: assert player.Play()
+[Test] test_av_seek_switch_epochs: assert Wait([&amp;] { return player.Position() &gt; 0.30 || player.State() == PlaybackState::Error; })
+[Test] test_av_seek_switch_epochs: assert player.State() != PlaybackState::Error
+[Test] test_av_seek_switch_epochs: assert player.Pause()
+[Test] test_av_seek_switch_epochs: assert before &gt; 2
+[ASSERT] test_av_seek_switch_epochs: before &gt; 2
+[in @ 0x7cf45c411780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7cf45c411780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] Finished test_av_seek_switch_epochs: FAIL
+</system-out>
+	</testcase>
+	<testcase name="preview.test_hdr_preview_tone_mapping" classname="preview.test_hdr_preview_tone_mapping" time="23.9686" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_hdr_preview_tone_mapping
+[Test] test_hdr_preview_tone_mapping: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_tone_mapping: assert player.Play()
+[Test] test_hdr_preview_tone_mapping: assert Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7c7bff2113c0] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c7bff2113c0] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_hdr_preview_tone_mapping: assert player.State() == PlaybackState::Ended
+[Test] test_hdr_preview_tone_mapping: assert display-&gt;m_videos &gt; 0
+[Test] test_hdr_preview_tone_mapping: assert display-&gt;m_image
+[Test] test_hdr_preview_tone_mapping: assert display-&gt;m_image-&gt;m_pixels.size() == static_cast&lt;std::size_t&gt;(display-&gt;m_image-&gt;m_width) * display-&gt;m_image-&gt;m_hei...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_hdr_preview_preserves_signal" classname="preview.test_hdr_preview_preserves_signal" time="26.2948" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_hdr_preview_preserves_signal
+[Test] test_hdr_preview_preserves_signal: assert player.OutputColor(PreviewColorMode::HDR)
+[Test] test_hdr_preview_preserves_signal: assert player.Open(Fixture("video/bluray_like_hdr10.mkv"))
+[Test] test_hdr_preview_preserves_signal: assert player.Play()
+[Test] test_hdr_preview_preserves_signal: assert Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[Test] test_hdr_preview_preserves_signal: assert player.State() == PlaybackState::Ended
+[Test] test_hdr_preview_preserves_signal: assert display-&gt;m_videos &gt; 0
+[Test] test_hdr_preview_preserves_signal: assert display-&gt;m_hdr_image
+[Test] test_hdr_preview_preserves_signal: assert !display-&gt;m_image
+[Test] test_hdr_preview_preserves_signal: assert display-&gt;m_hdr_image-&gt;m_pixels.size() == static_cast&lt;std::size_t&gt;(display-&gt;m_hdr_image-&gt;m_width) * display-&gt;m_hdr_image-&gt;m_height * 8
+[Test] test_hdr_preview_preserves_signal: assert display-&gt;m_hdr_image-&gt;m_transfer == Sto...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_live_audio_selection" classname="preview.test_live_audio_selection" time="27.3689" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_live_audio_selection
+[Test] test_live_audio_selection: assert player.Open(Safe::MakeUnique&lt;TokenReader&gt;(Fixture("video/anime_like.mkv"), stats))
+[CUDA @ 0x7bb0371e0cc0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bb0371e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Subtitle, -1)
+[Test] test_live_audio_selection: assert audio &gt;= 0
+[Test] test_live_audio_selection: assert player.Play()
+[Test] test_live_audio_selection: assert Wait([&amp;] { return player.Position() &gt; .15; })
+[Test] test_live_audio_selection: assert player.SelectTrack(MediaType::Audio, selected)
+[in @ 0x7c2037211780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c2037211780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_live_audio_tracks" classname="preview.test_live_audio_tracks" time="367.225" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_live_audio_tracks
+[Test] test_live_audio_tracks: assert player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7c8c881e0cc0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7c8c881e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_tracks: assert tracks.size() &gt;= 2
+[Test] test_live_audio_tracks: assert player.Play()
+[Test] test_live_audio_tracks: assert Wait([&amp;] { return player.Position() &gt; .15; })
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[in @ 0x7cfc88211780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7cfc88211780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&amp;] { { std::lock_guard lock(display-&gt;m_mutex); if (display-&gt;m_videos &gt; videos &amp;&amp; (track &lt; 0 || display-&gt;m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() &gt;= previous
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display-&gt;m_epoch == epoch
+[Test] test_live_audio_tracks: assert display-&gt;m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display-&gt;m_image
+live audio track=-1 position=0.661335 switch+delivery_ms=508
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&amp;] { { std::lock_guard lock(display-&gt;m_mutex); if (display-&gt;m_videos &gt; videos &amp;&amp; (track &lt; 0 || display-&gt;m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() &gt;= previous
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display-&gt;m_epoch == epoch
+[Test] test_live_audio_tracks: assert display-&gt;m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display-&gt;m_image
+live audio track=1 position=5.37949 switch+delivery_ms=4717
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&amp;] { { std::lock_guard lock(display-&gt;m_mutex); if (display-&gt;m_videos &gt; videos &amp;&amp; (track &lt; 0 || display-&gt;m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() &gt;= previous
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display-&gt;m_epoch == epoch
+[Test] test_live_audio_tracks: assert display-&gt;m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display-&gt;m_image
+live audio track=-1 position=5.66604 switch+delivery_ms=287
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&amp;] { { std::lock_guard lock(display-&gt;m_mutex); if (display-&gt;m_videos &gt; videos &amp;&amp; (track &lt; 0 || display-&gt;m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[ASSERT] test_live_audio_tracks: Wait([&amp;] { { std::lock_guard lock(display-&gt;m_mutex); if (display-&gt;m_videos &gt; videos &amp;&amp; (track &lt; 0 || display-&gt;m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] Finished test_live_audio_tracks: FAIL
+</system-out>
+	</testcase>
+	<testcase name="preview.test_subtitle_decode" classname="preview.test_subtitle_decode" time="24.0308" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_subtitle_decode
+[Test] test_subtitle_decode: assert player.Open(Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7bfccfde0cc0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bfccfde0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_subtitle_decode: assert player.SelectTrack(MediaType::Subtitle, 2)
+[Test] test_subtitle_decode: assert player.Play()
+[Test] test_subtitle_decode: assert Wait([&amp;] { std::lock_guard lock(display-&gt;m_mutex); return display-&gt;m_bitmaps &gt; 0; })
+[Test] test_subtitle_decode: assert Wait([&amp;] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; })
+[in @ 0x7c6ccfe11780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c6ccfe11780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="preview.test_faulted_reader_retained" classname="preview.test_faulted_reader_retained" time="16.9392" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_faulted_reader_retained
+[Test] test_faulted_reader_retained: assert player.Open(std::move(reader))
+[CUDA @ 0x7bbcdd3e0cc0] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7bbcdd3e0d40] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_faulted_reader_retained: assert player.Play()
+[Test] test_faulted_reader_retained: assert Wait([&amp;] { return player.State() == PlaybackState::Error; })
+[in @ 0x7c2cdd411780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c2cdd411780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[matroska,webm @ 0x7c8cdd3e0080] Read error
+StormByte: read preview packet: Input/output error
+[Test] test_faulted_reader_retained: assert !player.ReleaseReader()
+reader rewind re...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="file.test_progress_duration_hint_skips_scan" classname="file.test_progress_duration_hint_skips_scan" time="25.7325" status="run">
+		<properties>
+			<property name="cmake_labels" value="file;multimedia;pipeline"/>
+		</properties>
+		<system-out>[Test] Starting test_progress_duration_hint_skips_scan
+[Test] test_progress_duration_hint_skips_scan: assert opened
+[Test] test_progress_duration_hint_skips_scan: assert opened-&gt;DurationHint()
+[Test] OutputPath: preparing /tmp/BMDATA/sanitizer-clean-final/test-output/MultimediaDurationTests/test_progress_duration_hint_skips_scan/hint-duration-0.mkv
+[LowLevel] 02/11/2026 06:44:54 StormByte/Multimedia/Transcoder created
+[Notice  ] 02/11/2026 06:44:55 StormByte/Multimedia/Transcoder probed source test://duration.wav
+[LowLevel] 02/11/2026 06:44:55 StormByte/Multimedia/Transcoder add-track in=0
+[Debug   ] 02/11/2026 06:44:55 StormByte/Multimedia/Transcoder mapped Audio 0 -&gt; order 0
+[Debug   ] 02/11/2026 06:44:55 StormByte/Multimedia/Transcoder track 0 marked remux
+[Test] test_progress_duration_hint_skips_scan: assert CheckTranscoderConfigured(job) == 0
+[Test] CheckTranscoderConfigured: checking transcoder configuration
+[Test] test_progress_duration_hint_skips_scan: assert WaitForTranscoder(job) == 0
+[Test] WaitFor...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

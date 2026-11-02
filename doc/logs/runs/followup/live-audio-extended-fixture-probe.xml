@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="33"
+	timestamp="2026-11-02T06:52:20"
+	>
+	<testcase name="preview.test_live_audio_tracks" classname="preview.test_live_audio_tracks" time="33.8459" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_live_audio_tracks
+[Test] test_live_audio_tracks: assert player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7beefd9e0040] cu-&gt;cuInit(0) failed -&gt; CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7beefd9e00c0] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_tracks: assert tracks.size() &gt;= 2
+[Test] test_live_audio_tracks: assert player.Play()
+[Test] test_live_audio_tracks: assert Wait([&amp;] { return player.Position() &gt; .15; })
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&amp;] { { std::lock_guard lock(display-&gt;m_mutex); if (display-&gt;m_videos &gt; videos &amp;&amp; (track &lt; 0 || display-&gt;m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_trac...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

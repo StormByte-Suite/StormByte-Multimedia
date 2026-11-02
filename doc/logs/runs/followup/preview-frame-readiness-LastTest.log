@@ -1,0 +1,56 @@
+Start testing: Nov 02 06:51 CET
+----------------------------------------------------------
+11/435 Testing: preview.test_av_seek_switch_epochs
+11/435 Test: preview.test_av_seek_switch_epochs
+Command: "/tmp/BMDATA/sanitizer-clean-final/test/MultimediaSimplePlayerTests" "test_av_seek_switch_epochs"
+Directory: /tmp/BMDATA/sanitizer-clean-final/test
+"preview.test_av_seek_switch_epochs" start time: Nov 02 06:51 CET
+Output:
+----------------------------------------------------------
+[Test] Starting test_av_seek_switch_epochs
+[Test] test_av_seek_switch_epochs: assert player.Open(Fixture("video/anime_like.mkv"))
+[Test] test_av_seek_switch_epochs: assert video >= 0
+[Test] test_av_seek_switch_epochs: assert player.Play()
+[Test] test_av_seek_switch_epochs: assert Wait([&] { if (player.State() == PlaybackState::Error) return true; if (player.Position() <= 0.30) return false; std::lock_guard lock(display->m_mutex); return display->m_videos > 2; })
+[in @ 0x7c2cad011780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c2cad011780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_av_seek_switch_epochs: assert player.State() != PlaybackState::Error
+[Test] test_av_seek_switch_epochs: assert player.Pause()
+[Test] test_av_seek_switch_epochs: assert before > 2
+[Test] test_av_seek_switch_epochs: assert display->m_max_video_lead < 0.08
+[Test] test_av_seek_switch_epochs: assert display->m_max_audio_gap < 0.00001
+[Test] test_av_seek_switch_epochs: assert player.Seek(1.0)
+[Test] test_av_seek_switch_epochs: assert Wait([&] { std::lock_guard lock(display->m_mutex); return display->m_videos > before; })
+[Test] test_av_seek_switch_epochs: assert player.State() == PlaybackState::Paused
+[Test] test_av_seek_switch_epochs: assert display->m_epoch > epoch
+[Test] test_av_seek_switch_epochs: assert display->m_image->m_position >= 1.0
+[Test] test_av_seek_switch_epochs: assert display->m_image->m_position < 1.10
+[Test] test_av_seek_switch_epochs: assert display->DeliverDeferred() > 0
+[Test] test_av_seek_switch_epochs: assert player.SelectTrack(MediaType::Video, -1)
+[Test] test_av_seek_switch_epochs: assert !display->m_active_video
+[Test] test_av_seek_switch_epochs: assert !display->m_image
+[Test] test_av_seek_switch_epochs: assert display->DeliverDeferred() == 0
+[Test] test_av_seek_switch_epochs: assert player.SelectTrack(MediaType::Video, video)
+[Test] test_av_seek_switch_epochs: assert player.SelectTrack(MediaType::Audio, -1)
+[Test] test_av_seek_switch_epochs: assert player.Play()
+[Test] test_av_seek_switch_epochs: assert Wait([&] { return player.State() == PlaybackState::Ended; })
+[in @ 0x7c2cad01e340] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c2cad01e340] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 1000
+[Test] test_av_seek_switch_epochs: assert player.Stop()
+[Test] test_av_seek_switch_epochs: assert display->DeliverDeferred() > 0
+[Test] test_av_seek_switch_epochs: assert !display->m_image
+[Test] Finished test_av_seek_switch_epochs: PASS
+<end of output>
+Test time =  16.08 sec
+----------------------------------------------------------
+Test Passed.
+"preview.test_av_seek_switch_epochs" end time: Nov 02 06:51 CET
+"preview.test_av_seek_switch_epochs" time elapsed: 00:00:16
+----------------------------------------------------------
+
+End testing: Nov 02 06:51 CET
+
+multimedia =  16.08 sec*proc
+
+preview =  16.08 sec*proc
+

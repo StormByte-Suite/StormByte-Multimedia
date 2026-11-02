@@ -1,6 +1,6 @@
 # Upstream patch submissions
 
-This collection contains **49 independent bug-fix commits for ten source
+This collection contains **64 independent bug-fix commits for ten source
 repositories**. Each patch is a `git format-patch` email with the configured
 repository author, integrated into Multimedia's bundled build in a separate
 commit with a changelog entry.
@@ -41,13 +41,13 @@ changes touch different files and have also been checked in authoring order.
 
 | Repository | Tested base revision | Fixes |
 |---|---|---:|
-| FFmpeg source snapshot bundled by Multimedia | `5a215d7ce4de21ec5c34214994eea0ac13dc9054` | 3 |
-| SVT-AV1 | `9292ec8e32bce26f781f277ec8739b53426c4300` | 4 |
+| FFmpeg source snapshot bundled by Multimedia | `5a215d7ce4de21ec5c34214994eea0ac13dc9054` | 4 |
+| SVT-AV1 | `9292ec8e32bce26f781f277ec8739b53426c4300` | 10 |
 | Kvazaar | `6040962bed5cc68c5ad01234c38c08b8b2822068` | 10 |
-| x265 | `e444744c03978c1fb4e037168967020cf2648427` | 5 |
-| Vorbis | `0657aee69dec8508a0011f47f3b69d7538e9d262` | 4 |
+| x265 | `e444744c03978c1fb4e037168967020cf2648427` | 8 |
+| Vorbis | `0657aee69dec8508a0011f47f3b69d7538e9d262` | 5 |
 | VMAF | `74f930d17de8c58e7c2ce55e2b897b0030ebd8ef` | 2 |
-| FDK-AAC | `716f4394641d53f0d79c9ddac3fa93b03a49f278` | 16 |
+| FDK-AAC | `716f4394641d53f0d79c9ddac3fa93b03a49f278` | 20 |
 | x264 | `00852f599572d10798b2dafd2c5286213d0ce795` | 1 |
 | LAME | `1f5cc9487284d5950343aa5d4f70de433468070a` | 2 |
 | OpenH264 | `652bdb7719f30b52b08e506645a7322ff1b2cc6f` | 2 |
@@ -61,6 +61,78 @@ The FFmpeg snapshot includes a Meson build port; these changes touch codec
 sources, not the build port.
 
 ## Validation summary
+
+- Latest failed-path follow-up: all **15 selected provider paths now pass**
+  across focused runs, not a rerun of the full suite. Eleven passed without
+  suppressions in [the RPU follow-up](logs/runs/followup/rpu-followup.xml);
+  SVT repeated cancellation passed in
+  [the restoration follow-up](logs/runs/followup/svt-tail-followup.xml), and
+  all three interleave cases passed in
+  [the joint-convolution follow-up](logs/runs/followup/svt-joint-followup.xml),
+  exit **0** for that final three-test run. The latter runs retain leak
+  detection and use only the approved `leak:cuInit` exception.
+- Both per-frame Dolby Vision leaks are fixed: FFmpeg's generated RPU temporary
+  and x265's owned frame copy. All seven x265 Dolby Vision paths pass with
+  **no leak suppressions**. Before/after full output is retained because JUnit
+  truncates lengthy diagnostic streams:
+  [before](logs/runs/followup/failed-paths-LastTest.log),
+  [after](logs/runs/followup/rpu-followup-LastTest.log).
+- Fifteen additional mail patches were applied on clean predecessor trees;
+  all five resulting provider trees exactly match their authoring trees.
+  [Verification](logs/reproduce/git-am-followup-verification.log).
+- The other **19 unresolved original cases** were run separately:
+  **3 passed / 16 failed**, exit **8**. HDR10+ roundtrip and both watermark
+  paths now pass. Remaining failures are seven preview tests, a duration-hint
+  timeout and eight NVENC preflight/encode tests. All eight NVENC failures
+  explicitly report `cuInit` returning `CUDA_ERROR_OUT_OF_MEMORY`, despite
+  the GPU reporting free memory; these are **not waived** by the leak exception.
+  [Results](logs/runs/followup/remaining-paths.xml).
+- All seven preview failures also reproduce serially without concurrent test
+  load: **0 passed / 7 failed**, exit **8**.
+  [Serial evidence](logs/runs/followup/preview-serial.xml).
+- Overall the original 47 failing cases have **31 passing follow-up results
+  and 16 unresolved failures**. This is a union of focused runs, not a new
+  full-suite result or a release gate. OOM/static-analysis follow-up is also
+  still pending; releases and tags remain held.
+
+#### Subsequent preview and duration investigation
+
+The deadline follow-up resolves six more original cases without changing their
+functional assertions: HDR SDR/HDR preview, live audio selection, subtitle
+decode, faulted reader ownership and duration-hint remux. The latter passes
+unchanged in **26.29 seconds**, beyond CTest's previous 20-second cutoff.
+An isolated HDR probe likewise passes in **22.48 seconds**, beyond the old
+five-second in-process wait. Preview waits now honor the existing instrumented
+test deadline; CTest allows 480 seconds for ASan/PGO, as pipeline tests already do.
+[Eight-case results: 6 passed / 2 failed, exit 8](logs/runs/followup/test-deadlines.xml).
+
+The seek/epoch regression had a separate asynchronous test race: clock progress
+did not imply that three video frames had already reached the display. It now
+waits for both conditions before pausing and retains all subsequent assertions.
+[Focused result: 1 passed, exit 0](logs/runs/followup/preview-frame-readiness.xml).
+
+The original live-audio-track cycling case **still fails**: its two-second
+1080p fixture is exhausted while six track changes are being exercised under
+instrumentation. Its diagnostic output reaches position 5.666 before the next
+audio-track enable, with no remaining audio to deliver. Reusing the existing
+12-second low-resolution fixture still fails an epoch assertion; a 96-second
+stream-copy repetition passes all original timing/epoch assertions in 33.85
+seconds. This is diagnostic evidence, **not a passing result for the default
+fixture**. [Reproduction](logs/reproduce/README.md#live-audio-fixture-probes).
+
+Latest consolidated state: **38 of the original 47 failures have passing
+follow-up results; 9 remain unresolved** (the default live-audio-track test and
+eight NVENC tests). The full suite was not rerun. See
+[per-original-failure state](logs/runs/followup/latest-original-failures.tsv).
+
+The NVENC constraint is reproduced in a small standalone CUDA driver program:
+plain build **exit 0**, instrumented build **exit 1**, reporting
+`CUDA_ERROR_OUT_OF_MEMORY` from `cuInit`. No FFmpeg or StormByte code is linked.
+This confirms an external sanitizer/driver initialization incompatibility on
+this host, not a Multimedia allocation leak. It has **not** been waived.
+[Source, commands and output](logs/reproduce/README.md#nvidia-sanitizer-initialization-constraint).
+
+The following complete-suite figures are historical and remain unchanged:
 
 - Linux, Clang 22, ASan + UBSan + LSan; PGO and LTO disabled.
 - A new build directory, `/tmp/BMDATA/sanitizer-clean-final`, was created without
@@ -97,6 +169,24 @@ sources, not the build port.
   rate/channel/quality configurations pass without leak suppressions, exit **0**.
   The previously failing surround encode test also passes, exit **0**.
   [Before/after evidence and runnable main](logs/providers/vorbis/standalone/).
+
+### Additional PR material for the fifteen follow-up fixes
+
+Append these points to the corresponding provider submissions below. Patch
+paths, subjects, upstream commit IDs and resulting tree hashes are recorded in
+[patches.tsv](logs/reproduce/patches.tsv).
+
+| Provider | Additional patches | Confirmed defect and validation |
+|---|---|---|
+| FFmpeg | `0012` | Generated Dolby Vision RPU temporary leaked after `encoder_encode`; release it after synchronous consumption, without changing reordered opaque ownership. Seven Dolby Vision tests pass under unsuppressed LSan. |
+| x265 | `0008`-`0010` | Final coefficient-group shift by 64; diamond direction signed overflow; RPU copies leaked on frame reuse/destruction. Real helper reference check covers 4,368,000 comparisons; seven Dolby Vision paths pass under strict sanitizers. |
+| Vorbis | `0007` | Decoder first-table search hints shifted a signed value into its sign bit. Use the existing unsigned word type before shifting. Decode roundtrip passes. |
+| FDK-AAC | `0017`-`0020` | Negative shifts in minimum-SNR, intensity spectrum/correlation and threshold-log normalization. Preserve fixed-point bit patterns with unsigned shifts and restore signed values before arithmetic use. Stereo and surround encode paths pass. |
+| SVT-AV1 | `0007`-`0012` | Misaligned scalar loads in convolution, packing, SAD, SSE4.1 short rows and restoration tails; second-row stores also overflowed signed halfword assembly. Reuse existing unaligned-safe SIMD helpers; load a single restoration lane at its actual 16-bit width. Dolby Vision watermark, repeated cancellation and three interleave paths pass. |
+
+Build and complete per-test diagnostic logs for each iteration are in
+[follow-up builds](logs/builds/) and [focused test runs](logs/runs/followup/).
+Do not submit proprietary NVIDIA allocations as defects in these providers.
 
 ### Provider-focused results
 

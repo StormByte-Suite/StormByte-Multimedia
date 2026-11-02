@@ -1,0 +1,99 @@
+
+ffmpeg: predecessor=a91ed5a0c4d5b99db20164fcfc72a7e5f9155249
+Clonando en '/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/followup-git-am-ffmpeg'...
+Advertencia: estás dejando 1 commit atrás, no está conectado
+a ninguna rama:
+
+  735ab60990 avcodec/libx265: free generated RPU after encoder consumption
+
+Si quieres conservarlo creando una nueva rama, este es un buen momento
+para hacerlo:
+
+ git branch <nuevo-nombre-de-rama> 735ab60990
+
+HEAD está ahora en a91ed5a0c4 avcodec/libopenh264enc: map constrained baseline to PRO_BASELINE
+Aplicando: avcodec/libx265: free generated RPU after encoder consumption
+PASS exact_tree=a8f7ba49ce76f173f1afcb0482e558c23529d1b2; patches=1
+
+x265: predecessor=ddd324790cdf4191f45aca0ac6e46a39b07c3bca
+Clonando en '/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/followup-git-am-x265'...
+Advertencia: estás dejando 3 commits atrás, no están conectados
+a ninguna rama:
+
+  fa0369760 frame: release owned Dolby Vision RPU on reuse and destruction
+  194805d98 motion: decode diamond directions without signed overflow
+  0589a629c quant: guard final coefficient-group neighbor shifts
+
+Si quieres conservarlos creando una nueva rama, este es un buen momento
+para hacerlo:
+
+ git branch <nombre-de-rama> fa0369760
+
+HEAD está ahora en ddd324790 ratecontrol: skip residual-cost division when amortization is disabled
+Aplicando: quant: guard final coefficient-group neighbor shifts
+Aplicando: motion: decode diamond directions without signed overflow
+Aplicando: frame: release owned Dolby Vision RPU on reuse and destruction
+PASS exact_tree=30e0af1c22a0d6dd775bd5bee24eee3bea72ec9c; patches=3
+
+vorbis: predecessor=0be3365cdd4758693842fa44d055639456ba0bcf
+Clonando en '/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/followup-git-am-vorbis'...
+Advertencia: estás dejando 1 commit atrás, no está conectado
+a ninguna rama:
+
+  c11ed2b sharedbook: construct decode search words in unsigned arithmetic
+
+Si quieres conservarlo creando una nueva rama, este es un buen momento
+para hacerlo:
+
+ git branch <nuevo-nombre-de-rama> c11ed2b
+
+HEAD está ahora en 0be3365 vorbisenc: reuse residue allocations shared by encoding modes
+Aplicando: sharedbook: construct decode search words in unsigned arithmetic
+PASS exact_tree=e34937213ac07f461ae1cb8e710d4aa2343e0724; patches=1
+
+fdk-aac: predecessor=63e28cc956cff490e381920302d2c9ea29e24e6f
+Clonando en '/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/followup-git-am-fdk-aac'...
+Advertencia: estás dejando 4 commits atrás, no están conectados
+a ninguna rama:
+
+  12cd29c threshold: normalize signed logarithms using unsigned bit patterns
+  3bc82f5 intensity: normalize signed correlation and mixed spectra safely
+  7cb3f5f aacenc: normalize signed intensity spectra and correlation safely
+  c82bf7e aacenc: scale minimum SNR through unsigned fixed-point bits
+
+Si quieres conservarlos creando una nueva rama, este es un buen momento
+para hacerlo:
+
+ git branch <nombre-de-rama> 12cd29c
+
+HEAD está ahora en 63e28cc libFDK: widen folded MDCT samples without negative shifts
+Aplicando: aacenc: scale minimum SNR through unsigned fixed-point bits
+Aplicando: aacenc: normalize signed intensity spectra and correlation safely
+Aplicando: intensity: normalize signed correlation and mixed spectra safely
+Aplicando: threshold: normalize signed logarithms using unsigned bit patterns
+PASS exact_tree=76b5d575d32dfe4e872709d295d529f810f57adc; patches=4
+
+svt-av1: predecessor=d3444dbfb909937511cb066bd05cda31f3fed657
+Clonando en '/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/followup-git-am-svt-av1'...
+Advertencia: estás dejando 6 commits atrás, no están conectados
+a ninguna rama:
+
+  2bd35b3e1 AVX2: load joint-convolution rows without scalar alignment
+  bc0eefb25 AVX2: load restoration tails at their natural width
+  d59f6a858 SSE4.1: load short rows without scalar alignment
+  6ba2e8596 AVX2: load four-byte SAD rows without scalar alignment
+ ... y 2 más.
+
+Si quieres conservarlos creando una nueva rama, este es un buen momento
+para hacerlo:
+
+ git branch <nombre-de-rama> 2bd35b3e1
+
+HEAD está ahora en d3444dbfb AVX2: use unaligned-safe accesses for CDEF row fragments
+Aplicando: avx2: load four-byte convolution and packing fragments safely
+Aplicando: SSE2: store second short row with unaligned-safe helper
+Aplicando: AVX2: load four-byte SAD rows without scalar alignment
+Aplicando: SSE4.1: load short rows without scalar alignment
+Aplicando: AVX2: load restoration tails at their natural width
+Aplicando: AVX2: load joint-convolution rows without scalar alignment
+PASS exact_tree=4ddb8595e86378bdf55fa9060d8cb7d1aa178565; patches=6

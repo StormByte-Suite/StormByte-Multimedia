@@ -1,0 +1,29 @@
+In file included from doc/logs/providers/x265/standalone/x265-coefficient-context-check.cxx:1:
+In file included from /home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/quant.h:28:
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/common.h:179:65: error: use of undeclared identifier 'X265_DEPTH'
+  179 | inline pixel x265_clip(T x) { return (pixel)x265_min<T>(T((1 << X265_DEPTH) - 1), x265_max<T>(T(0), x)); }
+      |                                                                 ^~~~~~~~~~
+In file included from doc/logs/providers/x265/standalone/x265-coefficient-context-check.cxx:1:
+In file included from /home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/quant.h:30:
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/contexts.h:106:31: error: unknown type name 'entropyStateBits'
+  106 | extern "C" const uint32_t PFX(entropyStateBits)[128];
+      |                               ^
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/contexts.h:106:30: error: function cannot return array type 'const uint32_t[128]' (aka 'const unsigned int[128]')
+  106 | extern "C" const uint32_t PFX(entropyStateBits)[128];
+      |                              ^
+In file included from doc/logs/providers/x265/standalone/x265-coefficient-context-check.cxx:1:
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/quant.h:56:55: error: use of undeclared identifier 'X265_DEPTH'
+   56 |             lambda2 = (int64_t)(x265_lambda2_tab[qp - QP_BD_OFFSET] * 256. + 0.5);
+      |                                                       ^~~~~~~~~~~~
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/common.h:217:28: note: expanded from macro 'QP_BD_OFFSET'
+  217 | #define QP_BD_OFFSET (6 * (X265_DEPTH - 8))
+      |                            ^~~~~~~~~~
+In file included from doc/logs/providers/x265/standalone/x265-coefficient-context-check.cxx:1:
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/quant.h:57:54: error: use of undeclared identifier 'X265_DEPTH'
+   57 |             lambda  = (int32_t)(x265_lambda_tab[qp - QP_BD_OFFSET] * 256. + 0.5);
+      |                                                      ^~~~~~~~~~~~
+/home/stormbyte/.copilot/session-state/57a56689-79e2-43a4-a422-e8c363a826cf/files/x265-upstream-fixes/source/common/common.h:217:28: note: expanded from macro 'QP_BD_OFFSET'
+  217 | #define QP_BD_OFFSET (6 * (X265_DEPTH - 8))
+      |                            ^~~~~~~~~~
+5 errors generated.
+exit_code: 1

@@ -1,0 +1,313 @@
+[  0%] [BuildMaster/File     ]: Download (cached) StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  0%] [BuildMaster/File     ]: Download (cached) StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+[  0%] [BuildMaster/Core     ]: reset fail markers
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+[  1%] [BuildMaster/File     ]: Download (cached) StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/File     ]: Downloading StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip... (cached) OK
+-- [BuildMaster/File     ]: Downloading StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip... (cached) OK
+[  1%] Built target _bm_bin_StormByte-Base_dl
+[  1%] Built target _bm_bin_StormByte-System_dl
+[  1%] Built target _bm_bin_StormByte-Buffer_dl
+[  1%] Built target _bm_bin_StormByte-Logger_dl
+[  1%] Built target buildmaster_build_init
+[  2%] Built target StormByte-Base_build
+[  2%] Built target StormByte-Logger_build
+[  2%] [BuildMaster/File     ]: Decompress StormByte-Base StormByte-2.2.3-linux-x64-libc++.zip
+[  2%] [BuildMaster/Ninja    ]: Compiling FDK_AAC codec
+[  2%] [BuildMaster/Ninja    ]: Compiling kvazaar
+[  3%] [BuildMaster/Ninja    ]: Compiling liblzma (xz) compression library
+[  3%] [BuildMaster/Ninja    ]: Compiling X265 codec (10-bit)
+[  3%] [BuildMaster/Ninja    ]: Compiling X264 codec
+[  3%] [BuildMaster/Ninja    ]: Compiling dav1d
+[  4%] [BuildMaster/Ninja    ]: Compiling FFmpeg NVIDIA codec headers
+[  4%] [BuildMaster/Ninja    ]: Compiling bzip2 compression library
+[  5%] Built target StormByte-System_build
+[  5%] [BuildMaster/Ninja    ]: Compiling MP3 encoder LAME
+[  6%] [BuildMaster/Ninja    ]: Compiling libebur128
+[  6%] Built target StormByte-Buffer_build
+[  6%] [BuildMaster/Ninja    ]: Compiling LunaSVG
+[  7%] [BuildMaster/Ninja    ]: Compiling libsamplerate
+[  7%] [BuildMaster/Ninja    ]: Compiling libaom
+[  7%] [BuildMaster/Ninja    ]: Compiling SVT-AV1
+[  7%] [BuildMaster/Ninja    ]: Compiling VMAF library
+[  7%] [BuildMaster/Ninja    ]: Compiling zlib compression library
+[  8%] [BuildMaster/Ninja    ]: Compiling zimg
+[  8%] [BuildMaster/Ninja    ]: Compiling openh264
+[  9%] [BuildMaster/Ninja    ]: Compiling OGG container
+[  9%] [BuildMaster/Ninja    ]: Compiling VPX codec
+[  9%] [BuildMaster/Ninja    ]: Compiling Opus codec
+[  9%] [BuildMaster/Ninja    ]: Compiling leptonica
+[  9%] [BuildMaster/Ninja    ]: Compiling libwebp
+[  9%] [BuildMaster/Ninja    ]: Compiling X265 codec (12-bit)
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (build)
+[ 10%] [BuildMaster/Ninja    ]: Compiling Tesseract traineddata
+-- [BuildMaster/Component]: stamp hit bzip2 (build)
+-- [BuildMaster/Component]: stamp hit lunasvg (build)
+[ 10%] Built target ffnvcodec-headers_build
+-- [BuildMaster/Component]: stamp hit ogg (build)
+[ 10%] Built target bzip2_build
+[ 10%] Built target lunasvg_build
+[ 10%] Built target ogg_build
+[ 10%] [BuildMaster/Ninja    ]: Installing FFmpeg NVIDIA codec headers
+[ 10%] Built target _bm_bin_StormByte-Base_unpack
+-- [BuildMaster/Component]: stamp hit dav1d (build)
+-- [BuildMaster/Component]: stamp hit ffnvcodec-headers (install)
+[ 11%] [BuildMaster/Ninja    ]: Installing bzip2 compression library
+[ 12%] [BuildMaster/Ninja    ]: Installing LunaSVG
+[ 12%] [BuildMaster/Ninja    ]: Installing OGG container
+[ 12%] Built target ffnvcodec-headers_install
+-- [BuildMaster/Component]: stamp hit bzip2 (install)
+-- [BuildMaster/Component]: stamp hit lunasvg (install)
+-- [BuildMaster/Component]: stamp hit zimg (build)
+[ 12%] Built target dav1d_build
+[ 12%] [BuildMaster/File     ]: Decompress StormByte-Logger StormByte-Logger-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/Component]: stamp hit ogg (install)
+[ 12%] Built target StormByte-Base_install
+[ 12%] Built target bzip2_install
+[ 12%] Built target lunasvg_install
+[ 12%] Built target ogg_install
+[ 12%] Built target zimg_build
+[ 12%] [BuildMaster/Ninja    ]: Installing dav1d
+[ 12%] Built target _bm_bin_StormByte-Logger_unpack
+[ 12%] [BuildMaster/CMake    ]: Configuring vorbis
+[ 12%] [BuildMaster/Ninja    ]: Installing zimg
+[ 13%] [BuildMaster/File     ]: Decompress StormByte-System StormByte-System-2.1.3-linux-x64-libc++.zip
+-- [BuildMaster/Component]: stamp hit dav1d (install)
+[ 13%] Built target StormByte-Logger_install
+[ 13%] Built target dav1d_install
+[ 13%] Built target _bm_bin_StormByte-System_unpack
+-- [BuildMaster/Component]: stamp hit ebur128 (build)
+-- [BuildMaster/Component]: stamp hit zimg (install)
+[ 13%] Built target StormByte-System_install
+[ 13%] [BuildMaster/File     ]: Decompress StormByte-Buffer StormByte-Buffer-2.0.6-linux-x64-libc++.zip
+-- [BuildMaster/Component]: stamp hit zlib (build)
+[ 13%] Built target ebur128_build
+[ 13%] Built target zlib_build
+[ 13%] Built target zimg_install
+-- [BuildMaster/Component]: stamp hit samplerate (build)
+[ 13%] Built target _bm_bin_StormByte-Buffer_unpack
+[ 14%] [BuildMaster/Ninja    ]: Installing zlib compression library
+[ 14%] Built target samplerate_build
+[ 14%] [BuildMaster/Ninja    ]: Installing libebur128
+[ 14%] Built target StormByte-Buffer_install
+-- [BuildMaster/Component]: stamp hit lzma (build)
+-- [BuildMaster/Component]: stamp hit webp (build)
+[ 14%] [BuildMaster/Ninja    ]: Installing libsamplerate
+[ 14%] Built target webp_build
+-- [BuildMaster/Component]: stamp hit x264 (build)
+[ 14%] Built target lzma_build
+[ 15%] [BuildMaster/Ninja    ]: Installing libwebp
+[ 15%] Built target x264_build
+-- [BuildMaster/Component]: stamp hit mp3lame (build)
+[ 15%] [BuildMaster/Ninja    ]: Installing liblzma (xz) compression library
+[ 15%] [BuildMaster/Ninja    ]: Installing X264 codec
+[ 15%] Built target mp3lame_build
+-- [BuildMaster/Component]: stamp hit opus (build)
+[ 15%] [BuildMaster/Ninja    ]: Installing MP3 encoder LAME
+[ 15%] Built target opus_build
+-- [BuildMaster/Component]: stamp hit aom (build)
+-- [BuildMaster/Component]: stamp hit openh264 (build)
+[ 15%] [BuildMaster/Ninja    ]: Installing Opus codec
+[ 15%] Built target openh264_build
+-- [BuildMaster/Component]: stamp hit ebur128 (install)
+-- [BuildMaster/Component]: stamp hit zlib (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 17%] [BuildMaster/Ninja    ]: Installing openh264
+-- [BuildMaster/Component]: stamp hit vpx (build)
+-- [BuildMaster/Component]: stamp hit samplerate (install)
+[ 17%] Built target aom_build
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 18%] [BuildMaster/Ninja    ]: Installing libaom
+-- [BuildMaster/Component]: stamp hit webp (install)
+-- [BuildMaster/Component]: stamp hit leptonica (build)
+[ 18%] Built target ebur128_install
+[ 18%] Built target zlib_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 18%] Built target vpx_build
+[ 18%] Built target samplerate_install
+-- [BuildMaster/Component]: stamp hit vmaf (build)
+-- [BuildMaster/Component]: stamp hit lzma (install)
+-- [BuildMaster/Component]: stamp hit tessdata (build)
+[ 18%] [BuildMaster/Ninja    ]: Installing VPX codec
+[ 18%] [BuildMaster/CMake    ]: Configuring rubberband
+[ 18%] Built target leptonica_build
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 18%] Built target tessdata_build
+[ 18%] Built target vmaf_build
+[ 18%] [BuildMaster/Ninja    ]: Installing leptonica
+[ 18%] Built target webp_install
+[ 18%] [BuildMaster/Ninja    ]: Installing Tesseract traineddata
+[ 19%] [BuildMaster/Ninja    ]: Installing VMAF library
+-- [BuildMaster/Component]: stamp hit x264 (install)
+[ 19%] Built target lzma_install
+-- [BuildMaster/Component]: stamp hit mp3lame (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 19%] Built target x264_install
+[ 19%] Built target mp3lame_install
+[BuildMaster/Component]: stamp hit vorbis (configure)
+-- [BuildMaster/Component]: stamp hit opus (install)
+-- [BuildMaster/Component]: stamp hit x265-10bit (build)
+[ 19%] Built target vorbis_configure
+[BuildMaster/Component]: stamp hit rubberband (configure)
+[ 19%] Built target x265-10bit_build
+[ 19%] [BuildMaster/Ninja    ]: Compiling Vorbis codec
+[ 19%] Built target rubberband_configure
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 19%] [BuildMaster/Ninja    ]: Installing X265 codec (10-bit)
+[ 20%] [BuildMaster/Ninja    ]: Compiling rubberband
+-- [BuildMaster/Component]: stamp hit openh264 (install)
+[ 20%] Built target opus_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit aom (install)
+[ 20%] Built target openh264_install
+[ 20%] Built target aom_install
+-- [BuildMaster/Component]: stamp hit rubberband (build)
+[ 20%] Built target rubberband_build
+[ 20%] [BuildMaster/Ninja    ]: Installing rubberband
+-- [BuildMaster/Component]: stamp hit vpx (install)
+-- [BuildMaster/Component]: stamp hit vmaf (install)
+-- [BuildMaster/Component]: stamp hit leptonica (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 20%] Built target vpx_install
+-- [BuildMaster/Component]: stamp hit tessdata (install)
+[ 20%] Built target leptonica_install
+[ 20%] Built target vmaf_install
+[ 20%] Built target tessdata_install
+[ 21%] [BuildMaster/CMake    ]: Configuring tesseract
+-- [BuildMaster/Component]: stamp hit kvazaar (build)
+[ 21%] Built target kvazaar_build
+[ 22%] [BuildMaster/Ninja    ]: Installing kvazaar
+-- [BuildMaster/Component]: stamp hit rubberband (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit fdk-aac (build)
+[ 22%] Built target rubberband_install
+-- [BuildMaster/Component]: stamp hit vorbis (build)
+[ 22%] Built target fdk-aac_build
+[ 22%] Built target vorbis_build
+[ 22%] [BuildMaster/Ninja    ]: Installing Vorbis codec
+[ 22%] [BuildMaster/Ninja    ]: Installing FDK_AAC codec
+-- [BuildMaster/Component]: stamp hit x265-10bit (install)
+[ 22%] Built target x265-10bit_install
+[BuildMaster/Component]: stamp hit tesseract (configure)
+[ 22%] Built target tesseract_configure
+[ 22%] [BuildMaster/Ninja    ]: Compiling tesseract
+-- [BuildMaster/Component]: stamp hit vorbis (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 22%] Built target vorbis_install
+-- [BuildMaster/Component]: stamp hit tesseract (build)
+[ 22%] Built target tesseract_build
+[ 22%] [BuildMaster/Ninja    ]: Installing tesseract
+-- [BuildMaster/Component]: stamp hit kvazaar (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit tesseract (install)
+[ 22%] Built target kvazaar_install
+[BuildMaster/Git      ]: Resetting git source tree after install
+-- [BuildMaster/Component]: stamp hit x265-12bit (build)
+[ 22%] Built target tesseract_install
+[ 22%] Built target x265-12bit_build
+[ 22%] [BuildMaster/CMake    ]: Configuring x265
+[ 22%] [BuildMaster/Ninja    ]: Installing X265 codec (12-bit)
+-- [BuildMaster/Component]: stamp hit fdk-aac (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 22%] Built target fdk-aac_install
+-- [BuildMaster/Component]: stamp hit x265-12bit (install)
+[ 22%] Built target x265-12bit_install
+[ 22%] Built target svt-av1_build
+[ 22%] [BuildMaster/Ninja    ]: Installing SVT-AV1
+[BuildMaster/Component]: stamp hit x265 (configure)
+[ 22%] Built target x265_configure
+[ 23%] [BuildMaster/Ninja    ]: Compiling X265 codec
+-- [BuildMaster/Component]: stamp hit x265 (build)
+[ 23%] Built target x265_build
+[ 23%] [BuildMaster/Ninja    ]: Installing X265 codec
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 23%] Built target svt-av1_install
+-- [BuildMaster/Component]: stamp hit x265 (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 23%] Built target x265_install
+[ 23%] Built target ffmpeg-plugins_install
+[ 23%] [BuildMaster/CMake    ]: Configuring ffmpeg
+[BuildMaster/Component]: stamp hit ffmpeg (configure)
+[ 23%] Built target ffmpeg_configure
+[ 24%] [BuildMaster/Ninja    ]: Compiling FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (build)
+[ 24%] Built target ffmpeg_build
+[ 24%] [BuildMaster/Ninja    ]: Installing FFmpeg
+-- [BuildMaster/Component]: stamp hit ffmpeg (install)
+[BuildMaster/Git      ]: Resetting git source tree after install
+[ 24%] Built target ffmpeg_install
+[ 24%] Linking CXX shared library libStormByte-Multimedia.so
+[ 72%] Built target StormByte-Multimedia
+[ 74%] Linking CXX executable MultimediaFileTests
+[ 74%] Linking CXX executable MultimediaRegistryTests
+[ 74%] Linking CXX executable MultimediaRegistryAllocationTests
+[ 74%] Linking CXX executable MultimediaSimplePlayerTests
+[ 75%] Built target multimedia_pipeline_test_support
+[ 75%] Linking CXX executable MultimediaPipelineVmafApiTests
+[ 75%] Linking CXX executable MultimediaLogTests
+[ 75%] Linking CXX executable MultimediaPipelineMuxPolicyTests
+[ 75%] Linking CXX executable MultimediaDurationTests
+[ 76%] Linking CXX executable MultimediaPipelineRemuxTests
+[ 76%] Linking CXX executable MultimediaPipelineOcrTests
+[ 76%] Linking CXX executable MultimediaPipelineSubtitleHeaderTests
+[ 76%] Linking CXX executable MultimediaPipelineNegativeTests
+[ 76%] Linking CXX executable MultimediaPipelineAllocationTests
+[ 76%] Linking CXX executable MultimediaPipelineFilterTests
+[ 76%] Linking CXX executable MultimediaPipelineCeilingTests
+[ 76%] Linking CXX executable MultimediaPipelineSubtitleCodecTests
+[ 77%] Linking CXX executable MultimediaPipelineNlMeansTests
+[ 77%] Linking CXX executable MultimediaPipelineAudioCodecTests
+[ 78%] Linking CXX executable MultimediaPipelineImplementationTests
+[ 79%] Linking CXX executable MultimediaPipelineMp4PolicyTests
+[ 79%] Linking CXX executable MultimediaPipelineAudioTests
+[ 79%] Linking CXX executable MultimediaOcrModelTests
+[ 79%] Linking CXX executable MultimediaPipelineAnalyticsTests
+[ 80%] Linking CXX executable MultimediaPipelineDoviTests
+[ 80%] Linking CXX executable MultimediaPipelineWatermarkTests
+[ 80%] Linking CXX shared library ../lib/libStormByte-Multimedia-Test.so
+[ 81%] Built target MultimediaLogTests
+[ 81%] Built target MultimediaRegistryTests
+[ 81%] Built target MultimediaRegistryAllocationTests
+[ 81%] Built target MultimediaSimplePlayerTests
+[ 81%] Built target MultimediaFileTests
+[ 81%] Built target MultimediaPipelineVmafApiTests
+[ 81%] Built target MultimediaPipelineMuxPolicyTests
+[ 81%] Built target MultimediaPipelineMp4PolicyTests
+[ 82%] Built target MultimediaPipelineAudioTests
+[ 82%] Built target MultimediaDurationTests
+[ 82%] Built target MultimediaPipelineRemuxTests
+[ 82%] Built target MultimediaPipelineOcrTests
+[ 82%] Built target MultimediaPipelineAudioCodecTests
+[ 82%] Built target MultimediaPipelineImplementationTests
+[ 84%] Built target MultimediaPipelineCeilingTests
+[ 84%] Built target MultimediaPipelineNlMeansTests
+[ 85%] Built target MultimediaPipelineSubtitleHeaderTests
+[ 86%] Built target MultimediaPipelineAllocationTests
+[ 87%] Built target MultimediaPipelineWatermarkTests
+[ 88%] Built target MultimediaPipelineFilterTests
+[ 88%] Built target MultimediaPipelineNegativeTests
+[ 89%] Built target MultimediaPipelineAnalyticsTests
+[ 89%] Built target MultimediaPipelineSubtitleCodecTests
+[ 89%] Built target MultimediaPipelineDoviTests
+[ 90%] Built target MultimediaOcrModelTests
+[ 94%] Built target StormByte-Multimedia-Test
+[ 95%] Linking CXX executable MultimediaPipelineVideoTests
+[ 96%] Linking CXX executable MultimediaPipelineInterleaveTests
+[ 96%] Linking CXX executable MultimediaPipelineVideoCodecTests
+[ 96%] Linking CXX executable MultimediaPipelineVideoInputTests
+[ 96%] Linking CXX executable MultimediaPipelineHdr10PlusTests
+[ 97%] Linking CXX executable MultimediaFileAvioTests
+[ 98%] Linking CXX executable MultimediaPipelineContentVideoTests
+[ 98%] Built target MultimediaPipelineVideoTests
+[ 98%] Built target MultimediaPipelineContentVideoTests
+[ 98%] Built target MultimediaPipelineVideoCodecTests
+[100%] Built target MultimediaPipelineInterleaveTests
+[100%] Built target MultimediaFileAvioTests
+[100%] Built target MultimediaPipelineHdr10PlusTests
+[100%] Built target MultimediaPipelineVideoInputTests

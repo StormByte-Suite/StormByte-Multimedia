@@ -1,0 +1,3 @@
+cuInit: 2 (CUDA_ERROR_OUT_OF_MEMORY)
+
+exit_code=1

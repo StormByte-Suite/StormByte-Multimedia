@@ -1,0 +1,4 @@
+cuInit: 0 (CUDA_SUCCESS)
+cuDeviceGetCount: 0; devices=1
+
+exit_code=0

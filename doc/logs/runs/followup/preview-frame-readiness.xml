@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="16"
+	timestamp="2026-11-02T06:51:12"
+	>
+	<testcase name="preview.test_av_seek_switch_epochs" classname="preview.test_av_seek_switch_epochs" time="16.0788" status="run">
+		<properties>
+			<property name="cmake_labels" value="multimedia;preview"/>
+		</properties>
+		<system-out>[Test] Starting test_av_seek_switch_epochs
+[Test] test_av_seek_switch_epochs: assert player.Open(Fixture("video/anime_like.mkv"))
+[Test] test_av_seek_switch_epochs: assert video &gt;= 0
+[Test] test_av_seek_switch_epochs: assert player.Play()
+[Test] test_av_seek_switch_epochs: assert Wait([&amp;] { if (player.State() == PlaybackState::Error) return true; if (player.Position() &lt;= 0.30) return false; std::lock_guard lock(display-&gt;m_mutex); return display-&gt;m_videos &gt; 2; })
+[in @ 0x7c2cad011780] Changing video frame properties on the fly is not supported by all filters.
+[in @ 0x7c2cad011780] filter context - w: 1920 h: 1080 fmt: 175 csp: unknown range: unknown alpha: unspecified, incoming frame - w: 1920 h: 1080 fmt: 175 csp: gbr range: pc alpha: unspecified pts_time: 0
+[Test] test_av_seek_switch_epochs: assert player.State() != PlaybackState::Error
+[Test] test_av_seek_switch_epochs: assert player.Pause()
+[Test] test_av_seek_switch_epochs: assert before &gt; 2
+[Test] test_av_seek_switch_epochs: assert display-&gt;m_max_video_l...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

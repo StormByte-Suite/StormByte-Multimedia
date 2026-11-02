@@ -1,0 +1,13 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+    Start 11: preview.test_av_seek_switch_epochs
+1/1 Test #11: preview.test_av_seek_switch_epochs ...   Passed   16.08 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+multimedia    =  16.08 sec*proc (1 test)
+preview       =  16.08 sec*proc (1 test)
+
+Total Test time (real) =  16.08 sec
+
+exit_code=0

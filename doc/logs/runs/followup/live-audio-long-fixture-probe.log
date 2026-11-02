@@ -1,0 +1,58 @@
+Test project /tmp/BMDATA/sanitizer-clean-final/test
+    Start 15: preview.test_live_audio_tracks
+1/1 Test #15: preview.test_live_audio_tracks ...***Failed   11.84 sec
+[Test] Starting test_live_audio_tracks
+[Test] test_live_audio_tracks: assert player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv"))
+[CUDA @ 0x7c2c185e0040] cu->cuInit(0) failed -> CUDA_ERROR_OUT_OF_MEMORY: out of memory
+[VAAPI @ 0x7c2c185e00c0] Failed to initialise VAAPI connection: -1 (unknown libva error).
+SimplePlayer: hardware video decoder unavailable; continuing with software decode
+[Test] test_live_audio_tracks: assert tracks.size() >= 2
+[Test] test_live_audio_tracks: assert player.Play()
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > .15; })
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=-1 position=0.40963 switch+delivery_ms=254
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[Test] test_live_audio_tracks: assert display->m_audio_invalidations == resets + 1
+[Test] test_live_audio_tracks: assert display->m_image
+live audio track=1 position=11.1925 switch+delivery_ms=10652
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert player.SelectTrack(MediaType::Audio, track)
+[Test] test_live_audio_tracks: assert Wait([&] { { std::lock_guard lock(display->m_mutex); if (display->m_videos > videos && (track < 0 || display->m_first_audio)) return true; } return player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() == PlaybackState::Playing
+[Test] test_live_audio_tracks: assert player.Position() >= previous
+[Test] test_live_audio_tracks: assert Wait([&] { return player.Position() > previous + .25 || player.State() == PlaybackState::Error; })
+[Test] test_live_audio_tracks: assert player.State() != PlaybackState::Error
+[Test] test_live_audio_tracks: assert display->m_epoch == epoch
+[ASSERT] test_live_audio_tracks: display->m_epoch == epoch
+[Test] Finished test_live_audio_tracks: FAIL
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+multimedia    =  11.84 sec*proc (1 test)
+preview       =  11.84 sec*proc (1 test)
+
+Total Test time (real) =  11.84 sec
+
+The following tests FAILED:
+	 15 - preview.test_live_audio_tracks (Failed)           multimedia preview
+Errors while running CTest
+
+exit_code=8
