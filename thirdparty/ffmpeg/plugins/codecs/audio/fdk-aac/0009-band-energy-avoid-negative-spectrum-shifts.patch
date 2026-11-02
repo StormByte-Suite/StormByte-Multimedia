@@ -1,0 +1,71 @@
+From f3447e84435a5942aa1f0741620af97a839070bf Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:34:10 +0100
+Subject: [PATCH] AACenc: normalize signed spectra and energy exponents without
+ negative shifts
+
+The band-energy paths normalize signed MDCT spectra using shifts whose
+counts are bounded by measured headroom. Shift unsigned bit patterns
+instead of negative signed values and retain the original FIXP_DBL
+representation. Double bounded signed energy exponent differences with
+multiplication. Leave nonnegative energy accumulators unchanged.
+Reproduced in FDKaacEnc_CheckBandEnergyOptim by stereo AAC encoding with
+UBSan.
+---
+ libAACenc/src/band_nrg.cpp | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/libAACenc/src/band_nrg.cpp b/libAACenc/src/band_nrg.cpp
+index fb22dbb..c142d3b 100644
+--- a/libAACenc/src/band_nrg.cpp
++++ b/libAACenc/src/band_nrg.cpp
+@@ -157,7 +157,7 @@ FDKaacEnc_CheckBandEnergyOptim(const FIXP_DBL *const RESTRICT mdctSpectrum,
+     DWORD_ALIGNED(mdctSpectrum);
+ 
+     for (j = bandOffset[i]; j < bandOffset[i + 1]; j++) {
+-      spec = mdctSpectrum[j] << scale;
++      spec = (FIXP_DBL)((ULONG)mdctSpectrum[j] << scale);
+       tmp = fPow2AddDiv2(tmp, spec);
+     }
+     bandEnergy[i] = tmp << 1;
+@@ -208,7 +208,7 @@ INT FDKaacEnc_CalcBandEnergyOptimLong(const FIXP_DBL *RESTRICT mdctSpectrum,
+      */
+     if (leadingBits >= 0) {
+       for (j = bandOffset[i]; j < bandOffset[i + 1]; j++) {
+-        spec = mdctSpectrum[j] << leadingBits;
++        spec = (FIXP_DBL)((ULONG)mdctSpectrum[j] << leadingBits);
+         tmp = fPow2AddDiv2(tmp, spec);
+       }
+     } else {
+@@ -236,7 +236,7 @@ INT FDKaacEnc_CalcBandEnergyOptimLong(const FIXP_DBL *RESTRICT mdctSpectrum,
+ 
+   if (maxNrgLd <= (FIXP_DBL)0) {
+     for (i = numBands; i-- != 0;) {
+-      INT scale = fixMin((sfbMaxScaleSpec[i] - 4) << 1, (DFRACT_BITS - 1));
++      INT scale = fixMin((sfbMaxScaleSpec[i] - 4) * 2, (DFRACT_BITS - 1));
+       bandEnergy[i] = scaleValue(bandEnergy[i], -scale);
+     }
+     return 0;
+@@ -246,7 +246,7 @@ INT FDKaacEnc_CalcBandEnergyOptimLong(const FIXP_DBL *RESTRICT mdctSpectrum,
+       shiftBits++;
+     }
+     for (i = numBands; i-- != 0;) {
+-      INT scale = fixMin(((sfbMaxScaleSpec[i] - 4) + shiftBits) << 1,
++      INT scale = fixMin(((sfbMaxScaleSpec[i] - 4) + shiftBits) * 2,
+                          (DFRACT_BITS - 1));
+       bandEnergyLdData[i] -= shiftBits * FL2FXCONST_DBL(2.0 / 64);
+       bandEnergy[i] = scaleValue(bandEnergy[i], -scale);
+@@ -311,8 +311,8 @@ void FDKaacEnc_CalcBandNrgMSOpt(
+ 
+     if (minScale > 0) {
+       for (j = bandOffset[i]; j < bandOffset[i + 1]; j++) {
+-        FIXP_DBL specL = mdctSpectrumLeft[j] << (minScale - 1);
+-        FIXP_DBL specR = mdctSpectrumRight[j] << (minScale - 1);
++        FIXP_DBL specL = (FIXP_DBL)((ULONG)mdctSpectrumLeft[j] << (minScale - 1));
++        FIXP_DBL specR = (FIXP_DBL)((ULONG)mdctSpectrumRight[j] << (minScale - 1));
+         specm = specL + specR;
+         specs = specL - specR;
+         NrgMid = fPow2AddDiv2(NrgMid, specm);
+-- 
+2.56.0
+

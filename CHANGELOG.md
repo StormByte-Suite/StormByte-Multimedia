@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC normalizes signed MDCT band spectra through unsigned shifts and doubles bounded signed energy-exponent differences with multiplication.
 - Bundled FDK-AAC scales signed scalar samples and in-place values through unsigned bit patterns; saturating scaling uses widened multiplication after its headroom check.
 - Bundled Kvazaar's AVX2 quantizer matches the registered quantization strategy function type, avoiding calls through incompatible const-qualified parameter signatures.
 - Bundled x265 skips residual-cost division when rate control disables amortization near the end of a known-length encode, avoiding zero divided by zero and NaN-to-integer conversion in partial and final accounting.

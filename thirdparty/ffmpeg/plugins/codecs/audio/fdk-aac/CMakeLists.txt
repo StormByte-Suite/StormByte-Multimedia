@@ -11,6 +11,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0006-fixmul-avoid-negative-product-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0007-block-switch-avoid-negative-sample-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0008-scale-avoid-negative-value-shifts.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0009-band-energy-avoid-negative-spectrum-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS
