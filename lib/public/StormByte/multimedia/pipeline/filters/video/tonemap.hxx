@@ -107,7 +107,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 *        @c gamma, @c clip or @c linear. Empty → @c hable.
 			 */
 			Tonemap(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				StormByte::Safe::Optional<StormByte::Safe::String> op = {}) noexcept;
+				StormByte::Safe::Optional<StormByte::Safe::String> op = {});
 
 			/**
 			 * @brief Copy construction is unavailable.
@@ -179,13 +179,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief libavfilter curve, without a colorspace filter.
 			 * @return `tonemap=tonemap=<op>:desat=0`.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			/**
 			 * @brief Resolved operator name.
 			 * @return Owned operator name, falling back to hable for empty or invalid input.
 			 */
-			StormByte::Safe::String Operator() const noexcept;
+			StormByte::Safe::String Operator() const;
 
 			StormByte::Safe::Optional<StormByte::Safe::String> m_opIn;	///< Caller operator, or empty
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Curve filter only

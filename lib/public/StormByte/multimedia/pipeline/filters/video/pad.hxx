@@ -106,7 +106,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param height Destination height in pixels.
 			 */
 			Pad(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				std::uint32_t width, std::uint32_t height) noexcept;
+				std::uint32_t width, std::uint32_t height);
 
 			/**
 			 * @brief Copy construction is not allowed for a mounted leaf.
@@ -171,7 +171,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `pad=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			std::uint32_t m_width;	///< Destination width in pixels
 			std::uint32_t m_height;	///< Destination height in pixels

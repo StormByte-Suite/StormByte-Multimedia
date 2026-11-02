@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/ffmpeg/pixel_format.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/format.hxx>
@@ -62,11 +63,11 @@ using StormByte::Multimedia::Type;
 using StormByte::Multimedia::Pipeline::Filter::Video::Format;
 using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 
-Format::Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt) noexcept
+Format::Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt)
 	: Filter::Process(std::move(log), Safe::String("format")),
 	m_pixFmt(pixFmt) {}
 
-Format::Format(Safe::Shared<StormByte::Logger::Log> log, Property::PixelFormat format) noexcept
+Format::Format(Safe::Shared<StormByte::Logger::Log> log, Property::PixelFormat format)
 	: Format(std::move(log), StormByte::Multimedia::FFmpeg::ToAVPixelFormat(format)) {}
 
 Format::~Format() noexcept = default;
@@ -79,7 +80,7 @@ void Format::Clean() noexcept {}
 
 void Format::Setup() noexcept {}
 
-void Format::Process(const Pipeline::Frame& frame) noexcept {
+void Format::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -117,4 +118,8 @@ void Format::Process(const Pipeline::Frame& frame) noexcept {
 		"format {} -> {} {}x{} pts={}",
 		src.FormatName(), out.FormatName(), out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

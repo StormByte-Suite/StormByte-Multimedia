@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/limiter.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -65,7 +66,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Limiter::Limiter(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<double> ceiling) noexcept
+	StormByte::Safe::Optional<double> ceiling)
 	: Filter::Process(std::move(log), "limiter"),
 	m_ceilIn(ceiling) {}
 
@@ -83,14 +84,14 @@ void Limiter::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Limiter::Chain() const noexcept {
+StormByte::Safe::String Limiter::Chain() const {
 	const double db = m_ceilIn.value_or(-1.5);
 	double lin = std::pow(10.0, db / 20.0);
 	lin = std::clamp(lin, 0.0625, 1.0);
 	return StormByte::Safe::String::ReplaceToken("alimiter=limit={}:level=0:latency=1", lin);
 }
 
-void Limiter::Process(const Pipeline::Frame& frame) noexcept {
+void Limiter::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -129,9 +130,13 @@ void Limiter::Process(const Pipeline::Frame& frame) noexcept {
 		"limiter ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Limiter::Eof() noexcept {
+void Limiter::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -148,4 +153,8 @@ void Limiter::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

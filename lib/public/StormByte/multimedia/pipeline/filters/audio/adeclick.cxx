@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/adeclick.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -82,14 +83,14 @@ void Adeclick::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Adeclick::Chain() const noexcept {
+StormByte::Safe::String Adeclick::Chain() const {
 	if (!m_thrIn)
 		return StormByte::Safe::String("adeclick");
 	const double t = std::clamp(*m_thrIn, 1.0, 100.0);
 	return StormByte::Safe::String::ReplaceToken("adeclick=threshold={}", t);
 }
 
-void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
+void Adeclick::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -128,9 +129,13 @@ void Adeclick::Process(const Pipeline::Frame& frame) noexcept {
 		"adeclick ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Adeclick::Eof() noexcept {
+void Adeclick::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -149,4 +154,8 @@ void Adeclick::Eof() noexcept {
 			break;
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

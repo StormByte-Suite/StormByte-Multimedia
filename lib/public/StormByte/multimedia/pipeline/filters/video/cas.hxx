@@ -115,7 +115,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param strength Sharpen amount in [0, 1]. Empty → 0.4.
 			 */
 			Cas(Safe::Shared<StormByte::Logger::Log> log,
-				Safe::Optional<double> strength = {}) noexcept;
+				Safe::Optional<double> strength = {});
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -180,7 +180,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `cas=strength=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<double> m_strengthIn;	///< Caller strength, or empty.
 			Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< Cached graph allocated and destroyed through Base's heap.

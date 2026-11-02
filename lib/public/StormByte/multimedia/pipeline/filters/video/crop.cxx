@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/video/crop.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -213,7 +214,7 @@ namespace {
 	}
 }
 
-Crop::Crop(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+Crop::Crop(StormByte::Safe::Shared<StormByte::Logger::Log> log)
 	: Filter::Process(std::move(log), StormByte::Safe::String("crop")),
 	m_auto(true), m_released(false), m_skip(false),
 	m_x(0), m_y(0), m_w(0), m_h(0),
@@ -221,7 +222,7 @@ Crop::Crop(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
 	m_lumaW(0), m_lumaH(0), m_lumaFmt(FFrame::FormatNone()) {}
 
 Crop::Crop(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	int x, int y, int width, int height) noexcept
+	int x, int y, int width, int height)
 	: Filter::Process(std::move(log), StormByte::Safe::String("crop")),
 	m_auto(false), m_released(true), m_skip(false),
 	m_x(x), m_y(y), m_w(width), m_h(height),
@@ -263,7 +264,7 @@ bool Crop::Sure() const noexcept {
 	return boxed && m_stable >= 8;
 }
 
-const FFrame* Crop::Luma(const FFrame& src) noexcept {
+const FFrame* Crop::Luma(const FFrame& src) {
 	if (!src || src.Width() <= 0 || src.Height() <= 0)
 		return nullptr;
 	if (src.Hardware()) {
@@ -292,7 +293,7 @@ const FFrame* Crop::Luma(const FFrame& src) noexcept {
 	return m_luma.get();
 }
 
-bool Crop::ProbeBars(const FFrame& src) noexcept {
+bool Crop::ProbeBars(const FFrame& src) {
 	if (!Luma(src) || m_luma->Width() < 16 || m_luma->Height() < 16)
 		return false;
 	FFrame& gray = *m_luma;
@@ -352,7 +353,7 @@ bool Crop::ProbeBars(const FFrame& src) noexcept {
 	return true;
 }
 
-void Crop::Apply() noexcept {
+void Crop::Apply() {
 	const FFrame& src = AVFrame();
 	if (!src || src.Width() <= 0 || src.Height() <= 0) {
 		Fail("crop: missing video buffer");
@@ -404,7 +405,7 @@ void Crop::Apply() noexcept {
 	Save(std::move(out));
 }
 
-void Crop::Process(const Pipeline::Frame& frame) noexcept {
+void Crop::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	if (m_skip)
@@ -434,9 +435,13 @@ void Crop::Process(const Pipeline::Frame& frame) noexcept {
 	}
 
 	Apply();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Crop::LastChance(const Pipeline::Frame&) noexcept {
+void Crop::LastChance(const Pipeline::Frame&) noexcept try {
 	m_released = true;
 	if (!Sure()) {
 		m_skip = true;
@@ -444,4 +449,8 @@ void Crop::LastChance(const Pipeline::Frame&) noexcept {
 			"crop: could not detect bars, leaving the frame uncropped");
 	}
 	Release();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

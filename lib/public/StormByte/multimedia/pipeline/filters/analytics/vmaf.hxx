@@ -273,7 +273,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param lane Track context to initialise.
 			 * @return false if init or model load failed.
 			 */
-			bool OpenLane(Lane& lane) noexcept;
+			bool OpenLane(Lane& lane);
 
 			/**
 			 * @brief Hands one pair to libvmaf at contiguous @p index.
@@ -288,13 +288,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			void Score(Lane& lane,
 				const StormByte::Multimedia::FFmpeg::AVFrame& ref,
 				const StormByte::Multimedia::FFmpeg::AVFrame& dist,
-				unsigned index) noexcept;
+				unsigned index);
 
 			/**
 			 * @brief Scores while both presentation FIFOs of @p lane have a frame.
 			 * @param lane Track context.
 			 */
-			void Drain(Lane& lane) noexcept;
+			void Drain(Lane& lane);
 
 			/**
 			 * @brief libvmaf worker count actually used (at least 1).

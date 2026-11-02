@@ -110,7 +110,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Scale(Safe::Shared<StormByte::Logger::Log> log,
 				const StormByte::Multimedia::Property::Resolution& resolution,
 				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> filter = {},
-				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {}) noexcept;
+				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {});
 
 			/**
 			 * @brief Destination size. 0 on one axis keeps aspect ratio.
@@ -123,7 +123,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Scale(Safe::Shared<StormByte::Logger::Log> log,
 				std::uint32_t width, std::uint32_t height,
 				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Resample> filter = {},
-				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {}) noexcept;
+				Safe::Optional<StormByte::Multimedia::FFmpeg::AVFrame::Scaler> scaler = {});
 
 			/**
 			 * @brief Copy is not allowed. The tube owns the mounted leaf.

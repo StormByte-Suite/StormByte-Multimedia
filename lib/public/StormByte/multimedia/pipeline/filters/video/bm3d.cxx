@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/bm3d.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -64,7 +65,7 @@ using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Bm3d::Bm3d(Safe::Shared<StormByte::Logger::Log> log,
 	Safe::Optional<double> sigma, Safe::Optional<unsigned> group,
-	Safe::Optional<unsigned> range, Safe::Optional<unsigned> bstep) noexcept
+	Safe::Optional<unsigned> range, Safe::Optional<unsigned> bstep)
 	: Filter::Process(std::move(log), Safe::String("bm3d")),
 	m_sigmaIn(sigma), m_groupIn(group), m_rangeIn(range), m_bstepIn(bstep),
 	m_sigma(0.0), m_group(0), m_range(0), m_bstep(0), m_latched(false) {}
@@ -84,7 +85,7 @@ void Bm3d::Setup() noexcept {
 	Clean();
 }
 
-void Bm3d::Latch(int width, int height) noexcept {
+void Bm3d::Latch(int width, int height) {
 	const bool uhd = width >= 3840 || height >= 2160;
 	m_sigma = m_sigmaIn.value_or(uhd ? 2.0 : 3.0);
 	m_group = m_groupIn.value_or(uhd ? 8u : 16u);
@@ -96,13 +97,13 @@ void Bm3d::Latch(int width, int height) noexcept {
 		width, height, m_sigma, m_group, m_range, m_bstep, uhd));
 }
 
-StormByte::Safe::String Bm3d::Chain() const noexcept {
+StormByte::Safe::String Bm3d::Chain() const {
 	return StormByte::Safe::String::ReplaceToken(
 		"bm3d=sigma={}:block=8:bstep={}:group={}:range={}:estim=basic",
 		m_sigma, m_bstep, m_group, m_range);
 }
 
-void Bm3d::Process(const Pipeline::Frame& frame) noexcept {
+void Bm3d::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -141,4 +142,8 @@ void Bm3d::Process(const Pipeline::Frame& frame) noexcept {
 		"bm3d {}x{} sigma={:.3f} group={} range={} bstep={} pts={}",
 		src.Width(), src.Height(), m_sigma, m_group, m_range, m_bstep, src.Pts()));
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

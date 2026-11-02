@@ -123,7 +123,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				Safe::Optional<double> lumaA = {},
 				Safe::Optional<double> lumaB = {},
 				Safe::Optional<double> chromaA = {},
-				Safe::Optional<double> chromaB = {}) noexcept;
+				Safe::Optional<double> chromaB = {});
 
 			/**
 			 * @brief Copy construction is not allowed.
@@ -188,7 +188,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `atadenoise=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<unsigned> m_framesIn;	///< Caller temporal window, or empty.
 			Safe::Optional<double> m_laIn;		///< Caller luma centre threshold, or empty.

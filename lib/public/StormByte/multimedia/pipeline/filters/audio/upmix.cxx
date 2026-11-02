@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVChannelLayout.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/upmix.hxx>
@@ -67,7 +68,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Upmix::Upmix(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	ChannelLayout target) noexcept
+	ChannelLayout target)
 	: Filter::Process(std::move(log), "upmix"),
 	m_target(target) {}
 
@@ -119,7 +120,7 @@ bool Upmix::TargetHasLfe() const noexcept {
 	}
 }
 
-StormByte::Safe::String Upmix::SurroundChain(const FFrame& src) const noexcept {
+StormByte::Safe::String Upmix::SurroundChain(const FFrame& src) const {
 	const auto out = LayoutName();
 	if (out.empty())
 		return {};
@@ -135,14 +136,14 @@ StormByte::Safe::String Upmix::SurroundChain(const FFrame& src) const noexcept {
 		out, lfe);
 }
 
-StormByte::Safe::String Upmix::AformatChain() const noexcept {
+StormByte::Safe::String Upmix::AformatChain() const {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
 	return StormByte::Safe::String::ReplaceToken("aformat=channel_layouts={}", name);
 }
 
-StormByte::Safe::String Upmix::PanChain() const noexcept {
+StormByte::Safe::String Upmix::PanChain() const {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
@@ -155,7 +156,7 @@ StormByte::Safe::String Upmix::PanChain() const noexcept {
 		name);
 }
 
-bool Upmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
+bool Upmix::EnsureGraph(const FFrame& src, std::string_view chain) {
 	if (chain.empty())
 		return false;
 	if (!m_graph) {
@@ -168,7 +169,7 @@ bool Upmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
 	return m_graph->Ensure(src, chain);
 }
 
-void Upmix::Process(const Pipeline::Frame& frame) noexcept {
+void Upmix::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -245,9 +246,13 @@ void Upmix::Process(const Pipeline::Frame& frame) noexcept {
 		"upmix {}ch->{} ({}) pts={}",
 		have, ToString(m_target), how, out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Upmix::Eof() noexcept {
+void Upmix::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -264,4 +269,8 @@ void Upmix::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

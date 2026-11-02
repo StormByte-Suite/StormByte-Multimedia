@@ -102,7 +102,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param ceiling True-peak ceiling in dBTP. Empty → −1.5.
 			 */
 			Limiter(Safe::Shared<StormByte::Logger::Log> log,
-					Safe::Optional<double> ceiling = {}) noexcept;
+					Safe::Optional<double> ceiling = {});
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -167,7 +167,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `alimiter=…` for @ref StormByte::Multimedia::FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<double> m_ceilIn;	///< Caller dBTP, or empty
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.

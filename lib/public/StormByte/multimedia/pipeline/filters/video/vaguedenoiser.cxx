@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/vaguedenoiser.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -65,7 +66,7 @@ using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 VagueDenoiser::VagueDenoiser(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<double> threshold,
 	StormByte::Safe::Optional<unsigned> steps,
-	StormByte::Safe::Optional<double> percent) noexcept
+	StormByte::Safe::Optional<double> percent)
 	: Filter::Process(std::move(log), StormByte::Safe::String("vaguedenoiser")),
 	m_thrIn(std::move(threshold)), m_stepsIn(std::move(steps)), m_pctIn(std::move(percent)) {}
 
@@ -83,7 +84,7 @@ void VagueDenoiser::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String VagueDenoiser::Chain() const noexcept {
+StormByte::Safe::String VagueDenoiser::Chain() const {
 	const double thr = m_thrIn.value_or(2.0);
 	const unsigned steps = m_stepsIn.value_or(6u);
 	const double pct = m_pctIn.value_or(85.0);
@@ -92,7 +93,7 @@ StormByte::Safe::String VagueDenoiser::Chain() const noexcept {
 		thr, steps, pct);
 }
 
-void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept {
+void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -130,4 +131,8 @@ void VagueDenoiser::Process(const Pipeline::Frame& frame) noexcept {
 		"vaguedenoiser {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

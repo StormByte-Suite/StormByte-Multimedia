@@ -146,7 +146,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief XPSNR analytics leaf.
 			 * @param log Shared logger. Empty pointer means no log.
 			 */
-			explicit XPSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
+			explicit XPSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log);
 
 			/**
 			 * @brief Copy is not allowed. Each leaf owns parked looks.
@@ -229,7 +229,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Scores while both presentation FIFOs of @p lane have a frame.
 			 * @param lane Track context.
 			 */
-			void Drain(Lane& lane) noexcept;
+			void Drain(Lane& lane);
 
 			/**
 			 * @brief Accumulates XPSNR for one presentation pair.
@@ -239,7 +239,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			void Score(Lane& lane,
 				const StormByte::Multimedia::FFmpeg::AVFrame& ref,
-				const StormByte::Multimedia::FFmpeg::AVFrame& dist) noexcept;
+				const StormByte::Multimedia::FFmpeg::AVFrame& dist);
 
 			/**
 			 * @brief Drops parked RAII clones of @p lane.

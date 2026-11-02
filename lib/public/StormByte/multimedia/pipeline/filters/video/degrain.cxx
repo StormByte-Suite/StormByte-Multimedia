@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/video/degrain.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -221,7 +222,7 @@ namespace {
 }
 
 Degrain::Degrain(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<double> sigmaCap) noexcept
+	StormByte::Safe::Optional<double> sigmaCap)
 	: Filter::ProcessTwoPasses(std::move(log), StormByte::Safe::String("degrain")),
 		m_capIn(std::move(sigmaCap)), m_state(StormByte::Safe::MakeUnique<State>()) {}
 
@@ -263,7 +264,7 @@ void Degrain::Setup() noexcept {
 		Fail("degrain: sigma cap must be finite");
 }
 
-void Degrain::PushFrame(const FFrame& source) noexcept {
+void Degrain::PushFrame(const FFrame& source) {
 	++m_frames;
 	const int64_t pts = source.Pts();
 	const auto found = m_state->lookup.find(pts);
@@ -348,7 +349,7 @@ void Degrain::PushFrame(const FFrame& source) noexcept {
 		ScoreCenter(m_state->ring.size() - 1 - RingSpan);
 }
 
-void Degrain::ScoreCenter(StormByte::Size index) noexcept {
+void Degrain::ScoreCenter(StormByte::Size index) {
 	const std::size_t center = static_cast<std::size_t>(index);
 	if (center >= m_state->ring.size() || m_state->ring[center].scored)
 		return;
@@ -474,14 +475,14 @@ void Degrain::ScoreCenter(StormByte::Size index) noexcept {
 	}
 }
 
-void Degrain::FlushRing() noexcept {
+void Degrain::FlushRing() {
 	// Keep all remaining neighbours until every tail picture has been scored.
 	for (std::size_t index = 0; index < m_state->ring.size(); ++index)
 		ScoreCenter(index);
 	m_state->ring.clear();
 }
 
-void Degrain::Decide() noexcept {
+void Degrain::Decide() {
 	if (m_voted)
 		return;
 	if (m_capIn && !std::isfinite(m_capIn.value_or(DefaultCap))) {
@@ -562,7 +563,7 @@ double Degrain::RegionTarget(const RegionMap& regions, double horizontal, double
 }
 
 bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
-	double sigma, FFrame& output) noexcept {
+	double sigma, FFrame& output) {
 	if (!SameLayout(previous, current) || !std::isfinite(sigma) || sigma <= 0.0)
 		return false;
 	FFrame input;
@@ -630,7 +631,7 @@ bool Degrain::FilterWindow(const FFrame& previous, const FFrame& current,
 	return false;
 }
 
-bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
+bool Degrain::Apply(const FFrame& source, FFrame& output) {
 	const auto found = m_state->lookup.find(source.Pts());
 	if (source.Pts() == MissingPts || found == m_state->lookup.end() || !m_state->processed.insert(source.Pts()).second
 		|| !m_state->row[found->second].valid || m_state->row[found->second].width != source.Width()
@@ -709,7 +710,7 @@ bool Degrain::Apply(const FFrame& source, FFrame& output) noexcept {
 	return maximum > 0.0;
 }
 
-void Degrain::Measure(const Pipeline::Frame& frame) noexcept {
+void Degrain::Measure(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video || m_voted)
 		return;
 	if (m_capIn && !std::isfinite(m_capIn.value_or(DefaultCap))) {
@@ -719,9 +720,13 @@ void Degrain::Measure(const Pipeline::Frame& frame) noexcept {
 	const FFrame& source = AVFrame();
 	if (source)
 		PushFrame(source);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Degrain::Process(const Pipeline::Frame& frame) noexcept {
+void Degrain::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	if (!m_voted)
@@ -738,12 +743,20 @@ void Degrain::Process(const Pipeline::Frame& frame) noexcept {
 		++m_applied;
 		Save(std::move(output));
 	}
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Degrain::Eof() noexcept {
+void Degrain::Eof() noexcept try {
 	Decide();
 	m_state->previous.reset();
 	m_state->previousRow.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report Degrain::Report() const {

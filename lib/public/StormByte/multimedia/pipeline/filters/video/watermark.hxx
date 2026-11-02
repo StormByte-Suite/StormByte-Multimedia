@@ -367,7 +367,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Decodes raster bytes or parses SVG geometry on first use.
 			 * @return false if the logo was disabled.
 			 */
-			bool DecodeLogo() noexcept;
+			bool DecodeLogo();
 
 			/**
 			 * @brief Turns the overlay off without failing the tube.
@@ -378,7 +378,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @ref Process / @ref Paint become no-ops. Frames still
 			 * leave the filter.
 			 */
-			void DisableLogo(std::string_view why) noexcept;
+			void DisableLogo(std::string_view why);
 
 			/**
 			 * @brief Frees cached scale context and luma buffer.
@@ -390,7 +390,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param path UTF-8 file path, consumed during this call.
 			 * @return false if the file could not be opened or read.
 			 */
-			bool LoadFile(const StormByte::Safe::String& path) noexcept;
+			bool LoadFile(const StormByte::Safe::String& path);
 
 			/**
 			 * @brief Builds an 8-bit luma view of @p src for bar sampling.
@@ -398,14 +398,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @return Luma frame, or nullptr on Fail.
 			 */
 			const StormByte::Multimedia::FFmpeg::AVFrame* Luma(
-				const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+				const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Paints the logo and @ref FFmpeg::Save.
 			 *
 			 * An oversized logo calls @ref DisableLogo, not Fail.
 			 */
-			void Paint() noexcept;
+			void Paint();
 
 			/**
 			 * @brief Scales raster pixels or renders SVG at the final paint size.
@@ -413,14 +413,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param frameH Picture height of this run.
 			 * @return false if the logo was disabled.
 			 */
-			bool Prepare(int frameW, int frameH) noexcept;
+			bool Prepare(int frameW, int frameH);
 
 			/**
 			 * @brief Builds the linear logo for @p src, reusing the cache when the tags match.
 			 * @param src Live picture whose colour tags select the conversion.
 			 * @return false if the logo could not be converted.
 			 */
-			bool EnsureLinear(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+			bool EnsureLinear(const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Blends the logo into a clone of @p src and @ref FFmpeg::Save.
@@ -429,21 +429,21 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param y Top of the logo in frame pixels.
 			 * @return false if this format must use the full-frame fallback.
 			 */
-			bool Composite(const StormByte::Multimedia::FFmpeg::AVFrame& src, int x, int y) noexcept;
+			bool Composite(const StormByte::Multimedia::FFmpeg::AVFrame& src, int x, int y);
 
 			/**
 			 * @brief Previous full-frame blend, used when @ref Composite cannot represent @p src.
 			 * @param x Left of the logo in frame pixels.
 			 * @param y Top of the logo in frame pixels.
 			 */
-			void PaintLegacy(int x, int y) noexcept;
+			void PaintLegacy(int x, int y);
 
 			/**
 			 * @brief Samples letterbox / pillarbox on the luma view of @p src.
 			 * @param src Live RAII frame.
 			 * @return true if this frame updated or confirmed the rectangle.
 			 */
-			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			StormByte::Safe::Binary m_logo;			///< Persistent encoded source; retained across Clean and replays.
 			struct Svg;

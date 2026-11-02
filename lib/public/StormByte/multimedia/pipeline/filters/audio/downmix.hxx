@@ -108,7 +108,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param target Destination speaker layout (not a fixed stereo).
 			 */
 			Downmix(Safe::Shared<StormByte::Logger::Log> log,
-					Property::ChannelLayout target) noexcept;
+					Property::ChannelLayout target);
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -180,13 +180,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Preferred chain: `aformat=channel_layouts=…`.
 			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::LayoutName is empty.
 			 */
-			Safe::String AformatChain() const noexcept;
+			Safe::String AformatChain() const;
 
 			/**
 			 * @brief Fallback chain: fold LFE into FL/FR via `pan`.
 			 * @return Filterchain, or empty if @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::LayoutName is empty.
 			 */
-			Safe::String PanChain() const noexcept;
+			Safe::String PanChain() const;
 
 			/**
 			 * @brief Opens or reuses @ref StormByte::Multimedia::Pipeline::Filter::Audio::Downmix::m_graph for @p src and @p chain.
@@ -195,7 +195,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @return false if the graph could not be (re)opened.
 			 */
 			bool EnsureGraph(const StormByte::Multimedia::FFmpeg::AVFrame& src,
-					std::string_view chain) noexcept;
+					std::string_view chain);
 
 			Property::ChannelLayout m_target;	///< Destination layout
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.

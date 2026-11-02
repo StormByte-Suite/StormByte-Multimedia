@@ -101,7 +101,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			Afftdn(Safe::Shared<StormByte::Logger::Log> log,
 					Safe::Optional<double> nr = {},
 					Safe::Optional<double> nf = {},
-					Safe::Optional<bool> trackNoise = {}) noexcept;
+					Safe::Optional<bool> trackNoise = {});
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -166,7 +166,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `afftdn=…` for @ref StormByte::Multimedia::FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<double> m_nrIn;	///< Caller nr, or empty
 			Safe::Optional<double> m_nfIn;	///< Caller nf, or empty

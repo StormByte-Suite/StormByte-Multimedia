@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/pad.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -63,7 +64,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Pad::Pad(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	std::uint32_t width, std::uint32_t height) noexcept
+	std::uint32_t width, std::uint32_t height)
 	: Filter::Process(std::move(log), StormByte::Safe::String("pad")),
 	m_width(width), m_height(height) {}
 
@@ -81,13 +82,13 @@ void Pad::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Pad::Chain() const noexcept {
+StormByte::Safe::String Pad::Chain() const {
 	return StormByte::Safe::String::ReplaceToken(
 		"pad=width={}:height={}:x=(ow-iw)/2:y=(oh-ih)/2:color=black",
 		m_width, m_height);
 }
 
-void Pad::Process(const Pipeline::Frame& frame) noexcept {
+void Pad::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -151,9 +152,13 @@ void Pad::Process(const Pipeline::Frame& frame) noexcept {
 		"pad {}x{} -> {}x{} pts={}",
 		src.Width(), src.Height(), out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Pad::Eof() noexcept {
+void Pad::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -169,4 +174,8 @@ void Pad::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

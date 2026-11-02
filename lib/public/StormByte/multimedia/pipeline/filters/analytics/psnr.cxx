@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/analytics/psnr.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -160,7 +161,7 @@ namespace {
 	}
 }
 
-PSNR::PSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+PSNR::PSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log)
 	: Filter::Analytics(std::move(log), "psnr") {}
 
 PSNR::~PSNR() noexcept {
@@ -193,7 +194,7 @@ void PSNR::Setup() noexcept {
 	Log(Level::Debug, "setup");
 }
 
-void PSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
+void PSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) {
 	if (!ref || !dist)
 		return;
 	if (ref.Width() <= 0 || ref.Height() <= 0 || dist.Width() <= 0 || dist.Height() <= 0) {
@@ -269,7 +270,7 @@ void PSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 		lane.scored, framePsnr, ref.Pts(), d->Pts()));
 }
 
-void PSNR::Drain(Lane& lane) noexcept {
+void PSNR::Drain(Lane& lane) {
 	while (!lane.ref.empty() && !lane.dist.empty()) {
 		FFrame ref = std::move(lane.ref.front());
 		FFrame dist = std::move(lane.dist.front());
@@ -279,7 +280,7 @@ void PSNR::Drain(Lane& lane) noexcept {
 	}
 }
 
-void PSNR::Process(const Pipeline::Frame& frame) noexcept {
+void PSNR::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const Producer producer = frame.Producer();
@@ -294,8 +295,10 @@ void PSNR::Process(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 
-	StormByte::Safe::Shared<Lane> owner = std::as_const(m_lanes).contains(frame.Track())
-		? std::as_const(m_lanes).at(frame.Track()) : StormByte::Safe::Shared<Lane>{};
+	const auto& lanes = std::as_const(m_lanes);
+	const auto found = lanes.find(frame.Track());
+	StormByte::Safe::Shared<Lane> owner = found != lanes.end()
+		? found->second : StormByte::Safe::Shared<Lane>{};
 	if (!owner) {
 			owner = StormByte::Safe::MakeShared<Lane>();
 		m_lanes[frame.Track()] = owner;
@@ -332,9 +335,13 @@ void PSNR::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void PSNR::Eof() noexcept {
+void PSNR::Eof() noexcept try {
 	unsigned scored = 0;
 	for (const auto& [track, owner] : std::as_const(m_lanes)) {
 		Lane& lane = *owner;
@@ -381,6 +388,10 @@ void PSNR::Eof() noexcept {
 		Log(Level::Error, "no scored pairs");
 	else if (scored > 0)
 		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report PSNR::Report() const {

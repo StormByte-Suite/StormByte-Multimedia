@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/video/scale.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -59,7 +60,7 @@ using StormByte::Logger::Level;
 Scale::Scale(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	const StormByte::Multimedia::Property::Resolution& resolution,
 	StormByte::Safe::Optional<FFrame::Resample> filter,
-	StormByte::Safe::Optional<FFrame::Scaler> scaler) noexcept
+	StormByte::Safe::Optional<FFrame::Scaler> scaler)
 	: Filter::Process(std::move(log), StormByte::Safe::String("scale")),
 	m_width(resolution.Width()), m_height(resolution.Height()),
 	m_filter(filter), m_scaler(scaler) {}
@@ -67,7 +68,7 @@ Scale::Scale(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 Scale::Scale(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	std::uint32_t width, std::uint32_t height,
 	StormByte::Safe::Optional<FFrame::Resample> filter,
-	StormByte::Safe::Optional<FFrame::Scaler> scaler) noexcept
+	StormByte::Safe::Optional<FFrame::Scaler> scaler)
 	: Filter::Process(std::move(log), StormByte::Safe::String("scale")),
 	m_width(width), m_height(height),
 	m_filter(filter), m_scaler(scaler) {}
@@ -80,11 +81,15 @@ enum StormByte::Multimedia::Type Scale::Media() const noexcept {
 
 void Scale::Clean() noexcept {}
 
-void Scale::Setup() noexcept {
+void Scale::Setup() noexcept try {
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("target {}x{}", m_width, m_height));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Scale::Process(const Pipeline::Frame&) noexcept {
+void Scale::Process(const Pipeline::Frame&) noexcept try {
 	const FFrame& src = AVFrame();
 	if (!src || src.Width() <= 0 || src.Height() <= 0) {
 		Fail(StormByte::Safe::String::ReplaceToken(
@@ -129,4 +134,8 @@ void Scale::Process(const Pipeline::Frame&) noexcept {
 	}
 
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

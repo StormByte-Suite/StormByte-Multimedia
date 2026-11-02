@@ -107,7 +107,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Detect letterbox / pillarbox. Hold until sure, else no-op.
 			 * @param log Shared logger. Empty pointer means no log.
 			 */
-			explicit Crop(Safe::Shared<StormByte::Logger::Log> log) noexcept;
+			explicit Crop(Safe::Shared<StormByte::Logger::Log> log);
 
 			/**
 			 * @brief Explicit window in frame pixels.
@@ -118,7 +118,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param height Cropped height.
 			 */
 			Crop(Safe::Shared<StormByte::Logger::Log> log,
-				int x, int y, int width, int height) noexcept;
+				int x, int y, int width, int height);
 
 			/**
 			 * @brief Copying the provider-owned leaf is disabled.
@@ -191,14 +191,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @return Luma frame, or nullptr on Fail.
 			 */
 			const StormByte::Multimedia::FFmpeg::AVFrame* Luma(
-				const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+				const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Samples bars on the luma view of @p src.
 			 * @param src Live frame.
 			 * @return true if this frame saw a boxed pair.
 			 */
-			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+			bool ProbeBars(const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Boxed pair stable for 8 probes.
@@ -209,7 +209,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			/**
 			 * @brief Applies stored bars via Crop / ApplyCropping and Save.
 			 */
-			void Apply() noexcept;
+			void Apply();
 
 			/**
 			 * @brief Drops cached luma frame.

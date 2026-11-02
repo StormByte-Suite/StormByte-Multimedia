@@ -48,12 +48,14 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/fieldmatch.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/string.hxx>
 
+#include <string_view>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -63,16 +65,16 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 namespace {
-	bool OrderOk(const std::string& v) noexcept {
+	bool OrderOk(std::string_view v) noexcept {
 		return v == "auto" || v == "tff" || v == "bff";
 	}
 
-	bool ModeOk(const std::string& v) noexcept {
+	bool ModeOk(std::string_view v) noexcept {
 		return v == "pc" || v == "pc_n" || v == "pc_u"
 			|| v == "pc_n_ub" || v == "pcn" || v == "pcn_ub";
 	}
 
-	bool CombOk(const std::string& v) noexcept {
+	bool CombOk(std::string_view v) noexcept {
 		return v == "none" || v == "sc" || v == "full";
 	}
 }
@@ -80,7 +82,7 @@ namespace {
 Fieldmatch::Fieldmatch(Safe::Shared<StormByte::Logger::Log> log,
 	Safe::Optional<Safe::String> order,
 	Safe::Optional<Safe::String> mode,
-	Safe::Optional<Safe::String> combmatch) noexcept
+	Safe::Optional<Safe::String> combmatch)
 	: Filter::Process(std::move(log), Safe::String("fieldmatch")),
 	m_orderIn(std::move(order)),
 	m_modeIn(std::move(mode)),
@@ -100,21 +102,21 @@ void Fieldmatch::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Fieldmatch::Chain() const noexcept {
-	std::string order = std::string(m_orderIn.value_or(Safe::String("auto")));
+StormByte::Safe::String Fieldmatch::Chain() const {
+	std::string_view order = m_orderIn ? std::string_view(*m_orderIn) : "auto";
 	if (!OrderOk(order))
 		order = "auto";
-	std::string mode = std::string(m_modeIn.value_or(Safe::String("pc_n")));
+	std::string_view mode = m_modeIn ? std::string_view(*m_modeIn) : "pc_n";
 	if (!ModeOk(mode))
 		mode = "pc_n";
-	std::string comb = std::string(m_combIn.value_or(Safe::String("sc")));
+	std::string_view comb = m_combIn ? std::string_view(*m_combIn) : "sc";
 	if (!CombOk(comb))
 		comb = "sc";
 	return StormByte::Safe::String::ReplaceToken("fieldmatch=order={}:mode={}:combmatch={}",
 		order, mode, comb);
 }
 
-void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
+void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -164,9 +166,13 @@ void Fieldmatch::Process(const Pipeline::Frame& frame) noexcept {
 		"fieldmatch {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Fieldmatch::Eof() noexcept {
+void Fieldmatch::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -183,4 +189,8 @@ void Fieldmatch::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

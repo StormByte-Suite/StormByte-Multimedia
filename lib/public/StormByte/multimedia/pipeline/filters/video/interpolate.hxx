@@ -107,7 +107,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param den Rate denominator. 0 is treated as 1.
 			 */
 			Interpolate(Safe::Shared<StormByte::Logger::Log> log,
-				std::uint32_t num, std::uint32_t den = 1) noexcept;
+				std::uint32_t num, std::uint32_t den = 1);
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -172,7 +172,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `minterpolate=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			std::uint32_t m_num;	///< Rate numerator
 			std::uint32_t m_den;	///< Rate denominator

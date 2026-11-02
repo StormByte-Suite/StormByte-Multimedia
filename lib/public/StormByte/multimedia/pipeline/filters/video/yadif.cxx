@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/yadif.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -130,7 +131,7 @@ namespace {
 	}
 }
 
-Yadif::Yadif(StormByte::Safe::Shared<StormByte::Logger::Log> log, bool onlyInterlaced) noexcept
+Yadif::Yadif(StormByte::Safe::Shared<StormByte::Logger::Log> log, bool onlyInterlaced)
 	: Filter::Process(std::move(log), StormByte::Safe::String("yadif")), m_onlyInterlaced(onlyInterlaced) {}
 
 Yadif::~Yadif() noexcept {
@@ -150,7 +151,7 @@ void Yadif::Setup() noexcept {
 	Clean();
 }
 
-void Yadif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noexcept {
+void Yadif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) {
 	if (!cur) {
 		Log(Level::Warning, "yadif: empty current look");
 		return;
@@ -178,7 +179,7 @@ void Yadif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 	EmitFrame(std::move(out));
 }
 
-void Yadif::Process(const Pipeline::Frame& frame) noexcept {
+void Yadif::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& raw = AVFrame();
@@ -202,12 +203,20 @@ void Yadif::Process(const Pipeline::Frame& frame) noexcept {
 	Weave(m_prev, m_cur, incoming);
 	m_prev = std::move(m_cur);
 	m_cur = std::move(incoming);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Yadif::Eof() noexcept {
+void Yadif::Eof() noexcept try {
 	if (m_cur)
 		Weave(m_prev, m_cur, FFrame{});
 	Clean();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Yadif::LastChance(const Pipeline::Frame&) noexcept {}

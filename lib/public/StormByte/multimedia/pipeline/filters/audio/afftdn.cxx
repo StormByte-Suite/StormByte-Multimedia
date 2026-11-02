@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/afftdn.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -65,7 +66,7 @@ using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Afftdn::Afftdn(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<double> nr, StormByte::Safe::Optional<double> nf,
-	StormByte::Safe::Optional<bool> trackNoise) noexcept
+	StormByte::Safe::Optional<bool> trackNoise)
 	: Filter::Process(std::move(log), "afftdn"),
 	m_nrIn(nr), m_nfIn(nf), m_trackIn(trackNoise) {}
 
@@ -83,14 +84,14 @@ void Afftdn::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Afftdn::Chain() const noexcept {
+StormByte::Safe::String Afftdn::Chain() const {
 	const double nr = std::clamp(m_nrIn.value_or(12.0), 0.01, 97.0);
 	const double nf = std::clamp(m_nfIn.value_or(-50.0), -80.0, -20.0);
 	const int tn = m_trackIn.value_or(false) ? 1 : 0;
 	return StormByte::Safe::String::ReplaceToken("afftdn=nr={}:nf={}:tn={}:nt=w:om=o", nr, nf, tn);
 }
 
-void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
+void Afftdn::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -129,9 +130,13 @@ void Afftdn::Process(const Pipeline::Frame& frame) noexcept {
 		"afftdn ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Afftdn::Eof() noexcept {
+void Afftdn::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -148,4 +153,8 @@ void Afftdn::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

@@ -113,7 +113,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			Hqdn3d(Safe::Shared<StormByte::Logger::Log> log,
 				double lumaSpatial = 0.0, double chromaSpatial = 0.0,
-				double lumaTemporal = 0.0, double chromaTemporal = 0.0) noexcept;
+				double lumaTemporal = 0.0, double chromaTemporal = 0.0);
 
 			/**
 			 * @brief Copying the provider-owned leaf is disabled.

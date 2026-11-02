@@ -114,7 +114,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Fftdnoiz(Safe::Shared<StormByte::Logger::Log> log,
 				Safe::Optional<double> sigma = {},
 				Safe::Optional<unsigned> prev = {},
-				Safe::Optional<unsigned> next = {}) noexcept;
+				Safe::Optional<unsigned> next = {});
 
 			/**
 			 * @brief Copy construction is not allowed.
@@ -179,7 +179,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `format=...,fftdnoiz=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<double> m_sigmaIn;	///< Caller sigma, or empty.
 			Safe::Optional<unsigned> m_prevIn;	///< Caller previous-frame count, or empty.

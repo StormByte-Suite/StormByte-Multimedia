@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/deflicker.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -55,6 +56,7 @@
 #include <StormByte/safe/string.hxx>
 
 #include <algorithm>
+#include <string_view>
 #include <utility>
 
 using StormByte::Logger::Level;
@@ -64,7 +66,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 namespace {
-	bool ModeOk(const std::string& mode) noexcept {
+	bool ModeOk(std::string_view mode) noexcept {
 		return mode == "am" || mode == "gm" || mode == "hm"
 			|| mode == "qm" || mode == "cm" || mode == "pm"
 			|| mode == "median";
@@ -73,7 +75,7 @@ namespace {
 
 Deflicker::Deflicker(Safe::Shared<StormByte::Logger::Log> log,
 	Safe::Optional<unsigned> size,
-	Safe::Optional<Safe::String> mode) noexcept
+	Safe::Optional<Safe::String> mode)
 	: Filter::Process(std::move(log), Safe::String("deflicker")),
 	m_sizeIn(size), m_modeIn(std::move(mode)) {}
 
@@ -91,16 +93,16 @@ void Deflicker::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Deflicker::Chain() const noexcept {
+StormByte::Safe::String Deflicker::Chain() const {
 	unsigned size = m_sizeIn.value_or(5u);
 	size = std::clamp(size, 2u, 129u);
-	std::string mode = std::string(m_modeIn.value_or(Safe::String("am")));
+	std::string_view mode = m_modeIn ? std::string_view(*m_modeIn) : "am";
 	if (!ModeOk(mode))
 		mode = "am";
 	return StormByte::Safe::String::ReplaceToken("deflicker=size={}:mode={}", size, mode);
 }
 
-void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
+void Deflicker::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -150,9 +152,13 @@ void Deflicker::Process(const Pipeline::Frame& frame) noexcept {
 		"deflicker {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Deflicker::Eof() noexcept {
+void Deflicker::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -169,4 +175,8 @@ void Deflicker::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

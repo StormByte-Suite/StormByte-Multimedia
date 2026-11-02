@@ -115,7 +115,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			NlMeans(Safe::Shared<StormByte::Logger::Log> log,
 				Safe::Optional<unsigned> research = {},
 				Safe::Optional<unsigned> patch = {},
-				Safe::Optional<double> strength = {}) noexcept;
+				Safe::Optional<double> strength = {});
 
 			/**
 			 * @brief Copying is disabled.

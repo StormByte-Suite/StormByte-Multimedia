@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/bwdif.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -140,7 +141,7 @@ namespace {
 	}
 }
 
-Bwdif::Bwdif(StormByte::Safe::Shared<StormByte::Logger::Log> log, bool onlyInterlaced) noexcept
+Bwdif::Bwdif(StormByte::Safe::Shared<StormByte::Logger::Log> log, bool onlyInterlaced)
 	: Filter::Process(std::move(log), StormByte::Safe::String("bwdif")), m_onlyInterlaced(onlyInterlaced) {}
 
 Bwdif::~Bwdif() noexcept {
@@ -160,7 +161,7 @@ void Bwdif::Setup() noexcept {
 	Clean();
 }
 
-void Bwdif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noexcept {
+void Bwdif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) {
 	if (!cur) {
 		Log(Level::Warning, "bwdif: empty current look");
 		return;
@@ -188,7 +189,7 @@ void Bwdif::Weave(const FFrame& prev, const FFrame& cur, const FFrame& next) noe
 	EmitFrame(std::move(out));
 }
 
-void Bwdif::Process(const Pipeline::Frame& frame) noexcept {
+void Bwdif::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& raw = AVFrame();
@@ -212,12 +213,20 @@ void Bwdif::Process(const Pipeline::Frame& frame) noexcept {
 	Weave(m_prev, m_cur, incoming);
 	m_prev = std::move(m_cur);
 	m_cur = std::move(incoming);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Bwdif::Eof() noexcept {
+void Bwdif::Eof() noexcept try {
 	if (m_cur)
 		Weave(m_prev, m_cur, FFrame{});
 	Clean();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void Bwdif::LastChance(const Pipeline::Frame&) noexcept {}

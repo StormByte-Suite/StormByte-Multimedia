@@ -126,7 +126,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				Safe::Optional<double> sigma = {},
 				Safe::Optional<unsigned> group = {},
 				Safe::Optional<unsigned> range = {},
-				Safe::Optional<unsigned> bstep = {}) noexcept;
+				Safe::Optional<unsigned> bstep = {});
 
 			/**
 			 * @brief Copy construction is not allowed.
@@ -187,13 +187,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param width Frame width.
 			 * @param height Frame height.
 			 */
-			void Latch(int width, int height) noexcept;
+			void Latch(int width, int height);
 
 			/**
 			 * @brief Builds the avfilter chain from the latched values.
 			 * @return `bm3d=...` string for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			Safe::Optional<double> m_sigmaIn;	///< Caller sigma, or empty
 			Safe::Optional<unsigned> m_groupIn;	///< Caller group, or empty

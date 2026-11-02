@@ -124,7 +124,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			Deflicker(Safe::Shared<StormByte::Logger::Log> log,
 				Safe::Optional<unsigned> size = {},
-				Safe::Optional<Safe::String> mode = {}) noexcept;
+				Safe::Optional<Safe::String> mode = {});
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -189,7 +189,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `deflicker=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			Safe::Optional<unsigned> m_sizeIn;	///< Caller window, or empty
 			Safe::Optional<Safe::String> m_modeIn;	///< Caller mode, or empty

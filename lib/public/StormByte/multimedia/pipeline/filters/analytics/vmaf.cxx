@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
@@ -57,6 +58,7 @@
 #include <cstdint>
 #include <cstring>
 #include <deque>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -185,7 +187,7 @@ void VMAF::Clean() noexcept {
 	DropAll();
 }
 
-bool VMAF::OpenLane(Lane& lane) noexcept {
+bool VMAF::OpenLane(Lane& lane) {
 	VmafConfiguration cfg{};
 	cfg.log_level = VMAF_LOG_LEVEL_WARNING;
 	cfg.n_threads = Threads();
@@ -224,9 +226,13 @@ bool VMAF::OpenLane(Lane& lane) noexcept {
 	return true;
 }
 
-void VMAF::Setup() noexcept {
+void VMAF::Setup() noexcept try {
 	Clean();
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("setup model={}", static_cast<std::string_view>(m_modelName)));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexcept {
@@ -291,7 +297,7 @@ bool VMAF::Fill(Lane& lane, const FFrame& raw, int tw, int th, void* out) noexce
 	return true;
 }
 
-void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned index) noexcept {
+void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned index) {
 	if (!lane.vmaf || !ref || !dist) {
 		lane.failed = true;
 		Fail(StormByte::Safe::String::ReplaceToken("VMAF pair {} has no context or frame", index));
@@ -326,12 +332,14 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 
 	VmafPicture pref{};
 	VmafPicture pdist{};
+	const auto unref = [](VmafPicture* picture) noexcept {
+		if (picture->ref)
+			vmaf_picture_unref(picture);
+	};
+	std::unique_ptr<VmafPicture, decltype(unref)> refOwner(&pref, unref);
+	std::unique_ptr<VmafPicture, decltype(unref)> distOwner(&pdist, unref);
 	if (!Fill(lane, ref, lane.width, lane.height, &pref)
 		|| !Fill(lane, dist, lane.width, lane.height, &pdist)) {
-		if (pref.ref)
-			vmaf_picture_unref(&pref);
-		if (pdist.ref)
-			vmaf_picture_unref(&pdist);
 		lane.failed = true;
 		Fail(StormByte::Safe::String::ReplaceToken("VMAF pair {} fill failed ref={}x{} fmt={} bpc={} dist={}x{} fmt={} bpc={} latch={}x{}",
 			index, ref.Width(), ref.Height(), ref.FormatName(), ref.BitsPerComponent(),
@@ -341,21 +349,20 @@ void VMAF::Score(Lane& lane, const FFrame& ref, const FFrame& dist, unsigned ind
 
 	const int result = vmaf_read_pictures(lane.vmaf, &pref, &pdist, index);
 	if (result != 0) {
-		if (pref.ref)
-			vmaf_picture_unref(&pref);
-		if (pdist.ref)
-			vmaf_picture_unref(&pdist);
 		lane.failed = true;
 		Fail(StormByte::Safe::String::ReplaceToken("vmaf_read_pictures failed at index {}: {}", index, result));
 		return;
 	}
+	// A successful submission transfers both pictures to libvmaf.
+	static_cast<void>(refOwner.release());
+	static_cast<void>(distOwner.release());
 
 	++lane.scored;
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("scored index={} n={} ref_pts={} dist_pts={}",
 		index, lane.scored, ref.Pts(), dist.Pts()));
 }
 
-void VMAF::Drain(Lane& lane) noexcept {
+void VMAF::Drain(Lane& lane) {
 	while (!lane.failed && !Failed() && !lane.ref.empty() && !lane.dist.empty()) {
 		FFrame ref = std::move(lane.ref.front());
 		FFrame dist = std::move(lane.dist.front());
@@ -407,7 +414,7 @@ StormByte::Size VMAF::InputCeiling() const noexcept {
 	return PendingCeiling(Ceiling);
 }
 
-void VMAF::Process(const Pipeline::Frame& frame) noexcept {
+void VMAF::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const Producer producer = frame.Producer();
@@ -462,9 +469,13 @@ void VMAF::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void VMAF::Eof() noexcept {
+void VMAF::Eof() noexcept try {
 	unsigned scored = 0;
 	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
 		Lane& lane = *lanePointer;
@@ -513,6 +524,10 @@ void VMAF::Eof() noexcept {
 		Fail("VMAF no scored pairs");
 	else if (scored > 0)
 		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report VMAF::Report() const {

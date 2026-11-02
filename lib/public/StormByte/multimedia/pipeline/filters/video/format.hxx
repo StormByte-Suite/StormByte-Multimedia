@@ -97,14 +97,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param pixFmt Destination pixel format.
 			 */
-			Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt) noexcept;
+			Format(Safe::Shared<StormByte::Logger::Log> log, int pixFmt);
 
 			/**
 			 * @brief Convert to the public pixel format @p format.
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param format Destination pixel format. Unmapped values Fail at Process.
 			 */
-			Format(Safe::Shared<StormByte::Logger::Log> log, Property::PixelFormat format) noexcept;
+			Format(Safe::Shared<StormByte::Logger::Log> log, Property::PixelFormat format);
 
 			/**
 			 * @brief Copy construction is disabled.

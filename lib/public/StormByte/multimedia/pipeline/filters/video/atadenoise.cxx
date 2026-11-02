@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/atadenoise.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -67,7 +68,7 @@ Atadenoise::Atadenoise(Safe::Shared<StormByte::Logger::Log> log,
 	Safe::Optional<double> lumaA,
 	Safe::Optional<double> lumaB,
 	Safe::Optional<double> chromaA,
-	Safe::Optional<double> chromaB) noexcept
+	Safe::Optional<double> chromaB)
 	: Filter::Process(std::move(log), Safe::String("atadenoise")),
 	m_framesIn(frames), m_laIn(lumaA), m_lbIn(lumaB),
 	m_caIn(chromaA), m_cbIn(chromaB) {}
@@ -86,7 +87,7 @@ void Atadenoise::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Atadenoise::Chain() const noexcept {
+StormByte::Safe::String Atadenoise::Chain() const {
 	const unsigned s = m_framesIn.value_or(9u);
 	const double la = m_laIn.value_or(0.02);
 	const double lb = m_lbIn.value_or(0.04);
@@ -97,7 +98,7 @@ StormByte::Safe::String Atadenoise::Chain() const noexcept {
 		s, la, lb, ca, cb, ca, cb);
 }
 
-void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
+void Atadenoise::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -136,9 +137,13 @@ void Atadenoise::Process(const Pipeline::Frame& frame) noexcept {
 		"atadenoise {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Atadenoise::Eof() noexcept {
+void Atadenoise::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -155,4 +160,8 @@ void Atadenoise::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

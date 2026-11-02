@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/interpolate.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -63,7 +64,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Interpolate::Interpolate(Safe::Shared<StormByte::Logger::Log> log,
-	std::uint32_t num, std::uint32_t den) noexcept
+	std::uint32_t num, std::uint32_t den)
 	: Filter::Process(std::move(log), Safe::String("interpolate")),
 	m_num(num), m_den(den == 0 ? 1 : den) {}
 
@@ -82,13 +83,13 @@ void Interpolate::Setup() noexcept {
 }
 
 
-StormByte::Safe::String Interpolate::Chain() const noexcept {
+StormByte::Safe::String Interpolate::Chain() const {
 	return StormByte::Safe::String::ReplaceToken(
 		"minterpolate=fps={}/{}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1",
 		m_num, m_den);
 }
 
-void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
+void Interpolate::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -141,9 +142,13 @@ void Interpolate::Process(const Pipeline::Frame& frame) noexcept {
 		"interpolate {}/{} {}x{} pts={}",
 		m_num, m_den, out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Interpolate::Eof() noexcept {
+void Interpolate::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -160,4 +165,8 @@ void Interpolate::Eof() noexcept {
 		EmitFrame(std::move(out), Property::AVRational{static_cast<int>(m_num), static_cast<int>(m_den)});
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

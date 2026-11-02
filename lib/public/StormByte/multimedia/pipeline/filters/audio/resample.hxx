@@ -97,7 +97,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param rate Output sample rate in Hz. Empty → 48000.
 			 */
 			Resample(Safe::Shared<StormByte::Logger::Log> log,
-					Safe::Optional<int> rate = {}) noexcept;
+					Safe::Optional<int> rate = {});
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -168,7 +168,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `aresample=osr=…` for @ref StormByte::Multimedia::FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<int> m_rateIn;	///< Caller rate, or empty
 			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFilterGraph> m_graph;	///< FFmpeg graph context.

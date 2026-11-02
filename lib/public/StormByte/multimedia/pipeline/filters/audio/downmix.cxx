@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/downmix.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -66,7 +67,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Downmix::Downmix(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	ChannelLayout target) noexcept
+	ChannelLayout target)
 	: Filter::Process(std::move(log), "downmix"),
 	m_target(target) {}
 
@@ -104,21 +105,21 @@ std::string_view Downmix::LayoutName() const noexcept {
 	}
 }
 
-StormByte::Safe::String Downmix::AformatChain() const noexcept {
+StormByte::Safe::String Downmix::AformatChain() const {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
 	return StormByte::Safe::String::ReplaceToken("aformat=channel_layouts={}", name);
 }
 
-StormByte::Safe::String Downmix::PanChain() const noexcept {
+StormByte::Safe::String Downmix::PanChain() const {
 	const auto name = LayoutName();
 	if (name.empty())
 		return {};
 	return StormByte::Safe::String::ReplaceToken("pan={}|FL=FL+0.707*LFE|FR=FR+0.707*LFE", name);
 }
 
-bool Downmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
+bool Downmix::EnsureGraph(const FFrame& src, std::string_view chain) {
 	if (chain.empty())
 		return false;
 	if (!m_graph) {
@@ -131,7 +132,7 @@ bool Downmix::EnsureGraph(const FFrame& src, std::string_view chain) noexcept {
 	return m_graph->Ensure(src, chain);
 }
 
-void Downmix::Process(const Pipeline::Frame& frame) noexcept {
+void Downmix::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -198,9 +199,13 @@ void Downmix::Process(const Pipeline::Frame& frame) noexcept {
 		have, ToString(m_target),
 		m_pan ? "pan" : "aformat", out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Downmix::Eof() noexcept {
+void Downmix::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -217,4 +222,8 @@ void Downmix::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

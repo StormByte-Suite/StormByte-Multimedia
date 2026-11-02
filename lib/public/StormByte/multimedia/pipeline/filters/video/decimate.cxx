@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/decimate.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -72,7 +73,7 @@ using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 Decimate::Decimate(Safe::Shared<StormByte::Logger::Log> log,
 	Safe::Optional<unsigned> cycle,
 	Safe::Optional<double> dupthresh,
-	Safe::Optional<double> scthresh) noexcept
+	Safe::Optional<double> scthresh)
 	: Filter::ProcessTwoPasses(std::move(log), Safe::String("decimate")),
 	m_cycleIn(cycle), m_dupIn(dupthresh), m_scIn(scthresh) {}
 
@@ -177,7 +178,7 @@ StormByte::Multimedia::Property::AVRational Decimate::Cadence(Property::AVRation
 	return rate.num > 0 && rate.den > 0 ? rate : m_rate;
 }
 
-StormByte::Safe::String Decimate::Chain() const noexcept {
+StormByte::Safe::String Decimate::Chain() const {
 	unsigned cycle = std::clamp(m_cycleIn.value_or(5u), 2u, 25u);
 	const double dup = std::clamp(m_dupIn.value_or(1.1), 0.0, 100.0);
 	const double sc = std::clamp(m_scIn.value_or(15.0), 0.0, 100.0);
@@ -185,7 +186,7 @@ StormByte::Safe::String Decimate::Chain() const noexcept {
 		cycle, dup, sc);
 }
 
-void Decimate::Process(const Pipeline::Frame& frame) noexcept {
+void Decimate::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -241,9 +242,13 @@ void Decimate::Process(const Pipeline::Frame& frame) noexcept {
 		"decimate {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out), m_graph->FrameRate());
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Decimate::Eof() noexcept {
+void Decimate::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -260,4 +265,8 @@ void Decimate::Eof() noexcept {
 		EmitFrame(std::move(out), m_graph->FrameRate());
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

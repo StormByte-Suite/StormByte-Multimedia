@@ -73,7 +73,7 @@
 #include <limits>
 #include <memory>
 #include <new>
-#include <string>
+#include <string_view>
 #include <utility>
 
 using StormByte::Multimedia::Pipeline::Filter::Analytics;
@@ -290,10 +290,14 @@ StormByte::Size Analytics::PendingCeiling(StormByte::Size full) const noexcept {
 	return std::min(full, maximum);
 }
 
-void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexcept {
+void FFmpeg::Log(StormByte::Logger::Level level, std::string_view message) noexcept try {
 	if (!m_log)
 		return;
 	*m_log << level << message << std::endl;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::Fail(StormByte::Safe::String reason) noexcept {
@@ -303,8 +307,7 @@ void FFmpeg::Fail(StormByte::Safe::String reason) noexcept {
 		m_state->queue.clear();
 		m_telemetry->SetError(StormByte::Safe::String(reason));
 		m_error = std::move(reason);
-		const StormByte::Safe::String message = std::as_const(m_error).value();
-		Log(Level::Error, message);
+		Log(Level::Error, *std::as_const(m_error));
 		if (m_state->pumper)
 			m_state->pumper->Fail();
 	} catch (const StormByte::Safe::AllocationError&) {
@@ -339,7 +342,7 @@ void FFmpeg::Fail() noexcept {
 	Wake();
 }
 
-void FFmpeg::Hold(std::uint8_t n) noexcept {
+void FFmpeg::Hold(std::uint8_t n) noexcept try {
 	if (Held()) {
 		Fail(StormByte::Safe::String("Hold while already Held"));
 		return;
@@ -356,9 +359,13 @@ void FFmpeg::Hold(std::uint8_t n) noexcept {
 		static_cast<unsigned>(m_hold), TrackOf(*m_current),
 		SerialOf(*m_current).value_or(0), PartOf(*m_current), m_state->queue.size()));
 	Park();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void FFmpeg::Release() noexcept {
+void FFmpeg::Release() noexcept try {
 	if (!Held())
 		return;
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("release held={} queue={}",
@@ -420,6 +427,10 @@ void FFmpeg::Release() noexcept {
 	}
 
 	m_current.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 bool FFmpeg::Held() const noexcept {
@@ -467,7 +478,7 @@ bool FFmpeg::MeasuringTwoPass() const noexcept {
 	return two && two->m_measuring;
 }
 
-void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
+void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept try {
 	if (MeasuringTwoPass()) {
 		(void)incoming;
 		Log(Level::Warning, "Save during measure is a no-op");
@@ -501,9 +512,13 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVFrame&& incoming) noexcept {
 		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("frame side-data{}", frame->m_backend->Diagnostic()));
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("save frame t={} {}:{}",
 		frame->Track(), frame->Serial().value_or(0), frame->Part()));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
+void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept try {
 	if (MeasuringTwoPass()) {
 		(void)incoming;
 		Log(Level::Warning, "Save during measure is a no-op");
@@ -528,6 +543,10 @@ void FFmpeg::Save(StormByte::Multimedia::FFmpeg::AVPacket&& incoming) noexcept {
 	packet->m_backend->BindProperties(*packet);
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("save packet t={} {}:{}",
 		packet->Track(), packet->Serial().value_or(0), packet->Part()));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::Drop() noexcept {
@@ -536,7 +555,7 @@ void FFmpeg::Drop() noexcept {
 }
 
 void FFmpeg::EmitFrame(StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
-	StormByte::Safe::Optional<Property::AVRational> frameRate) noexcept {
+	StormByte::Safe::Optional<Property::AVRational> frameRate) noexcept try {
 	if (MeasuringTwoPass() || Failed() || Stopping())
 		return;
 	if (!incoming) {
@@ -579,11 +598,15 @@ void FFmpeg::EmitFrame(StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
 	}
 	m_current = std::move(current);
 	Drop();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::EmitGraph(StormByte::Multimedia::FFmpeg::AVFilterGraph& graph,
 	StormByte::Multimedia::FFmpeg::AVFrame&& incoming,
-	StormByte::Safe::Optional<Property::AVRational> frameRate) noexcept {
+	StormByte::Safe::Optional<Property::AVRational> frameRate) noexcept try {
 	Drop();
 	while (incoming && !Failed() && !Stopping()) {
 		EmitFrame(std::move(incoming), frameRate);
@@ -598,23 +621,33 @@ void FFmpeg::EmitGraph(StormByte::Multimedia::FFmpeg::AVFilterGraph& graph,
 			return;
 		}
 	}
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void FFmpeg::Open() noexcept {
+void FFmpeg::Open() noexcept try {
 	StormByte::Safe::String scope("Filters/");
 	scope.append(Name());
 	m_log = StormByte::Multimedia::UseLog(m_log, scope);
-	NameThread(std::string("SB/MM:").append(std::string_view(m_name)));
+	StormByte::Safe::String threadName("SB/MM:");
+	threadName.append(m_name);
+	NameThread(threadName);
 	Log(Level::Notice, "setup");
 	Clean();
 	Setup();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::LastChance(const Pipeline::Frame&) noexcept {}
 
 void FFmpeg::LastChance(const Pipeline::Packet&) noexcept {}
 
-void FFmpeg::Park() noexcept {
+void FFmpeg::Park() noexcept try {
 	if (!m_current)
 		return;
 	if (!m_state->queue.empty() && m_state->queue.back() == m_current)
@@ -626,6 +659,10 @@ void FFmpeg::Park() noexcept {
 
 	m_state->queue.push_back(m_current);
 	++m_heldFor;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::CallLastChance() noexcept {
@@ -638,7 +675,7 @@ void FFmpeg::CallLastChance() noexcept {
 		LastChance(static_cast<const Pipeline::Packet&>(*m_current));
 }
 
-void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
+void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept try {
 	if (const auto* progress = dynamic_cast<const Backend::Pipeline::SubtitleProgress*>(item.get())) {
 		auto boundary = progress->Boundary();
 		for (const auto& held : m_state->queue) {
@@ -716,9 +753,13 @@ void FFmpeg::Work(Pipeline::Item::PointerType item) noexcept {
 		m_current.reset();
 	else if (m_current)
 		Emit(std::move(m_current));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void FFmpeg::Finish() noexcept {
+void FFmpeg::Finish() noexcept try {
 	if (MeasuringTwoPass())
 		static_cast<ProcessTwoPasses*>(this)->LeaveMeasure();
 	if (Held()) {
@@ -731,6 +772,10 @@ void FFmpeg::Finish() noexcept {
 
 	if (!Failed())
 		Eof();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::Emit(Pipeline::Item::PointerType item) noexcept {
@@ -812,7 +857,7 @@ void FFmpeg::RecordWork(std::int64_t microseconds) noexcept {
 		m_workMax = microseconds;
 }
 
-void FFmpeg::DumpWork() noexcept {
+void FFmpeg::DumpWork() noexcept try {
 	if (m_workN == 0)
 		return;
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("work n={} min={}us max={}us last={}us",
@@ -821,6 +866,10 @@ void FFmpeg::DumpWork() noexcept {
 	m_workMin = std::numeric_limits<std::int64_t>::max();
 	m_workMax = 0;
 	m_lastWork = 0;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 void FFmpeg::Clean() noexcept {}

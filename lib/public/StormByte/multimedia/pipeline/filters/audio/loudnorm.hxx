@@ -113,7 +113,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 */
 			Loudnorm(Safe::Shared<StormByte::Logger::Log> log,
 					Safe::Optional<double> integrated = {},
-					Safe::Optional<double> truePeak = {}) noexcept;
+					Safe::Optional<double> truePeak = {});
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -197,7 +197,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param rate Sample rate in Hz.
 			 * @return false if the meter could not be created.
 			 */
-			bool OpenMeter(int channels, int rate) noexcept;
+			bool OpenMeter(int channels, int rate);
 
 			/**
 			 * @brief Maps channel @p i of a @p channels layout into ebur128.
@@ -212,12 +212,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param src Audio frame.
 			 * @return false on format / add failure.
 			 */
-			bool Add(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+			bool Add(const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Reads I, LRA and per-channel TP, then computes @c m_gain.
 			 */
-			void CloseMeter() noexcept;
+			void CloseMeter();
 
 			/**
 			 * @brief Scales @p src by @c m_gain and the linked TP ceiling.

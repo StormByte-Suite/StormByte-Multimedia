@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/resample.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -63,7 +64,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Resample::Resample(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<int> rate) noexcept
+	StormByte::Safe::Optional<int> rate)
 	: Filter::Process(std::move(log), "resample"),
 	m_rateIn(rate) {}
 
@@ -85,11 +86,11 @@ int Resample::Rate() const noexcept {
 	return m_rateIn.value_or(48000);
 }
 
-StormByte::Safe::String Resample::Chain() const noexcept {
+StormByte::Safe::String Resample::Chain() const {
 	return StormByte::Safe::String::ReplaceToken("aresample=osr={}", Rate());
 }
 
-void Resample::Process(const Pipeline::Frame& frame) noexcept {
+void Resample::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -139,9 +140,13 @@ void Resample::Process(const Pipeline::Frame& frame) noexcept {
 		"resample {}->{} Hz samples={} pts={}",
 		src.SampleRate(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Resample::Eof() noexcept {
+void Resample::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -158,4 +163,8 @@ void Resample::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

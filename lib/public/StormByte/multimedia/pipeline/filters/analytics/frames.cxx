@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/analytics/frames.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
@@ -80,7 +81,7 @@ void CountFrames::Clean() noexcept {
 
 void CountFrames::Setup() noexcept {}
 
-void CountFrames::Process(const Pipeline::Frame& frame) noexcept {
+void CountFrames::Process(const Pipeline::Frame& frame) noexcept try {
 	const Type type = frame.Type();
 	if (type != Type::Video && type != Type::Audio && type != Type::Subtitle)
 		return;
@@ -91,12 +92,20 @@ void CountFrames::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("count t={} producer={} pts={}",
 		frame.Track(), static_cast<int>(frame.Producer()),
 		frame.Pts() ? frame.Pts()->Nanoseconds().count() : 0));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void CountFrames::Eof() noexcept {
+void CountFrames::Eof() noexcept try {
 	for (const auto& [track, n] : std::as_const(m_frames))
 		Log(Level::Notice, StormByte::Safe::String::ReplaceToken("t={} frames={}", track, n));
 	Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={}", m_frames.size()));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report CountFrames::Report() const {

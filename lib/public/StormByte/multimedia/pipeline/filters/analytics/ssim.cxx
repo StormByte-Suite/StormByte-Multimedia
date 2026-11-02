@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/analytics/ssim.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -177,7 +178,7 @@ namespace {
 	}
 }
 
-SSIM::SSIM(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+SSIM::SSIM(StormByte::Safe::Shared<StormByte::Logger::Log> log)
 	: Filter::Analytics(std::move(log), "ssim") {}
 
 SSIM::~SSIM() noexcept {
@@ -210,7 +211,7 @@ void SSIM::Setup() noexcept {
 	Log(Level::Debug, "setup");
 }
 
-void SSIM::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
+void SSIM::Score(Lane& lane, const FFrame& ref, const FFrame& dist) {
 	if (!ref || !dist)
 		return;
 	if (ref.Width() <= 0 || ref.Height() <= 0 || dist.Width() <= 0 || dist.Height() <= 0) {
@@ -285,7 +286,7 @@ void SSIM::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 		lane.scored, frameSsim, ref.Pts(), d->Pts()));
 }
 
-void SSIM::Drain(Lane& lane) noexcept {
+void SSIM::Drain(Lane& lane) {
 	while (!lane.ref.empty() && !lane.dist.empty()) {
 		FFrame ref = std::move(lane.ref.front());
 		FFrame dist = std::move(lane.dist.front());
@@ -295,7 +296,7 @@ void SSIM::Drain(Lane& lane) noexcept {
 	}
 }
 
-void SSIM::Process(const Pipeline::Frame& frame) noexcept {
+void SSIM::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const Producer producer = frame.Producer();
@@ -347,9 +348,13 @@ void SSIM::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void SSIM::Eof() noexcept {
+void SSIM::Eof() noexcept try {
 	unsigned scored = 0;
 	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
 		Lane& lane = *lanePointer;
@@ -395,6 +400,10 @@ void SSIM::Eof() noexcept {
 		Log(Level::Error, "no scored pairs");
 	else if (scored > 0)
 		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report SSIM::Report() const {

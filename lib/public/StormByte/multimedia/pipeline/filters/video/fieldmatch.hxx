@@ -131,7 +131,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Fieldmatch(Safe::Shared<StormByte::Logger::Log> log,
 				Safe::Optional<Safe::String> order = {},
 				Safe::Optional<Safe::String> mode = {},
-				Safe::Optional<Safe::String> combmatch = {}) noexcept;
+				Safe::Optional<Safe::String> combmatch = {});
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -196,7 +196,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `fieldmatch=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			Safe::Optional<Safe::String> m_orderIn;	///< Caller order, or empty
 			Safe::Optional<Safe::String> m_modeIn;	///< Caller mode, or empty

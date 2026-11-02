@@ -131,7 +131,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			Decimate(Safe::Shared<StormByte::Logger::Log> log,
 				Safe::Optional<unsigned> cycle = {},
 				Safe::Optional<double> dupthresh = {},
-				Safe::Optional<double> scthresh = {}) noexcept;
+				Safe::Optional<double> scthresh = {});
 
 			/**
 			 * @brief Copy is not allowed. The graph is bound to one tube.
@@ -221,7 +221,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `decimate=…` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			Safe::Optional<unsigned> m_cycleIn;	///< Caller cycle, or empty
 			Safe::Optional<double> m_dupIn;		///< Caller dupthresh, or empty

@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFilterGraph.hxx>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/tonemap.hxx>
@@ -97,7 +98,7 @@ namespace {
 }
 
 Tonemap::Tonemap(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<StormByte::Safe::String> op) noexcept
+	StormByte::Safe::Optional<StormByte::Safe::String> op)
 	: Filter::Process(std::move(log), StormByte::Safe::String("tonemap")),
 	m_opIn(std::move(op)) {}
 
@@ -120,7 +121,7 @@ bool Tonemap::NeedsMap(const FFrame& src) noexcept {
 	return trc == TrcPq || trc == TrcHlg;
 }
 
-StormByte::Safe::String Tonemap::Operator() const noexcept {
+StormByte::Safe::String Tonemap::Operator() const {
 	if (!m_opIn || m_opIn->empty())
 		return StormByte::Safe::String("hable");
 	const StormByte::Safe::String op = *m_opIn;
@@ -130,12 +131,12 @@ StormByte::Safe::String Tonemap::Operator() const noexcept {
 	return StormByte::Safe::String("hable");
 }
 
-StormByte::Safe::String Tonemap::Chain() const noexcept {
+StormByte::Safe::String Tonemap::Chain() const {
 	return StormByte::Safe::String::ReplaceToken(
 		"tonemap=tonemap={}:desat=0", static_cast<std::string_view>(Operator()));
 }
 
-void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
+void Tonemap::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -206,9 +207,13 @@ void Tonemap::Process(const Pipeline::Frame& frame) noexcept {
 		"tonemap {} {}x{} pts={}",
 		static_cast<std::string_view>(Operator()), out.Width(), out.Height(), out.Pts()));
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Tonemap::Eof() noexcept {
+void Tonemap::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -237,4 +242,8 @@ void Tonemap::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/fftdnoiz.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -66,7 +67,7 @@ using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 Fftdnoiz::Fftdnoiz(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<double> sigma,
 	StormByte::Safe::Optional<unsigned> prev,
-	StormByte::Safe::Optional<unsigned> next) noexcept
+	StormByte::Safe::Optional<unsigned> next)
 	: Filter::Process(std::move(log), StormByte::Safe::String("fftdnoiz")),
 	m_sigmaIn(std::move(sigma)), m_prevIn(std::move(prev)), m_nextIn(std::move(next)) {}
 
@@ -84,7 +85,7 @@ void Fftdnoiz::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Fftdnoiz::Chain() const noexcept {
+StormByte::Safe::String Fftdnoiz::Chain() const {
 	const double sigma = std::clamp(m_sigmaIn.value_or(1.0), 0.0, 100.0);
 	const unsigned prev = std::min(m_prevIn.value_or(1u), 1u);
 	const unsigned next = std::min(m_nextIn.value_or(1u), 1u);
@@ -93,7 +94,7 @@ StormByte::Safe::String Fftdnoiz::Chain() const noexcept {
 		sigma, prev, next);
 }
 
-void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
+void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -143,9 +144,13 @@ void Fftdnoiz::Process(const Pipeline::Frame& frame) noexcept {
 		"fftdnoiz {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Fftdnoiz::Eof() noexcept {
+void Fftdnoiz::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -162,4 +167,8 @@ void Fftdnoiz::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

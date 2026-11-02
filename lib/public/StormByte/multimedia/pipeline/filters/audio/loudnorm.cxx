@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -196,7 +197,7 @@ class Loudnorm::Meter final {
 };
 
 Loudnorm::Loudnorm(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<double> integrated, StormByte::Safe::Optional<double> truePeak) noexcept
+	StormByte::Safe::Optional<double> integrated, StormByte::Safe::Optional<double> truePeak)
 	: Filter::ProcessTwoPasses(std::move(log), "loudnorm"),
 	m_targetI(integrated.value_or(DefaultI)),
 	m_targetTp(truePeak.value_or(DefaultTp)),
@@ -258,7 +259,7 @@ int Loudnorm::MapChannel(int i, int channels) noexcept {
 	return EBUR128_UNUSED;
 }
 
-bool Loudnorm::OpenMeter(int channels, int rate) noexcept {
+bool Loudnorm::OpenMeter(int channels, int rate) {
 	if (channels <= 0 || rate <= 0)
 		return false;
 	m_st = StormByte::Safe::MakeUnique<Meter>(channels, rate);
@@ -274,7 +275,7 @@ bool Loudnorm::OpenMeter(int channels, int rate) noexcept {
 	return true;
 }
 
-bool Loudnorm::Add(const FFrame& src) noexcept {
+bool Loudnorm::Add(const FFrame& src) {
 	if (!m_st)
 		return false;
 	const int n = src.NbSamples();
@@ -292,7 +293,7 @@ bool Loudnorm::Add(const FFrame& src) noexcept {
 		static_cast<std::size_t>(n)) == EBUR128_SUCCESS;
 }
 
-void Loudnorm::CloseMeter() noexcept {
+void Loudnorm::CloseMeter() {
 	if (!m_st || m_ready)
 		return;
 	if (ebur128_loudness_global(m_st->state, &m_measuredI) != EBUR128_SUCCESS
@@ -347,7 +348,7 @@ FFrame Loudnorm::Gain(const FFrame& src) const noexcept {
 	return out;
 }
 
-void Loudnorm::Measure(const Pipeline::Frame& frame) noexcept {
+void Loudnorm::Measure(const Pipeline::Frame& frame) noexcept try {
 	if (m_ready)
 		return;
 	if (frame.Type() != Type::Audio)
@@ -372,9 +373,13 @@ void Loudnorm::Measure(const Pipeline::Frame& frame) noexcept {
 		return;
 	}
 	++m_frames;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Loudnorm::Process(const Pipeline::Frame& frame) noexcept {
+void Loudnorm::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	if (!m_ready) {
@@ -393,11 +398,19 @@ void Loudnorm::Process(const Pipeline::Frame& frame) noexcept {
 	}
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("loudnorm process pts={} gain={:.6f}", src.Pts(), m_gain));
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Loudnorm::Eof() noexcept {
+void Loudnorm::Eof() noexcept try {
 	if (!m_ready)
 		CloseMeter();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report Loudnorm::Report() const {

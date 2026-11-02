@@ -88,7 +88,7 @@ namespace {
 
 NlMeans::NlMeans(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<unsigned> research, StormByte::Safe::Optional<unsigned> patch,
-	StormByte::Safe::Optional<double> strength) noexcept
+	StormByte::Safe::Optional<double> strength)
 	: Filter::Process(std::move(log), StormByte::Safe::String("nlmeans")),
 	m_researchIn(research), m_patchIn(patch), m_hIn(strength),
 	m_research(0), m_patch(0), m_h(0.0), m_latched(false) {}

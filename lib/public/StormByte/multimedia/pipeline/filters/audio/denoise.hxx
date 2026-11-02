@@ -129,7 +129,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param nr Reduction in dB. Empty → 12. Clamped 1–30.
 			 */
 			Denoise(Safe::Shared<StormByte::Logger::Log> log,
-					Safe::Optional<double> nr = {}) noexcept;
+					Safe::Optional<double> nr = {});
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -212,23 +212,23 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Mixes @p src into the measure window and emits candidates.
 			 * @param src Borrowed source frame, valid throughout this call.
 			 */
-			void Ingest(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+			void Ingest(const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Scores one full window and maybe stores a candidate.
 			 */
-			void EmitWindow() noexcept;
+			void EmitWindow();
 
 			/**
 			 * @brief Picks the signature with the most neighbours, or skip.
 			 */
-			void Vote() noexcept;
+			void Vote();
 
 			/**
 			 * @brief @c afftdn=nr=:nf= chain for the winner.
 			 * @return Base-owned filter chain for the voted floor.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<double> m_nrIn;			///< Caller noise reduction, or empty
 			StormByte::Safe::Vector<float> m_acc;		///< Base-owned measurement samples.

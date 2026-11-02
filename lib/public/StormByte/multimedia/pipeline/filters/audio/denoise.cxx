@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/audio/denoise.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/multimedia/type.hxx>
@@ -117,7 +118,7 @@ namespace {
 }
 
 Denoise::Denoise(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<double> nr) noexcept
+	StormByte::Safe::Optional<double> nr)
 	: Filter::ProcessTwoPasses(std::move(log), "denoise"),
 	m_nrIn(nr),
 	m_rate(0),
@@ -153,7 +154,7 @@ void Denoise::Setup() noexcept {
 	m_graph.reset();
 }
 
-void Denoise::Ingest(const FFrame& src) noexcept {
+void Denoise::Ingest(const FFrame& src) {
 	if (m_rate == 0) {
 		m_rate = src.SampleRate();
 		m_win = std::max(256, static_cast<int>(std::lround(
@@ -175,7 +176,7 @@ void Denoise::Ingest(const FFrame& src) noexcept {
 		EmitWindow();
 }
 
-void Denoise::EmitWindow() noexcept {
+void Denoise::EmitWindow() {
 	if (m_win <= 0 || static_cast<int>(m_acc.size()) < m_win)
 		return;
 
@@ -219,7 +220,7 @@ void Denoise::EmitWindow() noexcept {
 	m_cand.push_back(c);
 }
 
-void Denoise::Vote() noexcept {
+void Denoise::Vote() {
 	m_voted = true;
 	m_skip = true;
 	if (m_cand.size() < static_cast<std::size_t>(MinMatches)) {
@@ -272,11 +273,11 @@ void Denoise::Vote() noexcept {
 		m_nf, m_nr, m_matches, static_cast<std::uint64_t>(m_cand.size())));
 }
 
-StormByte::Safe::String Denoise::Chain() const noexcept {
+StormByte::Safe::String Denoise::Chain() const {
 	return StormByte::Safe::String::ReplaceToken("afftdn=nr={}:nf={}:tn=0", m_nr, m_nf);
 }
 
-void Denoise::Measure(const Pipeline::Frame& frame) noexcept {
+void Denoise::Measure(const Pipeline::Frame& frame) noexcept try {
 	if (m_voted)
 		return;
 	if (frame.Type() != Type::Audio)
@@ -288,9 +289,13 @@ void Denoise::Measure(const Pipeline::Frame& frame) noexcept {
 	}
 	Ingest(src);
 	++m_frames;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Denoise::Process(const Pipeline::Frame& frame) noexcept {
+void Denoise::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	if (!m_voted)
@@ -332,9 +337,13 @@ void Denoise::Process(const Pipeline::Frame& frame) noexcept {
 		"denoise ch={} samples={} pts={}",
 		out.Channels(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Denoise::Eof() noexcept {
+void Denoise::Eof() noexcept try {
 	if (!m_voted) {
 		if (m_win > 0 && static_cast<int>(m_acc.size()) >= m_win)
 			EmitWindow();
@@ -354,6 +363,10 @@ void Denoise::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report Denoise::Report() const {

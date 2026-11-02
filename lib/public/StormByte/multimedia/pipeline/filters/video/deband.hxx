@@ -109,7 +109,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			Deband(Safe::Shared<StormByte::Logger::Log> log,
 				unsigned range = 0, unsigned threshold = 0,
-				unsigned grain = 0) noexcept;
+				unsigned grain = 0);
 
 			/**
 			 * @brief Copying the provider-owned leaf is disabled.

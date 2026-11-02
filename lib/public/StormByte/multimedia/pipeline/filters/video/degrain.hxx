@@ -180,7 +180,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 *        at setup/measurement. Finite values are clamped to [0, 100].
 			 */
 			Degrain(Safe::Shared<StormByte::Logger::Log> log,
-				Safe::Optional<double> sigmaCap = {}) noexcept;
+				Safe::Optional<double> sigmaCap = {});
 
 			/**
 			 * @brief Copying the provider-owned leaf is disabled.
@@ -283,23 +283,23 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Convert @p src to YUV420P, isolate boundaries and score the ring centre.
 			 * @param src Live decoder frame. ScaleTo failure drops the sample.
 			 */
-			void PushFrame(const StormByte::Multimedia::FFmpeg::AVFrame& src) noexcept;
+			void PushFrame(const StormByte::Multimedia::FFmpeg::AVFrame& src);
 
 			/**
 			 * @brief Fill one measurement row from ring slot @p idx using up to five neighbours each side.
 			 * @param idx Index in the provider-owned ring. No-op if already scored or tiny.
 			 */
-			void ScoreCenter(StormByte::Size idx) noexcept;
+			void ScoreCenter(StormByte::Size idx);
 
 			/**
 			 * @brief Score every remaining slot so the last 5 frames are not silent.
 			 */
-			void FlushRing() noexcept;
+			void FlushRing();
 
 			/**
 			 * @brief Finalize targets, smooth only positive evidence within groups and report strengths.
 			 */
-			void Decide() noexcept;
+			void Decide();
 
 			/**
 			 * @brief Runs and validates a complete three-input temporal window.
@@ -311,7 +311,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			bool FilterWindow(const StormByte::Multimedia::FFmpeg::AVFrame& previous,
 				const StormByte::Multimedia::FFmpeg::AVFrame& current, double sigma,
-				StormByte::Multimedia::FFmpeg::AVFrame& output) noexcept;
+				StormByte::Multimedia::FFmpeg::AVFrame& output);
 
 			/**
 			 * @brief Processes one real input and remembers its unfiltered reference.
@@ -320,7 +320,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @return True only when output should replace source; false is passthrough or failure.
 			 */
 			bool Apply(const StormByte::Multimedia::FFmpeg::AVFrame& source,
-				StormByte::Multimedia::FFmpeg::AVFrame& output) noexcept;
+				StormByte::Multimedia::FFmpeg::AVFrame& output);
 
 			/**
 			 * @brief Interpolates targets at normalized plane coordinates.

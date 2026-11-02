@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/hqdn3d.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -146,7 +147,7 @@ namespace {
 
 Hqdn3d::Hqdn3d(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	double lumaSpatial, double chromaSpatial,
-	double lumaTemporal, double chromaTemporal) noexcept
+	double lumaTemporal, double chromaTemporal)
 	: Filter::Process(std::move(log), StormByte::Safe::String("hqdn3d")),
 	m_ls(lumaSpatial > 0.0 ? lumaSpatial : 4.0),
 	m_cs(chromaSpatial > 0.0 ? chromaSpatial : 3.0),
@@ -169,7 +170,7 @@ void Hqdn3d::Setup() noexcept {
 	Clean();
 }
 
-void Hqdn3d::Process(const Pipeline::Frame& frame) noexcept {
+void Hqdn3d::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -196,4 +197,8 @@ void Hqdn3d::Process(const Pipeline::Frame& frame) noexcept {
 		src.Width(), src.Height(), src.Pts()));
 	m_prev = out.Clone();
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/analytics/xpsnr.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -183,7 +184,7 @@ namespace {
 	}
 }
 
-XPSNR::XPSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+XPSNR::XPSNR(StormByte::Safe::Shared<StormByte::Logger::Log> log)
 	: Filter::Analytics(std::move(log), "xpsnr") {}
 
 XPSNR::~XPSNR() noexcept {
@@ -216,7 +217,7 @@ void XPSNR::Setup() noexcept {
 	Log(Level::Debug, "setup");
 }
 
-void XPSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
+void XPSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) {
 	if (!ref || !dist)
 		return;
 	if (ref.Width() <= 0 || ref.Height() <= 0 || dist.Width() <= 0 || dist.Height() <= 0) {
@@ -292,7 +293,7 @@ void XPSNR::Score(Lane& lane, const FFrame& ref, const FFrame& dist) noexcept {
 		lane.scored, frameX, ref.Pts(), d->Pts()));
 }
 
-void XPSNR::Drain(Lane& lane) noexcept {
+void XPSNR::Drain(Lane& lane) {
 	while (!lane.ref.empty() && !lane.dist.empty()) {
 		FFrame ref = std::move(lane.ref.front());
 		FFrame dist = std::move(lane.dist.front());
@@ -302,7 +303,7 @@ void XPSNR::Drain(Lane& lane) noexcept {
 	}
 }
 
-void XPSNR::Process(const Pipeline::Frame& frame) noexcept {
+void XPSNR::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const Producer producer = frame.Producer();
@@ -354,9 +355,13 @@ void XPSNR::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("park t={} producer={} ref={} dist={}",
 		frame.Track(), ToString(producer), lane.ref.size(), lane.dist.size()));
 	Drain(lane);
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void XPSNR::Eof() noexcept {
+void XPSNR::Eof() noexcept try {
 	unsigned scored = 0;
 	for (const auto& [track, lanePointer] : std::as_const(m_lanes)) {
 		Lane& lane = *lanePointer;
@@ -403,6 +408,10 @@ void XPSNR::Eof() noexcept {
 		Log(Level::Error, "no scored pairs");
 	else if (scored > 0)
 		Log(Level::Debug, StormByte::Safe::String::ReplaceToken("eof tracks={} scored={}", m_lanes.size(), scored));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
 class StormByte::Multimedia::Pipeline::Filter::Report XPSNR::Report() const {

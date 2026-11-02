@@ -245,6 +245,16 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 	 * here; it rides on the incoming frame if @c CopyProps /
 	 * @c WriteHdr10 copied it.
 	 *
+	 * @par Allocation failures
+	 * Construction and owning-value helpers (including reports and filter
+	 * chain strings) may propagate allocation failures. Worker lifecycle
+	 * callbacks remain noexcept: allocating overrides must catch
+	 * Safe::AllocationError and std::bad_alloc and call the allocation-free
+	 * @ref Fail() overload. Cleanup and destruction must not allocate.
+	 * The built-in leaves and the Open / Work / Finish dispatch boundaries
+	 * translate these failures to Pipeline::State::Failed without requiring
+	 * an error string.
+	 *
 	 * @ingroup multimedia_pipeline
 	 */
 	class STORMBYTE_MULTIMEDIA_PUBLIC FFmpeg {
@@ -444,6 +454,8 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * Called from @ref Process, @ref ProcessTwoPasses,
 			 * @ref Packet and @ref Analytics.
 			 * Do not construct FFmpeg from a filter leaf.
+			 * @throws Safe::AllocationError or std::bad_alloc if filter state
+			 * or the copied name cannot be allocated.
 			 */
 			FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				std::string_view name, Pipeline::Kinds receives, Pipeline::Kinds produces);

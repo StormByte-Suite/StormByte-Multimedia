@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/rubberband.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -63,7 +64,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Rubberband::Rubberband(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<double> tempo, StormByte::Safe::Optional<double> pitch) noexcept
+	StormByte::Safe::Optional<double> tempo, StormByte::Safe::Optional<double> pitch)
 	: Filter::Process(std::move(log), "rubberband"),
 	m_tempoIn(tempo), m_pitchIn(pitch) {}
 
@@ -81,14 +82,14 @@ void Rubberband::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Rubberband::Chain() const noexcept {
+StormByte::Safe::String Rubberband::Chain() const {
 	const double tempo = m_tempoIn.value_or(1.0);
 	const double pitch = m_pitchIn.value_or(1.0);
 	return StormByte::Safe::String::ReplaceToken(
 		"aformat=sample_fmts=fltp,rubberband=tempo={}:pitch={}", tempo, pitch);
 }
 
-void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
+void Rubberband::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Audio)
 		return;
 	const FFrame& src = AVFrame();
@@ -127,9 +128,13 @@ void Rubberband::Process(const Pipeline::Frame& frame) noexcept {
 		"rubberband ch={} rate={} samples={} pts={}",
 		out.Channels(), out.SampleRate(), out.NbSamples(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Rubberband::Eof() noexcept {
+void Rubberband::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -148,4 +153,8 @@ void Rubberband::Eof() noexcept {
 			break;
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

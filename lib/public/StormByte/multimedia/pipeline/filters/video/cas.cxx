@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/cas.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -64,7 +65,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Cas::Cas(Safe::Shared<StormByte::Logger::Log> log,
-	Safe::Optional<double> strength) noexcept
+	Safe::Optional<double> strength)
 	: Filter::Process(std::move(log), Safe::String("cas")),
 	m_strengthIn(strength) {}
 
@@ -82,12 +83,12 @@ void Cas::Setup() noexcept {
 	Clean();
 }
 
-StormByte::Safe::String Cas::Chain() const noexcept {
+StormByte::Safe::String Cas::Chain() const {
 	const double strength = std::clamp(m_strengthIn.value_or(0.4), 0.0, 1.0);
 	return StormByte::Safe::String::ReplaceToken("cas=strength={}", strength);
 }
 
-void Cas::Process(const Pipeline::Frame& frame) noexcept {
+void Cas::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -137,9 +138,13 @@ void Cas::Process(const Pipeline::Frame& frame) noexcept {
 		"cas {}x{} pts={}",
 		out.Width(), out.Height(), out.Pts()));
 	EmitGraph(*m_graph, std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Cas::Eof() noexcept {
+void Cas::Eof() noexcept try {
 	if (!m_graph)
 		return;
 	for (;;) {
@@ -156,4 +161,8 @@ void Cas::Eof() noexcept {
 		EmitFrame(std::move(out));
 	}
 	m_graph.reset();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

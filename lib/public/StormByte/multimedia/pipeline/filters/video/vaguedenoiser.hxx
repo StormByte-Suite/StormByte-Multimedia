@@ -106,7 +106,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			VagueDenoiser(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::Optional<double> threshold = {},
 				StormByte::Safe::Optional<unsigned> steps = {},
-				StormByte::Safe::Optional<double> percent = {}) noexcept;
+				StormByte::Safe::Optional<double> percent = {});
 
 			/**
 			 * @brief Copy construction is unavailable.
@@ -166,7 +166,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Builds the avfilter chain.
 			 * @return `vaguedenoiser=...` for @ref FFmpeg::AVFilterGraph::Ensure.
 			 */
-			StormByte::Safe::String Chain() const noexcept;
+			StormByte::Safe::String Chain() const;
 
 			StormByte::Safe::Optional<double> m_thrIn;	///< Caller threshold, or empty
 			StormByte::Safe::Optional<unsigned> m_stepsIn;	///< Caller nsteps, or empty

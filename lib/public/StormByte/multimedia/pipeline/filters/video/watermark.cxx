@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/pipeline/filters/video/watermark.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -439,7 +440,7 @@ namespace {
 	}
 
 	bool ResizeRgba(FFrame::ScaleContext& ctx, const std::uint8_t* src, int srcW, int srcH,
-		int dstW, int dstH, StormByte::Safe::Vector<std::uint8_t>& dst) noexcept {
+		int dstW, int dstH, StormByte::Safe::Vector<std::uint8_t>& dst) {
 		FFrame packed;
 		if (!StorePacked(packed, src, srcW, srcH))
 			return false;
@@ -807,15 +808,19 @@ void Watermark::Clean() noexcept {
 	DropScale();
 }
 
-void Watermark::Setup() noexcept {
+void Watermark::Setup() noexcept try {
 	if (m_designed)
 		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("opacity {}%, margin {}, designed {}x{}",
 			m_opacity, m_margin, m_designed->Width(), m_designed->Height()));
 	else
 		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("opacity {}%, margin {}", m_opacity, m_margin));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Watermark::DisableLogo(std::string_view why) noexcept {
+void Watermark::DisableLogo(std::string_view why) {
 	Log(Level::Warning, StormByte::Safe::String::ReplaceToken("disabled: {}", why));
 	m_opacity = 0;
 	m_svg.reset();
@@ -830,7 +835,7 @@ void Watermark::DisableLogo(std::string_view why) noexcept {
 	m_linearReady = false;
 }
 
-bool Watermark::LoadFile(const StormByte::Safe::String& path) noexcept {
+bool Watermark::LoadFile(const StormByte::Safe::String& path) {
 	if (path.empty()) {
 		DisableLogo("empty logo path");
 		return false;
@@ -862,7 +867,7 @@ bool Watermark::LoadFile(const StormByte::Safe::String& path) noexcept {
 	return true;
 }
 
-bool Watermark::DecodeLogo() noexcept {
+bool Watermark::DecodeLogo() {
 	if (m_decoded)
 		return m_svg || !m_rgba.empty();
 	m_decoded = true;
@@ -927,7 +932,7 @@ bool Watermark::DecodeLogo() noexcept {
 	return true;
 }
 
-const FFrame* Watermark::Luma(const FFrame& src) noexcept {
+const FFrame* Watermark::Luma(const FFrame& src) {
 	if (!src || src.Width() <= 0 || src.Height() <= 0)
 		return nullptr;
 	if (src.Hardware()) {
@@ -965,7 +970,7 @@ const FFrame* Watermark::Luma(const FFrame& src) noexcept {
 	return m_luma.get();
 }
 
-bool Watermark::ProbeBars(const FFrame& src) noexcept {
+bool Watermark::ProbeBars(const FFrame& src) {
 	if (!Luma(src) || m_luma->Width() < 16 || m_luma->Height() < 16) {
 			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("probe skip luma={}x{}",
 			m_luma ? m_luma->Width() : 0,
@@ -1054,7 +1059,7 @@ bool Watermark::ProbeBars(const FFrame& src) noexcept {
 	return true;
 }
 
-void Watermark::Process(const Pipeline::Frame& frame) noexcept {
+void Watermark::Process(const Pipeline::Frame& frame) noexcept try {
 	if (m_opacity == 0)
 		return;
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("process t={} {}:{} opacity={} released={}",
@@ -1089,18 +1094,26 @@ void Watermark::Process(const Pipeline::Frame& frame) noexcept {
 	}
 
 	Paint();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-void Watermark::LastChance(const Pipeline::Frame& frame) noexcept {
+void Watermark::LastChance(const Pipeline::Frame& frame) noexcept try {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken(
 		"last-chance t={} {}:{} stable={} bars={},{};{},{}",
 		frame.Track(), frame.Serial().value_or(0), frame.Part(),
 		m_stable, m_barTop, m_barBottom, m_barLeft, m_barRight));
 	m_released = true;
 	Release();
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }
 
-bool Watermark::Prepare(int frameW, int frameH) noexcept {
+bool Watermark::Prepare(int frameW, int frameH) {
 	if (m_prepared && m_preparedW == frameW && m_preparedH == frameH)
 		return m_opacity != 0;
 	m_linear.reset();
@@ -1168,7 +1181,7 @@ bool Watermark::Prepare(int frameW, int frameH) noexcept {
 	return true;
 }
 
-bool Watermark::EnsureLinear(const FFrame& src) noexcept {
+bool Watermark::EnsureLinear(const FFrame& src) {
 	const bool hdr = HdrTransfer(src.ColorTransfer());
 	const int primaries = AVCOL_PRI_BT2020;
 	const int matrix = src.ColorSpace();
@@ -1205,7 +1218,7 @@ bool Watermark::EnsureLinear(const FFrame& src) noexcept {
 	return true;
 }
 
-bool Watermark::Composite(const FFrame& src, int x, int y) noexcept {
+bool Watermark::Composite(const FFrame& src, int x, int y) {
 	const auto* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(src.Format()));
 	if (!CanComposite(desc))
 		return false;
@@ -1269,7 +1282,7 @@ bool Watermark::Composite(const FFrame& src, int x, int y) noexcept {
 	return true;
 }
 
-void Watermark::PaintLegacy(int x, int y) noexcept {
+void Watermark::PaintLegacy(int x, int y) {
 	const FFrame& src = AVFrame();
 	const std::uint8_t* logo = m_scaled.empty() ? m_rgba.data() : m_scaled.data();
 	FFrame out;
@@ -1305,7 +1318,7 @@ void Watermark::PaintLegacy(int x, int y) noexcept {
 	Save(std::move(out));
 }
 
-void Watermark::Paint() noexcept {
+void Watermark::Paint() {
 	if (m_opacity == 0)
 		return;
 	if (!DecodeLogo())

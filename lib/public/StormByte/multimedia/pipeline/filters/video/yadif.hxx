@@ -95,7 +95,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param onlyInterlaced Skip frames not marked interlaced.
 			 */
 			explicit Yadif(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				bool onlyInterlaced = true) noexcept;
+				bool onlyInterlaced = true);
 
 			/**
 			 * @brief Copy construction is unavailable.
@@ -174,7 +174,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 */
 			void Weave(const StormByte::Multimedia::FFmpeg::AVFrame& prev,
 				const StormByte::Multimedia::FFmpeg::AVFrame& cur,
-				const StormByte::Multimedia::FFmpeg::AVFrame& next) noexcept;
+				const StormByte::Multimedia::FFmpeg::AVFrame& next);
 
 			bool m_onlyInterlaced;				///< Skip progressive input
 			StormByte::Multimedia::FFmpeg::AVFrame m_prev;	///< Look t-1

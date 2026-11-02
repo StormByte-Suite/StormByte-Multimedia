@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <new>
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/deband.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
@@ -145,7 +146,7 @@ namespace {
 }
 
 Deband::Deband(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	unsigned range, unsigned threshold, unsigned grain) noexcept
+	unsigned range, unsigned threshold, unsigned grain)
 	: Filter::Process(std::move(log), StormByte::Safe::String("deband")),
 	m_range(range ? range : 16u),
 	m_threshold(threshold ? threshold : 4u),
@@ -161,7 +162,7 @@ void Deband::Clean() noexcept {}
 
 void Deband::Setup() noexcept {}
 
-void Deband::Process(const Pipeline::Frame& frame) noexcept {
+void Deband::Process(const Pipeline::Frame& frame) noexcept try {
 	if (frame.Type() != Type::Video)
 		return;
 	const FFrame& src = AVFrame();
@@ -186,4 +187,8 @@ void Deband::Process(const Pipeline::Frame& frame) noexcept {
 	Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("deband {}x{} range={} thr={} grain={} pts={}",
 		src.Width(), src.Height(), m_range, m_threshold, m_grain, src.Pts()));
 	Save(std::move(out));
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
 }

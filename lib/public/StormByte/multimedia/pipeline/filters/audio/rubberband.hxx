@@ -106,7 +106,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 */
 			Rubberband(Safe::Shared<StormByte::Logger::Log> log,
 					Safe::Optional<double> tempo = {},
-					Safe::Optional<double> pitch = {}) noexcept;
+					Safe::Optional<double> pitch = {});
 
 			/**
 			 * @brief Copy construction is disabled.
@@ -171,7 +171,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @brief Builds the avfilter chain.
 			 * @return `rubberband=...` for @ref StormByte::Multimedia::FFmpeg::AVFilterGraph::Ensure.
 			 */
-			Safe::String Chain() const noexcept;
+			Safe::String Chain() const;
 
 			Safe::Optional<double> m_tempoIn;	///< Caller tempo, or empty
 			Safe::Optional<double> m_pitchIn;	///< Caller pitch, or empty
