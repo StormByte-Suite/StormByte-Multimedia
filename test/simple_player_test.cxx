@@ -555,7 +555,13 @@ class TokenReader final: public IO::BufferedLocationReader {
  * @return Whether the condition occurred.
  */
 template<class Predicate>
-bool Wait(Predicate predicate, double seconds = 5) {
+bool Wait(Predicate predicate, double seconds =
+#ifdef STORMBYTE_MM_TEST_DEADLINE_SEC
+	STORMBYTE_MM_TEST_DEADLINE_SEC
+#else
+	5
+#endif
+) {
 	const auto start = TestClock::now();
 	while (!predicate()) {
 		if (std::chrono::duration<double>(TestClock::now() - start).count() >= seconds)

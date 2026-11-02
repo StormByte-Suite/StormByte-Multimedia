@@ -66,6 +66,9 @@ if(ENABLE_TEST)
 		test_stop_transfer_destructor)
 		add_test(NAME "preview.${test_name}" COMMAND MultimediaSimplePlayerTests "${test_name}")
 		set_tests_properties("preview.${test_name}" PROPERTIES TIMEOUT 20 LABELS "multimedia;preview")
+		if(PGO_STAGE STREQUAL "generate" OR ENABLE_ASAN)
+			set_tests_properties("preview.${test_name}" PROPERTIES TIMEOUT 480)
+		endif()
 	endforeach()
 
 	# One shared library absorbs every private translation unit and test

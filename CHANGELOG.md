@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Preview test waits honor the existing instrumented test deadline instead of failing after five seconds; CTest allows that deadline and teardown to complete under ASan/PGO, while normal-build waits and functional assertions remain unchanged.
 - Duration pipeline tests allow the existing instrumented in-process deadline to finish under ASan/PGO instead of being killed by CTest after 20 seconds; the duration-hint regression passes unchanged in 26 seconds under strict sanitizers.
 - Bundled Vorbis packs decoder search hints through unsigned bit patterns instead of shifting a signed value into its sign bit.
 - Bundled x265 guards the final coefficient-group neighbor lookup against a shift by 64; 4,368,000 isolated context comparisons preserve the reference results.
