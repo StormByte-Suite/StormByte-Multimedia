@@ -1183,7 +1183,7 @@ int test_live_audio_tracks() {
 	display->m_live_audio = true;
 	display->m_capture_deferred = false;
 	SimplePlayer player(display);
-	TEST_REQUIRE(player.Open(input ? std::string(input) : Fixture("video/anime_like.mkv")));
+	TEST_REQUIRE(player.Open(input ? std::string(input) : Fixture("video/live_audio_switch_long.mkv")));
 	std::vector<int> tracks{-1};
 	for (const auto& track : player.Tracks())
 		if (track.m_type == MediaType::Audio)

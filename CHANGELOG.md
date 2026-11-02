@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- The live audio track cycling regression uses a fixed long synthetic stream instead of exhausting a two-second clip during instrumented decoding; all six track changes retain the same epoch, timestamp and inter-frame timing checks.
 - The preview seek/epoch regression waits for both clock progress and its required three displayed frames before pausing, instead of assuming asynchronous video delivery has caught up with the audio clock.
 - Preview test waits honor the existing instrumented test deadline instead of failing after five seconds; CTest allows that deadline and teardown to complete under ASan/PGO, while normal-build waits and functional assertions remain unchanged.
 - Duration pipeline tests allow the existing instrumented in-process deadline to finish under ASan/PGO instead of being killed by CTest after 20 seconds; the duration-hint regression passes unchanged in 26 seconds under strict sanitizers.

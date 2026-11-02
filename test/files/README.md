@@ -63,6 +63,23 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
     -fflags +bitexact -flags:v +bitexact -flags:a +bitexact interleave_long.mkv
   ```
 
+- `video/live_audio_switch_long.mkv`: approximately 96 seconds, eight
+  stream-copy repetitions of the synthetic `interleave_long.mkv` fixture.
+  The live audio switching regression needs input beyond decoder read-ahead
+  throughout six track changes; a two-second clip can reach EOF before those
+  operations complete under instrumentation. Low-resolution video keeps
+  decode overhead from overwhelming the real-time sink assertions.
+  Tests retain their epoch, monotonic timestamp and 500 ms inter-frame checks
+  and never regenerate this fixture.
+  SHA-256: `caf35ac55c2ca5132d904ee2c236ab79457f009d1908e458b6687ad5e1ca8ca7`
+  (2,612,036 bytes). Authored once with:
+
+  ```sh
+  ffmpeg -v error -nostdin -n -stream_loop 7 \
+    -i test/files/video/interleave_long.mkv -map 0 -c copy \
+    test/files/video/live_audio_switch_long.mkv
+  ```
+
 - `video/missing_pts_bframes.avi`: synthetic two-second 96x64 MPEG-4/AC-3
   fixture with reordered frames and missing video packet PTS. Its regression
   verifies all 50 decoded/output video timestamps, intermediate encode progress
