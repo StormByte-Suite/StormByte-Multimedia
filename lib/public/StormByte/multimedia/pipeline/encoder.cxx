@@ -106,7 +106,7 @@ namespace {
 }
 
 Encoder::Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	int output_index, const Codec& codec) noexcept
+	int output_index, const Codec& codec)
 : Step(std::move(log), Producer::Encoder, Kinds{Kind::Frame}, Kinds{Kind::Packet}),
 	m_index(output_index), m_codec(&codec),
 	m_encoderTag("StormByte-Multimedia " STORMBYTE_MULTIMEDIA_VERSION), m_part(0) {

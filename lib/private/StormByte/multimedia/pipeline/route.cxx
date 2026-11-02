@@ -292,6 +292,7 @@ void Route::Hook(Lane& lane, Filter::FFmpeg& filter) noexcept {
 }
 
 void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
+	try {
 	const int output = OutputTrack();
 	if (origin.Produces().Has(Kind::Frame)) {
 		origin.pipe().CloneTo(m_track, analytics.pipe(), output);
@@ -318,9 +319,15 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 	Cap(analytics.pipe(), output, analytics.InputCeiling());
 	origin.pipe().CloneTo(m_track, look->pipe());
 	m_looks.push_back(std::move(look));
+	} catch (const StormByte::Safe::AllocationError&) {
+		origin.Fail();
+	} catch (const std::bad_alloc&) {
+		origin.Fail();
+	}
 }
 
 void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
+	try {
 	if (destination.m_name != Producer::Remuxer && destination.m_name != Producer::Encoder)
 		return;
 	const int output = OutputTrack();
@@ -352,4 +359,9 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 	Cap(analytics.pipe(), output, analytics.InputCeiling());
 	destination.pipe().CloneTo(packetTrack, look->pipe());
 	m_looks.push_back(std::move(look));
+	} catch (const StormByte::Safe::AllocationError&) {
+		destination.Fail();
+	} catch (const std::bad_alloc&) {
+		destination.Fail();
+	}
 }

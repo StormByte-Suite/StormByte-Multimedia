@@ -82,11 +82,11 @@ namespace {
 	}
 }
 
-Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log)
 : Demuxer(std::move(log), StormByte::Safe::MakeShared<class Progress>()) {}
 
 Demuxer::Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Shared<class Progress> progress) noexcept
+	StormByte::Safe::Shared<class Progress> progress)
 : Step(std::move(log), Producer::Demuxer, Kinds{}, Kinds{Kind::Packet}),
 	m_eof(false), m_positionNs(-1),
 	m_progress(progress ? std::move(progress) : StormByte::Safe::MakeShared<class Progress>()) {

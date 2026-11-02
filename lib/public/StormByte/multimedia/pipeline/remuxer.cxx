@@ -67,10 +67,10 @@
 using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
-Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept
+Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in)
 : Remuxer(std::move(log), in, -1) {}
 
-Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in, int out) noexcept
+Remuxer::Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in, int out)
 :	Step(std::move(log), Producer::Remuxer, Kinds{Kind::Packet}, Kinds{Kind::Packet}),
 	m_index(in), m_output(out) {
 	Mount(StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face()),

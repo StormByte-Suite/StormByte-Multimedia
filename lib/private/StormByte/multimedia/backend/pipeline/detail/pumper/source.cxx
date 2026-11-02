@@ -51,7 +51,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/pumper/source.hxx>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Pumper {
-	Source::Source(StormByte::Multimedia::Backend::Pipeline::Host& host) noexcept
+	Source::Source(StormByte::Multimedia::Backend::Pipeline::Host& host)
 	:	StormByte::Multimedia::Backend::Pipeline::Pumper(host) {}
 
 	void Source::Pump() noexcept {

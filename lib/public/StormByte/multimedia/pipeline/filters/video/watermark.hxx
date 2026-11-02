@@ -189,12 +189,12 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note File bytes are copied into the filter's persistent @ref StormByte::Safe::Binary.
 			 * A missing or unreadable file logs a Warning and disables the overlay.
-			 * Allocation or path-conversion exceptions terminate because this is noexcept.
+			 * Allocation and path-conversion failures propagate to the caller.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::String logo, Anchor anchor,
 				unsigned opacity = 100, int margin = 0,
-				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {});
 
 			/**
 			 * @brief Logo bytes at an anchor on the active picture.
@@ -206,13 +206,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
 			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note The encoded source is copied into Watermark's persistent @ref StormByte::Safe::Binary
-			 * and remains there across @ref Clean and filter replays. Allocation failure terminates
-			 * because this constructor is noexcept.
+			 * and remains there across @ref Clean and filter replays. Allocation failures
+			 * propagate to the caller.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				const StormByte::Safe::Binary& logo, Anchor anchor,
 				unsigned opacity = 100, int margin = 0,
-				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {});
 
 			/**
 			 * @brief Logo at an absolute top-left. No Hold.
@@ -224,13 +224,13 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note File bytes are copied into the filter's persistent @ref StormByte::Safe::Binary.
 			 * A missing or unreadable file logs a Warning and disables the overlay.
-			 * Allocation or path-conversion exceptions terminate because this is noexcept.
+			 * Allocation and path-conversion failures propagate to the caller.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				StormByte::Safe::String logo,
 				StormByte::Multimedia::Property::Point position,
 				unsigned opacity = 100,
-				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {});
 
 			/**
 			 * @brief Logo bytes at an absolute top-left. No Hold.
@@ -241,14 +241,14 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @param designedFor Video size the still was drawn for. Empty keeps native pixels.
 			 * One zero axis selects the other. Both zero disables the overlay.
 			 * @note The encoded source is copied into Watermark's persistent @ref StormByte::Safe::Binary
-			 * and remains there across @ref Clean and filter replays. Allocation failure terminates
-			 * because this constructor is noexcept.
+			 * and remains there across @ref Clean and filter replays. Allocation failures
+			 * propagate to the caller.
 			 */
 			Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 				const StormByte::Safe::Binary& logo,
 				StormByte::Multimedia::Property::Point position,
 				unsigned opacity = 100,
-				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {}) noexcept;
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor = {});
 
 			/**
 			 * @brief Copy constructor (deleted). Filters are unique in the tube.
@@ -356,7 +356,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 				StormByte::Safe::Optional<Anchor> anchor,
 				StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> position,
 				unsigned opacity, int margin, bool binaryInput,
-				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept;
+				StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor);
 
 			/**
 			 * @brief Hold ceiling in units.

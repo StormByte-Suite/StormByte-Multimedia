@@ -195,7 +195,7 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 
 class FFmpeg::PrivateState {
 	public:
-		explicit PrivateState(FFmpeg& owner) noexcept
+		explicit PrivateState(FFmpeg& owner)
 		:	surface(owner) {}
 
 		StormByte::Multimedia::Backend::Pipeline::Pipe pipe;					///< Input/output queues and wait synchronization
@@ -209,12 +209,12 @@ class FFmpeg::PrivateState {
 };
 
 FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	std::string_view name, Kinds receives, Kinds produces) noexcept
+	std::string_view name, Kinds receives, Kinds produces)
 :	m_log(std::move(log)),
 	m_name(name),
 	m_receives(receives),
 	m_produces(produces),
-	m_state(new PrivateState(*this)),
+	m_state(nullptr),
 	m_telemetry(StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
@@ -223,8 +223,11 @@ FFmpeg::FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	m_lastWork(0),
 	m_hold(0),
 	m_heldFor(0) {
+	auto state = std::make_unique<PrivateState>(*this);
+	m_state = state.get();
 	m_state->pumper = std::make_unique<StormByte::Multimedia::Backend::Pipeline::Detail::Pumper::Through>(Face());
 	m_state->pumper->Bind(StormByte::Safe::MakeUnique<StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Filter>(*this));
+	static_cast<void>(state.release());
 }
 
 FFmpeg::~FFmpeg() noexcept {
@@ -824,18 +827,18 @@ void FFmpeg::Clean() noexcept {}
 
 void FFmpeg::Setup() noexcept {}
 
-Process::Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+Process::Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name)
 : FFmpeg(std::move(log), name, Kinds{Kind::Frame}, Kinds{Kind::Frame}) {}
 
 Process::Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-	Kinds receives, Kinds produces) noexcept
+	Kinds receives, Kinds produces)
 : FFmpeg(std::move(log), name, receives, produces) {}
 
-ProcessTwoPasses::ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+ProcessTwoPasses::ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name)
 : StormByte::Multimedia::Pipeline::Filter::Process(std::move(log), name) {}
 
 ProcessTwoPasses::ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-	Kinds receives, Kinds produces) noexcept
+	Kinds receives, Kinds produces)
 : StormByte::Multimedia::Pipeline::Filter::Process(std::move(log), name, receives, produces) {}
 
 bool ProcessTwoPasses::Measuring() const noexcept {
@@ -861,16 +864,16 @@ void ProcessTwoPasses::BindMeasure(StormByte::Multimedia::Pipeline::Filters* own
 	m_measureOwner = owner;
 }
 
-Packet::Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+Packet::Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name)
 : FFmpeg(std::move(log), name, Kinds{Kind::Packet}, Kinds{Kind::Packet}) {}
 
 Packet::Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-	Kinds receives, Kinds produces) noexcept
+	Kinds receives, Kinds produces)
 : FFmpeg(std::move(log), name, receives, produces) {}
 
-Analytics::Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept
+Analytics::Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name)
 : FFmpeg(std::move(log), name, Kinds{Kind::Frame}, Kinds{}) {}
 
 Analytics::Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-	Kinds receives, Kinds produces) noexcept
+	Kinds receives, Kinds produces)
 : FFmpeg(std::move(log), name, receives, produces) {}

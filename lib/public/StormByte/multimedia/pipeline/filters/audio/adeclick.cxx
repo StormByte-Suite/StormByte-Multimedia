@@ -64,7 +64,7 @@ using FFrame = StormByte::Multimedia::FFmpeg::AVFrame;
 using FGraph = StormByte::Multimedia::FFmpeg::AVFilterGraph;
 
 Adeclick::Adeclick(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	StormByte::Safe::Optional<double> threshold) noexcept
+	StormByte::Safe::Optional<double> threshold)
 :	Filter::Process(std::move(log), "adeclick"),
 	m_thrIn(threshold) {}
 

@@ -74,7 +74,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Pumper {
 			 * @brief Through pumper in State::Created.
 			 * @param host Owner surface (Step or Filter::FFmpeg).
 			 */
-			explicit Through(StormByte::Multimedia::Backend::Pipeline::Host& host) noexcept;
+			explicit Through(StormByte::Multimedia::Backend::Pipeline::Host& host);
 
 			Through(const Through&) = delete;
 			Through(Through&&) noexcept = delete;

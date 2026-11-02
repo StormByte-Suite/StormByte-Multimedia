@@ -407,7 +407,7 @@ namespace StormByte {
 					 */
 					Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 						enum Producer name,
-						Kinds receives, Kinds produces) noexcept;
+						Kinds receives, Kinds produces);
 
 					/**
 					 * @}
@@ -567,7 +567,7 @@ namespace StormByte {
 					 * @endinternal
 					 */
 					void Mount(StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper,
-						StormByte::Safe::Unique<Backend::Pipeline::Worker> worker) noexcept;
+						StormByte::Safe::Unique<Backend::Pipeline::Worker> worker);
 
 					/**
 					 * @}

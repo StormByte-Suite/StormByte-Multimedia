@@ -472,7 +472,7 @@ namespace StormByte {
 							 * Transcoder::Filter. Both are allowed; there is no dedup.
 							 */
 							template<typename FilterType, typename... Args>
-							Track& Filter(Args&&... args) noexcept {
+							Track& Filter(Args&&... args) {
 								m_owner->AttachFilter(m_slot,
 									StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<FilterType>(std::forward<Args>(args)...));
 								return *this;
@@ -755,7 +755,7 @@ namespace StormByte {
 					 * are allowed; there is no dedup.
 					 */
 					template<typename FilterType, typename... Args>
-					Transcoder& Filter(Args&&... args) noexcept {
+					Transcoder& Filter(Args&&... args) {
 						static_assert(StormByte::Type::DerivedFrom<FilterType, Filter::Analytics>,
 							"Track filters attach on Track::Filter");
 						AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg>::MakePointer<FilterType>(std::forward<Args>(args)...));
@@ -1069,13 +1069,13 @@ namespace StormByte {
 					 * @param slot Job map index.
 					 * @param filter Filter instance.
 					 */
-					void AttachFilter(StormByte::Size slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
+					void AttachFilter(StormByte::Size slot, StormByte::Safe::Shared<Filter::FFmpeg> filter);
 
 					/**
 					 * @brief Appends a global analytics filter (one node).
 					 * @param filter Filter instance.
 					 */
-					void AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept;
+					void AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter);
 
 					StormByte::Safe::Shared<StormByte::Logger::Log> m_app_log;					///< Application logger used by pipeline stages
 					StormByte::Safe::Shared<StormByte::Logger::Log> m_logger;					///< Job logger after InstallLog

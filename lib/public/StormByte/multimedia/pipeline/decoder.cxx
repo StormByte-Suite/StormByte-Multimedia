@@ -83,7 +83,7 @@ using namespace StormByte::Multimedia::Pipeline;
 using StormByte::Logger::Level;
 
 Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	int track, DecoderFlags flags) noexcept
+	int track, DecoderFlags flags)
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags(flags), m_part(0), m_look(false) {
 	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
@@ -92,7 +92,7 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 }
 
 Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	int track, EncodeLook) noexcept
+	int track, EncodeLook)
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true), m_lookStamp(Producer::Encoder) {
 	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
@@ -101,7 +101,7 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 }
 
 Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	int track, RemuxLook) noexcept
+	int track, RemuxLook)
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true), m_lookStamp(Producer::Remuxer) {
 	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),
@@ -110,7 +110,7 @@ Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 }
 
 Decoder::Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-	int track, SourceLook) noexcept
+	int track, SourceLook)
 :	Step(std::move(log), Producer::Decoder, Kinds{Kind::Packet}, Kinds{Kind::Frame}),
 	m_index(track), m_flags{}, m_part(0), m_look(true) {
 	Mount(StormByte::Safe::MakeUnique<Backend::Pipeline::Detail::Pumper::Through>(Face()),

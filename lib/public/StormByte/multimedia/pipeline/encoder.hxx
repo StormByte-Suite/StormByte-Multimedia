@@ -156,7 +156,7 @@ namespace StormByte {
 					 * @param codec Registry codec. Must HasAccess(Write) at open.
 					 */
 					Encoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-						int output_index, const Codec& codec) noexcept;
+						int output_index, const Codec& codec);
 
 					/**
 					 * @brief Copy constructor.

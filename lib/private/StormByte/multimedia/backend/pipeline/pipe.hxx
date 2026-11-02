@@ -115,7 +115,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			/**
 			 * @brief Creates empty hoppers and provider-owned wait synchronization.
 			 */
-			Pipe() noexcept;
+			Pipe();
 
 			/**
 			 * @brief Copying a registered consumer is not allowed.

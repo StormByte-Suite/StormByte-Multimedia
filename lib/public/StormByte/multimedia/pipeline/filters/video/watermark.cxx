@@ -717,20 +717,20 @@ struct Watermark::Svg {
 
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::String logo, Anchor anchor, unsigned opacity, int margin,
-	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor)
 : Watermark(std::move(log), std::move(logo), StormByte::Safe::Binary{},
 	StormByte::Safe::Optional<Anchor>{anchor}, {}, opacity, margin, false, std::move(designedFor)) {}
 
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	const StormByte::Safe::Binary& logo, Anchor anchor, unsigned opacity, int margin,
-	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor)
 : Watermark(std::move(log), StormByte::Safe::String{}, logo,
 	StormByte::Safe::Optional<Anchor>{anchor}, {}, opacity, margin, true, std::move(designedFor)) {}
 
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::String logo, StormByte::Multimedia::Property::Point position,
 	unsigned opacity,
-	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor)
 : Watermark(std::move(log), std::move(logo), StormByte::Safe::Binary{}, {},
 	StormByte::Safe::Optional<StormByte::Multimedia::Property::Point>{position},
 	opacity, 0, false, std::move(designedFor)) {}
@@ -738,7 +738,7 @@ Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	const StormByte::Safe::Binary& logo, StormByte::Multimedia::Property::Point position,
 	unsigned opacity,
-	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor)
 : Watermark(std::move(log), StormByte::Safe::String{}, logo, {},
 	StormByte::Safe::Optional<StormByte::Multimedia::Property::Point>{position},
 	opacity, 0, true, std::move(designedFor)) {}
@@ -748,7 +748,7 @@ Watermark::Watermark(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	StormByte::Safe::Optional<Anchor> anchor,
 	StormByte::Safe::Optional<StormByte::Multimedia::Property::Point> position,
 	unsigned opacity, int margin, bool binaryInput,
-	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor) noexcept
+	StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> designedFor)
 : Filter::Process(std::move(log), "watermark"),
 	m_logo(logo),
 	m_anchor(std::move(anchor)), m_point(std::move(position)),

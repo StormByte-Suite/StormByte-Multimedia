@@ -145,7 +145,7 @@ namespace {
 }
 
 VMAF::VMAF(StormByte::Safe::Shared<StormByte::Logger::Log> log, StormByte::Safe::String model,
-	StormByte::Safe::Optional<unsigned short> threads) noexcept
+	StormByte::Safe::Optional<unsigned short> threads)
 : Filter::Analytics(std::move(log), "vmaf"),
 	m_modelName(std::move(model)), m_threads(threads) {}
 

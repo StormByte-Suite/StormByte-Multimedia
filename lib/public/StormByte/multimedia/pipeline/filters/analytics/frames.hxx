@@ -78,7 +78,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * @brief Named counter.
 			 * @param log Shared logger. Empty pointer means no log.
 			 */
-			explicit CountFrames(Safe::Shared<StormByte::Logger::Log> log) noexcept;
+			explicit CountFrames(Safe::Shared<StormByte::Logger::Log> log);
 
 			/**
 			 * @brief Copy is not allowed.

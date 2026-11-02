@@ -74,7 +74,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Pumper {
 			 * @brief Sink pumper in State::Created.
 			 * @param host Owner surface (the Step, via Host).
 			 */
-			explicit Sink(StormByte::Multimedia::Backend::Pipeline::Host& host) noexcept;
+			explicit Sink(StormByte::Multimedia::Backend::Pipeline::Host& host);
 
 			Sink(const Sink&) = delete;
 			Sink(Sink&&) noexcept = delete;

@@ -446,7 +446,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * Do not construct FFmpeg from a filter leaf.
 			 */
 			FFmpeg(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				std::string_view name, Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
+				std::string_view name, Pipeline::Kinds receives, Pipeline::Kinds produces);
 
 			/**
 			 * @}
@@ -848,7 +848,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 */
-			Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
+			Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name);
 
 			/**
 			 * @brief Named process node with an explicit mask.
@@ -858,7 +858,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param produces Kinds this leaf emits.
 			 */
 			Process(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
+				Pipeline::Kinds receives, Pipeline::Kinds produces);
 	};
 
 	/**
@@ -909,7 +909,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 */
-			ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
+			ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name);
 
 			/**
 			 * @brief Named two-pass process with an explicit mask.
@@ -919,7 +919,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param produces Kinds this leaf emits.
 			 */
 			ProcessTwoPasses(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
+				Pipeline::Kinds receives, Pipeline::Kinds produces);
 
 			/**
 			 * @brief Whether the tube is in the measure pass.
@@ -1010,7 +1010,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param log Shared logger. Empty pointer means no log.
 			 * @param name Short leaf name, borrowed during construction and copied into Safe storage.
 			 */
-			Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
+			Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name);
 
 			/**
 			 * @brief Named packet node with an explicit mask.
@@ -1020,7 +1020,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param produces Kinds this leaf emits.
 			 */
 			Packet(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
+				Pipeline::Kinds receives, Pipeline::Kinds produces);
 	};
 
 	/**
@@ -1085,7 +1085,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 *
 			 * Receives Frame. Produces Frame.
 			 */
-			Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name) noexcept;
+			Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name);
 
 			/**
 			 * @brief Named analytics node with an explicit mask.
@@ -1095,7 +1095,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @param produces Kinds this leaf emits.
 			 */
 			Analytics(StormByte::Safe::Shared<StormByte::Logger::Log> log, std::string_view name,
-				Pipeline::Kinds receives, Pipeline::Kinds produces) noexcept;
+				Pipeline::Kinds receives, Pipeline::Kinds produces);
 
 			/**
 			 * @brief Constrains pending analytics looks for the selected resource policy.

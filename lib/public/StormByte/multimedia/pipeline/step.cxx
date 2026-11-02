@@ -200,7 +200,7 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 
 class Step::PrivateState {
 	public:
-		explicit PrivateState(Step& owner) noexcept
+		explicit PrivateState(Step& owner)
 		:	surface(owner) {}
 
 		Backend::Pipeline::Pipe pipe;							///< Input/output queues and wait synchronization
@@ -214,18 +214,19 @@ class Step::PrivateState {
 
 Step::Step(StormByte::Safe::Shared<StormByte::Logger::Log> log,
 	enum Producer name,
-	Kinds receives, Kinds produces) noexcept
+	Kinds receives, Kinds produces)
 :	m_log(StormByte::Multimedia::UseLog(std::move(log), ToString(name))),
 	m_name(name),
 	m_receives(receives),
 	m_produces(produces),
-	m_state(new PrivateState(*this)),
+	m_state(nullptr),
 	m_telemetry(StormByte::Safe::MakeShared<StageTelemetry>()),
 	m_exhausted(false),
 	m_workN(0),
 	m_workMin(std::numeric_limits<std::int64_t>::max()),
 	m_workMax(0),
 	m_lastWork(0) {
+	m_state = new PrivateState(*this);
 	Log(Level::Notice, "created");
 }
 
@@ -559,7 +560,7 @@ Backend::Pipeline::Host& Step::Face() noexcept {
 }
 
 void Step::Mount(StormByte::Safe::Unique<Backend::Pipeline::Pumper> pumper,
-	StormByte::Safe::Unique<Backend::Pipeline::Worker> worker) noexcept {
+	StormByte::Safe::Unique<Backend::Pipeline::Worker> worker) {
 	if (m_state->pumper || !pumper || !worker)
 		return;
 	m_state->pumper = std::move(pumper);

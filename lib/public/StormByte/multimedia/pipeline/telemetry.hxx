@@ -112,7 +112,7 @@ namespace StormByte {
 					/**
 					 * @brief Construct empty stage counters.
 					 */
-					StageTelemetry() noexcept;
+					StageTelemetry();
 
 					/**
 					 * @brief Release stage telemetry in its providing library.

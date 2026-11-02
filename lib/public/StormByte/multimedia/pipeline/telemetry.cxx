@@ -162,7 +162,7 @@ namespace {
 	}
 }
 
-StageTelemetry::StageTelemetry() noexcept
+StageTelemetry::StageTelemetry()
 : m_process_calls(0),
 	m_input_frames(0),
 	m_input_packets(0),

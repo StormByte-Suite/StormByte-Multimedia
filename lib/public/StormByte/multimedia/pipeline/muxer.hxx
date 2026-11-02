@@ -227,7 +227,7 @@ namespace StormByte {
 					 * connections reserve all muxable tracks required by the Plan, or the
 					 * stage is stopped or fails.
 					 */
-					explicit Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
+					explicit Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log);
 
 					/**
 					 * @brief Copy constructor (deleted).

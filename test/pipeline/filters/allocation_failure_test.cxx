@@ -8,6 +8,8 @@
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/nlmeans.hxx>
+#include <StormByte/multimedia/pipeline/filters/analytics/frames.hxx>
+#include <StormByte/multimedia/pipeline/filters/analytics/vmaf.hxx>
 #include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
@@ -57,6 +59,45 @@ namespace {
 		++denied;
 		errno = ENOMEM;
 		return true;
+	}
+
+	class TestStep final: public Pipeline::Step {
+		public:
+			TestStep(): Step({}, Pipeline::Producer::Encoder, {}, {}) {}
+	};
+
+	static_assert(!noexcept(TestStep{}));
+
+	int TestFactoryAllocationFailure() {
+		unsigned caught = 0;
+		for (std::size_t position = 0; position < 80; ++position) {
+			reject_after = position;
+			try {
+				TestStep step;
+				reject_after = std::numeric_limits<std::size_t>::max();
+			} catch (const StormByte::Safe::AllocationError&) {
+				++caught;
+			} catch (const std::bad_alloc&) {
+				++caught;
+			}
+			reject_after = std::numeric_limits<std::size_t>::max();
+		}
+		TEST_REQUIRE(caught > 0);
+		caught = 0;
+		for (std::size_t position = 0; position < 96; ++position) {
+			reject_after = position;
+			try {
+				Pipeline::Filter::Video::CountFrames filter({});
+				reject_after = std::numeric_limits<std::size_t>::max();
+			} catch (const StormByte::Safe::AllocationError&) {
+				++caught;
+			} catch (const std::bad_alloc&) {
+				++caught;
+			}
+			reject_after = std::numeric_limits<std::size_t>::max();
+		}
+		TEST_REQUIRE(caught > 0);
+		return 0;
 	}
 
 	int TestSubtitleAllocationFailure() {
@@ -300,6 +341,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_worker_without_allocations", TestCoordinatorWorkerExhaustion},
 		TestEntry{"test_transcoder_cancel_without_allocations", TestCoordinatorCancelExhaustion},
 		TestEntry{"test_writer_destruction_without_allocations", TestWriterDestructionExhaustion},
+		TestEntry{"test_stage_factory_allocation_failure", TestFactoryAllocationFailure},
 		TestEntry{"test_subtitle_allocation_failure", TestSubtitleAllocationFailure}
 	};
 	return RunSelectedTest(argc, argv, tests);

@@ -51,7 +51,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/pumper/through.hxx>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Pumper {
-	Through::Through(StormByte::Multimedia::Backend::Pipeline::Host& host) noexcept
+	Through::Through(StormByte::Multimedia::Backend::Pipeline::Host& host)
 	:	StormByte::Multimedia::Backend::Pipeline::Pumper(host) {}
 
 	void Through::Pump() noexcept {

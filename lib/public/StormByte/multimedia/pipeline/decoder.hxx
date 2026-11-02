@@ -170,7 +170,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * Setup waits for demuxer >> decoder.
 			 */
 			explicit Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				int track, DecoderFlags flags = DecoderFlags{}) noexcept;
+				int track, DecoderFlags flags = DecoderFlags{});
 
 			/**
 			 * @brief Copy constructor.
@@ -366,7 +366,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @ref Producer::Encoder. Label is Decoder(look encode).
 			 */
 			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				int track, EncodeLook tag) noexcept;
+				int track, EncodeLook tag);
 
 			/**
 			 * @brief Post-remux recon for Analytics.
@@ -379,7 +379,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * @ref Producer::Remuxer. Label is Decoder(look remux).
 			 */
 			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				int track, RemuxLook tag) noexcept;
+				int track, RemuxLook tag);
 
 			/**
 			 * @brief Packet-origin recon for Analytics (Demuxer remux stretch).
@@ -392,7 +392,7 @@ namespace StormByte::Multimedia::Pipeline {
 			 * frames keep @ref Producer::Decoder.
 			 */
 			Decoder(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-				int track, SourceLook tag) noexcept;
+				int track, SourceLook tag);
 
 		private:
 			using Step::Log;

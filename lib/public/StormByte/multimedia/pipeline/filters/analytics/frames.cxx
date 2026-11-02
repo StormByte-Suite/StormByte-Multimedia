@@ -65,7 +65,7 @@ namespace {
 	}
 }
 
-CountFrames::CountFrames(Safe::Shared<StormByte::Logger::Log> log) noexcept
+CountFrames::CountFrames(Safe::Shared<StormByte::Logger::Log> log)
 : Analytics(std::move(log), "frames") {}
 
 CountFrames::~CountFrames() noexcept = default;

@@ -99,7 +99,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Audio {
 			 * @param threshold Impulse threshold 1–100. Empty → FFmpeg default (2).
 			 */
 			Adeclick(Safe::Shared<StormByte::Logger::Log> log,
-					Safe::Optional<double> threshold = {}) noexcept;
+					Safe::Optional<double> threshold = {});
 
 			/**
 			 * @brief Copy construction is disabled.

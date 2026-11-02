@@ -114,7 +114,7 @@ class Muxer::Connections final {
 		std::map<int, int> remuxes;	///< Explicit remux slots mapped to origin indices.
 };
 
-Muxer::Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept
+Muxer::Muxer(StormByte::Safe::Shared<StormByte::Logger::Log> log)
 : Step(std::move(log), Producer::Muxer, Kinds{Kind::Packet}, Kinds{}),
 	m_container(nullptr),
 	m_origin(nullptr),

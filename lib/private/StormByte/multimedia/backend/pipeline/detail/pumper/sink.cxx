@@ -51,7 +51,7 @@
 #include <StormByte/multimedia/backend/pipeline/detail/pumper/sink.hxx>
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Pumper {
-	Sink::Sink(StormByte::Multimedia::Backend::Pipeline::Host& host) noexcept
+	Sink::Sink(StormByte::Multimedia::Backend::Pipeline::Host& host)
 	:	StormByte::Multimedia::Backend::Pipeline::Pumper(host) {}
 
 	void Sink::Pump() noexcept {

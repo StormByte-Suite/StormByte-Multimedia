@@ -466,13 +466,13 @@ bool Transcoder::ValidSlot(StormByte::Size slot) const noexcept {
 	return m_backend && slot < m_backend->Mapped.size();
 }
 
-void Transcoder::AttachFilter(StormByte::Size slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
+void Transcoder::AttachFilter(StormByte::Size slot, StormByte::Safe::Shared<Filter::FFmpeg> filter) {
 	if (!ValidSlot(slot) || !filter)
 		return;
 	m_backend->Mapped[slot].Filters.push_back(std::move(filter));
 }
 
-void Transcoder::AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter) noexcept {
+void Transcoder::AttachAnalytics(StormByte::Safe::Shared<Filter::FFmpeg> filter) {
 	if (!m_backend || !filter)
 		return;
 	m_backend->Analytics.push_back(std::move(filter));

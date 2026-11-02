@@ -54,6 +54,7 @@
 #include <StormByte/safe/memory_order.hxx>
 
 #include <chrono>
+#include <new>
 #include <utility>
 
 using namespace StormByte::Multimedia::Backend::Pipeline;
@@ -71,7 +72,7 @@ namespace {
 	}
 }
 
-Pumper::Pumper(Host& host) noexcept
+Pumper::Pumper(Host& host)
 :	m_host(host),
 	m_state(static_cast<int>(State::Created)) {}
 
@@ -86,6 +87,7 @@ void Pumper::Bind(StormByte::Safe::Unique<Worker> worker) noexcept {
 }
 
 void Pumper::Launch() noexcept {
+	try {
 	if (m_thread.joinable() || !m_worker || Stopping())
 		return;
 	m_thread = StormByte::Safe::Thread([this]() {
@@ -137,6 +139,11 @@ void Pumper::Launch() noexcept {
 		telemetry.Finish();
 		m_host.Completed(success);
 	});
+	} catch (const StormByte::Safe::AllocationError&) {
+		m_host.Fail();
+	} catch (const std::bad_alloc&) {
+		m_host.Fail();
+	}
 }
 
 void Pumper::Halt() noexcept {

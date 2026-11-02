@@ -148,7 +148,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * @brief Pumper in State::Created, bound to @p host.
 			 * @param host Owner surface (Step or Filter::FFmpeg).
 			 */
-			explicit Pumper(Host& host) noexcept;
+			explicit Pumper(Host& host);
 
 			/**
 			 * @brief Loop body. Source, Through and Sink override.

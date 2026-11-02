@@ -142,7 +142,7 @@ namespace StormByte {
 					 * @param log Shared logger. Empty pointer means no log.
 					 * @param in Origin stream index.
 					 */
-					explicit Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in) noexcept;
+					explicit Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in);
 
 					/**
 					 * @brief Remuxes one origin into an explicit destination slot.
@@ -150,7 +150,7 @@ namespace StormByte {
 					 * @param in Origin stream index.
 					 * @param out Mux output slot, independent of @p in.
 					 */
-					Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in, int out) noexcept;
+					Remuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log, int in, int out);
 
 					/**
 					 * @brief Copy constructor.

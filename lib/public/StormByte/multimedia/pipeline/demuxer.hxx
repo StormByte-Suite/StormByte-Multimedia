@@ -167,7 +167,7 @@ namespace StormByte {
 					 * @brief Demuxer. Launches; Setup waits for a Plan.
 					 * @param log Shared logger. Empty pointer means no log.
 					 */
-					explicit Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log) noexcept;
+					explicit Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log);
 
 					/**
 					 * @brief Launch with a clock already used by duration resolution.
@@ -175,7 +175,7 @@ namespace StormByte {
 					 * @param progress Shared job clock; empty creates a fresh clock.
 					 */
 					Demuxer(StormByte::Safe::Shared<StormByte::Logger::Log> log,
-						StormByte::Safe::Shared<class Progress> progress) noexcept;
+						StormByte::Safe::Shared<class Progress> progress);
 
 					/**
 					 * @brief Copy constructor.

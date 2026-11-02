@@ -75,7 +75,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Pumper {
 			 * @brief Source pumper in State::Created.
 			 * @param host Owner surface (the Step, via Host).
 			 */
-			explicit Source(StormByte::Multimedia::Backend::Pipeline::Host& host) noexcept;
+			explicit Source(StormByte::Multimedia::Backend::Pipeline::Host& host);
 
 			Source(const Source&) = delete;
 			Source(Source&&) noexcept = delete;

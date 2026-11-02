@@ -73,7 +73,7 @@ namespace {
 	}
 }
 
-Pipe::Pipe() noexcept = default;
+Pipe::Pipe() = default;
 
 Pipe::~Pipe() noexcept {
 	m_in.Unnotify();

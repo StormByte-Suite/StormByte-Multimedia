@@ -166,7 +166,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			 * they do not enforce a hard process RSS ceiling.
 			 */
 			VMAF(StormByte::Safe::Shared<StormByte::Logger::Log> log, StormByte::Safe::String model,
-				StormByte::Safe::Optional<unsigned short> threads = {}) noexcept;
+				StormByte::Safe::Optional<unsigned short> threads = {});
 
 			/**
 			 * @brief Copy is not allowed. Each leaf owns libvmaf contexts.
