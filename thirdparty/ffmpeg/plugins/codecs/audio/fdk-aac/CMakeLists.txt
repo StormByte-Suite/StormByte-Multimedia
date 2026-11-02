@@ -2,6 +2,10 @@ plugin_require(WITH_NONFREE "libfdk_aac=disabled")
 
 set(FDK_AAC_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
 set(FDK_AAC_COMPONENT "FDK_AAC codec")
+set(FDK_AAC_PATCHES
+	"${CMAKE_CURRENT_LIST_DIR}/0001-widen-fractional-samples-without-negative-shift.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-log2-avoid-negative-exponent-shift.patch"
+)
 
 set(FDK_AAC_OPTIONS
 	"-DBUILD_PROGRAMS=OFF"
@@ -19,7 +23,7 @@ buildmaster_component(
 	"${FDK_AAC_OPTIONS}"
 	"${FFMPEG_BUNDLED_TYPE}"
 	"fdk-aac"
-	"GIT={RESET;PATCH=${CMAKE_CURRENT_LIST_DIR}/0001-widen-fractional-samples-without-negative-shift.patch;TITLE=FDK-AAC fixed-point conversion}"
+	"GIT={RESET;PATCH={${FDK_AAC_PATCHES}};TITLE=FDK-AAC fixed-point conversion}"
 )
 buildmaster_group_add(ff-audio fdk-aac)
 register_plugin(fdk-aac "libfdk_aac=enabled")

@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC normalizes signed logarithm exponents through widened multiplication instead of shifting negative values.
 - Bundled Kvazaar copies reconstructed four- and eight-pixel rows without dereferencing potentially misaligned scalar output pointers.
 - Bundled SVT-AV1 stores four-byte high-bit-depth deblocking tails without assuming four-byte destination alignment; the shared SSE2 store helper preserves the exact access width.
 - Bundled SVT-AV1 reads full-precision two-tap coefficient pairs through the same unaligned-safe helper as the half-precision interpolation path.

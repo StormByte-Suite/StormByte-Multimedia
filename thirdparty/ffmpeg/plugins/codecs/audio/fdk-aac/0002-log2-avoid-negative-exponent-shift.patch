@@ -1,0 +1,32 @@
+From db747d0d1235401716cfb336461885e2783ac997 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] libFDK: normalize signed log2 exponents without negative
+ shifts
+
+fLog2 combines its fractional result with a normalized exponent.
+Negative exponents make the signed left shift undefined. Form the scale
+factor with a positive INT64 shift and multiply the exponent in that
+wider type before converting back. The headroom-derived scale keeps the
+normalized exponent representable. Reproduced by the existing AAC
+surround decoding test with UBSan.
+---
+ libFDK/include/fixpoint_math.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libFDK/include/fixpoint_math.h b/libFDK/include/fixpoint_math.h
+index 51df4d7..bb4d251 100644
+--- a/libFDK/include/fixpoint_math.h
++++ b/libFDK/include/fixpoint_math.h
+@@ -854,7 +854,7 @@ FDK_INLINE FIXP_DBL fLog2(FIXP_DBL x_m, INT x_e, INT *result_e) {
+       /* The -1 in the right shift of result_m compensates the fMultDiv2() above
+        * in the taylor polynomial evaluation loop.*/
+       result_m = (result_m >> (enorm - 1)) +
+-                 ((FIXP_DBL)x_e << (DFRACT_BITS - 1 - enorm));
++                 (FIXP_DBL)((INT64)x_e * ((INT64)1 << (DFRACT_BITS - 1 - enorm)));
+ 
+       *result_e = enorm;
+     } else {
+-- 
+2.56.0
+
