@@ -1,0 +1,39 @@
+From 82963c1f0072cc93b44183ac5e4303d00552ac1c Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:30:39 +0100
+Subject: [PATCH] AACenc: normalize signed block-switch samples without
+ negative shifts
+
+The block-switch energy calculation widens signed PCM by a fixed left
+shift and doubles signed high-pass state the same way. Use bounded
+multiplication for the PCM conversion and an unsigned shift for the
+state bit pattern, retaining the existing rounding and filter
+arithmetic. Reproduced by the stereo AAC encoding test with UBSan.
+---
+ libAACenc/src/block_switch.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libAACenc/src/block_switch.cpp b/libAACenc/src/block_switch.cpp
+index c132253..a35cf6f 100644
+--- a/libAACenc/src/block_switch.cpp
++++ b/libAACenc/src/block_switch.cpp
+@@ -386,13 +386,13 @@ static void FDKaacEnc_CalcWindowEnergy(
+ #if SAMPLE_BITS == DFRACT_BITS
+       tempUnfiltered = (FIXP_DBL)*pTimeSignal++ >> 1;
+ #else
+-      tempUnfiltered = (FIXP_DBL)*pTimeSignal++
+-                       << (DFRACT_BITS - SAMPLE_BITS - 1);
++      tempUnfiltered = (FIXP_DBL)*pTimeSignal++ *
++                       ((FIXP_DBL)1 << (DFRACT_BITS - SAMPLE_BITS - 1));
+ #endif
+       t1 = fMultDiv2(hiPassCoeff1, tempUnfiltered - temp_iirState0);
+       t2 = fMultDiv2(hiPassCoeff0, temp_iirState1);
+       temp_iirState0 = tempUnfiltered;
+-      temp_iirState1 = (t1 - t2) << 1;
++      temp_iirState1 = (FIXP_DBL)((ULONG)(t1 - t2) << 1);
+ 
+       temp_windowNrg += (LONG)fPow2Div2(temp_iirState0) >>
+                         (BLOCK_SWITCH_ENERGY_SHIFT - 1 - 2);
+-- 
+2.56.0
+

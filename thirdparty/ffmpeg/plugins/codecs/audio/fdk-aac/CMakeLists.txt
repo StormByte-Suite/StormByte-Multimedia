@@ -9,6 +9,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0004-pow2-avoid-negative-integral-part-shift.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0005-scale-avoid-negative-saturating-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0006-fixmul-avoid-negative-product-shifts.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0007-block-switch-avoid-negative-sample-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS
