@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled Vorbis packs negative Bark-window lower bounds through representable multiplication instead of undefined signed left shifts.
 - Bundled x265 skips the zero-length copy from its initially null NAL buffer when allocating storage for the first output NAL.
 - Bundled Kvazaar reads eight-pixel residual and prediction rows with unaligned-safe SIMD loads rather than dereferencing potentially misaligned `int64_t` pointers.
 - Bundled SVT-AV1 uses unaligned-safe loads when packing level neighborhoods and reading two-tap interpolation coefficients, without changing row order or load width.

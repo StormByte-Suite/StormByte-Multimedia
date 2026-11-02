@@ -1,0 +1,33 @@
+From bbb869759918f683ab055718e03c9c25ba4e1bd5 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:55:44 +0100
+Subject: [PATCH] psy: avoid shifting a negative Bark window lower bound
+
+The lower Bark window bound can be negative for the first frequency
+bins. Packing it into p->bark with a signed left shift is undefined.
+
+Multiply the signed lower bound by 65536 instead. The configured window
+and block sizes keep the result within int range, and the packed value
+is unchanged on the two's-complement targets supported by the decoder.
+
+Reproduced with UBSan during existing Vorbis encoder tests.
+---
+ lib/psy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/psy.c b/lib/psy.c
+index 036b094..72ef475 100644
+--- a/lib/psy.c
++++ b/lib/psy.c
+@@ -316,7 +316,7 @@ void _vp_psy_init(vorbis_look_psy *p,vorbis_info_psy *vi,
+     for(;hi<=n && (hi<i+vi->noisewindowhimin ||
+           toBARK(rate/(2*n)*hi)<(bark+vi->noisewindowhi));hi++);
+ 
+-    p->bark[i]=((lo-1)<<16)+(hi-1);
++    p->bark[i]=(lo-1)*65536+(hi-1);
+ 
+   }
+ 
+-- 
+2.56.0
+

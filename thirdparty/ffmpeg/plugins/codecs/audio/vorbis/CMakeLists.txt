@@ -3,6 +3,7 @@ set(VORBIS_COMPONENT "Vorbis codec")
 set(VORBIS_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-cmake4-minimum-version.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0002-cmake-declare-libm-in-pkg-config-when-it-exists.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0003-psy-avoid-negative-bark-shift.patch"
 )
 
 set(VORBIS_OPTIONS
