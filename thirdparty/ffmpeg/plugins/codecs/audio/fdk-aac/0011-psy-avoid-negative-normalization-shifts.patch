@@ -1,0 +1,40 @@
+From bc560460891a01c2765a97ada82fb0c867682964 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:37:30 +0100
+Subject: [PATCH] AACenc: normalize signed psychoacoustic data without negative
+ shifts
+
+The psychoacoustic pass doubles a possibly negative difference between
+per-band and final scaling, then left-shifts signed spectral samples by
+the selected headroom. Use bounded multiplication for the exponent
+difference and unsigned sample bit patterns for normalization.
+Reproduced by stereo AAC encoding with UBSan.
+---
+ libAACenc/src/psy_main.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libAACenc/src/psy_main.cpp b/libAACenc/src/psy_main.cpp
+index f6345e4..d6e3032 100644
+--- a/libAACenc/src/psy_main.cpp
++++ b/libAACenc/src/psy_main.cpp
+@@ -694,7 +694,7 @@ AAC_ENCODER_ERROR FDKaacEnc_psyMain(INT channels, PSY_ELEMENT *psyElement,
+       for (w = 0; w < nWindows[ch]; w++) {
+         for (sfb = 0; sfb < psyData[ch]->sfbActive; sfb++) {
+           INT scale = fixMax(0, (pSfbMaxScaleSpec[ch] + w_maxSfb_ch)[sfb] - 4);
+-          scale = fixMin((scale - finalShift) << 1, DFRACT_BITS - 1);
++          scale = fixMin((scale - finalShift) * 2, DFRACT_BITS - 1);
+           if (scale >= 0)
+             (pSfbEnergy[ch] + w_maxSfb_ch)[sfb] >>= (scale);
+           else
+@@ -716,7 +716,7 @@ AAC_ENCODER_ERROR FDKaacEnc_psyMain(INT channels, PSY_ELEMENT *psyElement,
+         for (w = 0; w < nWindows[ch]; w++) {
+           FIXP_DBL *spectrum = &mdctSpectrum[wOffset];
+           for (line = 0; line < lowpassLine; line++) {
+-            spectrum[line] <<= finalShift;
++            spectrum[line] = (FIXP_DBL)((ULONG)spectrum[line] << finalShift);
+           }
+           wOffset += wLen;
+ 
+-- 
+2.56.0
+

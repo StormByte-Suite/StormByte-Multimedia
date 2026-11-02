@@ -13,6 +13,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0008-scale-avoid-negative-value-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0009-band-energy-avoid-negative-spectrum-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0010-scale-check-negative-saturation-in-widened-domain.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0011-psy-avoid-negative-normalization-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS

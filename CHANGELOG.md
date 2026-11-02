@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled FDK-AAC normalizes signed psychoacoustic spectral samples and doubles bounded scale differences without left-shifting negative values.
 - Bundled FDK-AAC clamps negative saturated-left-shift results correctly when the shift reaches or exceeds the destination width, verified against widened reference calculations for 8-, 16-, 24- and 32-bit outputs.
 - Bundled Kvazaar's AVX2 SAO edge-distortion callback matches its strategy's offset-parameter type, avoiding incompatible indirect calls.
 - Bundled FDK-AAC normalizes signed MDCT band spectra through unsigned shifts and doubles bounded signed energy-exponent differences with multiplication.
