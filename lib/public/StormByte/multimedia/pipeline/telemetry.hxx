@@ -90,6 +90,7 @@ namespace StormByte {
 			 * input counters count only actual units. Wait timings measure
 			 * time blocked on the stage's pipeline condition. Snapshots may
 			 * be read while the worker runs.
+			 * Owned labels and error snapshots may allocate and propagate allocation failures.
 			 *
 			 * @par Memory
 			 * Memory is deliberately not attributed to a stage. Multimedia
@@ -122,13 +123,13 @@ namespace StormByte {
 					 * @brief Set the stage origin label.
 					 * @param origin Human-readable stage identity.
 					 */
-					void SetOrigin(std::string_view origin) const noexcept;
+					void SetOrigin(std::string_view origin) const;
 
 					/**
 					 * @brief Stage identity recorded by its owning object.
 					 * @return Owned StormByte UTF-8 string.
 					 */
-					StormByte::Safe::String Origin() const noexcept;
+					StormByte::Safe::String Origin() const;
 
 					/**
 					 * @brief Record one consumed unit.
@@ -170,7 +171,7 @@ namespace StormByte {
 					 * @brief Store a stage failure reason.
 					 * @param reason Failure text.
 					 */
-					void SetError(StormByte::Safe::String reason) noexcept;
+					void SetError(StormByte::Safe::String reason);
 
 					/**
 					 * @brief Mark the start of stage setup.
@@ -276,7 +277,7 @@ namespace StormByte {
 					 * @brief Failure text, if the stage failed.
 					 * @return Failure text or empty.
 					 */
-					StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Error() const;
 
 					/**
 					 * @brief Flatten all stage counters into an owned Safe::String.
@@ -370,6 +371,8 @@ namespace StormByte {
 			 * PeakMemory is the sampled maximum, not an allocator-exact or
 			 * OS-lifetime peak. Sampling is nominally every 20 ms while the
 			 * job is running. It is not attributed to individual stages.
+			 * Stage registration and owned snapshots, including engaged memory
+			 * optionals, may allocate and propagate allocation failures.
 			 *
 			 * @par DLL boundary
 			 * Owned values use Safe storage and destruction is provider-local.
@@ -401,13 +404,13 @@ namespace StormByte {
 					 * @param metrics Stage counters to retain.
 					 */
 					void RegisterStage(StormByte::Safe::String name,
-						StormByte::Safe::Shared<const StageTelemetry> metrics) noexcept;
+						StormByte::Safe::Shared<const StageTelemetry> metrics);
 
 					/**
 					 * @brief Snapshot registered stages in registration order.
 					 * @return Owned list of names and shared metric handles.
 					 */
-					StormByte::Safe::Vector<Stage> Stages() const noexcept;
+					StormByte::Safe::Vector<Stage> Stages() const;
 
 					/**
 					 * @brief Sample current process resident memory.
@@ -420,25 +423,25 @@ namespace StormByte {
 					 * @brief Current process resident bytes at the last sample.
 					 * @return Bytes or empty if no sample succeeded.
 					 */
-					StormByte::Safe::Optional<std::uint64_t> MemoryCurrent() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> MemoryCurrent() const;
 
 					/**
 					 * @brief Lowest process resident memory sample.
 					 * @return Bytes or empty if no sample succeeded.
 					 */
-					StormByte::Safe::Optional<std::uint64_t> MemoryMinimum() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> MemoryMinimum() const;
 
 					/**
 					 * @brief Highest process resident memory sample.
 					 * @return Bytes or empty if no sample succeeded.
 					 */
-					StormByte::Safe::Optional<std::uint64_t> MemoryMaximum() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> MemoryMaximum() const;
 
 					/**
 					 * @brief Alias for the maximum sampled resident-memory value.
 					 * @return Sampled peak bytes or empty if no sample succeeded.
 					 */
-					StormByte::Safe::Optional<std::uint64_t> PeakMemory() const noexcept;
+					StormByte::Safe::Optional<std::uint64_t> PeakMemory() const;
 
 					/**
 					 * @brief Number of successful resident-memory samples.

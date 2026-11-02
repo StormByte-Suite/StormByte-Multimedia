@@ -301,16 +301,16 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			virtual enum StormByte::Multimedia::Type Media() const noexcept = 0;
 
 			/**
-			 * @brief `Media()/name` computed on each call.
+			 * @brief `Media()/name` computed on each call; may allocate.
 			 * @return Identity string.
 			 */
-			StormByte::Safe::String Name() const noexcept;
+			StormByte::Safe::String Name() const;
 
 			/**
 			 * @brief Shared counters retained independently of this filter.
 			 * @return Const stage metrics with this filter's origin label.
 			 */
-			StormByte::Safe::Shared<const Pipeline::StageTelemetry> Telemetry() const noexcept;
+			StormByte::Safe::Shared<const Pipeline::StageTelemetry> Telemetry() const;
 
 			/**
 			 * @brief Leaf token used in reports (`vmaf`).

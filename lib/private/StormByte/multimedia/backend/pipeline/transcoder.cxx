@@ -112,7 +112,7 @@ namespace {
 	}
 
 	void RegisterStage(StormByte::Multimedia::Pipeline::JobTelemetry& job,
-		const StormByte::Multimedia::Pipeline::Step& stage) noexcept {
+		const StormByte::Multimedia::Pipeline::Step& stage) {
 		auto metrics = stage.Telemetry();
 		auto name = metrics->Origin();
 		job.RegisterStage(std::move(name), std::move(metrics));

@@ -288,9 +288,11 @@ namespace StormByte {
 
 					/**
 					 * @brief Shared stage counters, retained independently of this Step.
+					 *
+					 * Refreshing the owned stage label may allocate.
 					 * @return Const metrics handle identifying this stage.
 					 */
-					StormByte::Safe::Shared<const StageTelemetry> Telemetry() const noexcept;
+					StormByte::Safe::Shared<const StageTelemetry> Telemetry() const;
 
 					/**
 					 * @brief Whether this step can take work.

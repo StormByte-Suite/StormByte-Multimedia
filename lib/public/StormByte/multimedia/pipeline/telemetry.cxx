@@ -181,12 +181,12 @@ StageTelemetry::StageTelemetry() noexcept
 
 StageTelemetry::~StageTelemetry() noexcept = default;
 
-void StageTelemetry::SetOrigin(std::string_view origin) const noexcept {
+void StageTelemetry::SetOrigin(std::string_view origin) const {
 	StormByte::Safe::UniqueLock lock(m_origin_lock);
 	m_origin = StormByte::Safe::String{origin};
 }
 
-StormByte::Safe::String StageTelemetry::Origin() const noexcept {
+StormByte::Safe::String StageTelemetry::Origin() const {
 	StormByte::Safe::UniqueLock lock(m_origin_lock);
 	return m_origin;
 }
@@ -228,7 +228,7 @@ void StageTelemetry::SetState(State state) noexcept {
 	m_state.store(static_cast<int>(state), StormByte::Safe::MemoryOrder::Release);
 }
 
-void StageTelemetry::SetError(StormByte::Safe::String reason) noexcept {
+void StageTelemetry::SetError(StormByte::Safe::String reason) {
 	StormByte::Safe::UniqueLock lock(m_error_lock);
 	m_error = std::move(reason);
 	SetState(State::Failed);
@@ -313,7 +313,7 @@ State StageTelemetry::Status() const noexcept {
 	return static_cast<State>(m_state.load(StormByte::Safe::MemoryOrder::Acquire));
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> StageTelemetry::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> StageTelemetry::Error() const {
 	StormByte::Safe::UniqueLock lock(m_error_lock);
 	return m_error;
 }
@@ -350,7 +350,7 @@ JobTelemetry::JobTelemetry() noexcept
 JobTelemetry::~JobTelemetry() noexcept = default;
 
 void JobTelemetry::RegisterStage(StormByte::Safe::String name,
-	StormByte::Safe::Shared<const StageTelemetry> metrics) noexcept {
+	StormByte::Safe::Shared<const StageTelemetry> metrics) {
 	if (!metrics)
 		return;
 	StormByte::Safe::UniqueLock lock(m_stages_lock);
@@ -362,7 +362,7 @@ void JobTelemetry::RegisterStage(StormByte::Safe::String name,
 	m_stages.push_back(Stage{std::move(name), std::move(metrics)});
 }
 
-StormByte::Safe::Vector<JobTelemetry::Stage> JobTelemetry::Stages() const noexcept {
+StormByte::Safe::Vector<JobTelemetry::Stage> JobTelemetry::Stages() const {
 	StormByte::Safe::UniqueLock lock(m_stages_lock);
 	return m_stages;
 }
@@ -377,25 +377,25 @@ void JobTelemetry::SampleMemory() noexcept {
 	m_memory_samples.fetch_add(std::uint64_t{1}, StormByte::Safe::MemoryOrder::Relaxed);
 }
 
-StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryCurrent() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryCurrent() const {
 	if (MemorySamples() == 0)
 		return std::nullopt;
 	return m_memory_current.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
-StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMinimum() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMinimum() const {
 	if (MemorySamples() == 0)
 		return std::nullopt;
 	return m_memory_min.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
-StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMaximum() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::MemoryMaximum() const {
 	if (MemorySamples() == 0)
 		return std::nullopt;
 	return m_memory_max.load(StormByte::Safe::MemoryOrder::Relaxed);
 }
 
-StormByte::Safe::Optional<std::uint64_t> JobTelemetry::PeakMemory() const noexcept {
+StormByte::Safe::Optional<std::uint64_t> JobTelemetry::PeakMemory() const {
 	return MemoryMaximum();
 }
 

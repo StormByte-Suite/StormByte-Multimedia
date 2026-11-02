@@ -40,6 +40,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - NLMeans uses 64-bit squared sample differences and preserves the full range of native-endian 16-bit samples instead of treating them as 12-bit; full-range regression samples reproduce the original overflow under UBSan and match the scalar reference after correction.
 - Sanitizer builds disable the unused bundled liblzma command-line sandbox, avoiding its Landlock configuration error when sanitizer flags are propagated to dependencies.
 - Registry initialization, lookups and owned list snapshots propagate allocation failures instead of terminating through incorrect `noexcept` contracts. Private codec/container catalogs, stored identity construction and muxer resolution preserve that propagation; failed singleton initialization can be retried.
+- Telemetry label/error operations, filter and step telemetry, stage registration, and owned snapshots propagate allocation failures, including the heap-backed optional memory counters, instead of terminating under incorrect `noexcept` contracts.
 
 ### Changed
 

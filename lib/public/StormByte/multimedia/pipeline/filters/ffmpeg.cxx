@@ -223,14 +223,14 @@ FFmpeg::~FFmpeg() noexcept {
 	delete m_state;
 }
 
-StormByte::Safe::String FFmpeg::Name() const noexcept {
+StormByte::Safe::String FFmpeg::Name() const {
 	StormByte::Safe::String name(ToString(Media()));
 	name.append("/");
 	name.append(m_name);
 	return name;
 }
 
-StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::StageTelemetry> FFmpeg::Telemetry() const noexcept {
+StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::StageTelemetry> FFmpeg::Telemetry() const {
 	const StormByte::Safe::String origin = Name();
 	m_telemetry->SetOrigin(origin);
 	return StormByte::Safe::StaticPointerCast<const StormByte::Multimedia::Pipeline::StageTelemetry>(m_telemetry);

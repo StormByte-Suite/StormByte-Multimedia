@@ -397,7 +397,7 @@ Filters::Reports() const noexcept {
 	return out;
 }
 
-StormByte::Safe::Vector<TelemetryStage> Filters::StageTelemetries() const noexcept {
+StormByte::Safe::Vector<TelemetryStage> Filters::StageTelemetries() const {
 	StormByte::Safe::Vector<TelemetryStage> out;
 	out.reserve(m_reports.size());
 	for (const auto& item : m_reports) {

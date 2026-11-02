@@ -349,7 +349,7 @@ State Step::Status() const noexcept {
 	return m_error ? State::Failed : State::Created;
 }
 
-StormByte::Safe::Shared<const StageTelemetry> Step::Telemetry() const noexcept {
+StormByte::Safe::Shared<const StageTelemetry> Step::Telemetry() const {
 	const auto origin = Label();
 	m_telemetry->SetOrigin(origin);
 	return m_telemetry;

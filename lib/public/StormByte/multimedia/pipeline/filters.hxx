@@ -286,8 +286,10 @@ namespace StormByte {
 					/**
 					 * @brief Telemetry handles for every attached filter.
 					 * @return Named stage metrics in mount order.
+					 *
+					 * Building the owned labels and result vector may allocate.
 					 */
-					StormByte::Safe::Vector<TelemetryStage> StageTelemetries() const noexcept;
+					StormByte::Safe::Vector<TelemetryStage> StageTelemetries() const;
 
 					/**
 					 * @class Handle
