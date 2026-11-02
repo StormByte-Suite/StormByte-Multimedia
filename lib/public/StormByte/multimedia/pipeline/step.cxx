@@ -417,7 +417,7 @@ bool Step::Stopping() const noexcept {
 	return state == State::Stopping || state == State::Stopped || state == State::Failed;
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> Step::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Step::Error() const {
 	StormByte::Safe::UniqueLock lock(m_state->mutex);
 	return m_error;
 }

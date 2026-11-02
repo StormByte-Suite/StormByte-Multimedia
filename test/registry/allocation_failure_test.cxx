@@ -11,6 +11,7 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
+#include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/safe/exception.hxx>
 
 #include <cerrno>
@@ -28,6 +29,7 @@ using StormByte::Multimedia::Pipeline::JobTelemetry;
 using StormByte::Multimedia::Pipeline::Filter::FFmpeg;
 using StormByte::Multimedia::Pipeline::Filters;
 using StormByte::Multimedia::Pipeline::Step;
+using StormByte::Multimedia::Pipeline::Transcoder;
 using StormByte::Safe::String;
 
 static_assert(!noexcept(Registry::Instance()));
@@ -54,7 +56,11 @@ static_assert(!noexcept(std::declval<const JobTelemetry&>().PeakMemory()));
 static_assert(!noexcept(std::declval<const FFmpeg&>().Name()));
 static_assert(!noexcept(std::declval<const FFmpeg&>().Telemetry()));
 static_assert(!noexcept(std::declval<const Step&>().Telemetry()));
+static_assert(!noexcept(std::declval<const Step&>().Error()));
 static_assert(!noexcept(std::declval<const Filters&>().StageTelemetries()));
+static_assert(!noexcept(std::declval<const Filters&>().Reports()));
+static_assert(!noexcept(std::declval<const Transcoder&>().Error()));
+static_assert(!noexcept(std::declval<const Transcoder&>().Reports()));
 
 #ifndef __has_feature
 #define __has_feature(feature) 0

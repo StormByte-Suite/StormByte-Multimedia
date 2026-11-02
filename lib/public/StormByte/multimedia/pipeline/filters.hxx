@@ -281,7 +281,7 @@ namespace StormByte {
 					 * @return Name / report pairs. Empty reports are omitted.
 					 */
 					StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>>
-						Reports() const noexcept;
+						Reports() const;
 
 					/**
 					 * @brief Telemetry handles for every attached filter.

@@ -816,7 +816,7 @@ namespace StormByte {
 					 * @brief Failure text.
 					 * @return Message, or empty.
 					 */
-					StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Error() const;
 
 					/**
 					 * @brief Shared telemetry for the original input reader.
@@ -853,7 +853,7 @@ namespace StormByte {
 					 * A low score is still Ok. Notice lines from a leaf
 					 * are log, not this API.
 					 */
-					StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> Reports() const noexcept;
+					StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> Reports() const;
 
 					/**
 					 * @brief Shared job and stage telemetry, available before Run.

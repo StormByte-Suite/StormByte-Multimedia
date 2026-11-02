@@ -688,7 +688,7 @@ bool Transcoder::Failed() const noexcept {
 	return Status() == Status::Error;
 }
 
-StormByte::Safe::Optional<StormByte::Safe::String> Transcoder::Error() const noexcept {
+StormByte::Safe::Optional<StormByte::Safe::String> Transcoder::Error() const {
 	if (!m_backend)
 		return {};
 	StormByte::Safe::UniqueLock lock(m_backend->Lock);
@@ -710,7 +710,7 @@ StormByte::Safe::Shared<const class Progress> Transcoder::Progress() const noexc
 	return m_backend->Clock;
 }
 
-StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> Transcoder::Reports() const noexcept {
+StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> Transcoder::Reports() const {
 	if (!m_backend)
 		return {};
 	return m_backend->Reports;

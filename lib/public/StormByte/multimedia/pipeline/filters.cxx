@@ -89,7 +89,7 @@ namespace {
 	}
 
 	std::string FlattenKey(std::string_view leaf, StormByte::Safe::Optional<int> track,
-		std::map<std::string, int>& seen) noexcept {
+		std::map<std::string, int>& seen) {
 		std::string base(leaf);
 		base += "[";
 		if (track)
@@ -383,7 +383,7 @@ bool Filters::Idle() const noexcept {
 }
 
 StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>>
-Filters::Reports() const noexcept {
+Filters::Reports() const {
 	StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, Filter::Report>> out;
 	std::map<std::string, int> seen;
 	out.reserve(m_reports.size());

@@ -339,7 +339,7 @@ namespace StormByte {
 					 * @brief Failure text.
 					 * @return Message, or empty.
 					 */
-					StormByte::Safe::Optional<StormByte::Safe::String> Error() const noexcept;
+					StormByte::Safe::Optional<StormByte::Safe::String> Error() const;
 
 					/**
 					 * @brief Marks the stage as failed and notifies connected stages.

@@ -43,6 +43,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Telemetry label/error operations, filter and step telemetry, stage registration, and owned snapshots propagate allocation failures, including the heap-backed optional memory counters, instead of terminating under incorrect `noexcept` contracts.
 - File probing, container resolution, attachment capture and lazy duration scans propagate allocation failures; duration observers that throw are reported as interrupted scans and remain retryable.
 - Plan construction, format resolution, validation and owned failure snapshots propagate allocation failures instead of terminating under incorrect `noexcept` contracts.
+- Filter report snapshots, job reports and owned stage/job failure snapshots also propagate allocation failures.
 
 ### Changed
 
