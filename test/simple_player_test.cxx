@@ -988,7 +988,14 @@ int test_av_seek_switch_epochs() {
 	const int video = player.SelectedTrack(MediaType::Video);
 	TEST_REQUIRE(video >= 0);
 	TEST_REQUIRE(player.Play());
-	TEST_REQUIRE(Wait([&] { return player.Position() > 0.30 || player.State() == PlaybackState::Error; }));
+	TEST_REQUIRE(Wait([&] {
+		if (player.State() == PlaybackState::Error)
+			return true;
+		if (player.Position() <= 0.30)
+			return false;
+		std::lock_guard lock(display->m_mutex);
+		return display->m_videos > 2;
+	}));
 	TEST_REQUIRE(player.State() != PlaybackState::Error);
 	TEST_REQUIRE(player.Pause());
 	unsigned before;
