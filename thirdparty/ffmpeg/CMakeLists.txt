@@ -268,6 +268,7 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0007-avformat-matroska-reset-state-after-generic-or-byte-.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0008-tests-api-cover-Matroska-byte-seek-after-EOF.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0009-opusdec-initialize-active-channel-delay-pointers.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0010-itut35-pad-dolby-vision-payloads.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"

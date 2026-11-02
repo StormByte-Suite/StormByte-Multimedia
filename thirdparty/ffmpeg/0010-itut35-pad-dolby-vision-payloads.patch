@@ -1,0 +1,55 @@
+From 47e7a5b321ca9b3fc74dbbcf0b394e8d7cd93363 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:50:00 +0100
+Subject: [PATCH] avcodec/itut35: pad Dolby Vision payloads before bitstream
+ parsing
+
+ITU-T T.35 payloads can refer to externally allocated buffers, including
+dav1d metadata buffers, without AV_INPUT_BUFFER_PADDING_SIZE trailing
+bytes. The Dolby Vision parser uses the optimized bitreader on the EMDF
+container before extracting the byte-aligned RPU into its own padded
+scratch buffer. Reading the EMDF footer can consequently overread the
+original allocation.
+
+Copy Dolby payloads into a zero-padded temporary buffer at the T.35
+dispatch boundary. Keep this buffer separate from the DOVIContext RPU
+scratch storage, which is written while the EMDF input is still being
+read. Check the allocation-size addition and release the temporary
+buffer on both parser success and failure.
+
+Reproduced with ASan while decoding AV1 Dolby Vision metadata through
+libdav1d in the existing StormByte-Multimedia pipeline tests.
+---
+ libavcodec/itut35.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/libavcodec/itut35.c b/libavcodec/itut35.c
+index b41d41406d..0c5d4b5c72 100644
+--- a/libavcodec/itut35.c
++++ b/libavcodec/itut35.c
+@@ -220,12 +220,22 @@ int ff_itut_t35_parse_payload_to_struct(FFITUTT35 *const itut_t35, FFITUTT35Aux
+         }
+         case ITU_T_T35_PROVIDER_CODE_DOLBY: {
+             AVDOVIMetadata *dovi;
++            uint8_t *rpu;
+ 
+             if (!aux || !aux->dovi)
+                 return 0; // ignore
+ 
+-            ret = ff_dovi_rpu_parse(aux->dovi, itut_t35->payload, itut_t35->payload_size,
++            /* External T.35 payloads need not have bitreader padding. */
++            if (itut_t35->payload_size > SIZE_MAX - AV_INPUT_BUFFER_PADDING_SIZE)
++                return AVERROR_INVALIDDATA;
++            rpu = av_mallocz(itut_t35->payload_size + AV_INPUT_BUFFER_PADDING_SIZE);
++            if (!rpu)
++                return AVERROR(ENOMEM);
++            memcpy(rpu, itut_t35->payload, itut_t35->payload_size);
++
++            ret = ff_dovi_rpu_parse(aux->dovi, rpu, itut_t35->payload_size,
+                                     err_recognition);
++            av_free(rpu);
+             if (ret < 0)
+                 return 0; // ignore
+ 
+-- 
+2.56.0
