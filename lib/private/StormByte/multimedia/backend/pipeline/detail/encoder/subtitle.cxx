@@ -376,7 +376,10 @@ void Subtitle::EmitHeld(StormByte::Multimedia::Pipeline::Encoder& owner,
 		else if (impl == "mov_text")
 			text = PackAss(std::move(text), 0);
 		StormByte::Multimedia::FFmpeg::AVSubtitle sub;
-		sub.FillText(StormByte::Safe::String(text), m_heldPts, durationMs, WantsAssRect(impl) || impl == "mov_text");
+		if (!sub.FillText(text, m_heldPts, durationMs, WantsAssRect(impl) || impl == "mov_text")) {
+			owner.Fail();
+			return;
+		}
 		if (!m_encoder) {
 			owner.Fail(StormByte::Safe::String::ReplaceToken(
 				"subtitle encoder track {} has no open codec for cue pts={} duration={}ms",

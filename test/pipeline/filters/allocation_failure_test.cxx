@@ -8,6 +8,7 @@
 
 #include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/filters/video/nlmeans.hxx>
+#include <StormByte/multimedia/ffmpeg/AVSubtitle.hxx>
 #include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
@@ -37,10 +38,19 @@ namespace {
 	thread_local bool exhausted = false;
 	thread_local std::size_t fail_aligned_at = std::numeric_limits<std::size_t>::max();
 	thread_local std::size_t denied = 0;
+	thread_local std::size_t reject_after = std::numeric_limits<std::size_t>::max();
 	std::atomic<bool> failed_scratch{false};
 	std::atomic<bool> coordinator_failed{false};
 
 	bool Reject(std::size_t size, bool aligned = false) noexcept {
+		if (reject_after != std::numeric_limits<std::size_t>::max()) {
+			if (reject_after-- == 0) {
+				reject_after = std::numeric_limits<std::size_t>::max();
+				++denied;
+				errno = ENOMEM;
+				return true;
+			}
+		}
 		if (!exhausted && (!aligned || size < fail_aligned_at))
 			return false;
 		exhausted = true;
@@ -49,10 +59,29 @@ namespace {
 		return true;
 	}
 
-	class TestStep final: public Pipeline::Step {
-		public:
-			TestStep(): Step({}, Pipeline::Producer::Encoder, {}, {}) {}
-	};
+	int TestSubtitleAllocationFailure() {
+		using StormByte::Multimedia::FFmpeg::AVSubtitle;
+		reject_after = 0;
+		AVSubtitle empty;
+		reject_after = std::numeric_limits<std::size_t>::max();
+		TEST_REQUIRE(empty.Text().empty());
+		AVSubtitle subtitle;
+		AVSubtitle moved{std::move(subtitle)};
+		reject_after = 0;
+		const bool restored = subtitle.FillText("cue", 42, 1000, false);
+		reject_after = std::numeric_limits<std::size_t>::max();
+		TEST_REQUIRE(!restored);
+		for (std::size_t position = 0; position < 3; ++position) {
+			reject_after = position;
+			const bool filled = moved.FillText("cue", 42, 1000, false);
+			reject_after = std::numeric_limits<std::size_t>::max();
+			TEST_REQUIRE(!filled);
+			TEST_REQUIRE(moved.Text().empty());
+		}
+		TEST_REQUIRE(moved.FillText("cue", 42, 1000, false));
+		TEST_REQUIRE(moved.Text() == StormByte::Safe::String{"cue"});
+		return 0;
+	}
 
 	class ExhaustedJob final: public Pipeline::Transcoder {
 		public:
@@ -270,7 +299,8 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_start_without_allocations", TestCoordinatorStartExhaustion},
 		TestEntry{"test_transcoder_worker_without_allocations", TestCoordinatorWorkerExhaustion},
 		TestEntry{"test_transcoder_cancel_without_allocations", TestCoordinatorCancelExhaustion},
-		TestEntry{"test_writer_destruction_without_allocations", TestWriterDestructionExhaustion}
+		TestEntry{"test_writer_destruction_without_allocations", TestWriterDestructionExhaustion},
+		TestEntry{"test_subtitle_allocation_failure", TestSubtitleAllocationFailure}
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

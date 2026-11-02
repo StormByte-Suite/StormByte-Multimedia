@@ -777,6 +777,10 @@ FFmpeg::OperationResult FFmpeg::AVEncoder::SendFrame(AVFrame& frame, char* error
 
 FFmpeg::OperationResult FFmpeg::AVEncoder::EncodeSubtitle(AVSubtitle& sub, AVPacket& pkt) noexcept {
 	m_operation_error = 0;
+	if (!sub.Get()) {
+		m_operation_error = AVERROR(ENOMEM);
+		return OperationResult::Error;
+	}
 	if (!m_ptr || m_ptr->codec_type != AVMEDIA_TYPE_SUBTITLE) {
 		m_operation_error = AVERROR(EINVAL);
 		return OperationResult::Error;

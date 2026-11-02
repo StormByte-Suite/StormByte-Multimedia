@@ -56,10 +56,12 @@ extern "C" {
 	#include <libavutil/mem.h>
 }
 
+#include <new>
+
 using namespace StormByte::Multimedia;
 
 FFmpeg::AVSubtitle::AVSubtitle() noexcept
-: m_sub(new ::AVSubtitle{}) {}
+: m_sub(new (std::nothrow) ::AVSubtitle{}) {}
 
 FFmpeg::AVSubtitle::AVSubtitle(AVSubtitle&& other) noexcept
 : m_sub(other.m_sub) {
@@ -123,10 +125,12 @@ StormByte::Safe::String FFmpeg::AVSubtitle::Text() const noexcept {
 	return out;
 }
 
-void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
+bool FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept {
 	Free();
 	if (!m_sub)
-		m_sub = new ::AVSubtitle{};
+		m_sub = new (std::nothrow) ::AVSubtitle{};
+	if (!m_sub)
+		return false;
 	m_sub->pts = pts;
 	m_sub->start_display_time = 0;
 	m_sub->end_display_time = duration_ms;
@@ -134,7 +138,7 @@ void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::
 	m_sub->rects = static_cast<AVSubtitleRect**>(av_mallocz(sizeof(AVSubtitleRect*)));
 	if (!m_sub->rects) {
 		m_sub->num_rects = 0;
-		return;
+		return false;
 	}
 
 	m_sub->rects[0] = static_cast<AVSubtitleRect*>(av_mallocz(sizeof(AVSubtitleRect)));
@@ -142,7 +146,7 @@ void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::
 		av_free(m_sub->rects);
 		m_sub->rects = nullptr;
 		m_sub->num_rects = 0;
-		return;
+		return false;
 	}
 
 	if (ass) {
@@ -154,6 +158,11 @@ void FFmpeg::AVSubtitle::FillText(std::string_view text, std::int64_t pts, std::
 		m_sub->rects[0]->type = SUBTITLE_TEXT;
 		m_sub->rects[0]->text = av_strndup(text.empty() ? "" : text.data(), text.size());
 	}
+	if (!(ass ? m_sub->rects[0]->ass : m_sub->rects[0]->text)) {
+		Free();
+		return false;
+	}
+	return true;
 }
 
 void FFmpeg::AVSubtitle::Free() noexcept {

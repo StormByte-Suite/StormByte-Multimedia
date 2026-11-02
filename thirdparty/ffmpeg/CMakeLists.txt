@@ -67,12 +67,19 @@ function(_sb_mm_attach_ffmpeg target visibility)
 			endif()
 		endforeach()
 		list(JOIN _libs "," _csv)
+		get_target_property(_type ${target} TYPE)
+		if(_type STREQUAL "EXECUTABLE" AND CMAKE_CXX_LINK_EXECUTABLE MATCHES "--start-group")
+			# BuildMaster already rescans executable libraries; lld rejects nested groups.
+			set(_archives ${_libs})
+		else()
+			set(_archives "$<LINK_GROUP:RESCAN,${_csv}>")
+		endif()
 		# Plugins are a second item, outside the group, as they were
 		# outside the pack. Linking ffmpeg itself would also pull the
 		# six archives ungrouped and CMake would fold that back into
 		# the group.
 		target_link_libraries(${target} ${visibility}
-			"$<LINK_GROUP:RESCAN,${_csv}>"
+			${_archives}
 			ffmpeg-plugins
 		)
 		if(TARGET ffmpeg_install)

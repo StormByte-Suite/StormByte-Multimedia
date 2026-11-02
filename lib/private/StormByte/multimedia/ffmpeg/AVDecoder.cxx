@@ -260,6 +260,10 @@ bool FFmpeg::AVDecoder::IsSubtitle() const noexcept {
 
 FFmpeg::OperationResult FFmpeg::AVDecoder::DecodeSubtitle(AVPacket& pkt, FFmpeg::AVSubtitle& out) noexcept {
 	m_operation_error = 0;
+	if (!out.Get()) {
+		m_operation_error = AVERROR(ENOMEM);
+		return OperationResult::Error;
+	}
 	if (!m_ptr || !IsSubtitle()) {
 		m_operation_error = AVERROR(EINVAL);
 		return OperationResult::Error;

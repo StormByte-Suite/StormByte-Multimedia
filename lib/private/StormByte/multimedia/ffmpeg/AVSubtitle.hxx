@@ -133,8 +133,9 @@ namespace StormByte::Multimedia::FFmpeg {
 			 * @param duration_ms Display window in milliseconds.
 			 * @param ass true writes `SUBTITLE_ASS`, false writes `SUBTITLE_TEXT`.
 			 * @note Input is borrowed only during this call and copied into FFmpeg-owned storage.
+			 * @return False when allocation fails; no partial rectangle is retained.
 			 */
-			void FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept;
+			bool FillText(std::string_view text, std::int64_t pts, std::uint32_t duration_ms, bool ass) noexcept;
 
 			/**
 			 * @brief Releases rects (`avsubtitle_free`).
