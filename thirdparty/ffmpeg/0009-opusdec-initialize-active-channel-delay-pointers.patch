@@ -1,0 +1,41 @@
+From 471862ad32f55b89d60ced8c388b34fd7d5dd437 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 04:50:00 +0100
+Subject: [PATCH] avcodec/opusdec: initialize hybrid delay pointers for active
+ channels only
+
+The second CELT output pointer is NULL when decoding mono. Initializing
+both delay-buffer pointers unconditionally therefore performs pointer
+arithmetic on NULL, even though av_audio_fifo_write() only consumes the
+active output channels.
+
+Initialize each delay pointer inside the existing output-channel loop.
+This keeps the stereo path unchanged and avoids forming an invalid
+pointer in the mono hybrid path.
+
+Reproduced with UBSan while decoding mono hybrid Opus in the existing
+StormByte-Multimedia native Opus preview test.
+---
+ libavcodec/opus/dec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libavcodec/opus/dec.c b/libavcodec/opus/dec.c
+index c353e6623d..cd0fbcf896 100644
+--- a/libavcodec/opus/dec.c
++++ b/libavcodec/opus/dec.c
+@@ -342,10 +342,10 @@ static int opus_decode_frame(OpusStreamContext *s, const uint8_t *data, int size
+ 
+         if (s->packet.mode == OPUS_MODE_HYBRID) {
+             int celt_delay = s->packet.frame_duration - celt_output_samples;
+-            void *delaybuf[2] = { s->celt_output[0] + celt_output_samples,
+-                                  s->celt_output[1] + celt_output_samples };
++            void *delaybuf[2];
+ 
+             for (i = 0; i < s->output_channels; i++) {
++                delaybuf[i] = s->celt_output[i] + celt_output_samples;
+                 s->fdsp->vector_fmac_scalar(out_tmp[i],
+                                             s->celt_output[i], 1.0,
+                                             celt_output_samples);
+-- 
+2.56.0
+

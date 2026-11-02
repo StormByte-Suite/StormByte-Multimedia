@@ -267,6 +267,7 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0006-meson-vaapi-check-name.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0007-avformat-matroska-reset-state-after-generic-or-byte-.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0008-tests-api-cover-Matroska-byte-seek-after-EOF.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0009-opusdec-initialize-active-channel-delay-pointers.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"
