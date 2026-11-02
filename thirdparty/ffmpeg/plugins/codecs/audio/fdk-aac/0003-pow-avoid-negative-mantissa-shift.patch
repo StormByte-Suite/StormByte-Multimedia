@@ -1,0 +1,31 @@
+From 1142de737a7038b9d4ac537ed91040cbf2df80ce Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:05:46 +0100
+Subject: [PATCH] libFDK: normalize signed power exponents with widened
+ multiplication
+
+fPow normalizes exp_m using a headroom-derived left shift. Negative
+mantissas make that operation undefined even though the normalized
+result fits. Multiply in INT64 by the same positive power of two and
+convert the representable result back. Reproduced by the existing stereo
+AAC encoding test with UBSan.
+---
+ libFDK/src/fixpoint_math.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libFDK/src/fixpoint_math.cpp b/libFDK/src/fixpoint_math.cpp
+index 1e26420..9552b0c 100644
+--- a/libFDK/src/fixpoint_math.cpp
++++ b/libFDK/src/fixpoint_math.cpp
+@@ -664,7 +664,7 @@ FIXP_DBL fPow(FIXP_DBL base_m, INT base_e, FIXP_DBL exp_m, INT exp_e,
+     INT leadingBits;
+ 
+     leadingBits = CountLeadingBits(fAbs(exp_m));
+-    exp_m = exp_m << leadingBits;
++    exp_m = (FIXP_DBL)((INT64)exp_m * ((INT64)1 << leadingBits));
+     exp_e -= leadingBits;
+   }
+ 
+-- 
+2.56.0
+
