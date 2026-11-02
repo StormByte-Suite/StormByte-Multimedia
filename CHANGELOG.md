@@ -29,6 +29,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bundled Kvazaar's AVX2 quantizer matches the registered quantization strategy function type, avoiding calls through incompatible const-qualified parameter signatures.
 - Bundled x265 skips residual-cost division when rate control disables amortization near the end of a known-length encode, avoiding zero divided by zero and NaN-to-integer conversion in partial and final accounting.
 - Bundled FDK-AAC widens signed PCM samples and doubles high-pass state for block-switch energy analysis without left-shifting negative values.
 - Bundled FDK-AAC doubles generic fixed-point products without negative signed shifts, preserving full-scale bit patterns; an isolated sanitizer check covers all multiply variants against a widened reference.
