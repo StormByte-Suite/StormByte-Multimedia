@@ -1,0 +1,30 @@
+From 50744691ee7f4e0d8fee5fbe2f4774b722f6f985 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 05:37:30 +0100
+Subject: [PATCH] avx2: match the SAO edge distortion strategy function type
+
+The AVX2 SAO edge callback declares its offset array const while
+sao_edge_ddistortion_func and the generic implementation take mutable
+offsets. Match that callback signature without changing any pixel or
+offset operations. Reproduced by the existing unaligned-video test with
+UBSan function-type checking.
+---
+ src/strategies/avx2/sao-avx2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/strategies/avx2/sao-avx2.c b/src/strategies/avx2/sao-avx2.c
+index 2673945f..5e2e4072 100644
+--- a/src/strategies/avx2/sao-avx2.c
++++ b/src/strategies/avx2/sao-avx2.c
+@@ -290,7 +290,7 @@ static int32_t sao_edge_ddistortion_avx2(const encoder_control_t* const encoder,
+                                                int32_t  block_width,
+                                                int32_t  block_height,
+                                                int32_t  eo_class,
+-                                         const int32_t  offsets[NUM_SAO_EDGE_CATEGORIES])
++                                               int32_t  offsets[NUM_SAO_EDGE_CATEGORIES])
+ {
+   int32_t y, x;
+   vector2d_t a_ofs = g_sao_edge_offsets[eo_class][0];
+-- 
+2.56.0
+
