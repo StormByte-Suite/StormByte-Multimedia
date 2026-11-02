@@ -1,0 +1,83 @@
+From 7cb3f5f836c9340bc8f2eb4dd10471c167913dd8 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:15:19 +0100
+Subject: [PATCH] aacenc: normalize signed intensity spectra and correlation
+ safely
+
+Channel correlation can be negative, as can normalized MDCT samples. Shift their unsigned fixed-point representations and convert back before signed arithmetic. Preserve the existing headroom calculations and spectral combination scaling. Strict surround AAC encoding reproduced the correlation shift; the spectral sites have identical signed-sample preconditions.
+---
+ libAACenc/src/intensity.cpp | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/libAACenc/src/intensity.cpp b/libAACenc/src/intensity.cpp
+index 0944fa3..8524f5f 100644
+--- a/libAACenc/src/intensity.cpp
++++ b/libAACenc/src/intensity.cpp
+@@ -378,9 +378,9 @@ static void FDKaacEnc_prepareIntensityDecision(
+ 
+         for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1];
+              j++) {
+-          ml += fMultDiv2((mdctSpectrumLeft[j] << s),
++          ml += fMultDiv2((FIXP_DBL)((UINT)mdctSpectrumLeft[j] << s),
+                           inv_n);  // scaled with mdctScale - s + inv_n
+-          mr += fMultDiv2((mdctSpectrumRight[j] << s),
++          mr += fMultDiv2((FIXP_DBL)((UINT)mdctSpectrumRight[j] << s),
+                           inv_n);  // scaled with mdctScale - s + inv_n
+         }
+         ml = fMultDiv2(ml, inv_n);  // scaled with mdctScale - s + inv_n
+@@ -388,9 +388,9 @@ static void FDKaacEnc_prepareIntensityDecision(
+ 
+         for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1];
+              j++) {
+-          tmp_l = fMultDiv2((mdctSpectrumLeft[j] << s), inv_n) -
++          tmp_l = fMultDiv2((FIXP_DBL)((UINT)mdctSpectrumLeft[j] << s), inv_n) -
+                   ml;  // scaled with mdctScale - s + inv_n
+-          tmp_r = fMultDiv2((mdctSpectrumRight[j] << s), inv_n) -
++          tmp_r = fMultDiv2((FIXP_DBL)((UINT)mdctSpectrumRight[j] << s), inv_n) -
+                   mr;  // scaled with mdctScale - s + inv_n
+ 
+           prod_lr += fMultDiv2(
+@@ -400,7 +400,7 @@ static void FDKaacEnc_prepareIntensityDecision(
+           square_r +=
+               fPow2Div2(tmp_r);  // scaled with 2*(mdctScale - s + inv_n) + 1
+         }
+-        prod_lr = prod_lr << 1;    // scaled with 2*(mdctScale - s + inv_n)
++        prod_lr = (FIXP_DBL)((UINT)prod_lr << 1);  // scaled with 2*(mdctScale - s + inv_n)
+         square_l = square_l << 1;  // scaled with 2*(mdctScale - s + inv_n)
+         square_r = square_r << 1;  // scaled with 2*(mdctScale - s + inv_n)
+ 
+@@ -700,7 +700,8 @@ void FDKaacEnc_IntensityStereoProcessing(
+       lr = FL2FXCONST_DBL(0.0f);
+       for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1]; j++)
+         lr += fMultDiv2(
+-            fMultDiv2(mdctSpectrumLeft[j] << sL, mdctSpectrumRight[j] << sR),
++            fMultDiv2((FIXP_DBL)((UINT)mdctSpectrumLeft[j] << sL),
++                      (FIXP_DBL)((UINT)mdctSpectrumRight[j] << sR)),
+             inv_n);
+       lr = lr << 1;
+ 
+@@ -712,8 +713,8 @@ void FDKaacEnc_IntensityStereoProcessing(
+         s0 = fixMin(sL, sR);
+         for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1];
+              j++) {
+-          d = ((mdctSpectrumLeft[j] << s0) >> 1) -
+-              ((mdctSpectrumRight[j] << s0) >> 1);
++          d = ((FIXP_DBL)((UINT)mdctSpectrumLeft[j] << s0) >> 1) -
++              ((FIXP_DBL)((UINT)mdctSpectrumRight[j] << s0) >> 1);
+           ed += fMultDiv2(d, d) >> (mdct_spec_sf - 1);
+         }
+         msMask[sfb + sfboffs] = 1;
+@@ -752,8 +753,8 @@ void FDKaacEnc_IntensityStereoProcessing(
+         s0 = fixMin(sL, sR);
+         for (j = sfbOffset[sfb + sfboffs]; j < sfbOffset[sfb + sfboffs + 1];
+              j++) {
+-          s = ((mdctSpectrumLeft[j] << s0) >> 1) +
+-              ((mdctSpectrumRight[j] << s0) >> 1);
++          s = ((FIXP_DBL)((UINT)mdctSpectrumLeft[j] << s0) >> 1) +
++              ((FIXP_DBL)((UINT)mdctSpectrumRight[j] << s0) >> 1);
+           es += fMultDiv2(s, s) >>
+                 (mdct_spec_sf -
+                  1);  // scaled 2*(mdctScale - s0 + 1) + mdct_spec_sf
+-- 
+2.56.0
+

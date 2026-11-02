@@ -20,6 +20,7 @@ set(FDK_AAC_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0015-scalefactor-avoid-negative-fractional-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0016-mdct-avoid-negative-folded-sample-shifts.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0017-threshold-avoid-negative-minimum-snr-shift.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0018-intensity-avoid-negative-correlation-and-spectrum-shifts.patch"
 )
 
 set(FDK_AAC_OPTIONS

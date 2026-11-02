@@ -33,6 +33,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Bundled x265 guards the final coefficient-group neighbor lookup against a shift by 64; 4,368,000 isolated context comparisons preserve the reference results.
 - Bundled x265 decodes diamond-search directions directly from their two-bit fields without overflowing signed shifts.
 - Bundled FDK-AAC scales signed minimum-SNR logarithms through unsigned bit patterns.
+- Bundled FDK-AAC normalizes signed intensity-stereo correlation products and input spectra without negative left shifts.
 - Bundled Vorbis reuses each residue configuration shared between short and long encoding modes, avoiding a 2,848-byte leak during surround encoder setup even when the encoder is correctly cleared.
 - Bundled FDK-AAC widens negated MDCT folding samples through bounded multiplication, preserving the full PCM range without undefined signed left shifts.
 - Bundled FDK-AAC converts signed scalefactor estimates and bit-cost differences to fixed-point values through unsigned bit patterns instead of negative signed shifts.
