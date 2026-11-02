@@ -1,0 +1,26 @@
+From c82bf7e08bde3d20860137230ca25b27860407ba Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Mon, 2 Nov 2026 06:15:19 +0100
+Subject: [PATCH] aacenc: scale minimum SNR through unsigned fixed-point bits
+
+The minimum-SNR logarithmic product can be negative. Apply its six-bit fixed-point scale using an unsigned intermediate, preserving the existing result bit pattern without undefined signed left shift. The strict stereo AAC encode reproduces the original diagnostic.
+---
+ libAACenc/src/adj_thr.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libAACenc/src/adj_thr.cpp b/libAACenc/src/adj_thr.cpp
+index 239abd0..1ad3e59 100644
+--- a/libAACenc/src/adj_thr.cpp
++++ b/libAACenc/src/adj_thr.cpp
+@@ -524,7 +524,7 @@ static void FDKaacEnc_adaptMinSnr(
+                                              dbRatio); /* scaled by 1.0f/64.0f*/
+         minSnrRed =
+             fixMax(minSnrRed, msaParam_maxRed); /* scaled by 1.0f/64.0f*/
+-        minSnrRed = (fMult(sfbMinSnrLdData, minSnrRed)) << 6;
++        minSnrRed = (FIXP_DBL)((UINT)fMult(sfbMinSnrLdData, minSnrRed) << 6);
+         minSnrRed = fixMin(minSnrLimitLD64, minSnrRed);
+         *psfbMinSnrLdData++ = update ? minSnrRed : sfbMinSnrLdData;
+       }
+-- 
+2.56.0
+
