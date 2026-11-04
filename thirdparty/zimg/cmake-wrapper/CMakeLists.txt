@@ -52,7 +52,7 @@ set(ZIMG_IS_X86 FALSE)
 set(ZIMG_IS_ARM FALSE)
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
 	set(ZIMG_IS_X86 TRUE)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|armv[0-9]|arm)$")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64|armv[0-9]|arm)$")
 	set(ZIMG_IS_ARM TRUE)
 endif()
 

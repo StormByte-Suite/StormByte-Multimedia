@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -564,7 +564,7 @@ if(NOT OPUS_DISABLE_INTRINSICS)
+         add_sources_group(opus celt ${celt_sources_arm_rtcd})
+         add_sources_group(opus silk ${silk_sources_arm_rtcd})
+         add_sources_group(opus lpcnet ${dnn_sources_arm_rtcd})
+-      else()
++      elseif(NOT OPUS_PRESUME_NEON)
+         message(ERROR "Runtime cpu capability detection needed for MAY_HAVE_NEON")
+       endif()
+       # Do runtime check for NEON

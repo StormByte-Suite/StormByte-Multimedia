@@ -30,6 +30,7 @@ target_include_directories(StormByte-Multimedia BEFORE PRIVATE ${_tess_includes}
 
 set(TESSERACT_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-cmake-unversioned-tesseract-output-name.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0002-cmake-detect-uppercase-arm64.patch"
 )
 
 set(TESSERACT_OPTIONS
@@ -56,7 +57,7 @@ else()
 	list(APPEND TESSERACT_OPTIONS "-DBUILD_SHARED_LIBS=OFF")
 endif()
 
-set(TESSERACT_EXTRA "GIT={RESET;PATCH={${TESSERACT_PATCHES}};TITLE=tesseract unversioned name}")
+set(TESSERACT_EXTRA "GIT={RESET;PATCH={${TESSERACT_PATCHES}};TITLE=tesseract CMake compatibility}")
 
 buildmaster_component(
 	tesseract

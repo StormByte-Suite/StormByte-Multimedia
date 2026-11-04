@@ -51,6 +51,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
 		"-DOPUS_X86_PRESUME_SSE4_1=OFF" "-DOPUS_X86_PRESUME_AVX2=OFF")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64|arm|armv[0-9].*)$")
 	list(APPEND OPUS_OPTIONS "-DOPUS_USE_NEON=ON" "-DOPUS_MAY_HAVE_NEON=ON")
+	if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+		list(APPEND OPUS_OPTIONS "-DOPUS_PRESUME_NEON=ON")
+	endif()
 endif()
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86|x86)$")
 	list(APPEND OPUS_OPTIONS "-DCMAKE_ASM_NASM_FLAGS=-DPIC -w-pp-macro-params-legacy")
@@ -59,6 +62,7 @@ endif()
 set(OPUS_PATCHES
 	"${CMAKE_CURRENT_LIST_DIR}/0001-dnn-data-from-unpack.patch"
 	"${CMAKE_CURRENT_LIST_DIR}/0002-shallow-package-version.patch"
+	"${CMAKE_CURRENT_LIST_DIR}/0003-assume-neon-without-runtime-detection.patch"
 )
 
 buildmaster_component(

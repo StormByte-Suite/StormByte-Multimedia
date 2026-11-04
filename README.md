@@ -531,6 +531,8 @@ These flags select dependencies/capabilities, not the license of original Multim
 
 Release defaults target x86-64-v3 on GCC/Clang x86-64, AVX2 on MSVC-compatible x86 and Apple M1 on Apple Silicon. Explicit compiler flags remain authoritative. Bundled specialized SIMD kernels retain runtime selectors without raising the global baseline; bundled x86 FFmpeg requires NASM.
 
+Bundled Opus presumes NEON on ARM64 when the compiler supports its intrinsics; 32-bit ARM does not assume NEON. Bundled FFmpeg includes the upstream AArch64 swscale fix for signed intermediate samples and fixes its Meson NEON/SSE2 intrinsics probes, building the NEON MPEG unquantizer only when NEON intrinsics are detected.
+
 Bundled tessdata embeds the models selected in [the language configuration](thirdparty/tessdata/languages/CMakeLists.txt), including available vertical variants. System models are loaded from the configured installation; use `TESSDATA_DIR`, `TESSDATA_PREFIX` or `Tessdata_ROOT` to select it and deploy the required files. Partial installations are accepted, but an absent requested language fails without fallback. OCR receives decoded grayscale subtitle pixels, not external image files.
 
 Bundled SVG rendering uses LunaSVG 3.5.0/PlutoVG 1.3.1. Binary packages must retain `THIRD-PARTY`, `COPYING.LunaSVG` and `COPYING.FTL` alongside the existing notices.

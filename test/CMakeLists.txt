@@ -171,6 +171,47 @@ if(ENABLE_TEST)
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/simd_options_test.cmake")
 	set_tests_properties(configuration.test_simd_options
 		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration")
+	if(WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WIN32)
+		add_test(NAME configuration.test_opus_arm64_neon
+			COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+			"-DWORK=${PROJECT_BINARY_DIR}/test-output/opus-neon"
+			"-DC_COMPILER=${CMAKE_C_COMPILER}" "-DGENERATOR=${CMAKE_GENERATOR}"
+			-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/opus_arm64_neon_test.cmake")
+		set_tests_properties(configuration.test_opus_arm64_neon
+			PROPERTIES TIMEOUT 90 LABELS "multimedia;configuration;simd"
+				SKIP_REGULAR_EXPRESSION "SKIPPED:")
+	endif()
+	if(WITH_FFMPEG STREQUAL "BUNDLED" AND NOT WIN32 AND NOT CMAKE_CROSSCOMPILING)
+		add_test(NAME configuration.test_ffmpeg_intrinsics_probes
+			COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+			"-DWORK=${PROJECT_BINARY_DIR}/test-output/ffmpeg-intrinsics"
+			"-DC_COMPILER=${CMAKE_C_COMPILER}" "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+			"-DPROCESSOR=${CMAKE_SYSTEM_PROCESSOR}"
+			-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/ffmpeg_intrinsics_test.cmake")
+		set_tests_properties(configuration.test_ffmpeg_intrinsics_probes
+			PROPERTIES TIMEOUT 600 LABELS "multimedia;configuration;simd;ffmpeg"
+				SKIP_REGULAR_EXPRESSION "SKIPPED:")
+	endif()
+	if(WITH_OCR STREQUAL "BUNDLED" AND NOT WIN32)
+		add_test(NAME configuration.test_tesseract_arm64_neon
+			COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+			"-DWORK=${PROJECT_BINARY_DIR}/test-output/tesseract-neon"
+			"-DCXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DGENERATOR=${CMAKE_GENERATOR}"
+			-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/tesseract_arm64_neon_test.cmake")
+		set_tests_properties(configuration.test_tesseract_arm64_neon
+			PROPERTIES TIMEOUT 90 LABELS "multimedia;configuration;simd"
+				SKIP_REGULAR_EXPRESSION "SKIPPED:")
+	endif()
+	if(WITH_FFMPEG STREQUAL "BUNDLED" AND FFMPEG_BUNDLED_TYPE STREQUAL "static"
+			AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+		add_executable(FFmpegArm64SwscaleTests ffmpeg/arm64_swscale_test.c)
+		target_compile_features(FFmpegArm64SwscaleTests PRIVATE c_std_11)
+		set_target_properties(FFmpegArm64SwscaleTests PROPERTIES LINKER_LANGUAGE CXX)
+		stormbyte_link_ffmpeg(FFmpegArm64SwscaleTests)
+		add_test(NAME ffmpeg.test_arm64_swscale_signed_tail COMMAND FFmpegArm64SwscaleTests)
+		set_tests_properties(ffmpeg.test_arm64_swscale_signed_tail
+			PROPERTIES TIMEOUT 15 LABELS "multimedia;ffmpeg;simd")
+	endif()
 	add_test(NAME configuration.test_x265_shallow_version
 		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
 		"-DWORK=${PROJECT_BINARY_DIR}/test-output/x265-shallow-version"
