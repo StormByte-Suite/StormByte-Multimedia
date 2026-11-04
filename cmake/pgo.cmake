@@ -69,6 +69,29 @@ else()
 	message(FATAL_ERROR "ENABLE_PGO does not support the ${CMAKE_CXX_COMPILER_ID} compiler")
 endif()
 
+# GCC 16 on AArch64 crashes (internal compiler error) in SVT-AV1 and libaom
+# NEON reductions when atomic profile counters are enabled: late-combine
+# moves a UADDLV result into a general register that the pattern rejects.
+# Skip that pass only in the instrumented build, which is used for training.
+set(_pgo_generate_workaround "")
+# The compiler target is probed instead of CMAKE_SYSTEM_PROCESSOR, which the
+# nested instrumented configure does not inherit when cross compiling.
+if(_pgo_kind STREQUAL "GNU")
+	include(CheckCXXSourceCompiles)
+	include(CMakePushCheckState)
+	cmake_push_check_state(RESET)
+	set(CMAKE_REQUIRED_FLAGS "-fno-late-combine-instructions")
+	check_cxx_source_compiles("
+#if !defined(__aarch64__)
+#error not AArch64
+#endif
+int main() { return 0; }" PGO_AARCH64_NO_LATE_COMBINE)
+	cmake_pop_check_state()
+	if(PGO_AARCH64_NO_LATE_COMBINE)
+		set(_pgo_generate_workaround "-fno-late-combine-instructions")
+	endif()
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	message(WARNING "ENABLE_PGO on a Debug build: the profile will not match an optimized binary")
 endif()
@@ -171,6 +194,7 @@ function(_pgo_strip_profile_flags value out)
 		"-fprofile-correction"
 		"-fprofile-update=[^ ]+"
 		"-fprofile-prefix-path=[^ ]+"
+		"-fno-late-combine-instructions"
 		"-Wno-error=missing-profile"
 		"-Wno-error=coverage-mismatch"
 		"-Wno-error=profile-instr-unprofiled"
@@ -208,8 +232,9 @@ macro(_pgo_apply_stage_flags stage)
 			list(APPEND _compile
 				"-fprofile-generate=${PGO_PROFILE_DIR}"
 				"-fprofile-update=atomic"
-				"-fprofile-prefix-path=${CMAKE_BINARY_DIR}")
-			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}")
+				"-fprofile-prefix-path=${CMAKE_BINARY_DIR}"
+				${_pgo_generate_workaround})
+			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}" ${_pgo_generate_workaround})
 		elseif(_pgo_kind STREQUAL "CLANG")
 			list(APPEND _compile "-fprofile-generate=${PGO_PROFILE_DIR}")
 			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}")

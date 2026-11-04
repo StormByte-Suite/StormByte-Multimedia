@@ -30,10 +30,6 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Add backend-selection diagnostics and cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention. Separate measured underruns, skipped video frames and processing throughput from subjective smoothness; do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
-### Added
-
-- `WITH_LUNASVG=SYSTEM` links an installed LunaSVG 3.5 or newer through its CMake package instead of building the bundled checkout. `BUNDLED` remains the default and keeps the static build with system font loading and the font-face cache disabled.
-
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.0.0...HEAD
 
 ## [3.0.0] - 2026-11-04
@@ -43,6 +39,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Linux amd64/arm64 releases for glibc/musl and GCC/libstdc++ or Clang/libc++, with matching binary dependency archives.
 - Installed `FindStormByteMultimedia.cmake` with transitive Base, Buffer, Logger and System targets. Package discovery tests configure, link and run consumers against both the installed prefix and an extracted ZIP.
 - Regression coverage for caller-controlled optimization flags, bundled SIMD configuration, FFmpeg intrinsics probes and the AArch64 swscale signed scalar tail.
+- `WITH_LUNASVG=SYSTEM` links an installed LunaSVG 3.5 or newer through its CMake package instead of building the bundled checkout. `BUNDLED` remains the default and keeps the static build with system font loading and the font-face cache disabled.
 
 ### Changed
 
@@ -55,6 +52,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Backport FFmpeg's AArch64 swscale signed intermediate load and repair Meson NEON/SSE2 intrinsics probes and NEON MPEG source selection. The native AArch64 `ops_asmgen` build tool now receives FFmpeg's feature macros, so glibc declares `strdup`.
 - Presume Opus NEON on ARM64 without requiring runtime detection, while preserving 32-bit ARM detection. Recognize uppercase `ARM64` in Tesseract and zimg SIMD configuration.
 - Work around the GCC/fortify-headers LTO link failure in bundled Tesseract on affected Alpine toolchains without disabling LTO or fortify. Musl CI and release builds install `xxd`, which bundled VMAF needs to embed its models.
+- Avoid a GCC 16 internal compiler error in the AArch64 PGO training build: with atomic profile counters, late instruction combining broke NEON reductions in bundled SVT-AV1 and libaom. Only the instrumented build disables that pass; the optimized build is unchanged.
 
 [3.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/2.0.0...3.0.0
 
