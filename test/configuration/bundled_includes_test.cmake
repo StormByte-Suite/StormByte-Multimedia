@@ -49,6 +49,14 @@ if(DEFINED TEST_CASE)
 		endif()
 		include("${REPO}/thirdparty/zimg/CMakeLists.txt")
 		set(_need "zimg/cmake-wrapper/src/src/zimg/api")
+	elseif(TEST_CASE STREQUAL "lunasvg-bundled" OR TEST_CASE STREQUAL "lunasvg-system")
+		if(TEST_CASE STREQUAL "lunasvg-bundled")
+			set(WITH_LUNASVG "BUNDLED")
+		else()
+			set(WITH_LUNASVG "SYSTEM")
+		endif()
+		include("${REPO}/thirdparty/lunasvg/CMakeLists.txt")
+		set(_need "lunasvg/src/include")
 	elseif(TEST_CASE STREQUAL "ebur128-bundled" OR TEST_CASE STREQUAL "ebur128-system")
 		if(TEST_CASE STREQUAL "ebur128-bundled")
 			set(WITH_EBUR128 "BUNDLED")
@@ -124,6 +132,7 @@ else()
 	foreach(case IN ITEMS
 		vmaf-bundled vmaf-system
 		zimg-bundled zimg-system
+		lunasvg-bundled lunasvg-system
 		ebur128-bundled ebur128-system
 		tesseract-bundled
 		leptonica-bundled

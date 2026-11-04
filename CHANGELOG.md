@@ -30,6 +30,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Add backend-selection diagnostics and cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention. Separate measured underruns, skipped video frames and processing throughput from subjective smoothness; do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
+### Added
+
+- `WITH_LUNASVG=SYSTEM` links an installed LunaSVG 3.5 or newer through its CMake package instead of building the bundled checkout. `BUNDLED` remains the default and keeps the static build with system font loading and the font-face cache disabled.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.0.0...HEAD
 
 ## [3.0.0] - 2026-11-04

@@ -518,6 +518,7 @@ The application controls logging levels, headers and redaction. Processing stage
 | `WITH_OCR` | `BUNDLED` (default) / `SYSTEM` | Tesseract/Leptonica; Windows forces bundled OCR |
 | `WITH_TESSDATA` | `BUNDLED` (default) / `SYSTEM` | Embedded selected models or installed runtime models, independent of OCR mode |
 | `WITH_ZIMG` | `BUNDLED` / `SYSTEM` | Image-processing dependency |
+| `WITH_LUNASVG` | `BUNDLED` (default) / `SYSTEM` | SVG watermark renderer; `SYSTEM` requires LunaSVG 3.5 or newer. Bundled builds disable system font loading and the font-face cache |
 | `BUILD_SHARED_LIBS` | `ON` (default) / `OFF` | Shared/static Multimedia and matching StormByte archives |
 | `ENABLE_TEST` | `ON` / `OFF` (default) | Build/register CTest; PGO enables tests in the instrumented tree |
 | `ENABLE_PREVIEW_DEMO` | `ON` / `OFF` (default) | Optional SDL2 output demo; requires SDL2 development files |
