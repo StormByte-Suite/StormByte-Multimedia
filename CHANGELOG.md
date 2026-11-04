@@ -48,7 +48,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Fixed
 
 - Join inherited Unix PGO library paths with `:` rather than `;`.
-- Backport FFmpeg's AArch64 swscale signed intermediate load and repair Meson NEON/SSE2 intrinsics probes and NEON MPEG source selection.
+- Backport FFmpeg's AArch64 swscale signed intermediate load and repair Meson NEON/SSE2 intrinsics probes and NEON MPEG source selection. The native AArch64 `ops_asmgen` build tool now receives FFmpeg's feature macros, so glibc declares `strdup`.
 - Presume Opus NEON on ARM64 without requiring runtime detection, while preserving 32-bit ARM detection. Recognize uppercase `ARM64` in Tesseract and zimg SIMD configuration.
 - Work around the GCC/fortify-headers LTO link failure in bundled Tesseract on affected Alpine toolchains without disabling LTO or fortify. Musl CI and release builds install `xxd`, which bundled VMAF needs to embed its models.
 

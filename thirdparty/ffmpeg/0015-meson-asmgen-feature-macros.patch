@@ -1,0 +1,30 @@
+From a7b9c15deffb3db85dbf616f0956fd1dfbaf858d Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Wed, 4 Nov 2026 08:39:26 +0100
+Subject: [PATCH] meson: define feature macros for the aarch64 ops_asmgen tool
+
+ops_asmgen is a native build tool, and add_project_arguments() only
+applies to the host machine, so it is compiled with -std=c17 but
+without _GNU_SOURCE. glibc then hides strdup(), which the tool uses
+through av_strdup(), and GCC rejects the implicit declaration.
+
+Pass the same feature macros as the rest of the project.
+---
+ libswscale/aarch64/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libswscale/aarch64/meson.build b/libswscale/aarch64/meson.build
+index 4a621ec1b6..c49e301dd2 100644
+--- a/libswscale/aarch64/meson.build
++++ b/libswscale/aarch64/meson.build
+@@ -27,6 +27,7 @@ if conf.get('neon', 0) == 1
+   ops_asmgen = executable('ops_asmgen',
+     files('ops_asmgen.c'),
+     include_directories: common_incs,
++    c_args: ['-D_ISOC11_SOURCE', '-D_GNU_SOURCE'],
+     native: true,
+     install: false
+   )
+-- 
+2.56.0
+
