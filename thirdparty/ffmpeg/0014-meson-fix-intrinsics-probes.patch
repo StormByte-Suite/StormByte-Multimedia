@@ -23,7 +23,7 @@ index 5dc1a4f..044683e 100644
 @@ -1257,7 +1257,13 @@ subdir('opus')
  subdir('vulkan')
  subdir('vvc')
-
+ 
 -foreach i : [libavcodec_aac_optional_sources, libavcodec_bsf_optional_sources, libavcodec_hevc_optional_sources, libavcodec_opus_optional_sources, libavcodec_vvc_optional_sources]
 +libavcodec_intrinsics_optional_sources = {}
 +if conf.get('intrinsics_neon', 0) == 1
@@ -48,7 +48,7 @@ index 670c1e2..fc6f272 100644
 +  ['intrinsics_neon', ['arm_neon.h'], 'int probe(void); int probe(void) { int16x8_t v = vdupq_n_s16(0); return vgetq_lane_s16(v, 0); }'],
 +  ['intrinsics_sse2', ['emmintrin.h'], 'int probe(void); int probe(void) { __m128i v = _mm_setzero_si128(); return _mm_cvtsi128_si32(v); }'],
  ]
-
+ 
  if get_option('schannel').allowed()
 --
 2.56.0

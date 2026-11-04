@@ -30,7 +30,7 @@ index a650d72f54c..2e559ba1e55 100644
          add             x14, x14, x7, lsl #1            // Add pixel offset
 -        ldrh            w16, [x14]
 +        ldrsh           w16, [x14]
-
+ 
          sxtw            x16, w16
          sxtw            x15, w15
 --
