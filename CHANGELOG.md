@@ -11,7 +11,7 @@ StormByte Multimedia provides checked asynchronous media processing and real-tim
 
 The C++26 API includes codec and container registries, `File` inspection, owned `Plan`s, pipeline stages, filters, analytics, progress and telemetry. Backend codec and format contexts remain private; filter-facing frame, packet and graph adapters are available when needed. Cross-module values and lifetimes use StormByte Base's `Safe` APIs and require compatible provider/consumer ABIs.
 
-The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.3) 2.2.3, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.6) 2.0.6, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.6) 2.0.6 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.3) 2.1.3, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
+The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/3.0.0), [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/3.0.0), [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/3.0.0) and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/3.0.0), all at version 3.0.0, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
 
 Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. Third-party dependencies and redistributed fixtures keep their own licenses; neither option grants codec patent rights. GPL/nonfree FFmpeg build options affect the resulting binary's redistribution requirements, not the license of the original Multimedia source.
 
@@ -30,7 +30,29 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Add backend-selection diagnostics and cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention. Separate measured underruns, skipped video frames and processing throughput from subjective smoothness; do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.0.0...HEAD
+
+## [3.0.0] - 2026-11-04
+
+### Added
+
+- Linux amd64/arm64 releases for glibc/musl and GCC/libstdc++ or Clang/libc++, with matching binary dependency archives.
+- Installed `FindStormByteMultimedia.cmake` with transitive Base, Buffer, Logger and System targets. Package discovery tests configure, link and run consumers against both the installed prefix and an extracted ZIP.
+- Regression coverage for caller-controlled optimization flags, bundled SIMD configuration, FFmpeg intrinsics probes and the AArch64 swscale signed scalar tail.
+
+### Changed
+
+- Require StormByte Base/Buffer/Logger/System 3.0.0 and BuildMaster 2.1.5. CI keeps GPL/nonfree ON/OFF coverage, macOS Apple Clang and Windows clang-cl.
+- Align the common optimization and PGO modules with the suite: the shared action selects architecture-specific CPU baselines; each release build installs and uploads its own PGO/LTO archive without a final publish job.
+
+### Fixed
+
+- Join inherited Unix PGO library paths with `:` rather than `;`.
+- Backport FFmpeg's AArch64 swscale signed intermediate load and repair Meson NEON/SSE2 intrinsics probes and NEON MPEG source selection.
+- Presume Opus NEON on ARM64 without requiring runtime detection, while preserving 32-bit ARM detection. Recognize uppercase `ARM64` in Tesseract and zimg SIMD configuration.
+- Work around the GCC/fortify-headers LTO link failure in bundled Tesseract on affected Alpine toolchains without disabling LTO or fortify. Musl CI and release builds install `xxd`, which bundled VMAF needs to embed its models.
+
+[3.0.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/2.0.0...3.0.0
 
 ## [2.0.0] - 2026-11-02
 

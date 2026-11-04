@@ -3,6 +3,9 @@ install(TARGETS StormByte-Multimedia
 	LIBRARY 		DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 	RUNTIME 		DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+install(FILES "${CMAKE_SOURCE_DIR}/cmake/FindStormByteMultimedia.cmake"
+	DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/Modules"
+)
 set(_filter_header_exclusions "")
 foreach(_filter IN LISTS STORMBYTE_MULTIMEDIA_DISABLED_FILTERS)
 	list(APPEND _filter_header_exclusions

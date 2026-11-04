@@ -6,6 +6,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" _sb_ver)
 string(STRIP "${_sb_ver}" _sb_ver)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+	"${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
 
 project("StormByte C++ Library: Multimedia module"
 	VERSION ${_sb_ver}
@@ -16,6 +18,7 @@ project("StormByte C++ Library: Multimedia module"
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 include(cmake/optimizations.cmake)
+include(cmake/gcc_fortify_lto.cmake)
 include(cmake/asan.cmake)
 include(cmake/pgo.cmake)
 cmake_policy(SET CMP0079 NEW)

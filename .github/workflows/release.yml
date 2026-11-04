@@ -1,13 +1,9 @@
 name: Release
 
-# Manual only. In the Actions tab, pick a tag. master (or any branch)
-# fails before the build. The zips replace the assets of that tag's release.
-# A retag of the same name is replaced.
-#
-# Same shape as ci.yml, with two differences: ci.yml is left as the
-# GPL/nonfree matrix, and this workflow always builds the redistributable
-# configuration (everything BUNDLED, WITH_GPL=OFF, WITH_NONFREE=OFF) with
-# LTO and PGO. Docs are deployed only here.
+# Manual only, on a tag. Each build installs and uploads its own ZIP.
+# Releases use the redistributable configuration: all dependencies BUNDLED,
+# WITH_GPL=OFF and WITH_NONFREE=OFF, with PGO and LTO.
+# Docs are deployed independently for this tag.
 
 on:
   workflow_dispatch:
@@ -43,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-26.04, windows-latest, macos-latest]
+        os: [ubuntu-26.04, ubuntu-26.04-arm, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     name: checkout-bootstrap (${{ matrix.os }})
     steps:
@@ -55,8 +51,12 @@ jobs:
 
   apt-bootstrap:
     needs: guard
-    runs-on: ubuntu-26.04
-    name: apt-bootstrap
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-26.04, ubuntu-26.04-arm]
+    runs-on: ${{ matrix.runner }}
+    name: apt-bootstrap (${{ matrix.runner }})
     steps:
       - name: Warm APT package indexes
         uses: stormbytepp/githubactions/.github/actions/update-apt-cached@master
@@ -64,23 +64,30 @@ jobs:
           cache-key: apt-lists
 
   ###########################################################################
-  # Linux. libstdc++ and libc++. No GCC archive: it matches libstdc++.
-  # Name: StormByte-Multimedia-<tag>-linux-x64-<stdlib>.zip
+  # Linux: amd64/arm64 x glibc/musl x GCC/libstdc++ or Clang/libc++.
+  # Name: <component>-<tag>-linux-<arch>-<libc>-<stdlib>.zip
   ###########################################################################
   build-linux:
     needs: [checkout-bootstrap, apt-bootstrap]
-    runs-on: ubuntu-26.04
+    permissions:
+      actions: write
+      contents: write
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - compiler: clang
+        platform:
+          - runner: ubuntu-26.04
+            arch: amd64
+          - runner: ubuntu-26.04-arm
+            arch: arm64
+        libc: [glibc, musl]
+        toolchain:
+          - compiler: gcc
             stdlib: libstdc++
-            asset: linux-x64-libstdc++
-          - compiler: clang-libc++
+          - compiler: clang
             stdlib: libc++
-            asset: linux-x64-libc++
-    name: linux-${{ matrix.stdlib }}
+    runs-on: ${{ matrix.platform.runner }}
+    name: linux-${{ matrix.platform.arch }}-${{ matrix.libc }}-${{ matrix.toolchain.stdlib }}
     steps:
       - name: Checkout repository and submodules
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
@@ -88,24 +95,11 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Install nasm/yasm (bundled FFmpeg)
-        uses: stormbytepp/githubactions/.github/actions/install-cached@master
-        with:
-          packages: "nasm yasm"
-          cache-key: apt-nasm-yasm
-          lists-cache-key: apt-lists
-          rotate-weekly: true
-
       - name: Add shared library directories
         shell: bash
         run: |
           set -euo pipefail
-          # Prepend. A job-level assignment replaces the variable and
-          # drops whatever the runner or a previous step already set.
-          # /usr/lib/llvm-20/lib holds LLVM libunwind. libc++ needs it
-          # and the default loader does not search that directory.
-          # The toolchain creates it later; tests only need the entry.
-          extra="/usr/lib/llvm-20/lib:${{ github.workspace }}/build/lib:${{ github.workspace }}/build/buildmaster/install/lib:${{ github.workspace }}/build/buildmaster/install/lib64"
+          extra="/usr/lib/llvm-22/lib:${{ github.workspace }}/build/pgo-instr/lib:${{ github.workspace }}/build/pgo-instr/buildmaster/install/lib:${{ github.workspace }}/build/pgo-instr/buildmaster/install/lib64:${{ github.workspace }}/build/lib:${{ github.workspace }}/build/buildmaster/install/lib:${{ github.workspace }}/build/buildmaster/install/lib64"
           for name in LD_LIBRARY_PATH DYLD_LIBRARY_PATH; do
             current="$(printenv "$name" 2>/dev/null || true)"
             if [[ -n "${current}" ]]; then
@@ -115,16 +109,23 @@ jobs:
             fi
           done
 
-      - name: Build with toolchain
+      - name: Build and deploy with toolchain
         uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
         with:
-          toolchain: ${{ matrix.compiler }}
-          ccache-key: v1-${{ matrix.compiler }}-extra-OFF
-          buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-${{ matrix.compiler }}
+          compiler: ${{ matrix.toolchain.compiler }}
+          cxx-stdlib: ${{ matrix.toolchain.stdlib }}
+          libc: ${{ matrix.libc }}
+          compiler-cache-key: multimedia-v1
+          compiler-cache-scope: release-${{ matrix.platform.arch }}-${{ matrix.libc }}-${{ matrix.toolchain.compiler }}-${{ matrix.toolchain.stdlib }}
+          buildmaster-cache-key: bm-multimedia-release-${{ matrix.platform.arch }}-${{ matrix.libc }}-${{ matrix.toolchain.compiler }}-${{ matrix.toolchain.stdlib }}
+          # Alpine already ships nasm/yasm; VMAF needs vim's xxd, BusyBox xxd
+          # rejects the output-file argument.
+          extra-packages: ${{ matrix.libc == 'musl' && 'xxd' || (matrix.platform.arch == 'amd64' && 'nasm yasm' || '') }}
           build-type: ${{ env.BUILD_TYPE }}
-          configure-options: >-
-            -DENABLE_LTO=ON
-            -DENABLE_PGO=ON
+          pgo: true
+          lto: true
+          cpu-baseline: auto
+          cmake-options: >-
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
@@ -135,43 +136,18 @@ jobs:
             -DWITH_NONFREE=OFF
             -DWITH_GPL=OFF
             -DBUILD_SHARED_LIBS=ON
-            -DCMAKE_CXX_FLAGS=-stdlib=${{ matrix.stdlib }}
-            -DCMAKE_CXX_STANDARD_LIBRARIES=-stdlib=${{ matrix.stdlib }}
-          run-tests: false
-          install: true
-          install-location: package
-
-      - name: Zip the install prefix
-        id: zip
-        shell: bash
-        run: |
-          set -euo pipefail
-          name="${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.asset }}.zip"
-          for notice in LICENSE COPYING.* THIRD-PARTY; do
-            if [[ -f "${notice}" ]]; then
-              cp "${notice}" package/
-            fi
-          done
-          (
-            cd package
-            cmake -E tar cf "../${name}" --format=zip -- .
-          )
-          echo "name=${name}" >> "$GITHUB_OUTPUT"
-          echo "Packed ${name}"
-          cmake -E tar tf "${name}"
-
-      - name: Upload archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.zip.outputs.name }}
-          path: ${{ steps.zip.outputs.name }}
-          if-no-files-found: error
+          ctest: false
+          install-prefix: package
+          deploy: true
 
   ###########################################################################
-  # macOS. Apple Clang only. One archive, no standard-library suffix.
+  # macOS: Apple Clang only, BUNDLED.
   ###########################################################################
   build-macos:
     needs: [checkout-bootstrap]
+    permissions:
+      actions: write
+      contents: write
     runs-on: macos-latest
     name: macos
     steps:
@@ -185,8 +161,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Prepend. A job-level assignment replaces the variable and
-          # drops whatever the runner or a previous step already set.
           extra="${{ github.workspace }}/build/lib:${{ github.workspace }}/build/buildmaster/install/lib:${{ github.workspace }}/build/buildmaster/install/lib64"
           for name in LD_LIBRARY_PATH DYLD_LIBRARY_PATH; do
             current="$(printenv "$name" 2>/dev/null || true)"
@@ -197,16 +171,18 @@ jobs:
             fi
           done
 
-      - name: Build with toolchain
+      - name: Build and deploy with toolchain
         uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
         with:
-          toolchain: clang
-          ccache-key: v1-clang-extra-OFF
-          buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-clang
+          compiler: clang
+          compiler-cache-key: multimedia-v1
+          compiler-cache-scope: release-macos-clang
+          buildmaster-cache-key: bm-multimedia-release-macos-clang
           build-type: ${{ env.BUILD_TYPE }}
-          configure-options: >-
-            -DENABLE_LTO=ON
-            -DENABLE_PGO=ON
+          pgo: true
+          lto: true
+          cpu-baseline: auto
+          cmake-options: >-
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
@@ -217,44 +193,20 @@ jobs:
             -DWITH_NONFREE=OFF
             -DWITH_GPL=OFF
             -DBUILD_SHARED_LIBS=ON
-          run-tests: false
-          install: true
-          install-location: package
-
-      - name: Zip the install prefix
-        id: zip
-        shell: bash
-        run: |
-          set -euo pipefail
-          name="${{ github.event.repository.name }}-${{ github.ref_name }}-macos-arm64.zip"
-          for notice in LICENSE COPYING.* THIRD-PARTY; do
-            if [[ -f "${notice}" ]]; then
-              cp "${notice}" package/
-            fi
-          done
-          (
-            cd package
-            cmake -E tar cf "../${name}" --format=zip -- .
-          )
-          echo "name=${name}" >> "$GITHUB_OUTPUT"
-          echo "Packed ${name}"
-          cmake -E tar tf "${name}"
-
-      - name: Upload archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.zip.outputs.name }}
-          path: ${{ steps.zip.outputs.name }}
-          if-no-files-found: error
+          ctest: false
+          install-prefix: package
+          deploy: true
 
   ###########################################################################
-  # Windows. clang-cl. No libc++ suffix: it shares the MSVC archive.
+  # Windows: clang-cl, BUNDLED.
   ###########################################################################
   build-windows:
     needs: [checkout-bootstrap]
+    permissions:
+      actions: write
+      contents: write
     runs-on: windows-latest
     name: windows-clang-cl
-
     steps:
       - name: Checkout repository and submodules
         uses: stormbytepp/githubactions/.github/actions/checkout-cached@master
@@ -262,27 +214,25 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Install nasm (bundled FFmpeg)
-        uses: stormbytepp/githubactions/.github/actions/install-cached@master
-        with:
-          packages: nasm
-
       - name: Add DLL directories to PATH
         shell: pwsh
         run: |
           echo "${{ github.workspace }}\build\lib" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{ github.workspace }}\build\buildmaster\install\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Build with toolchain
+      - name: Build and deploy with toolchain
         uses: stormbytepp/githubactions/.github/actions/build-with-toolchain@master
         with:
-          toolchain: clang-cl
-          ccache-key: v1-clang-cl-extra-OFF
-          buildmaster-datadir-cache-key: bm-datadir-${{ runner.os }}-clang-cl
+          compiler: clang-cl
+          compiler-cache-key: multimedia-v1
+          compiler-cache-scope: release-windows-clang-cl
+          buildmaster-cache-key: bm-multimedia-release-windows-clang-cl
+          extra-packages: nasm
           build-type: ${{ env.BUILD_TYPE }}
-          configure-options: >-
-            -DENABLE_LTO=ON
-            -DENABLE_PGO=ON
+          pgo: true
+          lto: true
+          cpu-baseline: auto
+          cmake-options: >-
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
@@ -293,64 +243,9 @@ jobs:
             -DWITH_NONFREE=OFF
             -DWITH_GPL=OFF
             -DBUILD_SHARED_LIBS=ON
-          run-tests: false
-          install: true
-          install-location: package
-
-      - name: Zip the install prefix
-        id: zip
-        shell: bash
-        run: |
-          set -euo pipefail
-          name="${{ github.event.repository.name }}-${{ github.ref_name }}-windows-x64.zip"
-          for notice in LICENSE COPYING.* THIRD-PARTY; do
-            if [[ -f "${notice}" ]]; then
-              cp "${notice}" package/
-            fi
-          done
-          (
-            cd package
-            cmake -E tar cf "../${name}" --format=zip -- .
-          )
-          echo "name=${name}" >> "$GITHUB_OUTPUT"
-          echo "Packed ${name}"
-          cmake -E tar tf "${name}"
-
-      - name: Upload archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.zip.outputs.name }}
-          path: ${{ steps.zip.outputs.name }}
-          if-no-files-found: error
-
-  publish:
-    needs: [build-linux, build-macos, build-windows]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download archives
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
-
-      - name: Attach archives to this tag's release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          tag="${{ github.ref_name }}"
-          shopt -s nullglob
-          files=(dist/*.zip)
-          if [ "${#files[@]}" -eq 0 ]; then
-            echo "::error::No archives to upload"
-            exit 1
-          fi
-          printf 'Uploading to %s:\n' "$tag"
-          printf '  %s\n' "${files[@]}"
-          gh release upload "$tag" "${files[@]}" --repo "$GH_REPO" --clobber
+          ctest: false
+          install-prefix: package
+          deploy: true
 
   docs:
     needs: [guard, checkout-bootstrap, apt-bootstrap]
@@ -379,10 +274,7 @@ jobs:
           toolchain: clang
           docs: true
 
-      # Ubuntu archive FFmpeg is still older than 9.0.2, which is what
-      # WITH_FFMPEG=SYSTEM requires. The handbook PPA ships 9.0.2. Drop
-      # this step once the archive has it and the reusable docs workflow
-      # can install the packages itself.
+      # Ubuntu's FFmpeg is older than the 9.0.2 required by SYSTEM mode.
       - name: FFmpeg 9.0.2 from ppa:ubuntuhandbook1/ffmpeg9
         run: |
           set -euo pipefail
@@ -422,7 +314,7 @@ jobs:
           set -euo pipefail
           cmake --build "${{ github.workspace }}/build" \
             --target StormByteMultimediaDoc \
-            --parallel
+            -j"$(nproc)"
 
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1

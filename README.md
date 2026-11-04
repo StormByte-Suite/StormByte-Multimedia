@@ -21,7 +21,7 @@ There are two independent workflows:
 
 `Transcoder` is a complete facade over the processing pipeline, not a reduced encoder. Manual wiring exposes the same machinery when a graph needs more control. `SimplePlayer` handles real-time playback independently; it is a **preview service, not a replacement for a professional media player**, an editor or a bundled Qt/SDL widget.
 
-It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/2.2.3) 2.2.3, [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/2.0.6) 2.0.6, [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/2.0.6) 2.0.6 and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/2.1.3) 2.1.3. Each is a release archive. Public headers live under `StormByte/multimedia/`.
+It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/3.0.0), [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/3.0.0), [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/3.0.0) and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/3.0.0), all at version 3.0.0. Each is a release archive. Public headers live under `StormByte/multimedia/`.
 
 The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, Network and System are **other repositories**. This one does not implement them.
 
@@ -529,7 +529,11 @@ The application controls logging levels, headers and redaction. Processing stage
 
 These flags select dependencies/capabilities, not the license of original Multimedia source. System installations determine their own codec availability and licensing. Review the enabled components when distributing an application.
 
-Release defaults target x86-64-v3 on GCC/Clang x86-64, AVX2 on MSVC-compatible x86 and Apple M1 on Apple Silicon. Explicit compiler flags remain authoritative. Bundled specialized SIMD kernels retain runtime selectors without raising the global baseline; bundled x86 FFmpeg requires NASM.
+CI/release CPU baselines are selected by the shared build action: x86-64-v3 on Linux amd64, ARMv8.2-A on Linux arm64, AVX on Windows x64 and Apple M1 on Apple Silicon. Direct CMake builds preserve the compiler's defaults and caller-provided CPU flags. Bundled specialized SIMD kernels retain runtime selectors without raising the global baseline; bundled x86 FFmpeg requires NASM.
+
+Linux releases cover amd64/arm64, glibc/musl and GCC/libstdc++ or Clang/libc++. Their archive names are `StormByte-Multimedia-<tag>-linux-<arch>-<libc>-<stdlib>.zip`. macOS uses `macos-arm64` and Windows uses `windows-x64`, without a runtime suffix. Each release build uploads its own archive directly; documentation deployment is independent.
+
+For GCC/Linux builds with LTO, configure checks for the [Alpine fortify-headers/LTO bug](https://gitlab.alpinelinux.org/alpine/aports/-/issues/13735). When the toolchain is affected, Multimedia adds `-fno-builtin-vsnprintf` to its C++ build flags, including PGO training and bundled CMake dependencies such as Tesseract. LTO and fortify remain enabled. Consumers compiling their own code may need the same flag until their toolchain is fixed.
 
 Bundled Opus presumes NEON on ARM64 when the compiler supports its intrinsics; 32-bit ARM does not assume NEON. Bundled FFmpeg includes the upstream AArch64 swscale fix for signed intermediate samples and fixes its Meson NEON/SSE2 intrinsics probes, building the NEON MPEG unquantizer only when NEON intrinsics are detected.
 
@@ -539,7 +543,7 @@ Bundled SVG rendering uses LunaSVG 3.5.0/PlutoVG 1.3.1. Binary packages must ret
 
 ## Installation
 
-Requires a C++26-capable compiler/standard library, CMake with `CXX_STANDARD 26` support (3.25+) and [StormByte-BuildMaster](https://github.com/StormByte-Suite/StormByte-BuildMaster) 2.1.3 or newer. BuildMaster downloads matching Base/Buffer/Logger/System release archives; these are not submodules. Bundled media dependencies need recursive checkout and NASM on x86.
+Requires a C++26-capable compiler/standard library, CMake with `CXX_STANDARD 26` support (3.25+) and [StormByte-BuildMaster](https://github.com/StormByte-Suite/StormByte-BuildMaster) 2.1.5 or newer. BuildMaster downloads matching Base/Buffer/Logger/System release archives by architecture, Linux C library and C++ runtime; these are not submodules. Bundled media dependencies need recursive checkout and NASM on x86.
 
 ```sh
 git clone --recursive https://github.com/StormBytePP/StormByte-Multimedia.git
@@ -555,6 +559,15 @@ On platforms without `nproc`, pass the detected available CPU count to `-j`.
 
 The in-tree target is `StormByte::Multimedia`, the library is `StormByte-Multimedia`, and installed headers use `#include <StormByte/multimedia/...>`. Deploy runtime dependencies with a compatible ABI; public headers do not expose the platform or media-engine implementation dependencies.
 
+Installed prefixes and extracted release ZIPs provide `FindStormByteMultimedia.cmake`. Put both the Multimedia prefix and its matching StormByte dependency prefix in `CMAKE_PREFIX_PATH`, and their `share/cmake/Modules` directories in `CMAKE_MODULE_PATH`, then consume the imported target:
+
+```cmake
+find_package(StormByte REQUIRED COMPONENTS Multimedia)
+target_link_libraries(my_application PRIVATE StormByte::Multimedia)
+```
+
+The finder brings in Base, Buffer, Logger and System transitively and propagates the shared-library definitions required by Windows consumers.
+
 ## Tests
 
 ```sh
@@ -566,6 +579,8 @@ ctest --test-dir build-tests/test --output-on-failure
 ```
 
 Processing tests cover registries, `File`, facade/manual graphs, codecs, filters, remux/encode, mux policies, interleaving, OCR, artwork and HDR metadata. Outputs are reopened and decoded through library APIs; tests do not require external media command-line tools. HDR tests compare metadata and frame counts, not merely successful file creation. Hardware cases preflight device/profile support; unavailable implementations skip, but an available implementation's processing failure does not.
+
+For shared builds with bundled StormByte dependencies, `PackageDiscoveryTests` installs Multimedia, creates and extracts a ZIP, then configures, links and runs a separate consumer against each prefix. The consumer probes the stereo WAV fixture and verifies audio properties and the codec registry. `OptimizationTests` checks that the common LTO module does not inject x86 flags into ARM builds or overwrite caller-supplied flags.
 
 Preview tests use a clocked fake Display, synthetic inputs and a remote-like reader with irreversible close. They cover exact decoded audio, playback timing, pause/seek/track changes, subtitles, errors, ownership and transfer into Transcoder without another origin Open. Run the focused group with:
 
