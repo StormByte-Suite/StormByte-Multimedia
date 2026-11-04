@@ -10,6 +10,9 @@ matching threshold, without changing accepted distances or ordering.
 
 This reduces floating-point work and atomic PGO counter updates in the
 innermost search loop while preserving the denoising parameters.
+
+Found-by: https://github.com/StormByte-Suite/StormByte-Multimedia
+Signed-off-by: David C. Manuelda <StormByte@gmail.com>
 ---
  libavfilter/vf_bm3d.c | 40 ++++++++++++++++++++++++++++++----------
  1 file changed, 30 insertions(+), 10 deletions(-)
@@ -108,4 +111,3 @@ index 16f4d98ac6..fa91325c80 100644
          if (dist <= th_sse && dist != 0) {
 -- 
 2.56.0
-
