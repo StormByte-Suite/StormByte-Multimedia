@@ -281,6 +281,7 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0013-swscale-aarch64-fix-signed-load.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0014-meson-fix-intrinsics-probes.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0015-meson-asmgen-feature-macros.patch"
+		"${CMAKE_CURRENT_LIST_DIR}/0016-bm3d-bound-block-distance-work.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS
 		"GIT={RESET;PATCH={${FFMPEG_PATCHES}};TITLE=FFmpeg compatibility patches}"

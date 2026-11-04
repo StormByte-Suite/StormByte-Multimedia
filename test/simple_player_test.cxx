@@ -1043,6 +1043,23 @@ int test_audio_pacing_pause_drain() {
 }
 
 /**
+ * @brief Close while audio playback workers enter their queue waits.
+ * @return Test status.
+ */
+int test_close_wakes_idle_workers() {
+	auto display = Safe::MakeShared<FakeDisplay>();
+	SimplePlayer player(display);
+	for (unsigned iteration = 0; iteration < 32; ++iteration) {
+		TEST_REQUIRE(player.Open(Fixture("audio/noise_stereo.wav")));
+		TEST_REQUIRE(player.Play());
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		TEST_REQUIRE(player.Close());
+		TEST_REQUIRE(player.State() == PlaybackState::Closed);
+	}
+	return 0;
+}
+
+/**
  * @brief Seek audio-only input while paused and resume at the requested sample.
  * @return Test status.
  */
@@ -1224,14 +1241,15 @@ int test_hdr_preview_preserves_signal() {
 int test_live_audio_selection() {
 	auto display = Safe::MakeShared<FakeDisplay>();
 	display->m_live_audio = true;
+	display->m_capture_deferred = false;
 	auto stats = Safe::MakeShared<ReaderStats>();
-	// Keep the short fixture's demux cursor away from EOF during live switches.
+	// Live switches must remain away from EOF even with instrumented decoding.
 	StormByte::Multimedia::PreviewBuffering buffering;
 	buffering.Preload = std::chrono::milliseconds(100);
 	buffering.ReadAhead = std::chrono::milliseconds(250);
 	buffering.AudioAhead = std::chrono::milliseconds(100);
 	SimplePlayer player(display, {}, buffering);
-	TEST_REQUIRE(player.Open(Safe::MakeUnique<TokenReader>(Fixture("video/anime_like.mkv"), stats)));
+	TEST_REQUIRE(player.Open(Safe::MakeUnique<TokenReader>(Fixture("video/live_audio_switch_long.mkv"), stats)));
 	TEST_REQUIRE(player.SelectTrack(MediaType::Subtitle, -1));
 	const int audio = player.SelectedTrack(MediaType::Audio);
 	TEST_REQUIRE(audio >= 0);
@@ -1285,13 +1303,13 @@ int test_live_audio_selection() {
 	TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
 	TEST_REQUIRE(player.State() == PlaybackState::Paused);
 	TEST_REQUIRE(player.Position() == paused);
-	TEST_REQUIRE(player.Seek(.5));
+	TEST_REQUIRE(player.Seek(player.Duration() - 1.5));
 	TEST_REQUIRE(player.Play());
 	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
 	TEST_REQUIRE(player.State() == PlaybackState::Ended);
 	TEST_REQUIRE(player.SelectTrack(MediaType::Audio, audio));
 	TEST_REQUIRE(player.State() == PlaybackState::Paused);
-	TEST_REQUIRE(player.Seek(1.9));
+	TEST_REQUIRE(player.Seek(player.Duration() - .1));
 	TEST_REQUIRE(player.Play());
 	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }));
 	TEST_REQUIRE(player.State() == PlaybackState::Ended);
@@ -2079,6 +2097,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_audio_native_opus", test_audio_native_opus},
 		TestEntry{"test_audio_native_stereo", test_audio_native_stereo},
 		TestEntry{"test_audio_pacing_pause_drain", test_audio_pacing_pause_drain},
+		TestEntry{"test_close_wakes_idle_workers", test_close_wakes_idle_workers},
 		TestEntry{"test_audio_paused_seek", test_audio_paused_seek},
 		TestEntry{"test_av_seek_switch_epochs", test_av_seek_switch_epochs},
 		TestEntry{"test_hdr_preview_tone_mapping", test_hdr_preview_tone_mapping},

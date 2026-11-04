@@ -65,8 +65,7 @@ using namespace StormByte::Multimedia::Pipeline;
 using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
-// The instrumented tree passes a longer value. bm3d on the 48-frame
-// fixture takes about five seconds a frame under -fprofile-generate.
+// The instrumented tree passes a longer value for expensive filters.
 #ifndef STORMBYTE_MM_TEST_DEADLINE_SEC
 #define STORMBYTE_MM_TEST_DEADLINE_SEC 30
 #endif
@@ -83,8 +82,12 @@ constexpr auto TestDeadline = std::chrono::seconds{STORMBYTE_MM_TEST_DEADLINE_SE
 		while (!IsTerminal(job.Status()) && std::chrono::steady_clock::now() < deadline) {
 			if (const auto progress = job.Progress()) {
 				const auto values = progress->Snapshot();
-				TEST_REQUIRE(values.Main >= lastMain);
-				TEST_REQUIRE(values.Main <= 100.0);
+				if (!(values.Main >= lastMain && values.Main <= 100.0)) {
+					std::cerr << "[ASSERT] Transcoder progress must be monotonic and at most 100: previous="
+						<< lastMain << " current=" << values.Main << std::endl;
+					job.Cancel();
+					return 1;
+				}
 				lastMain = values.Main;
 			}
 			std::this_thread::sleep_for(10ms);

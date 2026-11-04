@@ -95,7 +95,7 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 *   sigma=2, group=8, range=9, bstep=4
 	 * - below that (1080p class):
 	 *   sigma=3, group=16, range=9, bstep=4
-	 * Patch log2 size is always 4 (16×16). Caller values are
+	 * Patch size is always 8×8. Caller values are
 	 * used as-is.
 	 *
 	 * @par Cost

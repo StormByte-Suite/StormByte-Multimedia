@@ -398,12 +398,12 @@ class Backend::SimplePlayer::Context {
 			{
 				std::lock_guard lock(m_mutex);
 				m_state = PlaybackState::Error;
+				m_cancel = true;
 				try { m_error = message; }
 				catch (...) {
 					LogFailure("unable to store preview failure text");
 				}
 			}
-			m_cancel = true;
 			m_ready.notify_all();
 			LogFailure(message);
 			return false;
@@ -432,8 +432,12 @@ class Backend::SimplePlayer::Context {
 		 * @brief Interrupt and join both workers without closing input.
 		 */
 		void Halt() noexcept {
-			m_cancel = true;
-			m_decode_stop = true;
+			{
+				// Pair cancellation with the wait mutex so no worker misses the wakeup.
+				std::lock_guard lock(m_mutex);
+				m_cancel = true;
+				m_decode_stop = true;
+			}
 			m_ready.notify_all();
 			if (m_decode.joinable())
 				m_decode.join();

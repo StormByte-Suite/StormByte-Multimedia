@@ -1,0 +1,71 @@
+cmake_minimum_required(VERSION 3.20)
+
+if(NOT DEFINED REPO OR NOT DEFINED WORK OR WORK STREQUAL "" OR NOT DEFINED C_COMPILER)
+	message(FATAL_ERROR "REPO, WORK and C_COMPILER are required")
+endif()
+
+file(READ "${REPO}/thirdparty/ffmpeg/CMakeLists.txt" configuration)
+if(NOT configuration MATCHES "0016-bm3d-bound-block-distance-work.patch")
+	message(FATAL_ERROR "BM3D optimization patch is not registered")
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/patched_checkout.cmake")
+file(GLOB patches LIST_DIRECTORIES FALSE "${REPO}/thirdparty/ffmpeg/[0-9][0-9][0-9][0-9]-*.patch")
+list(SORT patches)
+prepare_patched_checkout("${REPO}/thirdparty/ffmpeg/src" "${WORK}" ready ${patches})
+if(NOT ready)
+	return()
+endif()
+
+file(READ "${WORK}/source/libavfilter/vf_bm3d.c" source)
+string(FIND "${source}" "static double do_block_ssd(" begin)
+string(FIND "${source}" "static void do_block_matching_multi(" end)
+if(begin LESS 0 OR end LESS begin)
+	message(FATAL_ERROR "Cannot locate patched BM3D distance functions")
+endif()
+math(EXPR length "${end} - ${begin}")
+string(SUBSTRING "${source}" ${begin} ${length} functions)
+file(WRITE "${WORK}/bm3d_ssd.h" "${functions}")
+file(WRITE "${WORK}/CMakeLists.txt"
+	"cmake_minimum_required(VERSION 3.20)\nproject(Bm3dSsdTest C)\n"
+	"add_executable(Bm3dSsdTest \"${REPO}/test/ffmpeg/bm3d_ssd_test.c\")\n"
+	"target_include_directories(Bm3dSsdTest PRIVATE \"${WORK}\")\n"
+	"set_target_properties(Bm3dSsdTest PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON RUNTIME_OUTPUT_DIRECTORY \"${WORK}/bin\" RUNTIME_OUTPUT_DIRECTORY_RELEASE \"${WORK}/bin\")\n")
+set(generator_options)
+if(DEFINED GENERATOR AND NOT GENERATOR STREQUAL "")
+	list(APPEND generator_options -G "${GENERATOR}")
+endif()
+if(DEFINED GENERATOR_PLATFORM AND NOT GENERATOR_PLATFORM STREQUAL "")
+	list(APPEND generator_options -A "${GENERATOR_PLATFORM}")
+endif()
+if(DEFINED GENERATOR_TOOLSET AND NOT GENERATOR_TOOLSET STREQUAL "")
+	list(APPEND generator_options -T "${GENERATOR_TOOLSET}")
+endif()
+execute_process(COMMAND "${CMAKE_COMMAND}" -S "${WORK}" -B "${WORK}/build"
+	${generator_options} "-DCMAKE_C_COMPILER=${C_COMPILER}" -DCMAKE_BUILD_TYPE=Release
+	RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
+if(NOT result EQUAL 0)
+	message(FATAL_ERROR "BM3D test configuration failed:\n${output}\n${error}")
+endif()
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+	execute_process(COMMAND nproc OUTPUT_VARIABLE processors OUTPUT_STRIP_TRAILING_WHITESPACE
+		COMMAND_ERROR_IS_FATAL ANY)
+else()
+	cmake_host_system_information(RESULT processors QUERY NUMBER_OF_LOGICAL_CORES)
+endif()
+execute_process(COMMAND "${CMAKE_COMMAND}" --build "${WORK}/build" --config Release -j "${processors}"
+	RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
+if(NOT result EQUAL 0)
+	message(FATAL_ERROR "BM3D test build failed:\n${output}\n${error}")
+endif()
+if(WIN32)
+	set(executable "${WORK}/bin/Bm3dSsdTest.exe")
+else()
+	set(executable "${WORK}/bin/Bm3dSsdTest")
+endif()
+execute_process(COMMAND "${executable}"
+	RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
+if(NOT result EQUAL 0)
+	message(FATAL_ERROR "BM3D distance regression failed:\n${output}\n${error}")
+endif()
+message(STATUS "${output}")

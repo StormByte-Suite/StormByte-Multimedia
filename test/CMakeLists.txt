@@ -60,6 +60,7 @@ if(ENABLE_TEST)
 		test_audio_native_opus
 		test_audio_native_stereo
 		test_audio_pacing_pause_drain
+		test_close_wakes_idle_workers
 		test_audio_paused_seek
 		test_av_seek_switch_epochs
 		test_hdr_preview_tone_mapping
@@ -171,6 +172,17 @@ if(ENABLE_TEST)
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/bundled_includes_test.cmake")
 	set_tests_properties(configuration.test_bundled_checkout_includes
 		PROPERTIES TIMEOUT 30 LABELS "multimedia;configuration")
+	add_test(NAME configuration.test_ffmpeg_bm3d_distances
+		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
+		"-DWORK=${PROJECT_BINARY_DIR}/test-output/ffmpeg-bm3d"
+		"-DC_COMPILER=${CMAKE_C_COMPILER}"
+		"-DGENERATOR=${CMAKE_GENERATOR}"
+		"-DGENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
+		"-DGENERATOR_TOOLSET=${CMAKE_GENERATOR_TOOLSET}"
+		-P "${CMAKE_CURRENT_SOURCE_DIR}/configuration/ffmpeg_bm3d_test.cmake")
+	set_tests_properties(configuration.test_ffmpeg_bm3d_distances
+		PROPERTIES TIMEOUT 60 LABELS "multimedia;configuration;ffmpeg"
+			SKIP_REGULAR_EXPRESSION "SKIPPED:")
 	add_test(NAME configuration.test_tessdata_language_selection
 		COMMAND "${CMAKE_COMMAND}" "-DREPO=${PROJECT_SOURCE_DIR}"
 		"-DWORK=${PROJECT_BINARY_DIR}/test-output/tessdata-selection"

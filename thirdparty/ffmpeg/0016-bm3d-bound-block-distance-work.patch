@@ -1,0 +1,111 @@
+From 6ba1eedf684f5b32e0b6dabfb399bc716b7ee6b5 Mon Sep 17 00:00:00 2001
+From: "David C. Manuelda" <StormByte@gmail.com>
+Date: Wed, 4 Nov 2026 16:57:08 +0100
+Subject: [PATCH] avfilter/bm3d: bound exact block-distance work
+
+Accumulate SSD in exact integer arithmetic with four samples per loop.
+Use 32-bit sums for 8-bit pixels and 64-bit sums for higher depths.
+Reject candidates as soon as their partial SSD exceeds the existing
+matching threshold, without changing accepted distances or ordering.
+
+This reduces floating-point work and atomic PGO counter updates in the
+innermost search loop while preserving the denoising parameters.
+---
+ libavfilter/vf_bm3d.c | 40 ++++++++++++++++++++++++++++++----------
+ 1 file changed, 30 insertions(+), 10 deletions(-)
+
+diff --git a/libavfilter/vf_bm3d.c b/libavfilter/vf_bm3d.c
+index 16f4d98ac6..fa91325c80 100644
+--- a/libavfilter/vf_bm3d.c
++++ b/libavfilter/vf_bm3d.c
+@@ -119,7 +119,7 @@ typedef struct BM3DContext {
+                           int y, int x, int block_size, float *dst);
+     double (*do_block_ssd)(struct BM3DContext *s, PosCode *pos,
+                            const uint8_t *src, int src_stride,
+-                           int r_y, int r_x);
++                           int r_y, int r_x, double limit);
+     void (*do_output)(struct BM3DContext *s, uint8_t *dst, int dst_linesize,
+                       int plane, int nb_jobs);
+     void (*block_filtering)(struct BM3DContext *s,
+@@ -226,20 +226,30 @@ static int cmp_scores(const void *a, const void *b)
+     return FFDIFFSIGN(pair1->score, pair2->score);
+ }
+ 
+-static double do_block_ssd(BM3DContext *s, PosCode *pos, const uint8_t *src, int src_stride, int r_y, int r_x)
++static double do_block_ssd(BM3DContext *s, PosCode *pos, const uint8_t *src, int src_stride, int r_y, int r_x, double limit)
+ {
+     const uint8_t *srcp = src + pos->y * src_stride + pos->x;
+     const uint8_t *refp = src + r_y * src_stride + r_x;
+     const int block_size = s->block_size;
+-    double dist = 0.;
++    uint32_t dist = 0;
+     int x, y;
+ 
+     for (y = 0; y < block_size; y++) {
+-        for (x = 0; x < block_size; x++) {
+-            double temp = refp[x] - srcp[x];
++        for (x = 0; x + 3 < block_size; x += 4) {
++            const int d0 = refp[x]     - srcp[x];
++            const int d1 = refp[x + 1] - srcp[x + 1];
++            const int d2 = refp[x + 2] - srcp[x + 2];
++            const int d3 = refp[x + 3] - srcp[x + 3];
++            dist += d0 * d0 + d1 * d1 + d2 * d2 + d3 * d3;
++        }
++        for (; x < block_size; x++) {
++            const int temp = refp[x] - srcp[x];
+             dist += temp * temp;
+         }
+ 
++        if (dist > limit)
++            return dist;
++
+         srcp += src_stride;
+         refp += src_stride;
+     }
+@@ -247,20 +257,30 @@ static double do_block_ssd(BM3DContext *s, PosCode *pos, const uint8_t *src, int
+     return dist;
+ }
+ 
+-static double do_block_ssd16(BM3DContext *s, PosCode *pos, const uint8_t *src, int src_stride, int r_y, int r_x)
++static double do_block_ssd16(BM3DContext *s, PosCode *pos, const uint8_t *src, int src_stride, int r_y, int r_x, double limit)
+ {
+     const uint16_t *srcp = (uint16_t *)src + pos->y * src_stride / 2 + pos->x;
+     const uint16_t *refp = (uint16_t *)src + r_y * src_stride / 2 + r_x;
+     const int block_size = s->block_size;
+-    double dist = 0.;
++    uint64_t dist = 0;
+     int x, y;
+ 
+     for (y = 0; y < block_size; y++) {
+-        for (x = 0; x < block_size; x++) {
+-            double temp = refp[x] - srcp[x];
++        for (x = 0; x + 3 < block_size; x += 4) {
++            const int64_t d0 = refp[x]     - srcp[x];
++            const int64_t d1 = refp[x + 1] - srcp[x + 1];
++            const int64_t d2 = refp[x + 2] - srcp[x + 2];
++            const int64_t d3 = refp[x + 3] - srcp[x + 3];
++            dist += d0 * d0 + d1 * d1 + d2 * d2 + d3 * d3;
++        }
++        for (; x < block_size; x++) {
++            const int64_t temp = refp[x] - srcp[x];
+             dist += temp * temp;
+         }
+ 
++        if (dist > limit)
++            return dist;
++
+         srcp += src_stride / 2;
+         refp += src_stride / 2;
+     }
+@@ -282,7 +302,7 @@ static void do_block_matching_multi(BM3DContext *s, const uint8_t *src, int src_
+         PosCode pos = search_pos[i];
+         double dist;
+ 
+-        dist = s->do_block_ssd(s, &pos, src, src_stride, r_y, r_x);
++        dist = s->do_block_ssd(s, &pos, src, src_stride, r_y, r_x, th_sse);
+ 
+         // Only match similar blocks but not identical blocks
+         if (dist <= th_sse && dist != 0) {
+-- 
+2.56.0
+
