@@ -30,7 +30,9 @@ if(ENABLE_TEST)
 		"STORMBYTE_TEST_OUTPUT_DIR=\"${PROJECT_BINARY_DIR}/test-output\"")
 	# Instrumented filters can take several seconds per frame.
 	if(PGO_STAGE STREQUAL "generate" OR ENABLE_ASAN)
-		target_compile_definitions(multimedia_test_support INTERFACE STORMBYTE_MM_TEST_DEADLINE_SEC=360)
+		target_compile_definitions(multimedia_test_support INTERFACE
+			STORMBYTE_MM_TEST_DEADLINE_SEC=360
+			STORMBYTE_MM_TEST_VIDEO_LATENESS_SEC=0.25)
 	endif()
 
 	file(MAKE_DIRECTORY

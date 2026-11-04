@@ -92,6 +92,29 @@ int main() { return 0; }" PGO_AARCH64_NO_LATE_COMBINE)
 	endif()
 endif()
 
+# LLVM value profiling can corrupt its linked list under concurrent AArch64
+# training (llvm/llvm-project#160968). Keep execution counters and threading.
+set(_pgo_clang_generate_workaround "")
+if(_pgo_kind STREQUAL "CLANG" AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	include(CheckCXXSourceCompiles)
+	include(CMakePushCheckState)
+	cmake_push_check_state(RESET)
+	set(CMAKE_REQUIRED_FLAGS "--start-no-unused-arguments -mllvm -disable-vp --end-no-unused-arguments")
+	check_cxx_source_compiles("
+#if !defined(__aarch64__)
+#error not AArch64
+#endif
+int main() { return 0; }" PGO_AARCH64_NO_VALUE_PROFILING)
+	cmake_pop_check_state()
+	if(PGO_AARCH64_NO_VALUE_PROFILING)
+		# CMake also passes C/C++ flags to link-only feature probes. Suppress
+		# unused-argument diagnostics for this compile-only option, not others.
+		set(_pgo_clang_generate_workaround
+			"--start-no-unused-arguments" "-mllvm" "-disable-vp"
+			"--end-no-unused-arguments")
+	endif()
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	message(WARNING "ENABLE_PGO on a Debug build: the profile will not match an optimized binary")
 endif()
@@ -195,6 +218,7 @@ function(_pgo_strip_profile_flags value out)
 		"-fprofile-update=[^ ]+"
 		"-fprofile-prefix-path=[^ ]+"
 		"-fno-late-combine-instructions"
+		"--start-no-unused-arguments -mllvm -disable-vp --end-no-unused-arguments"
 		"-Wno-error=missing-profile"
 		"-Wno-error=coverage-mismatch"
 		"-Wno-error=profile-instr-unprofiled"
@@ -236,8 +260,8 @@ macro(_pgo_apply_stage_flags stage)
 				${_pgo_generate_workaround})
 			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}" ${_pgo_generate_workaround})
 		elseif(_pgo_kind STREQUAL "CLANG")
-			list(APPEND _compile "-fprofile-generate=${PGO_PROFILE_DIR}")
-			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}")
+			list(APPEND _compile "-fprofile-generate=${PGO_PROFILE_DIR}" ${_pgo_clang_generate_workaround})
+			list(APPEND _link "-fprofile-generate=${PGO_PROFILE_DIR}" ${_pgo_clang_generate_workaround})
 		elseif(_pgo_kind STREQUAL "CLANG_CL")
 			# lld-link is the linker, not clang-cl. A /clang: flag is an input file
 			# to lld-link. Instrumentation stays in the objects; the link only needs

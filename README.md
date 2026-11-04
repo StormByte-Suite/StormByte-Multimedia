@@ -538,6 +538,8 @@ For GCC/Linux builds with LTO, configure checks for the [Alpine fortify-headers/
 
 Bundled Opus presumes NEON on ARM64 when the compiler supports its intrinsics; 32-bit ARM does not assume NEON. Bundled FFmpeg includes the upstream AArch64 swscale fix for signed intermediate samples and fixes its Meson NEON/SSE2 intrinsics probes, building the NEON MPEG unquantizer only when NEON intrinsics are detected.
 
+Clang/Linux AArch64 PGO training disables value profiling to avoid the concurrent profiler hang tracked in [llvm/llvm-project#160968](https://github.com/llvm/llvm-project/issues/160968). Execution-count profiling, LTO, SIMD and codec multithreading remain enabled. The workaround is removed from the optimized build.
+
 Bundled tessdata embeds the models selected in [the language configuration](thirdparty/tessdata/languages/CMakeLists.txt), including available vertical variants. System models are loaded from the configured installation; use `TESSDATA_DIR`, `TESSDATA_PREFIX` or `Tessdata_ROOT` to select it and deploy the required files. Partial installations are accepted, but an absent requested language fails without fallback. OCR receives decoded grayscale subtitle pixels, not external image files.
 
 Bundled SVG rendering uses LunaSVG 3.5.0/PlutoVG 1.3.1. Binary packages must retain `THIRD-PARTY`, `COPYING.LunaSVG` and `COPYING.FTL` alongside the existing notices.
@@ -589,6 +591,8 @@ Preview tests use a clocked fake Display, synthetic inputs and a remote-like rea
 cmake --build build-tests --target MultimediaSimplePlayerTests -j"$(nproc)"
 ctest --test-dir build-tests/test -R '^preview\.' --output-on-failure
 ```
+
+The skewed-interleave software-playback tests bound video lateness to 100 ms in ordinary builds and 250 ms under PGO instrumentation or ASan, where shared-runner scheduling and instrumentation can delay delivery. The audio underrun (50 ms), video lead (100 ms), delivery gap (500 ms), and timestamp-continuity checks remain unchanged.
 
 The live-audio cases also cover disabled audio, repeated/rapid selections, full PCM queues, sink errors and pause/seek/EOF reconstruction. For a local multitrack file (not redistributed with the tests), the same registered case cycles every audio track and checks increasing video timestamps, bounded delivery gaps and unchanged video epoch:
 

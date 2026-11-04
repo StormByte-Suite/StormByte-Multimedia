@@ -1424,7 +1424,12 @@ int SkewedInterleavePlayback(const char* name, DecodeAcceleration acceleration) 
 			if (check_timing) {
 				TEST_REQUIRE(display->m_max_audio_underrun < 0.05);
 				TEST_REQUIRE(display->m_max_video_lead < 0.10);
+#ifdef STORMBYTE_MM_TEST_VIDEO_LATENESS_SEC
+				// Instrumentation on shared runners can deschedule presentation.
+				TEST_REQUIRE(display->m_max_video_late < STORMBYTE_MM_TEST_VIDEO_LATENESS_SEC);
+#else
 				TEST_REQUIRE(display->m_max_video_late < 0.10);
+#endif
 			}
 			epoch = display->m_epoch;
 			resets = display->m_audio_invalidations;
