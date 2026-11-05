@@ -141,6 +141,7 @@ jobs:
           cpu-baseline: auto
           cmake-options: >-
             -DENABLE_TEST=ON
+            -DENABLE_CI_FIXTURES=ON
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
@@ -212,6 +213,7 @@ jobs:
           cpu-baseline: auto
           cmake-options: >-
             -DENABLE_TEST=ON
+            -DENABLE_CI_FIXTURES=ON
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED
@@ -264,6 +266,7 @@ jobs:
           cpu-baseline: auto
           cmake-options: >-
             -DENABLE_TEST=ON
+            -DENABLE_CI_FIXTURES=ON
             -DWITH_FFMPEG=BUNDLED
             -DWITH_STORMBYTE=BUNDLED
             -DWITH_OCR=BUNDLED

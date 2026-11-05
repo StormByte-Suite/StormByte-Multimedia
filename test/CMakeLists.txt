@@ -1,4 +1,5 @@
 option(ENABLE_TEST "Enable Unit Tests" OFF)
+option(ENABLE_CI_FIXTURES "Enable CI-only package discovery fixtures" OFF)
 option(ENABLE_PREVIEW_DEMO "Build the optional SDL2 interactive preview demo" OFF)
 if(ENABLE_PREVIEW_DEMO)
 	find_package(SDL2 CONFIG REQUIRED)
@@ -260,7 +261,7 @@ if(ENABLE_TEST)
 	set_tests_properties(configuration.test_ocr_raw_options
 		PROPERTIES TIMEOUT 15 LABELS "multimedia;configuration;ocr")
 
-	if(BUILD_SHARED_LIBS AND WITH_STORMBYTE STREQUAL "BUNDLED" AND NOT CMAKE_CROSSCOMPILING)
+	if(ENABLE_CI_FIXTURES AND BUILD_SHARED_LIBS AND WITH_STORMBYTE STREQUAL "BUNDLED" AND NOT CMAKE_CROSSCOMPILING)
 		set(_package_cxx_flags "${CMAKE_CXX_FLAGS}")
 		set(_package_link_flags "${CMAKE_EXE_LINKER_FLAGS}")
 		if(COMMAND _pgo_strip_profile_flags)

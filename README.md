@@ -521,6 +521,7 @@ The application controls logging levels, headers and redaction. Processing stage
 | `WITH_LUNASVG` | `BUNDLED` (default) / `SYSTEM` | SVG watermark renderer; `SYSTEM` requires LunaSVG 3.5 or newer. Bundled builds disable system font loading and the font-face cache |
 | `BUILD_SHARED_LIBS` | `ON` (default) / `OFF` | Shared/static Multimedia and matching StormByte archives |
 | `ENABLE_TEST` | `ON` / `OFF` (default) | Build/register CTest; PGO enables tests in the instrumented tree |
+| `ENABLE_CI_FIXTURES` | `ON` / `OFF` (default) | CI-only package discovery fixtures; explicitly enabled by CI, not needed for local tests or PGO |
 | `ENABLE_PREVIEW_DEMO` | `ON` / `OFF` (default) | Optional SDL2 output demo; requires SDL2 development files |
 | `ENABLE_LTO` | `ON` (default) / `OFF` | Link-time optimization |
 | `ENABLE_PGO` | `ON` / `OFF` (default) | Instrument/train in `pgo-instr`, then build the profiled library |
