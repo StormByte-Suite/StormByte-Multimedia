@@ -410,7 +410,9 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		opts.emplace(row->bitrate_key, "0");
 	if (owner.MaxBitRate() && row && HasKey(row->maxrate_key))
 		opts.emplace(row->maxrate_key, std::to_string(*owner.MaxBitRate()));
-	if (row && HasKey(row->bufsize_key) && (owner.BitRate() || owner.MaxBitRate()))
+	// MPEG-4 Part 2 encoders reject a VBV buffer without a peak rate, so pair them.
+	const bool pairedVbv = row && (std::string_view(row->name) == "mpeg4" || std::string_view(row->name) == "libxvid");
+	if (row && HasKey(row->bufsize_key) && (pairedVbv ? static_cast<bool>(owner.MaxBitRate()) : (owner.BitRate() || owner.MaxBitRate())))
 		opts.emplace(row->bufsize_key, std::to_string(BufSizeBits(owner)));
 	if (need.Has(Feature::DOVI) && row && std::string_view(row->name) == "libx265") {
 		if ((owner.MaxBitRate() && *owner.MaxBitRate() <= 0) || (owner.BitRate() && *owner.BitRate() <= 0)) {

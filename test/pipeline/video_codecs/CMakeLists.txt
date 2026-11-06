@@ -29,6 +29,7 @@ foreach(test_name IN ITEMS
 	test_openh264_rejects_ten_bit_input
 	test_openh264_encodes_ten_bit_after_format
 	test_kvazaar_encodes_hevc_matroska
+	test_mpeg4_encodes_part2_avi
 	test_vaapi_encodes_hevc_main_matroska
 	test_libwebp_anim_encodes_webp
 	test_libwebp_decodes_animated_webp

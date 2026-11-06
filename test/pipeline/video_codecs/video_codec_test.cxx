@@ -433,6 +433,10 @@ int test_x265_encodes_hevc_matroska() {
 	return CheckVideoEncode("pipeline/video-codecs/x265.mkv", "Matroska", "H.265", "libx265");
 }
 
+int test_mpeg4_encodes_part2_avi() {
+	return CheckVideoEncode("pipeline/video-codecs/mpeg4.avi", "AVI", "MPEG-4 Part 2", "mpeg4");
+}
+
 int test_nvenc_feature_contract() {
 	const auto& encoders = Tables::Encoder::Video();
 	const auto findEncoder = [&encoders](std::string_view name) {
@@ -652,6 +656,7 @@ int RunPipelineVideoCodecTests(int argc, char** argv) {
 		TestEntry{"test_openh264_rejects_ten_bit_input", test_openh264_rejects_ten_bit_input},
 		TestEntry{"test_openh264_encodes_ten_bit_after_format", test_openh264_encodes_ten_bit_after_format},
 		TestEntry{"test_kvazaar_encodes_hevc_matroska", test_kvazaar_encodes_hevc_matroska},
+		TestEntry{"test_mpeg4_encodes_part2_avi", test_mpeg4_encodes_part2_avi},
 		TestEntry{"test_x265_encodes_hevc_matroska", test_x265_encodes_hevc_matroska},
 		TestEntry{"test_nvenc_feature_contract", test_nvenc_feature_contract},
 		TestEntry{"test_hevc_feature_access_matches_available_encoders", test_hevc_feature_access_matches_available_encoders},
