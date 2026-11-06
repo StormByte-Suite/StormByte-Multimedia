@@ -1321,6 +1321,15 @@ int test_live_audio_selection() {
 	buffering.ReadAhead = std::chrono::milliseconds(250);
 	buffering.AudioAhead = std::chrono::milliseconds(100);
 	SimplePlayer player(display, {}, buffering);
+	const auto started = TestClock::now();
+	// Selection start and duration, reported if the frame-interval bound fails.
+	std::vector<std::pair<TestClock::time_point, TestClock::duration>> switches;
+	const auto select = [&](int index) {
+		const auto at = TestClock::now();
+		const bool selected = player.SelectTrack(MediaType::Audio, index);
+		switches.emplace_back(at, TestClock::now() - at);
+		return selected;
+	};
 	TEST_REQUIRE(player.Open(Safe::MakeUnique<TokenReader>(Fixture("video/live_audio_switch_long.mkv"), stats)));
 	TEST_REQUIRE(player.SelectTrack(MediaType::Subtitle, -1));
 	const int audio = player.SelectedTrack(MediaType::Audio);
@@ -1343,7 +1352,7 @@ int test_live_audio_selection() {
 			videos = display->m_videos;
 			resets = display->m_audio_invalidations;
 		}
-		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, selected));
+		TEST_REQUIRE(select(selected));
 		TEST_REQUIRE(player.SelectedTrack(MediaType::Audio) == selected);
 		TEST_REQUIRE(stats->m_seeks == seeks);
 		TEST_REQUIRE(player.State() == PlaybackState::Playing);
@@ -1359,16 +1368,28 @@ int test_live_audio_selection() {
 		TEST_REQUIRE(display->m_image);
 	}
 	for (int i = 0; i < 10; ++i) {
-		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, -1));
-		TEST_REQUIRE(player.SelectTrack(MediaType::Audio, audio));
+		TEST_REQUIRE(select(-1));
+		TEST_REQUIRE(select(audio));
 	}
 	TEST_REQUIRE(stats->m_seeks == seeks);
 	{
 		std::lock_guard lock(display->m_mutex);
 		TEST_REQUIRE(display->m_epoch == epoch);
 		TEST_REQUIRE(display->m_invalidations == invalidations);
-		for (std::size_t i = 1; i < display->m_video_times.size(); ++i)
+		const auto seconds = [&](TestClock::time_point at) { return std::chrono::duration<double>(at - started).count(); };
+		for (std::size_t i = 1; i < display->m_video_times.size(); ++i) {
+			if (display->m_video_times[i] - display->m_video_times[i - 1] >= std::chrono::milliseconds(500)) {
+				const auto diagnostics = player.Diagnostics();
+				std::cerr << "frame interval " << i << " exceeded 500 ms; backend="
+					<< static_cast<int>(diagnostics.m_backend) << " skipped=" << diagnostics.m_skipped_video << '\n';
+				for (std::size_t frame = 0; frame < display->m_video_times.size(); ++frame)
+					std::cerr << "  frame " << frame << " at " << seconds(display->m_video_times[frame]) << " s\n";
+				for (const auto& [at, took] : switches)
+					std::cerr << "  switch at " << seconds(at) << " s took "
+						<< std::chrono::duration<double, std::milli>(took).count() << " ms\n";
+			}
 			TEST_REQUIRE(display->m_video_times[i] - display->m_video_times[i - 1] < std::chrono::milliseconds(500));
+		}
 	}
 	TEST_REQUIRE(player.Pause());
 	const double paused = player.Position();

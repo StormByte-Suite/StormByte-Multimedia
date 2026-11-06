@@ -756,8 +756,10 @@ class Backend::SimplePlayer::Context {
 			if (!owned)
 				throw Exception("preview video frame reference failed");
 			std::unique_lock lock(m_mutex);
+			// A decode stop (live audio switch) must not wait for conversion; keep
+			// this decoded picture in one extra slot so no frame is lost.
 			m_ready.wait(lock, [&] {
-				if (m_cancel || m_video_queue.size() < 2)
+				if (m_cancel || m_decode_stop || m_video_queue.size() < 2)
 					return true;
 				if (!m_preview && !m_buffering && m_video_queue.front().Start <= m_position) {
 					m_video_queue.pop_front();
