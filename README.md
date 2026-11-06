@@ -440,6 +440,66 @@ The player reports the number skipped when workers stop. This prioritizes audio
 continuity under processing pressure; it does not guarantee every video frame
 under sustained CPU starvation.
 
+#### Actual backend and measurements
+
+`player.Diagnostics()` returns a thread-safe `PreviewDiagnostics` snapshot.
+Use `m_decoder`, `m_backend` and `m_device` to log actual decoder output.
+`PreviewDecodeBackend::Unknown` means no decoded frame has established the
+backend yet; `Auto` is only a policy and never proof of hardware acceleration.
+Changing `Acceleration` takes effect when a decoder is next opened.
+An audio-only source has no video decoder identity.
+
+`m_skipped_video` counts pressure drops before conversion; `m_shown_video`
+counts successful Display/HDRDisplay callbacks, not compositor presentations.
+`m_audio_underruns` counts distinct valid `AudioClock` drained episodes while
+audio production is active, excluding preload, pause, audio switching and EOF
+drain. This is sampled starvation, not a device xrun counter; zero with
+`m_audio_clock_samples == 0` means unavailable feedback, not verified continuity.
+Counters reset on Open, survive seeks/stop/close; decoder identity clears on
+decoder close. All snapshots contain public scalars and Safe strings only.
+
+`m_converted_video` and `m_conversion_fps` are separate from these counters.
+Throughput divides converted pictures by the sum of measured conversion-stage
+wall seconds (no queue waits). Stage fields include setup and internal worker
+scheduling, not summed CPU time: download, HDR input color/linearization, tone
+mapping, HDR output color, and RGBA allocation/packing. For SDR, swscale fuses
+color conversion and packing; only packing is charged. `m_peak_queue_bytes`
+counts presentation payload only, not RSS, codec references or scratch.
+Application OpenGL uploads and real device/compositor behavior are outside
+these measurements.
+
+Build `MultimediaSimplePlayerTests` with `ENABLE_TEST=ON`, then run:
+
+```sh
+bash test/measure_preview.sh build/test/MultimediaSimplePlayerTests \
+  /path/to/input.mkv 4 10 build/test-output/preview-measurements/my-source
+```
+
+The script saves three baseline and three contention CSV/log pairs, using the
+unchanged buffering defaults and SDR RGBA8 output. Contention runs a separate
+process with `nproc` busy threads for two seconds, starting one second after
+launch. Startup is Open-to-first-delivery; seek is Seek-to-first-delivery.
+Peak RSS comes from `getrusage` on Linux/macOS (`-1` when unavailable).
+For forced software, invoke the runner directly:
+
+```sh
+build/test/MultimediaSimplePlayerTests --measure /path/to/input.mkv 4 10 software
+```
+
+Reproduce the generated SDR/20 ms Opus signals used in the software baseline:
+
+```sh
+ffmpeg -f lavfi -i testsrc2=size=1920x1080:rate=24:duration=12 \
+  -f lavfi -i sine=frequency=440:sample_rate=48000:duration=12 \
+  -c:v libx264 -preset ultrafast -threads "$(nproc)" -pix_fmt yuv420p \
+  -color_trc bt709 -color_primaries bt709 -colorspace bt709 \
+  -c:a aac -shortest build/test-output/preview-sdr1080.mp4
+ffmpeg -f lavfi -i sine=frequency=440:sample_rate=48000:duration=12 \
+  -c:a libopus -frame_duration 20 build/test-output/preview-opus20.opus
+```
+
+See [CHANGELOG.md](CHANGELOG.md) for results and pending hardware measurements.
+
 ### Reader ownership and transfer to Transcoder
 
 `Open(std::string_view)` constructs a `BufferedFileReader`, copying the path into its `Safe::String`. `Open(Safe::Unique<Buffer::IO::BufferedLocationReader>)` takes exclusive ownership of a compatible buffered reader, preserving its subtype. It opens a not-yet-open reader once or rewinds a healthy already-open one. Failed Open retains the reader.

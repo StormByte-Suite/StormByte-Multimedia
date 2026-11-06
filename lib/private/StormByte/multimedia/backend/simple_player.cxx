@@ -457,6 +457,12 @@ class Backend::SimplePlayer::Context {
 		void ResetFormat() noexcept {
 			for (auto& decoder : m_decoders)
 				decoder.Reset();
+			{
+				std::lock_guard lock(m_diagnostics_mutex);
+				m_diagnostics.m_decoder.clear();
+				m_diagnostics.m_device.clear();
+				m_diagnostics.m_backend = PreviewDecodeBackend::Unknown;
+			}
 			if (m_format) {
 				m_format->pb = nullptr;
 				avformat_close_input(&m_format);
@@ -482,6 +488,7 @@ class Backend::SimplePlayer::Context {
 			m_error.clear();
 			m_open_cue = 0;
 			m_open_cue_start = 0;
+			m_audio_starved = false;
 		}
 
 		/**
@@ -526,6 +533,12 @@ class Backend::SimplePlayer::Context {
 		void OpenDecoder(int slot, int index) {
 			auto& decoder = m_decoders[slot];
 			decoder.Reset();
+			if (slot == 0) {
+				std::lock_guard lock(m_diagnostics_mutex);
+				m_diagnostics.m_decoder.clear();
+				m_diagnostics.m_device.clear();
+				m_diagnostics.m_backend = PreviewDecodeBackend::Unknown;
+			}
 			if (index < 0)
 				return;
 			const auto* parameters = m_format->streams[index]->codecpar;
@@ -561,6 +574,10 @@ class Backend::SimplePlayer::Context {
 				opened = avcodec_open2(decoder.m_codec, codec, nullptr);
 			}
 			Check(opened, "open preview decoder");
+			if (video) {
+				std::lock_guard lock(m_diagnostics_mutex);
+				m_diagnostics.m_decoder = std::string_view(decoder.m_codec->codec->name);
+			}
 			if (video && m_acceleration == DecodeAcceleration::Auto && !decoder.m_codec->hw_device_ctx)
 				LogWarning("hardware video decoder unavailable; continuing with software decode");
 			if (hardware && decoder.m_codec->hw_device_ctx) {
@@ -681,6 +698,10 @@ class Backend::SimplePlayer::Context {
 			if (std::isfinite(event.m_end))
 				m_end = std::max(m_end, event.m_end);
 			m_bytes += event.m_bytes;
+			{
+				std::lock_guard diagnostics(m_diagnostics_mutex);
+				m_diagnostics.m_peak_queue_bytes = std::max(m_diagnostics.m_peak_queue_bytes, m_bytes);
+			}
 			const auto at = std::upper_bound(m_queue.begin(), m_queue.end(), event.m_start,
 				[](double start, const Event& queued) { return start < queued.m_start; });
 			m_queue.insert(at, std::move(event));
@@ -711,6 +732,18 @@ class Backend::SimplePlayer::Context {
 		 */
 		bool Video(AVFrame* frame) {
 			auto& decoder = m_decoders[0];
+			{
+				std::lock_guard lock(m_diagnostics_mutex);
+				const bool hardware = FFmpeg::HardwareDecode::Hardware(static_cast<AVPixelFormat>(frame->format));
+				m_diagnostics.m_backend = hardware ? PreviewDecodeBackend::Hardware : PreviewDecodeBackend::Software;
+				m_diagnostics.m_device.clear();
+				if (hardware && frame->hw_frames_ctx) {
+					const auto* frames = reinterpret_cast<const AVHWFramesContext*>(frame->hw_frames_ctx->data);
+					const char* device = av_hwdevice_get_type_name(frames->device_ctx->type);
+					if (device)
+						m_diagnostics.m_device = std::string_view(device);
+				}
+			}
 			const double start = Timestamp(0, frame->best_effort_timestamp);
 			const auto rate = av_guess_frame_rate(m_format, m_format->streams[m_selected[0]], frame);
 			const double duration = frame->duration > 0
@@ -729,6 +762,10 @@ class Backend::SimplePlayer::Context {
 				if (!m_preview && !m_buffering && m_video_queue.front().Start <= m_position) {
 					m_video_queue.pop_front();
 					++m_dropped_video;
+					{
+						std::lock_guard diagnostics(m_diagnostics_mutex);
+						++m_diagnostics.m_skipped_video;
+					}
 					return true;
 				}
 				return false;
@@ -744,6 +781,23 @@ class Backend::SimplePlayer::Context {
 
 		bool ConvertVideo(AVFrame* frame, double start, double duration) {
 			auto& decoder = m_decoders[0];
+			PreviewDiagnostics timings;
+			auto stage = PlaybackClock::now();
+			const auto elapsed = [&stage] {
+				const auto now = PlaybackClock::now();
+				const double seconds = std::chrono::duration<double>(now - stage).count();
+				stage = now;
+				return seconds;
+			};
+			const auto publish = [&] {
+				std::lock_guard lock(m_diagnostics_mutex);
+				++m_diagnostics.m_converted_video;
+				m_diagnostics.m_download_seconds += timings.m_download_seconds;
+				m_diagnostics.m_linearization_seconds += timings.m_linearization_seconds;
+				m_diagnostics.m_tone_mapping_seconds += timings.m_tone_mapping_seconds;
+				m_diagnostics.m_color_conversion_seconds += timings.m_color_conversion_seconds;
+				m_diagnostics.m_rgba_packing_seconds += timings.m_rgba_packing_seconds;
+			};
 			if (FFmpeg::HardwareDecode::Hardware(static_cast<AVPixelFormat>(frame->format))) {
 				if (!decoder.m_download)
 					throw Exception("preview hardware frame has no transfer destination");
@@ -751,7 +805,9 @@ class Backend::SimplePlayer::Context {
 				if (!FFmpeg::HardwareDecode::Download(*frame, *decoder.m_download))
 					throw Exception("preview hardware frame transfer failed");
 				frame = decoder.m_download;
+				timings.m_download_seconds = elapsed();
 			}
+			stage = PlaybackClock::now();
 			using PreviewFrame = FFmpeg::AVFrame;
 			const int transfer = frame->color_trc;
 			if (m_color_mode == PreviewColorMode::HDR
@@ -780,6 +836,7 @@ class Backend::SimplePlayer::Context {
 				hdr_rgb.ColorPrimaries(frame->color_primaries);
 				hdr_rgb.ColorSpace(AVCOL_SPC_RGB);
 				hdr_rgb.ColorRange(AVCOL_RANGE_JPEG);
+				timings.m_color_conversion_seconds = elapsed();
 				auto image = Safe::MakeShared<PreviewHDRVideo>();
 				image->m_width = frame->width;
 				image->m_height = frame->height;
@@ -870,6 +927,8 @@ class Backend::SimplePlayer::Context {
 				event.m_end = start + duration;
 				event.m_bytes = bytes;
 				event.m_hdr_video = std::move(image);
+				timings.m_rgba_packing_seconds = elapsed();
+				publish();
 				const bool accepted = Enqueue(std::move(event));
 				return accepted;
 			}
@@ -904,6 +963,7 @@ class Backend::SimplePlayer::Context {
 				linear.ColorPrimaries(AVCOL_PRI_BT709);
 				linear.ColorSpace(AVCOL_SPC_RGB);
 				linear.ColorRange(AVCOL_RANGE_JPEG);
+				timings.m_linearization_seconds = elapsed();
 				constexpr std::string_view chain = "tonemap=tonemap=hable:desat=0";
 				if (!m_decoders[0].m_tonemap) {
 					auto graph = FFmpeg::AVFilterGraph::Open(linear, chain);
@@ -920,6 +980,7 @@ class Backend::SimplePlayer::Context {
 				curved.ColorPrimaries(AVCOL_PRI_BT709);
 				curved.ColorSpace(AVCOL_SPC_RGB);
 				curved.ColorRange(AVCOL_RANGE_JPEG);
+				timings.m_tone_mapping_seconds = elapsed();
 				display_rgb.Format(AV_PIX_FMT_GBRP);
 				PreviewFrame::ColorTarget sdr_target{
 					.transfer = AVCOL_TRC_BT709,
@@ -936,6 +997,7 @@ class Backend::SimplePlayer::Context {
 					source_data[plane] = display_rgb.Data(plane);
 					source_linesize[plane] = display_rgb.Linesize(plane);
 				}
+				timings.m_color_conversion_seconds = elapsed();
 			}
 
 			auto image = Safe::MakeShared<PreviewVideo>();
@@ -954,6 +1016,8 @@ class Backend::SimplePlayer::Context {
 			int strides[] = {frame->width * 4, 0, 0, 0};
 			Check(sws_scale(decoder.m_scale, source_data.data(), source_linesize.data(),
 				0, frame->height, output, strides), "convert preview video");
+			timings.m_rgba_packing_seconds = elapsed();
+			publish();
 			Event event;
 			event.m_start = std::max(start, m_target);
 			event.m_end = start + duration;
@@ -1408,6 +1472,14 @@ class Backend::SimplePlayer::Context {
 					return wall;
 				m_audio_transition = false;
 			}
+			{
+				std::lock_guard diagnostics(m_diagnostics_mutex);
+				++m_diagnostics.m_audio_clock_samples;
+				const bool starved = audio.m_drained && audible + 0.001 >= m_audio_end && !m_draining && !m_eof;
+				if (starved && !m_audio_starved)
+					++m_diagnostics.m_audio_underruns;
+				m_audio_starved = starved;
+			}
 			const bool pending_audio = std::any_of(m_queue.begin(), m_queue.end(),
 				[](const Event& event) { return static_cast<bool>(event.m_audio); });
 			if (audio.m_drained && !pending_audio && audible + 0.001 >= m_audio_end) {
@@ -1465,6 +1537,7 @@ class Backend::SimplePlayer::Context {
 					});
 					if (found != m_queue.end()) {
 						Event event = std::move(*found);
+						const bool video = event.m_video || event.m_hdr_video;
 						m_queue.erase(found);
 						m_bytes -= event.m_bytes;
 						if (event.m_audio)
@@ -1482,6 +1555,10 @@ class Backend::SimplePlayer::Context {
 							m_display->Audio(std::move(event.m_audio));
 						else
 							m_display->Subtitle(std::move(event.m_subtitle));
+						if (video) {
+							std::lock_guard diagnostics(m_diagnostics_mutex);
+							++m_diagnostics.m_shown_video;
+						}
 						continue;
 					}
 					const bool finished = m_eof && m_queue.empty() && clock + 0.000001 >= m_end;
@@ -1737,6 +1814,9 @@ class Backend::SimplePlayer::Context {
 		std::deque<PendingVideo> m_video_queue;						///< At most two referenced decoded pictures, plus one conversion.
 		bool m_video_busy = false;									///< Conversion must finish before EOF is published.
 		std::size_t m_dropped_video = 0;							///< Reported once workers have joined.
+		mutable std::mutex m_diagnostics_mutex;
+		PreviewDiagnostics m_diagnostics;
+		bool m_audio_starved = false;
 		std::deque<Event> m_queue;									///< Bounded scheduled presentation.
 		std::size_t m_bytes = 0;									///< Charged queue storage.
 		PlaybackState m_state = PlaybackState::Closed;				///< Observable lifecycle.
@@ -1789,9 +1869,13 @@ bool Backend::SimplePlayer::Open(Safe::Unique<Buffer::IO::BufferedLocationReader
 	try {
 		if (!m_ctx->CloseInput()) {
 			m_ctx->m_reader = std::move(reader);
-			return false;
-		}
-		m_ctx->m_reader = std::move(reader);
+				return false;
+			}
+			m_ctx->m_reader = std::move(reader);
+			{
+				std::lock_guard lock(m_ctx->m_diagnostics_mutex);
+				m_ctx->m_diagnostics = {};
+			}
 		if (!m_ctx->m_reader)
 			return m_ctx->Fail("preview reader is empty");
 		if (!m_ctx->m_reader->IsOpen() && !m_ctx->m_reader->Open())
@@ -1966,6 +2050,16 @@ bool Backend::SimplePlayer::Close() {
 	catch (...) { return m_ctx->Failure(); }
 }
 
+PreviewDiagnostics Backend::SimplePlayer::Diagnostics() const {
+	std::lock_guard lock(m_ctx->m_diagnostics_mutex);
+	auto result = m_ctx->m_diagnostics;
+	const double seconds = result.m_download_seconds + result.m_linearization_seconds
+		+ result.m_tone_mapping_seconds + result.m_color_conversion_seconds + result.m_rgba_packing_seconds;
+	if (seconds > 0)
+		result.m_conversion_fps = result.m_converted_video / seconds;
+	return result;
+}
+
 Safe::Unique<Buffer::IO::BufferedLocationReader> Backend::SimplePlayer::ReleaseReader() {
 	std::lock_guard control(m_ctx->m_control);
 	try {
@@ -2061,6 +2155,10 @@ double Multimedia::SimplePlayer::Duration() const {
 
 Safe::String Multimedia::SimplePlayer::Error() const {
 	return m_backend->Error();
+}
+
+PreviewDiagnostics Multimedia::SimplePlayer::Diagnostics() const {
+	return m_backend->Diagnostics();
 }
 
 bool Multimedia::SimplePlayer::Close() {

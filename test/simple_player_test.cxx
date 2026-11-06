@@ -73,6 +73,10 @@
 #include <thread>
 #include <vector>
 
+#if defined(__linux__) || defined(__APPLE__)
+	#include <sys/resource.h>
+#endif
+
 namespace Safe = StormByte::Safe;
 namespace IO = StormByte::Buffer::IO;
 using StormByte::ByteSize;
@@ -289,6 +293,10 @@ class FakeDisplay final: public Display, public HDRDisplay {
 			result.m_position = Played() + 0.020;
 			result.m_latency = 0.020;
 			result.m_drained = Played() + 0.001 >= m_pending_end;
+			if (m_force_underrun) {
+				result.m_position = m_pending_end + result.m_latency;
+				result.m_drained = true;
+			}
 			return result;
 		}
 
@@ -389,7 +397,78 @@ class FakeDisplay final: public Display, public HDRDisplay {
 		bool m_hold_drain = false;									///< Artificial GUI completion barrier.
 		bool m_throw_video = false;									///< Simulated callback failure.
 		bool m_throw_invalidate = false;								///< Simulated cleanup callback failure.
+		bool m_force_underrun = false;
 };
+
+constexpr double DefaultDeadline =
+#ifdef STORMBYTE_MM_TEST_DEADLINE_SEC
+	STORMBYTE_MM_TEST_DEADLINE_SEC;
+#else
+	5;
+#endif
+
+template<class Predicate>
+bool Wait(Predicate predicate, double seconds = DefaultDeadline);
+std::string Fixture(std::string_view path);
+
+int test_preview_diagnostics() {
+	using Backend = StormByte::Multimedia::PreviewDecodeBackend;
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_capture_deferred = false;
+	SimplePlayer player(display);
+	TEST_REQUIRE(player.Diagnostics().m_decoder.empty());
+	player.Acceleration(DecodeAcceleration::Software);
+	TEST_REQUIRE(player.Open(Fixture("video/bluray_like_hdr10.mkv")));
+	TEST_REQUIRE(!player.Diagnostics().m_decoder.empty());
+	TEST_REQUIRE(player.Diagnostics().m_backend == Backend::Unknown);
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error; }, 15));
+	TEST_REQUIRE(player.State() == PlaybackState::Ended);
+	const auto result = player.Diagnostics();
+	TEST_REQUIRE(result.m_backend == Backend::Software);
+	TEST_REQUIRE(result.m_device.empty());
+	TEST_REQUIRE(result.m_converted_video > 0);
+	TEST_REQUIRE(result.m_shown_video == result.m_converted_video);
+	TEST_REQUIRE(result.m_linearization_seconds > 0);
+	TEST_REQUIRE(result.m_tone_mapping_seconds > 0);
+	TEST_REQUIRE(result.m_color_conversion_seconds > 0);
+	TEST_REQUIRE(result.m_rgba_packing_seconds > 0);
+	TEST_REQUIRE(result.m_download_seconds == 0);
+	TEST_REQUIRE(result.m_conversion_fps > 0);
+	TEST_REQUIRE(result.m_peak_queue_bytes <= StormByte::Multimedia::PreviewBuffering{}.MaxBytes);
+	TEST_REQUIRE(player.Seek(.5));
+	TEST_REQUIRE(player.Diagnostics().m_converted_video >= result.m_converted_video);
+	TEST_REQUIRE(player.Close());
+	TEST_REQUIRE(player.Diagnostics().m_decoder.empty());
+	TEST_REQUIRE(player.Diagnostics().m_converted_video >= result.m_converted_video);
+	player.Acceleration(DecodeAcceleration::Auto);
+	TEST_REQUIRE(player.Open(Fixture("video/live_audio_switch_long.mkv")));
+	TEST_REQUIRE(player.Diagnostics().m_converted_video == 0);
+	TEST_REQUIRE(player.Play());
+	TEST_REQUIRE(Wait([&] { return player.Diagnostics().m_shown_video > 0; }, 15));
+	const auto actual = player.Diagnostics();
+	TEST_REQUIRE(actual.m_backend != Backend::Unknown);
+	TEST_REQUIRE((actual.m_backend == Backend::Hardware) == !actual.m_device.empty());
+	{
+		std::lock_guard lock(display->m_mutex);
+		display->m_force_underrun = true;
+	}
+	TEST_REQUIRE(Wait([&] { return player.Diagnostics().m_audio_underruns == 1; }));
+	std::this_thread::sleep_for(std::chrono::milliseconds(40));
+	TEST_REQUIRE(player.Diagnostics().m_audio_underruns == 1);
+	{
+		std::lock_guard lock(display->m_mutex);
+		display->m_force_underrun = false;
+	}
+	std::this_thread::sleep_for(std::chrono::milliseconds(40));
+	{
+		std::lock_guard lock(display->m_mutex);
+		display->m_force_underrun = true;
+	}
+	TEST_REQUIRE(Wait([&] { return player.Diagnostics().m_audio_underruns == 2; }));
+	TEST_REQUIRE(player.Close());
+	return 0;
+}
 
 /**
  * @struct ReaderStats
@@ -578,15 +657,8 @@ class TokenReader final: public IO::BufferedLocationReader {
  * @param seconds Deadline.
  * @return Whether the condition occurred.
  */
-constexpr double DefaultDeadline =
-#ifdef STORMBYTE_MM_TEST_DEADLINE_SEC
-	STORMBYTE_MM_TEST_DEADLINE_SEC;
-#else
-	5;
-#endif
-
 template<class Predicate>
-bool Wait(Predicate predicate, double seconds = DefaultDeadline) {
+bool Wait(Predicate predicate, double seconds) {
 	const auto start = TestClock::now();
 	while (!predicate()) {
 		if (std::chrono::duration<double>(TestClock::now() - start).count() >= seconds)
@@ -2080,13 +2152,116 @@ int test_unknown_duration_seek() {
  * @param argv Selected test name.
  * @return Test status.
  */
+int MeasurePreview(int argc, char** argv) {
+	if (argc != 6) {
+		std::fprintf(stderr, "usage: --measure FILE WALL_SECONDS SEEK_SECONDS auto|software\n");
+		return 2;
+	}
+	const double seconds = std::stod(argv[3]);
+	const double seek = std::stod(argv[4]);
+	const std::string_view policy(argv[5]);
+	if (!std::isfinite(seconds) || seconds <= 0 || !std::isfinite(seek) || seek < 0
+		|| (policy != "auto" && policy != "software"))
+		throw StormByte::Exception("invalid measurement arguments");
+	auto display = Safe::MakeShared<FakeDisplay>();
+	display->m_capture_deferred = false;
+	SimplePlayer player(display);
+	player.Acceleration(policy == "software" ? DecodeAcceleration::Software : DecodeAcceleration::Auto);
+	const auto start = TestClock::now();
+	if (!player.Open(argv[2]) || !player.Play())
+		throw StormByte::Exception(player.Error());
+	const bool video = player.SelectedTrack(MediaType::Video) >= 0;
+	const auto delivered = [&] {
+		std::lock_guard lock(display->m_mutex);
+		return video ? display->m_videos : display->m_audios;
+	};
+	if (!Wait([&] { return delivered() > 0 || player.State() == PlaybackState::Error; }, 60)
+		|| player.State() == PlaybackState::Error)
+		throw StormByte::Exception("measurement startup failed: " + player.Error());
+	const double startup = std::chrono::duration<double, std::milli>(TestClock::now() - start).count();
+	const auto first = TestClock::now();
+	if (!Wait([&] {
+		return std::chrono::duration<double>(TestClock::now() - first).count() >= seconds
+			|| player.State() == PlaybackState::Ended || player.State() == PlaybackState::Error;
+	}, seconds + 60))
+		throw StormByte::Exception("measurement playback deadline exceeded");
+	if (player.State() == PlaybackState::Error)
+		throw StormByte::Exception(player.Error());
+	const auto before_seek = TestClock::now();
+	const unsigned before = delivered();
+	if (!player.Seek(seek))
+		throw StormByte::Exception(player.Error());
+	if (player.State() != PlaybackState::Playing && !player.Play())
+		throw StormByte::Exception(player.Error());
+	if (!Wait([&] { return delivered() > before || player.State() == PlaybackState::Error; }, 60)
+		|| player.State() == PlaybackState::Error)
+		throw StormByte::Exception("measurement seek failed");
+	const double seek_ms = std::chrono::duration<double, std::milli>(TestClock::now() - before_seek).count();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	if (player.State() == PlaybackState::Playing && !player.Pause())
+		throw StormByte::Exception(player.Error());
+	const auto result = player.Diagnostics();
+	if (!player.Close())
+		throw StormByte::Exception(player.Error());
+	double rss_mib = -1;
+#if defined(__linux__) || defined(__APPLE__)
+	rusage usage{};
+	if (getrusage(RUSAGE_SELF, &usage) != 0)
+		throw StormByte::Exception("getrusage failed");
+#if defined(__APPLE__)
+	rss_mib = usage.ru_maxrss / (1024.0 * 1024.0);
+#else
+	rss_mib = usage.ru_maxrss / 1024.0;
+#endif
+#endif
+	std::printf("startup_ms,seek_ms,rss_mib,queue_mib,decoder,backend,device,shown,skipped,underruns,clock_samples,converted,conversion_fps,download_ms,linear_ms,tonemap_ms,color_ms,packing_ms\n");
+	const double per_frame = result.m_converted_video ? 1000.0 / result.m_converted_video : 0;
+	std::printf("%.3f,%.3f,%.3f,%.3f,%s,%d,%s,%llu,%llu,%llu,%llu,%llu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+		startup, seek_ms, rss_mib, result.m_peak_queue_bytes / (1024.0 * 1024.0),
+		result.m_decoder.c_str(), static_cast<int>(result.m_backend), result.m_device.c_str(),
+		static_cast<unsigned long long>(result.m_shown_video), static_cast<unsigned long long>(result.m_skipped_video),
+		static_cast<unsigned long long>(result.m_audio_underruns), static_cast<unsigned long long>(result.m_audio_clock_samples),
+		static_cast<unsigned long long>(result.m_converted_video), result.m_conversion_fps,
+		result.m_download_seconds * per_frame, result.m_linearization_seconds * per_frame,
+		result.m_tone_mapping_seconds * per_frame, result.m_color_conversion_seconds * per_frame,
+		result.m_rgba_packing_seconds * per_frame);
+	return 0;
+}
+
+int LoadPreviewCPU(int argc, char** argv) {
+	if (argc != 4)
+		throw StormByte::Exception("usage: --cpu-load SECONDS WORKERS");
+	const double seconds = std::stod(argv[2]);
+	const int workers = std::stoi(argv[3]);
+	if (!std::isfinite(seconds) || seconds <= 0 || workers <= 0)
+		throw StormByte::Exception("invalid CPU load arguments");
+	const auto end = TestClock::now() + std::chrono::duration<double>(seconds);
+	std::vector<std::jthread> load;
+	for (int i = 0; i < workers; ++i)
+		load.emplace_back([end] {
+			while (TestClock::now() < end)
+				std::atomic_signal_fence(std::memory_order_seq_cst);
+		});
+	return 0;
+}
+
 int main(int argc, char** argv) {
+	if (argc > 1 && (std::string_view(argv[1]) == "--measure" || std::string_view(argv[1]) == "--cpu-load")) {
+		try {
+			return std::string_view(argv[1]) == "--measure" ? MeasurePreview(argc, argv) : LoadPreviewCPU(argc, argv);
+		}
+		catch (const std::exception& error) {
+			std::fprintf(stderr, "%s\n", error.what());
+			return 1;
+		}
+	}
 	// -------------------
 	// Construct
 	// -------------------
 	static constexpr std::array tests{
 		TestEntry{"test_empty_display", test_empty_display},
 		TestEntry{"test_buffering_policy", test_buffering_policy},
+		TestEntry{"test_preview_diagnostics", test_preview_diagnostics},
 		// -------------------
 		// Playback
 		// -------------------

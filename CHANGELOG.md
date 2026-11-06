@@ -23,15 +23,77 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### TODO
 
-- Measure preview buffering defaults with SDR/HDR, high-resolution video, small codec audio blocks and transient CPU contention; tune the current policy or retain it if measurements support it. Include startup/seek latency, peak memory, audio underruns and video continuity.
-- Profile the remaining preview CPU bottlenecks: hardware-decoded frames are downloaded to host memory, HDR linearization/tone mapping/color conversion still run on the CPU, and RGB packing plus application texture uploads add copies. The separate conversion worker protects audio scheduling but does not accelerate these operations.
+- Complete buffering measurements with actual hardware decoding after the NVIDIA driver reinstall, including startup/seek latency, peak memory, audio underruns and video continuity. Compare against the software baseline below before deciding whether to tune defaults.
+- Measure hardware-frame download to host memory and repeat the conversion-stage profile with a working hardware decoder. Download was not exercised in the software baseline; zero measured download time is not evidence of a zero-cost hardware path. Application OpenGL texture uploads remain consumer-side and unmeasured.
 - Design optional GPU color-conversion and HDR-to-SDR tone-mapping backends for Linux, Windows and macOS. Evaluate Vulkan/VA-API/CUDA interoperability on Linux, D3D11 video processing or shaders on Windows, and VideoToolbox/Metal on macOS; preserve correct PQ/HLG transfer, primaries, range and mastering metadata. Check backend availability and licensing/build implications before adding dependencies, retain an explicit CPU fallback and test output against the current color-managed reference.
 - Explore bounded, explicitly owned GPU-frame delivery so native presentation can avoid hardware-frame download and RGB re-upload. Define device/context ownership, synchronization, frame lifetime, cancellation and cross-thread rules without exposing private FFmpeg types or breaking existing Display consumers.
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
-- Add backend-selection diagnostics and cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention. Separate measured underruns, skipped video frames and processing throughput from subjective smoothness; do not treat Auto decode policy alone as proof that hardware acceleration is active.
+- Complete cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention using the new diagnostics. Do not treat Auto decode policy alone as proof that hardware acceleration is active.
+
+### Added
+
+- `SimplePlayer::Diagnostics()` exposes the opened video decoder name, actual decoded-frame backend (`Unknown` until the first frame, `Software` or `Hardware`) and hardware device name without private FFmpeg types. Thread-safe, cumulative counters separate pressure-skipped and sink-delivered pictures, observed audio-starvation episodes and conversion throughput. Conversion-stage wall times cover download, HDR linearization, tone mapping, output color conversion and RGBA packing. Counters reset on Open, survive seek/stop/close; decoder identity clears when the decoder closes. Display's virtual interface is unchanged; SimplePlayer's existing object layout and virtual interfaces are unchanged (additive API, no new consumer rebuild requirement beyond existing ABI changes).
+- Reproducible headless measurement mode in the preview tests and `test/measure_preview.sh`: three baseline and three transient CPU-contention runs per source. A clocked sink consumes RGBA8 without deferred frame retention; this is not an Alchemist/OpenGL/device benchmark.
+
+### Preview software measurements (2026-11-06)
+
+Linux x86-64, i9-13900KF, 32 available processors, Release Clang 22.1.8/libc++,
+x86-64-v3, no PGO, system FFmpeg 9.0.2/zimg 3.0.6. Defaults unchanged:
+750 ms preload, 2 s read-ahead, 500 ms audio advance, 128 MiB/256 events.
+Each fresh process plays four wall seconds after its first delivery, seeks to
+6 s (SDR/Opus) or 10 s (4K), then plays one second. Startup includes Open/probing;
+seek includes reconstruction and first delivery. Contention is a separate
+32-thread process busy for two seconds starting one second after launch;
+it does not necessarily overlap startup/seek. Baseline runs precede contention
+runs, so cache/thermal effects and other host load preclude causal comparisons
+of startup numbers. Three repetitions per cell; values below are medians,
+except peak RSS is the maximum across repetitions. Counts include post-seek
+delivery, not discarded seek-trim or queued-at-close frames.
+
+| Source / load | Startup ms | Seek ms | Peak RSS MiB | Queue peak MiB | Delivered / skipped | Audio underruns | Conversion fps |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| SDR 1080p24 H.264 + AAC / baseline | 424 | 259 | 424.5 | 126.7 | 122 / 0 | 0 | 476.6 |
+| SDR / contention | 241 | 129 | 415.4 | 126.7 | 122 / 0 | 0 | 665.5 |
+| HDR10 3840x2160 PQ HEVC 23.976 + E-AC-3 / baseline | 505 | 2844 | 1020.3 | 127.3 | 121 / 0 | 0 | 31.2 |
+| HDR10 / contention | 484 | 2731 | 1020.0 | 127.1 | 106 / 15 | 0 | 25.1 |
+| Dolby Vision profile 7, 3840x2160 PQ HEVC 23.976 / baseline | 501 | 904 | 969.2 | 126.8 | 112 / 6 | 0 (range 0-6) | 23.5 |
+| Dolby Vision / contention | 982 | 1014 | 817.7 | 126.8 | 78 / 19 | 3 | 14.2 |
+| Mono Opus 48 kHz, 20 ms blocks / baseline | 6.1 | 5.7 | 61.2 | 0.275 | 0 / 0 | 0 | N/A |
+| Opus / contention | 6.0 | 5.4 | 60.6 | 0.275 | 0 / 0 | 0 | N/A |
+
+SDR and Opus are generated test signals; HDR10 uses local
+`test_alita_30s.mkv`, Dolby Vision uses local `test_anillos_30s.mkv`
+(profile 7 RPU + enhancement-layer configuration). Dolby Vision here means
+the available PQ base-layer preview, not Dolby Vision rendering. Auto chose
+software (`h264`/`hevc`) in every run while the NVIDIA driver was being
+reinstalled. Actual hardware measurements remain TODO, at the user's request.
+
+Median stage wall milliseconds per converted frame:
+
+| Source / load | Download | Linearization + input color | Tone mapping | Output color | RGBA allocation/packing |
+|---|---:|---:|---:|---:|---:|
+| SDR / baseline | N/A | N/A | N/A | fused | 2.098 |
+| SDR / contention | N/A | N/A | N/A | fused | 1.503 |
+| HDR10 / baseline | N/A | 6.952 | 7.127 | 5.056 | 12.584 |
+| HDR10 / contention | N/A | 9.425 | 8.389 | 7.152 | 14.325 |
+| Dolby Vision / baseline | N/A | 9.689 | 8.941 | 7.229 | 16.736 |
+| Dolby Vision / contention | N/A | 17.907 | 12.072 | 12.427 | 25.682 |
+
+Packing/allocation is the largest individual measured stage in these 4K
+software runs, while combined HDR color/linearization/tone mapping costs more.
+Stage timings include graph setup and scheduling stalls, not summed CPU time
+of internal workers. SDR swscale fuses color conversion and packing and cannot
+be honestly split without changing the implementation. Audio-only has no video
+conversion. Process RSS substantially exceeds the pending-payload cap because
+decoder references, conversion scratch and library allocations are separate.
+Dolby Vision varies materially (baseline throughput 16.0-31.8 fps); increasing
+buffering cannot cure sustained sub-real-time processing. These short,
+software-only, headless observations do not justify changing defaults or
+claiming end-to-end smoothness. GPU backends and native HDR remain future work.
 
 ### Changed
 
+- Retain preview buffering defaults pending actual hardware measurements; record the software-only buffering and CPU-stage baseline above.
 - Watermark is several times faster, especially in front of hardware encoders, where the CPU filter stage limited the whole job (4K HDR10 into NVENC: from about 26 to about 76 fps; 88 fps without a watermark). The logo's per-pixel blend weights and PQ encoding are precomputed once, the blend runs across worker threads, the untouched picture is copied while the logo rectangle is processed, and letterbox detection samples luma in place instead of converting every probed frame. Output on planar formats is bit-identical to the previous release.
 - ABI: `Filter::Video::Watermark` has new private members; consumers must be rebuilt.
 

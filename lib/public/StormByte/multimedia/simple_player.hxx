@@ -109,6 +109,36 @@ namespace StormByte {
 			std::size_t MaxEvents = 256;				///< Maximum pending decoded units.
 		};
 
+		/** @brief Actual output of the video decoder, not the requested policy. */
+		enum class PreviewDecodeBackend { Unknown, Software, Hardware };
+
+		/**
+		 * @brief Thread-safe diagnostics, cumulative since Open (including seeks).
+		 *
+		 * Stage seconds are elapsed wall time on the conversion worker, including
+		 * setup, not summed CPU time across its internal threads. SDR swscale fuses
+		 * color conversion and packing; its time is charged only to packing.
+		 * Underruns count drained AudioClock episodes during active production,
+		 * not device xruns; an invalid clock cannot measure them.
+		 */
+		struct STORMBYTE_MULTIMEDIA_PUBLIC PreviewDiagnostics {
+			Safe::String m_decoder;	///< Opened video codec name; empty without video.
+			Safe::String m_device;	///< Actual hardware-frame device type, otherwise empty.
+			PreviewDecodeBackend m_backend = PreviewDecodeBackend::Unknown; ///< Unknown until a frame is decoded.
+			std::uint64_t m_skipped_video = 0; ///< Processing-pressure drops, not seek trimming.
+			std::uint64_t m_shown_video = 0; ///< Successful video sink callbacks, not compositor presentations.
+			std::uint64_t m_audio_underruns = 0;
+			std::uint64_t m_audio_clock_samples = 0; ///< Valid active-clock observations.
+			std::uint64_t m_converted_video = 0; ///< Successfully converted pictures.
+			std::size_t m_peak_queue_bytes = 0; ///< Decoded presentation payload only, not process RSS.
+			double m_download_seconds = 0;
+			double m_linearization_seconds = 0; ///< HDR input matrix/primaries conversion plus linearization.
+			double m_tone_mapping_seconds = 0;
+			double m_color_conversion_seconds = 0; ///< HDR output transfer/color conversion.
+			double m_rgba_packing_seconds = 0; ///< Allocation and packing; fused color conversion for SDR.
+			double m_conversion_fps = 0; ///< Pictures / sum of measured conversion-stage seconds; excludes queue waits.
+		};
+
 		/**
 		 * @enum PlaybackState
 		 * @brief Observable preview lifecycle.
@@ -335,6 +365,9 @@ namespace StormByte {
 				 * @return Safe-owned diagnostic, empty when none.
 				 */
 				Safe::String Error() const;
+
+				/** @brief Snapshot actual decoder output and cumulative preview measurements. */
+				PreviewDiagnostics Diagnostics() const;
 
 				/**
 				 * @brief Join workers and close/release input, without rewind.

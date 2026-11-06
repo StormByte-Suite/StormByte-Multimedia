@@ -54,6 +54,7 @@ if(ENABLE_TEST)
 	foreach(test_name IN ITEMS
 		test_empty_display
 		test_buffering_policy
+		test_preview_diagnostics
 		test_audio_adapter_mapping
 		test_audio_adapter_samples
 		test_audio_native_51

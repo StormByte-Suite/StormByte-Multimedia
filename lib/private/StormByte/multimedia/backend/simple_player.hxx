@@ -175,6 +175,8 @@ namespace StormByte {
 					 */
 					Safe::String Error() const;
 
+					PreviewDiagnostics Diagnostics() const;
+
 					/**
 					 * @brief Join, invalidate and close.
 					 * @return Success.
