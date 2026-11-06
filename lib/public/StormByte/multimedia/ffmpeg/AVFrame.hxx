@@ -616,7 +616,8 @@ namespace StormByte {
 
 					/**
 					 * @brief Number of video components or audio channels.
-					 * @return Plane/component count, or 0.
+					 * @return Component or channel count, or 0. For semi-planar or packed video this is not the
+					 * number of data planes; use @ref PlanarLayout before iterating planes by component.
 					 */
 					int PlaneCount() const noexcept;
 
@@ -645,6 +646,17 @@ namespace StormByte {
 					 * @return True for CPU-readable samples with no packing or bit shifts.
 					 */
 					bool PlanarInteger() const noexcept;
+
+					/**
+					 * @brief Layout with one integer component per plane, as per-plane filters read it.
+					 * @return This frame's format when every component already has its own native-endian plane
+					 * at a common 8-16 bit depth (planar YUV, YUVA, GBR(A) or gray); otherwise the planar
+					 * equivalent it converts to losslessly (NV12 -> yuv420p, P010 -> yuv420p10, packed RGB ->
+					 * gbrp, YUYV -> yuv422p); -1 when there is none.
+					 * @note Unlike @ref PlaneCount, which counts components, plane @c i of this layout holds
+					 * component @c i.
+					 */
+					int PlanarLayout() const noexcept;
 
 					/**
 					 * @brief Byte order of multi-byte video samples.

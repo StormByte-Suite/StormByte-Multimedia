@@ -56,6 +56,7 @@
 #include <StormByte/multimedia/property/dovi.hxx>
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
 #include <climits>
 #include <cstdint>
@@ -146,6 +147,71 @@ namespace {
 			|| !sws_isSupportedInput(planar) || !sws_isSupportedOutput(planar))
 			return AV_PIX_FMT_NONE;
 		return planar;
+	}
+
+	// One native-endian integer component per plane, all at the same depth.
+	bool SeparatePlanes(const AVPixFmtDescriptor* desc) noexcept {
+		if (!desc || desc->nb_components < 1 || desc->nb_components > 4
+			|| (desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL
+				| AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_FLOAT)) != 0)
+			return false;
+		const int depth = desc->comp[0].depth;
+		if (depth < 8 || depth > 16 || (depth > 8 && ((desc->flags & AV_PIX_FMT_FLAG_BE) != 0) != (std::endian::native == std::endian::big)))
+			return false;
+		for (int component = 0; component < desc->nb_components; ++component) {
+			const auto& sample = desc->comp[component];
+			if (sample.plane != component || sample.depth != depth || sample.shift != 0
+				|| sample.offset != 0 || sample.step != (depth > 8 ? 2 : 1))
+				return false;
+		}
+		return true;
+	}
+
+	// Planar twin with the same family, alpha, subsampling and depth, e.g. NV12 -> yuv420p, P010 -> yuv420p10.
+	int PlanarTwin(const AVPixFmtDescriptor* desc) noexcept {
+		if (!desc || desc->nb_components < 1 || desc->nb_components > 4
+			|| (desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL
+				| AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_FLOAT)) != 0)
+			return AV_PIX_FMT_NONE;
+		const int depth = desc->comp[0].depth;
+		for (int component = 1; component < desc->nb_components; ++component)
+			if (desc->comp[component].depth != depth)
+				return AV_PIX_FMT_NONE;
+		const bool alpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA) != 0;
+		std::string name;
+		if ((desc->flags & AV_PIX_FMT_FLAG_RGB) != 0) {
+			if (desc->nb_components != (alpha ? 4 : 3))
+				return AV_PIX_FMT_NONE;
+			name = alpha ? "gbrap" : "gbrp";
+		} else if (desc->nb_components == 1) {
+			name = "gray";
+		} else if (desc->nb_components == (alpha ? 4 : 3)) {
+			const char* layout = nullptr;
+			switch ((desc->log2_chroma_w << 4) | desc->log2_chroma_h) {
+				case 0x11: layout = "420"; break;
+				case 0x10: layout = "422"; break;
+				case 0x00: layout = "444"; break;
+				case 0x01: layout = "440"; break;
+				case 0x20: layout = "411"; break;
+				case 0x22: layout = "410"; break;
+				default: return AV_PIX_FMT_NONE;
+			}
+			name = std::string(alpha ? "yuva" : "yuv") + layout + "p";
+		} else {
+			return AV_PIX_FMT_NONE;
+		}
+		if (depth != 8) {
+			name += std::to_string(depth);
+			name += std::endian::native == std::endian::big ? "be" : "le";
+		}
+		const AVPixelFormat twin = av_get_pix_fmt(name.c_str());
+		if (twin == AV_PIX_FMT_NONE || !SeparatePlanes(av_pix_fmt_desc_get(twin)))
+			return AV_PIX_FMT_NONE;
+		const auto source = static_cast<AVPixelFormat>(av_pix_fmt_desc_get_id(desc));
+		if (!sws_isSupportedInput(source) || !sws_isSupportedOutput(source)
+			|| !sws_isSupportedInput(twin) || !sws_isSupportedOutput(twin))
+			return AV_PIX_FMT_NONE;
+		return twin;
 	}
 }
 
@@ -754,6 +820,13 @@ bool FFmpeg::AVFrame::PlanarInteger() const noexcept {
 			return false;
 	}
 	return true;
+}
+
+int FFmpeg::AVFrame::PlanarLayout() const noexcept {
+	if (!m_ptr || m_ptr->width <= 0 || m_ptr->height <= 0)
+		return AV_PIX_FMT_NONE;
+	const auto* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(m_ptr->format));
+	return SeparatePlanes(desc) ? m_ptr->format : PlanarTwin(desc);
 }
 
 bool FFmpeg::AVFrame::BigEndianSamples() const noexcept {
