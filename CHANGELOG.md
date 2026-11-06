@@ -28,6 +28,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Complete cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention using the new diagnostics. Do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.1.0...HEAD
+
+## [3.1.0] - 2026-11-06
+
 ### Added
 
 - `SimplePlayer::Diagnostics()` exposes the opened video decoder name, actual decoded-frame backend (`Unknown` until the first frame, `Software` or `Hardware`) and hardware device name without private FFmpeg types. Thread-safe, cumulative counters separate pressure-skipped and sink-delivered pictures, observed audio-starvation episodes and conversion throughput. Conversion-stage wall times cover download, HDR linearization, tone mapping, output color conversion and RGBA packing. Counters reset on Open, survive seek/stop/close; decoder identity clears when the decoder closes. Display's virtual interface is unchanged; SimplePlayer's existing object layout and virtual interfaces are unchanged (additive API, no new consumer rebuild requirement beyond existing ABI changes).
@@ -130,7 +134,7 @@ or consumer-side OpenGL upload measurements; keep buffering defaults unchanged.
 - MPEG-4 Part 2 (DivX/Xvid) is now writable: the encoder table lists FFmpeg's native `mpeg4` encoder (preferred, no external library) and `libxvid` when available. Previously the codec was read-only even though FFmpeg could encode it, so applications such as Alchemist could not offer it for AVI or other containers. Their VBV buffer is only set together with a maximum bitrate, as these encoders require.
 - Degrain reuses its measurement pictures and previous encode input instead of allocating a full picture per frame. The C heap no longer fragments as the source gets longer, so resident memory stays bounded across both passes; previously it rose by about one picture per frame until long or 4K sources became impractical.
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.0.0...HEAD
+[3.1.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.0.0...3.1.0
 
 ## [3.0.0] - 2026-11-04
 
