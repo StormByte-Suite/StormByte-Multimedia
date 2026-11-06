@@ -267,11 +267,8 @@ else()
 	set(FFMPEG_BM_OPTS "REQUIRE_TOOL=pkgconfig")
 	set(FFMPEG_PATCHES
 		"${CMAKE_CURRENT_LIST_DIR}/0001-mov-read-track-name-as-raw-utf8.patch"
-		"${CMAKE_CURRENT_LIST_DIR}/0002-clang-cl-no-options-strict.patch"
-		"${CMAKE_CURRENT_LIST_DIR}/0003-clang-cl-no-nonlocal-asm-labels.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0004-avcodec-apv-parser-rename-close.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0005-movenc-preserve-long-subtitle-gaps.patch"
-		"${CMAKE_CURRENT_LIST_DIR}/0006-meson-vaapi-check-name.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0007-avformat-matroska-reset-state-after-generic-or-byte-.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0008-tests-api-cover-Matroska-byte-seek-after-EOF.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0009-opusdec-initialize-active-channel-delay-pointers.patch"
@@ -279,8 +276,6 @@ else()
 		"${CMAKE_CURRENT_LIST_DIR}/0011-libopenh264enc-map-constrained-baseline.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0012-libx265-free-generated-rpu-after-encode.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0013-swscale-aarch64-fix-signed-load.patch"
-		"${CMAKE_CURRENT_LIST_DIR}/0014-meson-fix-intrinsics-probes.patch"
-		"${CMAKE_CURRENT_LIST_DIR}/0015-meson-asmgen-feature-macros.patch"
 		"${CMAKE_CURRENT_LIST_DIR}/0016-bm3d-bound-block-distance-work.patch"
 	)
 	list(APPEND FFMPEG_BM_OPTS

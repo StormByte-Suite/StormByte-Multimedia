@@ -19,9 +19,6 @@ list(SORT available)
 if(NOT patches STREQUAL available)
 	message(FATAL_ERROR "FFmpeg patch registration mismatch:\nregistered=${patches}\navailable=${available}")
 endif()
-if(NOT "${FFMPEG}/0014-meson-fix-intrinsics-probes.patch" IN_LIST patches)
-	message(FATAL_ERROR "FFmpeg intrinsics probe patch is not registered")
-endif()
 
 find_program(MESON_EXECUTABLE meson)
 if(NOT MESON_EXECUTABLE)
@@ -35,7 +32,13 @@ if(NOT ready)
 	return()
 endif()
 
-# Mirrors how FFmpeg's Meson 'compiles' checks join header prefix and code.
+file(READ "${WORK}/source/meson.build" meson_build)
+string(FIND "${meson_build}" "cc.compiles(prefix + '\\n\\nint main(void) {\\n' + compiles + '\\nreturn 0;\\n}'" probe_wrapper)
+if(probe_wrapper LESS 0)
+	message(FATAL_ERROR "FFmpeg Meson compilation probe wrapper changed")
+endif()
+
+# Mirrors FFmpeg's Meson compilation checks, including the main wrapper.
 function(read_probe name output)
 	file(STRINGS "${WORK}/source/meson.build" lines REGEX "^  \\['${name}', ")
 	list(LENGTH lines count)
@@ -46,7 +49,7 @@ function(read_probe name output)
 		message(FATAL_ERROR "Unexpected ${name} Meson probe: ${lines}")
 	endif()
 	string(REPLACE "\\;" ";" code "${CMAKE_MATCH_2}")
-	set(${output} "#include <${CMAKE_MATCH_1}>\n\n\n${code}\n" PARENT_SCOPE)
+	set(${output} "#include <${CMAKE_MATCH_1}>\n\nint main(void) {\n${code}\nreturn 0;\n}\n" PARENT_SCOPE)
 endfunction()
 
 function(check_probe name target expected)

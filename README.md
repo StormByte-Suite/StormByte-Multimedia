@@ -537,7 +537,9 @@ Linux releases cover amd64/arm64, glibc/musl and GCC/libstdc++ or Clang/libc++. 
 
 For GCC/Linux builds with LTO, configure checks for the [Alpine fortify-headers/LTO bug](https://gitlab.alpinelinux.org/alpine/aports/-/issues/13735). When the toolchain is affected, Multimedia adds `-fno-builtin-vsnprintf` to its C++ build flags, including PGO training and bundled CMake dependencies such as Tesseract. LTO and fortify remain enabled. Consumers compiling their own code may need the same flag until their toolchain is fixed.
 
-Bundled Opus presumes NEON on ARM64 when the compiler supports its intrinsics; 32-bit ARM does not assume NEON. Bundled FFmpeg includes the upstream AArch64 swscale fix for signed intermediate samples and fixes its Meson NEON/SSE2 intrinsics probes, building the NEON MPEG unquantizer only when NEON intrinsics are detected.
+Bundled FFmpeg is pinned to `42c25af15f51` on `meson-9.0`. Its upstream Meson build includes the clang-cl, VA-API, intrinsics and native AArch64 generator fixes merged in [!208](https://gitlab.freedesktop.org/gstreamer/meson-ports/ffmpeg/-/merge_requests/208); the corresponding five local patches have been removed.
+
+Bundled Opus presumes NEON on ARM64 when the compiler supports its intrinsics; 32-bit ARM does not assume NEON. Bundled FFmpeg includes the upstream AArch64 swscale fix for signed intermediate samples and uses upstream Meson NEON/SSE2 intrinsics probes, building the NEON MPEG unquantizer only when NEON intrinsics are detected.
 
 Clang/Linux AArch64 PGO training disables value profiling to avoid the concurrent profiler hang tracked in [llvm/llvm-project#160968](https://github.com/llvm/llvm-project/issues/160968). Execution-count profiling, LTO, SIMD and codec multithreading remain enabled. The workaround is removed from the optimized build.
 
