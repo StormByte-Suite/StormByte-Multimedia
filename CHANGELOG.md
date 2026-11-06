@@ -30,6 +30,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Add backend-selection diagnostics and cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention. Separate measured underruns, skipped video frames and processing throughput from subjective smoothness; do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
+### Fixed
+
+- Degrain reuses its measurement pictures and previous encode input instead of allocating a full picture per frame. The C heap no longer fragments as the source gets longer, so resident memory stays bounded across both passes; previously it rose by about one picture per frame until long or 4K sources became impractical.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.0.0...HEAD
 
 ## [3.0.0] - 2026-11-04

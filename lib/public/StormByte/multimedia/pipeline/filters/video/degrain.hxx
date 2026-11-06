@@ -148,6 +148,8 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 	 * @par Cost
 	 * Measurement requires a full decode and memory for at most
 	 * 11 measurement frames plus compact per-frame measurements.
+	 * Measurement pictures and the previous encode input are reused, so
+	 * resident memory does not grow with the source duration.
 	 * The second pass evaluates one denoising strength per active frame and
 	 * blends it according to regional measurements. Processing is
 	 * computationally expensive, especially at 4K. Each input frame produces

@@ -105,7 +105,8 @@ struct Degrain::State {
 	};
 
 	std::deque<Slot> ring;						///< Bounded measurement pixel storage.
-	std::vector<Row> row;						///< Compact rows per unique measured PTS.
+	std::vector<std::unique_ptr<FFrame>> spare;	///< Recycled ring pictures, at most RingMax.
+	std::deque<Row> row;						///< Compact rows per unique measured PTS, never reallocated.
 	std::unordered_map<int64_t, std::size_t> lookup;	///< PTS-to-row lookup.
 	std::unordered_set<int64_t> processed;		///< Encode timestamps already encountered.
 	std::unique_ptr<FFrame> previous;				///< Previous real, unfiltered encode input.
@@ -192,6 +193,11 @@ namespace {
 		return sum / count;
 	}
 
+	void Recycle(std::vector<std::unique_ptr<FFrame>>& spare, std::unique_ptr<FFrame> picture) {
+		if (picture && spare.size() < RingMax)
+			spare.push_back(std::move(picture));
+	}
+
 	bool SameLayout(const FFrame& first, const FFrame& second) noexcept {
 		if (first.Width() != second.Width() || first.Height() != second.Height()
 			|| first.Format() != second.Format() || first.PlaneCount() != second.PlaneCount())
@@ -234,6 +240,7 @@ enum Type Degrain::Media() const noexcept {
 
 void Degrain::Clean() noexcept {
 	m_state->ring.clear();
+	m_state->spare.clear();
 	m_state->row.clear();
 	m_state->lookup.clear();
 	m_state->processed.clear();
@@ -281,14 +288,25 @@ void Degrain::PushFrame(const FFrame& source) {
 		m_state->lastPts.reset();
 		return;
 	}
-	if (m_state->ring.size() == RingMax)
+	if (m_state->ring.size() == RingMax) {
+		Recycle(m_state->spare, std::move(m_state->ring.front().pic));
 		m_state->ring.pop_front();
+	}
 	State::Slot slot;
-	slot.pic = std::make_unique<FFrame>();
+	// Reusing a same-sized picture lets ScaleTo keep its buffer. Allocating a
+	// new picture per frame between long-lived rows fragments the C heap until
+	// resident memory grows with the length of the source.
+	if (!m_state->spare.empty()) {
+		slot.pic = std::move(m_state->spare.back());
+		m_state->spare.pop_back();
+	}
+	else
+		slot.pic = std::make_unique<FFrame>();
 	slot.pic->Format(FFrame::FormatYUV420P());
 	if (source.Hardware() || source.Width() < 16 || source.Height() < 16
 		|| !source.ScaleTo(ScalingContext(), *slot.pic, source.Width(), source.Height(),
 			FFrame::Resample::Default, FFrame::Scaler::Sws) || !slot.pic->Data(0)) {
+		Recycle(m_state->spare, std::move(slot.pic));
 		++m_rejected;
 		FlushRing();
 		++m_group;
@@ -479,6 +497,8 @@ void Degrain::FlushRing() {
 	// Keep all remaining neighbours until every tail picture has been scored.
 	for (std::size_t index = 0; index < m_state->ring.size(); ++index)
 		ScoreCenter(index);
+	for (auto& slot : m_state->ring)
+		Recycle(m_state->spare, std::move(slot.pic));
 	m_state->ring.clear();
 }
 
@@ -492,6 +512,7 @@ void Degrain::Decide() {
 		return;
 	}
 	FlushRing();
+	m_state->spare.clear();
 	m_voted = true;
 	RegionMap previousRaw{};
 	std::vector<double> strengths;
@@ -699,10 +720,13 @@ bool Degrain::Apply(const FFrame& source, FFrame& output) {
 	}
 	// Remember the REAL input even when its targets are zero, never a filtered
 	// result. This prevents feedback and bounds encode history to one picture.
+	// Only its pixels feed the next window, so a same-layout buffer is reused
+	// instead of reallocating one full picture per frame.
 	if (!m_state->previous)
 		m_state->previous = std::make_unique<FFrame>();
-	if (!m_state->previous->AllocVideo(source.Width(), source.Height(), source.Format())
-		|| !m_state->previous->Copy(source) || !m_state->previous->CopyProps(source)) {
+	if ((!SameLayout(*m_state->previous, source)
+			&& !m_state->previous->AllocVideo(source.Width(), source.Height(), source.Format()))
+		|| !m_state->previous->Copy(source)) {
 		Fail("degrain: previous input copy failed");
 		return false;
 	}
