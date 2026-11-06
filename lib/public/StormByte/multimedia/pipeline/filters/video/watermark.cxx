@@ -65,6 +65,7 @@
 #include <fstream>
 #include <locale>
 #include <sstream>
+#include <thread>
 #include <utility>
 
 extern "C" {
@@ -97,13 +98,74 @@ namespace {
 		return {};
 	}
 
-	int SampleY8(const FFrame& src, int x, int y) noexcept {
-		if (!src.Data(0) || x < 0 || y < 0 || x >= src.Width() || y >= src.Height())
-			return 0;
-		return src.Data(0)[y * src.Linesize(0) + x];
+	// Read-only 8-bit luma view; the probe only samples a sparse grid, so the
+	// tone curves are composed into one LUT instead of rewriting every pixel.
+	struct Gray {
+		const std::uint8_t* data = nullptr;
+		std::ptrdiff_t linesize = 0;
+		int width = 0;
+		int height = 0;
+		int bytes = 1;
+		bool bigEndian = false;
+		int shift = 0;
+		int down = 0;
+		std::array<std::uint8_t, 256> lut {};
+
+		int Width() const noexcept { return width; }
+		int Height() const noexcept { return height; }
+	};
+
+	void IdentityLut(std::array<std::uint8_t, 256>& lut) noexcept {
+		for (int i = 0; i < 256; ++i)
+			lut[static_cast<std::size_t>(i)] = static_cast<std::uint8_t>(i);
 	}
 
-	int RowMeanY8(const FFrame& src, int row) noexcept {
+	Gray GrayOf(const FFrame& frame) noexcept {
+		Gray gray;
+		gray.data = frame.Data(0);
+		gray.linesize = frame.Linesize(0);
+		gray.width = frame.Width();
+		gray.height = frame.Height();
+		IdentityLut(gray.lut);
+		return gray;
+	}
+
+	// Planar and semi-planar YUV/gray keep luma alone in plane 0, so it is read in place.
+	bool DirectGray(const FFrame& frame, Gray& gray) noexcept {
+		const auto* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(frame.Format()));
+		if (!desc || !frame.Data(0) || desc->nb_components < 1
+			|| (desc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL
+				| AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_FLOAT)) != 0)
+			return false;
+		const auto& luma = desc->comp[0];
+		const int bytes = (luma.depth + luma.shift + 7) / 8;
+		if (luma.plane != 0 || luma.offset != 0 || luma.depth < 8 || luma.depth > 16
+			|| (bytes != 1 && bytes != 2) || luma.step != bytes)
+			return false;
+		gray = GrayOf(frame);
+		gray.bytes = bytes;
+		gray.bigEndian = (desc->flags & AV_PIX_FMT_FLAG_BE) != 0;
+		gray.shift = luma.shift;
+		gray.down = luma.depth - 8;
+		return true;
+	}
+
+	int SampleY8(const Gray& src, int x, int y) noexcept {
+		if (!src.data || x < 0 || y < 0 || x >= src.width || y >= src.height)
+			return 0;
+		const std::uint8_t* row = src.data + static_cast<std::ptrdiff_t>(y) * src.linesize;
+		unsigned value = row[x];
+		if (src.bytes == 2) {
+			const std::uint8_t* p = row + static_cast<std::ptrdiff_t>(x) * 2;
+			value = src.bigEndian ? (unsigned{p[0]} << 8 | p[1]) : (unsigned{p[1]} << 8 | p[0]);
+			value >>= src.shift;
+			if (src.down > 0)
+				value = std::min(255u, (value + (1u << (src.down - 1))) >> src.down);
+		}
+		return src.lut[value];
+	}
+
+	int RowMeanY8(const Gray& src, int row) noexcept {
 		unsigned sum = 0;
 		const int step = src.Width() > 64 ? src.Width() / 64 : 1;
 		int n = 0;
@@ -115,7 +177,7 @@ namespace {
 		return n ? static_cast<int>(sum / static_cast<unsigned>(n)) : 0;
 	}
 
-	int ColMeanY8(const FFrame& src, int col) noexcept {
+	int ColMeanY8(const Gray& src, int col) noexcept {
 		unsigned sum = 0;
 		const int step = src.Height() > 64 ? src.Height() / 64 : 1;
 		int n = 0;
@@ -160,14 +222,9 @@ namespace {
 		return {a, b};
 	}
 
-	void ApplyLut(FFrame& gray, const std::array<uint8_t, 256>& lut) noexcept {
-		if (!gray || !gray.Data(0))
-			return;
-		for (int y = 0; y < gray.Height(); ++y) {
-			uint8_t* row = gray.Data(0) + static_cast<std::ptrdiff_t>(y) * gray.Linesize(0);
-			for (int x = 0; x < gray.Width(); ++x)
-				row[x] = lut[row[x]];
-		}
+	void ApplyLut(Gray& gray, const std::array<uint8_t, 256>& lut) noexcept {
+		for (auto& value : gray.lut)
+			value = lut[value];
 	}
 
 	std::array<uint8_t, 256> StretchLut(int lo, int hi) noexcept {
@@ -205,7 +262,7 @@ namespace {
 		int right = 0;
 	};
 
-	Probe Measure(const FFrame& gray) noexcept {
+	Probe Measure(const Gray& gray) noexcept {
 		Probe out;
 		const int midY = RowMeanY8(gray, gray.Height() / 2);
 		const int midX = ColMeanY8(gray, gray.Width() / 2);
@@ -502,9 +559,6 @@ namespace {
 	bool CanComposite(const AVPixFmtDescriptor* desc) noexcept {
 		if (!desc || (desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_BITSTREAM)) != 0)
 			return false;
-		if (desc->nb_components >= 3 && desc->comp[1].plane == desc->comp[2].plane
-			&& desc->comp[1].plane != desc->comp[0].plane)
-			return false;
 		if ((desc->flags & AV_PIX_FMT_FLAG_RGB) != 0 && (desc->flags & AV_PIX_FMT_FLAG_PLANAR) == 0)
 			return desc->log2_chroma_w == 0 && desc->log2_chroma_h == 0;
 		return (desc->flags & AV_PIX_FMT_FLAG_PLANAR) != 0 || desc->nb_components == 1;
@@ -515,6 +569,14 @@ namespace {
 			|| (desc->flags & AV_PIX_FMT_FLAG_RGB) != 0)
 			return 0;
 		return vertical ? desc->log2_chroma_h : desc->log2_chroma_w;
+	}
+
+	// Bytes per pixel position in a plane; semi-planar chroma planes hold interleaved U/V pairs.
+	int PlaneStep(const AVPixFmtDescriptor* desc, int plane) noexcept {
+		for (int c = 0; c < desc->nb_components; ++c)
+			if (desc->comp[c].plane == plane)
+				return std::max(1, desc->comp[c].step);
+		return 1;
 	}
 
 	struct Box {
@@ -549,8 +611,7 @@ namespace {
 		const AVPixFmtDescriptor* desc) noexcept {
 		if (!tile.AllocVideo(w, h, src.Format()))
 			return false;
-		const bool packed = (desc->flags & AV_PIX_FMT_FLAG_PLANAR) == 0;
-		const int planes = std::min(src.PlaneCount(), 4);
+		const int planes = std::min(av_pix_fmt_count_planes(static_cast<AVPixelFormat>(src.Format())), 4);
 		for (int plane = 0; plane < planes; ++plane) {
 			if (!src.Data(plane) || !tile.Data(plane))
 				return false;
@@ -558,9 +619,7 @@ namespace {
 			const int shiftY = PlaneShift(desc, plane, true);
 			const int copyW = w >> shiftX;
 			const int copyH = h >> shiftY;
-			const int sample = packed
-				? std::max(1, desc->comp[0].step)
-				: std::max(1, (desc->comp[std::min(plane, desc->nb_components - 1)].depth + 7) / 8);
+			const int sample = PlaneStep(desc, plane);
 			const int rowBytes = copyW * sample;
 			const int srcX = (x >> shiftX) * sample;
 			for (int row = 0; row < copyH; ++row) {
@@ -573,34 +632,35 @@ namespace {
 		return true;
 	}
 
-	bool Covered(const std::uint8_t* rgba, int logoW, int logoH, int frameX, int frameY,
-		int placeX, int placeY, unsigned opacity) noexcept {
-		const int lx = frameX - placeX;
-		const int ly = frameY - placeY;
-		if (lx < 0 || ly < 0 || lx >= logoW || ly >= logoH)
-			return false;
-		const int alpha = static_cast<int>(rgba[(static_cast<std::size_t>(ly) * static_cast<std::size_t>(logoW)
-			+ static_cast<std::size_t>(lx)) * 4 + 3]);
-		return (alpha * static_cast<int>(opacity)) / 100 > 0;
+	// One byte per logo pixel: whether its weighted alpha rewrites the picture.
+	void BuildCover(const std::uint8_t* rgba, int logoW, int logoH, unsigned opacity,
+		StormByte::Safe::Vector<std::uint8_t>& cover) {
+		const std::size_t count = static_cast<std::size_t>(logoW) * static_cast<std::size_t>(logoH);
+		cover.resize(count);
+		for (std::size_t i = 0; i < count; ++i)
+			cover[i] = (static_cast<int>(rgba[i * 4 + 3]) * static_cast<int>(opacity)) / 100 > 0 ? 1 : 0;
 	}
 
-	bool BlockCovered(const std::uint8_t* rgba, int logoW, int logoH, int frameX, int frameY,
-		int placeX, int placeY, unsigned opacity, int spanX, int spanY) noexcept {
-		for (int dy = 0; dy < spanY; ++dy) {
-			for (int dx = 0; dx < spanX; ++dx) {
-				if (Covered(rgba, logoW, logoH, frameX + dx, frameY + dy, placeX, placeY, opacity))
+	bool BlockCovered(const std::uint8_t* cover, int logoW, int logoH, int frameX, int frameY,
+		int placeX, int placeY, int spanX, int spanY) noexcept {
+		const int x0 = std::max(frameX - placeX, 0);
+		const int y0 = std::max(frameY - placeY, 0);
+		const int x1 = std::min(frameX - placeX + spanX, logoW);
+		const int y1 = std::min(frameY - placeY + spanY, logoH);
+		for (int ly = y0; ly < y1; ++ly) {
+			const std::uint8_t* row = cover + static_cast<std::size_t>(ly) * static_cast<std::size_t>(logoW);
+			for (int lx = x0; lx < x1; ++lx)
+				if (row[lx])
 					return true;
-			}
 		}
 		return false;
 	}
 
-	void Scatter(const FFrame& tile, FFrame& dst, Box box, const std::uint8_t* rgba,
-		int logoW, int logoH, int placeX, int placeY, unsigned opacity,
-		const AVPixFmtDescriptor* desc) noexcept {
+	void Scatter(const FFrame& tile, FFrame& dst, Box box, const std::uint8_t* cover,
+		int logoW, int logoH, int placeX, int placeY, const AVPixFmtDescriptor* desc) noexcept {
 		const bool packed = (desc->flags & AV_PIX_FMT_FLAG_PLANAR) == 0;
 		const bool keepAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA) != 0;
-		const int planes = std::min(std::min(tile.PlaneCount(), dst.PlaneCount()), 4);
+		const int planes = std::min(av_pix_fmt_count_planes(static_cast<AVPixelFormat>(dst.Format())), 4);
 		const int colorPlanes = (keepAlpha && !packed) ? std::max(1, planes - 1) : planes;
 		int alphaOffset = -1;
 		int alphaBytes = 0;
@@ -616,16 +676,14 @@ namespace {
 			const int shiftY = PlaneShift(desc, plane, true);
 			const int copyW = box.w >> shiftX;
 			const int copyH = box.h >> shiftY;
-			const int sample = packed
-				? std::max(1, desc->comp[0].step)
-				: std::max(1, (desc->comp[std::min(plane, desc->nb_components - 1)].depth + 7) / 8);
+			const int sample = PlaneStep(desc, plane);
 			const int spanX = 1 << shiftX;
 			const int spanY = 1 << shiftY;
 			for (int row = 0; row < copyH; ++row) {
 				for (int col = 0; col < copyW; ++col) {
 					const int frameX = box.x + (col << shiftX);
 					const int frameY = box.y + (row << shiftY);
-					if (!BlockCovered(rgba, logoW, logoH, frameX, frameY, placeX, placeY, opacity, spanX, spanY))
+					if (!BlockCovered(cover, logoW, logoH, frameX, frameY, placeX, placeY, spanX, spanY))
 						continue;
 					std::uint8_t* pixel = dst.Data(plane)
 						+ (static_cast<std::size_t>(box.y >> shiftY) + static_cast<std::size_t>(row))
@@ -664,49 +722,93 @@ namespace {
 
 	// Use the same perceptual curve at the same graphics-white reference.
 	// SDR linear white is 1; HDR linear white is GraphicsWhite / HdrPeak.
-	float Mix(float under, float over, float a, bool hdr) noexcept {
-		if (a >= 1.f)
-			return over;
-		const float scale = hdr ? 1.f : static_cast<float>(GraphicsWhite / HdrPeak);
-		return PqDecode(PqEncode(under * scale) * (1.f - a) + PqEncode(over * scale) * a) / scale;
+	float PqScale(bool hdr) noexcept {
+		return hdr ? 1.f : static_cast<float>(GraphicsWhite / HdrPeak);
 	}
 
-	void BlendLinear(FFrame& tile, const FFrame& logo, int placeX, int placeY, int tileX, int tileY,
-		const std::uint8_t* rgba, int logoW, int logoH, unsigned opacity, bool hdr) noexcept {
-		if (!tile.Data(0) || !tile.Data(1) || !tile.Data(2) || !logo.Data(0) || !logo.Data(1) || !logo.Data(2))
-			return;
+	// Per logo pixel: effective alpha, then the logo G, B, R already PQ-encoded,
+	// so each frame only encodes the picture under the logo and decodes the mix.
+	constexpr std::size_t BlendStride = 4;
+
+	void BuildBlend(const FFrame& logo, const std::uint8_t* rgba, int logoW, int logoH,
+		unsigned opacity, bool hdr, StormByte::Safe::Vector<float>& blend) {
+		blend.assign(static_cast<std::size_t>(logoW) * static_cast<std::size_t>(logoH) * BlendStride, 0.f);
 		const float opacityScale = static_cast<float>(opacity) / 100.f;
-		const int originX = placeX - tileX;
-		const int originY = placeY - tileY;
+		const float scale = PqScale(hdr);
 		for (int row = 0; row < logoH; ++row) {
+			const float* planes[3];
+			for (int plane = 0; plane < 3; ++plane)
+				planes[plane] = reinterpret_cast<const float*>(logo.Data(plane)
+					+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(plane));
+			const std::uint8_t* alpha = rgba + static_cast<std::size_t>(row) * static_cast<std::size_t>(logoW) * 4;
+			float* out = blend.data() + static_cast<std::size_t>(row) * static_cast<std::size_t>(logoW) * BlendStride;
+			for (int col = 0; col < logoW; ++col, out += BlendStride) {
+				const float a = (static_cast<float>(alpha[col * 4 + 3]) / 255.f) * opacityScale;
+				out[0] = a;
+				if (a <= 0.f)
+					continue;
+				for (int plane = 0; plane < 3; ++plane)
+					out[1 + plane] = a >= 1.f ? planes[plane][col] : PqEncode(planes[plane][col] * scale);
+			}
+		}
+	}
+
+	void BlendRows(FFrame& tile, const float* blend, int originX, int originY, int logoW,
+		int rowBegin, int rowEnd, bool hdr) noexcept {
+		const float scale = PqScale(hdr);
+		for (int row = rowBegin; row < rowEnd; ++row) {
 			const int ty = originY + row;
 			if (ty < 0 || ty >= tile.Height())
 				continue;
-			auto* tileG = reinterpret_cast<float*>(tile.Data(0)
-				+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(0));
-			auto* tileB = reinterpret_cast<float*>(tile.Data(1)
-				+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(1));
-			auto* tileR = reinterpret_cast<float*>(tile.Data(2)
-				+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(2));
-			const auto* logoG = reinterpret_cast<const float*>(logo.Data(0)
-				+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(0));
-			const auto* logoB = reinterpret_cast<const float*>(logo.Data(1)
-				+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(1));
-			const auto* logoR = reinterpret_cast<const float*>(logo.Data(2)
-				+ static_cast<std::ptrdiff_t>(row) * logo.Linesize(2));
-			const std::uint8_t* alpha = rgba + static_cast<std::size_t>(row) * static_cast<std::size_t>(logoW) * 4;
-			for (int col = 0; col < logoW; ++col) {
+			float* planes[3];
+			for (int plane = 0; plane < 3; ++plane)
+				planes[plane] = reinterpret_cast<float*>(tile.Data(plane)
+					+ static_cast<std::ptrdiff_t>(ty) * tile.Linesize(plane));
+			const float* px = blend + static_cast<std::size_t>(row) * static_cast<std::size_t>(logoW) * BlendStride;
+			for (int col = 0; col < logoW; ++col, px += BlendStride) {
+				const float a = px[0];
 				const int tx = originX + col;
-				if (tx < 0 || tx >= tile.Width())
+				if (a <= 0.f || tx < 0 || tx >= tile.Width())
 					continue;
-				const float a = (static_cast<float>(alpha[col * 4 + 3]) / 255.f) * opacityScale;
-				if (a <= 0.f)
-					continue;
-				tileG[tx] = Mix(tileG[tx], logoG[col], a, hdr);
-				tileB[tx] = Mix(tileB[tx], logoB[col], a, hdr);
-				tileR[tx] = Mix(tileR[tx], logoR[col], a, hdr);
+				for (int plane = 0; plane < 3; ++plane) {
+					float& under = planes[plane][tx];
+					under = a >= 1.f ? px[1 + plane]
+						: PqDecode(PqEncode(under * scale) * (1.f - a) + px[1 + plane] * a) / scale;
+				}
 			}
 		}
+	}
+
+	// Rows are independent, so the PQ round trip is split across cores; any thread
+	// start failure finishes the remaining rows on the calling thread.
+	void BlendLinear(FFrame& tile, const StormByte::Safe::Vector<float>& blend, int placeX, int placeY,
+		int tileX, int tileY, int logoW, int logoH, bool hdr) noexcept {
+		if (!tile.Data(0) || !tile.Data(1) || !tile.Data(2) || blend.size()
+			< static_cast<std::size_t>(logoW) * static_cast<std::size_t>(logoH) * BlendStride)
+			return;
+		const int originX = placeX - tileX;
+		const int originY = placeY - tileY;
+		constexpr int MinRows = 16;
+		const unsigned cores = std::max(1u, std::thread::hardware_concurrency());
+		const int jobs = std::clamp(logoH / MinRows, 1, static_cast<int>(std::min(cores, 64u)));
+		const int chunk = (logoH + jobs - 1) / jobs;
+		std::array<std::thread, 64> workers;
+		int started = 0;
+		int next = chunk;
+		try {
+			for (; started < jobs - 1 && next < logoH; ++started, next += chunk) {
+				const int begin = next;
+				const int end = std::min(logoH, next + chunk);
+				workers[static_cast<std::size_t>(started)] = std::thread([&, begin, end] {
+					BlendRows(tile, blend.data(), originX, originY, logoW, begin, end, hdr);
+				});
+			}
+		} catch (...) {}
+		BlendRows(tile, blend.data(), originX, originY, logoW, 0, std::min(logoH, chunk), hdr);
+		if (next < logoH)
+			BlendRows(tile, blend.data(), originX, originY, logoW, next, logoH, hdr);
+		for (int i = 0; i < started; ++i)
+			workers[static_cast<std::size_t>(i)].join();
 	}
 }
 
@@ -788,6 +890,8 @@ void Watermark::Clean() noexcept {
 	m_rgba.clear();
 	m_scaled.clear();
 	m_linear.reset();
+	m_blend.clear();
+	m_cover.clear();
 	m_logoWidth = 0;
 	m_logoHeight = 0;
 	m_paintW = 0;
@@ -827,6 +931,8 @@ void Watermark::DisableLogo(std::string_view why) {
 	m_rgba.clear();
 	m_scaled.clear();
 	m_linear.reset();
+	m_blend.clear();
+	m_cover.clear();
 	m_logoWidth = 0;
 	m_logoHeight = 0;
 	m_paintW = 0;
@@ -971,13 +1077,22 @@ const FFrame* Watermark::Luma(const FFrame& src) {
 }
 
 bool Watermark::ProbeBars(const FFrame& src) {
-	if (!Luma(src) || m_luma->Width() < 16 || m_luma->Height() < 16) {
-			Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("probe skip luma={}x{}",
-			m_luma ? m_luma->Width() : 0,
-			m_luma ? m_luma->Height() : 0));
+	if (src.Hardware()) {
+		Fail("watermark needs a software frame");
 		return false;
 	}
-	FFrame& gray = *m_luma;
+	Gray gray;
+	if (!DirectGray(src, gray)) {
+		const FFrame* luma = Luma(src);
+		if (!luma)
+			return false;
+		gray = GrayOf(*luma);
+	}
+	if (!gray.data || gray.Width() < 16 || gray.Height() < 16) {
+		Log(Level::LowLevel, StormByte::Safe::String::ReplaceToken("probe skip luma={}x{}",
+			gray.Width(), gray.Height()));
+		return false;
+	}
 
 	Probe found = Measure(gray);
 	const bool rawBoxed = Boxed(found);
@@ -1117,6 +1232,8 @@ bool Watermark::Prepare(int frameW, int frameH) {
 	if (m_prepared && m_preparedW == frameW && m_preparedH == frameH)
 		return m_opacity != 0;
 	m_linear.reset();
+	m_blend.clear();
+	m_cover.clear();
 	m_linearReady = false;
 	m_scaled.clear();
 	m_scaledMargin = m_margin;
@@ -1209,6 +1326,8 @@ bool Watermark::EnsureLinear(const FFrame& src) {
 		return false;
 	if (hdr)
 		ScaleLinearRgb(*linear, static_cast<float>(GraphicsWhite / HdrPeak));
+	BuildBlend(*linear, bytes, m_paintW, m_paintH, m_opacity, hdr, m_blend);
+	BuildCover(bytes, m_paintW, m_paintH, m_opacity, m_cover);
 	m_linear = std::move(linear);
 	m_linearTrc = transfer;
 	m_linearPri = primaries;
@@ -1231,6 +1350,25 @@ bool Watermark::Composite(const FFrame& src, int x, int y) {
 	if (box.w <= 0 || box.h <= 0 || box.x > x || box.y > y
 		|| box.x + box.w < x + m_paintW || box.y + box.h < y + m_paintH)
 		return false;
+	FFrame out;
+	if (!out.AllocVideo(src.Width(), src.Height(), src.Format())) {
+		Fail(StormByte::Safe::String::ReplaceToken(
+			"watermark could not allocate output frame {}x{} fmt={}",
+			src.Width(), src.Height(), src.Format()));
+		return true;
+	}
+	// The untouched picture is copied while the logo rectangle is converted and blended.
+	bool copied = false;
+	std::thread copier;
+	try {
+		copier = std::thread([&out, &src, &copied] { copied = out.Copy(src); });
+	} catch (...) {
+		copied = out.Copy(src);
+	}
+	struct Join {
+		std::thread& thread;
+		~Join() { if (thread.joinable()) thread.join(); }
+	} join{copier};
 	FFrame tile;
 	if (!ExtractTile(src, tile, box.x, box.y, box.w, box.h, desc))
 		return false;
@@ -1247,8 +1385,7 @@ bool Watermark::Composite(const FFrame& src, int x, int y) {
 			FFrame::Resample::Point, FFrame::Scaler::Zimg, LinearTarget(AVCOL_PRI_BT2020, hdr))
 		|| !linear.Data(0) || !linear.Data(1) || !linear.Data(2))
 		return false;
-	const std::uint8_t* rgba = m_scaled.empty() ? m_rgba.data() : m_scaled.data();
-	BlendLinear(linear, *m_linear, x, y, box.x, box.y, rgba, m_paintW, m_paintH, m_opacity, hdr);
+	BlendLinear(linear, m_blend, x, y, box.x, box.y, m_paintW, m_paintH, hdr);
 	linear.ColorTransfer(AVCOL_TRC_LINEAR);
 	linear.ColorPrimaries(AVCOL_PRI_BT2020);
 	linear.ColorSpace(AVCOL_SPC_RGB);
@@ -1264,20 +1401,15 @@ bool Watermark::Composite(const FFrame& src, int x, int y) {
 	if (!linear.ScaleTo(ScalingContext(), restored, box.w, box.h,
 			FFrame::Resample::Point, FFrame::Scaler::Zimg, back) || !restored.Data(0))
 		return false;
-	FFrame out;
-	if (!out.AllocVideo(src.Width(), src.Height(), src.Format())) {
-		Fail(StormByte::Safe::String::ReplaceToken(
-			"watermark could not allocate output frame {}x{} fmt={}",
-			src.Width(), src.Height(), src.Format()));
-		return true;
-	}
-	if (!out.Copy(src) || !out.CopyProps(src)) {
+	if (copier.joinable())
+		copier.join();
+	if (!copied || !out.CopyProps(src)) {
 		Fail(StormByte::Safe::String::ReplaceToken(
 			"watermark could not copy source pixels or metadata for {}x{} fmt={}",
 			src.Width(), src.Height(), src.Format()));
 		return true;
 	}
-	Scatter(restored, out, box, rgba, m_paintW, m_paintH, x, y, m_opacity, desc);
+	Scatter(restored, out, box, m_cover.data(), m_paintW, m_paintH, x, y, desc);
 	Save(std::move(out));
 	return true;
 }

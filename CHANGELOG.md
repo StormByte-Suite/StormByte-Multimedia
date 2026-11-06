@@ -30,8 +30,14 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Add backend-selection diagnostics and cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention. Separate measured underruns, skipped video frames and processing throughput from subjective smoothness; do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
+### Changed
+
+- Watermark is several times faster, especially in front of hardware encoders, where the CPU filter stage limited the whole job (4K HDR10 into NVENC: from about 26 to about 76 fps; 88 fps without a watermark). The logo's per-pixel blend weights and PQ encoding are precomputed once, the blend runs across worker threads, the untouched picture is copied while the logo rectangle is processed, and letterbox detection samples luma in place instead of converting every probed frame. Output on planar formats is bit-identical to the previous release.
+- ABI: `Filter::Video::Watermark` has new private members; consumers must be rebuilt.
+
 ### Fixed
 
+- Watermark composites semi-planar frames (NV12, P010 and similar, as produced by hardware decoders) in linear light like planar ones. Previously they fell back to a full-frame 8-bit RGBA path, which was slow and reduced 10-bit/HDR precision. Zimg conversions also accept any semi-planar YUV layout and depth through its planar equivalent.
 - MPEG-4 Part 2 (DivX/Xvid) is now writable: the encoder table lists FFmpeg's native `mpeg4` encoder (preferred, no external library) and `libxvid` when available. Previously the codec was read-only even though FFmpeg could encode it, so applications such as Alchemist could not offer it for AVI or other containers. Their VBV buffer is only set together with a maximum bitrate, as these encoders require.
 - Degrain reuses its measurement pictures and previous encode input instead of allocating a full picture per frame. The C heap no longer fragments as the source gets longer, so resident memory stays bounded across both passes; previously it rose by about one picture per frame until long or 4K sources became impractical.
 

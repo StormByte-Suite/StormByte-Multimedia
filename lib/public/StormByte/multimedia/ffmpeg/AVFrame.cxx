@@ -59,6 +59,7 @@
 #include <cctype>
 #include <climits>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -115,18 +116,36 @@ namespace {
 		return SWS_BILINEAR;
 	}
 
+	// Semi-planar YUV (NV12/NV16/NV24, P010/P012/P016, P2xx, P4xx) repacks losslessly to planar YUV.
 	int ZimgPlanarFormat(int format) noexcept {
-		switch (format) {
-			case AV_PIX_FMT_NV12:
-			case AV_PIX_FMT_NV21:
-				return AV_PIX_FMT_YUV420P;
-			case AV_PIX_FMT_P010LE:
-				return AV_PIX_FMT_YUV420P10LE;
-			case AV_PIX_FMT_P010BE:
-				return AV_PIX_FMT_YUV420P10BE;
-			default:
-				return AV_PIX_FMT_NONE;
+		const auto* desc = av_pix_fmt_desc_get(static_cast<AVPixelFormat>(format));
+		if (!desc || desc->nb_components != 3
+			|| (desc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL
+				| AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_FLOAT)) != 0
+			|| desc->comp[1].plane != desc->comp[2].plane || desc->comp[0].plane == desc->comp[1].plane)
+			return AV_PIX_FMT_NONE;
+		const char* layout = nullptr;
+		switch ((desc->log2_chroma_w << 4) | desc->log2_chroma_h) {
+			case 0x11: layout = "420"; break;
+			case 0x10: layout = "422"; break;
+			case 0x00: layout = "444"; break;
+			case 0x01: layout = "440"; break;
+			default: return AV_PIX_FMT_NONE;
 		}
+		const int depth = desc->comp[0].depth;
+		char name[32];
+		const int written = depth == 8
+			? std::snprintf(name, sizeof(name), "yuv%sp", layout)
+			: std::snprintf(name, sizeof(name), "yuv%sp%d%s", layout, depth,
+				(desc->flags & AV_PIX_FMT_FLAG_BE) != 0 ? "be" : "le");
+		if (written <= 0 || written >= static_cast<int>(sizeof(name)))
+			return AV_PIX_FMT_NONE;
+		const AVPixelFormat planar = av_get_pix_fmt(name);
+		if (planar == AV_PIX_FMT_NONE || !sws_isSupportedInput(static_cast<AVPixelFormat>(format))
+			|| !sws_isSupportedOutput(static_cast<AVPixelFormat>(format))
+			|| !sws_isSupportedInput(planar) || !sws_isSupportedOutput(planar))
+			return AV_PIX_FMT_NONE;
+		return planar;
 	}
 }
 

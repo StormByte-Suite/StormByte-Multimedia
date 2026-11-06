@@ -456,7 +456,9 @@ namespace StormByte::Multimedia::Pipeline::Filter::Video {
 			int m_margin;					///< Authored anchor margin
 			StormByte::Safe::Optional<StormByte::Multimedia::Property::Resolution> m_designed;	///< Empty keeps native pixels
 			StormByte::Safe::Vector<std::uint8_t> m_scaled;	///< Scaled sRGB RGBA. Empty uses @ref m_rgba
-			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_linear;	///< Cached linear logo, GBRAPF32
+			StormByte::Safe::Unique<StormByte::Multimedia::FFmpeg::AVFrame> m_linear;	///< Cached linear logo, GBRPF32
+			StormByte::Safe::Vector<float> m_blend;	///< Per logo pixel: effective alpha and PQ-encoded G, B, R
+			StormByte::Safe::Vector<std::uint8_t> m_cover;	///< Per logo pixel: whether it rewrites the picture
 			int m_scaledMargin;				///< Margin for this run
 			int m_paintW;					///< Width used when painting
 			int m_paintH;					///< Height used when painting
