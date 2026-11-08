@@ -28,6 +28,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Complete cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention using the new diagnostics. Do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
+### Fixed
+
+- FFmpeg codec aliases are only resolved within their own media kind. The H.264 alias `avc` is FFmpeg's name for the On2 AVC audio codec, so `Codec::Decoders()` listed the audio decoder `on2avc` for H.264, and read access and muxer support were also checked against it.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.1.0...HEAD
 
 ## [3.1.0] - 2026-11-06

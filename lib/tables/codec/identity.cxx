@@ -50,6 +50,10 @@
 
 #include <tables/codec/table.hxx>
 
+extern "C" {
+	#include <libavcodec/avcodec.h>
+}
+
 std::span<const StormByte::Multimedia::Tables::Codec::CodecDef>
 StormByte::Multimedia::Tables::Codec::Identity(Type type) noexcept {
 	switch (type) {
@@ -58,5 +62,18 @@ StormByte::Multimedia::Tables::Codec::Identity(Type type) noexcept {
 		case Type::Subtitle:	return Subtitle();
 		case Type::Attachment:	return Attachment();
 		default:				return {};
+	}
+}
+
+const AVCodecDescriptor*
+StormByte::Multimedia::Tables::Codec::Descriptor(Type type, const char* id) noexcept {
+	const AVCodecDescriptor* descriptor = id ? avcodec_descriptor_get_by_name(id) : nullptr;
+	if (!descriptor)
+		return nullptr;
+	switch (type) {
+		case Type::Video:		return descriptor->type == AVMEDIA_TYPE_VIDEO ? descriptor : nullptr;
+		case Type::Audio:		return descriptor->type == AVMEDIA_TYPE_AUDIO ? descriptor : nullptr;
+		case Type::Subtitle:	return descriptor->type == AVMEDIA_TYPE_SUBTITLE ? descriptor : nullptr;
+		default:				return descriptor;
 	}
 }

@@ -78,7 +78,7 @@ namespace {
 			const char* id = def.FfmpegId(i);
 			if (!id)
 				continue;
-			const AVCodecDescriptor* descriptor = avcodec_descriptor_get_by_name(id);
+			const AVCodecDescriptor* descriptor = Tables::Codec::Descriptor(type, id);
 			if (descriptor && avcodec_find_decoder(descriptor->id) != nullptr) {
 				access |= Access(Operation::Read);
 				break;

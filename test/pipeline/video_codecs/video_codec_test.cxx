@@ -310,10 +310,7 @@ int test_discovered_video_decoders_have_software_formats() {
 			const auto* decoder = avcodec_find_decoder_by_name(info.Name().data());
 			TEST_REQUIRE(decoder);
 			TEST_REQUIRE((decoder->capabilities & (AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_EXPERIMENTAL)) == 0);
-			// Some legacy catalog entries are grouped as video despite their
-			// backend media kind (for example on2avc is audio).
-			if (decoder->type != AVMEDIA_TYPE_VIDEO)
-				continue;
+			TEST_REQUIRE(decoder->type == AVMEDIA_TYPE_VIDEO);
 			const void* formats = nullptr;
 			int count = 0;
 			TEST_REQUIRE(avcodec_get_supported_config(nullptr, decoder, AV_CODEC_CONFIG_PIX_FORMAT,

@@ -137,7 +137,7 @@ bool Backend::MuxerAccepts(const AVOutputFormat& muxer, const Codec& codec) {
 		const char* id = def->FfmpegId(i);
 		if (!id)
 			continue;
-		const AVCodecDescriptor* descriptor = avcodec_descriptor_get_by_name(id);
+		const AVCodecDescriptor* descriptor = Tables::Codec::Descriptor(codec.Type(), id);
 		if (!descriptor)
 			continue;
 		known = true;

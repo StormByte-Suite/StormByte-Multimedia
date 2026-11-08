@@ -94,11 +94,11 @@ namespace {
 		return false;
 	}
 
-	bool MatchesCodec(const AVCodec* decoder, const Tables::Codec::CodecDef& identity) noexcept {
+	bool MatchesCodec(const AVCodec* decoder, StormByte::Multimedia::Type type, const Tables::Codec::CodecDef& identity) noexcept {
 		if (!UsableDecoder(decoder))
 			return false;
 		for (std::size_t i = 0; i < identity.FfmpegIdCount(); ++i) {
-			const auto* descriptor = avcodec_descriptor_get_by_name(identity.FfmpegId(i));
+			const auto* descriptor = Tables::Codec::Descriptor(type, identity.FfmpegId(i));
 			if (descriptor && descriptor->id == decoder->id)
 				return true;
 		}
@@ -165,7 +165,7 @@ bool Codec::HasAccess(Access access, const Features& need) const noexcept {
 			for (const auto rows : {Tables::Decoder::Video(), Tables::Decoder::Audio()}) {
 				for (const auto& row : rows) {
 					if (m_name == row.codec && row.features.Has(need)
-						&& MatchesCodec(avcodec_find_decoder_by_name(row.name), identity))
+						&& MatchesCodec(avcodec_find_decoder_by_name(row.name), m_type, identity))
 						return true;
 				}
 			}
@@ -187,7 +187,7 @@ StormByte::Safe::Vector<DecoderInfo> Codec::Decoders(const Features& need) const
 		std::vector<const Tables::Decoder::DecoderDef*> rows;
 		for (const auto table : {Tables::Decoder::Video(), Tables::Decoder::Audio()}) {
 			for (const auto& row : table) {
-				if (m_name == row.codec && MatchesCodec(avcodec_find_decoder_by_name(row.name), identity))
+				if (m_name == row.codec && MatchesCodec(avcodec_find_decoder_by_name(row.name), m_type, identity))
 					rows.push_back(&row);
 			}
 		}
@@ -210,9 +210,9 @@ StormByte::Safe::Vector<DecoderInfo> Codec::Decoders(const Features& need) const
 			out.push_back(info);
 		};
 		for (std::size_t i = 0; i < identity.FfmpegIdCount(); ++i) {
-			const auto* descriptor = avcodec_descriptor_get_by_name(identity.FfmpegId(i));
+			const auto* descriptor = Tables::Codec::Descriptor(m_type, identity.FfmpegId(i));
 			const auto* decoder = descriptor ? avcodec_find_decoder(descriptor->id) : nullptr;
-			if (!MatchesCodec(decoder, identity))
+			if (!MatchesCodec(decoder, m_type, identity))
 				continue;
 			const auto row = std::find_if(rows.begin(), rows.end(), [&](const auto* candidate) {
 				return std::string_view{candidate->name} == decoder->name;

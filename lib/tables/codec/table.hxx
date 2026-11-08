@@ -57,6 +57,8 @@
 #include <cstddef>
 #include <span>
 
+struct AVCodecDescriptor;
+
 /**
  * @namespace StormByte::Multimedia::Tables::Codec
  * @brief Private static codec identity tables.
@@ -127,4 +129,16 @@ namespace StormByte::Multimedia::Tables::Codec {
 	 * @return Span over that table; empty if @p type has none.
 	 */
 	std::span<const CodecDef> Identity(Type type) noexcept;
+
+	/**
+	 * @brief FFmpeg descriptor of @p id when it has the media kind @p type.
+	 *
+	 * Some FFmpeg names belong to another media kind (for example `avc` is
+	 * the On2 AVC audio codec, not H.264), so aliases are only resolved
+	 * within their own kind.
+	 * @param type Video, Audio or Subtitle; other kinds accept any descriptor.
+	 * @param id FFmpeg codec name.
+	 * @return Descriptor, or nullptr if unknown or of another media kind.
+	 */
+	const AVCodecDescriptor* Descriptor(Type type, const char* id) noexcept;
 }
