@@ -58,6 +58,7 @@
 #include <StormByte/multimedia/codec.hxx>
 #include <StormByte/multimedia/decode_policy.hxx>
 #include <StormByte/multimedia/file.hxx>
+#include <StormByte/multimedia/metadata/tag.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
 #include <StormByte/multimedia/pipeline/filters/report.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
@@ -447,17 +448,30 @@ namespace StormByte {
 
 							/**
 							 * @brief Overrides stream language.
-							 * @param language ISO tag. Empty clears the override.
+							 * @param language ISO tag. Empty clears the override and keeps the source tag.
 							 * @return *this.
 							 */
 							Track& Language(StormByte::Safe::String language);
 
 							/**
+							 * @brief Writes this track without a language tag.
+							 * Containers whose language field is mandatory store their undefined value.
+							 * @return *this.
+							 */
+							Track& RemoveLanguage();
+
+							/**
 							 * @brief Overrides stream title.
-							 * @param title Title text. Empty clears the override.
+							 * @param title Title text. Empty clears the override and keeps the source title.
 							 * @return *this.
 							 */
 							Track& Title(StormByte::Safe::String title);
+
+							/**
+							 * @brief Writes this track without a title.
+							 * @return *this.
+							 */
+							Track& RemoveTitle();
 
 							/**
 							 * @brief Appends a Process, Packet or Analytics filter to this track.
@@ -705,6 +719,24 @@ namespace StormByte {
 					 * @return *this.
 					 */
 					Transcoder& Attachments(std::string_view pattern) noexcept;
+
+					/**
+					 * @brief Replaces a file-level tag in the output.
+					 * Tags without an edit are copied from the source. Track and Disc
+					 * are written verbatim, so "3" and "3/12" both work. Formats that
+					 * cannot store @p tag ignore it; see Container::Stores.
+					 * @param tag File tag.
+					 * @param value New value. Empty drops the edit and keeps the source value.
+					 * @return *this.
+					 */
+					Transcoder& Tag(StormByte::Multimedia::Metadata::FileTag tag, StormByte::Safe::String value) noexcept;
+
+					/**
+					 * @brief Writes the output without file tag @p tag.
+					 * @param tag File tag.
+					 * @return *this.
+					 */
+					Transcoder& RemoveTag(StormByte::Multimedia::Metadata::FileTag tag) noexcept;
 
 					/**
 					 * @brief Resource policy selected for this job.

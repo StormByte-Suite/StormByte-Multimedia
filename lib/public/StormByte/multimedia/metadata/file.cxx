@@ -50,6 +50,8 @@
 
 #include <StormByte/multimedia/metadata/file.hxx>
 
+#include <string>
+
 using namespace StormByte;
 using namespace StormByte::Multimedia::Metadata;
 
@@ -88,6 +90,39 @@ const Safe::Optional<Safe::String>& File::Date() const noexcept { return m_date;
 Safe::Optional<unsigned> File::Track() const { return m_track; }
 
 Safe::Optional<unsigned> File::Disc() const { return m_disc; }
+
+Safe::Optional<Safe::String> File::Tag(FileTag tag) const {
+	const auto number = [](const Safe::Optional<unsigned>& value) -> Safe::Optional<Safe::String> {
+		if (!value)
+			return std::nullopt;
+		return Safe::String{std::to_string(*value)};
+	};
+	switch (tag) {
+		case FileTag::Title:
+			return m_title;
+		case FileTag::Artist:
+			return m_artist;
+		case FileTag::Album:
+			return m_album;
+		case FileTag::AlbumArtist:
+			return m_albumArtist;
+		case FileTag::Composer:
+			return m_composer;
+		case FileTag::Genre:
+			return m_genre;
+		case FileTag::Comment:
+			return m_comment;
+		case FileTag::Copyright:
+			return m_copyright;
+		case FileTag::Date:
+			return m_date;
+		case FileTag::Track:
+			return number(m_track);
+		case FileTag::Disc:
+			return number(m_disc);
+	}
+	return std::nullopt;
+}
 
 void File::Title(Safe::String title) { m_title = std::move(title); }
 

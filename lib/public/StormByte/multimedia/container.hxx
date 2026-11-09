@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/metadata/tag.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 
@@ -160,6 +161,28 @@ namespace StormByte {
 				 */
 				bool Allows(const CodecRefs& codecs) const noexcept;
 
+				/**
+				 * @brief Whether files written in this container keep file tag @p tag.
+				 * @param tag File tag.
+				 * @return false for read-only containers and tags the muxer drops.
+				 */
+				bool Stores(Metadata::FileTag tag) const noexcept;
+
+				/**
+				 * @brief Whether files written in this container keep per-track tag @p tag.
+				 * @param tag Stream tag.
+				 * @return false for read-only containers and tags the muxer drops.
+				 */
+				bool Stores(Metadata::StreamTag tag) const noexcept;
+
+				/**
+				 * @brief Whether the file title and the track titles share one field.
+				 * Ogg-based containers store the file title as each track's TITLE
+				 * comment, so a file title edit also replaces the track titles.
+				 * @return true for Ogg-based containers.
+				 */
+				bool SharedTitle() const noexcept;
+
 			private:
 				/**
 				 * @brief Registry creates identities and resolves compatibility handles.
@@ -171,6 +194,9 @@ namespace StormByte {
 				std::string_view m_extension;		///< Primary extension
 				Access m_access;				///< Read and optional Write
 				CodecRefs m_allowed;				///< Resolved compatibility set
+				unsigned short m_file_tags = 0;		///< Bit per stored Metadata::FileTag
+				unsigned char m_stream_tags = 0;	///< Bit per stored Metadata::StreamTag
+				bool m_shared_title = false;		///< File and track titles share a field
 
 				/**
 				 * @brief Registry-only constructor.

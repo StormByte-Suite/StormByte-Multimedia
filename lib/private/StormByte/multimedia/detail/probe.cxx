@@ -161,8 +161,11 @@ StormByte::Multimedia::Detail::Probe::File(const FFmpeg::AVFormatContext& ctx) n
 StormByte::Multimedia::Metadata::Stream
 StormByte::Multimedia::Detail::Probe::Stream(const FFmpeg::AVStream& stream) noexcept {
 	Metadata::Stream meta;
+	// MP4 and MOV store the track title in the udta "name" atom.
 	if (const auto value = NonEmpty(stream.Tag("title")))
 		meta.Title(*value);
+	else if (const auto name = NonEmpty(stream.Tag("name")))
+		meta.Title(*name);
 	if (const auto value = NonEmpty(stream.Tag("language")))
 		meta.Language(*value);
 	const auto bitRate = stream.CodecParameters().BitRate();

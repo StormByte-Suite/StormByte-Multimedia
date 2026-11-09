@@ -50,6 +50,7 @@
 
 #include <StormByte/multimedia/registry.hxx>
 #include <StormByte/multimedia/backend/muxer_format.hxx>
+#include <StormByte/multimedia/backend/muxer_tags.hxx>
 #include <tables/codec/catalog.hxx>
 #include <tables/encoder/table.hxx>
 #include <tables/container/catalog.hxx>
@@ -220,8 +221,13 @@ void Registry::Add(const Tables::Container::ContainerDef& def) {
 void Registry::Resolve(const Tables::Container::ContainerDef& def, Container& container) {
 	// Every container is indexed now, so muxer names resolve like they do when muxing.
 	const auto muxer = Backend::ResolveMuxer(*this, container);
-	if (muxer.format)
+	if (muxer.format) {
 		container.m_access |= Access(Operation::Write);
+		const auto tags = Backend::SelectTagSupport(muxer.format->name);
+		container.m_file_tags = tags.file;
+		container.m_stream_tags = tags.stream;
+		container.m_shared_title = tags.sharedTitle;
+	}
 
 	const auto rows = Tables::Container::Catalog::Instance().Compat(def);
 	container.m_allowed.reserve(rows.size());

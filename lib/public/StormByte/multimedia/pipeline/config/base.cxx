@@ -91,3 +91,11 @@ void Base::Title(StormByte::Safe::String title) {
 	else
 		m_title = std::move(title);
 }
+
+void Base::RemoveLanguage() {
+	m_language = StormByte::Safe::String{};
+}
+
+void Base::RemoveTitle() {
+	m_title = StormByte::Safe::String{};
+}

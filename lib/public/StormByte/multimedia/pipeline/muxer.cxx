@@ -208,6 +208,10 @@ void Muxer::Language(int output_index, StormByte::Safe::String language) {
 		m_language[output_index] = std::move(language);
 }
 
+void Muxer::RemoveLanguage(int output_index) {
+	m_language[output_index] = StormByte::Safe::String{};
+}
+
 StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Title(int output_index) const {
 	if (!m_title.contains(output_index))
 		return std::nullopt;
@@ -221,6 +225,10 @@ void Muxer::Title(int output_index, StormByte::Safe::String title) {
 		m_title[output_index] = std::move(title);
 }
 
+void Muxer::RemoveTitle(int output_index) {
+	m_title[output_index] = StormByte::Safe::String{};
+}
+
 StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Muxer::Disposition(int output_index) const {
 	if (!m_disposition.contains(output_index))
 		return std::nullopt;
@@ -230,6 +238,23 @@ StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition> Muxer::D
 void Muxer::Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition) {
 	m_disposition.erase(output_index);
 	m_disposition.insert({output_index, StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition>(std::move(disposition))});
+}
+
+StormByte::Safe::Optional<StormByte::Safe::String> Muxer::Tag(StormByte::Multimedia::Metadata::FileTag tag) const {
+	if (!m_tags.contains(tag))
+		return std::nullopt;
+	return m_tags.at(tag);
+}
+
+void Muxer::Tag(StormByte::Multimedia::Metadata::FileTag tag, StormByte::Safe::String value) {
+	if (value.empty())
+		m_tags.erase(tag);
+	else
+		m_tags[tag] = std::move(value);
+}
+
+void Muxer::RemoveTag(StormByte::Multimedia::Metadata::FileTag tag) {
+	m_tags[tag] = StormByte::Safe::String{};
 }
 
 void Muxer::WaitArmed() noexcept {

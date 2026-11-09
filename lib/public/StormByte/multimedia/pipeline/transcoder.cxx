@@ -350,6 +350,20 @@ Transcoder::Track& Transcoder::Track::Title(StormByte::Safe::String title) {
 	return *this;
 }
 
+Transcoder::Track& Transcoder::Track::RemoveLanguage() {
+	if (!m_owner || !m_owner->ValidSlot(m_slot))
+		return *this;
+	m_owner->m_backend->Mapped[m_slot].Config->RemoveLanguage();
+	return *this;
+}
+
+Transcoder::Track& Transcoder::Track::RemoveTitle() {
+	if (!m_owner || !m_owner->ValidSlot(m_slot))
+		return *this;
+	m_owner->m_backend->Mapped[m_slot].Config->RemoveTitle();
+	return *this;
+}
+
 Transcoder::Transcoder(const StormByte::Safe::String& source,
 	const StormByte::Safe::String& destination,
 	StormByte::Safe::Shared<StormByte::Logger::Log> logger,
@@ -654,6 +668,31 @@ Transcoder& Transcoder::Attachments(std::string_view pattern) noexcept try {
 		if (have && StormByte::Multimedia::Detail::MimeMatches(*have, pattern))
 			AddTrack(i, Type::Attachment);
 	}
+	return *this;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return *this;
+}
+
+Transcoder& Transcoder::Tag(StormByte::Multimedia::Metadata::FileTag tag, StormByte::Safe::String value) noexcept try {
+	if (value.empty())
+		m_backend->FileTags.erase(tag);
+	else
+		m_backend->FileTags[tag] = std::move(value);
+	return *this;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+	return *this;
+} catch (const std::bad_alloc&) {
+	Fail();
+	return *this;
+}
+
+Transcoder& Transcoder::RemoveTag(StormByte::Multimedia::Metadata::FileTag tag) noexcept try {
+	m_backend->FileTags[tag] = StormByte::Safe::String{};
 	return *this;
 } catch (const StormByte::Safe::AllocationError&) {
 	Fail();

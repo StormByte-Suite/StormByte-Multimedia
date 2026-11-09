@@ -49,6 +49,7 @@
  */
 
 #include <StormByte/multimedia/backend/pipeline/detail/muxer/ffmpeg/container.hxx>
+#include <StormByte/multimedia/backend/muxer_tags.hxx>
 #include <StormByte/multimedia/backend/pipeline/encoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
@@ -100,27 +101,27 @@ namespace {
 	constexpr std::int64_t InterleaveMixedUs = 60LL * 1000 * 1000;
 	constexpr std::int64_t InterleaveHoldNs = InterleaveMixedUs * 1000;
 
+	/**
+	 * @brief Copies source file tags into the output, applying the muxer edits.
+	 * @param destination Output format metadata.
+	 * @param source Source file metadata.
+	 * @param owner Muxer holding the edits.
+	 * @return False only when a tag cannot be stored.
+	 */
 	bool CopyFileTags(AVDictionary*& destination,
-		const StormByte::Multimedia::Metadata::File& source) {
-		const auto text = [&destination](const char* key,
-			const StormByte::Safe::Optional<StormByte::Safe::String>& value) {
-			return !value || av_dict_set(&destination, key, value->data(), 0) >= 0;
-		};
-		const auto index = [&destination](const char* key,
-			const StormByte::Safe::Optional<unsigned>& value) {
-			return !value || av_dict_set(&destination, key, std::to_string(*value).c_str(), 0) >= 0;
-		};
-		return text("title", source.Title())
-			&& text("artist", source.Artist())
-			&& text("album", source.Album())
-			&& text("album_artist", source.AlbumArtist())
-			&& text("composer", source.Composer())
-			&& text("genre", source.Genre())
-			&& text("comment", source.Comment())
-			&& text("copyright", source.Copyright())
-			&& text("date", source.Date())
-			&& index("track", source.Track())
-			&& index("disc", source.Disc());
+		const StormByte::Multimedia::Metadata::File& source,
+		const StormByte::Multimedia::Pipeline::Muxer& owner) {
+		using StormByte::Multimedia::Metadata::FileTag;
+		for (unsigned i = 0; i < StormByte::Multimedia::Metadata::FileTagCount; ++i) {
+			const auto tag = static_cast<FileTag>(i);
+			const auto edit = owner.Tag(tag);
+			const auto value = edit ? edit : source.Tag(tag);
+			if (!value || value->empty())
+				continue;
+			if (av_dict_set(&destination, StormByte::Multimedia::Backend::FileTagKey(tag), value->data(), 0) < 0)
+				return false;
+		}
+		return true;
 	}
 
 	/**
@@ -418,7 +419,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		m_ctx = ctx;
 		const auto& source = owner.Plan()->Snapshot().Metadata();
 		m_shiftNs = m_policy->ZeroBasedTimeline() ? std::max<std::int64_t>(source.StartTime().count(), 0) : 0;
-		if (!CopyFileTags(m_ctx->metadata, source)
+		if (!CopyFileTags(m_ctx->metadata, source, owner)
 			|| !StampCreationTime(m_ctx->metadata)
 			|| !CopyChapters(*m_ctx, source.Chapters(), m_shiftNs)) {
 			owner.Fail(StormByte::Safe::String::ReplaceToken(
@@ -684,10 +685,15 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 				}
 			}
 
-			if (track.language)
+			if (track.language && !track.language->empty())
 				av_dict_set(&stream->metadata, "language", track.language->data(), 0);
-			if (track.title)
+			if (track.title && !track.title->empty())
 				av_dict_set(&stream->metadata, "title", track.title->data(), 0);
+			// Ogg muxers copy the file title into each stream only when the stream has none.
+			if (StormByte::Multimedia::Backend::SelectTagSupport(m_ctx->oformat->name).sharedTitle) {
+				if (const auto title = owner.Tag(StormByte::Multimedia::Metadata::FileTag::Title))
+					av_dict_set(&stream->metadata, "title", title->empty() ? nullptr : title->data(), 0);
+			}
 			// MP3 reuses this field for the technical Xing/LAME gapless identifier.
 			if (std::strcmp(m_ctx->oformat->name, "mp3") != 0) {
 				const int branding = av_dict_set(&stream->metadata, "encoder", WritingApp, 0);

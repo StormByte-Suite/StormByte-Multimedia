@@ -55,6 +55,7 @@
 #include <StormByte/multimedia/attachment.hxx>
 #include <StormByte/multimedia/container.hxx>
 #include <StormByte/multimedia/metadata/stream.hxx>
+#include <StormByte/multimedia/metadata/tag.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/step.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
@@ -329,7 +330,7 @@ namespace StormByte {
 					/**
 					 * @brief Language tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
-					 * @return Tag, or empty.
+					 * @return Tag; engaged and empty when removed; disengaged when unset.
 					 */
 					StormByte::Safe::Optional<StormByte::Safe::String> Language(int output_index) const;
 
@@ -341,9 +342,15 @@ namespace StormByte {
 					void Language(int output_index, StormByte::Safe::String language);
 
 					/**
+					 * @brief Writes mux output @p output_index without a language tag.
+					 * @param output_index Mux destination order key.
+					 */
+					void RemoveLanguage(int output_index);
+
+					/**
 					 * @brief Title tag for mux output @p output_index.
 					 * @param output_index Mux destination order key.
-					 * @return Title, or empty.
+					 * @return Title; engaged and empty when removed; disengaged when unset.
 					 */
 					StormByte::Safe::Optional<StormByte::Safe::String> Title(int output_index) const;
 
@@ -353,6 +360,12 @@ namespace StormByte {
 					 * @param title Stream title. Empty clears.
 					 */
 					void Title(int output_index, StormByte::Safe::String title);
+
+					/**
+					 * @brief Writes mux output @p output_index without a title.
+					 * @param output_index Mux destination order key.
+					 */
+					void RemoveTitle(int output_index);
 
 					/**
 					 * @brief Disposition for mux output @p output_index.
@@ -367,6 +380,37 @@ namespace StormByte {
 					 * @param disposition Flags written verbatim (default, forced, ...).
 					 */
 					void Disposition(int output_index, StormByte::Multimedia::Metadata::Disposition disposition);
+
+					/**
+					 * @}
+					 */
+
+					/**
+					 * @name File tags
+					 * Tags without an edit are copied from the source.
+					 * @{
+					 */
+
+					/**
+					 * @brief Edit of file tag @p tag.
+					 * @param tag File tag.
+					 * @return Value; engaged and empty when removed; disengaged keeps the source.
+					 */
+					StormByte::Safe::Optional<StormByte::Safe::String> Tag(StormByte::Multimedia::Metadata::FileTag tag) const;
+
+					/**
+					 * @brief Replaces file tag @p tag.
+					 * Track and Disc are written verbatim, so "3" and "3/12" both work.
+					 * @param tag File tag.
+					 * @param value New value. Empty keeps the source value.
+					 */
+					void Tag(StormByte::Multimedia::Metadata::FileTag tag, StormByte::Safe::String value);
+
+					/**
+					 * @brief Writes the output without file tag @p tag.
+					 * @param tag File tag.
+					 */
+					void RemoveTag(StormByte::Multimedia::Metadata::FileTag tag);
 
 					/**
 					 * @}
@@ -515,6 +559,7 @@ namespace StormByte {
 					StormByte::Safe::Unique<Connections> m_connections;	///< Provider-owned borrowed encoder registry; stages must outlive this muxer.
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_language;	///< Per-output language
 					StormByte::Safe::Map<int, StormByte::Safe::String> m_title;		///< Per-output title
+					StormByte::Safe::Map<StormByte::Multimedia::Metadata::FileTag, StormByte::Safe::String> m_tags;	///< File tag edits; empty removes
 					StormByte::Safe::Map<int, StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Disposition>> m_disposition;	///< Per-output disposition
 					StormByte::Safe::Atomic<bool> m_closed;				///< Set by Finish / Fail
 					StormByte::Safe::Atomic<std::uint64_t> m_reserved;			///< Reserved Video/Audio/Subtitle hoppers

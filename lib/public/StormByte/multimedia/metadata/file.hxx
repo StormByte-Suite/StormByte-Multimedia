@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <StormByte/multimedia/metadata/tag.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/optional.hxx>
 #include <StormByte/safe/string.hxx>
@@ -220,6 +221,13 @@ namespace StormByte {
 					 * @return Disc, or empty.
 					 */
 					Safe::Optional<unsigned> Disc() const;
+
+					/**
+					 * @brief One file tag as text, for generic tag editors.
+					 * @param tag Tag to read.
+					 * @return Value, with Track and Disc as decimal text, or empty.
+					 */
+					Safe::Optional<Safe::String> Tag(FileTag tag) const;
 
 					/**
 					 * @brief Chapter list in source order.

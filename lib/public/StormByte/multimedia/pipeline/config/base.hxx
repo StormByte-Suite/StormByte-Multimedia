@@ -205,7 +205,7 @@ namespace StormByte::Multimedia::Pipeline::Config {
 
 			/**
 			 * @brief Language override.
-			 * @return ISO tag, or empty to inherit.
+			 * @return ISO tag; an engaged empty tag removes the language; disengaged inherits.
 			 */
 			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Language() const noexcept {
 				return m_language;
@@ -218,8 +218,14 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			void Language(StormByte::Safe::String language);
 
 			/**
+			 * @brief Writes the track without a language tag, even if the source has one.
+			 * Containers with a mandatory language field write their own undefined value.
+			 */
+			void RemoveLanguage();
+
+			/**
 			 * @brief Title override.
-			 * @return Title, or empty to inherit.
+			 * @return Title; an engaged empty title removes it; disengaged inherits.
 			 */
 			inline const StormByte::Safe::Optional<StormByte::Safe::String>& Title() const noexcept {
 				return m_title;
@@ -230,6 +236,11 @@ namespace StormByte::Multimedia::Pipeline::Config {
 			 * @param title Title. Empty clears the override.
 			 */
 			void Title(StormByte::Safe::String title);
+
+			/**
+			 * @brief Writes the track without a title, even if the source has one.
+			 */
+			void RemoveTitle();
 
 			/**
 			 * @brief Default-disposition override.

@@ -28,8 +28,16 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Complete cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention using the new diagnostics. Do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
+### Added
+
+- Track title and language can be removed as well as replaced: `Transcoder::Track::RemoveTitle()` and `RemoveLanguage()` write the track without the source tag. The same calls exist on `Config::Base` and on `Muxer` per output index.
+- File-level tags can be replaced or removed with `Transcoder::Tag(FileTag, value)` and `Transcoder::RemoveTag(FileTag)`; tags without an edit are still copied from the source. `Muxer::Tag` and `Muxer::RemoveTag` do the same for manually wired pipelines.
+- `Metadata::FileTag` and `Metadata::StreamTag` name the editable tags, and `Metadata::File::Tag(FileTag)` reads any of them as text.
+- `Container::Stores(FileTag)`, `Container::Stores(StreamTag)` and `Container::SharedTitle()` report which tags a written file keeps, so applications can warn before writing tags that the output format drops. Ogg-based containers report a shared title: their file title is stored in each track's TITLE comment, and a file title edit now replaces those track titles too.
+
 ### Fixed
 
+- MP4 and MOV track titles are read back from the `name` atom where FFmpeg writes them, so a track title survives an MP4 round trip.
 - FFmpeg codec aliases are only resolved within their own media kind. The H.264 alias `avc` is FFmpeg's name for the On2 AVC audio codec, so `Codec::Decoders()` listed the audio decoder `on2avc` for H.264, and read access and muxer support were also checked against it.
 
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.1.0...HEAD

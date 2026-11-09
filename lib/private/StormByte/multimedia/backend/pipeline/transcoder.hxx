@@ -51,6 +51,7 @@
 #pragma once
 
 #include <StormByte/multimedia/metadata/stream.hxx>
+#include <StormByte/multimedia/metadata/tag.hxx>
 #include <StormByte/multimedia/pipeline/config/base.hxx>
 #include <StormByte/multimedia/pipeline/filters.hxx>
 #include <StormByte/multimedia/pipeline/filters/ffmpeg.hxx>
@@ -61,6 +62,7 @@
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/condition_variable.hxx>
+#include <StormByte/safe/map.hxx>
 #include <StormByte/safe/mutex.hxx>
 #include <StormByte/safe/thread.hxx>
 #include <StormByte/safe/unique_lock.hxx>
@@ -228,6 +230,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;	///< Retained stage and process metrics
 			StormByte::Safe::Optional<StormByte::Safe::String> Error;			///< Failure text
 			StormByte::Safe::Vector<TranscoderSlot> Mapped;	///< Fluent map, mux order
+			StormByte::Safe::Map<StormByte::Multimedia::Metadata::FileTag, StormByte::Safe::String> FileTags;	///< File tag edits; empty removes
 			StormByte::Safe::Vector<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>> Analytics;	///< Global analytics
 			StormByte::Safe::Vector<StormByte::Safe::Pair<StormByte::Safe::String, StormByte::Multimedia::Pipeline::Filter::Report>> Reports;	///< Snapshots at Done
 

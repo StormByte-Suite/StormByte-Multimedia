@@ -206,11 +206,15 @@ namespace {
 	void StampMuxTags(StormByte::Multimedia::Pipeline::Muxer& mux, int out,
 		const StormByte::Multimedia::Pipeline::Config::Base& config,
 		const StormByte::Safe::Optional<StormByte::Multimedia::Metadata::Stream>& origin) {
-		if (config.Language())
+		if (config.Language() && config.Language()->empty())
+			mux.RemoveLanguage(out);
+		else if (config.Language())
 			mux.Language(out, config.Language().value());
 		else if (origin && origin->Language())
 			mux.Language(out, origin->Language().value());
-		if (config.Title())
+		if (config.Title() && config.Title()->empty())
+			mux.RemoveTitle(out);
+		else if (config.Title())
 			mux.Title(out, config.Title().value());
 		else if (origin && origin->Title())
 			mux.Title(out, origin->Title().value());
@@ -428,6 +432,12 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	auto mux = StormByte::Safe::MakeShared<StormByte::Multimedia::Pipeline::Muxer>(tube);
 	RegisterStage(*Metrics, *demux);
 	RegisterStage(*Metrics, *mux);
+	for (const auto& [tag, value] : FileTags) {
+		if (value.empty())
+			mux->RemoveTag(tag);
+		else
+			mux->Tag(tag, value);
+	}
 	*demux >> *mux;
 
 	if (demux->Failed()) {

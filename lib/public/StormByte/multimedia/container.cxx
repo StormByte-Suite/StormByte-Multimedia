@@ -95,3 +95,15 @@ bool Container::Allows(const CodecRefs& codecs) const noexcept {
 
 	return true;
 }
+
+bool Container::Stores(Metadata::FileTag tag) const noexcept {
+	return (m_file_tags >> static_cast<unsigned>(tag)) & 1U;
+}
+
+bool Container::Stores(Metadata::StreamTag tag) const noexcept {
+	return (m_stream_tags >> static_cast<unsigned>(tag)) & 1U;
+}
+
+bool Container::SharedTitle() const noexcept {
+	return m_shared_title;
+}
