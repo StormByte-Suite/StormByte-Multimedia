@@ -1,0 +1,32 @@
+add_executable(MultimediaPipelineMetadataEditTests metadata_edit_test.cxx)
+target_link_libraries(MultimediaPipelineMetadataEditTests PRIVATE multimedia_pipeline_test_support)
+
+foreach(test_name IN ITEMS
+	test_capability_aiff
+	test_capability_avi
+	test_capability_caf
+	test_capability_flac
+	test_capability_matroska
+	test_capability_mov
+	test_capability_mp3
+	test_capability_mp4
+	test_capability_ogg
+	test_capability_opus
+	test_capability_wav
+	test_capability_webm
+	test_container_capability_queries
+	test_file_tag_accessor
+	test_file_tags_flac
+	test_file_tags_matroska
+	test_file_tags_mp3
+	test_file_tags_mp4
+	test_file_tags_opus
+	test_ogg_file_title_removed
+	test_ogg_file_title_wins
+	test_track_tags_encode_matroska
+	test_track_tags_mp4
+	test_track_tags_remux_matroska
+)
+	add_optional_pipeline_test(MultimediaPipelineMetadataEditTests ${test_name})
+	set_tests_properties("pipeline.${test_name}" PROPERTIES LABELS "multimedia;pipeline;metadata-edit")
+endforeach()
