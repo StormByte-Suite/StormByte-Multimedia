@@ -101,5 +101,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			void Flush() noexcept override;
 
 			StormByte::Multimedia::Pipeline::Muxer& m_owner;	///< Public muxer
+			bool m_has_video = false;	///< Whether the output plan has a video clock.
 	};
 }

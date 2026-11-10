@@ -41,6 +41,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Audio-only output progress advances with every newer audio timestamp instead of freezing after the first packet, including when video tracks from the source are omitted. Mixed video/audio outputs retain the video clock as their progress reference.
 - MP4 and MOV track titles are read back from the `name` atom where FFmpeg writes them, so a track title survives an MP4 round trip.
 - FFmpeg codec aliases are only resolved within their own media kind. The H.264 alias `avc` is FFmpeg's name for the On2 AVC audio codec, so `Codec::Decoders()` listed the audio decoder `on2avc` for H.264, and read access and muxer support were also checked against it.
 

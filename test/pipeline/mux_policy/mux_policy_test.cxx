@@ -52,16 +52,78 @@
 
 #include <StormByte/multimedia/file.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/resample.hxx>
+#include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
 #include <algorithm>
 #include <array>
+#include <chrono>
+#include <thread>
 
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
 
 namespace {
+	class PacedAudio final: public Filter::Process {
+		public:
+			PacedAudio(): Filter::Process({}, "paced-audio-progress-test") {}
+
+			StormByte::Multimedia::Type Media() const noexcept override {
+				return StormByte::Multimedia::Type::Audio;
+			}
+
+			void Clean() noexcept override {}
+
+			void Setup() noexcept override {}
+
+			void Process(const Frame&) noexcept override {
+				std::this_thread::sleep_for(std::chrono::milliseconds{3});
+			}
+	};
+
+	int CheckAudioProgress(std::string_view suffix, bool video = false) {
+		const auto codec = Registry::Instance().FindCodec("E-AC3");
+		TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+		const auto output = OutputPath(std::string{"pipeline/mux-policy/progress."} + std::string{suffix});
+		Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")), TestLocation(output),
+			MakeLogger(), 2008000000LL};
+		if (video)
+			job.Video(0).Remux();
+		job.Audio(1).Codec(codec->get()).Implementation(ImplementationSide::Encoder,
+			StormByte::Safe::String{"eac3"}).Filter<PacedAudio>();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		double previous = 0.0;
+		double intermediate = 0.0;
+		unsigned advances = 0;
+		const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{10};
+		while (job.Status() != Status::Done && job.Status() != Status::Error
+			&& job.Status() != Status::Aborted && std::chrono::steady_clock::now() < deadline) {
+			if (const auto progress = job.Progress()) {
+				const auto values = progress->Snapshot();
+				TEST_REQUIRE(values.Main >= previous && values.Main <= 100.0);
+				if (!values.MainComplete && values.Main > previous && values.Main < 100.0) {
+					++advances;
+					intermediate = values.Main;
+				}
+				previous = values.Main;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds{1});
+		}
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		TEST_REQUIRE(advances >= 3);
+		TEST_REQUIRE(intermediate > 25.0 && intermediate < 100.0);
+		if (video) {
+			auto opened = File::Open(StormByte::Safe::String{output.string()});
+			TEST_REQUIRE(opened && opened->Streams().size() == 2);
+			TEST_REQUIRE(opened->Streams()[0].Type() == StormByte::Multimedia::Type::Video);
+			TEST_REQUIRE(opened->Streams()[1].Codec().Name() == "E-AC3");
+			return 0;
+		}
+		return CheckSingleAudioOutput(output, suffix == "mka" ? "Matroska" : "E-AC3", "E-AC3", 6, 48000);
+	}
+
 	int CheckCoverMetadata(const File& source, const File& output) {
 		TEST_REQUIRE(output.Streams().size() == 1);
 		TEST_REQUIRE(output.Streams()[0].Type() == StormByte::Multimedia::Type::Audio);
@@ -213,6 +275,18 @@ int test_generic_muxer_writes_eac3() {
 	return CheckSimpleOutput("pipeline/mux-policy/dolby.eac3", "E-AC3", "E-AC3");
 }
 
+int test_audio_only_matroska_progress_advances() {
+	return CheckAudioProgress("mka");
+}
+
+int test_audio_only_raw_progress_advances() {
+	return CheckAudioProgress("eac3");
+}
+
+int test_mixed_output_progress_advances() {
+	return CheckAudioProgress("mkv", true);
+}
+
 int test_generic_flac_rejects_aac_remux() {
 	auto logger = MakeLogger();
 	TEST_PHASE("creating transcoder");
@@ -286,6 +360,9 @@ int main(int argc, char** argv) {
 		TestEntry{"test_generic_muxer_writes_vorbis_in_ogv", test_generic_muxer_writes_vorbis_in_ogv},
 		TestEntry{"test_generic_muxer_writes_alac_in_caf", test_generic_muxer_writes_alac_in_caf},
 		TestEntry{"test_generic_muxer_writes_eac3", test_generic_muxer_writes_eac3},
+		TestEntry{"test_audio_only_matroska_progress_advances", test_audio_only_matroska_progress_advances},
+		TestEntry{"test_audio_only_raw_progress_advances", test_audio_only_raw_progress_advances},
+		TestEntry{"test_mixed_output_progress_advances", test_mixed_output_progress_advances},
 		TestEntry{"test_generic_flac_rejects_aac_remux", test_generic_flac_rejects_aac_remux},
 		TestEntry{"test_webm_policy_rejects_attachments", test_webm_policy_rejects_attachments},
 	};

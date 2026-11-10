@@ -19,6 +19,9 @@ foreach(test_name IN ITEMS
 	test_generic_muxer_writes_vorbis_in_ogv
 	test_generic_muxer_writes_alac_in_caf
 	test_generic_muxer_writes_eac3
+	test_audio_only_matroska_progress_advances
+	test_audio_only_raw_progress_advances
+	test_mixed_output_progress_advances
 	test_generic_flac_rejects_aac_remux
 	test_webm_policy_rejects_attachments
 )

@@ -56,7 +56,9 @@
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/muxer.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
+#include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/safe/memory_order.hxx>
@@ -87,7 +89,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 	void Mux::Setup() noexcept try {
 		NameThread("STMM:Muxer");
-		static_cast<void>(m_owner.SetupPlan());
+		if (!m_owner.SetupPlan())
+			return;
+		for (const auto& track : m_owner.Plan()->Tracks())
+			if (track && track->Type() == Type::Video)
+				m_has_video = true;
 	} catch (const StormByte::Safe::AllocationError&) {
 		Fail();
 	} catch (const std::bad_alloc&) {
@@ -138,7 +144,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 					m_owner.m_positionNs.store(ns, StormByte::Safe::MemoryOrder::Release);
 				else {
 					const std::int64_t current = m_owner.m_positionNs.load(StormByte::Safe::MemoryOrder::Acquire);
-					if (current < 0)
+					if (current < 0 || (!m_has_video && ns > current))
 						m_owner.m_positionNs.store(ns, StormByte::Safe::MemoryOrder::Release);
 				}
 			}
