@@ -98,8 +98,9 @@ namespace {
 	constexpr const char WritingApp[] = "StormByte-Multimedia " STORMBYTE_MULTIMEDIA_VERSION;
 	constexpr std::int64_t InterleaveSlotUs = 40LL * 1000;
 	constexpr std::int64_t InterleaveFloorUs = 250000;
-	constexpr std::int64_t InterleaveMixedUs = 60LL * 1000 * 1000;
-	constexpr std::int64_t InterleaveHoldNs = InterleaveMixedUs * 1000;
+	constexpr std::int64_t InterleaveCeilingUs = 1000000;
+	// This separate skew tolerance protects delayed encoders, not sparse subtitle readiness.
+	constexpr std::int64_t InterleaveHoldNs = 60LL * 1000 * 1000 * 1000;
 
 	/**
 	 * @brief Copies source file tags into the output, applying the muxer edits.
@@ -223,14 +224,11 @@ namespace {
 					++encodeOther;
 			}
 		}
-		if (encodeVideo != 0 && remux != 0)
-			return InterleaveMixedUs;
-
 		return std::clamp<std::int64_t>(InterleaveFloorUs
 			+ static_cast<std::int64_t>(encodeVideo) * 500000
 			+ static_cast<std::int64_t>(remux) * 100000
 			+ static_cast<std::int64_t>(encodeOther) * 80000,
-			InterleaveFloorUs, InterleaveMixedUs);
+			InterleaveFloorUs, InterleaveCeilingUs);
 	}
 
 
@@ -741,13 +739,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 		}
 		const std::int64_t spanUs = havePts && maxPts > minPts
 			? (maxPts - minPts) / 1000 + InterleaveSlotUs : 0;
-		std::int64_t deltaUs = InterleaveDeltaUs(owner.Plan() ? &owner.Plan()->Tracks() : nullptr);
-		const auto capacity = owner.InputCeiling();
-		const StormByte::Size depth = capacity == StormByte::Size{0}
-			? StormByte::Size{1} : capacity;
-		deltaUs = std::max(deltaUs, InterleaveSlotUs * static_cast<std::int64_t>(depth));
-		deltaUs = std::max(deltaUs, spanUs);
-		m_ctx->max_interleave_delta = deltaUs;
+		// Queue capacity and encoder startup skew must not expand FFmpeg's sparse-stream wait.
+		m_ctx->max_interleave_delta = InterleaveDeltaUs(owner.Plan() ? &owner.Plan()->Tracks() : nullptr);
 
 		AVDictionary* opts = nullptr;
 		m_policy->ConfigureHeader(owner, *m_ctx, spanUs, &opts);

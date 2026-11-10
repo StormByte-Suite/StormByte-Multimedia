@@ -51,6 +51,8 @@
 #include "../helpers.hxx"
 #include "runners.hxx"
 
+#include <StormByte/buffer/io/buffered_file_writer.hxx>
+#include <StormByte/buffer/io/telemetry.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
@@ -68,11 +70,13 @@
 #include <chrono>
 #include <charconv>
 #include <cmath>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
@@ -659,6 +663,262 @@ int test_avi_missing_pts_preserves_timeline_and_progress() {
 }
 
 // -------------------
+// Progressive output
+// -------------------
+namespace {
+	struct VideoGate {
+		std::atomic<bool> Reached{false};
+		std::atomic<bool> Release{false};
+	};
+
+	class PauseVideo final: public Filter::Process {
+		public:
+			explicit PauseVideo(VideoGate& gate):
+				Filter::Process({}, "pause-video-test"), m_gate(gate) {}
+
+			PauseVideo(const PauseVideo&) = delete;
+
+			PauseVideo(PauseVideo&&) = delete;
+
+			~PauseVideo() noexcept override = default;
+
+			PauseVideo& operator=(const PauseVideo&) = delete;
+
+			PauseVideo& operator=(PauseVideo&&) = delete;
+
+			StormByte::Multimedia::Type Media() const noexcept override {
+				return StormByte::Multimedia::Type::Video;
+			}
+
+			void Clean() noexcept override {}
+
+			void Setup() noexcept override {}
+
+			void Process(const Frame& frame) noexcept override {
+				if (!frame.Pts() || frame.Pts()->Nanoseconds().count() < 8000000000LL)
+					return;
+				m_gate.Reached.store(true);
+				while (!m_gate.Release.load())
+					std::this_thread::sleep_for(std::chrono::milliseconds{1});
+			}
+
+		private:
+			VideoGate& m_gate;	///< Borrowed test gate, released before job teardown.
+	};
+
+	struct ReleaseVideo {
+		VideoGate& Gate;
+
+		~ReleaseVideo() noexcept {
+			Gate.Release.store(true);
+		}
+	};
+
+	int MakeSparseInput(const std::filesystem::path& output, bool empty) {
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, FixturePath(Fixture).string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+		TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+		AVFormatContext* mux = nullptr;
+		TEST_REQUIRE(avformat_alloc_output_context2(&mux, nullptr, "matroska", output.string().c_str()) >= 0);
+		const auto close = [](AVFormatContext* context) {
+			avio_closep(&context->pb);
+			avformat_free_context(context);
+		};
+		std::unique_ptr<AVFormatContext, decltype(close)> destination{mux, close};
+		for (int index = 0; index != 4; ++index) {
+			auto* stream = avformat_new_stream(mux, nullptr);
+			TEST_REQUIRE(stream);
+			if (index < 2) {
+				TEST_REQUIRE(avcodec_parameters_copy(stream->codecpar, input->streams[index]->codecpar) >= 0);
+				stream->time_base = input->streams[index]->time_base;
+			}
+			else {
+				stream->codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
+				stream->codecpar->codec_id = AV_CODEC_ID_SUBRIP;
+				stream->time_base = AVRational{1, 1000};
+			}
+		}
+		TEST_REQUIRE(avio_open(&mux->pb, output.string().c_str(), AVIO_FLAG_WRITE) >= 0);
+		TEST_REQUIRE(avformat_write_header(mux, nullptr) >= 0);
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		TEST_REQUIRE(packet);
+		bool cue = empty;
+		int result = 0;
+		while ((result = av_read_frame(input.get(), packet.get())) == 0) {
+			const int index = packet->stream_index;
+			if (index < 2) {
+				av_packet_rescale_ts(packet.get(), input->streams[index]->time_base, mux->streams[index]->time_base);
+				if (!cue && Seconds(packet->dts, mux->streams[index]->time_base) >= 10) {
+					std::unique_ptr<AVPacket, PacketFree> subtitle{av_packet_alloc()};
+					TEST_REQUIRE(subtitle && av_new_packet(subtitle.get(), 4) >= 0);
+					std::memcpy(subtitle->data, "late", 4);
+					subtitle->stream_index = 2;
+					subtitle->pts = subtitle->dts = av_rescale_q(10, AVRational{1, 1}, mux->streams[2]->time_base);
+					subtitle->duration = av_rescale_q(1, AVRational{1, 1}, mux->streams[2]->time_base);
+					TEST_REQUIRE(av_interleaved_write_frame(mux, subtitle.get()) >= 0);
+					cue = true;
+				}
+				TEST_REQUIRE(av_interleaved_write_frame(mux, packet.get()) >= 0);
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF && cue);
+		TEST_REQUIRE(av_write_trailer(mux) >= 0);
+		return 0;
+	}
+
+	int CheckSparseOutput(const std::filesystem::path& source, const std::filesystem::path& path, bool empty) {
+		using Payloads = std::vector<std::vector<std::uint8_t>>;
+		Payloads expectedAudio;
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, source.string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> original{raw};
+		TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		TEST_REQUIRE(packet);
+		unsigned expectedVideo = 0;
+		int result = 0;
+		while ((result = av_read_frame(raw, packet.get())) == 0) {
+			if (packet->stream_index == 0)
+				++expectedVideo;
+			else if (packet->stream_index == 1)
+				expectedAudio.emplace_back(packet->data, packet->data + packet->size);
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF && expectedVideo > 0 && !expectedAudio.empty());
+		raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, path.string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+		TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0 && raw->nb_streams == 4);
+		TEST_REQUIRE(raw->streams[0]->codecpar->codec_id == AV_CODEC_ID_HEVC);
+		TEST_REQUIRE(raw->duration >= 11900000 && raw->duration <= 12200000);
+		std::map<int, std::int64_t> previous;
+		std::array<unsigned, 4> count{};
+		Payloads actualAudio;
+		double latestMedia = -1;
+		while ((result = av_read_frame(raw, packet.get())) == 0) {
+			const int index = packet->stream_index;
+			TEST_REQUIRE(index >= 0 && index < 4);
+			++count[index];
+			const auto dts = packet->dts;
+			if (dts != AV_NOPTS_VALUE) {
+				if (const auto found = previous.find(index); found != previous.end())
+					TEST_REQUIRE(dts >= found->second);
+				previous[index] = dts;
+			}
+			if (index == 2) {
+				TEST_REQUIRE(packet->size == 4 && std::memcmp(packet->data, "late", 4) == 0);
+				TEST_REQUIRE(std::abs(Seconds(packet->pts, raw->streams[index]->time_base) - 10) < 0.1);
+				TEST_REQUIRE(std::abs(Seconds(packet->duration, raw->streams[index]->time_base) - 1) < 0.01);
+				TEST_REQUIRE(latestMedia - Seconds(packet->pts, raw->streams[index]->time_base) <= MaxSpreadSeconds);
+			}
+			else if (index == 1)
+				actualAudio.emplace_back(packet->data, packet->data + packet->size);
+			if (Paced(*raw->streams[index]) && packet->pts != AV_NOPTS_VALUE)
+				latestMedia = std::max(latestMedia, Seconds(packet->pts, raw->streams[index]->time_base));
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		TEST_REQUIRE(count[0] == expectedVideo && actualAudio == expectedAudio);
+		TEST_REQUIRE(count[2] == (empty ? 0u : 1u) && count[3] == 0);
+		return CheckInterleave(path);
+	}
+
+	int RunSparseRetention(bool empty, bool cancel, bool deep = false) {
+		if (!avcodec_find_encoder_by_name("libx265"))
+			return TEST_SKIP;
+		const auto codec = Registry::Instance().FindCodec("H.265");
+		TEST_REQUIRE(codec);
+		const std::string name = cancel ? "retention-cancel"
+			: deep ? "retention-deep" : empty ? "retention-empty" : "retention-sparse";
+		const auto input = OutputPath("pipeline/interleave/" + name + "-input.mkv");
+		const auto output = OutputPath("pipeline/interleave/" + name + "-output.mkv");
+		TEST_REQUIRE(MakeSparseInput(input, empty) == 0);
+		VideoGate gate;
+		StormByte::Buffer::ByteBudget budget{StormByte::ByteSize{1024 * 1024}};
+		{
+			namespace IO = StormByte::Buffer::IO;
+			auto writer = StormByte::Safe::Unique<IO::BufferedLocationWriter>::MakePointer<IO::BufferedFileWriter>(
+				TestLocation(output), IO::WriterParameters{IO::MaxMemory{0}, IO::WriteChunk{0}});
+			Transcoder job{TestLocation(input), std::move(writer), MakeLogger(), 12012000000LL};
+			ReleaseVideo release{gate};
+			BufferingPolicy buffering;
+			buffering.VideoFrames(QueueLimit::Bounded(2));
+			buffering.AudioFrames(QueueLimit::Bounded(1));
+			buffering.Packets(QueueLimit::Bounded(deep ? 4096 : 1));
+			buffering.DemuxPending(QueueLimit::Bounded(1));
+			buffering.QueueBytes(StormByte::ByteSize{256 * 1024});
+			buffering.Budget(budget);
+			job.Buffering(buffering);
+			job.Resources(ResourceUsage::Low);
+			auto video = job.Video(0);
+			video.Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"libx265"})
+				.Preset(StormByte::Safe::String{"ultrafast"}).CRF(35);
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+			options.emplace(StormByte::Safe::String{"rc-lookahead"}, StormByte::Safe::String{"24"});
+			options.emplace(StormByte::Safe::String{"bframes"}, StormByte::Safe::String{"4"});
+			video.FineTune(std::move(options)).Filter<PauseVideo>(gate);
+			job.Audio(1).Remux();
+			job.Subtitle(2).Remux();
+			job.Subtitle(3).Remux();
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{20};
+			while (!gate.Reached.load() && job.Status() != Status::Error
+				&& std::chrono::steady_clock::now() < deadline)
+				std::this_thread::sleep_for(std::chrono::milliseconds{2});
+			TEST_REQUIRE(gate.Reached.load());
+			const auto telemetry = job.OutputTelemetry();
+			TEST_REQUIRE(telemetry);
+			const auto io = StormByte::Safe::DynamicPointerCast<StormByte::Buffer::IO::WriteTelemetry>(telemetry);
+			TEST_REQUIRE(io);
+			// A paused producer prevents EOF/trailer from masquerading as progressive output.
+			while (io->Origin() < StormByte::ByteSize{32768}
+				&& std::chrono::steady_clock::now() < deadline)
+				std::this_thread::sleep_for(std::chrono::milliseconds{2});
+			std::cout << "[Test] bytes accepted before video resumes: " << telemetry->Accepted() << '\n';
+			TEST_REQUIRE(telemetry->Accepted() >= StormByte::ByteSize{32768});
+			TEST_REQUIRE(io->Origin() >= StormByte::ByteSize{32768});
+			const auto accounting = budget.Snapshot();
+			TEST_REQUIRE(accounting.Peak > StormByte::ByteSize{0} && accounting.Peak <= accounting.Limit);
+			if (cancel)
+				job.Cancel();
+			gate.Release.store(true);
+			if (cancel) {
+				const auto stopped = std::chrono::steady_clock::now() + std::chrono::seconds{5};
+				while (job.Status() != Status::Aborted && job.Status() != Status::Error
+					&& std::chrono::steady_clock::now() < stopped)
+					std::this_thread::sleep_for(std::chrono::milliseconds{2});
+				TEST_REQUIRE(job.Status() == Status::Aborted || job.Status() == Status::Error);
+				if (job.Status() == Status::Error)
+					TEST_REQUIRE(job.Error() && TestView(*job.Error()) == "transcode cancelled");
+			}
+			else
+				TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		TEST_REQUIRE(budget.Snapshot().Reserved == StormByte::ByteSize{0});
+		return cancel ? 0 : CheckSparseOutput(input, output, empty);
+	}
+}
+
+int test_interleave_cancel_retained_mixed_packets() {
+	return RunSparseRetention(false, true);
+}
+
+int test_interleave_deep_queues_do_not_extend_retention() {
+	return RunSparseRetention(false, false, true);
+}
+
+int test_interleave_empty_subtitles_with_delayed_video() {
+	return RunSparseRetention(true, false);
+}
+
+int test_interleave_sparse_subtitles_with_delayed_video() {
+	return RunSparseRetention(false, false);
+}
+
+// -------------------
 // Queue
 // -------------------
 int test_three_track_remux_with_small_shared_queues() {
@@ -778,6 +1038,13 @@ int RunPipelineInterleaveTests(int argc, char** argv) {
 		TestEntry{"test_interleave_encoded_video_remuxed_audio", test_interleave_encoded_video_remuxed_audio},
 		TestEntry{"test_interleave_remuxed_video_loudnorm_audio", test_interleave_remuxed_video_loudnorm_audio},
 		TestEntry{"test_interleave_encoded_video_loudnorm_audio", test_interleave_encoded_video_loudnorm_audio},
+		// -------------------
+		// Progressive output
+		// -------------------
+		TestEntry{"test_interleave_cancel_retained_mixed_packets", test_interleave_cancel_retained_mixed_packets},
+		TestEntry{"test_interleave_deep_queues_do_not_extend_retention", test_interleave_deep_queues_do_not_extend_retention},
+		TestEntry{"test_interleave_empty_subtitles_with_delayed_video", test_interleave_empty_subtitles_with_delayed_video},
+		TestEntry{"test_interleave_sparse_subtitles_with_delayed_video", test_interleave_sparse_subtitles_with_delayed_video},
 		// -------------------
 		// Queue
 		// -------------------

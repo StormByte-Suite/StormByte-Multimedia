@@ -12,6 +12,10 @@ foreach(test_name IN ITEMS
 	test_interleave_encoded_video_remuxed_audio
 	test_interleave_remuxed_video_loudnorm_audio
 	test_interleave_encoded_video_loudnorm_audio
+	test_interleave_cancel_retained_mixed_packets
+	test_interleave_deep_queues_do_not_extend_retention
+	test_interleave_empty_subtitles_with_delayed_video
+	test_interleave_sparse_subtitles_with_delayed_video
 )
 	add_optional_pipeline_test(MultimediaPipelineInterleaveTests ${test_name})
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;interleave")

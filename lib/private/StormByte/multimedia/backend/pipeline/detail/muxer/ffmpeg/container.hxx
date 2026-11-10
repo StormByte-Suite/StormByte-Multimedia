@@ -269,9 +269,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			 * Encoders and filters add latency that differs per track (a video encoder can hold
 			 * seconds of lookahead while audio flows at once), so arrival order says nothing about
 			 * timeline order. The oldest held packet is written only once every audio/video track
-			 * holds a packet, so no track can still deliver an older one. Subtitles are sparse and
-			 * never gate. A track that stays silent past the hold limit (ended, or never started)
-			 * stops gating so memory stays bounded.
+			 * holds a packet, subject to a 60-second media-DTS skew fallback for silent
+			 * audio/video tracks. This is independent of FFmpeg's 0.25-1 second sparse-stream
+			 * delta: lowering the skew fallback to that delta can write remuxed audio ahead of
+			 * delayed video. Encoded subtitles gate through ordered progress watermarks;
+			 * remuxed sparse subtitles do not gate here. Neither time window is a byte/RSS cap.
 			 */
 			bool Drain(StormByte::Multimedia::Pipeline::Muxer& owner, bool force);
 

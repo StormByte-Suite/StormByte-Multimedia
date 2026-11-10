@@ -38,6 +38,15 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Bound FFmpeg's mux interleave delta to a positive 0.25-1 second media-time
+  window, including mixed encoded video/remux jobs with sparse or initially
+  empty subtitles. Queue depth and header-startup timestamp span no longer
+  enlarge that window to 60 seconds or beyond. Preserve the separate
+  audio/video encoder-skew guard and encoded-subtitle progress ordering.
+  Regress progressive writer delivery before encoder EOF with libx265
+  lookahead/B-frames, one-packet and deep queues, a 1 MiB shared budget,
+  sparse/empty subtitles and cancellation; verify DTS, A/V interleave, exact
+  remux payloads and subtitle timing.
 - Configure pipeline queue byte limits and shared accounting before publishing
   newly wired inputs to producers, including clone and redirected-clone lanes.
   Applying a late element ceiling now preserves the existing budget even when

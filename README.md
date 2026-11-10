@@ -203,6 +203,22 @@ for an input track through `Step::QueueSnapshot(track)` and
 and shared reservations from `Plan::Buffering().Budget().Snapshot()`. A
 snapshot with `Exists == false` means that track's input queue is not wired yet.
 
+The muxer uses a positive 0.25-1 second media-DTS window in FFmpeg's
+interleaver, including encoded-video/remux combinations. An empty or sparse
+subtitle track therefore cannot select the former 60-second window; queue
+depth and header-startup timestamp span do not enlarge it. This is not a
+wall-clock delivery deadline: encoder startup, ordered subtitle processing,
+container clustering, AVIO and the output writer can still delay bytes.
+
+The muxer's own audio/video readiness guard is separate. Its existing
+60-second media-DTS skew fallback protects delayed encoders; reducing it to
+one second lets remuxed audio run ahead of video with long lookahead. Encoded
+subtitle progress watermarks still protect cue ordering. Payloads held by this
+guard, codec internals and FFmpeg's interleaver are not covered by the queue
+`ByteBudget`; neither time window guarantees a byte/RSS cap. Buffer's output
+telemetry counts bytes only once the writer receives them, not packets held
+inside the muxer.
+
 ### Configure output tracks
 
 Map the streams you want, in output order, and choose `Remux()` or `Codec(...)` for each. Omitted streams are dropped. These calls append outputs: `Audio(1)` twice means two independent destination tracks, not another lookup of the first one.
