@@ -288,7 +288,7 @@ void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept try {
 		Fail("connected stages have conflicting plans");
 		return;
 	}
-	m_state->pipe.Buffering(plan->Buffering());
+	m_state->pipe.Buffering(plan->Buffering(), InputCeiling());
 	plan->Observe(*this);
 	if (error)
 		plan->State(Plan::State::Failed, error);

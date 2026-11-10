@@ -278,7 +278,7 @@ bool FFmpeg::Failed() const noexcept {
 void FFmpeg::BindPlan(StormByte::Safe::Shared<const Pipeline::Plan> plan) noexcept {
 	m_plan = std::move(plan);
 	if (m_plan)
-		m_state->pipe.Buffering(m_plan->Buffering());
+		m_state->pipe.Buffering(m_plan->Buffering(), InputCeiling());
 }
 
 const StormByte::Safe::Optional<StormByte::Safe::String>& FFmpeg::Error() const noexcept {

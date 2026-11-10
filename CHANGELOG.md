@@ -21,10 +21,6 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
-### Added
-
-- Add independent queue element limits, logical payload-byte limits and shared byte budgets through `Pipeline::BufferingPolicy`, backed by StormByte Buffer 4.0.0 weighted queue admission. Stage snapshots expose effective queue limits, occupancy and backpressure counters.
-
 ### TODO
 
 - Design optional GPU color-conversion and HDR-to-SDR tone-mapping backends for Linux, Windows and macOS. Evaluate Vulkan/VA-API/CUDA interoperability on Linux, D3D11 video processing or shaders on Windows, and VideoToolbox/Metal on macOS; preserve correct PQ/HLG transfer, primaries, range and mastering metadata. Check backend availability and licensing/build implications before adding dependencies, retain an explicit CPU fallback and test output against the current color-managed reference.
@@ -39,6 +35,21 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Added
 
 - Add independent queue element limits, logical payload-byte limits and shared byte budgets through `Pipeline::BufferingPolicy`, backed by StormByte Buffer 4.0.0 weighted queue admission. Stage snapshots expose effective queue limits, occupancy and backpressure counters.
+
+### Fixed
+
+- Configure pipeline queue byte limits and shared accounting before publishing
+  newly wired inputs to producers, including clone and redirected-clone lanes.
+  Applying a late element ceiling now preserves the existing budget even when
+  packets are already queued, fixing timing-dependent subtitle encode and
+  Dolby Vision remux failures on macOS and ARM64 CI.
+- Preserve producer writer holds and EOF propagation while staging newly wired
+  queues; test initial reservations, late ceilings, clones and multiple writers.
+- Apply the Plan's policy to inputs wired before Plan binding and install
+  initial element ceilings before producer publication. Regress the Alchemist
+  three-second FFV1/two-FLAC remux with one-packet queues, a 1 MiB queue-byte
+  limit and an 8 MiB shared budget across repeated fluent and manual jobs;
+  compare compressed payloads byte-for-byte and verify queue peaks and release.
 
 [3.3.0]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.2.0...3.3.0
 

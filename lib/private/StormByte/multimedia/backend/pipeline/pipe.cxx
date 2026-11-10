@@ -53,10 +53,10 @@
 #include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
+#include <chrono>
 #include <cstdint>
 #include <limits>
 #include <optional>
-#include <chrono>
 #include <thread>
 #include <utility>
 
@@ -83,6 +83,26 @@ Pipe::~Pipe() noexcept {
 	m_out.Unnotify();
 	for (auto& fork : m_forks)
 		fork.second->Unnotify();
+}
+
+bool Pipe::BindInput(int track, ItemSink& source) {
+	if (m_inTracks.contains(track)) {
+		m_in.To(track) >> source;
+		return true;
+	}
+	// Keep the initial writer private until the budget is attached. Its
+	// destruction releases only that hold, leaving the published producer.
+	ItemSink staged;
+	staged.To(track) >> m_in;
+	Capacity(track, m_initialCeiling);
+	if (!m_configuredTracks.contains(track)) {
+		staged.Abort();
+		source.Abort();
+		return false;
+	}
+	m_inTracks.insert(track);
+	staged.To(track) >> source;
+	return true;
 }
 
 Pipe::ItemSink& Pipe::In() noexcept {
@@ -134,8 +154,24 @@ StormByte::Buffer::QueueSnapshot Pipe::Snapshot(int track) const noexcept {
 	return m_in.Snapshot(track);
 }
 
-void Pipe::Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& policy) noexcept {
+void Pipe::Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& policy,
+	StormByte::Size ceiling) noexcept {
 	m_buffering = policy;
+	m_initialCeiling = ceiling;
+	StormByte::Safe::Optional<StormByte::Size> elements;
+	if (ceiling > StormByte::Size{0})
+		elements = ceiling;
+	const StormByte::Buffer::QueueLimits limits{elements, policy.QueueBytes()};
+	for (const int track : m_in.Keys()) {
+		const auto status = m_in.Configure(track, limits, policy.Budget());
+		if (status != StormByte::Buffer::QueueStatus::Ok) {
+			if (m_failureHandler)
+				m_failureHandler(m_failureOwner, status);
+			else
+				m_in.Abort();
+			return;
+		}
+	}
 }
 
 void Pipe::FailureHandler(void* owner,
@@ -245,6 +281,8 @@ Pipe& Pipe::CloneTo(int track, Pipe& dest) {
 Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) {
 	dest.Listen();
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
+	if (!dest.BindInput(output, *hopper))
+		return dest;
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
 	if (m_forkDestinations.contains({track, &dest, output}))
 		return dest;
@@ -256,52 +294,30 @@ Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) {
 		m_forkDestinations.erase(destination);
 		throw;
 	}
-	const bool wired = dest.m_inTracks.contains(output);
-	bool registered = false;
-	try {
-		if (!wired) {
-			dest.m_inTracks.insert(output);
-			registered = true;
-		}
-		auto& fork = m_forks.back();
-		if (wired)
-			dest.In().To(output) >> *fork.second;
-		else
-			fork.second->To(output) >> dest.In();
-		if (m_closed)
-			fork.second->Eof();
-	} catch (...) {
-		if (registered)
-			dest.m_inTracks.erase(output);
-		m_forks.pop_back();
-		m_forkDestinations.erase(destination);
-		throw;
-	}
+	if (m_closed)
+		m_forks.back().second->Eof();
 	return dest;
 }
 
 bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) {
 	dest.Listen();
+	{
+		StormByte::Safe::UniqueLock lock(m_forkMutex);
+		if (!m_forkDestinations.contains({track, &previous, track})
+			|| m_forkDestinations.contains({track, &dest, track}))
+			return false;
+	}
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
+	if (!dest.BindInput(track, *hopper))
+		return false;
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
 	const auto found = m_forkDestinations.find({track, &previous, track});
 	if (found == m_forkDestinations.end() || m_forkDestinations.contains({track, &dest, track}))
 		return false;
 	const auto index = found->second;
-	const auto destination = m_forkDestinations.emplace(
-		std::make_tuple(track, &dest, track), index).first;
-	bool registered = false;
-	try {
-		registered = dest.m_inTracks.insert(track).second;
-		hopper->To(track) >> dest.In();
-		if (m_closed)
-			hopper->Eof();
-	} catch (...) {
-		if (registered)
-			dest.m_inTracks.erase(track);
-		m_forkDestinations.erase(destination);
-		throw;
-	}
+	m_forkDestinations.emplace(std::make_tuple(track, &dest, track), index);
+	if (m_closed)
+		hopper->Eof();
 	m_forks[index].second = std::move(hopper);
 	m_forkDestinations.erase(found);
 	return true;
@@ -327,14 +343,8 @@ Pipe::Lane Pipe::To(int track) noexcept {
 }
 
 Pipe& Pipe::Lane::operator>>(Pipe& dest) {
-	if (dest.m_inTracks.contains(m_track)) {
-		dest.m_in.To(m_track) >> m_from->m_out;
-		return dest;
-	}
-
 	dest.Listen();
-	m_from->m_out.To(m_track) >> dest.m_in;
-	dest.m_inTracks.insert(m_track);
+	dest.BindInput(m_track, m_from->m_out);
 	return dest;
 }
 

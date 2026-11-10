@@ -29,6 +29,19 @@ add_pipeline_test(MultimediaPipelineCeilingTests test_resource_budget_resolution
 add_pipeline_test(MultimediaPipelineCeilingTests test_full_resources_keep_bounded_video_capacity)
 add_pipeline_test(MultimediaPipelineCeilingTests test_buffering_policy_overrides_are_independent)
 
+add_executable(MultimediaPipelinePipeTests pipe_test.cxx
+	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx"
+	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/packet.cxx"
+	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/AVCodecParameters.cxx")
+target_include_directories(MultimediaPipelinePipeTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
+target_link_libraries(MultimediaPipelinePipeTests PRIVATE multimedia_pipeline_test_support)
+stormbyte_link_ffmpeg(MultimediaPipelinePipeTests)
+add_pipeline_test(MultimediaPipelinePipeTests test_accounting_precedes_first_push)
+add_pipeline_test(MultimediaPipelinePipeTests test_clone_accounting_precedes_first_push)
+add_pipeline_test(MultimediaPipelinePipeTests test_plan_policy_configures_already_wired_inputs)
+add_pipeline_test(MultimediaPipelinePipeTests test_redirected_clone_configures_destination)
+add_pipeline_test(MultimediaPipelinePipeTests test_shared_writers_keep_budget_and_eof)
+
 add_subdirectory(remux)
 add_subdirectory(analytics)
 add_subdirectory(video)

@@ -4,6 +4,24 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
 
 ## Video
 
+- `video/ffv1_two_flac.mkv`: three seconds of synthetic 320x180/25 fps FFV1
+  `testsrc2` video and two independent 48 kHz mono FLAC sine tracks (440 Hz
+  and 880 Hz). Reproduces concurrent mux input setup with one-packet queues,
+  local byte limits and a shared budget. Tests compare every compressed
+  packet payload by track across repeated Transcoder and manual remuxes;
+  they never regenerate this fixture.
+  SHA-256: `8d928777d129309a07adc0e86a7a2262e399ef085d7e83f4fbbdd82fa5166a42`
+  (609,533 bytes). Authored once with:
+
+  ```sh
+  ffmpeg -hide_banner -loglevel error -n \
+    -f lavfi -i 'testsrc2=size=320x180:rate=25:duration=3' \
+    -f lavfi -i 'sine=frequency=440:sample_rate=48000:duration=3' \
+    -f lavfi -i 'sine=frequency=880:sample_rate=48000:duration=3' \
+    -map 0:v -map 1:a -map 2:a -c:v ffv1 -c:a flac \
+    -threads "$(nproc)" test/files/video/ffv1_two_flac.mkv
+  ```
+
 - `video/bluray_like_hdr10.mkv`: HEVC Main 10, BT.2020/PQ, mastering-display and content-light metadata; English AC-3 5.1 and Spanish AAC 5.1; English and Spanish PGS; attached synthetic cover.
 - `video/bluray_like_hdr10.mp4`: H.264 8-bit SDR video with a BT.709 color matrix, two 5.1 AAC tracks and English/Spanish `mov_text` subtitles. Primaries and transfer are unspecified; HDR metadata is absent.
 - `video/bluray_like_vp9.mkv`: VP9 video, the same two distinct 5.1 audio codecs and English/Spanish PGS subtitles.

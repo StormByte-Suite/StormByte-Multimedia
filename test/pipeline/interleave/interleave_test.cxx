@@ -51,9 +51,14 @@
 #include "../helpers.hxx"
 #include "runners.hxx"
 
+#include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
+#include <StormByte/multimedia/pipeline/muxer.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
+#include <StormByte/multimedia/pipeline/remuxer.hxx>
+#include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/registry.hxx>
 
@@ -70,6 +75,7 @@
 #include <memory>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 extern "C" {
 	#include <libavcodec/avcodec.h>
@@ -652,6 +658,113 @@ int test_avi_missing_pts_preserves_timeline_and_progress() {
 	return 0;
 }
 
+// -------------------
+// Queue
+// -------------------
+int test_three_track_remux_with_small_shared_queues() {
+	using StormByte::ByteSize;
+	const auto inputPath = FixturePath("video/ffv1_two_flac.mkv");
+	const auto outputPath = OutputPath("pipeline/interleave/small-shared-queues.mkv");
+	StormByte::Buffer::ByteBudget budget{ByteSize{8 * 1024 * 1024}};
+	BufferingPolicy buffering;
+	buffering.VideoFrames(QueueLimit::Bounded(2));
+	buffering.AudioFrames(QueueLimit::Bounded(1));
+	buffering.Packets(QueueLimit::Bounded(1));
+	buffering.DemuxPending(QueueLimit::Bounded(1));
+	buffering.QueueBytes(ByteSize{1024 * 1024});
+	buffering.Budget(budget);
+	using Payloads = std::array<std::vector<std::vector<std::uint8_t>>, 3>;
+	Payloads expected;
+	for (std::size_t iteration = 0; iteration < 24; ++iteration) {
+		StormByte::Safe::Shared<StormByte::Logger::Log> noLogger;
+		if (iteration % 2 == 0) {
+			Transcoder job{TestLocation(inputPath), TestLocation(outputPath), MakeLogger(), 3000000000LL};
+			job.Buffering(buffering);
+			job.Video(0).Remux();
+			job.Audio(1).Remux();
+			job.Audio(2).Remux();
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		else {
+			auto plan = StormByte::Safe::MakeShared<Plan>(
+				TestLocation(inputPath), TestLocation(outputPath), 3000000000LL);
+			TEST_REQUIRE(plan->Buffering(buffering));
+			plan->add(Track{0, StormByte::Multimedia::Type::Video});
+			plan->add(Track{1, StormByte::Multimedia::Type::Audio});
+			plan->add(Track{2, StormByte::Multimedia::Type::Audio});
+			TEST_REQUIRE(plan->Check());
+			Demuxer demuxer{noLogger};
+			Remuxer video{noLogger, 0};
+			Remuxer audioOne{noLogger, 1};
+			Remuxer audioTwo{noLogger, 2};
+			Muxer muxer{noLogger};
+			ManualPipelineStop teardown{&demuxer, &video, &audioOne, &audioTwo, &muxer};
+			demuxer >> muxer;
+			demuxer >> video >> muxer;
+			demuxer >> audioOne >> muxer;
+			demuxer >> audioTwo >> muxer;
+			plan >> demuxer;
+			for (Step* stage : std::array<Step*, 5>{&demuxer, &video, &audioOne, &audioTwo, &muxer})
+				TEST_REQUIRE(WaitForManualPipeline(*stage) == 0);
+			TEST_REQUIRE(plan->State() == Plan::State::Finished);
+			const std::array<Remuxer*, 3> remuxers{&video, &audioOne, &audioTwo};
+			for (int track = 0; track < 3; ++track) {
+				for (const Step* stage : std::array<const Step*, 2>{remuxers[track], &muxer}) {
+					const auto queue = stage->QueueSnapshot(track);
+					TEST_REQUIRE(queue.Exists);
+					TEST_REQUIRE(queue.Limits.ElementsLimited());
+					TEST_REQUIRE(queue.Limits.Elements() == StormByte::Size{1});
+					TEST_REQUIRE(queue.Limits.BytesLimited());
+					TEST_REQUIRE(queue.Limits.Bytes() == ByteSize{1024 * 1024});
+					TEST_REQUIRE(queue.PeakElements == StormByte::Size{1});
+					TEST_REQUIRE(queue.PeakBytes > ByteSize{0} && queue.PeakBytes <= queue.Limits.Bytes());
+					TEST_REQUIRE(queue.Elements == StormByte::Size{0} && queue.Bytes == ByteSize{0});
+				}
+			}
+		}
+		const auto accounting = budget.Snapshot();
+		TEST_REQUIRE(accounting.Limited && accounting.Limit == ByteSize{8 * 1024 * 1024});
+		TEST_REQUIRE(accounting.Peak > ByteSize{0} && accounting.Peak <= accounting.Limit);
+		TEST_REQUIRE(accounting.Reserved == ByteSize{0} && !accounting.Closed);
+		for (const bool source : {true, false}) {
+			if (source && iteration > 0)
+				continue;
+			const auto& path = source ? inputPath : outputPath;
+			AVFormatContext* raw = nullptr;
+			TEST_REQUIRE(avformat_open_input(&raw, path.string().c_str(), nullptr, nullptr) == 0);
+			std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+			TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+			TEST_REQUIRE(raw->nb_streams == 3);
+			TEST_REQUIRE(raw->streams[0]->codecpar->codec_id == AV_CODEC_ID_FFV1);
+			TEST_REQUIRE(raw->streams[0]->codecpar->width == 320 && raw->streams[0]->codecpar->height == 180);
+			TEST_REQUIRE(raw->streams[1]->codecpar->codec_id == AV_CODEC_ID_FLAC);
+			TEST_REQUIRE(raw->streams[2]->codecpar->codec_id == AV_CODEC_ID_FLAC);
+			TEST_REQUIRE(raw->duration >= 2990000 && raw->duration <= 3010000);
+			std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+			TEST_REQUIRE(packet);
+			Payloads actual;
+			int result = 0;
+			while ((result = av_read_frame(raw, packet.get())) == 0) {
+				TEST_REQUIRE(packet->stream_index >= 0 && packet->stream_index < 3);
+				TEST_REQUIRE(packet->size > 0);
+				actual[packet->stream_index].emplace_back(packet->data, packet->data + packet->size);
+				av_packet_unref(packet.get());
+			}
+			TEST_REQUIRE(result == AVERROR_EOF);
+			if (source) {
+				expected = std::move(actual);
+				for (const auto& track : expected)
+					TEST_REQUIRE(!track.empty());
+			}
+			else
+				TEST_REQUIRE(actual == expected);
+		}
+	}
+	return 0;
+}
+
 int RunPipelineInterleaveTests(int argc, char** argv) {
 	const std::array tests{
 		TestEntry{"test_avi_missing_pts_preserves_timeline_and_progress", test_avi_missing_pts_preserves_timeline_and_progress},
@@ -665,6 +778,10 @@ int RunPipelineInterleaveTests(int argc, char** argv) {
 		TestEntry{"test_interleave_encoded_video_remuxed_audio", test_interleave_encoded_video_remuxed_audio},
 		TestEntry{"test_interleave_remuxed_video_loudnorm_audio", test_interleave_remuxed_video_loudnorm_audio},
 		TestEntry{"test_interleave_encoded_video_loudnorm_audio", test_interleave_encoded_video_loudnorm_audio},
+		// -------------------
+		// Queue
+		// -------------------
+		TestEntry{"test_three_track_remux_with_small_shared_queues", test_three_track_remux_with_small_shared_queues},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

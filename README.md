@@ -189,6 +189,13 @@ counts and logical payload-byte admission; they do not change codec CPU
 threading. Byte weights are estimates of queued frame or packet payload, not
 process RSS or uniquely owned physical memory.
 
+Newly wired track queues attach their byte limits and shared budget before
+producers can enqueue. Inputs wired before Plan binding receive the Plan's
+policy before workers start; initial element ceilings are installed too.
+A stage may refine its element ceiling during startup
+without rebinding that budget or discarding packets already waiting in its
+input, including clone lanes and inputs shared by multiple producers.
+
 Manually mounted stages expose the effective limits and live queue accounting
 for an input track through `Step::QueueSnapshot(track)` and
 `Filter::FFmpeg::QueueSnapshot(track)`. Read the requested mode from the Plan's

@@ -100,9 +100,10 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 *
 	 * Private. Step and Filter::FFmpeg compose one Pipe each.
 	 * Not installed. @c operator>> between Pipes is redirect
-	 * (Notify destination input, then Bind). It does not set
-	 * Capacity: the call site uses the consumer's
-	 * InputCeiling on @ref Capacity after Bind.
+	 * (Notify destination input, then Bind). Track wiring attaches
+	 * byte accounting before publishing the queue to its producer.
+	 * The call site applies the consumer's InputCeiling on
+	 * @ref Capacity after Bind without replacing that accounting.
 	 *
 	 * Item flow is left to right, same as the public tube:
 	 * @c pipe << item / @c item >> pipe write to Out (Push,
@@ -226,7 +227,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			/**
 			 * @brief Ceiling of the input hopper for @p track.
 			 * @param track Hopper key.
-			 * @param n Max queued items. Caller skips this when 0.
+			 * @param n Max queued items; zero leaves elements unlimited.
 			 *
 			 * After Bind, Out and In are the same hopper: this is
 			 * the only cap. There is no out ceiling.
@@ -239,9 +240,12 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Buffer::QueueSnapshot Snapshot(int track) const noexcept;
 
 			/**
-			 * @brief Selects the policy used when newly wired input buckets are configured.
+			 * @brief Configure idle inputs and the policy used for newly wired buckets.
+			 * @param policy Plan byte accounting selected before producers start.
+			 * @param ceiling Initial element ceiling; zero means unlimited.
 			 */
-			void Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& policy) noexcept;
+			void Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& policy,
+				StormByte::Size ceiling = StormByte::Size{0}) noexcept;
 
 			/**
 			 * @brief Installs the owner-local error path for an unadmittable item.
@@ -420,6 +424,14 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			friend Pipe& operator>>(Item::PointerType&& item, Pipe& pipe) noexcept;
 
 		private:
+			/**
+			 * @brief Configure a new input before publishing it to a producer.
+			 * @param track Input bucket key.
+			 * @param source Producer sink sharing the configured input.
+			 * @return Whether setup succeeded; failures use the configured error path.
+			 */
+			bool BindInput(int track, ItemSink& source);
+
 			bool PushWeighted(ItemSink& sink, int track, Item::PointerType& item) noexcept;
 
 			StormByte::Safe::ConditionVariable m_wake;	///< Provider-owned consumer CV
@@ -441,6 +453,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Safe::UnorderedSet<int> m_inTracks;	///< Keys already wired on In
 			StormByte::Safe::UnorderedSet<int> m_configuredTracks;	///< Buckets with limits and byte accounting.
 			StormByte::Multimedia::Pipeline::BufferingPolicy m_buffering;	///< Buffer limits and shared accounting.
+			StormByte::Size m_initialCeiling{0};	///< Element limit applied before producer publication.
 			void* m_failureOwner = nullptr;	///< Borrowed owner, valid through pipe shutdown.
 			void (*m_failureHandler)(void*, StormByte::Buffer::QueueStatus) noexcept = nullptr;	///< Queue admission error path.
 	};
