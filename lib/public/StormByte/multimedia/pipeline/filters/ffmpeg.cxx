@@ -196,7 +196,12 @@ class FFmpeg::Surface final: public StormByte::Multimedia::Backend::Pipeline::Ho
 class FFmpeg::PrivateState {
 	public:
 		explicit PrivateState(FFmpeg& owner)
-		:	surface(owner) {}
+		:	surface(owner) {
+			pipe.FailureHandler(&owner, [](void* context, StormByte::Buffer::QueueStatus status) noexcept {
+				static_cast<FFmpeg*>(context)->Fail(
+					StormByte::Multimedia::Backend::Pipeline::QueueFailureReason(status));
+			});
+		}
 
 		StormByte::Multimedia::Backend::Pipeline::Pipe pipe;					///< Input/output queues and wait synchronization
 		Surface surface;														///< Host adapter borrowing the owning filter
@@ -248,6 +253,10 @@ StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::StageTelemetry> F
 	return StormByte::Safe::StaticPointerCast<const StormByte::Multimedia::Pipeline::StageTelemetry>(m_telemetry);
 }
 
+StormByte::Buffer::QueueSnapshot FFmpeg::QueueSnapshot(int track) const noexcept {
+	return m_state->pipe.Snapshot(track);
+}
+
 void FFmpeg::Process(const Pipeline::Frame&) noexcept {}
 
 void FFmpeg::Process(const Pipeline::Packet&) noexcept {}
@@ -266,16 +275,30 @@ bool FFmpeg::Failed() const noexcept {
 	return Status() == State::Failed;
 }
 
+void FFmpeg::BindPlan(StormByte::Safe::Shared<const Pipeline::Plan> plan) noexcept {
+	m_plan = std::move(plan);
+	if (m_plan)
+		m_state->pipe.Buffering(m_plan->Buffering());
+}
+
 const StormByte::Safe::Optional<StormByte::Safe::String>& FFmpeg::Error() const noexcept {
 	return m_error;
 }
 
 StormByte::Size FFmpeg::InputCeiling() const noexcept {
 	const auto usage = m_plan ? m_plan->Resources() : ResourceUsage::Full;
-	if (Media() == StormByte::Multimedia::Type::Video && m_receives.Has(Kind::Frame))
-		return m_plan ? StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan) : 27;
-	if (m_receives.Has(Kind::Frame) || m_receives.Has(Kind::Packet))
-		return StormByte::Multimedia::Backend::Pipeline::Ceiling::ResourceFrames(usage, 32);
+	if (Media() == StormByte::Multimedia::Type::Video && m_receives.Has(Kind::Frame)) {
+		if (!m_plan)
+			return 27;
+		const auto automatic = static_cast<StormByte::Size>(
+			StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan));
+		return m_plan->Buffering().VideoFrames().Resolve(automatic);
+	}
+	if (m_receives.Has(Kind::Frame) || m_receives.Has(Kind::Packet)) {
+		const auto automatic = static_cast<StormByte::Size>(
+			StormByte::Multimedia::Backend::Pipeline::Ceiling::ResourceFrames(usage, 32));
+		return m_plan ? m_plan->Buffering().Packets().Resolve(automatic) : automatic;
+	}
 	return 0;
 }
 
@@ -284,7 +307,8 @@ StormByte::Size Analytics::PendingCeiling(StormByte::Size full) const noexcept {
 	const StormByte::Size maximum = usage == ResourceUsage::Low ? 2 : usage == ResourceUsage::Medium ? 8 : 32;
 	if (m_plan) {
 		const StormByte::Size capacity =
-			StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan, full);
+			m_plan->Buffering().VideoFrames().Resolve(
+				StormByte::Multimedia::Backend::Pipeline::Ceiling::VideoFrames(*m_plan, full));
 		return std::min(maximum, capacity);
 	}
 	return std::min(full, maximum);

@@ -201,7 +201,11 @@ class Step::Surface final: public StormByte::Multimedia::Backend::Pipeline::Host
 class Step::PrivateState {
 	public:
 		explicit PrivateState(Step& owner)
-		:	surface(owner) {}
+		:	surface(owner) {
+			pipe.FailureHandler(&owner, [](void* context, StormByte::Buffer::QueueStatus status) noexcept {
+				static_cast<Step*>(context)->Fail(Backend::Pipeline::QueueFailureReason(status));
+			});
+		}
 
 		Backend::Pipeline::Pipe pipe;							///< Input/output queues and wait synchronization
 		Surface surface;										///< Host adapter borrowing the owning step
@@ -284,6 +288,7 @@ void Step::Plan(StormByte::Safe::Shared<class Plan> plan) noexcept try {
 		Fail("connected stages have conflicting plans");
 		return;
 	}
+	m_state->pipe.Buffering(plan->Buffering());
 	plan->Observe(*this);
 	if (error)
 		plan->State(Plan::State::Failed, error);
@@ -314,8 +319,7 @@ void Step::Wire(Step& downstream) noexcept try {
 		if (!track || track->Type() == StormByte::Multimedia::Type::Attachment)
 			continue;
 		pipe().To(track->In()) >> downstream.pipe();
-		if (const std::size_t cap = downstream.InputCeiling(); cap > 0)
-			downstream.pipe().Capacity(track->In(), cap);
+		downstream.pipe().Capacity(track->In(), downstream.InputCeiling());
 	}
 } catch (const StormByte::Safe::AllocationError&) {
 	Fail();
@@ -399,6 +403,10 @@ StormByte::Safe::Shared<const StageTelemetry> Step::Telemetry() const {
 	const auto origin = Label();
 	m_telemetry->SetOrigin(origin);
 	return m_telemetry;
+}
+
+StormByte::Buffer::QueueSnapshot Step::QueueSnapshot(int track) const noexcept {
+	return m_state->pipe.Snapshot(track);
 }
 
 void Step::CloseHoppers() noexcept {

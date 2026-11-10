@@ -50,11 +50,14 @@
 
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
+#include <StormByte/multimedia/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
 #include <cstdint>
 #include <limits>
 #include <optional>
+#include <chrono>
+#include <thread>
 #include <utility>
 
 using StormByte::Multimedia::Backend::Pipeline::Pipe;
@@ -99,7 +102,77 @@ const Pipe::ItemSink& Pipe::Out() const noexcept {
 }
 
 void Pipe::Capacity(int track, StormByte::Size n) noexcept {
-	m_in.Capacity(track, n);
+	StormByte::Safe::Optional<StormByte::Size> elements;
+	if (n > 0)
+		elements = n;
+	const StormByte::Buffer::QueueLimits limits{elements, m_buffering.QueueBytes()};
+	StormByte::Buffer::QueueStatus status;
+	if (m_configuredTracks.contains(track)) {
+		status = m_in.Limits(track, limits);
+	}
+	else {
+		status = m_in.Configure(track, limits, m_buffering.Budget());
+		if (status == StormByte::Buffer::QueueStatus::Ok) {
+			try {
+				m_configuredTracks.insert(track);
+			} catch (const StormByte::Safe::AllocationError&) {
+				status = StormByte::Buffer::QueueStatus::Error;
+			} catch (const std::bad_alloc&) {
+				status = StormByte::Buffer::QueueStatus::Error;
+			}
+		}
+	}
+	if (status != StormByte::Buffer::QueueStatus::Ok) {
+		if (m_failureHandler)
+			m_failureHandler(m_failureOwner, status);
+		else
+			m_in.Abort();
+	}
+}
+
+StormByte::Buffer::QueueSnapshot Pipe::Snapshot(int track) const noexcept {
+	return m_in.Snapshot(track);
+}
+
+void Pipe::Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& policy) noexcept {
+	m_buffering = policy;
+}
+
+void Pipe::FailureHandler(void* owner,
+	void (*handler)(void*, StormByte::Buffer::QueueStatus) noexcept) noexcept {
+	m_failureOwner = owner;
+	m_failureHandler = handler;
+}
+
+bool Pipe::PushWeighted(ItemSink& sink, int track, Item::PointerType& item) noexcept {
+	if (!item)
+		return true;
+	StormByte::ByteSize weight{1};
+	if (const auto frame = StormByte::Safe::DynamicPointerCast<StormByte::Multimedia::Pipeline::Frame>(item))
+		weight = frame->BufferingWeight();
+	else if (const auto packet = StormByte::Safe::DynamicPointerCast<StormByte::Multimedia::Pipeline::Packet>(item))
+		weight = packet->BufferingWeight();
+
+	for (;;) {
+		const auto status = sink.PushFor(track, item, weight, std::chrono::milliseconds{100});
+		if (status == StormByte::Buffer::QueueStatus::Ok)
+			return true;
+		if (status == StormByte::Buffer::QueueStatus::Timeout)
+			continue;
+		if (status == StormByte::Buffer::QueueStatus::Missing) {
+			if (sink.Draining())
+				return true;
+			if (!sink.EoF()) {
+				std::this_thread::sleep_for(std::chrono::milliseconds{1});
+				continue;
+			}
+		}
+		if (m_failureHandler)
+			m_failureHandler(m_failureOwner, status);
+		else
+			sink.Abort();
+		return false;
+	}
 }
 
 void Pipe::Listen() noexcept {
@@ -316,10 +389,12 @@ Pipe& Pipe::operator<<(Item::PointerType item) noexcept {
 	for (auto& fork : forks) {
 		if (auto copy = item->Clone()) {
 			copy->m_track = fork.first;
-			fork.second->Push(fork.first, std::move(copy));
+			if (!PushWeighted(*fork.second, fork.first, copy))
+				return *this;
 		}
 	}
-	m_out.Push(key, std::move(item));
+	if (!PushWeighted(m_out, key, item))
+		return *this;
 	return *this;
 }
 

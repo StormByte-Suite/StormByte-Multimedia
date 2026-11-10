@@ -101,10 +101,33 @@ class Plan::Observers {
 	public:
 		std::vector<Step*> Stages;	///< Stages whose owners serialize teardown with notification.
 		std::vector<Step*> Completed;
+		BufferingPolicy Buffering;	///< Queue capacity overrides.
 		StormByte::Safe::Mutex HoldMutex;					///< Guards HoldCv waits.
 		StormByte::Safe::ConditionVariable HoldCv;			///< Wakes held stages.
 		StormByte::Safe::Atomic<bool> Held{false};			///< Stages pause before their next work unit.
 };
+
+const BufferingPolicy& Plan::Buffering() const noexcept {
+	static const BufferingPolicy automatic;
+	return m_observers ? m_observers->Buffering : automatic;
+}
+
+bool Plan::Buffering(const BufferingPolicy& policy) noexcept {
+	if (!policy.Valid() || State() != State::Created)
+		return false;
+	try {
+		if (!m_observers)
+			m_observers = StormByte::Safe::Unique<Observers>::MakePointer<Observers>();
+		m_observers->Buffering = policy;
+		return true;
+	} catch (const StormByte::Safe::AllocationError&) {
+		State(State::Failed, StormByte::Safe::String{"failed to allocate plan buffering policy"});
+		return false;
+	} catch (const std::bad_alloc&) {
+		State(State::Failed, StormByte::Safe::String{"failed to allocate plan buffering policy"});
+		return false;
+	}
+}
 
 namespace {
 	StormByte::Safe::Unique<BufferedLocationReader> LocalReader(const StormByte::Safe::String& path) {

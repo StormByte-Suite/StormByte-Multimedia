@@ -74,8 +74,7 @@ namespace {
 	}
 
 	void Cap(StormByte::Multimedia::Backend::Pipeline::Pipe& pipe, int track, std::size_t n) {
-		if (n > 0)
-			pipe.Capacity(track, n);
+		pipe.Capacity(track, n);
 	}
 }
 
@@ -121,7 +120,7 @@ int Route::Track() const noexcept {
 void Route::Observe(StormByte::Safe::Shared<Filter::FFmpeg> analytics) {
 	if (analytics) {
 		if (m_origin && m_origin->Plan())
-			analytics->m_plan = m_origin->Plan();
+			analytics->BindPlan(m_origin->Plan());
 		m_analytics.push_back(std::move(analytics));
 	}
 }
@@ -143,7 +142,7 @@ Route& Route::Add(StormByte::Safe::Shared<Filter::FFmpeg> filter) {
 
 	Filter::FFmpeg& node = *filter;
 	if (m_origin)
-		node.m_plan = m_origin->Plan();
+		node.BindPlan(m_origin->Plan());
 	node.m_origin = m_track;
 	const bool analytics = static_cast<bool>(StormByte::Safe::DynamicPointerCast<Filter::Analytics>(filter));
 	m_filters.push_back(filter);
@@ -206,7 +205,6 @@ void Route::Close() noexcept try {
 			destination.Fail(StormByte::Safe::String::ReplaceToken("{} media does not match this stretch", filter->Name()));
 			return;
 		}
-		Cap(filter->pipe(), m_track, filter->InputCeiling());
 	}
 
 	if (!origin.Connect(destination))
@@ -324,9 +322,9 @@ void Route::TapDecode(Step& origin, Filter::FFmpeg& analytics) noexcept {
 	m_looks.push_back(look);
 	look->pipe().CloneTo(m_track, analytics.pipe(), output);
 	look->pipe().Drain();
-	Cap(look->pipe(), m_track, look->InputCeiling());
 	Cap(analytics.pipe(), output, analytics.InputCeiling());
 	origin.pipe().CloneTo(m_track, look->pipe());
+	Cap(look->pipe(), m_track, look->InputCeiling());
 	} catch (const StormByte::Safe::AllocationError&) {
 		origin.Fail();
 		analytics.Fail();
@@ -366,9 +364,9 @@ void Route::TapEncode(Step& destination, Filter::FFmpeg& analytics) noexcept {
 	look->pipe().Listen();
 	look->pipe().CloneTo(packetTrack, analytics.pipe(), output);
 	look->pipe().Drain();
-	Cap(look->pipe(), packetTrack, look->InputCeiling());
 	Cap(analytics.pipe(), output, analytics.InputCeiling());
 	destination.pipe().CloneTo(packetTrack, look->pipe());
+	Cap(look->pipe(), packetTrack, look->InputCeiling());
 	} catch (const StormByte::Safe::AllocationError&) {
 		destination.Fail();
 		analytics.Fail();

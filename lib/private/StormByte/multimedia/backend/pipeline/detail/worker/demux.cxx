@@ -301,7 +301,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			EnsureFeed(track);
 			m_parkCv.wait(lock, [this, track, ceiling]() {
 				return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
-					|| m_park[track].size() < ceiling;
+					|| ceiling == 0 || m_park[track].size() < ceiling;
 			});
 			if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire))
 				return;

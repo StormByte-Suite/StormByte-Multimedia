@@ -532,8 +532,9 @@ class TokenReader final: public IO::BufferedLocationReader {
 		 * @param stats Lifetime counters.
 		 */
 		TokenReader(std::string_view path, Safe::Shared<ReaderStats> stats):
-			BufferedLocationReader(Safe::String(path), IO::Location::Remote, ByteSize{0}, ByteSize{16384},
-				std::chrono::milliseconds(50), false), m_stats(std::move(stats)) {
+			BufferedLocationReader(Safe::String(path), IO::Location::Remote, IO::BufferedLocationReader::Parameters{
+				IO::ReadAhead{0}, IO::MaxMemory{16384}, IO::MaxWait{std::chrono::milliseconds(50)}}),
+			m_stats(std::move(stats)) {
 			std::ifstream input(std::string(path), std::ios::binary | std::ios::ate);
 			if (!input)
 				throw StormByte::Exception("test fixture open failed");
@@ -549,8 +550,9 @@ class TokenReader final: public IO::BufferedLocationReader {
 		 * @param stats Lifetime counters.
 		 */
 		TokenReader(Safe::Binary data, Safe::Shared<ReaderStats> stats):
-			BufferedLocationReader(Safe::String("memory://preview"), IO::Location::Remote, ByteSize{0}, ByteSize{16384},
-				std::chrono::milliseconds(50), false), m_data(std::move(data)), m_stats(std::move(stats)) {}
+			BufferedLocationReader(Safe::String("memory://preview"), IO::Location::Remote, IO::BufferedLocationReader::Parameters{
+				IO::ReadAhead{0}, IO::MaxMemory{16384}, IO::MaxWait{std::chrono::milliseconds(50)}}),
+			m_data(std::move(data)), m_stats(std::move(stats)) {}
 
 		TokenReader(const TokenReader&) = delete;
 

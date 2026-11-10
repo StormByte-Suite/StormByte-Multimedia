@@ -11,7 +11,7 @@ StormByte Multimedia provides checked asynchronous media processing and real-tim
 
 The C++26 API includes codec and container registries, `File` inspection, owned `Plan`s, pipeline stages, filters, analytics, progress and telemetry. Backend codec and format contexts remain private; filter-facing frame, packet and graph adapters are available when needed. Cross-module values and lifetimes use StormByte Base's `Safe` APIs and require compatible provider/consumer ABIs.
 
-The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/3.0.0), [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/3.0.0), [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/3.0.0) and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/3.0.0), all at version 3.0.0, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
+The module uses [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/3.0.0), [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/3.0.0) and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/3.0.0) at version 3.0.0, and [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/4.0.0) at version 4.0.0, plus FFmpeg, libvmaf, zimg, libebur128 and Tesseract/Leptonica with OCR language data. Dependencies may be bundled or selected from the system at build time; the resulting build determines which codecs and filters are available. This repository implements Multimedia only, not the other StormByte modules.
 
 Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. Third-party dependencies and redistributed fixtures keep their own licenses; neither option grants codec patent rights. GPL/nonfree FFmpeg build options affect the resulting binary's redistribution requirements, not the license of the original Multimedia source.
 
@@ -20,6 +20,10 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
 ## [Unreleased]
+
+### Added
+
+- Add independent queue element limits, logical payload-byte limits and shared byte budgets through `Pipeline::BufferingPolicy`, backed by StormByte Buffer 4.0.0 weighted queue admission. Stage snapshots expose effective queue limits, occupancy and backpressure counters.
 
 ### TODO
 

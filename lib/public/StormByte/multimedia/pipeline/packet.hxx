@@ -308,6 +308,15 @@ namespace StormByte {
 					}
 
 					/**
+					 * @brief Estimates the compressed payload weight for queue accounting.
+					 * @return The larger of the facade and FFmpeg packet payload sizes.
+					 *
+					 * This is a logical estimate, not RSS or uniquely-owned physical
+					 * memory. Packet copies may share the same payload.
+					 */
+					StormByte::ByteSize BufferingWeight() const noexcept;
+
+					/**
 					 * @brief Side-data blobs bound to this access unit.
 					 * @return Blobs (HdrPlus, captions, …). Empty when none.
 					 */

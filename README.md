@@ -21,7 +21,7 @@ There are two independent workflows:
 
 `Transcoder` is a complete facade over the processing pipeline, not a reduced encoder. Manual wiring exposes the same machinery when a graph needs more control. `SimplePlayer` handles real-time playback independently; it is a **preview service, not a replacement for a professional media player**, an editor or a bundled Qt/SDL widget.
 
-It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/3.0.0), [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/3.0.0), [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/3.0.0) and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/3.0.0), all at version 3.0.0. Each is a release archive. Public headers live under `StormByte/multimedia/`.
+It depends on [StormByte Base](https://github.com/StormByte-Suite/StormByte/releases/tag/3.0.0), [StormByte Logger](https://github.com/StormByte-Suite/StormByte-Logger/releases/tag/3.0.0) and [StormByte System](https://github.com/StormByte-Suite/StormByte-System/releases/tag/3.0.0) at version 3.0.0, and [StormByte Buffer](https://github.com/StormByte-Suite/StormByte-Buffer/releases/tag/4.0.0) at version 4.0.0. Each is a release archive. Public headers live under `StormByte/multimedia/`.
 
 The suite is split on purpose. Base, Buffer, Config, Crypto, Database, Logger, Network and System are **other repositories**. This one does not implement them.
 
@@ -153,6 +153,48 @@ int main(int argc, char** argv) {
 	}
 }
 ```
+
+### Queue buffering policy
+
+`ResourceUsage` continues to select the CPU profile and automatic queue caps.
+Use `BufferingPolicy` to override those element caps independently, including
+while keeping `ResourceUsage::Full`. `QueueLimit::Automatic()` follows the
+selected profile, `QueueLimit::Bounded(n)` requests a strict item limit, and
+`QueueLimit::Unlimited()` disables that item limit. A video-frame cap must be
+at least two; audio-frame, packet and demux-pending caps must be at least one.
+
+```cpp
+#include <StormByte/multimedia/pipeline/buffering.hxx>
+#include <StormByte/multimedia/pipeline/transcoder.hxx>
+
+using namespace StormByte::Multimedia::Pipeline;
+
+BufferingPolicy queues;
+queues.VideoFrames(QueueLimit::Bounded(6));
+queues.AudioFrames(QueueLimit::Bounded(4));
+queues.Packets(QueueLimit::Bounded(8));
+queues.DemuxPending(QueueLimit::Bounded(2));
+queues.QueueBytes(StormByte::ByteSize{64 * 1024 * 1024});
+queues.Budget(StormByte::Buffer::ByteBudget{StormByte::ByteSize{256 * 1024 * 1024}});
+
+Transcoder job{source, destination, logger};
+job.Resources(ResourceUsage::Full);
+job.Buffering(queues);
+```
+
+The same value can be set on a manually created `Plan` before connecting or
+starting its stages with `plan->Buffering(queues)`. Invalid minima are rejected
+without changing the previous policy. These overrides affect queue element
+counts and logical payload-byte admission; they do not change codec CPU
+threading. Byte weights are estimates of queued frame or packet payload, not
+process RSS or uniquely owned physical memory.
+
+Manually mounted stages expose the effective limits and live queue accounting
+for an input track through `Step::QueueSnapshot(track)` and
+`Filter::FFmpeg::QueueSnapshot(track)`. Read the requested mode from the Plan's
+`BufferingPolicy`, the applied limits and occupancy from the queue snapshot,
+and shared reservations from `Plan::Buffering().Budget().Snapshot()`. A
+snapshot with `Exists == false` means that track's input queue is not wired yet.
 
 ### Configure output tracks
 

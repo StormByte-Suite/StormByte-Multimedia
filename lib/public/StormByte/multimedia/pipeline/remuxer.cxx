@@ -87,8 +87,7 @@ bool Remuxer::WaitForPlan() noexcept {
 }
 
 void Remuxer::SetupPlan() noexcept try {
-	if (const std::size_t capacity = InputCeiling(); capacity > 0)
-		pipe().Capacity(m_index, capacity);
+	pipe().Capacity(m_index, InputCeiling());
 	pipe().WaitWake(this, [](void* context) noexcept {
 		const auto& owner = *static_cast<Remuxer*>(context);
 		return owner.Stopping() || owner.Plan()->State() != Plan::State::Running

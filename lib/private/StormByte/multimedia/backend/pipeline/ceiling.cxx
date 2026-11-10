@@ -250,25 +250,29 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		const bool encode = Encodes(track);
 		const bool video = track.Type() == Type::Video;
 		const bool audio = track.Type() == Type::Audio;
+		const auto& buffering = plan->Buffering();
 		const std::size_t cheap = ResourceFrames(plan->Resources(), CheapPackets());
 		const std::size_t remux = ResourceFrames(plan->Resources(), RemuxPackets());
+		const std::size_t packets = buffering.Packets().Resolve(remux);
+		const std::size_t videoFrames = buffering.VideoFrames().Resolve(VideoFrames(*plan));
+		const std::size_t audioFrames = buffering.AudioFrames().Resolve(cheap);
+		const std::size_t demuxPending = buffering.DemuxPending().Resolve(remux);
 		switch (producer) {
 			case Producer::Demuxer:
-				// Park + out hopper share the remux budget so the file reader
-				// cannot prefetch a full GOP of every track while video encode
-				// is one frame behind.
-				m_packets = remux;
-				m_park = remux;
+				// Keep the demux output hopper and its separate park cap
+				// independently configurable.
+				m_packets = packets;
+				m_park = demuxPending;
 				break;
 			case Producer::Decoder:
 				if (video) {
-					m_frames = VideoFrames(*plan);
-					m_packets = m_frames;
+					m_frames = videoFrames;
+					m_packets = buffering.Packets().Resolve(m_frames);
 				}
 				else {
-					m_packets = cheap;
+					m_packets = packets;
 					if (audio)
-						m_frames = cheap;
+						m_frames = audioFrames;
 				}
 				break;
 			case Producer::Encoder:
@@ -278,28 +282,28 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 					// Raw in = lookahead. Encoded out is cheap; keep it on the
 					// remux budget so the muxer does not buffer a second of
 					// compressed video while waiting on other tracks.
-					m_frames = VideoFrames(*plan);
-					m_packets = remux;
+					m_frames = videoFrames;
+					m_packets = packets;
 				}
 				else {
-					m_packets = remux;
+					m_packets = packets;
 					if (audio)
-						m_frames = cheap;
+						m_frames = audioFrames;
 				}
 				break;
 			case Producer::Remuxer:
-				m_packets = remux;
+				m_packets = packets;
 				break;
 			case Producer::Muxer:
-				m_packets = remux;
+				m_packets = packets;
 				break;
 			case Producer::Filter:
 				if (!encode)
 					break;
 				if (video)
-					m_frames = VideoFrames(*plan);
+					m_frames = videoFrames;
 				else
-					m_packets = cheap;
+					m_packets = audio ? audioFrames : packets;
 				break;
 			case Producer::Filters:
 			case Producer::Route:

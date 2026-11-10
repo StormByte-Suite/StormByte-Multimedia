@@ -276,8 +276,7 @@ Decoder& StormByte::Multimedia::Pipeline::operator>>(Demuxer& demuxer, Decoder& 
 	decoder.AttachOrigin(demuxer);
 	demuxer.pipe().CloneTo(decoder.Index(), decoder.pipe());
 	demuxer.pipe().Drain();
-	if (const std::size_t cap = decoder.InputCeiling(); cap > 0)
-		decoder.pipe().Capacity(decoder.Index(), cap);
+	decoder.pipe().Capacity(decoder.Index(), decoder.InputCeiling());
 	demuxer.Log(Level::Debug, StormByte::Safe::String::ReplaceToken("bind decoder t={}", decoder.Index()));
 	return decoder;
 } catch (const StormByte::Safe::AllocationError&) {

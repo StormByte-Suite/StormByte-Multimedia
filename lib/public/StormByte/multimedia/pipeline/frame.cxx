@@ -52,6 +52,9 @@
 #include <StormByte/multimedia/backend/pipeline/frame.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
 
+#include <algorithm>
+#include <cstdint>
+#include <limits>
 #include <utility>
 
 using namespace StormByte::Multimedia;
@@ -161,6 +164,27 @@ StormByte::Buffer::FIFO& Frame::Payload() noexcept {
 	}
 
 	return m_payload;
+}
+
+StormByte::ByteSize Frame::BufferingWeight() const noexcept {
+	std::uint64_t bytes = 0;
+	if (m_backend && m_backend->Handle()) {
+		const auto& raw = m_backend->Handle();
+		const int planes = std::clamp(raw.PlaneCount(), 0, 8);
+		for (int plane = 0; plane < planes; ++plane) {
+			const auto line = static_cast<std::int64_t>(raw.Linesize(plane));
+			const auto height = static_cast<std::uint64_t>(std::max(raw.PlaneHeight(plane), 0));
+			const auto row = static_cast<std::uint64_t>(line < 0 ? -line : line);
+			if (height != 0 && row > (std::numeric_limits<std::uint64_t>::max() - bytes) / height)
+				return StormByte::ByteSize{std::numeric_limits<std::uint64_t>::max()};
+			bytes += row * height;
+		}
+		if (raw.NbSamples() > 0 && raw.Linesize(0) > 0)
+			bytes = std::max(bytes, static_cast<std::uint64_t>(raw.Linesize(0)));
+	}
+	if (bytes == 0)
+		bytes = static_cast<std::size_t>(m_payload.Size());
+	return StormByte::ByteSize{std::max<std::uint64_t>(bytes, 1)};
 }
 
 void Frame::Bind(StormByte::Safe::Unique<Backend::Pipeline::Frame> backend) noexcept {

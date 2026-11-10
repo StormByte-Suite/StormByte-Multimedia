@@ -59,6 +59,7 @@
 #include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/pipeline/resource_usage.hxx>
+#include <StormByte/multimedia/pipeline/buffering.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/function.hxx>
@@ -580,6 +581,20 @@ namespace StormByte {
 								break;
 						}
 					}
+
+					/**
+					 * @brief Queue capacity policy shared with manually mounted pipelines.
+					 * @return The policy configured for this plan.
+					 */
+					const BufferingPolicy& Buffering() const noexcept;
+
+					/**
+					 * @brief Set queue capacity overrides before stages start.
+					 * @param policy Automatic, bounded, or unlimited queue element caps.
+					 * @return False when a bounded cap is below its functional minimum
+					 *         or the plan has already started.
+					 */
+					bool Buffering(const BufferingPolicy& policy) noexcept;
 
 					/**
 					 * @}

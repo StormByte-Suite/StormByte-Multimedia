@@ -64,6 +64,7 @@
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/progress.hxx>
 #include <StormByte/multimedia/pipeline/resource_usage.hxx>
+#include <StormByte/multimedia/pipeline/buffering.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/typedefs.hxx>
@@ -768,6 +769,21 @@ namespace StormByte {
 					 * drivers may use additional resources.
 					 */
 					void Resources(ResourceUsage usage) noexcept;
+
+					/**
+					 * @brief Queue capacity overrides used by the Plan built on Run.
+					 * @return Configured queue policy.
+					 */
+					BufferingPolicy Buffering() const noexcept;
+
+					/**
+					 * @brief Configure queue element caps before @ref Run.
+					 * @param policy Automatic, bounded, or unlimited caps.
+					 *
+					 * Invalid minima fail the Transcoder. This policy does not alter
+					 * CPU threading selected by @ref Resources.
+					 */
+					void Buffering(const BufferingPolicy& policy) noexcept;
 
 					/**
 					 * @brief Drops an origin stream (omit from the Plan).

@@ -295,6 +295,16 @@ namespace StormByte {
 					StormByte::Safe::Shared<const StageTelemetry> Telemetry() const;
 
 					/**
+					 * @brief Reads effective queue limits and logical-byte accounting.
+					 * @param track Input track key.
+					 * @return Coherent snapshot; Exists is false before the queue is wired.
+					 *
+					 * Read the requested policy from @ref Plan::Buffering. Snapshot
+					 * byte weights are logical estimates, not physical memory or RSS.
+					 */
+					StormByte::Buffer::QueueSnapshot QueueSnapshot(int track) const noexcept;
+
+					/**
 					 * @brief Whether this step can take work.
 					 *
 					 * By default, @ref Status must be State::Ready. Muxer also

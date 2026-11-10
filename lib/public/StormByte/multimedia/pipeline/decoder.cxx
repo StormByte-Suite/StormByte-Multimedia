@@ -141,8 +141,7 @@ bool Decoder::SetupPlan() noexcept try {
 			}
 		}
 		InheritSourceTags();
-		if (const std::size_t capacity = InputCeiling(); capacity > 0)
-			pipe().Capacity(m_index, capacity);
+		pipe().Capacity(m_index, InputCeiling());
 	}
 	catch (const std::exception& error) {
 		Fail(StormByte::Safe::String::ReplaceToken(

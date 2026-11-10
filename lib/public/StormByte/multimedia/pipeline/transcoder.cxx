@@ -560,6 +560,29 @@ void Transcoder::Resources(ResourceUsage usage) noexcept try {
 	Fail();
 }
 
+BufferingPolicy Transcoder::Buffering() const noexcept {
+	return m_backend ? m_backend->Buffering : BufferingPolicy{};
+}
+
+void Transcoder::Buffering(const BufferingPolicy& policy) noexcept try {
+	if (!m_backend)
+		return;
+	const auto current = m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire);
+	if (m_armed || current != Status::Stopped) {
+		Fail("buffering policy must be configured before Run");
+		return;
+	}
+	if (!policy.Valid()) {
+		Fail("buffering queue capacity is below its functional minimum");
+		return;
+	}
+	m_backend->Buffering = policy;
+} catch (const StormByte::Safe::AllocationError&) {
+	Fail();
+} catch (const std::bad_alloc&) {
+	Fail();
+}
+
 Transcoder::Track Transcoder::AddTrack(int in, Type kind) noexcept try {
 	JobLog(m_logger, Level::LowLevel, "add-track in=" + std::to_string(in));
 	if (!m_consult && !ProbeSource())

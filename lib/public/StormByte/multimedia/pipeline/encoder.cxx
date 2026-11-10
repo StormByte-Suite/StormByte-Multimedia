@@ -149,8 +149,7 @@ bool Encoder::SetupPlan() noexcept try {
 			return false;
 	}
 
-	if (const std::size_t capacity = InputCeiling(); capacity > 0)
-		pipe().Capacity(track.In(), capacity);
+	pipe().Capacity(track.In(), InputCeiling());
 	return Backend::Pipeline::Encoder::PrepareForMux(*this);
 } catch (const StormByte::Safe::AllocationError&) {
 	Fail();

@@ -170,6 +170,47 @@ namespace {
 		}
 		return 0;
 	}
+
+	int test_buffering_policy_overrides_are_independent() {
+		auto plan = StormByte::Safe::MakeShared<Plan>(
+			TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath("pipeline/buffering-policy-unused.mkv")), 2000000000LL);
+		plan->add(Track{0, StormByte::Multimedia::Type::Video});
+		plan->add(Track{1, StormByte::Multimedia::Type::Audio});
+
+		BufferingPolicy policy;
+		TEST_REQUIRE(policy.Valid());
+		policy.VideoFrames(QueueLimit::Bounded(6));
+		policy.AudioFrames(QueueLimit::Bounded(3));
+		policy.Packets(QueueLimit::Bounded(5));
+		policy.DemuxPending(QueueLimit::Bounded(2));
+		TEST_REQUIRE(policy.Valid());
+		TEST_REQUIRE(plan->Buffering(policy));
+
+		const auto& video = plan->Tracks()[0];
+		const auto& audio = plan->Tracks()[1];
+		const Ceiling decodedVideo{plan, Producer::Decoder, video};
+		TEST_REQUIRE(decodedVideo.Frames() == 6);
+		TEST_REQUIRE(decodedVideo.Packets() == 5);
+		const Ceiling decodedAudio{plan, Producer::Decoder, audio};
+		TEST_REQUIRE(decodedAudio.Frames() == 3);
+		TEST_REQUIRE(decodedAudio.Packets() == 5);
+		const Ceiling demux{plan, Producer::Demuxer, video};
+		TEST_REQUIRE(demux.Packets() == 5);
+		TEST_REQUIRE(demux.Park() == 2);
+
+		policy.VideoFrames(QueueLimit::Unlimited());
+		TEST_REQUIRE(policy.Valid());
+		TEST_REQUIRE(plan->Buffering(policy));
+		const Ceiling unlimitedVideo{plan, Producer::Decoder, video};
+		TEST_REQUIRE(unlimitedVideo.Frames() == 0);
+
+		policy.VideoFrames(QueueLimit::Bounded(1));
+		TEST_REQUIRE(!policy.Valid());
+		TEST_REQUIRE(!plan->Buffering(policy));
+		TEST_REQUIRE(plan->Buffering().VideoFrames().GetMode() == QueueLimit::Mode::Unlimited);
+		return 0;
+	}
 }
 
 int main(int argc, char** argv) {
@@ -177,6 +218,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_resource_budget_resolution_and_minima", test_resource_budget_resolution_and_minima},
 		TestEntry{"test_packet_ceilings_do_not_query_memory", test_packet_ceilings_do_not_query_memory},
 		TestEntry{"test_full_resources_keep_bounded_video_capacity", test_full_resources_keep_bounded_video_capacity},
+		TestEntry{"test_buffering_policy_overrides_are_independent", test_buffering_policy_overrides_are_independent},
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

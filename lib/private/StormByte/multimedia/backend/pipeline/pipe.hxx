@@ -52,6 +52,7 @@
 
 #include <StormByte/size.hxx>
 #include <StormByte/buffer/sink.hxx>
+#include <StormByte/multimedia/pipeline/buffering.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/condition_variable.hxx>
@@ -76,6 +77,23 @@
  * @ingroup multimedia_pipeline
  */
 namespace StormByte::Multimedia::Backend::Pipeline {
+	inline std::string_view QueueFailureReason(StormByte::Buffer::QueueStatus status) noexcept {
+		using enum StormByte::Buffer::QueueStatus;
+		switch (status) {
+			case Ok: return "unexpected queue admission success";
+			case WouldBlock: return "queue admission would block";
+			case TooLarge: return "queue item exceeds its configured limits";
+			case Closed: return "queue is closed";
+			case Cancelled: return "queue admission was cancelled";
+			case Timeout: return "queue admission timed out";
+			case Missing: return "queue track is not wired";
+			case Empty: return "queue item is empty";
+			case Error: return "queue storage allocation failed";
+			case Invalid: return "queue limits or budget are invalid";
+		}
+		return "unknown queue admission failure";
+	}
+
 	/**
 	 * @class Pipe
 	 * @brief Input and output hoppers of one stage.
@@ -214,6 +232,22 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 * the only cap. There is no out ceiling.
 			 */
 			void Capacity(int track, StormByte::Size n) noexcept;
+
+			/**
+			 * @brief Reads effective limits and accounting for one input track.
+			 */
+			StormByte::Buffer::QueueSnapshot Snapshot(int track) const noexcept;
+
+			/**
+			 * @brief Selects the policy used when newly wired input buckets are configured.
+			 */
+			void Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& policy) noexcept;
+
+			/**
+			 * @brief Installs the owner-local error path for an unadmittable item.
+			 */
+			void FailureHandler(void* owner,
+				void (*handler)(void*, StormByte::Buffer::QueueStatus) noexcept) noexcept;
 
 			/**
 			 * @brief Registers the owned consumer CV on In (Launch and Bind).
@@ -386,6 +420,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			friend Pipe& operator>>(Item::PointerType&& item, Pipe& pipe) noexcept;
 
 		private:
+			bool PushWeighted(ItemSink& sink, int track, Item::PointerType& item) noexcept;
+
 			StormByte::Safe::ConditionVariable m_wake;	///< Provider-owned consumer CV
 			StormByte::Safe::Mutex m_wait;				///< Mutex held through wait completion
 			StormByte::Safe::Atomic<std::size_t> m_wakeGeneration{0};	///< Published explicit control notifications
@@ -403,6 +439,10 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			bool m_closed = false;			///< Output and clone destinations have reached EOF.
 			bool m_measureInput = false;		///< Only measuring decoder branches receive first-pass packets.
 			StormByte::Safe::UnorderedSet<int> m_inTracks;	///< Keys already wired on In
+			StormByte::Safe::UnorderedSet<int> m_configuredTracks;	///< Buckets with limits and byte accounting.
+			StormByte::Multimedia::Pipeline::BufferingPolicy m_buffering;	///< Buffer limits and shared accounting.
+			void* m_failureOwner = nullptr;	///< Borrowed owner, valid through pipe shutdown.
+			void (*m_failureHandler)(void*, StormByte::Buffer::QueueStatus) noexcept = nullptr;	///< Queue admission error path.
 	};
 
 	/**

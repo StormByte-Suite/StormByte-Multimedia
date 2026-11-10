@@ -52,11 +52,19 @@
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
+#include <algorithm>
 #include <memory>
 #include <utility>
 
 using namespace StormByte::Multimedia;
 using namespace StormByte::Multimedia::Pipeline;
+
+StormByte::ByteSize Packet::BufferingWeight() const noexcept {
+	std::size_t bytes = static_cast<std::size_t>(Payload().Size());
+	if (m_backend && m_backend->Handle() && m_backend->Handle().Size() > 0)
+		bytes = std::max(bytes, static_cast<std::size_t>(m_backend->Handle().Size()));
+	return StormByte::ByteSize{std::max<std::size_t>(bytes, 1)};
+}
 
 Packet::Packet()
 : Item(-1, Type::Unknown, Kind::Packet, Producer::Demuxer),

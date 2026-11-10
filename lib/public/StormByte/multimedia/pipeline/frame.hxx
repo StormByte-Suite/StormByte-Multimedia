@@ -344,6 +344,15 @@ namespace StormByte {
 					}
 
 					/**
+					 * @brief Estimates the retained media payload weight for queue accounting.
+					 * @return Bytes from FFmpeg plane strides or the materialized payload.
+					 *
+					 * This is a logical estimate, not RSS or uniquely-owned physical
+					 * memory. Cloned frames may share the same FFmpeg planes.
+					 */
+					StormByte::ByteSize BufferingWeight() const noexcept;
+
+					/**
 					 * @}
 					 */
 

@@ -323,6 +323,13 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			StormByte::Safe::Shared<const Pipeline::StageTelemetry> Telemetry() const;
 
 			/**
+			 * @brief Reads effective queue limits and logical-byte accounting.
+			 * @param track Input track key.
+			 * @return Coherent snapshot; Exists is false before the queue is wired.
+			 */
+			StormByte::Buffer::QueueSnapshot QueueSnapshot(int track) const noexcept;
+
+			/**
 			 * @brief Leaf token used in reports (`vmaf`).
 			 * @return Constructor name, not `Media()/name`.
 			 */
@@ -743,6 +750,11 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 			 * @brief Eof on the Pipe.
 			 */
 			void CloseHoppers() noexcept;
+
+			/**
+			 * @brief Binds the job policy before the filter is wired.
+			 */
+			void BindPlan(StormByte::Safe::Shared<const Pipeline::Plan> plan) noexcept;
 
 			/**
 			 * @brief Records one timed @ref Process call.

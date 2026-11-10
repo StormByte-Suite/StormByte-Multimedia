@@ -338,7 +338,7 @@ bool Muxer::SetupPlan() noexcept try {
 		const Backend::Pipeline::Ceiling capacity{Plan(), Producer::Muxer, track};
 		const auto packets = capacity.Packets();
 		pipe().Capacity(encoder != m_connections->encoders.end() ? encoder->first : track.In(),
-			packets > 0 ? packets : StormByte::Size{8});
+			packets);
 		++slot;
 	}
 	if (!BindPlanAttachments() || Stopping() || Plan()->State() != Plan::State::Running)

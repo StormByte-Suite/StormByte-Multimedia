@@ -365,6 +365,11 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		return;
 	}
 	built->Resources(job.Resources());
+	if (built->State() == StormByte::Multimedia::Pipeline::Plan::State::Created
+		&& !built->Buffering(job.Buffering())) {
+		job.Fail("buffering policy could not be applied to the new plan");
+		return;
+	}
 	{
 		StormByte::Safe::UniqueLock lock(Lock);
 		job.m_plan = built;

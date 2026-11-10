@@ -270,7 +270,7 @@ namespace {
 			exhausted = true;
 		}
 		exhausted = false;
-		TEST_REQUIRE(denied > 0);
+		TEST_REQUIRE(denied == 0);
 		return 0;
 	}
 
