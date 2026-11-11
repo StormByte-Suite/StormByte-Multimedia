@@ -1215,23 +1215,35 @@ namespace {
 			const auto accounting = budget.Snapshot();
 			TEST_REQUIRE(accounting.Peak > StormByte::ByteSize{0} && accounting.Peak <= accounting.Limit);
 			TEST_REQUIRE(job.Status() == Status::Running);
-			bool empty_subtitle_waiting = false;
-			const auto live = retained->Topology();
+			const auto empty_subtitle_idle = [](const TopologySnapshot& snapshot) {
+				for (const auto& stage : snapshot.Stages) {
+					if (stage.Kind != TopologyStageKind::Remuxer || stage.Track != 3)
+						continue;
+					for (const auto& worker : stage.Activity.Workers)
+						if (worker.Available && worker.Role == ActivityRole::Main
+							&& (worker.State == ActivityState::WaitingInput || worker.State == ActivityState::Finished))
+							return true;
+				}
+				return false;
+			};
+			// Deep queues can reach input EOF before video pauses; allow the empty remuxer to finish.
+			auto live = retained->Topology();
+			while (!empty_subtitle_idle(live) && std::chrono::steady_clock::now() < deadline) {
+				std::this_thread::sleep_for(std::chrono::milliseconds{2});
+				live = retained->Topology();
+			}
+			TEST_REQUIRE(empty_subtitle_idle(live));
 			for (const auto& stage : live.Stages) {
 				TEST_REQUIRE(ActivityConserved(stage.Activity));
 				if (stage.Kind != TopologyStageKind::Remuxer || stage.Track != 3)
 					continue;
 				TEST_REQUIRE(stage.Activity.Available && stage.Activity.Complete);
-				for (const auto& worker : stage.Activity.Workers)
-					empty_subtitle_waiting = empty_subtitle_waiting
-						|| (worker.State == ActivityState::WaitingInput && worker.WaitingInput > std::chrono::nanoseconds{0});
 				for (const auto& ref : stage.Queues)
 					if (ref.Role == TopologyQueueRole::Input)
 						for (const auto& queue : live.Queues)
 							if (queue.Id == ref.Queue)
 								TEST_REQUIRE(queue.Snapshot.Elements == StormByte::Size{0});
 			}
-			TEST_REQUIRE(empty_subtitle_waiting);
 			if (paused) {
 				job.Pause();
 				TEST_REQUIRE(job.Status() == Status::Paused);
