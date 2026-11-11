@@ -50,6 +50,8 @@
 
 #include <StormByte/multimedia/backend/pipeline/transcoder.hxx>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
+#include <StormByte/multimedia/backend/pipeline/topology.hxx>
+#include <StormByte/multimedia/backend/pipeline/topology_access.hxx>
 #include <StormByte/multimedia/detail/locale.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/exception.hxx>
@@ -125,6 +127,72 @@ namespace {
 		auto name = metrics->Origin();
 		job.RegisterStage(std::move(name), std::move(metrics));
 	}
+
+	using StormByte::Multimedia::Pipeline::TopologyFilterKind;
+	using StormByte::Multimedia::Pipeline::TopologyStageKind;
+
+	using NamedStages = StormByte::Safe::Vector<StormByte::Multimedia::Pipeline::TelemetryStage>;
+
+	// Reuses the JobTelemetry::Stages display name for the same counters, else the origin.
+	StormByte::Safe::String StageName(const NamedStages& named,
+		const StormByte::Safe::Shared<const StormByte::Multimedia::Pipeline::StageTelemetry>& metrics) {
+		for (const auto& entry : named)
+			if (entry.Metrics.get() == metrics.get())
+				return entry.Name;
+		return metrics->Origin();
+	}
+
+	void DescribeStage(Topology& topology, const NamedStages& named, const StormByte::Multimedia::Pipeline::Step& stage,
+		TopologyStageKind kind, StormByte::Safe::Optional<int> track = {},
+		StormByte::Safe::Optional<int> output = {},
+		StormByte::Safe::Optional<enum StormByte::Multimedia::Type> media = {}) {
+		TopologyDescriptor descriptor;
+		descriptor.Kind = kind;
+		descriptor.Track = track;
+		descriptor.OutputTrack = output;
+		descriptor.Media = media;
+		descriptor.Metrics = stage.Telemetry();
+		descriptor.Name = StageName(named, descriptor.Metrics);
+		descriptor.Probe = TopologyAccess::Probe(stage);
+		topology.Register(std::move(descriptor));
+	}
+
+	void DescribeFilter(Topology& topology, const NamedStages& named,
+		const StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Filter::FFmpeg>& filter,
+		StormByte::Safe::Optional<int> track, StormByte::Safe::Optional<int> output,
+		StormByte::Safe::Optional<std::uint32_t> position) {
+		namespace Filter = StormByte::Multimedia::Pipeline::Filter;
+		if (!filter)
+			return;
+		TopologyDescriptor descriptor;
+		descriptor.Kind = TopologyStageKind::Filter;
+		if (dynamic_cast<const Filter::Analytics*>(filter.get()))
+			descriptor.Filter = TopologyFilterKind::Analytics;
+		else if (dynamic_cast<const Filter::Packet*>(filter.get()))
+			descriptor.Filter = TopologyFilterKind::Packet;
+		else if (dynamic_cast<const Filter::Process*>(filter.get()))
+			descriptor.Filter = TopologyFilterKind::Process;
+		else
+			descriptor.Filter = TopologyFilterKind::Other;
+		descriptor.Track = track;
+		descriptor.OutputTrack = output;
+		descriptor.Media = filter->Media();
+		descriptor.FilterPosition = position;
+		descriptor.FilterName = filter->Leaf();
+		descriptor.Metrics = filter->Telemetry();
+		descriptor.Name = StageName(named, descriptor.Metrics);
+		descriptor.Probe = TopologyAccess::Probe(*filter);
+		topology.Register(std::move(descriptor));
+	}
+
+	struct TopologyFreeze {
+		StormByte::Safe::Shared<Topology> Recorder;
+
+		~TopologyFreeze() noexcept {
+			if (Recorder)
+				Recorder->Freeze();
+		}
+	};
 
 	struct TelemetrySummary {
 		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::JobTelemetry> Metrics;
@@ -318,6 +386,15 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	NameThread("MM-Transcoder");
 	Metrics->SampleMemory();
 	TelemetrySummary summary{Metrics, job.Logger()};
+	// Declared before every stage owner: freezes after all stages are torn down.
+	TopologyFreeze topologyFreeze;
+	try {
+		topologyFreeze.Recorder = Metrics->TopologyRecorder();
+		topologyFreeze.Recorder->Reset();
+	}
+	catch (...) {
+		topologyFreeze.Recorder.reset();
+	}
 	const auto started = std::chrono::steady_clock::now();
 	JobLog(job.Logger(), Level::Notice, "running");
 	job.OnConfigure();
@@ -570,6 +647,49 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	const auto stages = graph.StageTelemetries();
 	for (auto stage : stages)
 		Metrics->RegisterStage(std::move(stage.Name), std::move(stage.Metrics));
+	// Topology is diagnostic only: an allocation failure leaves it partial, never fails the job.
+	if (topologyFreeze.Recorder) try {
+		auto& topology = *topologyFreeze.Recorder;
+		const auto named = Metrics->Stages();
+		DescribeStage(topology, named, *demux, TopologyStageKind::Demuxer);
+		struct Stretch {
+			int In;
+			int Out;
+			enum StormByte::Multimedia::Type Media;
+		};
+		std::vector<Stretch> stretches;
+		std::size_t laneIndex = 0;
+		std::size_t remuxIndex = 0;
+		int outputIndex = 0;
+		for (const auto& slot : Mapped) {
+			if (slot.Kind == StormByte::Multimedia::Type::Attachment)
+				continue;
+			const bool remuxed = LeafCodec(slot.Config.get()) == nullptr;
+			if (remuxed && remuxIndex < remuxes.size())
+				DescribeStage(topology, named, *remuxes[remuxIndex++], TopologyStageKind::Remuxer, slot.In, outputIndex, slot.Kind);
+			else if (!remuxed && laneIndex < lanes.size())
+				DescribeStage(topology, named, *lanes[laneIndex].Decoder, TopologyStageKind::Decoder, slot.In, outputIndex, slot.Kind);
+			std::uint32_t position = 0;
+			for (const auto& filter : slot.Filters)
+				DescribeFilter(topology, named, filter, slot.In, outputIndex, position++);
+			if (!remuxed && laneIndex < lanes.size())
+				DescribeStage(topology, named, *lanes[laneIndex++].Encoder, TopologyStageKind::Encoder, slot.In, outputIndex, slot.Kind);
+			stretches.push_back(Stretch{slot.In, outputIndex, slot.Kind});
+			++outputIndex;
+		}
+		for (const auto& filter : Analytics)
+			DescribeFilter(topology, named, filter, {}, {}, {});
+		for (const auto& look : TopologyAccess::Looks(graph)) {
+			if (look.Stretch < stretches.size())
+				DescribeStage(topology, named, *look.Decoder, TopologyStageKind::InspectionDecoder,
+					look.Track, stretches[look.Stretch].Out, stretches[look.Stretch].Media);
+			else
+				DescribeStage(topology, named, *look.Decoder, TopologyStageKind::InspectionDecoder, look.Track);
+		}
+		DescribeStage(topology, named, *mux, TopologyStageKind::Muxer);
+	}
+	catch (...) {
+	}
 	TickHooks(job, graph);
 	auto captureStageFailure = [&]() {
 		if (job.Failed())

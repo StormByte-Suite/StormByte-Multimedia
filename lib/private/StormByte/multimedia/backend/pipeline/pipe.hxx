@@ -52,6 +52,7 @@
 
 #include <StormByte/size.hxx>
 #include <StormByte/buffer/sink.hxx>
+#include <StormByte/multimedia/backend/pipeline/queue_probe.hxx>
 #include <StormByte/multimedia/pipeline/buffering.hxx>
 #include <StormByte/multimedia/pipeline/item.hxx>
 #include <StormByte/safe/atomic.hxx>
@@ -248,6 +249,12 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				StormByte::Size ceiling = StormByte::Size{0}) noexcept;
 
 			/**
+			 * @brief Telemetry probe of this pipe's input queues.
+			 * @return Shared probe; it outlives the pipe and never keeps it alive.
+			 */
+			const StormByte::Safe::Shared<QueueProbe>& Probe() const noexcept { return m_probe; }
+
+			/**
 			 * @brief Installs the owner-local error path for an unadmittable item.
 			 */
 			void FailureHandler(void* owner,
@@ -439,6 +446,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Safe::Atomic<std::size_t> m_wakeGeneration{0};	///< Published explicit control notifications
 			ItemSink m_in;						///< Input buckets
 			ItemSink m_out;						///< Output buckets
+			StormByte::Safe::Shared<QueueProbe> m_probe;	///< Topology telemetry view of m_in.
 
 			/**
 			 * @brief Track-specific clone destination.

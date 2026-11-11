@@ -103,6 +103,7 @@ namespace StormByte::Multimedia::Pipeline {
 	 */
 	class STORMBYTE_MULTIMEDIA_PRIVATE Route {
 		friend class Filters;
+		friend class StormByte::Multimedia::Backend::Pipeline::TopologyAccess;
 
 		public:
 			/**

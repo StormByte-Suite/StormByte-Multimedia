@@ -307,6 +307,33 @@ Show `Main` as the transcode bar, with measure/analytics separately when present
 
 After `Done`, `Reports()` contains analytics results. Capture `Telemetry()` before running if the final snapshot must outlive the job. It retains stage counts, setup/processing/wait times and sampled memory. Memory minimum/current/peak are **process-wide RSS**, not stage allocations; sampling can miss short peaks.
 
+#### Pipeline topology and queue telemetry
+
+`Telemetry()->Topology()` returns an owned `TopologySnapshot` of the real stages and `StormByte::Buffer` queues of the latest run. It is thread-safe while running, paused, after cancel/failure and after the `Transcoder` was destroyed; the snapshot keeps no stage alive and holds no raw pointers.
+
+```cpp
+auto telemetry = job.Telemetry();               // retain before or during Run()
+const auto topo = telemetry->Topology();
+for (const auto& stage : topo.Stages)
+	if (stage.Kind == StormByte::Multimedia::Pipeline::TopologyStageKind::Filter && stage.FilterPosition)
+		std::cout << "filter #" << *stage.FilterPosition << " on track " << stage.Track.value_or(-1) << '\n';
+for (const auto& queue : topo.Queues) {
+	const auto& q = queue.Snapshot;              // Buffer::QueueSnapshot
+	const bool unlimited = !q.Limits.ElementsLimited();   // limited with Elements() == 0 is a zero cap
+	std::cout << "queue " << queue.Id << (q.Exists ? "" : " absent") << (unlimited ? " unlimited" : "")
+		<< " waits=" << q.Waits << (q.Closed ? " closed" : "") << '\n';
+}
+for (const auto& budget : topo.Budgets)         // Buffer::BudgetSnapshot, once per shared budget
+	std::cout << "budget " << budget.Id << " charged by " << budget.Queues.size() << " queues\n";
+```
+
+- **Stages** carry `Kind` (demuxer, decoder, filter, encoder, remuxer, muxer, inspection decoder), `Filter` family, source `Track`, `OutputTrack`, `Media`, `FilterPosition` within the track filter list, `FilterName`, `Order` (longest producer hop count, ties by `Sequence`) and `Queues` references with role `Input`, `Output` or `Pending`. Use these fields, never the display `Name`.
+- **Queues** appear once even when several producers share them (`Producers` lists them all). `Kind` is `Pipe` (Buffer::Sink hopper) or `DemuxPending` (demuxer park list: elements only, `BytesAccounted == false`). `Snapshot.Exists == false` means the key is not present (yet), not empty. Absent `Limits` means unlimited; an engaged limit of 0 is a zero cap. Input–output relations come only from registered wiring, not inferred.
+- **Budgets** are listed once per shared `ByteBudget` (`Id` is stable across reads and after the run); each queue names its `Budget`.
+- `State` is `Live` while stages exist and `Final` after teardown: final values never change. Right after `Status::Done` the run may still be finishing and report `Live`.
+- Bytes are logical admission weights, not RSS. Counters are per queue and per budget in their own units; do not derive a batch average. A full queue or pressure/waits are normal backpressure, not an error. Different queues are read one after another, so a snapshot is not an atomic cut across queues.
+- Encoder/muxer-internal codec buffers are not `Buffer` queues and are not reported.
+
 Construction, graph attachment, owning metadata access and report snapshots may
 throw `StormByte::Safe::AllocationError` or `std::bad_alloc`; they do not promise
 allocation-free operation. Worker lifecycle callbacks retain their `noexcept`

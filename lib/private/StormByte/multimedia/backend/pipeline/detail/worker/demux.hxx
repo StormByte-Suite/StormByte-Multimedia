@@ -51,6 +51,7 @@
 #pragma once
 
 #include <StormByte/size.hxx>
+#include <StormByte/multimedia/backend/pipeline/queue_probe.hxx>
 #include <StormByte/multimedia/backend/pipeline/worker.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -228,6 +229,7 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			mutable StormByte::Safe::Mutex m_parkMutex;	///< Guards @ref m_park.
 			StormByte::Safe::ConditionVariable m_parkCv;	///< Read / feeder rendezvous.
 			StormByte::Safe::Atomic<bool> m_feedStop{false};	///< Feeder halt.
+			StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::QueueProbe> m_probe;	///< Pending-list telemetry shared with the demuxer pipe.
 			std::uint32_t m_feeding = 0;	///< Packets popped from a park but still in Emit; guarded by @ref m_parkMutex.
 			StormByte::Safe::Vector<int> m_subtitles;	///< Encoded subtitle source tracks receiving ordered watermarks.
 			StormByte::Safe::Optional<std::int64_t> m_subtitleBoundary;

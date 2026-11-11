@@ -80,6 +80,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 * @brief Backend coordinator for transcoding jobs.
 	 */
 	class Transcoder;
+
+	/**
+	 * @brief Provider-local reader of filter routes for job topology telemetry.
+	 */
+	class TopologyAccess;
 }
 
 /**
@@ -364,6 +369,11 @@ namespace StormByte {
 					 * @brief Allows the backend coordinator to update analytics completion.
 					 */
 					friend class StormByte::Multimedia::Backend::Pipeline::Transcoder;
+
+					/**
+					 * @brief Reads route-owned inspection decoders for topology telemetry.
+					 */
+					friend class StormByte::Multimedia::Backend::Pipeline::TopologyAccess;
 
 					/**
 					 * @brief Stops all routes before joining filters and look decoders.

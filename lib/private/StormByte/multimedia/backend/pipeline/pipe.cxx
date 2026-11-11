@@ -76,9 +76,12 @@ namespace {
 	}
 }
 
-Pipe::Pipe() = default;
+Pipe::Pipe()
+:	m_probe(StormByte::Safe::Shared<QueueProbe>::MakePointer<QueueProbe>(m_in)) {}
 
 Pipe::~Pipe() noexcept {
+	// Freeze telemetry before any hopper can disappear.
+	m_probe->Detach();
 	m_in.Unnotify();
 	m_out.Unnotify();
 	for (auto& fork : m_forks)
@@ -133,6 +136,7 @@ void Pipe::Capacity(int track, StormByte::Size n) noexcept {
 	else {
 		status = m_in.Configure(track, limits, m_buffering.Budget());
 		if (status == StormByte::Buffer::QueueStatus::Ok) {
+			m_probe->Budget(track, m_buffering.Budget());
 			try {
 				m_configuredTracks.insert(track);
 			} catch (const StormByte::Safe::AllocationError&) {
@@ -171,6 +175,7 @@ void Pipe::Buffering(const StormByte::Multimedia::Pipeline::BufferingPolicy& pol
 				m_in.Abort();
 			return;
 		}
+		m_probe->Budget(track, policy.Budget());
 	}
 }
 
@@ -283,6 +288,7 @@ Pipe& Pipe::CloneTo(int track, Pipe& dest, int output) {
 	auto hopper = StormByte::Safe::Shared<ItemSink>::MakePointer<ItemSink>();
 	if (!dest.BindInput(output, *hopper))
 		return dest;
+	dest.m_probe->Producer(output, m_probe->Id());
 	StormByte::Safe::UniqueLock lock(m_forkMutex);
 	if (m_forkDestinations.contains({track, &dest, output}))
 		return dest;
@@ -320,6 +326,9 @@ bool Pipe::RedirectCloneTo(int track, Pipe& previous, Pipe& dest) {
 		hopper->Eof();
 	m_forks[index].second = std::move(hopper);
 	m_forkDestinations.erase(found);
+	lock.unlock();
+	dest.m_probe->Producer(track, m_probe->Id());
+	previous.m_probe->RemoveProducer(track, m_probe->Id());
 	return true;
 }
 
@@ -344,13 +353,16 @@ Pipe::Lane Pipe::To(int track) noexcept {
 
 Pipe& Pipe::Lane::operator>>(Pipe& dest) {
 	dest.Listen();
-	dest.BindInput(m_track, m_from->m_out);
+	if (dest.BindInput(m_track, m_from->m_out))
+		dest.m_probe->Producer(m_track, m_from->m_probe->Id());
 	return dest;
 }
 
 Pipe& Pipe::operator>>(Pipe& dest) {
 	dest.Listen();
 	m_out >> dest.m_in;
+	for (const int track : m_out.Keys())
+		dest.m_probe->Producer(track, m_probe->Id());
 	return dest;
 }
 

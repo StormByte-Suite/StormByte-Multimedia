@@ -92,6 +92,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 * @brief Stage execution body.
 	 */
 	class Worker;
+
+	/**
+	 * @brief Provider-local reader of stage queue probes for job topology telemetry.
+	 */
+	class TopologyAccess;
 }
 
 /**
@@ -646,6 +651,11 @@ namespace StormByte {
 					 * @brief Allows filter configuration to access step internals.
 					 */
 					friend class Filters;
+
+					/**
+					 * @brief Allows topology telemetry to read the queue probe.
+					 */
+					friend class Backend::Pipeline::TopologyAccess;
 
 					/**
 					 * @brief Connects a demultiplexing stage to a decoding stage.

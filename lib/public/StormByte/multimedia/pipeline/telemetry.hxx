@@ -50,7 +50,9 @@
 
 #pragma once
 
+#include <StormByte/buffer/byte_budget.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
+#include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
 #include <StormByte/safe/atomic.hxx>
 #include <StormByte/safe/mutex.hxx>
@@ -63,6 +65,22 @@
 #include <chrono>
 #include <cstdint>
 #include <string_view>
+
+/**
+ * @namespace StormByte::Multimedia::Backend::Pipeline
+ * @brief Multimedia-owned pipeline stages and unit holders.
+ */
+namespace StormByte::Multimedia::Backend::Pipeline {
+	/**
+	 * @brief Provider-owned stage and queue topology of one job.
+	 */
+	class Topology;
+
+	/**
+	 * @brief Backend coordinator for transcoding jobs.
+	 */
+	class Transcoder;
+}
 
 /**
  * @namespace StormByte
@@ -338,12 +356,173 @@ namespace StormByte {
 
 				StormByte::Safe::Shared<const StageTelemetry> Metrics;	///< Shared stage counter handle retained across DLL boundaries.
 			};
+
+			/**
+			 * @enum TopologyStageKind
+			 * @brief Kind of real pipeline stage reported by @ref JobTelemetry::Topology.
+			 */
+			enum class STORMBYTE_MULTIMEDIA_PUBLIC TopologyStageKind: std::uint8_t {
+				Demuxer,			///< Container reader; owns the demux pending queues.
+				Decoder,			///< Track decoder feeding a decode/encode lane.
+				Filter,				///< User or built-in filter leaf (see @ref TopologyFilterKind).
+				Encoder,			///< Track encoder feeding the muxer.
+				Remuxer,			///< Stream-copy stage feeding the muxer.
+				Muxer,				///< Container writer.
+				InspectionDecoder	///< Internal decoder created only to feed analytics filters.
+			};
+
+			/**
+			 * @enum TopologyFilterKind
+			 * @brief Filter family of a @ref TopologyStageKind::Filter stage.
+			 */
+			enum class STORMBYTE_MULTIMEDIA_PUBLIC TopologyFilterKind: std::uint8_t {
+				None,		///< Stage is not a filter.
+				Process,	///< Frame-processing filter (Filter::Process and derived).
+				Packet,		///< Packet filter (Filter::Packet and derived).
+				Analytics,	///< Observing analytics filter (Filter::Analytics and derived).
+				Other		///< Filter of another family.
+			};
+
+			/**
+			 * @enum TopologyQueueRole
+			 * @brief Relation between a stage and one queue.
+			 */
+			enum class STORMBYTE_MULTIMEDIA_PUBLIC TopologyQueueRole: std::uint8_t {
+				Input,		///< The stage consumes this queue.
+				Output,		///< The stage is a registered producer of this queue.
+				Pending		///< Stage-owned pending queue (demux park) before its output queues.
+			};
+
+			/**
+			 * @enum TopologyQueueKind
+			 * @brief Storage that backs a @ref TopologyQueue.
+			 */
+			enum class STORMBYTE_MULTIMEDIA_PUBLIC TopologyQueueKind: std::uint8_t {
+				Pipe,			///< Buffer::Sink hopper owned by its consumer stage.
+				DemuxPending	///< Demuxer per-track pending list; elements only, no byte accounting.
+			};
+
+			/**
+			 * @enum TopologySnapshotState
+			 * @brief Whether values are read live or are frozen copies.
+			 */
+			enum class STORMBYTE_MULTIMEDIA_PUBLIC TopologySnapshotState: std::uint8_t {
+				Live,	///< Read from the running queue or budget when the snapshot was taken.
+				Final	///< Captured when the owning stage or job run was torn down; never changes again.
+			};
+
+			/**
+			 * @struct TopologyQueueRef
+			 * @brief Stage-to-queue link in a topology snapshot.
+			 */
+			struct TopologyQueueRef {
+				std::uint64_t Queue = 0;									///< @ref TopologyQueue::Id.
+				TopologyQueueRole Role = TopologyQueueRole::Input;			///< Stage relation to that queue.
+			};
+
+		}
+	}
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TopologyQueueRef);
+
+namespace StormByte {
+	namespace Multimedia {
+		namespace Pipeline {
+			/**
+			 * @struct TopologyStage
+			 * @brief Structured identity of one real pipeline stage.
+			 *
+			 * GUI code should use these fields rather than parse @ref Name.
+			 * Absent optionals mean "not applicable" (for example the demuxer
+			 * has no track and global analytics have no filter position).
+			 */
+			struct TopologyStage {
+				std::uint64_t Id = 0;													///< Stable stage id, unique in the process.
+				TopologyStageKind Kind = TopologyStageKind::Demuxer;					///< Stage kind.
+				TopologyFilterKind Filter = TopologyFilterKind::None;					///< Filter family; None unless Kind is Filter.
+				StormByte::Safe::Optional<int> Track;									///< Input (source) track index.
+				StormByte::Safe::Optional<int> OutputTrack;								///< Output (muxer) track index.
+				StormByte::Safe::Optional<enum StormByte::Multimedia::Type> Media;	///< Media handled; absent for multi-track stages.
+				StormByte::Safe::Optional<std::uint32_t> FilterPosition;				///< Zero-based position in the track filter list.
+				StormByte::Safe::String FilterName;										///< Filter constructor name; empty when not a filter.
+				StormByte::Safe::String Name;											///< @ref JobTelemetry::Stages name for the same counters; origin label for stages not listed there.
+				std::uint32_t Order = 0;												///< Longest producer hop count from a source stage.
+				std::uint32_t Sequence = 0;												///< Registration order within the run.
+				StormByte::Safe::Shared<const StageTelemetry> Metrics;					///< Shared stage counters.
+				StormByte::Safe::Vector<TopologyQueueRef> Queues;						///< Inputs, outputs and pending queues of this stage.
+			};
+
+			/**
+			 * @struct TopologyQueue
+			 * @brief One real queue and its Buffer accounting.
+			 *
+			 * Each queue appears once even when several producers share it.
+			 * `Snapshot.Exists == false` marks a key known to the topology
+			 * that is not (or no longer) wired. Unlimited bounds have
+			 * `Limits.ElementsLimited()` / `Limits.BytesLimited()` false; an
+			 * engaged bound equal to zero is a real zero cap.
+			 */
+			struct TopologyQueue {
+				std::uint64_t Id = 0;													///< Stable queue id, unique in the process.
+				TopologyQueueKind Kind = TopologyQueueKind::Pipe;						///< Backing storage.
+				int Key = 0;															///< Hopper key in the consumer (track index for pending queues).
+				StormByte::Safe::Optional<std::uint64_t> Consumer;						///< Consumer stage id; for pending queues the owning demuxer.
+				StormByte::Safe::Vector<std::uint64_t> Producers;						///< Registered producer stage ids.
+				StormByte::Safe::Optional<std::uint64_t> Budget;						///< @ref TopologyBudget::Id charged by this queue, if any.
+				bool BytesAccounted = true;												///< False when the queue never accounts bytes.
+				TopologySnapshotState State = TopologySnapshotState::Live;				///< Live or final reading.
+				StormByte::Safe::Optional<enum StormByte::Multimedia::Type> Media;	///< Media carried, when known.
+				StormByte::Buffer::QueueSnapshot Snapshot;								///< Limits, occupancy, peaks, pressure, waits, Closed and Exists.
+			};
+
+			/**
+			 * @struct TopologyBudget
+			 * @brief Shared byte budget reported once for every queue that charges it.
+			 */
+			struct TopologyBudget {
+				std::uint64_t Id = 0;											///< Stable identity; equal ids mean the same shared budget.
+				TopologySnapshotState State = TopologySnapshotState::Live;		///< Live or final reading.
+				StormByte::Safe::Vector<std::uint64_t> Queues;					///< Queue ids charging this budget in this snapshot.
+				StormByte::Buffer::BudgetSnapshot Snapshot;						///< Aggregate reservation counters.
+			};
+
+		}
+	}
+}
+
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TopologyStage);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TopologyQueue);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TopologyBudget);
+
+namespace StormByte {
+	namespace Multimedia {
+		namespace Pipeline {
+			/**
+			 * @struct TopologySnapshot
+			 * @brief Owned, coherent-per-queue view of the pipeline stages and queues.
+			 *
+			 * Different queues are read one after another, not atomically as a
+			 * group. Values are Buffer accounting: bytes are logical caller
+			 * weights, not resident memory; a full queue is normal backpressure,
+			 * not an error. Elements and bytes are independent units; no
+			 * batch size or per-item average is implied.
+			 */
+			struct TopologySnapshot {
+				bool Available = false;												///< False before a run registered its topology.
+				TopologySnapshotState State = TopologySnapshotState::Live;			///< Final once the run tore its stages down.
+				std::uint64_t Run = 0;												///< Run generation; increases on each registration reset.
+				StormByte::Safe::Vector<TopologyStage> Stages;						///< Stages in pipeline order, then registration order.
+				StormByte::Safe::Vector<TopologyQueue> Queues;						///< Unique queues.
+				StormByte::Safe::Vector<TopologyBudget> Budgets;					///< Unique budgets.
+			};
 		}
 	}
 }
 
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::StageTelemetry);
 STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TelemetryStage);
+STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Pipeline::TopologySnapshot);
 
 /**
  * @namespace StormByte
@@ -373,6 +552,9 @@ namespace StormByte {
 			 * job is running. It is not attributed to individual stages.
 			 * Stage registration and owned snapshots, including engaged memory
 			 * optionals, may allocate and propagate allocation failures.
+			 *
+			 * @ref Topology exposes the stages and Buffer queues of the latest
+			 * run, live while it runs and final after teardown.
 			 *
 			 * @par DLL boundary
 			 * Owned values use Safe storage and destruction is provider-local.
@@ -411,6 +593,21 @@ namespace StormByte {
 					 * @return Owned list of names and shared metric handles.
 					 */
 					StormByte::Safe::Vector<Stage> Stages() const;
+
+					/**
+					 * @brief Snapshot the real stages, queues and shared budgets of the job.
+					 *
+					 * Thread-safe and usable while the job runs, is paused, after
+					 * cancellation or failure, and after the Transcoder was destroyed
+					 * (the returned handle of Transcoder::Telemetry() is enough).
+					 * The snapshot owns no stage and no queue: live readings go through
+					 * provider-owned probes that freeze to final values when their
+					 * stage is destroyed, and the whole topology becomes
+					 * @ref TopologySnapshotState::Final when the run ends.
+					 * @return Owned topology; `Available` is false before a run registers it.
+					 * @throw Safe::AllocationError or std::bad_alloc when owned storage cannot be allocated.
+					 */
+					TopologySnapshot Topology() const;
 
 					/**
 					 * @brief Sample current process resident memory.
@@ -456,7 +653,17 @@ namespace StormByte {
 					operator StormByte::Safe::String() const override;
 
 				private:
-					mutable StormByte::Safe::Mutex m_stages_lock;	///< Protects registered stage list.
+					friend class StormByte::Multimedia::Backend::Pipeline::Transcoder;
+
+					/**
+					 * @brief Provider-owned topology recorder, created on first use.
+					 * @return Shared recorder.
+					 */
+					StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> TopologyRecorder();
+
+					mutable StormByte::Safe::Mutex m_stages_lock;	///< Protects registered stage list and topology owner.
+
+					StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> m_topology;	///< Provider-owned topology recorder.
 
 					StormByte::Safe::Vector<Stage> m_stages;		///< Safe-owned registered stage snapshots.
 

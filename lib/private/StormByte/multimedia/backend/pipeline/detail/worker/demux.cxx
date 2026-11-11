@@ -93,7 +93,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 	Demux::Demux(Demuxer& owner)
 	:	StormByte::Multimedia::Backend::Pipeline::Worker(owner.Face()),
-		m_owner(owner) {}
+		m_owner(owner),
+		m_probe(owner.pipe().Probe()) {}
 
 	Demux::~Demux() noexcept {
 		StopFeed();
@@ -108,6 +109,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			m_feedStop.store(true, StormByte::Safe::MemoryOrder::Release);
 			if (cancelPending)
 				m_park.clear();
+			m_probe->PendingClose(cancelPending);
 		}
 		m_parkCv.notify_all();
 		for (auto& feeder : m_feeds)
@@ -159,6 +161,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 					continue;
 				packet = std::move(m_park[track].front());
 				m_park[track].pop_front();
+				m_probe->PendingSize(track, m_park[track].size());
 				++m_feeding;
 			}
 			m_parkCv.notify_all();
@@ -213,6 +216,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 				m_subtitles.push_back(track->In());
 		}
 		m_feedStop.store(false, StormByte::Safe::MemoryOrder::Release);
+		m_probe->PendingReopen();
 		std::string_view path{m_owner.Origin().Path()};
 		if (path.size() > 4096)
 			path = std::string_view{path.data(), 4096};
@@ -299,13 +303,22 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		{
 			StormByte::Safe::UniqueLock lock(m_parkMutex);
 			EnsureFeed(track);
-			m_parkCv.wait(lock, [this, track, ceiling]() {
+			m_probe->PendingOpen(track, ceiling);
+			auto admissible = [this, track, ceiling]() {
 				return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
 					|| ceiling == 0 || m_park[track].size() < ceiling;
-			});
+			};
+			if (!admissible()) {
+				m_probe->PendingPressure(track);
+				const auto waitStarted = std::chrono::steady_clock::now();
+				m_parkCv.wait(lock, admissible);
+				m_probe->PendingWait(track, std::chrono::duration_cast<std::chrono::nanoseconds>(
+					std::chrono::steady_clock::now() - waitStarted).count());
+			}
 			if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire))
 				return;
 			m_park[track].push_back(std::move(packet));
+			m_probe->PendingSize(track, m_park[track].size());
 		}
 		m_parkCv.notify_all();
 	} catch (const StormByte::Safe::AllocationError&) {

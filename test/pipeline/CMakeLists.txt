@@ -31,6 +31,7 @@ add_pipeline_test(MultimediaPipelineCeilingTests test_buffering_policy_overrides
 
 add_executable(MultimediaPipelinePipeTests pipe_test.cxx
 	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/pipe.cxx"
+	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/queue_probe.cxx"
 	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/backend/pipeline/packet.cxx"
 	"${PROJECT_SOURCE_DIR}/lib/private/StormByte/multimedia/ffmpeg/AVCodecParameters.cxx")
 target_include_directories(MultimediaPipelinePipeTests PRIVATE "${PROJECT_SOURCE_DIR}/lib/private")
@@ -41,6 +42,10 @@ add_pipeline_test(MultimediaPipelinePipeTests test_clone_accounting_precedes_fir
 add_pipeline_test(MultimediaPipelinePipeTests test_plan_policy_configures_already_wired_inputs)
 add_pipeline_test(MultimediaPipelinePipeTests test_redirected_clone_configures_destination)
 add_pipeline_test(MultimediaPipelinePipeTests test_shared_writers_keep_budget_and_eof)
+add_pipeline_test(MultimediaPipelinePipeTests test_probe_distinguishes_absent_empty_unlimited_zero_and_closed)
+add_pipeline_test(MultimediaPipelinePipeTests test_probe_keeps_final_snapshot_after_pipe_destruction)
+add_pipeline_test(MultimediaPipelinePipeTests test_probe_budget_identity_deduplicates_shared_budgets)
+add_pipeline_test(MultimediaPipelinePipeTests test_probe_pending_counters_and_close)
 
 add_subdirectory(remux)
 add_subdirectory(analytics)
@@ -62,3 +67,4 @@ add_subdirectory(filters)
 add_subdirectory(mp4_policy)
 add_subdirectory(interleave)
 add_subdirectory(metadata_edit)
+add_subdirectory(topology)

@@ -65,6 +65,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	class Pipe;
 	class Pumper;
 	class Worker;
+	class TopologyAccess;
 }
 
 namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
@@ -262,6 +263,7 @@ namespace StormByte::Multimedia::Pipeline::Filter {
 		friend class StormByte::Multimedia::Pipeline::Route;
 		friend class StormByte::Multimedia::Backend::Pipeline::Detail::Worker::Filter;
 		friend class ProcessTwoPasses;
+		friend class StormByte::Multimedia::Backend::Pipeline::TopologyAccess;
 
 		public:
 			/**

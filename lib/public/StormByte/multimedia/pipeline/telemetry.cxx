@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/topology.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/unique_lock.hxx>
@@ -360,6 +361,25 @@ void JobTelemetry::RegisterStage(StormByte::Safe::String name,
 		return;
 	metrics->SetOrigin(static_cast<std::string_view>(name));
 	m_stages.push_back(Stage{std::move(name), std::move(metrics)});
+}
+
+StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> JobTelemetry::TopologyRecorder() {
+	StormByte::Safe::UniqueLock lock(m_stages_lock);
+	if (!m_topology)
+		m_topology = StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology>::MakePointer<
+			StormByte::Multimedia::Backend::Pipeline::Topology>();
+	return m_topology;
+}
+
+TopologySnapshot JobTelemetry::Topology() const {
+	StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> topology;
+	{
+		StormByte::Safe::UniqueLock lock(m_stages_lock);
+		topology = m_topology;
+	}
+	if (!topology)
+		return {};
+	return topology->Snapshot();
 }
 
 StormByte::Safe::Vector<JobTelemetry::Stage> JobTelemetry::Stages() const {
