@@ -291,8 +291,13 @@ namespace {
 		exhausted = true;
 		job.Cancel();
 		exhausted = false;
-		TEST_REQUIRE(denied > 0);
-		TEST_REQUIRE(job.Plan()->State() == Pipeline::Plan::State::Failed);
+		TEST_REQUIRE(denied == 0);
+		TEST_REQUIRE(job.Plan()->State() == Pipeline::Plan::State::Aborted);
+		while (job.Status() != Pipeline::Status::Aborted && job.Status() != Pipeline::Status::Error
+			&& std::chrono::steady_clock::now() < deadline)
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		TEST_REQUIRE(job.Status() == Pipeline::Status::Aborted);
+		TEST_REQUIRE(!job.Error());
 		return 0;
 	}
 

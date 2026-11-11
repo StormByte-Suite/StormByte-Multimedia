@@ -830,7 +830,8 @@ namespace StormByte {
 					void Run() noexcept;
 
 					/**
-					 * @brief Requests abort. Coordinator ends in Status::Aborted.
+					 * @brief Requests abort. Coordinator ends in Status::Aborted unless a genuine failure occurs.
+					 * @note Cancellation wakes paused stages and joins in-flight work before OnAborted.
 					 */
 					void Cancel() noexcept;
 

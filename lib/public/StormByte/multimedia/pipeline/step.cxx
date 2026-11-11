@@ -203,7 +203,13 @@ class Step::PrivateState {
 		explicit PrivateState(Step& owner)
 		:	surface(owner) {
 			pipe.FailureHandler(&owner, [](void* context, StormByte::Buffer::QueueStatus status) noexcept {
-				static_cast<Step*>(context)->Fail(Backend::Pipeline::QueueFailureReason(status));
+				auto& step = *static_cast<Step*>(context);
+				if (status == StormByte::Buffer::QueueStatus::Closed) {
+					const auto plan = step.Plan();
+					if (step.Stopping() || (plan && plan->State() == Plan::State::Failed))
+						return;
+				}
+				step.Fail(Backend::Pipeline::QueueFailureReason(status));
 			});
 		}
 
@@ -501,7 +507,10 @@ StormByte::Size Step::InputCeiling() const noexcept {
 
 bool Step::Stopping() const noexcept {
 	const State state = Status();
-	return state == State::Stopping || state == State::Stopped || state == State::Failed;
+	if (state == State::Stopping || state == State::Stopped || state == State::Failed)
+		return true;
+	const auto plan = Plan();
+	return plan && plan->State() == Plan::State::Aborted;
 }
 
 StormByte::Safe::Optional<StormByte::Safe::String> Step::Error() const {

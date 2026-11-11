@@ -283,12 +283,6 @@ void Transcoder::RequestCancel() noexcept {
 	PauseCv.notify_all();
 }
 
-void Transcoder::Hold(StormByte::Multimedia::Pipeline::Transcoder& job, bool held) noexcept {
-	StormByte::Safe::UniqueLock lock(Lock);
-	if (job.m_plan)
-		job.m_plan->Hold(held);
-}
-
 void Transcoder::Join() noexcept {
 	if (m_worker.joinable())
 		m_worker.join();
@@ -377,9 +371,12 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			built->Hold(true);
 		if (Status.load(StormByte::Safe::MemoryOrder::Acquire) == StormByte::Multimedia::Pipeline::Status::Error)
 			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed, Error);
+		else if (Stopping(*this))
+			built->State(StormByte::Multimedia::Pipeline::Plan::State::Aborted);
 	}
 	auto failUnlessFinished = [built]() noexcept {
-		if (built->State() != StormByte::Multimedia::Pipeline::Plan::State::Finished)
+		if (built->State() != StormByte::Multimedia::Pipeline::Plan::State::Finished
+			&& built->State() != StormByte::Multimedia::Pipeline::Plan::State::Aborted)
 			built->State(StormByte::Multimedia::Pipeline::Plan::State::Failed, {});
 	};
 	struct PlanCompletion {
@@ -389,13 +386,31 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			(*action)();
 		}
 	} completion{&failUnlessFinished};
+	StormByte::Multimedia::Pipeline::Filters graph;
+	auto finishCancellation = [&]() {
+		if (!Stopping(*this))
+			return false;
+		graph.Halt();
+		built->Halt();
+		if (!job.Failed() && built->State() == StormByte::Multimedia::Pipeline::Plan::State::Failed)
+			job.Fail(ErrorText(built->Error(), "plan failed"));
+		{
+			StormByte::Safe::UniqueLock lock(Lock);
+			if (Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error)
+				Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
+		}
+		if (job.Failed())
+			job.OnError(ErrorText(job.Error(), "transcode failed"));
+		else {
+			JobLog(job.Logger(), Level::Notice, "aborted");
+			job.OnAborted();
+		}
+		return true;
+	};
 	Clock->SetDurationCalculation(std::nullopt);
 	job.OnProgress();
-	if (Stopping(*this)) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
-		job.OnAborted();
+	if (finishCancellation())
 		return;
-	}
 	job.m_armed = true;
 	job.m_consult.reset();
 	try {
@@ -413,6 +428,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		return;
 	}
 	job.OnPlan(*built);
+	if (finishCancellation())
+		return;
 
 	const auto start = job.OnStart();
 	if (start != StormByte::Multimedia::Pipeline::Status::Running) {
@@ -422,6 +439,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 			job.OnError(ErrorText(job.Error(), "OnStart rejected the job"));
 		}
 		else if (start == StormByte::Multimedia::Pipeline::Status::Aborted) {
+			built->State(StormByte::Multimedia::Pipeline::Plan::State::Aborted);
 			Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
 			JobLog(job.Logger(), Level::Notice, "aborted");
 			job.OnAborted();
@@ -455,14 +473,8 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		job.OnError(ErrorText(job.Error(), "mux"));
 		return;
 	}
-	if (Stopping(*this)) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
-		JobLog(job.Logger(), Level::Notice, "aborted");
-		job.OnAborted();
+	if (finishCancellation())
 		return;
-	}
-
-	StormByte::Multimedia::Pipeline::Filters graph;
 
 	struct EncodeLane {
 		int Out = -1;
@@ -480,6 +492,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		}
 		for (auto& remux : remuxes)
 			remux->Stop();
+		graph.Halt();
 	};
 	struct StageCancellation {
 		decltype(stopStages)& Action;
@@ -541,9 +554,13 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 
 	for (const auto& filter : Analytics)
 		graph.Add(filter);
+	if (finishCancellation())
+		return;
 	graph.BindPlan(built);
 	graph.Close();
 	built >> *demux;
+	if (finishCancellation())
+		return;
 	if (built->State(StormByte::Multimedia::Pipeline::Plan::State::Running)
 		!= StormByte::Multimedia::Pipeline::Plan::State::Running) {
 		job.Fail(ErrorText(built->Error(), "plan could not start"));
@@ -663,14 +680,11 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
-	captureStageFailure();
-	if (Stopping(*this)
-		&& Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
-		JobLog(job.Logger(), Level::Notice, "aborted");
-		job.OnAborted();
+	if (finishCancellation())
 		return;
-	}
+	captureStageFailure();
+	if (finishCancellation())
+		return;
 
 	if (job.Failed()) {
 		job.OnError(ErrorText(job.Error(), "transcode failed"));
@@ -718,14 +732,11 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
-	captureStageFailure();
-	if (Stopping(*this)
-		&& Status.load(StormByte::Safe::MemoryOrder::Acquire) != StormByte::Multimedia::Pipeline::Status::Error) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
-		JobLog(job.Logger(), Level::Notice, "aborted");
-		job.OnAborted();
+	if (finishCancellation())
 		return;
-	}
+	captureStageFailure();
+	if (finishCancellation())
+		return;
 
 	if (job.Failed()) {
 		job.OnError(ErrorText(job.Error(), "transcode failed"));
@@ -736,24 +747,32 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		job.MarkSettled(lane.Out, *lane.Encoder);
 	Reports = graph.Reports();
 	TickHooks(job, graph);
+	if (finishCancellation())
+		return;
 	captureStageFailure();
+	if (finishCancellation())
+		return;
 	if (job.Failed()) {
 		job.OnError(ErrorText(job.Error(), "transcode failed"));
 		return;
 	}
-	if (Stopping(*this)) {
-		Status.store(StormByte::Multimedia::Pipeline::Status::Aborted, StormByte::Safe::MemoryOrder::Release);
-		job.OnAborted();
-		return;
-	}
-	if (built->State(StormByte::Multimedia::Pipeline::Plan::State::Finished)
-		!= StormByte::Multimedia::Pipeline::Plan::State::Finished) {
-		job.Fail(ErrorText(built->Error(), "plan could not finish"));
-		job.OnError(ErrorText(job.Error(), "plan could not finish"));
-		return;
+	{
+		StormByte::Safe::UniqueLock lock(Lock);
+		if (Stopping(*this)) {
+			lock.unlock();
+			finishCancellation();
+			return;
+		}
+		if (built->State(StormByte::Multimedia::Pipeline::Plan::State::Finished)
+			!= StormByte::Multimedia::Pipeline::Plan::State::Finished) {
+			lock.unlock();
+			job.Fail(ErrorText(built->Error(), "plan could not finish"));
+			job.OnError(ErrorText(job.Error(), "plan could not finish"));
+			return;
+		}
+		Status.store(StormByte::Multimedia::Pipeline::Status::Done, StormByte::Safe::MemoryOrder::Release);
 	}
 
-	Status.store(StormByte::Multimedia::Pipeline::Status::Done, StormByte::Safe::MemoryOrder::Release);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now() - started).count();
 	JobLog(job.Logger(), Level::Info, StormByte::Safe::String::ReplaceToken("done tracks={} {}ms", Mapped.size(), ms));

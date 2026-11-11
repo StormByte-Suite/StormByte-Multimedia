@@ -86,6 +86,10 @@ Route::Route(int track,
 	m_destination(std::move(destination)) {}
 
 Route::~Route() noexcept {
+	Halt();
+}
+
+void Route::Halt() noexcept {
 	Stop();
 	for (auto& filter : m_filters) {
 		if (filter)

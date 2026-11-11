@@ -339,17 +339,20 @@ enum Plan::State Plan::State(enum State desired,
 		return State();
 	StormByte::Safe::UniqueLock lock(m_state_mutex);
 	const auto current = m_state.load(StormByte::Safe::MemoryOrder::Acquire);
-	const bool accepted = (current == State::Created && (desired == State::Running || desired == State::Failed))
-		|| (current == State::Running && (desired == State::Finished || desired == State::Failed))
+	const bool accepted = (current == State::Created && (desired == State::Running || desired == State::Failed || desired == State::Aborted))
+		|| (current == State::Running && (desired == State::Finished || desired == State::Failed || desired == State::Aborted))
+		|| (current == State::Aborted && desired == State::Failed)
 		|| (current == State::Failed && desired == State::Failed);
 	if (accepted) {
 		if (desired == State::Failed && reason && !m_error)
 			m_error = std::move(reason);
 		m_state.store(desired, StormByte::Safe::MemoryOrder::Release);
 	}
-	if (accepted && m_observers)
+	if (accepted && m_observers) {
 		for (auto* observer : m_observers->Stages)
 			observer->Wake();
+		m_observers->HoldCv.notify_all();
+	}
 	return accepted ? desired : current;
 }
 
@@ -391,7 +394,7 @@ void Plan::WaitWhileHeld(const Step& step) const noexcept {
 	if (!observers)
 		return;
 	StormByte::Safe::UniqueLock lock(observers->HoldMutex);
-	// Timed so cancellation and failure, which do not signal HoldCv, still release the stage.
+	// Timed to also observe a local stage stop without a plan state transition.
 	while (observers->Held.load(StormByte::Safe::MemoryOrder::Acquire) && !step.Stopping()
 		&& State() == State::Running)
 		observers->HoldCv.wait_for(lock, std::chrono::milliseconds(100));
@@ -408,13 +411,20 @@ void Plan::Unobserve(Step& step) noexcept {
 }
 
 void Plan::Complete(Step& step, bool success) {
+	StormByte::Safe::UniqueLock lock(m_state_mutex);
 	if (!success) {
-		if (State() == State::Failed)
+		if (State() == State::Failed || State() == State::Aborted || State() == State::Finished)
 			return;
-		State(State::Failed, step.Error().value_or(StormByte::Safe::String{"pipeline stage stopped before completion"}));
+		if (!m_error)
+			m_error = step.Error().value_or(StormByte::Safe::String{"pipeline stage stopped before completion"});
+		m_state.store(State::Failed, StormByte::Safe::MemoryOrder::Release);
+		if (m_observers) {
+			for (auto* observer : m_observers->Stages)
+				observer->Wake();
+			m_observers->HoldCv.notify_all();
+		}
 		return;
 	}
-	StormByte::Safe::UniqueLock lock(m_state_mutex);
 	if (!m_observers || State() != State::Running)
 		return;
 	auto& completed = m_observers->Completed;
@@ -425,6 +435,26 @@ void Plan::Complete(Step& step, bool success) {
 	m_state.store(State::Finished, StormByte::Safe::MemoryOrder::Release);
 	for (auto* observer : m_observers->Stages)
 		observer->Wake();
+}
+
+void Plan::Halt() noexcept {
+	// Stage owners remain alive throughout both passes; never join under the state mutex.
+	for (const bool join : {false, true}) {
+		std::size_t index = 0;
+		for (;;) {
+			Step* stage = nullptr;
+			{
+				StormByte::Safe::UniqueLock lock(m_state_mutex);
+				if (!m_observers || index == m_observers->Stages.size())
+					break;
+				stage = m_observers->Stages[index++];
+			}
+			if (join)
+				stage->Halt();
+			else
+				stage->Stop();
+		}
+	}
 }
 
 BufferedLocationReader& Plan::Reader() noexcept {

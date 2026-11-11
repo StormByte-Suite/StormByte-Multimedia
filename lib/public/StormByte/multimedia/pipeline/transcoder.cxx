@@ -766,31 +766,24 @@ void Transcoder::Run() noexcept {
 void Transcoder::Cancel() noexcept {
 	if (!m_backend)
 		return;
-	StormByte::Safe::Shared<class Plan> intention;
-	{
-		StormByte::Safe::UniqueLock lock(m_backend->Lock);
-		intention = m_plan;
-	}
+	StormByte::Safe::UniqueLock lock(m_backend->Lock);
 	m_backend->RequestCancel();
-	if (intention) {
-		try {
-			intention->State(Plan::State::Failed, StormByte::Safe::String{"transcode cancelled"});
-		} catch (const StormByte::Safe::AllocationError&) {
-			intention->State(Plan::State::Failed, {});
-		} catch (const std::bad_alloc&) {
-			intention->State(Plan::State::Failed, {});
-		}
-	}
+	if (m_plan)
+		m_plan->State(Plan::State::Aborted);
 }
 
 void Transcoder::Pause() noexcept try {
 	if (!m_backend)
 		return;
+	StormByte::Safe::UniqueLock lock(m_backend->Lock);
+	if (m_backend->Cancel.load(StormByte::Safe::MemoryOrder::Acquire))
+		return;
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Running)
 		return;
 	m_backend->Paused.store(true, StormByte::Safe::MemoryOrder::Release);
 	m_backend->Status.store(Status::Paused, StormByte::Safe::MemoryOrder::Release);
-	m_backend->Hold(*this, true);
+	if (m_plan)
+		m_plan->Hold(true);
 	JobLog(m_logger, Level::Notice, "paused");
 } catch (const StormByte::Safe::AllocationError&) {
 	Fail();
@@ -801,13 +794,17 @@ void Transcoder::Pause() noexcept try {
 void Transcoder::Resume() noexcept try {
 	if (!m_backend)
 		return;
+	StormByte::Safe::UniqueLock lock(m_backend->Lock);
+	if (m_backend->Cancel.load(StormByte::Safe::MemoryOrder::Acquire))
+		return;
 	if (m_backend->Status.load(StormByte::Safe::MemoryOrder::Acquire) != Status::Paused)
 		return;
 	{
 		StormByte::Safe::UniqueLock lock(m_backend->PauseMutex);
 		m_backend->Paused.store(false, StormByte::Safe::MemoryOrder::Release);
 	}
-	m_backend->Hold(*this, false);
+	if (m_plan)
+		m_plan->Hold(false);
 	m_backend->Status.store(Status::Running, StormByte::Safe::MemoryOrder::Release);
 	m_backend->PauseCv.notify_all();
 	JobLog(m_logger, Level::Notice, "resumed");

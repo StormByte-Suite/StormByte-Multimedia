@@ -358,7 +358,7 @@ Important differences from the facade:
 
 1. **Configure before binding.** `Plan` owns input/output locations and output-track intentions. It is noncopyable/nonmovable; bind the shared owner, not a value. `Check()` validates formation. Container and codec support are also checked during setup/run.
 2. **Finish every connection first.** Workers exist from stage construction but wait for the Plan to run. For a filter graph, use shared endpoints, register leaves, call `Filters::Close()`, then bind.
-3. **Observe, do not publish, state.** Plan states are `Created`, `Running`, `Finished` and `Failed`. Preserve the first error. `Finished` requires every participating stage to complete; muxer completion alone is insufficient.
+3. **Observe, do not publish, state.** Plan states are `Created`, `Running`, `Finished`, `Failed` and `Aborted`. Intentional cancellation publishes `Aborted`; a genuine in-flight failure still publishes `Failed` and preserves the first error. `Finished` requires every participating stage to complete; muxer completion alone is insufficient.
 4. **Own the lifetime.** Keep stages, graph, Plan and borrowed identities alive through completion and notifications. Wait for graph `Idle()` where applicable. Stop every peer before destroying any of them and quiesce concurrent controllers; `Step::Stop()` is nonblocking, not a join barrier.
 5. **Keep errors distinct from EOF.** Normal EOF drains queued media; failure/cancellation wakes blocked peers. Queue capacities bound individual queues, not total memory.
 

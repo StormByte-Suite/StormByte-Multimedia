@@ -366,6 +366,11 @@ namespace StormByte {
 					friend class StormByte::Multimedia::Backend::Pipeline::Transcoder;
 
 					/**
+					 * @brief Stops all routes before joining filters and look decoders.
+					 */
+					void Halt() noexcept;
+
+					/**
 					 * @typedef Stretch
 					 * @brief Route-binding record stored in the facade.
 					 */

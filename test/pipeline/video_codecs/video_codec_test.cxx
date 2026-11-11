@@ -620,6 +620,12 @@ int test_svt_av1_cancel_repeated() {
 				}
 			}
 			job.Cancel();
+			const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{5};
+			while (job.Status() != Status::Aborted && job.Status() != Status::Error
+				&& std::chrono::steady_clock::now() < deadline)
+				std::this_thread::sleep_for(std::chrono::milliseconds{10});
+			TEST_REQUIRE(job.Status() == Status::Aborted);
+			TEST_REQUIRE(!job.Error());
 		}
 	}
 	return 0;

@@ -213,7 +213,8 @@ namespace StormByte {
 						Created,	///< Constructed and not yet running.
 						Running,	///< Pipeline execution has started.
 						Finished,	///< Pipeline execution completed successfully.
-						Failed		///< Pipeline formation or execution failed.
+						Failed,		///< Pipeline formation or execution failed.
+						Aborted		///< Intentional cancellation; a genuine in-flight failure may still win.
 					};
 
 					/**
@@ -778,6 +779,12 @@ namespace StormByte {
 					 * @param success Whether the stage completed successfully.
 					 */
 					void Complete(Step& step, bool success);
+
+					/**
+					 * @brief Stops and joins registered stages before resolving cancellation.
+					 * @note The coordinator keeps graph owners alive and serializes teardown.
+					 */
+					void Halt() noexcept;
 
 					/**
 					 * @brief Provider-owned borrowed notification registry.

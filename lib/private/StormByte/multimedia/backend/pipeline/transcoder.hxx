@@ -210,13 +210,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			void WaitIfPaused() noexcept;
 
-			/**
-			 * @brief Holds or releases every pipeline stage of @p job.
-			 * @param job Public job owning the shared plan.
-			 * @param held True pauses stage work; false resumes it.
-			 */
-			void Hold(StormByte::Multimedia::Pipeline::Transcoder& job, bool held) noexcept;
-
 			mutable StormByte::Safe::Mutex Lock;	///< Status / Error
 			StormByte::Safe::Mutex PauseMutex;		///< PauseCv
 			StormByte::Safe::ConditionVariable PauseCv;	///< Pause waiters

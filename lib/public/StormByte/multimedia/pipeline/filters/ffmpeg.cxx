@@ -198,8 +198,10 @@ class FFmpeg::PrivateState {
 		explicit PrivateState(FFmpeg& owner)
 		:	surface(owner) {
 			pipe.FailureHandler(&owner, [](void* context, StormByte::Buffer::QueueStatus status) noexcept {
-				static_cast<FFmpeg*>(context)->Fail(
-					StormByte::Multimedia::Backend::Pipeline::QueueFailureReason(status));
+				auto& filter = *static_cast<FFmpeg*>(context);
+				if (status == StormByte::Buffer::QueueStatus::Closed && filter.Stopping())
+					return;
+				filter.Fail(StormByte::Multimedia::Backend::Pipeline::QueueFailureReason(status));
 			});
 		}
 
@@ -331,6 +333,8 @@ void FFmpeg::Fail(StormByte::Safe::String reason) noexcept {
 		m_state->queue.clear();
 		m_telemetry->SetError(StormByte::Safe::String(reason));
 		m_error = std::move(reason);
+		if (m_plan)
+			m_plan->State(Pipeline::Plan::State::Failed, m_error);
 		Log(Level::Error, *std::as_const(m_error));
 		if (m_state->pumper)
 			m_state->pumper->Fail();
@@ -847,7 +851,9 @@ void FFmpeg::Stop() noexcept {
 
 bool FFmpeg::Stopping() const noexcept {
 	const State state = Status();
-	return state == State::Stopping || state == State::Stopped || state == State::Failed;
+	return state == State::Stopping || state == State::Stopped || state == State::Failed
+		|| (m_plan && (m_plan->State() == Pipeline::Plan::State::Aborted
+			|| m_plan->State() == Pipeline::Plan::State::Failed));
 }
 
 StormByte::Multimedia::Backend::Pipeline::Host& FFmpeg::Face() noexcept {

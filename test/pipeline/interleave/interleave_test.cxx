@@ -570,13 +570,8 @@ namespace {
 			while (job.Status() != Status::Aborted && job.Status() != Status::Error
 				&& std::chrono::steady_clock::now() < deadline)
 				std::this_thread::sleep_for(std::chrono::milliseconds{10});
-			// A running plan can report its explicit cancellation as an error.
-			if (job.Status() == Status::Error) {
-				const auto error = job.Error();
-				TEST_REQUIRE(error && TestView(*error) == "transcode cancelled");
-			}
-			else
-				TEST_REQUIRE(job.Status() == Status::Aborted);
+			TEST_REQUIRE(job.Status() == Status::Aborted);
+			TEST_REQUIRE(!job.Error());
 			return 0;
 		}
 		TEST_REQUIRE(WaitForTranscoder(job) == 0);
@@ -669,6 +664,7 @@ namespace {
 	struct VideoGate {
 		std::atomic<bool> Reached{false};
 		std::atomic<bool> Release{false};
+		bool FailOnRelease = false;
 	};
 
 	class PauseVideo final: public Filter::Process {
@@ -700,6 +696,8 @@ namespace {
 				m_gate.Reached.store(true);
 				while (!m_gate.Release.load())
 					std::this_thread::sleep_for(std::chrono::milliseconds{1});
+				if (m_gate.FailOnRelease)
+					Fail("in-flight video filter failed");
 			}
 
 		private:
@@ -712,6 +710,22 @@ namespace {
 		~ReleaseVideo() noexcept {
 			Gate.Release.store(true);
 		}
+	};
+
+	class CancellationJob final: public Transcoder {
+		public:
+			using Transcoder::Transcoder;
+			std::atomic<unsigned> AbortedCalls{0};
+			std::atomic<unsigned> ErrorCalls{0};
+
+		protected:
+			void OnAborted() noexcept override {
+				AbortedCalls.fetch_add(1);
+			}
+
+			void OnError(const StormByte::Safe::String&) noexcept override {
+				ErrorCalls.fetch_add(1);
+			}
 	};
 
 	int MakeSparseInput(const std::filesystem::path& output, bool empty) {
@@ -768,7 +782,8 @@ namespace {
 		return 0;
 	}
 
-	int CheckSparseOutput(const std::filesystem::path& source, const std::filesystem::path& path, bool empty) {
+	int CheckSparseOutput(const std::filesystem::path& source, const std::filesystem::path& path, bool empty,
+		bool remux = false) {
 		using Payloads = std::vector<std::vector<std::uint8_t>>;
 		Payloads expectedAudio;
 		AVFormatContext* raw = nullptr;
@@ -791,7 +806,8 @@ namespace {
 		TEST_REQUIRE(avformat_open_input(&raw, path.string().c_str(), nullptr, nullptr) == 0);
 		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
 		TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0 && raw->nb_streams == 4);
-		TEST_REQUIRE(raw->streams[0]->codecpar->codec_id == AV_CODEC_ID_HEVC);
+		TEST_REQUIRE(raw->streams[0]->codecpar->codec_id
+			== (remux ? original->streams[0]->codecpar->codec_id : AV_CODEC_ID_HEVC));
 		TEST_REQUIRE(raw->duration >= 11900000 && raw->duration <= 12200000);
 		std::map<int, std::int64_t> previous;
 		std::array<unsigned, 4> count{};
@@ -825,23 +841,25 @@ namespace {
 		return CheckInterleave(path);
 	}
 
-	int RunSparseRetention(bool empty, bool cancel, bool deep = false) {
+	int RunSparseRetention(bool empty, bool cancel, bool deep = false, bool paused = false, bool fail = false) {
 		if (!avcodec_find_encoder_by_name("libx265"))
 			return TEST_SKIP;
 		const auto codec = Registry::Instance().FindCodec("H.265");
 		TEST_REQUIRE(codec);
-		const std::string name = cancel ? "retention-cancel"
+		const std::string name = fail ? "retention-failure" : paused ? "retention-paused-cancel" : cancel ? "retention-cancel"
 			: deep ? "retention-deep" : empty ? "retention-empty" : "retention-sparse";
 		const auto input = OutputPath("pipeline/interleave/" + name + "-input.mkv");
 		const auto output = OutputPath("pipeline/interleave/" + name + "-output.mkv");
 		TEST_REQUIRE(MakeSparseInput(input, empty) == 0);
 		VideoGate gate;
+		gate.FailOnRelease = fail;
 		StormByte::Buffer::ByteBudget budget{StormByte::ByteSize{1024 * 1024}};
+		auto teardownStarted = std::chrono::steady_clock::now();
 		{
 			namespace IO = StormByte::Buffer::IO;
 			auto writer = StormByte::Safe::Unique<IO::BufferedLocationWriter>::MakePointer<IO::BufferedFileWriter>(
 				TestLocation(output), IO::WriterParameters{IO::MaxMemory{0}, IO::WriteChunk{0}});
-			Transcoder job{TestLocation(input), std::move(writer), MakeLogger(), 12012000000LL};
+			CancellationJob job{TestLocation(input), std::move(writer), MakeLogger(), 12012000000LL};
 			ReleaseVideo release{gate};
 			BufferingPolicy buffering;
 			buffering.VideoFrames(QueueLimit::Bounded(2));
@@ -882,28 +900,84 @@ namespace {
 			TEST_REQUIRE(io->Origin() >= StormByte::ByteSize{32768});
 			const auto accounting = budget.Snapshot();
 			TEST_REQUIRE(accounting.Peak > StormByte::ByteSize{0} && accounting.Peak <= accounting.Limit);
-			if (cancel)
-				job.Cancel();
-			gate.Release.store(true);
+			TEST_REQUIRE(job.Status() == Status::Running);
+			if (paused) {
+				job.Pause();
+				TEST_REQUIRE(job.Status() == Status::Paused);
+			}
+			const auto cancelStarted = std::chrono::steady_clock::now();
 			if (cancel) {
+				job.Cancel();
+				job.Cancel();
+				job.Resume();
+			}
+			gate.Release.store(true);
+			if (cancel || fail) {
 				const auto stopped = std::chrono::steady_clock::now() + std::chrono::seconds{5};
-				while (job.Status() != Status::Aborted && job.Status() != Status::Error
+				while (job.AbortedCalls.load() == 0 && job.ErrorCalls.load() == 0
 					&& std::chrono::steady_clock::now() < stopped)
 					std::this_thread::sleep_for(std::chrono::milliseconds{2});
-				TEST_REQUIRE(job.Status() == Status::Aborted || job.Status() == Status::Error);
-				if (job.Status() == Status::Error)
-					TEST_REQUIRE(job.Error() && TestView(*job.Error()) == "transcode cancelled");
+				TEST_REQUIRE(std::chrono::steady_clock::now() - cancelStarted < std::chrono::seconds{5});
+				TEST_REQUIRE(job.Status() == (fail ? Status::Error : Status::Aborted));
+				TEST_REQUIRE(job.AbortedCalls.load() == (fail ? 0u : 1u));
+				TEST_REQUIRE(job.ErrorCalls.load() == (fail ? 1u : 0u));
+				TEST_REQUIRE(job.Plan()->State() == (fail ? Plan::State::Failed : Plan::State::Aborted));
+				if (fail) {
+					TEST_REQUIRE(job.Error() && TestView(*job.Error()) == "in-flight video filter failed");
+					job.Cancel();
+					TEST_REQUIRE(job.Status() == Status::Error);
+					TEST_REQUIRE(job.Error() && TestView(*job.Error()) == "in-flight video filter failed");
+				}
+				else
+					TEST_REQUIRE(!job.Error());
+				TEST_REQUIRE(budget.Snapshot().Reserved == StormByte::ByteSize{0});
 			}
 			else
 				TEST_REQUIRE(WaitForTranscoder(job) == 0);
+			teardownStarted = std::chrono::steady_clock::now();
 		}
+		TEST_REQUIRE(std::chrono::steady_clock::now() - teardownStarted < std::chrono::seconds{5});
 		TEST_REQUIRE(budget.Snapshot().Reserved == StormByte::ByteSize{0});
-		return cancel ? 0 : CheckSparseOutput(input, output, empty);
+		TEST_REQUIRE(!budget.Snapshot().Closed);
+		if (cancel) {
+			{
+				Transcoder next{TestLocation(input), TestLocation(output), MakeLogger(), 12012000000LL};
+				BufferingPolicy buffering;
+				buffering.Packets(QueueLimit::Bounded(1));
+				buffering.DemuxPending(QueueLimit::Bounded(1));
+				buffering.QueueBytes(StormByte::ByteSize{256 * 1024});
+				buffering.Budget(budget);
+				next.Buffering(buffering);
+				next.Video(0).Remux();
+				next.Audio(1).Remux();
+				next.Subtitle(2).Remux();
+				next.Subtitle(3).Remux();
+				TEST_REQUIRE(CheckTranscoderConfigured(next) == 0);
+				next.Run();
+				TEST_REQUIRE(WaitForTranscoder(next) == 0);
+			}
+			TEST_REQUIRE(budget.Snapshot().Reserved == StormByte::ByteSize{0});
+			TEST_REQUIRE(!budget.Snapshot().Closed);
+			return CheckSparseOutput(input, output, empty, true);
+		}
+		return fail ? 0 : CheckSparseOutput(input, output, empty);
 	}
 }
 
 int test_interleave_cancel_retained_mixed_packets() {
 	return RunSparseRetention(false, true);
+}
+
+int test_interleave_cancel_paused_mixed_packets() {
+	return RunSparseRetention(false, true, false, true);
+}
+
+int test_interleave_cancel_preserves_inflight_failure() {
+	return RunSparseRetention(false, true, false, false, true);
+}
+
+int test_interleave_inflight_failure_without_cancel() {
+	return RunSparseRetention(false, false, false, false, true);
 }
 
 int test_interleave_deep_queues_do_not_extend_retention() {
@@ -1042,6 +1116,9 @@ int RunPipelineInterleaveTests(int argc, char** argv) {
 		// Progressive output
 		// -------------------
 		TestEntry{"test_interleave_cancel_retained_mixed_packets", test_interleave_cancel_retained_mixed_packets},
+		TestEntry{"test_interleave_cancel_paused_mixed_packets", test_interleave_cancel_paused_mixed_packets},
+		TestEntry{"test_interleave_cancel_preserves_inflight_failure", test_interleave_cancel_preserves_inflight_failure},
+		TestEntry{"test_interleave_inflight_failure_without_cancel", test_interleave_inflight_failure_without_cancel},
 		TestEntry{"test_interleave_deep_queues_do_not_extend_retention", test_interleave_deep_queues_do_not_extend_retention},
 		TestEntry{"test_interleave_empty_subtitles_with_delayed_video", test_interleave_empty_subtitles_with_delayed_video},
 		TestEntry{"test_interleave_sparse_subtitles_with_delayed_video", test_interleave_sparse_subtitles_with_delayed_video},

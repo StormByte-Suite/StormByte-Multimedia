@@ -192,7 +192,7 @@ bool Pumper::Failed() const noexcept {
 
 bool Pumper::Stopping() const noexcept {
 	const State state = Status();
-	return state == State::Stopping || state == State::Stopped || state == State::Failed;
+	return state == State::Stopping || state == State::Stopped || state == State::Failed || m_host.Stopping();
 }
 
 void Pumper::Fail() noexcept {

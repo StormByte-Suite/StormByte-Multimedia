@@ -38,6 +38,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Intentional Running/Paused transcoder cancellation now ends in `Aborted`,
+  not `Error`. Wake and join in-flight stages before reporting cancellation,
+  distinguish expected queue closure from admission failures, preserve genuine
+  failures racing with cancellation, and release shared byte-budget reservations
+  without closing the budget. Cover mixed libx265/remux jobs, paused cancellation,
+  in-flight filter failures, allocation-free cancellation and budget reuse.
 - Bound FFmpeg's mux interleave delta to a positive 0.25-1 second media-time
   window, including mixed encoded video/remux jobs with sparse or initially
   empty subtitles. Queue depth and header-startup timestamp span no longer

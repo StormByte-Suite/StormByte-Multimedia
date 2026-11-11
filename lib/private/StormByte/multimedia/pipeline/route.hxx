@@ -148,6 +148,11 @@ namespace StormByte::Multimedia::Pipeline {
 			void Stop() noexcept;
 
 			/**
+			 * @brief Stops the route and joins its filters and look decoders.
+			 */
+			void Halt() noexcept;
+
+			/**
 			 * @brief Copy assignment.
 			 * @param other Source route.
 			 * @return *this.

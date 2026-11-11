@@ -178,6 +178,10 @@ Filters::Handle Filters::Between(StormByte::Safe::Shared<Step> origin,
 }
 
 Filters::~Filters() noexcept {
+	Halt();
+}
+
+void Filters::Halt() noexcept {
 	for (auto& stretch : m_stretches) {
 		if (stretch.Lane)
 			stretch.Lane->Stop();
@@ -189,6 +193,10 @@ Filters::~Filters() noexcept {
 	for (auto& global : m_globals) {
 		if (global.Filter)
 			global.Filter->Halt();
+	}
+	for (auto& stretch : m_stretches) {
+		if (stretch.Lane)
+			stretch.Lane->Halt();
 	}
 }
 
