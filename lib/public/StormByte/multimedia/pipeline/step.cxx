@@ -90,6 +90,10 @@ namespace {
 				m_worker->Process(std::move(item));
 			}
 
+			void Halt() noexcept override {
+				m_worker->Halt();
+			}
+
 		protected:
 			void Flush() noexcept override {}
 

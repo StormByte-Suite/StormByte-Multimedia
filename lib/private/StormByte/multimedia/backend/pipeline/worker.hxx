@@ -116,6 +116,13 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			 */
 			virtual void Process(Multimedia::Pipeline::Item::PointerType item) noexcept = 0;
 
+			/**
+			 * @brief Stop auxiliary threads after the pumper thread has joined.
+			 *
+			 * May be called repeatedly while the host is still alive.
+			 */
+			virtual void Halt() noexcept {}
+
 		protected:
 			/**
 			 * @brief Worker bound to @p host.

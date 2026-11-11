@@ -100,6 +100,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		StopFeed();
 	}
 
+	void Demux::Halt() noexcept {
+		StopFeed(true);
+	}
+
 	void Demux::StopFeed(bool cancelPending) noexcept {
 		if (cancelPending)
 			m_owner.pipe().Abort();

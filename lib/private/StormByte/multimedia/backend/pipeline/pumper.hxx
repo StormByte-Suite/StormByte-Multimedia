@@ -204,6 +204,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		private:
 			Host& m_host;											///< Owner, via Host
 			StormByte::Safe::Unique<Worker> m_worker;		///< Body
+			bool m_workerHalted = false;					///< Auxiliary threads have been joined.
 			StormByte::Safe::Atomic<int> m_state;			///< Lifecycle
 			StormByte::Safe::Thread m_thread;			///< Owned thread
 	};

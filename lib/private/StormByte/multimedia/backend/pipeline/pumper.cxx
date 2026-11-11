@@ -160,6 +160,10 @@ void Pumper::Halt() noexcept {
 	Stop();
 	if (m_thread.joinable())
 		m_thread.join();
+	if (m_worker && !m_workerHalted) {
+		m_worker->Halt();
+		m_workerHalted = true;
+	}
 
 	int expected = static_cast<int>(State::Stopping);
 	if (!m_state.compare_exchange_strong(expected, static_cast<int>(State::Stopped),

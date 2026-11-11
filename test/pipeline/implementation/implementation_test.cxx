@@ -231,6 +231,18 @@ int test_transcoder_rejects_mismatched_decoder_implementation() {
 		"decoder implementation does not match source codec");
 }
 
+int test_decoder_failure_repeated_teardown() {
+	for (int i = 0; i < 10; ++i) {
+		const int missing = test_transcoder_rejects_missing_decoder_implementation();
+		if (missing != 0)
+			return missing;
+		const int mismatched = test_transcoder_rejects_mismatched_decoder_implementation();
+		if (mismatched != 0)
+			return mismatched;
+	}
+	return 0;
+}
+
 int test_manual_selects_plan_decoder_implementation() {
 	auto codec = Registry::Instance().FindCodec("PCM S16 LE");
 	TEST_REQUIRE(codec);
@@ -268,6 +280,7 @@ int main(int argc, char** argv) {
 		TestEntry{"test_transcoder_selects_decoder_implementation", test_transcoder_selects_decoder_implementation},
 		TestEntry{"test_transcoder_rejects_missing_decoder_implementation", test_transcoder_rejects_missing_decoder_implementation},
 		TestEntry{"test_transcoder_rejects_mismatched_decoder_implementation", test_transcoder_rejects_mismatched_decoder_implementation},
+		TestEntry{"test_decoder_failure_repeated_teardown", test_decoder_failure_repeated_teardown},
 		TestEntry{"test_manual_selects_plan_decoder_implementation", test_manual_selects_plan_decoder_implementation},
 		TestEntry{"test_manual_rejects_missing_decoder_implementation", test_manual_rejects_missing_decoder_implementation},
 		TestEntry{"test_manual_rejects_mismatched_decoder_implementation", test_manual_rejects_mismatched_decoder_implementation},

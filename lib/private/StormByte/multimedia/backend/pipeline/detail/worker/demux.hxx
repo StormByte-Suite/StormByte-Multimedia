@@ -174,6 +174,11 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			 */
 			void Process(StormByte::Multimedia::Pipeline::Item::PointerType item) noexcept override;
 
+			/**
+			 * @brief Stop and join feeders before the owning stage is destroyed.
+			 */
+			void Halt() noexcept override;
+
 		private:
 			friend class FeedThread;
 
