@@ -388,13 +388,10 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 	TelemetrySummary summary{Metrics, job.Logger()};
 	// Declared before every stage owner: freezes after all stages are torn down.
 	TopologyFreeze topologyFreeze;
-	try {
-		topologyFreeze.Recorder = Metrics->TopologyRecorder();
-		topologyFreeze.Recorder->Reset();
-	}
-	catch (...) {
-		topologyFreeze.Recorder.reset();
-	}
+	// A recorder that cannot be allocated is reported by JobTelemetry::Topology().
+	topologyFreeze.Recorder = Metrics->TopologyRecorder();
+	if (topologyFreeze.Recorder)
+		topologyFreeze.Recorder->Begin(job.Buffering().Budget());
 	const auto started = std::chrono::steady_clock::now();
 	JobLog(job.Logger(), Level::Notice, "running");
 	job.OnConfigure();
@@ -689,6 +686,7 @@ void Transcoder::Run(StormByte::Multimedia::Pipeline::Transcoder& job) noexcept 
 		DescribeStage(topology, named, *mux, TopologyStageKind::Muxer);
 	}
 	catch (...) {
+		topologyFreeze.Recorder->MarkIncomplete();
 	}
 	TickHooks(job, graph);
 	auto captureStageFailure = [&]() {

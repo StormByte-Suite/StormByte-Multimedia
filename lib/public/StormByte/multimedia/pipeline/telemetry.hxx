@@ -407,8 +407,9 @@ namespace StormByte {
 			 * @brief Whether values are read live or are frozen copies.
 			 */
 			enum class STORMBYTE_MULTIMEDIA_PUBLIC TopologySnapshotState: std::uint8_t {
-				Live,	///< Read from the running queue or budget when the snapshot was taken.
-				Final	///< Captured when the owning stage or job run was torn down; never changes again.
+				Live,		///< Read from the running queue or budget when the snapshot was taken.
+				Final,		///< Captured when the owning stage or job run was torn down; never changes again.
+				Unfrozen	///< Snapshot only: the run was torn down but its final copy could not be allocated. Queues keep their own Final captures; budgets stay Live and may still change. Complete is false.
 			};
 
 			/**
@@ -479,9 +480,17 @@ namespace StormByte {
 			/**
 			 * @struct TopologyBudget
 			 * @brief Shared byte budget reported once for every queue that charges it.
+			 *
+			 * Identity is proven by a zero-byte anchor lease, which Buffer only
+			 * grants while the budget is open. Budgets already closed when first
+			 * seen, with no live anchor from an earlier sighting, cannot be
+			 * matched: each such queue gets its own entry with
+			 * `Identified == false`. Those entries may describe the same budget
+			 * as another entry and must not be summed or deduplicated by id.
 			 */
 			struct TopologyBudget {
-				std::uint64_t Id = 0;											///< Stable identity; equal ids mean the same shared budget.
+				std::uint64_t Id = 0;											///< Stable entry id; equal ids mean the same shared budget.
+				bool Identified = true;											///< False when sharing with other entries could not be proven.
 				TopologySnapshotState State = TopologySnapshotState::Live;		///< Live or final reading.
 				StormByte::Safe::Vector<std::uint64_t> Queues;					///< Queue ids charging this budget in this snapshot.
 				StormByte::Buffer::BudgetSnapshot Snapshot;						///< Aggregate reservation counters.
@@ -510,6 +519,8 @@ namespace StormByte {
 			 */
 			struct TopologySnapshot {
 				bool Available = false;												///< False before a run registered its topology.
+				bool RecorderFailed = false;										///< The latest run could not allocate its topology recorder: nothing was recorded, `Available` is false and `Complete` is false. The job itself is unaffected.
+				bool Complete = true;												///< False when telemetry bookkeeping could not allocate; stages, queues, producer links, budgets or pending lists may be missing. Never affects the job.
 				TopologySnapshotState State = TopologySnapshotState::Live;			///< Final once the run tore its stages down.
 				std::uint64_t Run = 0;												///< Run generation; increases on each registration reset.
 				StormByte::Safe::Vector<TopologyStage> Stages;						///< Stages in pipeline order, then registration order.
@@ -572,8 +583,9 @@ namespace StormByte {
 
 					/**
 					 * @brief Construct empty job telemetry.
+					 * @throw Safe::AllocationError if synchronization storage cannot be allocated.
 					 */
-					JobTelemetry() noexcept;
+					JobTelemetry();
 
 					/**
 					 * @brief Release job telemetry in its providing library.
@@ -602,9 +614,13 @@ namespace StormByte {
 					 * (the returned handle of Transcoder::Telemetry() is enough).
 					 * The snapshot owns no stage and no queue: live readings go through
 					 * provider-owned probes that freeze to final values when their
-					 * stage is destroyed, and the whole topology becomes
-					 * @ref TopologySnapshotState::Final when the run ends.
-					 * @return Owned topology; `Available` is false before a run registers it.
+					 * stage is destroyed. After teardown the topology becomes
+					 * @ref TopologySnapshotState::Final if the final copy succeeds,
+					 * otherwise @ref TopologySnapshotState::Unfrozen.
+					 * @return Owned topology; `Available` is false before a run registers
+					 *         it. If a run could not allocate its recorder,
+					 *         `RecorderFailed` is true and `Complete` false, so it is
+					 *         never mistaken for a job that has not run yet.
 					 * @throw Safe::AllocationError or std::bad_alloc when owned storage cannot be allocated.
 					 */
 					TopologySnapshot Topology() const;
@@ -657,13 +673,19 @@ namespace StormByte {
 
 					/**
 					 * @brief Provider-owned topology recorder, created on first use.
-					 * @return Shared recorder.
+					 *
+					 * An allocation or lock failure records @ref TopologySnapshot::RecorderFailed
+					 * for readers instead of being silent; a later successful
+					 * acquisition clears it.
+					 * @return Shared recorder, or empty when it could not be allocated.
 					 */
-					StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> TopologyRecorder();
+					StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> TopologyRecorder() noexcept;
 
 					mutable StormByte::Safe::Mutex m_stages_lock;	///< Protects registered stage list and topology owner.
 
 					StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> m_topology;	///< Provider-owned topology recorder.
+
+					StormByte::Safe::Atomic<bool> m_topology_failed;	///< Latest recorder acquisition failed (zero-initialized).
 
 					StormByte::Safe::Vector<Stage> m_stages;		///< Safe-owned registered stage snapshots.
 

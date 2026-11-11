@@ -62,7 +62,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			std::vector<StormByte::Safe::Weak<BudgetIdentity>> Entries;
 		};
 
-		BudgetRegistry& Registry() noexcept {
+		// Safe::Mutex construction may allocate; a failed first use retries on the next call.
+		BudgetRegistry& Registry() {
 			static BudgetRegistry registry;
 			return registry;
 		}
@@ -91,9 +92,17 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		auto identity = StormByte::Safe::Shared<BudgetIdentity>::MakePointer<BudgetIdentity>();
 		identity->Id = NextTopologyId();
 		// A zero-byte charge never changes Reserved, Peak, Pressure or Waits.
-		if (budget.TryReserve(StormByte::ByteSize{0}, identity->Anchor) == StormByte::Buffer::QueueStatus::Ok)
-			registry.Entries.push_back(StormByte::Safe::Weak<BudgetIdentity>{identity});
-		return identity;
+		switch (budget.TryReserve(StormByte::ByteSize{0}, identity->Anchor)) {
+			case StormByte::Buffer::QueueStatus::Ok:
+				registry.Entries.push_back(StormByte::Safe::Weak<BudgetIdentity>{identity});
+				return identity;
+			case StormByte::Buffer::QueueStatus::Closed:
+				// Buffer exposes no other proof of identity: report it unidentified, never merged.
+				return identity;
+			default:
+				// Only the lease allocation can fail a zero-byte charge on an open budget.
+				throw std::bad_alloc();
+		}
 	}
 
 	QueueProbe::QueueProbe(const ItemSink& sink)
@@ -116,7 +125,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			for (const int key : m_sink->Keys())
 				Key(key);
 		} catch (const StormByte::Safe::AllocationError&) {
+			m_incomplete.store(true, std::memory_order_release);
 		} catch (const std::bad_alloc&) {
+			m_incomplete.store(true, std::memory_order_release);
 		}
 		for (auto& [key, state] : m_keys)
 			state.Final = m_sink->Snapshot(key);
@@ -129,7 +140,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		if (std::find(state.Producers.begin(), state.Producers.end(), producer) == state.Producers.end())
 			state.Producers.push_back(producer);
 	} catch (const StormByte::Safe::AllocationError&) {
+		m_incomplete.store(true, std::memory_order_release);
 	} catch (const std::bad_alloc&) {
+		m_incomplete.store(true, std::memory_order_release);
 	}
 
 	void QueueProbe::RemoveProducer(int key, std::uint64_t producer) noexcept {
@@ -145,7 +158,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		state.Budget = std::move(identity);
 		state.Handle = budget;
 	} catch (const StormByte::Safe::AllocationError&) {
+		m_incomplete.store(true, std::memory_order_release);
 	} catch (const std::bad_alloc&) {
+		m_incomplete.store(true, std::memory_order_release);
 	}
 
 	void QueueProbe::PendingOpen(int track, StormByte::Size limit) noexcept try {
@@ -161,7 +176,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			limits.Elements(limit);
 		found->second.Snapshot.Limits = limits;
 	} catch (const StormByte::Safe::AllocationError&) {
+		m_incomplete.store(true, std::memory_order_release);
 	} catch (const std::bad_alloc&) {
+		m_incomplete.store(true, std::memory_order_release);
 	}
 
 	void QueueProbe::PendingSize(int track, StormByte::Size size) noexcept {

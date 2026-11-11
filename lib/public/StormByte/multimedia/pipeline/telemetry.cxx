@@ -50,6 +50,8 @@
 
 #include <StormByte/multimedia/backend/pipeline/topology.hxx>
 #include <StormByte/multimedia/pipeline/telemetry.hxx>
+#include <StormByte/exception.hxx>
+#include <StormByte/safe/exception.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/safe/unique_lock.hxx>
 #include <StormByte/safe/string.hxx>
@@ -57,6 +59,7 @@
 #include <algorithm>
 #include <charconv>
 #include <limits>
+#include <new>
 #include <optional>
 #include <string>
 #include <utility>
@@ -342,7 +345,7 @@ StageTelemetry::operator StormByte::Safe::String() const {
 	return StormByte::Safe::String{std::string_view{report}};
 }
 
-JobTelemetry::JobTelemetry() noexcept
+JobTelemetry::JobTelemetry()
 : m_memory_current(0),
 	m_memory_min(std::numeric_limits<std::uint64_t>::max()),
 	m_memory_max(0),
@@ -363,15 +366,29 @@ void JobTelemetry::RegisterStage(StormByte::Safe::String name,
 	m_stages.push_back(Stage{std::move(name), std::move(metrics)});
 }
 
-StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> JobTelemetry::TopologyRecorder() {
-	StormByte::Safe::UniqueLock lock(m_stages_lock);
-	if (!m_topology)
-		m_topology = StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology>::MakePointer<
-			StormByte::Multimedia::Backend::Pipeline::Topology>();
-	return m_topology;
+StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> JobTelemetry::TopologyRecorder() noexcept {
+	try {
+		StormByte::Safe::UniqueLock lock(m_stages_lock);
+		if (!m_topology)
+			m_topology = StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology>::MakePointer<
+				StormByte::Multimedia::Backend::Pipeline::Topology>();
+		m_topology_failed.store(false, StormByte::Safe::MemoryOrder::Release);
+		return m_topology;
+	} catch (const StormByte::Safe::AllocationError&) {
+	} catch (const std::bad_alloc&) {
+	} catch (const StormByte::OperationError&) {
+	}
+	m_topology_failed.store(true, StormByte::Safe::MemoryOrder::Release);
+	return {};
 }
 
 TopologySnapshot JobTelemetry::Topology() const {
+	if (m_topology_failed.load(StormByte::Safe::MemoryOrder::Acquire)) {
+		TopologySnapshot failed;
+		failed.RecorderFailed = true;
+		failed.Complete = false;
+		return failed;
+	}
 	StormByte::Safe::Shared<StormByte::Multimedia::Backend::Pipeline::Topology> topology;
 	{
 		StormByte::Safe::UniqueLock lock(m_stages_lock);

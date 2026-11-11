@@ -92,6 +92,16 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void Reset() noexcept;
 
 			/**
+			 * @brief Start a new run anchoring the job budget first.
+			 *
+			 * The budget is identified before Reset releases the previous
+			 * run's anchors, so a budget closed later stays identifiable.
+			 * A lost anchor marks the run incomplete.
+			 * @param budget Job budget.
+			 */
+			void Begin(const StormByte::Buffer::ByteBudget& budget) noexcept;
+
+			/**
 			 * @brief Register one stage once per probe.
 			 * @param stage Descriptor.
 			 * @throw Safe::AllocationError or std::bad_alloc.
@@ -100,8 +110,25 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 			/**
 			 * @brief Capture a final copy and release probes.
+			 *
+			 * If the copy cannot be allocated, later snapshots report
+			 * TopologySnapshotState::Unfrozen and Complete == false instead
+			 * of a Final view whose shared budgets could still change.
 			 */
 			void Freeze() noexcept;
+
+			/**
+			 * @brief Keep @p identity alive for this run so its budget stays
+			 *        identifiable even if it is closed before queues register.
+			 * @param identity Budget identity.
+			 * @throw Safe::AllocationError or std::bad_alloc.
+			 */
+			void Pin(StormByte::Safe::Shared<BudgetIdentity> identity);
+
+			/**
+			 * @brief Record that a registration was lost to an allocation failure.
+			 */
+			void MarkIncomplete() noexcept;
 
 			/**
 			 * @brief Current or final view.
@@ -111,7 +138,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			StormByte::Multimedia::Pipeline::TopologySnapshot Snapshot() const;
 
 		private:
-			StormByte::Multimedia::Pipeline::TopologySnapshot Build(bool final) const;
+			StormByte::Multimedia::Pipeline::TopologySnapshot Build(StormByte::Multimedia::Pipeline::TopologySnapshotState state) const;
 
 			mutable StormByte::Safe::Mutex m_mutex;										///< Guards all fields.
 			std::vector<TopologyDescriptor> m_stages;									///< Live registrations.
@@ -119,5 +146,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			std::optional<StormByte::Multimedia::Pipeline::TopologySnapshot> m_final;	///< Frozen view.
 			std::uint64_t m_run = 0;													///< Run generation.
 			bool m_available = false;													///< A run registered stages.
+			bool m_frozen = false;														///< Stages torn down, even if the final copy failed.
+			bool m_incomplete = false;													///< A registration was lost.
 	};
 }

@@ -61,6 +61,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		using namespace StormByte::Multimedia::Pipeline;
 
 		struct BudgetEntry {
+			bool Identified = true;
 			std::optional<StormByte::Buffer::ByteBudget> Handle;
 			std::vector<std::uint64_t> Queues;
 		};
@@ -73,12 +74,51 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		m_final.reset();
 		++m_run;
 		m_available = false;
+		m_frozen = false;
+		m_incomplete = false;
+	}
+
+	void Topology::Begin(const StormByte::Buffer::ByteBudget& budget) noexcept {
+		StormByte::Safe::Shared<BudgetIdentity> identity;
+		bool lost = false;
+		try {
+			identity = IdentifyBudget(budget);
+		} catch (const StormByte::Safe::AllocationError&) {
+			lost = true;
+		} catch (const std::bad_alloc&) {
+			lost = true;
+		}
+		Reset();
+		try {
+			Pin(std::move(identity));
+		} catch (const StormByte::Safe::AllocationError&) {
+			lost = true;
+		} catch (const std::bad_alloc&) {
+			lost = true;
+		}
+		if (lost)
+			MarkIncomplete();
+	}
+
+	void Topology::Pin(StormByte::Safe::Shared<BudgetIdentity> identity) {
+		if (!identity)
+			return;
+		StormByte::Safe::UniqueLock lock(m_mutex);
+		if (std::find(m_budgets.begin(), m_budgets.end(), identity) == m_budgets.end())
+			m_budgets.push_back(std::move(identity));
+	}
+
+	void Topology::MarkIncomplete() noexcept {
+		StormByte::Safe::UniqueLock lock(m_mutex);
+		m_incomplete = true;
 	}
 
 	void Topology::Register(TopologyDescriptor stage) {
-		if (!stage.Probe)
-			return;
 		StormByte::Safe::UniqueLock lock(m_mutex);
+		if (!stage.Probe) {
+			m_incomplete = true;
+			return;
+		}
 		if (m_final)
 			return;
 		const auto id = stage.Probe->Id();
@@ -94,20 +134,21 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		StormByte::Safe::UniqueLock lock(m_mutex);
 		if (m_final || !m_available)
 			return;
+		m_frozen = true;
 		try {
 			// Keep budget identities so later runs sharing the budget reuse the id.
-			std::vector<StormByte::Safe::Shared<BudgetIdentity>> identities;
+			auto identities = m_budgets;
 			for (const auto& stage : m_stages) {
 				for (const auto& reading : stage.Probe->Read()) {
 					if (reading.Budget && std::find(identities.begin(), identities.end(), reading.Budget) == identities.end())
 						identities.push_back(reading.Budget);
 				}
 			}
-			m_final = Build(true);
+			m_final = Build(TopologySnapshotState::Final);
 			m_budgets = std::move(identities);
 			m_stages.clear();
 		} catch (const StormByte::Safe::AllocationError&) {
-			// Live probes still report final values after their stages detach.
+			// Reported as Unfrozen: detached probes keep immutable queue values, budgets stay live.
 		} catch (const std::bad_alloc&) {
 		}
 	}
@@ -116,11 +157,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		StormByte::Safe::UniqueLock lock(m_mutex);
 		if (m_final)
 			return *m_final;
-		return Build(false);
+		return Build(m_frozen ? TopologySnapshotState::Unfrozen : TopologySnapshotState::Live);
 	}
 
-	TopologySnapshot Topology::Build(bool final) const {
-		const auto state = final ? TopologySnapshotState::Final : TopologySnapshotState::Live;
+	TopologySnapshot Topology::Build(TopologySnapshotState state) const {
+		const bool final = state == TopologySnapshotState::Final;
 		const std::size_t count = m_stages.size();
 		std::vector<TopologyStage> stages;
 		std::vector<std::vector<QueueProbe::Reading>> readings;
@@ -173,6 +214,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				if (reading.Budget) {
 					queue.Budget = reading.Budget->Id;
 					auto& entry = budgets[reading.Budget->Id];
+					entry.Identified = reading.Budget->Identified();
 					if (!entry.Handle && reading.Handle)
 						entry.Handle = std::move(reading.Handle);
 					entry.Queues.push_back(queue.Id);
@@ -204,6 +246,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 		TopologySnapshot out;
 		out.Available = m_available;
+		out.Complete = !m_incomplete && state != TopologySnapshotState::Unfrozen;
+		for (const auto& stage : m_stages) {
+			if (stage.Probe->Incomplete())
+				out.Complete = false;
+		}
 		out.State = state;
 		out.Run = m_run;
 		out.Stages.reserve(stages.size());
@@ -216,7 +263,9 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		for (auto& [id, entry] : budgets) {
 			TopologyBudget budget;
 			budget.Id = id;
-			budget.State = state;
+			budget.Identified = entry.Identified;
+			// Budget values are read through the live handle unless this is the frozen copy.
+			budget.State = final ? TopologySnapshotState::Final : TopologySnapshotState::Live;
 			for (const auto queue : entry.Queues)
 				budget.Queues.push_back(queue);
 			if (entry.Handle)

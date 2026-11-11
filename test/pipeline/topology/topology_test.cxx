@@ -262,6 +262,7 @@ namespace {
 	int CheckFinal(const TopologySnapshot& snapshot) {
 		TEST_REQUIRE(snapshot.Available);
 		TEST_REQUIRE(snapshot.State == TopologySnapshotState::Final);
+		TEST_REQUIRE(snapshot.Complete);
 		TEST_REQUIRE(Consistent(snapshot));
 		for (const auto& queue : snapshot.Queues)
 			TEST_REQUIRE(queue.State == TopologySnapshotState::Final);
@@ -532,13 +533,68 @@ int test_topology_unlimited_queues_and_open_failure() {
 	return 0;
 }
 
+int test_topology_closed_budget_identity() {
+	auto logger = MakeLogger();
+	StormByte::Buffer::ByteBudget budget{SharedBudgetBytes};
+	BufferingPolicy policy;
+	policy.Budget(budget);
+	const auto runJob = [&](const char* name, const BufferingPolicy& buffering) {
+		StormByte::Safe::Shared<const JobTelemetry> telemetry;
+		Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath(name)), logger, 2008000000LL};
+		job.Buffering(buffering);
+		job.Video(0).Remux();
+		job.Audio(1).Remux();
+		if (CheckTranscoderConfigured(job) != 0)
+			return telemetry;
+		telemetry = job.Telemetry();
+		job.Run();
+		const auto deadline = std::chrono::steady_clock::now() + 30s;
+		while (!IsTerminalStatus(job.Status()) && std::chrono::steady_clock::now() < deadline)
+			std::this_thread::sleep_for(5ms);
+		return telemetry;
+	};
+
+	const auto first = runJob("pipeline/topology/budget-open.mkv", policy);
+	TEST_REQUIRE(first);
+	const auto open = first->Topology();
+	TEST_REQUIRE(CheckFinal(open) == 0 && open.Complete);
+	TEST_REQUIRE(open.Budgets.size() == 1 && open.Budgets.front().Identified);
+	const auto id = open.Budgets.front().Id;
+
+	// Closed after an earlier sighting: still the same, proven budget.
+	budget.Close();
+	const auto second = runJob("pipeline/topology/budget-closed.mkv", policy);
+	TEST_REQUIRE(second);
+	const auto closed = second->Topology();
+	TEST_REQUIRE(Consistent(closed) && closed.Complete);
+	TEST_REQUIRE(closed.Available && !closed.Budgets.empty());
+	for (const auto& entry : closed.Budgets)
+		TEST_REQUIRE(entry.Identified && entry.Id == id && entry.Snapshot.Closed);
+
+	// Closed before any sighting: reported unidentified, never merged under a false id.
+	StormByte::Buffer::ByteBudget unseen{SharedBudgetBytes};
+	unseen.Close();
+	BufferingPolicy unseenPolicy;
+	unseenPolicy.Budget(unseen);
+	const auto third = runJob("pipeline/topology/budget-unseen.mkv", unseenPolicy);
+	TEST_REQUIRE(third);
+	const auto anonymous = third->Topology();
+	TEST_REQUIRE(Consistent(anonymous) && anonymous.Complete);
+	TEST_REQUIRE(anonymous.Available && !anonymous.Budgets.empty());
+	for (const auto& entry : anonymous.Budgets)
+		TEST_REQUIRE(!entry.Identified && entry.Queues.size() == 1 && entry.Id != id);
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
 		TestEntry{"test_topology_reports_filters_tracks_remux_and_shared_budget",
 			test_topology_reports_filters_tracks_remux_and_shared_budget},
 		TestEntry{"test_topology_cancel_freezes_and_survives_transcoder", test_topology_cancel_freezes_and_survives_transcoder},
 		TestEntry{"test_topology_failure_is_final", test_topology_failure_is_final},
-		TestEntry{"test_topology_unlimited_queues_and_open_failure", test_topology_unlimited_queues_and_open_failure}
+		TestEntry{"test_topology_unlimited_queues_and_open_failure", test_topology_unlimited_queues_and_open_failure},
+		TestEntry{"test_topology_closed_budget_identity", test_topology_closed_budget_identity}
 	};
 	return RunSelectedTest(argc, argv, tests);
 }

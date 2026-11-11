@@ -35,10 +35,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 ### Added
 
 - Add independent queue element limits, logical payload-byte limits and shared byte budgets through `Pipeline::BufferingPolicy`, backed by StormByte Buffer 4.0.0 weighted queue admission. Stage snapshots expose effective queue limits, occupancy and backpressure counters.
-- Add `JobTelemetry::Topology()`: a thread-safe, owned snapshot of the latest run's real stages (kind, track, media, filter family and position, pipeline order) and their unique Buffer queues (consumer, producers, input/output/pending role, full `Buffer::QueueSnapshot`), plus deduplicated `Buffer::BudgetSnapshot`s with stable ids. Readable while running, paused, after cancel or failure and after the `Transcoder` is destroyed, with live versus final state.
+- Add `JobTelemetry::Topology()`: a thread-safe, owned snapshot of the latest run's real stages (kind, track, media, filter family and position, pipeline order) and their unique Buffer queues (consumer, producers, input/output/pending role, full `Buffer::QueueSnapshot`), plus deduplicated `Buffer::BudgetSnapshot`s with stable ids (`Identified == false` when a budget closed before any sighting cannot be proven shared). `Complete` reports lost bookkeeping, `RecorderFailed` an unavailable recorder, and `Unfrozen` a teardown whose final copy could not be allocated. Readable while running, paused, after cancel or failure and after the `Transcoder` is destroyed, with live versus final state.
 
 ### Fixed
 
+- Join demux feeder threads while their owning stage and its synchronization
+  state are still alive, including when a decoder fails during startup.
 - Prefer the decoder's best-effort presentation timestamp when available, even
   when the raw frame PTS is present, reducing duplicates in reordered MPEG-4
   AVI transcoding. Retain the raw PTS and delayed-frame fallback when no

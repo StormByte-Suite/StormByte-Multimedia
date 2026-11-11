@@ -58,6 +58,7 @@
 #include <StormByte/safe/pointers.hxx>
 #include <StormByte/size.hxx>
 
+#include <atomic>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -80,13 +81,22 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	struct STORMBYTE_MULTIMEDIA_PRIVATE BudgetIdentity {
 		std::uint64_t Id = 0;							///< Topology budget id.
 		StormByte::Buffer::ByteBudget::Lease Anchor;	///< Empty when the budget refused a zero-byte anchor.
+
+		/**
+		 * @brief Whether sharing can be proven through @ref Anchor.
+		 * @return False for a budget closed before any anchor existed.
+		 */
+		bool Identified() const noexcept { return static_cast<bool>(Anchor); }
 	};
 
 	/**
 	 * @brief Resolve the shared identity of @p budget.
 	 * @param budget Budget handle.
-	 * @return Existing identity when an anchored one matches, otherwise a new one.
-	 * @throw Safe::AllocationError or std::bad_alloc.
+	 * @return Existing identity when a live anchor matches. Otherwise a new
+	 *         identity, anchored only if @p budget is still open; a closed
+	 *         budget yields an unidentified one instead of a false match.
+	 * @throw Safe::AllocationError or std::bad_alloc, including when the anchor
+	 *        lease of an open budget cannot be allocated.
 	 */
 	STORMBYTE_MULTIMEDIA_PRIVATE StormByte::Safe::Shared<BudgetIdentity>
 		IdentifyBudget(const StormByte::Buffer::ByteBudget& budget);
@@ -199,6 +209,12 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void PendingReopen() noexcept;
 
 			/**
+			 * @brief Whether bookkeeping was lost to an allocation failure.
+			 * @return True if a producer link, budget, pending list or final key may be missing.
+			 */
+			bool Incomplete() const noexcept { return m_incomplete.load(std::memory_order_acquire); }
+
+			/**
 			 * @brief Read every known queue.
 			 * @return Owned readings.
 			 * @throw Safe::AllocationError or std::bad_alloc.
@@ -226,5 +242,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			const ItemSink* m_sink;							///< Borrowed sink; null after Detach.
 			mutable std::map<int, KeyState> m_keys;			///< Known sink keys.
 			std::map<int, PendingState> m_pending;			///< Demux pending lists.
+			std::atomic<bool> m_incomplete{false};			///< Set when bookkeeping could not allocate.
 	};
 }
