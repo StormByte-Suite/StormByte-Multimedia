@@ -38,6 +38,11 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
+- Use the decoder's best-effort presentation timestamp when available, even
+  when the raw frame PTS is present, to preserve reordered MPEG-4 AVI timing
+  during video transcoding. Retain the raw PTS and delayed-frame fallback when
+  no best-effort timestamp exists; regress SVT-AV1 and VP9 output, copied audio
+  and variable-frame-rate presentation timestamps.
 - Intentional Running/Paused transcoder cancellation now ends in `Aborted`,
   not `Error`. Wake and join in-flight stages before reporting cancellation,
   distinguish expected queue closure from admission failures, preserve genuine

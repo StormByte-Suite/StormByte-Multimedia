@@ -328,7 +328,8 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Decoder {
 				video->SampleAspectRatio(), video->DOVI());
 		}
 
-		if (holder->Handle().Pts() == AV_NOPTS_VALUE)
+		// FFmpeg may correct a present but reordered PTS using decoder timing.
+		if (holder->Handle().BestEffortTimestamp() != AV_NOPTS_VALUE)
 			holder->Handle().Pts(holder->Handle().BestEffortTimestamp());
 		// A delayed final AVI frame can lack both PTS and a best-effort timestamp.
 		if (holder->Handle().Pts() == AV_NOPTS_VALUE && m_nextPts)

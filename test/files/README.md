@@ -29,6 +29,39 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
 - `video/hdr10_metadata_source.mkv`: HEVC Main 10 source with BT.2020/PQ, mastering-display and content-light metadata.
 - `video/hdr_without_mastering_metadata.mkv`: BT.2020/PQ HEVC Main 10 with mastering-display and content-light side-data intentionally absent. `File` is expected to classify it as HDR10-like and report `HDR10::Source::Heuristics` from the signaled primaries/transfer, rather than treating it as SDR.
 - `video/xvid_mp3_stereo.avi`: Xvid/MPEG-4 Part 2 video with stereo MP3 audio.
+- `video/late_bframes_dx50.avi`: three seconds of synthetic 96x64/25 fps
+  MPEG-4 Part 2 video and AC-3 audio. A one-second Xvid segment without
+  B-frames precedes a two-second packed B-frame segment. The later reordering
+  makes at least one decoded raw PTS differ from FFmpeg's best-effort
+  presentation timestamp. Regress the decoded and transcoded timelines and
+  copied audio with SVT-AV1 and VP9. SHA-256:
+  `41771e6f9abfffe53be576626e0140c154f7b0f26a1a5ccb15d73642f9285a88`
+  (111,168 bytes). Authored once with FFmpeg 9.0.2 and libxvid:
+
+  ```sh
+  ffmpeg -v error -n -f lavfi -i 'testsrc2=size=96x64:rate=25:duration=1' \
+    -c:v libxvid -bf 0 -g 25 -vtag DX50 no-b.avi
+  ffmpeg -v error -n -f lavfi -i 'testsrc2=size=96x64:rate=25:duration=2' \
+    -c:v libxvid -bf 2 -g 25 -vtag DX50 with-b.avi
+  ffmpeg -v error -n -i 'concat:no-b.avi|with-b.avi' \
+    -f lavfi -i 'sine=frequency=440:sample_rate=48000:duration=3' \
+    -map 0:v -map 1:a -c:v copy -tag:v DX50 -c:a ac3 -b:a 96k \
+    -fflags +bitexact -flags:a +bitexact -shortest late_bframes_dx50.avi
+  ```
+
+- `video/vfr_pts.mkv`: synthetic 96x64 FFV1 with irregular 40 ms and 80 ms
+  frame gaps on a 1/1000 container timebase. Tests compare every decoded
+  presentation timestamp before and after H.264/MP4 transcoding. SHA-256:
+  `9285341f19ae9a237710907cc5985e662e7edf85b3c1da0e37f55769b5fff5be`
+  (73,279 bytes). Authored once with:
+
+  ```sh
+  ffmpeg -hide_banner -loglevel error -n -f lavfi \
+    -i 'testsrc2=size=96x64:rate=25:duration=2' \
+    -vf "select='not(eq(mod(n,3),1))'" -fps_mode vfr -c:v ffv1 \
+    -fflags +bitexact -flags:v +bitexact -map_metadata -1 vfr_pts.mkv
+  ```
+
 - `video/packed_ac3_seek.avi`: eight seconds of 96x64/25 fps synthetic `testsrc2`
   packed Xvid B-frames (`libxvid -bf 2 -g 25`) and six distinct sine tones,
   AC-3 5.1(side), 48 kHz, 448 kb/s. Audio is deliberately stored in 2,240-byte

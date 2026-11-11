@@ -112,6 +112,18 @@ namespace {
 		}
 	};
 
+	struct FrameFree {
+		void operator()(AVFrame* frame) const noexcept {
+			av_frame_free(&frame);
+		}
+	};
+
+	struct CodecFree {
+		void operator()(AVCodecContext* context) const noexcept {
+			avcodec_free_context(&context);
+		}
+	};
+
 	bool Paced(const AVStream& stream) noexcept;
 	double Seconds(std::int64_t ticks, AVRational base) noexcept;
 
@@ -443,6 +455,170 @@ namespace {
 			DecodedTiming& m_timing;
 	};
 
+	int ReadVideoTimes(const std::filesystem::path& path, std::vector<std::int64_t>& times,
+		unsigned& corrected) {
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, path.string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+		TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+		const int index = av_find_best_stream(raw, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+		TEST_REQUIRE(index >= 0);
+		const auto* stream = raw->streams[index];
+		const auto* codec = avcodec_find_decoder(stream->codecpar->codec_id);
+		TEST_REQUIRE(codec);
+		std::unique_ptr<AVCodecContext, CodecFree> decoder{avcodec_alloc_context3(codec)};
+		TEST_REQUIRE(decoder);
+		TEST_REQUIRE(avcodec_parameters_to_context(decoder.get(), stream->codecpar) >= 0);
+		decoder->pkt_timebase = stream->time_base;
+		TEST_REQUIRE(avcodec_open2(decoder.get(), codec, nullptr) >= 0);
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		std::unique_ptr<AVFrame, FrameFree> frame{av_frame_alloc()};
+		TEST_REQUIRE(packet && frame);
+		std::int64_t next = AV_NOPTS_VALUE;
+		const auto receive = [&]() {
+			int result;
+			while ((result = avcodec_receive_frame(decoder.get(), frame.get())) == 0) {
+				auto pts = frame->best_effort_timestamp;
+				if (pts != AV_NOPTS_VALUE && frame->pts != AV_NOPTS_VALUE && pts != frame->pts)
+					++corrected;
+				if (pts == AV_NOPTS_VALUE)
+					pts = frame->pts != AV_NOPTS_VALUE ? frame->pts : next;
+				if (pts == AV_NOPTS_VALUE)
+					return AVERROR_INVALIDDATA;
+				next = frame->duration > 0 ? pts + frame->duration : AV_NOPTS_VALUE;
+				times.push_back(av_rescale_q(pts, stream->time_base, AVRational{1, 1000000000}));
+				av_frame_unref(frame.get());
+			}
+			return result;
+		};
+		int result;
+		while ((result = av_read_frame(raw, packet.get())) == 0) {
+			if (packet->stream_index == index) {
+				TEST_REQUIRE(avcodec_send_packet(decoder.get(), packet.get()) == 0);
+				TEST_REQUIRE(receive() == AVERROR(EAGAIN));
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		TEST_REQUIRE(avcodec_send_packet(decoder.get(), nullptr) == 0);
+		TEST_REQUIRE(receive() == AVERROR_EOF);
+		return 0;
+	}
+
+	struct CapturedTimes {
+		std::vector<std::int64_t> Values;
+		bool Missing = false;
+	};
+
+	class CapturePresentationTimes final: public Filter::Process {
+		public:
+			explicit CapturePresentationTimes(CapturedTimes& timing):
+				Filter::Process({}, "capture-presentation-times"), m_timing(timing) {}
+			StormByte::Multimedia::Type Media() const noexcept override { return StormByte::Multimedia::Type::Video; }
+			void Clean() noexcept override {}
+			void Setup() noexcept override {}
+			void Process(const Frame& frame) noexcept override {
+				if (!frame.Pts())
+					m_timing.Missing = true;
+				else
+					m_timing.Values.push_back(frame.Pts()->Nanoseconds().count());
+			}
+		private:
+			CapturedTimes& m_timing;
+	};
+
+	struct AudioPacket {
+		std::vector<std::uint8_t> Data;
+		std::int64_t Pts;
+		std::int64_t Dts;
+	};
+
+	int ReadAudioPackets(const std::filesystem::path& path, std::vector<AudioPacket>& packets) {
+		AVFormatContext* raw = nullptr;
+		TEST_REQUIRE(avformat_open_input(&raw, path.string().c_str(), nullptr, nullptr) == 0);
+		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+		TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+		const int index = av_find_best_stream(raw, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+		TEST_REQUIRE(index >= 0);
+		std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+		TEST_REQUIRE(packet);
+		int result;
+		while ((result = av_read_frame(raw, packet.get())) == 0) {
+			if (packet->stream_index == index) {
+				TEST_REQUIRE(packet->pts != AV_NOPTS_VALUE && packet->dts != AV_NOPTS_VALUE);
+				const auto base = raw->streams[index]->time_base;
+				packets.push_back({{packet->data, packet->data + packet->size},
+					av_rescale_q(packet->pts, base, AVRational{1, 1000000}),
+					av_rescale_q(packet->dts, base, AVRational{1, 1000000})});
+			}
+			av_packet_unref(packet.get());
+		}
+		TEST_REQUIRE(result == AVERROR_EOF);
+		return 0;
+	}
+
+	int CheckDecodedTimeline(std::string_view fixture, std::string_view outputName,
+		std::string_view codecName, std::string_view encoder, bool audio, bool expectCorrection) {
+		if (!avcodec_find_encoder_by_name(std::string{encoder}.c_str()))
+			return TEST_SKIP;
+		const auto codec = Registry::Instance().FindCodec(codecName);
+		TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+		const auto source = FixturePath(fixture);
+		const auto output = OutputPath(outputName);
+		std::vector<std::int64_t> expected;
+		unsigned corrected = 0;
+		TEST_REQUIRE(ReadVideoTimes(source, expected, corrected) == 0);
+		TEST_REQUIRE(!expected.empty());
+		if (expectCorrection) {
+			TEST_REQUIRE(corrected > 0);
+			TEST_REQUIRE(expected.size() == 74);
+		}
+		else {
+			TEST_REQUIRE(expected.size() == 33);
+			TEST_REQUIRE(expected[1] - expected[0] != expected[2] - expected[1]);
+		}
+		auto logger = MakeLogger();
+		CapturedTimes captured;
+		Transcoder job{TestLocation(source), TestLocation(output), logger};
+		auto track = job.Video(0);
+		track.Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder})
+			.Acceleration(DecodeAcceleration::Software).Filter<CapturePresentationTimes>(captured);
+		if (encoder == "libsvtav1")
+			track.Preset(StormByte::Safe::String{"12"}).CRF(40);
+		else if (encoder == "libx264")
+			track.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
+		else {
+			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
+			options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
+			options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
+			track.FineTune(std::move(options));
+		}
+		if (audio)
+			job.Audio(1).Remux();
+		TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+		job.Run();
+		TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		TEST_REQUIRE(!captured.Missing);
+		TEST_REQUIRE(captured.Values == expected);
+		std::vector<std::int64_t> actual;
+		unsigned outputCorrected = 0;
+		TEST_REQUIRE(ReadVideoTimes(output, actual, outputCorrected) == 0);
+		TEST_REQUIRE(actual == expected);
+		if (audio) {
+			std::vector<AudioPacket> original;
+			std::vector<AudioPacket> remuxed;
+			TEST_REQUIRE(ReadAudioPackets(source, original) == 0);
+			TEST_REQUIRE(ReadAudioPackets(output, remuxed) == 0);
+			TEST_REQUIRE(!original.empty() && original.size() == remuxed.size());
+			for (std::size_t i = 0; i < original.size(); ++i) {
+				TEST_REQUIRE(original[i].Data == remuxed[i].Data);
+				TEST_REQUIRE(std::abs(original[i].Pts - remuxed[i].Pts) <= 1000);
+				TEST_REQUIRE(std::abs(original[i].Dts - remuxed[i].Dts) <= 1000);
+			}
+		}
+		return 0;
+	}
+
 	int CheckLongMovTextGaps(bool fragmented, bool mixedTimeBases) {
 #ifdef STORMBYTE_MM_TEST_FFMPEG_SYSTEM
 		// SYSTEM releases through 9.0.2 lack the bundled mov_text gap patch.
@@ -655,6 +831,21 @@ int test_avi_missing_pts_preserves_timeline_and_progress() {
 	}
 	TEST_REQUIRE(result == AVERROR_EOF && count == 50);
 	return 0;
+}
+
+int test_avi_reordered_pts_svt_timeline() {
+	return CheckDecodedTimeline("video/late_bframes_dx50.avi", "pipeline/interleave/late-b-svt.mkv",
+		"AV1", "libsvtav1", true, true);
+}
+
+int test_avi_reordered_pts_vp9_timeline() {
+	return CheckDecodedTimeline("video/late_bframes_dx50.avi", "pipeline/interleave/late-b-vp9.mkv",
+		"VP9", "libvpx-vp9", true, true);
+}
+
+int test_vfr_preserves_presentation_timeline() {
+	return CheckDecodedTimeline("video/vfr_pts.mkv", "pipeline/interleave/vfr-h264.mp4",
+		"H.264", "libx264", false, false);
 }
 
 // -------------------
@@ -1102,6 +1293,9 @@ int test_three_track_remux_with_small_shared_queues() {
 int RunPipelineInterleaveTests(int argc, char** argv) {
 	const std::array tests{
 		TestEntry{"test_avi_missing_pts_preserves_timeline_and_progress", test_avi_missing_pts_preserves_timeline_and_progress},
+		TestEntry{"test_avi_reordered_pts_svt_timeline", test_avi_reordered_pts_svt_timeline},
+		TestEntry{"test_avi_reordered_pts_vp9_timeline", test_avi_reordered_pts_vp9_timeline},
+		TestEntry{"test_vfr_preserves_presentation_timeline", test_vfr_preserves_presentation_timeline},
 		TestEntry{"test_mov_text_preserves_long_gaps", test_mov_text_preserves_long_gaps},
 		TestEntry{"test_mov_text_preserves_long_gaps_mixed_time_bases", test_mov_text_preserves_long_gaps_mixed_time_bases},
 		TestEntry{"test_mov_text_preserves_long_gaps_fragmented", test_mov_text_preserves_long_gaps_fragmented},
