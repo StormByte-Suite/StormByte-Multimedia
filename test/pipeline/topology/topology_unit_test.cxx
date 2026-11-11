@@ -73,6 +73,7 @@
 
 #if defined(__linux__) && defined(__GLIBC__) && !defined(__SANITIZE_ADDRESS__) && !__has_feature(address_sanitizer)
 #define TOPOLOGY_ALLOCATION_INTERPOSITION 1
+#include <pthread.h>
 #endif
 
 using StormByte::ByteSize;
@@ -86,6 +87,7 @@ using namespace StormByte::Multimedia::Pipeline;
 using namespace std::chrono_literals;
 
 namespace {
+#ifdef TOPOLOGY_ALLOCATION_INTERPOSITION
 	thread_local std::size_t reject_after = std::numeric_limits<std::size_t>::max();
 	thread_local std::size_t denied = 0;
 	// Countdown applied only on the transcoder coordinator thread; negative when disarmed.
@@ -116,6 +118,7 @@ namespace {
 		errno = ENOMEM;
 		return true;
 	}
+#endif
 
 	std::optional<QueueProbe::Reading> FindReading(const QueueProbe& probe, int key, bool pending = false) {
 		for (auto& reading : probe.Read())

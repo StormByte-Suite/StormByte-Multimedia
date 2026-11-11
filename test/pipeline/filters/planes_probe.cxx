@@ -68,7 +68,15 @@ class Dump final: public Filter::Process {
 
 int main(int argc, char** argv) {
 	if (argc < 6) return 2;
+#ifdef _MSC_VER
+	::fopen_s(&g_dump, argv[3], "wb");
+#else
 	g_dump = std::fopen(argv[3], "wb");
+#endif
+	if (!g_dump) {
+		std::perror(argv[3]);
+		return 1;
+	}
 	g_canon = std::stoi(argv[4]);
 	const std::string name = argv[2];
 	auto codec = Registry::Instance().FindCodec("VP9");
