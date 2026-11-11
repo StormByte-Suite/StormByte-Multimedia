@@ -23,6 +23,17 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### TODO
 
+- Investigate FFmpeg's handling of packed DivX/MPEG-4 AVI with missing VOL
+  control parameters and B-frame reordering. With FFmpeg 9.0.2, one affected
+  sample produces a duplicate decoded reference, a roughly one-frame video
+  timestamp shift and a non-increasing final timestamp warning. Multimedia
+  currently follows FFmpeg's best-effort timestamps; the underlying issue
+  remains. Compare container timing, coded VOP timing, frame identity, duration
+  and A/V synchronization, including seeks and variable-frame-rate inputs.
+  Do not assume either DTS order or the VOP clock always gives the original
+  presentation times: some encoders can discard source timing information.
+  Any upstream fix should preserve existing behavior when timing cannot be
+  recovered reliably and avoid inventing timestamps or dropping valid frames.
 - Design optional GPU color-conversion and HDR-to-SDR tone-mapping backends for Linux, Windows and macOS. Evaluate Vulkan/VA-API/CUDA interoperability on Linux, D3D11 video processing or shaders on Windows, and VideoToolbox/Metal on macOS; preserve correct PQ/HLG transfer, primaries, range and mastering metadata. Check backend availability and licensing/build implications before adding dependencies, retain an explicit CPU fallback and test output against the current color-managed reference.
 - Explore bounded, explicitly owned GPU-frame delivery so native presentation can avoid hardware-frame download and RGB re-upload. Define device/context ownership, synchronization, frame lifetime, cancellation and cross-thread rules without exposing private FFmpeg types or breaking existing Display consumers.
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
@@ -46,8 +57,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
   AVI transcoding. Retain the raw PTS and delayed-frame fallback when no
   best-effort timestamp exists. Misflagged packed MPEG-4 streams can still
   produce a duplicate decoded reference and shift the subsequent presentation
-  timeline, including the final frame; those streams require further
-  correction before release.
+  timeline, including the final frame; this FFmpeg limitation remains under
+  investigation.
 - Preserve the decoded video time base independently of the nominal frame
   rate when opening video encoders, instead of quantizing variable-frame-rate
   timestamps to the nominal frame duration. Preserve nominal duration when an
