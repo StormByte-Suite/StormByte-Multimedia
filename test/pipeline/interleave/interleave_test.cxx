@@ -53,6 +53,7 @@
 
 #include <StormByte/buffer/io/buffered_file_writer.hxx>
 #include <StormByte/buffer/io/telemetry.hxx>
+#include <StormByte/multimedia/ffmpeg/AVFrame.hxx>
 #include <StormByte/multimedia/pipeline/demuxer.hxx>
 #include <StormByte/multimedia/pipeline/filters/audio/loudnorm.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
@@ -527,6 +528,25 @@ namespace {
 			CapturedTimes& m_timing;
 	};
 
+	class ReplaceVideoFrame final: public Filter::Process {
+		public:
+			ReplaceVideoFrame(): Filter::Process({}, "replace-video-frame") {}
+			StormByte::Multimedia::Type Media() const noexcept override { return StormByte::Multimedia::Type::Video; }
+		protected:
+			void Clean() noexcept override {}
+			void Setup() noexcept override {}
+			void Process(const Frame&) noexcept override {
+				StormByte::Multimedia::FFmpeg::AVFrame replacement;
+				const auto& source = AVFrame();
+				if (!replacement.AllocVideo(source.Width(), source.Height(), source.Format())
+					|| !replacement.Copy(source)) {
+					Fail("could not replace video frame");
+					return;
+				}
+				Save(std::move(replacement));
+			}
+	};
+
 	struct AudioPacket {
 		std::vector<std::uint8_t> Data;
 		std::int64_t Pts;
@@ -558,7 +578,8 @@ namespace {
 	}
 
 	int CheckDecodedTimeline(std::string_view fixture, std::string_view outputName,
-		std::string_view codecName, std::string_view encoder, bool audio, bool expectCorrection) {
+		std::string_view codecName, std::string_view encoder, bool audio, bool expectCorrection,
+		bool replaceFrame = false) {
 		if (!avcodec_find_encoder_by_name(std::string{encoder}.c_str()))
 			return TEST_SKIP;
 		const auto codec = Registry::Instance().FindCodec(codecName);
@@ -576,6 +597,12 @@ namespace {
 		else {
 			TEST_REQUIRE(expected.size() == 33);
 			TEST_REQUIRE(expected[1] - expected[0] != expected[2] - expected[1]);
+			if (fixture == "video/vfr_subframe_pts.mkv" || fixture == "video/vfr_90k_pts.mp4") {
+				TEST_REQUIRE(expected[0] == 0);
+				TEST_REQUIRE(expected[1] == 45000000);
+				TEST_REQUIRE(expected[2] == 80000000);
+				TEST_REQUIRE(expected[3] == 125000000);
+			}
 		}
 		auto logger = MakeLogger();
 		CapturedTimes captured;
@@ -583,11 +610,13 @@ namespace {
 		auto track = job.Video(0);
 		track.Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{encoder})
 			.Acceleration(DecodeAcceleration::Software).Filter<CapturePresentationTimes>(captured);
+		if (replaceFrame)
+			track.Filter<ReplaceVideoFrame>();
 		if (encoder == "libsvtav1")
 			track.Preset(StormByte::Safe::String{"12"}).CRF(40);
 		else if (encoder == "libx264")
 			track.Preset(StormByte::Safe::String{"ultrafast"}).CRF(30);
-		else {
+		else if (encoder == "libvpx-vp9") {
 			StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String> options;
 			options.emplace(StormByte::Safe::String{"cpu-used"}, StormByte::Safe::String{"8"});
 			options.emplace(StormByte::Safe::String{"deadline"}, StormByte::Safe::String{"realtime"});
@@ -604,6 +633,28 @@ namespace {
 		unsigned outputCorrected = 0;
 		TEST_REQUIRE(ReadVideoTimes(output, actual, outputCorrected) == 0);
 		TEST_REQUIRE(actual == expected);
+		if (fixture == "video/vfr_subframe_pts.mkv" && encoder == "libsvtav1") {
+			AVFormatContext* raw = nullptr;
+			TEST_REQUIRE(avformat_open_input(&raw, output.string().c_str(), nullptr, nullptr) == 0);
+			std::unique_ptr<AVFormatContext, InputCloser> input{raw};
+			TEST_REQUIRE(avformat_find_stream_info(raw, nullptr) >= 0);
+			const int index = av_find_best_stream(raw, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+			TEST_REQUIRE(index >= 0);
+			std::unique_ptr<AVPacket, PacketFree> packet{av_packet_alloc()};
+			TEST_REQUIRE(packet);
+			std::size_t count = 0;
+			int result;
+			while ((result = av_read_frame(raw, packet.get())) == 0) {
+				if (packet->stream_index == index) {
+					TEST_REQUIRE(av_rescale_q(packet->duration, raw->streams[index]->time_base,
+						AVRational{1, 1000000000}) == 40000000);
+					++count;
+				}
+				av_packet_unref(packet.get());
+			}
+			TEST_REQUIRE(result == AVERROR_EOF);
+			TEST_REQUIRE(count == expected.size());
+		}
 		if (audio) {
 			std::vector<AudioPacket> original;
 			std::vector<AudioPacket> remuxed;
@@ -846,6 +897,76 @@ int test_avi_reordered_pts_vp9_timeline() {
 int test_vfr_preserves_presentation_timeline() {
 	return CheckDecodedTimeline("video/vfr_pts.mkv", "pipeline/interleave/vfr-h264.mp4",
 		"H.264", "libx264", false, false);
+}
+
+int test_vfr_subframe_h264_timeline() {
+	return CheckDecodedTimeline("video/vfr_subframe_pts.mkv", "pipeline/interleave/vfr-subframe-h264.mp4",
+		"H.264", "libx264", false, false);
+}
+
+int test_vfr_subframe_replaced_frame_timeline() {
+	return CheckDecodedTimeline("video/vfr_subframe_pts.mkv", "pipeline/interleave/vfr-replaced-h264.mp4",
+		"H.264", "libx264", false, false, true);
+}
+
+int test_vfr_subframe_svt_timeline() {
+	return CheckDecodedTimeline("video/vfr_subframe_pts.mkv", "pipeline/interleave/vfr-subframe-svt.mkv",
+		"AV1", "libsvtav1", false, false);
+}
+
+int test_vfr_subframe_vp9_timeline() {
+	return CheckDecodedTimeline("video/vfr_subframe_pts.mkv", "pipeline/interleave/vfr-subframe-vp9.mkv",
+		"VP9", "libvpx-vp9", false, false);
+}
+
+int test_vfr_90k_mpeg4_timeline() {
+	return CheckDecodedTimeline("video/vfr_90k_pts.mp4", "pipeline/interleave/vfr-90k-mpeg4.mkv",
+		"MPEG-4 Part 2", "mpeg4", false, false);
+}
+
+int test_vfr_90k_xvid_timeline() {
+	return CheckDecodedTimeline("video/vfr_90k_pts.mp4", "pipeline/interleave/vfr-90k-xvid.mkv",
+		"MPEG-4 Part 2", "libxvid", false, false);
+}
+
+int test_vfr_90k_mpeg4_unrepresentable() {
+	if (!avcodec_find_encoder_by_name("mpeg4"))
+		return TEST_SKIP;
+	const auto codec = Registry::Instance().FindCodec("MPEG-4 Part 2");
+	TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(FixturePath("video/vfr_90k_unrepresentable.mp4")),
+		TestLocation(OutputPath("pipeline/interleave/vfr-90k-unrepresentable.mkv")), logger};
+	job.Video(0).Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"mpeg4"})
+		.Acceleration(DecodeAcceleration::Software);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	return WaitForTranscoderFailure(job, "video encoder time base cannot represent the source presentation timestamp");
+}
+
+int test_cfr_microsecond_clock_mpeg4_timeline() {
+	if (!avcodec_find_encoder_by_name("mpeg4"))
+		return TEST_SKIP;
+	const auto codec = Registry::Instance().FindCodec("MPEG-4 Part 2");
+	TEST_REQUIRE(codec && codec->get().HasAccess(Access{Operation::Write}));
+	const auto source = FixturePath("video/cfr_24fps_microseconds.mp4");
+	const auto output = OutputPath("pipeline/interleave/cfr-24-mpeg4.mp4");
+	auto logger = MakeLogger();
+	Transcoder job{TestLocation(source), TestLocation(output), logger};
+	job.Video(0).Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"mpeg4"})
+		.Acceleration(DecodeAcceleration::Software);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	job.Run();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	std::vector<std::int64_t> expected, actual;
+	unsigned corrected = 0;
+	TEST_REQUIRE(ReadVideoTimes(source, expected, corrected) == 0);
+	TEST_REQUIRE(ReadVideoTimes(output, actual, corrected) == 0);
+	TEST_REQUIRE(expected.size() == 24 && actual.size() == expected.size());
+	for (std::size_t i = 0; i < expected.size(); ++i)
+		TEST_REQUIRE(av_rescale_q(actual[i], AVRational{1, 1000000000}, AVRational{1, 1000000})
+			== av_rescale_q(expected[i], AVRational{1, 1000000000}, AVRational{1, 1000000}));
+	return 0;
 }
 
 // -------------------
@@ -1296,6 +1417,14 @@ int RunPipelineInterleaveTests(int argc, char** argv) {
 		TestEntry{"test_avi_reordered_pts_svt_timeline", test_avi_reordered_pts_svt_timeline},
 		TestEntry{"test_avi_reordered_pts_vp9_timeline", test_avi_reordered_pts_vp9_timeline},
 		TestEntry{"test_vfr_preserves_presentation_timeline", test_vfr_preserves_presentation_timeline},
+		TestEntry{"test_vfr_subframe_h264_timeline", test_vfr_subframe_h264_timeline},
+		TestEntry{"test_vfr_subframe_replaced_frame_timeline", test_vfr_subframe_replaced_frame_timeline},
+		TestEntry{"test_vfr_subframe_svt_timeline", test_vfr_subframe_svt_timeline},
+		TestEntry{"test_vfr_subframe_vp9_timeline", test_vfr_subframe_vp9_timeline},
+		TestEntry{"test_vfr_90k_mpeg4_timeline", test_vfr_90k_mpeg4_timeline},
+		TestEntry{"test_vfr_90k_xvid_timeline", test_vfr_90k_xvid_timeline},
+		TestEntry{"test_vfr_90k_mpeg4_unrepresentable", test_vfr_90k_mpeg4_unrepresentable},
+		TestEntry{"test_cfr_microsecond_clock_mpeg4_timeline", test_cfr_microsecond_clock_mpeg4_timeline},
 		TestEntry{"test_mov_text_preserves_long_gaps", test_mov_text_preserves_long_gaps},
 		TestEntry{"test_mov_text_preserves_long_gaps_mixed_time_bases", test_mov_text_preserves_long_gaps_mixed_time_bases},
 		TestEntry{"test_mov_text_preserves_long_gaps_fragmented", test_mov_text_preserves_long_gaps_fragmented},

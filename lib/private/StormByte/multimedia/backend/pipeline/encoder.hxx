@@ -373,6 +373,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	 * @param timeBase Encoder time base chosen by the media leaf.
 	 * @param need Extra feature bits the leaf derived from the frame.
 	 * @param firstFrame Optional decoded metadata used to configure native video encoding.
+	 * @param frameRate Nominal video frame rate, independent of timestamp time base.
 	 * @return Opened backend, or empty after owner.Fail().
 	 */
 	StormByte::Safe::Optional<StormByte::Multimedia::Backend::Pipeline::Encoder::Opened> OpenCodec(
@@ -380,5 +381,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		StormByte::Multimedia::FFmpeg::AVCodecParameters params,
 		AVRational timeBase,
 		StormByte::Multimedia::Features need,
-		const StormByte::Multimedia::FFmpeg::AVFrame* firstFrame = nullptr);
+		const StormByte::Multimedia::FFmpeg::AVFrame* firstFrame = nullptr,
+		AVRational frameRate = {0, 1});
 }

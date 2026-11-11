@@ -198,6 +198,8 @@ void Frame::Put(StormByte::Multimedia::Pipeline::Frame& owner, ::AVFrame* raw) n
 	m_contentValid = true;
 	const ::AVFrame* before = m_handle.Get();
 	if (owner.Type() == Type::Video && raw) {
+		if (before && (raw->time_base.num <= 0 || raw->time_base.den <= 0))
+			raw->time_base = before->time_base;
 		Detail::Content::Video::ResolveColor(before, raw);
 		const bool keepsHdr = Detail::Content::Video::HdrCompatible(raw);
 		const bool keepsDovi = !before || Detail::Content::Video::DoviCompatible(before, raw);

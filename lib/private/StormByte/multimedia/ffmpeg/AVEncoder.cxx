@@ -490,7 +490,7 @@ FFmpeg::AVEncoder::~AVEncoder() noexcept {
 
 FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, const AVCodecParameters& params, int stream_index,
 	const StormByte::Safe::Map<StormByte::Safe::String, StormByte::Safe::String>& options, FFmpeg::AVRational time_base,
-	const AVFrame* firstFrame, int thread_count) {
+	const AVFrame* firstFrame, int thread_count, FFmpeg::AVRational frame_rate) {
 	const std::string codec_name_copy{codec_name};
 	const AVCodec* codec = avcodec_find_encoder_by_name(codec_name_copy.c_str());
 	if (!codec || !params.Get())
@@ -556,10 +556,9 @@ FFmpeg::ExpectedAVEncoder FFmpeg::AVEncoder::Open(std::string_view codec_name, c
 	if (time_base.num > 0 && time_base.den > 0) {
 		ctx->time_base = FFmpeg::ToRaw(time_base);
 		ctx->pkt_timebase = FFmpeg::ToRaw(time_base);
-		if (ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
-			ctx->framerate.num = time_base.den;
-			ctx->framerate.den = time_base.num;
-		}
+		if (ctx->codec_type == AVMEDIA_TYPE_VIDEO)
+			ctx->framerate = frame_rate.Valid()
+				? FFmpeg::ToRaw(frame_rate) : ::AVRational{time_base.den, time_base.num};
 	}
 
 	if (ctx->codec_type == AVMEDIA_TYPE_SUBTITLE && !ctx->subtitle_header) {

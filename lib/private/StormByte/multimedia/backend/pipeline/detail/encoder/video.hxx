@@ -189,6 +189,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder {
 			StormByte::Safe::Deque<StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::Packet>> m_pending;	///< Base-owned packets waiting for Mux.
 			StormByte::Multimedia::Pipeline::Encoder* m_owner;							///< Owner for Take/Wrap
 			AVRational m_timeBase;														///< Encoder time base
+			std::int64_t m_defaultDuration = 1;											///< Nominal frame duration in encoder ticks.
 			int m_index;																///< Encoder::Index after Open
 			bool m_flushed;																///< EOF already signalled
 	};

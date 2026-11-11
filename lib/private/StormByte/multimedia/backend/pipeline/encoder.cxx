@@ -292,7 +292,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 	StormByte::Multimedia::Pipeline::Encoder& owner,
 	StormByte::Multimedia::FFmpeg::AVCodecParameters params,
 	StormByte::Multimedia::FFmpeg::AVRational timeBase,
-	Features need, const FFmpeg::AVFrame* firstFrame) {
+	Features need, const FFmpeg::AVFrame* firstFrame, FFmpeg::AVRational frameRate) {
 	if (!owner.Destination().HasAccess(Operation::Write)) {
 		owner.Fail("codec is not writable");
 		return std::nullopt;
@@ -328,6 +328,21 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 			: need.HasAny(Features{Feature::TenBit} | Feature::TwelveBit) ? "no encoder for destination codec supports the input bit depth"
 			: "no encoder for destination codec");
 		return std::nullopt;
+	}
+	if (codec->id == AV_CODEC_ID_MPEG4 && timeBase.Valid() && timeBase.den > 65535) {
+		int denominator = 0;
+		for (int candidate = 65535; candidate > 0; --candidate) {
+			if (timeBase.den % candidate == 0
+				&& (!frameRate.Valid() || candidate % frameRate.num == 0)) {
+				denominator = candidate;
+				break;
+			}
+		}
+		if (!denominator && frameRate.Valid() && frameRate.num <= 65535)
+			denominator = (65535 / frameRate.num) * frameRate.num;
+		if (!denominator)
+			denominator = 65535;
+		timeBase = FFmpeg::AVRational{1, denominator};
 	}
 	const auto plan = owner.Plan();
 	const unsigned threadCount = plan ? Ceiling::StageThreads(*plan, Ceiling::MaxThreads()) : 0;
@@ -605,7 +620,7 @@ StormByte::Multimedia::Backend::Pipeline::OpenCodec(
 		options.emplace(StormByte::Safe::String{key}, StormByte::Safe::String{value});
 	auto opened = StormByte::Multimedia::FFmpeg::AVEncoder::Open(
 		row->name, params, owner.Index(), options, timeBase, firstFrame,
-		static_cast<int>(threadCount));
+		static_cast<int>(threadCount), frameRate);
 	if (!opened.has_value()) {
 		if (opened.error())
 			owner.Fail(opened.error()->what());

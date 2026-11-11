@@ -39,11 +39,22 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Fixed
 
-- Use the decoder's best-effort presentation timestamp when available, even
-  when the raw frame PTS is present, to preserve reordered MPEG-4 AVI timing
-  during video transcoding. Retain the raw PTS and delayed-frame fallback when
-  no best-effort timestamp exists; regress SVT-AV1 and VP9 output, copied audio
-  and variable-frame-rate presentation timestamps.
+- Prefer the decoder's best-effort presentation timestamp when available, even
+  when the raw frame PTS is present, reducing duplicates in reordered MPEG-4
+  AVI transcoding. Retain the raw PTS and delayed-frame fallback when no
+  best-effort timestamp exists. Misflagged packed MPEG-4 streams can still
+  produce a duplicate decoded reference and shift the subsequent presentation
+  timeline, including the final frame; those streams require further
+  correction before release.
+- Preserve the decoded video time base independently of the nominal frame
+  rate when opening video encoders, instead of quantizing variable-frame-rate
+  timestamps to the nominal frame duration. Preserve nominal duration when an
+  encoder omits packet duration. For MPEG-4 Part 2, select a compatible clock
+  within its 16-bit VOP limit and fail explicitly if a presentation timestamp
+  cannot round-trip at the source clock precision. Preserve the source clock
+  when a video filter replaces a frame without specifying its own. Regress
+  sub-frame VFR with H.264, SVT-AV1 and VP9, and 90 kHz input with MPEG-4
+  and Xvid.
 - Intentional Running/Paused transcoder cancellation now ends in `Aborted`,
   not `Error`. Wake and join in-flight stages before reporting cancellation,
   distinguish expected queue closure from admission failures, preserve genuine

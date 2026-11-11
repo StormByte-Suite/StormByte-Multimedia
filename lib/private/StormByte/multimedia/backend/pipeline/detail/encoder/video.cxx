@@ -83,6 +83,12 @@ using namespace StormByte::Multimedia::Backend::Pipeline::Detail::Encoder;
 namespace FFmpeg = StormByte::Multimedia::FFmpeg;
 
 namespace {
+	std::uint64_t Distance(std::int64_t left, std::int64_t right) noexcept {
+		return left > right
+			? static_cast<std::uint64_t>(left) - static_cast<std::uint64_t>(right)
+			: static_cast<std::uint64_t>(right) - static_cast<std::uint64_t>(left);
+	}
+
 	int ToAVRange(Property::Range range) noexcept {
 		switch (range) {
 			case Property::Range::TV:	return AVCOL_RANGE_MPEG;
@@ -150,7 +156,11 @@ namespace {
 		}
 	}
 
-	FFmpeg::AVRational VideoTimeBase(const StormByte::Multimedia::Pipeline::Frame& frame) noexcept {
+	FFmpeg::AVRational VideoTimeBase(const StormByte::Multimedia::Pipeline::Frame& frame,
+		const FFmpeg::AVFrame& handle) noexcept {
+		const auto source = handle.TimeBase();
+		if (source.Valid())
+			return source;
 		if (frame.Video() && frame.Video()->FrameRate() && frame.Video()->FrameRate()->Valid()) {
 			const auto& fps = *frame.Video()->FrameRate();
 			return FFmpeg::AVRational{fps.den, fps.num};
@@ -294,7 +304,7 @@ void Video::StampOutgoing() noexcept {
 	if (pts == AV_NOPTS_VALUE)
 		pts = dts;
 	if (dur <= 0)
-		dur = 1;
+		dur = m_defaultDuration;
 	m_scratch.Timestamps(pts, dts, dur);
 }
 
@@ -348,8 +358,10 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	}
 	if (need.Has(Feature::HDR10) && frame.Video() && frame.Video()->HDR10())
 		firstFrame.WriteHdr10(*frame.Video()->HDR10());
+	const auto frameRate = frame.Video() && frame.Video()->FrameRate() && frame.Video()->FrameRate()->Valid()
+		? *frame.Video()->FrameRate() : FFmpeg::AVRational{24, 1};
 	auto opened = StormByte::Multimedia::Backend::Pipeline::OpenCodec(
-		owner, std::move(params), VideoTimeBase(frame), need, &firstFrame);
+		owner, std::move(params), VideoTimeBase(frame, *handle), need, &firstFrame, frameRate);
 	if (!opened)
 		return false;
 
@@ -357,6 +369,9 @@ bool Video::Open(StormByte::Multimedia::Pipeline::Encoder& owner,
 	m_timeBase = opened->TimeBase();
 	if (m_timeBase.num <= 0 || m_timeBase.den <= 0)
 		m_timeBase = FFmpeg::AVRational{1, 24};
+	m_defaultDuration = FFmpeg::AVRational{frameRate.den, frameRate.num}.Rescale(1, m_timeBase);
+	if (m_defaultDuration <= 0)
+		m_defaultDuration = 1;
 	m_encoder = std::move(opened->Handle());
 	m_index = owner.Index();
 	m_owner = &owner;
@@ -441,9 +456,24 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 			return false;
 		}
 
-		if (frame->Pts())
-			handle->Pts(StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(
-				frame->Pts()->Nanoseconds().count(), m_timeBase));
+		if (frame->Pts()) {
+			const auto ns = frame->Pts()->Nanoseconds().count();
+			const auto ticks = StormByte::Multimedia::Backend::Pipeline::Encoder::NsToTicks(ns, m_timeBase);
+			const auto restored = m_timeBase.Rescale(ticks, FFmpeg::Nanosecond);
+			bool representable = Distance(ns, restored) <= 1;
+			const auto sourceBase = source->TimeBase();
+			if (sourceBase.Valid()) {
+				const auto sourceTicks = FFmpeg::Nanosecond.Rescale(ns, sourceBase);
+				const auto sourceNs = sourceBase.Rescale(sourceTicks, FFmpeg::Nanosecond);
+				if (Distance(ns, sourceNs) <= 1)
+					representable = m_timeBase.Rescale(ticks, sourceBase) == sourceTicks;
+			}
+			if (!representable) {
+				owner.Fail("video encoder time base cannot represent the source presentation timestamp");
+				return false;
+			}
+			handle->Pts(ticks);
+		}
 		else
 			handle->Pts(AV_NOPTS_VALUE);
 		if (frame->Duration()) {
@@ -454,7 +484,7 @@ bool Video::Push(StormByte::Multimedia::Pipeline::Encoder& owner,
 			handle->DurationTicks(duration);
 		}
 		else
-			handle->DurationTicks(1);
+			handle->DurationTicks(m_defaultDuration);
 		m_inputSource = frame;
 	}
 

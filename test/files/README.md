@@ -34,7 +34,9 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
   B-frames precedes a two-second packed B-frame segment. The later reordering
   makes at least one decoded raw PTS differ from FFmpeg's best-effort
   presentation timestamp. Regress the decoded and transcoded timelines and
-  copied audio with SVT-AV1 and VP9. SHA-256:
+  copied audio with SVT-AV1 and VP9. This fixture uses FFmpeg's decoded
+  timestamps as its oracle; it does not independently validate coded VOP
+  timing or reproduce the duplicated-reference transition. SHA-256:
   `41771e6f9abfffe53be576626e0140c154f7b0f26a1a5ccb15d73642f9285a88`
   (111,168 bytes). Authored once with FFmpeg 9.0.2 and libxvid:
 
@@ -60,6 +62,56 @@ Video and audio payloads are synthetic seeded noise, approximately two seconds p
     -i 'testsrc2=size=96x64:rate=25:duration=2' \
     -vf "select='not(eq(mod(n,3),1))'" -fps_mode vfr -c:v ffv1 \
     -fflags +bitexact -flags:v +bitexact -map_metadata -1 vfr_pts.mkv
+  ```
+
+- `video/vfr_subframe_pts.mkv`: synthetic 96x64 FFV1 with alternating 45 ms and
+  35 ms presentation intervals, not multiples of the nominal 25 fps frame
+  duration. The H.264, SVT-AV1 and VP9 tests check every decoded timestamp through
+  encoding, including H.264 after a filter replaces each frame. SHA-256:
+  `92df3e91d5923756e0978f2056006471d903dbe2e550d9f4dee2ad57dfc6d043`.
+  Authored once with:
+
+  ```sh
+  ffmpeg -v error -f lavfi -i 'testsrc2=size=96x64:rate=25:duration=1.32' \
+    -vf "settb=1/1000,setpts=N*40+mod(N\,2)*5" -fps_mode passthrough \
+    -enc_time_base:v 1:1000 -c:v ffv1 -fflags +bitexact -flags:v +bitexact \
+    -map_metadata -1 -n vfr_subframe_pts.mkv
+  ```
+
+- `video/vfr_90k_pts.mp4` and `video/vfr_90k_unrepresentable.mp4`: synthetic
+  96x64 H.264 with a 90 kHz clock. The first uses 45 ms and 35 ms intervals
+  representable by MPEG-4 Part 2; the second adds a single 90 kHz tick that
+  cannot be represented together with the other intervals by that codec's
+  16-bit VOP clock. MPEG-4 and Xvid tests check exact preservation; a separate
+  MPEG-4 test checks explicit failure. SHA-256:
+  `6e988a1bbfea679f769de49faeebbd346cc37166cab1f0dd210c22c7b6566a17`
+  and `d6d90290e64713e83660fef779312cba90fe4b7850d47669874f1a373d3ee9a5`.
+  Authored once with FFmpeg using the following commands:
+
+  ```sh
+  ffmpeg -v error -f lavfi -i 'testsrc2=size=96x64:rate=25:duration=1.32' \
+    -vf "settb=1/90000,setpts=N*3600+mod(N\,2)*450" -fps_mode passthrough \
+    -enc_time_base:v 1:90000 -c:v libx264 -preset ultrafast \
+    -video_track_timescale 90000 -fflags +bitexact -flags:v +bitexact \
+    -map_metadata -1 -n vfr_90k_pts.mp4
+  ffmpeg -v error -f lavfi -i 'testsrc2=size=96x64:rate=25:duration=0.16' \
+    -vf "settb=1/90000,setpts=N*3600+mod(N\,2)*451" -fps_mode passthrough \
+    -enc_time_base:v 1:90000 -c:v libx264 -preset ultrafast \
+    -video_track_timescale 90000 -fflags +bitexact -flags:v +bitexact \
+    -map_metadata -1 -n vfr_90k_unrepresentable.mp4
+  ```
+
+- `video/cfr_24fps_microseconds.mp4`: synthetic 96x64 H.264 at 24 fps with a
+  1/1000000 time base. MPEG-4 output is compared at the source clock precision,
+  accounting for the rounding of 24 fps timestamps to microseconds. SHA-256:
+  `a34af2c063b692700cc9182eea9ca7ef845ca43f6fd72e2677a6f33d7170fd4f`.
+
+  ```sh
+  ffmpeg -v error -f lavfi -i 'testsrc2=size=96x64:rate=24:duration=1' \
+    -vf 'settb=1/1000000' -fps_mode passthrough -enc_time_base:v 1:1000000 \
+    -c:v libx264 -preset ultrafast -video_track_timescale 1000000 \
+    -fflags +bitexact -flags:v +bitexact -map_metadata -1 \
+    -n cfr_24fps_microseconds.mp4
   ```
 
 - `video/packed_ac3_seek.avi`: eight seconds of 96x64/25 fps synthetic `testsrc2`
