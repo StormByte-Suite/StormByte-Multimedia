@@ -767,9 +767,9 @@ void Transcoder::Cancel() noexcept {
 	if (!m_backend)
 		return;
 	StormByte::Safe::UniqueLock lock(m_backend->Lock);
-	m_backend->RequestCancel();
 	if (m_plan)
 		m_plan->State(Plan::State::Aborted);
+	m_backend->RequestCancel();
 }
 
 void Transcoder::Pause() noexcept try {
