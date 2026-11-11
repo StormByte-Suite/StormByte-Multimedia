@@ -51,6 +51,7 @@
 #pragma once
 
 #include <StormByte/buffer/byte_budget.hxx>
+#include <StormByte/multimedia/pipeline/activity.hxx>
 #include <StormByte/multimedia/pipeline/typedefs.hxx>
 #include <StormByte/multimedia/type.hxx>
 #include <StormByte/multimedia/visibility.h>
@@ -104,10 +105,13 @@ namespace StormByte {
 			 * @brief Thread-safe counters and timings for one pipeline worker.
 			 *
 			 * Input/output counts distinguish frames and packets. Process
-			 * timings include source ticks and end-of-input flush calls;
+			 * timings include source ticks and end-of-input flush calls,
+			 * including output-delivery waits nested inside those calls;
 			 * input counters count only actual units. Wait timings measure
 			 * time blocked on the stage's pipeline condition. Snapshots may
 			 * be read while the worker runs.
+			 * Use Activity() for exclusive live per-worker wall times, not
+			 * ProcessTotal()/Elapsed() or queue occupancy as utilization.
 			 * Owned labels and error snapshots may allocate and propagate allocation failures.
 			 *
 			 * @par Memory
@@ -136,6 +140,26 @@ namespace StormByte {
 					 * @brief Release stage telemetry in its providing library.
 					 */
 					~StageTelemetry() noexcept override;
+
+					/**
+					 * @brief Read independent worker activity, including open intervals.
+					 * @return Owned values and explicit instrumentation coverage.
+					 */
+					StageActivitySnapshot Activity() const;
+
+					/**
+					 * @brief Access the main worker clock for producer instrumentation.
+					 * @return Clock owned by this stage telemetry.
+					 */
+					WorkerActivity& MainActivity() noexcept;
+
+					/**
+					 * @brief Register another execution domain without affecting the job on allocation failure.
+					 * @param role Execution domain.
+					 * @param track Source track or -1 when inapplicable.
+					 * @return Retained clock, or empty with Activity().Complete false.
+					 */
+					StormByte::Safe::Shared<WorkerActivity> RegisterActivityWorker(ActivityRole role, int track) noexcept;
 
 					/**
 					 * @brief Set the stage origin label.
@@ -304,6 +328,10 @@ namespace StormByte {
 					operator StormByte::Safe::String() const override;
 
 				private:
+					WorkerActivity m_activity; ///< Independent main worker clock.
+					mutable StormByte::Safe::Mutex m_activity_lock; ///< Guards additional worker registration.
+					StormByte::Safe::Vector<StormByte::Safe::Shared<WorkerActivity>> m_activity_workers; ///< Retained additional clocks.
+					bool m_activity_complete = true; ///< False after a lost registration.
 					StormByte::Safe::Atomic<std::uint64_t> m_process_calls;	///< Process calls.
 
 					StormByte::Safe::Atomic<std::uint64_t> m_input_frames;	///< Consumed frames.
@@ -451,6 +479,7 @@ namespace StormByte {
 				std::uint32_t Order = 0;												///< Longest producer hop count from a source stage.
 				std::uint32_t Sequence = 0;												///< Registration order within the run.
 				StormByte::Safe::Shared<const StageTelemetry> Metrics;					///< Shared stage counters.
+				StageActivitySnapshot Activity;											///< Independent worker samples, frozen by value in a final topology.
 				StormByte::Safe::Vector<TopologyQueueRef> Queues;						///< Inputs, outputs and pending queues of this stage.
 			};
 

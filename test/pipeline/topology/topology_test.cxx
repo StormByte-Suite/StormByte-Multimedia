@@ -96,6 +96,38 @@ namespace {
 			unsigned m_seen = 0;
 	};
 
+	struct AudioGate {
+		std::atomic<bool> Entered{false};
+		std::atomic<bool> Release{false};
+	};
+
+	class GatedAudio final: public Filter::Process {
+		public:
+			explicit GatedAudio(AudioGate& gate): Filter::Process({}, "activity-gated-audio"), m_gate(gate) {}
+			GatedAudio(const GatedAudio&) = delete;
+			GatedAudio(GatedAudio&&) noexcept = delete;
+			~GatedAudio() noexcept override = default;
+			GatedAudio& operator=(const GatedAudio&) = delete;
+			GatedAudio& operator=(GatedAudio&&) noexcept = delete;
+
+			StormByte::Multimedia::Type Media() const noexcept override { return StormByte::Multimedia::Type::Audio; }
+			void Clean() noexcept override {}
+			void Setup() noexcept override {}
+			void Process(const Frame&) noexcept override {
+				m_gate.Entered.store(true);
+				while (!m_gate.Release.load())
+					std::this_thread::sleep_for(1ms);
+			}
+
+		private:
+			AudioGate& m_gate; ///< Test-controlled long Process call.
+	};
+
+	struct ReleaseAudio {
+		AudioGate& Gate;
+		~ReleaseAudio() noexcept { Gate.Release.store(true); }
+	};
+
 	bool IsTerminalStatus(Status status) noexcept {
 		return status == Status::Done || status == Status::Error || status == Status::Aborted
 			|| status == Status::Stopped;
@@ -116,6 +148,8 @@ namespace {
 		std::set<std::uint64_t> ids;
 		for (const auto& stage : snapshot.Stages) {
 			if (!ids.insert(stage.Id).second || !stage.Metrics)
+				return false;
+			if (!ActivityConserved(stage.Activity))
 				return false;
 			if ((stage.Kind == TopologyStageKind::Filter) != (stage.Filter != TopologyFilterKind::None))
 				return false;
@@ -268,8 +302,138 @@ namespace {
 			TEST_REQUIRE(queue.State == TopologySnapshotState::Final);
 		for (const auto& budget : snapshot.Budgets)
 			TEST_REQUIRE(budget.State == TopologySnapshotState::Final);
+		std::size_t active = 0;
+		for (const auto& stage : snapshot.Stages) {
+			TEST_REQUIRE(stage.Activity.Complete && stage.Activity.WaitReasons);
+			for (const auto& worker : stage.Activity.Workers) {
+				if (!worker.Available)
+					continue;
+				++active;
+				TEST_REQUIRE(worker.State == ActivityState::Finished || worker.State == ActivityState::Failed);
+			}
+		}
+		TEST_REQUIRE(active > 0);
 		return 0;
 	}
+}
+
+int test_activity_batch_shared_budget() {
+	StormByte::Buffer::ByteBudget budget{StormByte::ByteSize{1024 * 1024}};
+	StormByte::Buffer::ByteBudget::Lease held;
+	TEST_REQUIRE(budget.TryReserve(StormByte::ByteSize{1024 * 1024}, held) == StormByte::Buffer::QueueStatus::Ok);
+	StormByte::Safe::Shared<const JobTelemetry> first_metrics;
+	StormByte::Safe::Shared<const JobTelemetry> second_metrics;
+	bool both_waiting = false;
+	{
+		Transcoder first{TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath("pipeline/topology/activity-batch-first.mkv")), MakeLogger(), 2000000000LL};
+		Transcoder second{TestLocation(FixturePath("video/anime_like.mkv")),
+			TestLocation(OutputPath("pipeline/topology/activity-batch-second.mkv")), MakeLogger(), 2000000000LL};
+		for (auto* job : {&first, &second}) {
+			job->Buffering(BoundedPolicy(budget));
+			job->Video(0).Remux();
+			job->Audio(1).Remux();
+			TEST_REQUIRE(CheckTranscoderConfigured(*job) == 0);
+		}
+		first_metrics = first.Telemetry();
+		second_metrics = second.Telemetry();
+		first.Run();
+		second.Run();
+		const auto waiting = [](const JobTelemetry& metrics) {
+			for (const auto& stage : metrics.Topology().Stages)
+				for (const auto& worker : stage.Activity.Workers)
+					if (worker.State == ActivityState::WaitingBudget)
+						return true;
+			return false;
+		};
+		const auto deadline = std::chrono::steady_clock::now() + 10s;
+		while (std::chrono::steady_clock::now() < deadline) {
+			if (waiting(*first_metrics) && waiting(*second_metrics)) {
+				both_waiting = true;
+				break;
+			}
+			std::this_thread::sleep_for(1ms);
+		}
+		held.Reset();
+		TEST_REQUIRE(both_waiting);
+		TEST_REQUIRE(WaitForTranscoder(first) == 0);
+		TEST_REQUIRE(WaitForTranscoder(second) == 0);
+	}
+	const auto first = first_metrics->Topology();
+	const auto second = second_metrics->Topology();
+	TEST_REQUIRE(CheckFinal(first) == 0 && CheckFinal(second) == 0);
+	TEST_REQUIRE(first.Budgets.size() == 1 && second.Budgets.size() == 1);
+	TEST_REQUIRE(first.Budgets.front().Id == second.Budgets.front().Id);
+	for (const auto* snapshot : {&first, &second}) {
+		auto waited = 0ns;
+		for (const auto& stage : snapshot->Stages)
+			for (const auto& worker : stage.Activity.Workers)
+				waited += worker.WaitingBudget;
+		TEST_REQUIRE(waited > 0ns);
+	}
+	TEST_REQUIRE(budget.Snapshot().Reserved == StormByte::ByteSize{0});
+	return 0;
+}
+
+int test_activity_live_processing_and_pause() {
+	const auto codec = Registry::Instance().FindCodec("E-AC3");
+	if (!codec || !codec->get().HasAccess(Access{Operation::Write}))
+		return TEST_SKIP;
+	AudioGate gate;
+	Transcoder job{TestLocation(FixturePath("video/anime_like.mkv")),
+		TestLocation(OutputPath("pipeline/topology/activity-open-process.mkv")), MakeLogger(), 2000000000LL};
+	ReleaseAudio release{gate};
+	job.Video(0).Remux();
+	job.Audio(1).Codec(codec->get()).Implementation(ImplementationSide::Encoder, StormByte::Safe::String{"eac3"})
+		.Filter<GatedAudio>(gate);
+	TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+	const auto telemetry = job.Telemetry();
+	job.Run();
+	const auto deadline = std::chrono::steady_clock::now() + 10s;
+	while (!gate.Entered.load() && std::chrono::steady_clock::now() < deadline)
+		std::this_thread::sleep_for(1ms);
+	TEST_REQUIRE(gate.Entered.load() && WaitLive(*telemetry, job));
+	const auto sample = [&]() {
+		const auto topology = telemetry->Topology();
+		for (const auto& stage : topology.Stages)
+			if (stage.Kind == TopologyStageKind::Filter)
+				return stage.Activity.Workers.front();
+		return WorkerActivitySnapshot{};
+	};
+	const auto first = sample();
+	std::this_thread::sleep_for(30ms);
+	const auto second = sample();
+	TEST_REQUIRE(first.Available && first.State == ActivityState::Processing);
+	TEST_REQUIRE(second.Id == first.Id && second.Generation == first.Generation);
+	TEST_REQUIRE(second.Processing - first.Processing >= 30ms);
+	job.Pause();
+	gate.Release.store(true);
+	StormByte::Safe::Optional<WorkerActivitySnapshot> paused;
+	const auto pause_deadline = std::chrono::steady_clock::now() + 5s;
+	while (!paused && std::chrono::steady_clock::now() < pause_deadline) {
+		for (const auto& stage : telemetry->Topology().Stages)
+			for (const auto& worker : stage.Activity.Workers)
+				if (worker.State == ActivityState::Paused)
+					paused = worker;
+		std::this_thread::sleep_for(1ms);
+	}
+	TEST_REQUIRE(paused);
+	std::this_thread::sleep_for(30ms);
+	bool matched = false;
+	for (const auto& stage : telemetry->Topology().Stages) {
+		TEST_REQUIRE(ActivityConserved(stage.Activity));
+		for (const auto& worker : stage.Activity.Workers)
+			if (worker.Id == paused->Id) {
+				matched = true;
+				TEST_REQUIRE(worker.State == ActivityState::Paused);
+				TEST_REQUIRE(worker.Paused - paused->Paused >= 30ms);
+				TEST_REQUIRE(worker.Processing == paused->Processing);
+			}
+	}
+	TEST_REQUIRE(matched);
+	job.Resume();
+	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	return 0;
 }
 
 int test_topology_reports_filters_tracks_remux_and_shared_budget() {
@@ -325,6 +489,10 @@ int test_topology_reports_filters_tracks_remux_and_shared_budget() {
 	TEST_REQUIRE(CountKind(snapshot, TopologyStageKind::InspectionDecoder) >= 1);
 	TEST_REQUIRE(snapshot.Stages.front().Kind == TopologyStageKind::Demuxer);
 	TEST_REQUIRE(snapshot.Stages.front().Order == 0);
+	TEST_REQUIRE(snapshot.Stages.front().Activity.Workers.size() >= 3);
+	for (const auto& worker : snapshot.Stages.front().Activity.Workers)
+		if (worker.Role == ActivityRole::DemuxFeeder)
+			TEST_REQUIRE(worker.Track >= 0);
 	const auto& muxer = *std::find_if(snapshot.Stages.begin(), snapshot.Stages.end(),
 		[](const TopologyStage& stage) { return stage.Kind == TopologyStageKind::Muxer; });
 	std::map<std::uint32_t, const TopologyStage*> paced;
@@ -442,6 +610,13 @@ int test_topology_cancel_freezes_and_survives_transcoder() {
 	TEST_REQUIRE(readers->Broken() == 0);
 	const auto snapshot = telemetry->Topology();
 	TEST_REQUIRE(CheckFinal(snapshot) == 0);
+	std::this_thread::sleep_for(20ms);
+	const auto retained = telemetry->Topology();
+	for (std::size_t i = 0; i < snapshot.Stages.size(); ++i) {
+		TEST_REQUIRE(snapshot.Stages[i].Activity.Workers.size() == retained.Stages[i].Activity.Workers.size());
+		for (std::size_t j = 0; j < snapshot.Stages[i].Activity.Workers.size(); ++j)
+			TEST_REQUIRE(snapshot.Stages[i].Activity.Workers[j] == retained.Stages[i].Activity.Workers[j]);
+	}
 	TEST_REQUIRE(CountKind(snapshot, TopologyStageKind::Filter) == 1);
 	TEST_REQUIRE(snapshot.Budgets.size() == 1);
 	TEST_REQUIRE(telemetry->Topology().Queues.size() == snapshot.Queues.size());
@@ -589,6 +764,8 @@ int test_topology_closed_budget_identity() {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_activity_batch_shared_budget", test_activity_batch_shared_budget},
+		TestEntry{"test_activity_live_processing_and_pause", test_activity_live_processing_and_pause},
 		TestEntry{"test_topology_reports_filters_tracks_remux_and_shared_budget",
 			test_topology_reports_filters_tracks_remux_and_shared_budget},
 		TestEntry{"test_topology_cancel_freezes_and_survives_transcoder", test_topology_cancel_freezes_and_survives_transcoder},

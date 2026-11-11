@@ -336,6 +336,19 @@ for (const auto& budget : topo.Budgets)         // Buffer::BudgetSnapshot, once 
 - Bytes are logical admission weights, not RSS. Counters are per queue and per budget in their own units; do not derive a batch average. A full queue or pressure/waits are normal backpressure, not an error. Different queues are read one after another, so a snapshot is not an atomic cut across queues.
 - Encoder/muxer-internal codec buffers are not `Buffer` queues and are not reported.
 
+#### Per-worker activity
+
+Each topology stage also exposes an owned `Activity` sample: independent
+worker ids/generations, preparation, exclusive processing, input wait, local
+output wait, shared-budget wait, cooperative pause and unclassified time.
+Open intervals are included in live snapshots and terminal times freeze.
+Demux feeders are separate workers, not an exclusive aggregate stage state.
+Coverage and missing instrumentation are explicit; these are wall times,
+**not CPU utilization**. Existing counters and queue topology are unchanged.
+See [the activity API and Alchemist delta example](doc/pipeline-activity.md)
+for retention, pause semantics, limitations and validation. This requires
+Buffer 4.0.0 retagged with its optional admission-wait observer.
+
 Construction, graph attachment, owning metadata access and report snapshots may
 throw `StormByte::Safe::AllocationError` or `std::bad_alloc`; they do not promise
 allocation-free operation. Worker lifecycle callbacks retain their `noexcept`

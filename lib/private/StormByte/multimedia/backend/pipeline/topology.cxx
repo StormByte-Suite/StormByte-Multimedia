@@ -182,6 +182,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			stage.Name = source.Name;
 			stage.Sequence = static_cast<std::uint32_t>(i);
 			stage.Metrics = source.Metrics;
+			if (source.Metrics)
+				stage.Activity = source.Metrics->Activity();
 			index.emplace(stage.Id, i);
 			stages.push_back(std::move(stage));
 			readings.push_back(source.Probe->Read());

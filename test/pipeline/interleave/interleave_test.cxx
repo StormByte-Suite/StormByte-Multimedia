@@ -1166,6 +1166,7 @@ namespace {
 		VideoGate gate;
 		gate.FailOnRelease = fail;
 		StormByte::Buffer::ByteBudget budget{StormByte::ByteSize{1024 * 1024}};
+		StormByte::Safe::Shared<const JobTelemetry> retained;
 		auto teardownStarted = std::chrono::steady_clock::now();
 		{
 			namespace IO = StormByte::Buffer::IO;
@@ -1193,6 +1194,7 @@ namespace {
 			job.Subtitle(2).Remux();
 			job.Subtitle(3).Remux();
 			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			retained = job.Telemetry();
 			job.Run();
 			const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{20};
 			while (!gate.Reached.load() && job.Status() != Status::Error
@@ -1213,6 +1215,23 @@ namespace {
 			const auto accounting = budget.Snapshot();
 			TEST_REQUIRE(accounting.Peak > StormByte::ByteSize{0} && accounting.Peak <= accounting.Limit);
 			TEST_REQUIRE(job.Status() == Status::Running);
+			bool empty_subtitle_waiting = false;
+			const auto live = retained->Topology();
+			for (const auto& stage : live.Stages) {
+				TEST_REQUIRE(ActivityConserved(stage.Activity));
+				if (stage.Kind != TopologyStageKind::Remuxer || stage.Track != 3)
+					continue;
+				TEST_REQUIRE(stage.Activity.Available && stage.Activity.Complete);
+				for (const auto& worker : stage.Activity.Workers)
+					empty_subtitle_waiting = empty_subtitle_waiting
+						|| (worker.State == ActivityState::WaitingInput && worker.WaitingInput > std::chrono::nanoseconds{0});
+				for (const auto& ref : stage.Queues)
+					if (ref.Role == TopologyQueueRole::Input)
+						for (const auto& queue : live.Queues)
+							if (queue.Id == ref.Queue)
+								TEST_REQUIRE(queue.Snapshot.Elements == StormByte::Size{0});
+			}
+			TEST_REQUIRE(empty_subtitle_waiting);
 			if (paused) {
 				job.Pause();
 				TEST_REQUIRE(job.Status() == Status::Paused);
@@ -1251,6 +1270,14 @@ namespace {
 		TEST_REQUIRE(std::chrono::steady_clock::now() - teardownStarted < std::chrono::seconds{5});
 		TEST_REQUIRE(budget.Snapshot().Reserved == StormByte::ByteSize{0});
 		TEST_REQUIRE(!budget.Snapshot().Closed);
+		const auto final_activity = retained->Topology();
+		TEST_REQUIRE(final_activity.State == TopologySnapshotState::Final);
+		for (const auto& stage : final_activity.Stages) {
+			TEST_REQUIRE(ActivityConserved(stage.Activity));
+			for (const auto& worker : stage.Activity.Workers)
+				if (worker.Available)
+					TEST_REQUIRE(worker.State == ActivityState::Finished || worker.State == ActivityState::Failed);
+		}
 		if (cancel) {
 			{
 				Transcoder next{TestLocation(input), TestLocation(output), MakeLogger(), 12012000000LL};

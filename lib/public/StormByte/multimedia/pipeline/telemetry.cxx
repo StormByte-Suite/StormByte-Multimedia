@@ -185,6 +185,37 @@ StageTelemetry::StageTelemetry()
 
 StageTelemetry::~StageTelemetry() noexcept = default;
 
+StageActivitySnapshot StageTelemetry::Activity() const {
+	StormByte::Safe::UniqueLock lock(m_activity_lock);
+	StageActivitySnapshot out;
+	out.Complete = m_activity_complete;
+	out.Workers.reserve(m_activity_workers.size() + 1);
+	out.Workers.push_back(m_activity.Snapshot());
+	for (const auto& worker : m_activity_workers)
+		out.Workers.push_back(worker->Snapshot());
+	for (const auto& worker : out.Workers)
+		out.Available = out.Available || worker.Available;
+	return out;
+}
+
+WorkerActivity& StageTelemetry::MainActivity() noexcept {
+	return m_activity;
+}
+
+StormByte::Safe::Shared<WorkerActivity> StageTelemetry::RegisterActivityWorker(ActivityRole role, int track) noexcept {
+	StormByte::Safe::UniqueLock lock(m_activity_lock);
+	try {
+		auto worker = StormByte::Safe::MakeShared<WorkerActivity>(role, track);
+		m_activity_workers.push_back(worker);
+		return worker;
+	} catch (const StormByte::Safe::AllocationError&) {
+		m_activity_complete = false;
+	} catch (const std::bad_alloc&) {
+		m_activity_complete = false;
+	}
+	return {};
+}
+
 void StageTelemetry::SetOrigin(std::string_view origin) const {
 	StormByte::Safe::UniqueLock lock(m_origin_lock);
 	m_origin = StormByte::Safe::String{origin};

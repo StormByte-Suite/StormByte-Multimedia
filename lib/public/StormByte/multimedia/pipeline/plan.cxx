@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/activity.hxx>
 #include <StormByte/multimedia/features.hxx>
 #include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/property/dovi.hxx>
@@ -396,8 +397,10 @@ void Plan::WaitWhileHeld(const Step& step) const noexcept {
 	StormByte::Safe::UniqueLock lock(observers->HoldMutex);
 	// Timed to also observe a local stage stop without a plan state transition.
 	while (observers->Held.load(StormByte::Safe::MemoryOrder::Acquire) && !step.Stopping()
-		&& State() == State::Running)
+		&& State() == State::Running) {
+		StormByte::Multimedia::Backend::Pipeline::ActivityScope paused(ActivityState::Paused);
 		observers->HoldCv.wait_for(lock, std::chrono::milliseconds(100));
+	}
 }
 
 void Plan::Unobserve(Step& step) noexcept {

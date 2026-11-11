@@ -265,6 +265,31 @@ namespace {
 	}
 
 #ifdef TOPOLOGY_ALLOCATION_INTERPOSITION
+	int test_activity_worker_registration_failure_is_reported() {
+		unsigned failures = 0;
+		bool succeeded = false;
+		for (std::size_t position = 0; position < 32 && !succeeded; ++position) {
+			StageTelemetry metrics;
+			reject_after = position;
+			const auto worker = metrics.RegisterActivityWorker(ActivityRole::DemuxFeeder, 4);
+			reject_after = std::numeric_limits<std::size_t>::max();
+			const auto activity = metrics.Activity();
+			if (!worker) {
+				++failures;
+				TEST_REQUIRE(!activity.Complete);
+				TEST_REQUIRE(!activity.Available && activity.Workers.size() == 1);
+				TEST_REQUIRE(metrics.Status() == State::Created);
+				continue;
+			}
+			succeeded = true;
+			TEST_REQUIRE(activity.Complete && activity.Workers.size() == 2);
+			TEST_REQUIRE(worker->Snapshot().Role == ActivityRole::DemuxFeeder);
+			TEST_REQUIRE(worker->Snapshot().Track == 4);
+		}
+		TEST_REQUIRE(failures > 0 && succeeded);
+		return 0;
+	}
+
 	int test_job_telemetry_construction_allocation_failure() {
 		unsigned failures = 0;
 		bool succeeded = false;
@@ -473,6 +498,7 @@ namespace {
 		return 0;
 	}
 #else
+	int test_activity_worker_registration_failure_is_reported() { return TEST_SKIP; }
 	int test_job_telemetry_construction_allocation_failure() { return TEST_SKIP; }
 	int test_topology_recorder_allocation_failure_is_reported() { return TEST_SKIP; }
 	int test_topology_begin_allocation_failure_is_reported() { return TEST_SKIP; }
@@ -520,6 +546,7 @@ extern "C" void* aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		TestEntry{"test_activity_worker_registration_failure_is_reported", test_activity_worker_registration_failure_is_reported},
 		TestEntry{"test_budget_identity_survives_close", test_budget_identity_survives_close},
 		TestEntry{"test_closed_budget_identity_is_deduplicated", test_closed_budget_identity_is_deduplicated},
 		TestEntry{"test_pinned_budget_stays_identified_after_close", test_pinned_budget_stays_identified_after_close},

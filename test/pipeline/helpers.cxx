@@ -58,6 +58,7 @@
 #include <StormByte/multimedia/pipeline/transcoder.hxx>
 
 #include <chrono>
+#include <set>
 #include <thread>
 
 using namespace StormByte::Multimedia;
@@ -70,6 +71,31 @@ using namespace std::string_view_literals;
 #define STORMBYTE_MM_TEST_DEADLINE_SEC 30
 #endif
 constexpr auto TestDeadline = std::chrono::seconds{STORMBYTE_MM_TEST_DEADLINE_SEC};
+
+bool ActivityConserved(const StageActivitySnapshot& activity) {
+	bool available = false;
+	std::set<std::uint64_t> ids;
+	for (const auto& worker : activity.Workers) {
+		if (!ids.insert(worker.Id).second || worker.Id == 0)
+			return false;
+		available = available || worker.Available;
+		if (!worker.Available) {
+			if (worker.Generation != 0 || worker.Elapsed() != 0ns || worker.State != ActivityState::Unknown)
+				return false;
+			continue;
+		}
+		const auto total = worker.Unknown + worker.Preparing + worker.Processing + worker.WaitingInput
+			+ worker.WaitingOutput + worker.WaitingBudget + worker.Paused;
+		if (worker.Generation == 0 || total != worker.Elapsed() || worker.Unknown < 0ns
+			|| worker.Preparing < 0ns || worker.Processing < 0ns || worker.WaitingInput < 0ns
+			|| worker.WaitingOutput < 0ns || worker.WaitingBudget < 0ns || worker.Paused < 0ns)
+			return false;
+		const bool terminal = worker.State == ActivityState::Finished || worker.State == ActivityState::Failed;
+		if (terminal != (worker.FinishedAt != 0ns) || (terminal && worker.SampledAt != worker.FinishedAt))
+			return false;
+	}
+	return activity.Available == available;
+}
 
 	static bool IsTerminal(Status status) {
 		return status == Status::Done || status == Status::Error || status == Status::Aborted;

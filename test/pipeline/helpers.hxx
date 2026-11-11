@@ -85,6 +85,8 @@ namespace StormByte {
 			 */
 			class Transcoder;
 
+			struct StageActivitySnapshot;
+
 			/**
 			 * @brief Worker stage used by the manual pipeline tests.
 			 */
@@ -113,6 +115,13 @@ int WaitForOptionalCodec(StormByte::Multimedia::Pipeline::Transcoder& job);
  * @return Zero for a valid configuration, one on failure.
  */
 int CheckTranscoderConfigured(StormByte::Multimedia::Pipeline::Transcoder& job);
+
+/**
+ * @brief Check exclusive per-worker accounting with zero nanoseconds tolerance.
+ * @param activity Independently sampled worker clocks.
+ * @return True when durations are nonnegative, conserved and terminal ticks frozen.
+ */
+bool ActivityConserved(const StormByte::Multimedia::Pipeline::StageActivitySnapshot& activity);
 
 /**
  * @brief Waits for an expected transcoder failure within the test deadline.

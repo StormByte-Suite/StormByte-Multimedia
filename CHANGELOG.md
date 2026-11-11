@@ -45,6 +45,16 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ### Added
 
+- Add retained per-worker activity through `StageTelemetry::Activity()` and
+  `TopologyStage::Activity`: coherent live/open-interval wall times for setup,
+  exclusive processing, input/output/shared-budget waits, cooperative pause
+  and explicit unclassified time, with worker identities, execution
+  generations, coverage and immutable terminal samples. Demux feeders are
+  independent execution domains; decode, filters, encode, remux, mux and
+  inspection/VMAF use the same instrumentation. Preserve existing counters,
+  queue policies and optimization settings. Requires Buffer 4.0.0 retagged
+  with `AdmissionWaitObserver`; document limitations and Alchemist delta
+  calculations in [the activity guide](doc/pipeline-activity.md).
 - Add independent queue element limits, logical payload-byte limits and shared byte budgets through `Pipeline::BufferingPolicy`, backed by StormByte Buffer 4.0.0 weighted queue admission. Stage snapshots expose effective queue limits, occupancy and backpressure counters.
 - Add `JobTelemetry::Topology()`: a thread-safe, owned snapshot of the latest run's real stages (kind, track, media, filter family and position, pipeline order) and their unique Buffer queues (consumer, producers, input/output/pending role, full `Buffer::QueueSnapshot`), plus deduplicated `Buffer::BudgetSnapshot`s with stable ids even for budgets already closed. Requires Buffer 4.0.0 retagged with `ByteBudget::SharesIdentity`. `Complete` reports lost bookkeeping, `RecorderFailed` an unavailable recorder, and `Unfrozen` a teardown whose final copy could not be allocated. Readable while running, paused, after cancel or failure and after the `Transcoder` is destroyed, with live versus final state.
 

@@ -50,21 +50,190 @@
 
 #include "helpers.hxx"
 
+#include <StormByte/multimedia/backend/pipeline/activity.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/backend/pipeline/queue_probe.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
 
 #include <algorithm>
 #include <array>
+#include <atomic>
+#include <chrono>
 #include <optional>
+#include <thread>
 #include <vector>
 
 using StormByte::ByteSize;
 using StormByte::Multimedia::Backend::Pipeline::Pipe;
 using StormByte::Multimedia::Backend::Pipeline::QueueProbe;
 using namespace StormByte::Multimedia::Pipeline;
+using namespace std::chrono_literals;
 
 namespace {
+	using StormByte::Multimedia::Backend::Pipeline::ActivityBinding;
+	using StormByte::Multimedia::Backend::Pipeline::ActivityScope;
+
+	bool Conserved(const WorkerActivitySnapshot& value) {
+		const auto total = value.Unknown + value.Preparing + value.Processing + value.WaitingInput
+			+ value.WaitingOutput + value.WaitingBudget + value.Paused;
+		// All boundaries use the same integer-nanosecond tick: tolerance is zero.
+		return total == value.Elapsed() && value.Unknown >= 0ns && value.Preparing >= 0ns
+			&& value.Processing >= 0ns && value.WaitingInput >= 0ns && value.WaitingOutput >= 0ns
+			&& value.WaitingBudget >= 0ns && value.Paused >= 0ns;
+	}
+
+	bool Await(const WorkerActivity& worker, ActivityState state) {
+		const auto deadline = std::chrono::steady_clock::now() + 5s;
+		while (std::chrono::steady_clock::now() < deadline) {
+			if (worker.Snapshot().State == state)
+				return true;
+			std::this_thread::sleep_for(1ms);
+		}
+		return false;
+	}
+
+	// -------------------
+	// Activity
+	// -------------------
+	int test_activity_input_wait_open_interval() {
+		Pipe pipe;
+		StageTelemetry stage;
+		std::atomic<bool> ready{false};
+		std::thread thread([&] {
+			ActivityBinding binding(&stage.MainActivity(), stage);
+			ActivityScope process(ActivityState::Processing);
+			pipe.WaitWake(&ready, [](void* data) noexcept {
+				return static_cast<std::atomic<bool>*>(data)->load();
+			});
+		});
+		const bool waiting = Await(stage.MainActivity(), ActivityState::WaitingInput);
+		const auto first = stage.MainActivity().Snapshot();
+		std::this_thread::sleep_for(20ms);
+		const auto second = stage.MainActivity().Snapshot();
+		ready.store(true);
+		pipe.Wake();
+		thread.join();
+		TEST_REQUIRE(waiting && Conserved(first) && Conserved(second));
+		TEST_REQUIRE(second.WaitingInput - first.WaitingInput >= 20ms);
+		TEST_REQUIRE(second.Processing == first.Processing);
+		TEST_REQUIRE(stage.MainActivity().Snapshot().State == ActivityState::Finished);
+		return 0;
+	}
+
+	int test_activity_nested_states_and_generation() {
+		StageTelemetry stage;
+		auto& worker = stage.MainActivity();
+		TEST_REQUIRE(!stage.Activity().Available);
+		WorkerActivitySnapshot first;
+		WorkerActivitySnapshot second;
+		{
+			ActivityBinding binding(&worker, stage);
+			ActivityScope processing(ActivityState::Processing);
+			first = worker.Snapshot();
+			std::this_thread::sleep_for(20ms);
+			second = worker.Snapshot();
+			TEST_REQUIRE(first.State == ActivityState::Processing && second.Processing - first.Processing >= 20ms);
+			{
+				ActivityScope input(ActivityState::WaitingInput);
+				std::this_thread::sleep_for(10ms);
+				{
+					ActivityScope output(ActivityState::WaitingOutput);
+					std::this_thread::sleep_for(10ms);
+					{
+						ActivityScope budget(ActivityState::WaitingBudget);
+						std::this_thread::sleep_for(10ms);
+						TEST_REQUIRE(worker.Snapshot().State == ActivityState::WaitingBudget);
+					}
+					TEST_REQUIRE(worker.Snapshot().State == ActivityState::WaitingOutput);
+				}
+				TEST_REQUIRE(worker.Snapshot().State == ActivityState::WaitingInput);
+			}
+			const auto before = worker.Snapshot();
+			{
+				ActivityScope paused(ActivityState::Paused);
+				const auto paused_first = worker.Snapshot();
+				std::this_thread::sleep_for(20ms);
+				const auto paused_second = worker.Snapshot();
+				TEST_REQUIRE(paused_second.Paused - paused_first.Paused >= 20ms);
+				TEST_REQUIRE(paused_second.Processing == paused_first.Processing);
+				TEST_REQUIRE(Conserved(paused_second));
+			}
+			const auto after = worker.Snapshot();
+			TEST_REQUIRE(after.Paused - before.Paused >= 20ms);
+		}
+		const auto final = worker.Snapshot();
+		TEST_REQUIRE(Conserved(final) && final.State == ActivityState::Finished);
+		TEST_REQUIRE(final.WaitingInput >= 10ms && final.WaitingOutput >= 10ms && final.WaitingBudget >= 10ms);
+		worker.Exchange(ActivityState::Processing);
+		worker.Finish(true);
+		std::this_thread::sleep_for(10ms);
+		TEST_REQUIRE(worker.Snapshot() == final);
+		worker.Start();
+		const auto restarted = worker.Snapshot();
+		TEST_REQUIRE(restarted.Id == final.Id && restarted.Generation == final.Generation + 1);
+		TEST_REQUIRE(restarted.State == ActivityState::Preparing);
+		worker.Finish(true);
+		TEST_REQUIRE(worker.Snapshot().State == ActivityState::Failed);
+		TEST_REQUIRE(Conserved(worker.Snapshot()));
+		TEST_REQUIRE(Conserved(first) && Conserved(second));
+		TEST_REQUIRE(second.Processing - first.Processing <= second.SampledAt - first.SampledAt);
+		return 0;
+	}
+
+	int CheckAdmissionActivity(bool budget_wait) {
+		StormByte::Buffer::ByteBudget budget{ByteSize{1}};
+		StormByte::Buffer::ByteBudget::Lease lease;
+		BufferingPolicy policy;
+		policy.Budget(budget);
+		Pipe producer;
+		Pipe consumer;
+		consumer.Buffering(policy, StormByte::Size{1});
+		producer.To(-1) >> consumer;
+		if (budget_wait) {
+			TEST_REQUIRE(budget.TryReserve(ByteSize{1}, lease) == StormByte::Buffer::QueueStatus::Ok);
+		}
+		else
+			producer << StormByte::Safe::MakeShared<Packet>();
+		StageTelemetry stage;
+		std::thread thread([&] {
+			ActivityBinding binding(&stage.MainActivity(), stage);
+			ActivityScope process(ActivityState::Processing);
+			producer << StormByte::Safe::MakeShared<Packet>();
+		});
+		const auto state = budget_wait ? ActivityState::WaitingBudget : ActivityState::WaitingOutput;
+		const bool waiting = Await(stage.MainActivity(), state);
+		const auto first = stage.MainActivity().Snapshot();
+		std::this_thread::sleep_for(20ms);
+		const auto second = stage.MainActivity().Snapshot();
+		if (budget_wait)
+			lease.Reset();
+		else {
+			Pipe::Item::PointerType item;
+			consumer >> item;
+		}
+		thread.join();
+		TEST_REQUIRE(waiting && Conserved(first) && Conserved(second));
+		TEST_REQUIRE(second.Processing == first.Processing);
+		if (budget_wait) {
+			TEST_REQUIRE(second.WaitingBudget - first.WaitingBudget >= 20ms);
+			TEST_REQUIRE(second.WaitingOutput == 0ns);
+		}
+		else {
+			TEST_REQUIRE(second.WaitingOutput - first.WaitingOutput >= 20ms);
+			TEST_REQUIRE(second.WaitingBudget == 0ns);
+		}
+		TEST_REQUIRE(Conserved(stage.MainActivity().Snapshot()));
+		return 0;
+	}
+
+	int test_activity_output_wait_open_interval() {
+		return CheckAdmissionActivity(false);
+	}
+
+	int test_activity_shared_budget_wait_open_interval() {
+		return CheckAdmissionActivity(true);
+	}
+
 	// -------------------
 	// Wiring
 	// -------------------
@@ -346,6 +515,13 @@ namespace {
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
+		// -------------------
+		// Activity
+		// -------------------
+		TestEntry{"test_activity_input_wait_open_interval", test_activity_input_wait_open_interval},
+		TestEntry{"test_activity_nested_states_and_generation", test_activity_nested_states_and_generation},
+		TestEntry{"test_activity_output_wait_open_interval", test_activity_output_wait_open_interval},
+		TestEntry{"test_activity_shared_budget_wait_open_interval", test_activity_shared_budget_wait_open_interval},
 		// -------------------
 		// Wiring
 		// -------------------

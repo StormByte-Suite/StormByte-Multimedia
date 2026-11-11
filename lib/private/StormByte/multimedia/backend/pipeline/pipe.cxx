@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/activity.hxx>
 #include <StormByte/multimedia/backend/pipeline/packet.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/pipeline/frame.hxx>
@@ -194,8 +195,25 @@ bool Pipe::PushWeighted(ItemSink& sink, int track, Item::PointerType& item) noex
 	else if (const auto packet = StormByte::Safe::DynamicPointerCast<StormByte::Multimedia::Pipeline::Packet>(item))
 		weight = packet->BufferingWeight();
 
+	struct WaitContext {
+		WorkerActivity* Worker;
+		ActivityState Previous = ActivityState::Unknown;
+	} context{CurrentActivity};
+	const StormByte::Buffer::AdmissionWaitObserver observer{
+		&context,
+		[](void* data, StormByte::Buffer::AdmissionWaitReason reason, bool entering) noexcept {
+			auto& wait = *static_cast<WaitContext*>(data);
+			if (!wait.Worker)
+				return;
+			if (entering)
+				wait.Previous = wait.Worker->Exchange(reason == StormByte::Buffer::AdmissionWaitReason::SharedBudget
+					? ActivityState::WaitingBudget : ActivityState::WaitingOutput);
+			else
+				wait.Worker->Exchange(wait.Previous);
+		}
+	};
 	for (;;) {
-		const auto status = sink.PushFor(track, item, weight, std::chrono::milliseconds{100});
+		const auto status = sink.PushFor(track, item, weight, std::chrono::milliseconds{100}, observer);
 		if (status == StormByte::Buffer::QueueStatus::Ok)
 			return true;
 		if (status == StormByte::Buffer::QueueStatus::Timeout)
@@ -204,6 +222,7 @@ bool Pipe::PushWeighted(ItemSink& sink, int track, Item::PointerType& item) noex
 			if (sink.Draining())
 				return true;
 			if (!sink.EoF()) {
+				ActivityScope missing(ActivityState::WaitingOutput);
 				std::this_thread::sleep_for(std::chrono::milliseconds{1});
 				continue;
 			}
@@ -231,6 +250,7 @@ void Pipe::WaitWake(void* owner, bool (*ready)(void*) noexcept) noexcept {
 		const auto generation = m_wakeGeneration.load(StormByte::Safe::MemoryOrder::Acquire);
 		if (ready(owner))
 			return;
+		ActivityScope waiting(ActivityState::WaitingInput);
 		m_wakeGeneration.wait(generation, StormByte::Safe::MemoryOrder::Acquire);
 	}
 }

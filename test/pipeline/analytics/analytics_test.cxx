@@ -85,6 +85,22 @@ static int CheckVmafRemux(std::string_view source, std::string_view destination,
 	TEST_PHASE("starting transcoder run");
 	job.Run();
 	TEST_REQUIRE(WaitForTranscoder(job) == 0);
+	const auto topology = job.Telemetry()->Topology();
+	std::size_t inspections = 0;
+	bool analytics = false;
+	for (const auto& stage : topology.Stages) {
+		TEST_REQUIRE(ActivityConserved(stage.Activity));
+		TEST_REQUIRE(stage.Activity.Available && stage.Activity.Complete);
+		if (stage.Kind == TopologyStageKind::InspectionDecoder) {
+			++inspections;
+			TEST_REQUIRE(stage.Activity.Workers.front().Processing > 0ns);
+		}
+		if (stage.Filter == TopologyFilterKind::Analytics) {
+			analytics = true;
+			TEST_REQUIRE(stage.Activity.Workers.front().Processing > 0ns);
+		}
+	}
+	TEST_REQUIRE(inspections == 2 && analytics);
 
 	auto reports = job.Reports();
 	TEST_REQUIRE(reports.size() == 1);

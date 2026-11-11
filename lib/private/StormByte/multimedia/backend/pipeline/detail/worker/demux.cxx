@@ -48,6 +48,7 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later OR LicenseRef-StormByte-Commercial
  */
 
+#include <StormByte/multimedia/backend/pipeline/activity.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/worker/demux.hxx>
 #include <new>
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
@@ -75,8 +76,11 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	using StormByte::Multimedia::Pipeline::Packet;
 	using StormByte::Logger::Level;
 
-	FeedThread::FeedThread(Demux& owner, int track)
-	: m_thread([&owner, track]() { owner.FeedTrack(track); }), m_track(track) {}
+	FeedThread::FeedThread(Demux& owner, int track,
+		StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::WorkerActivity> activity)
+	: m_activity(std::move(activity)),
+		m_thread([&owner, track, activity = m_activity]() { owner.FeedTrack(track, activity.get()); }),
+		m_track(track) {}
 
 	FeedThread::~FeedThread() noexcept {
 		Join();
@@ -87,8 +91,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	}
 
 	void FeedThread::Join() noexcept {
-		if (m_thread.joinable())
+		if (m_thread.joinable()) {
+			ActivityScope waiting(ActivityState::WaitingOutput);
 			m_thread.join();
+		}
 	}
 
 	Demux::Demux(Demuxer& owner)
@@ -127,7 +133,9 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			}) != m_feeds.end())
 			return;
 		m_feeds.reserve(m_feeds.size() + 1);
-		m_feeds.push_back(StormByte::Safe::Shared<FeedThread>::MakePointer<FeedThread>(*this, track));
+		auto activity = m_owner.Face().Telemetry().RegisterActivityWorker(
+			StormByte::Multimedia::Pipeline::ActivityRole::DemuxFeeder, track);
+		m_feeds.push_back(StormByte::Safe::Shared<FeedThread>::MakePointer<FeedThread>(*this, track, std::move(activity)));
 	}
 
 	bool Demux::ParkPending() const noexcept {
@@ -149,47 +157,59 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		return cap.Park() != 0 ? cap.Park() : ParkFallback;
 	}
 
-	void Demux::FeedTrack(int track) noexcept try {
-		NameThread(StormByte::Safe::String::ReplaceToken("STMM:DmxF{}", track));
-		for (;;) {
-			Packet::PointerType packet;
-			{
-				StormByte::Safe::UniqueLock lock(m_parkMutex);
-				m_parkCv.wait(lock, [this, track]() {
-					return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
-						|| !m_park[track].empty();
-				});
-				if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire) && m_park[track].empty())
-					return;
-				if (m_park[track].empty())
-					continue;
-				packet = std::move(m_park[track].front());
-				m_park[track].pop_front();
-				m_probe->PendingSize(track, m_park[track].size());
-				++m_feeding;
+	void Demux::FeedTrack(int track, StormByte::Multimedia::Pipeline::WorkerActivity* activity) noexcept {
+		ActivityBinding binding(activity, m_owner.Face().Telemetry());
+		try {
+			NameThread(StormByte::Safe::String::ReplaceToken("STMM:DmxF{}", track));
+			if (activity)
+				activity->Exchange(ActivityState::Processing);
+			for (;;) {
+				Packet::PointerType packet;
+				{
+					StormByte::Safe::UniqueLock lock(m_parkMutex);
+					if (!m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire) && m_park[track].empty()) {
+						ActivityScope waiting(ActivityState::WaitingInput);
+						m_parkCv.wait(lock, [this, track]() {
+							return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
+								|| !m_park[track].empty();
+						});
+					}
+					if (m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire) && m_park[track].empty())
+						return;
+					if (m_park[track].empty())
+						continue;
+					packet = std::move(m_park[track].front());
+					m_park[track].pop_front();
+					m_probe->PendingSize(track, m_park[track].size());
+					++m_feeding;
+				}
+				m_parkCv.notify_all();
+				if (packet)
+					Emit(std::move(packet));
+				{
+					StormByte::Safe::UniqueLock lock(m_parkMutex);
+					--m_feeding;
+				}
+				m_parkCv.notify_all();
 			}
-			m_parkCv.notify_all();
-			if (packet)
-				Emit(std::move(packet));
-			{
-				StormByte::Safe::UniqueLock lock(m_parkMutex);
-				--m_feeding;
-			}
-			m_parkCv.notify_all();
+		} catch (const StormByte::Safe::AllocationError&) {
+			Fail();
+		} catch (const std::bad_alloc&) {
+			Fail();
 		}
-	} catch (const StormByte::Safe::AllocationError&) {
-		Fail();
-	} catch (const std::bad_alloc&) {
-		Fail();
 	}
 
 	void Demux::WaitFeedIdle() noexcept {
 		StormByte::Safe::UniqueLock lock(m_parkMutex);
+		const auto idle = [this]() {
+			return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
+				|| (m_feeding == 0 && !ParkPending());
+		};
+		if (idle())
+			return;
+		ActivityScope waiting(ActivityState::WaitingOutput);
 		// Stopping has no cv notification here, so poll it.
-		while (!m_parkCv.wait_for(lock, std::chrono::milliseconds(50), [this]() {
-				return m_feedStop.load(StormByte::Safe::MemoryOrder::Acquire)
-					|| (m_feeding == 0 && !ParkPending());
-			})) {
+		while (!m_parkCv.wait_for(lock, std::chrono::milliseconds(50), idle)) {
 			if (Stopping())
 				return;
 		}
@@ -313,6 +333,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 					|| ceiling == 0 || m_park[track].size() < ceiling;
 			};
 			if (!admissible()) {
+				ActivityScope waiting(ActivityState::WaitingOutput);
 				m_probe->PendingPressure(track);
 				const auto waitStarted = std::chrono::steady_clock::now();
 				m_parkCv.wait(lock, admissible);

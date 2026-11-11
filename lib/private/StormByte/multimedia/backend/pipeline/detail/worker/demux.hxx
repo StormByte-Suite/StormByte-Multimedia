@@ -91,8 +91,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			 * @brief Starts the feeder for @p track.
 			 * @param owner Demux whose lifetime extends through Join.
 			 * @param track Origin stream index.
+			 * @param activity Independent retained clock, or empty when registration failed.
 			 */
-			FeedThread(Demux& owner, int track);
+			FeedThread(Demux& owner, int track,
+				StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::WorkerActivity> activity);
 
 			FeedThread(const FeedThread&) = delete;
 
@@ -119,6 +121,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 			void Join() noexcept;
 
 		private:
+			StormByte::Safe::Shared<StormByte::Multimedia::Pipeline::WorkerActivity> m_activity; ///< Retained feeder clock.
 			StormByte::Safe::Thread m_thread;	///< Base-owned execution.
 			int m_track;	///< Origin stream index.
 	};
@@ -195,8 +198,9 @@ STORMBYTE_DECLARE_MAYBE_SAFE(StormByte::Multimedia::Backend::Pipeline::Detail::W
 			/**
 			 * @brief Blocking Emit of parked packets for one track.
 			 * @param track Origin stream index.
+			 * @param activity Clock retained by the feeder thread.
 			 */
-			void FeedTrack(int track) noexcept;
+			void FeedTrack(int track, StormByte::Multimedia::Pipeline::WorkerActivity* activity) noexcept;
 
 			/**
 			 * @brief Stops every feeder and joins.
