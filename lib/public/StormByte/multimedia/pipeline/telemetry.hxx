@@ -480,18 +480,14 @@ namespace StormByte {
 			/**
 			 * @struct TopologyBudget
 			 * @brief Shared byte budget reported once for every queue that charges it.
-			 *
-			 * Identity is proven by a zero-byte anchor lease, which Buffer only
-			 * grants while the budget is open. Budgets already closed when first
-			 * seen, with no live anchor from an earlier sighting, cannot be
-			 * matched: each such queue gets its own entry with
-			 * `Identified == false`. Those entries may describe the same budget
-			 * as another entry and must not be summed or deduplicated by id.
+			 * Identity is shared by all valid handles of the same budget,
+			 * including handles first observed after closure.
+			 * An invalid handle is omitted and marks the topology incomplete.
 			 */
 			struct TopologyBudget {
 				std::uint64_t Id = 0;											///< Stable entry id; equal ids mean the same shared budget.
-				bool Identified = true;											///< False when sharing with other entries could not be proven.
 				TopologySnapshotState State = TopologySnapshotState::Live;		///< Live or final reading.
+				bool Identified = true;											///< True for valid handles, including closed budgets.
 				StormByte::Safe::Vector<std::uint64_t> Queues;					///< Queue ids charging this budget in this snapshot.
 				StormByte::Buffer::BudgetSnapshot Snapshot;						///< Aggregate reservation counters.
 			};

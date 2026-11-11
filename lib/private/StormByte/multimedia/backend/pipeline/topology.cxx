@@ -61,7 +61,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		using namespace StormByte::Multimedia::Pipeline;
 
 		struct BudgetEntry {
-			bool Identified = true;
 			std::optional<StormByte::Buffer::ByteBudget> Handle;
 			std::vector<std::uint64_t> Queues;
 		};
@@ -83,6 +82,7 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		bool lost = false;
 		try {
 			identity = IdentifyBudget(budget);
+			lost = !identity;
 		} catch (const StormByte::Safe::AllocationError&) {
 			lost = true;
 		} catch (const std::bad_alloc&) {
@@ -214,7 +214,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				if (reading.Budget) {
 					queue.Budget = reading.Budget->Id;
 					auto& entry = budgets[reading.Budget->Id];
-					entry.Identified = reading.Budget->Identified();
 					if (!entry.Handle && reading.Handle)
 						entry.Handle = std::move(reading.Handle);
 					entry.Queues.push_back(queue.Id);
@@ -263,7 +262,6 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 		for (auto& [id, entry] : budgets) {
 			TopologyBudget budget;
 			budget.Id = id;
-			budget.Identified = entry.Identified;
 			// Budget values are read through the live handle unless this is the frozen copy.
 			budget.State = final ? TopologySnapshotState::Final : TopologySnapshotState::Live;
 			for (const auto queue : entry.Queues)

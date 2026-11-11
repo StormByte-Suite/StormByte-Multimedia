@@ -74,29 +74,20 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	/**
 	 * @brief Stable identity of one shared ByteBudget state.
 	 *
-	 * The zero-byte anchor lease lets later handles of the same budget be
-	 * recognised with ByteBudget::Lease::BelongsTo. It reserves no bytes and
-	 * keeps only the small budget state alive, never a pipeline stage.
+	 * A retained handle lets later handles be compared without reserving bytes,
+	 * including after closure. It never keeps a pipeline stage alive.
 	 */
 	struct STORMBYTE_MULTIMEDIA_PRIVATE BudgetIdentity {
+		explicit BudgetIdentity(const StormByte::Buffer::ByteBudget& budget) noexcept: Handle(budget) {}
 		std::uint64_t Id = 0;							///< Topology budget id.
-		StormByte::Buffer::ByteBudget::Lease Anchor;	///< Empty when the budget refused a zero-byte anchor.
-
-		/**
-		 * @brief Whether sharing can be proven through @ref Anchor.
-		 * @return False for a budget closed before any anchor existed.
-		 */
-		bool Identified() const noexcept { return static_cast<bool>(Anchor); }
+		StormByte::Buffer::ByteBudget Handle;			///< Shared identity without a reservation.
 	};
 
 	/**
 	 * @brief Resolve the shared identity of @p budget.
 	 * @param budget Budget handle.
-	 * @return Existing identity when a live anchor matches. Otherwise a new
-	 *         identity, anchored only if @p budget is still open; a closed
-	 *         budget yields an unidentified one instead of a false match.
-	 * @throw Safe::AllocationError or std::bad_alloc, including when the anchor
-	 *        lease of an open budget cannot be allocated.
+	 * @return Existing or new identity, or empty for an invalid budget handle.
+	 * @throw Safe::AllocationError or std::bad_alloc.
 	 */
 	STORMBYTE_MULTIMEDIA_PRIVATE StormByte::Safe::Shared<BudgetIdentity>
 		IdentifyBudget(const StormByte::Buffer::ByteBudget& budget);

@@ -131,41 +131,83 @@ namespace {
 		topology.Register(std::move(descriptor));
 	}
 
-	int test_budget_identity_survives_close_after_anchor() {
+	int test_budget_identity_survives_close() {
 		StormByte::Buffer::ByteBudget budget{ByteSize{64}};
-		const auto anchored = IdentifyBudget(budget);
-		TEST_REQUIRE(anchored && anchored->Identified());
+		const auto first = IdentifyBudget(budget);
+		TEST_REQUIRE(first);
 		budget.Close();
 		const auto again = IdentifyBudget(budget);
-		TEST_REQUIRE(again && again->Identified());
-		TEST_REQUIRE(again->Id == anchored->Id);
+		TEST_REQUIRE(again);
+		TEST_REQUIRE(again->Id == first->Id);
 		return 0;
 	}
 
-	int test_closed_budget_is_never_falsely_merged() {
+	int test_closed_budget_identity_is_deduplicated() {
 		StormByte::Buffer::ByteBudget closed{ByteSize{64}};
 		closed.Close();
+		const auto before = closed.Snapshot();
+		StormByte::Buffer::ByteBudget other{ByteSize{64}};
+		other.Close();
 		BufferingPolicy policy;
 		policy.Budget(closed);
+		BufferingPolicy other_policy;
+		other_policy.Budget(other);
 		Pipe source;
 		Pipe a;
 		Pipe b;
+		Pipe c;
 		a.Buffering(policy, StormByte::Size{2});
 		b.Buffering(policy, StormByte::Size{2});
+		c.Buffering(other_policy, StormByte::Size{2});
 		source.To(0) >> a;
 		source.To(1) >> b;
+		source.To(2) >> c;
 		Topology topology;
 		topology.Reset();
 		Register(topology, a);
 		Register(topology, b);
+		Register(topology, c);
 		const auto snapshot = topology.Snapshot();
 		TEST_REQUIRE(snapshot.Complete);
 		TEST_REQUIRE(snapshot.Budgets.size() == 2);
-		for (const auto& budget : snapshot.Budgets) {
-			TEST_REQUIRE(!budget.Identified);
-			TEST_REQUIRE(budget.Queues.size() == 1);
-			TEST_REQUIRE(budget.Snapshot.Closed);
+		std::size_t queues = 0;
+		for (const auto& entry : snapshot.Budgets) {
+			TEST_REQUIRE(entry.Identified && entry.Snapshot.Closed);
+			queues += entry.Queues.size();
+			TEST_REQUIRE(entry.Queues.size() == 1 || entry.Queues.size() == 2);
 		}
+		TEST_REQUIRE(queues == 3);
+		const auto after = closed.Snapshot();
+		TEST_REQUIRE(before.Reserved == after.Reserved && before.Peak == after.Peak);
+		TEST_REQUIRE(before.Pressure == after.Pressure && before.Waits == after.Waits);
+		TEST_REQUIRE(before.WaitNanoseconds == after.WaitNanoseconds && before.Closed == after.Closed);
+		const auto first = IdentifyBudget(closed);
+		const auto distinct = IdentifyBudget(other);
+		TEST_REQUIRE(first && distinct && first->Id != distinct->Id);
+		std::atomic<bool> matching{true};
+		std::vector<std::thread> readers;
+		for (int i = 0; i < 8; ++i) {
+			readers.emplace_back([&] {
+				for (int j = 0; j < 500; ++j) {
+					const auto shared = IdentifyBudget(closed);
+					const auto separate = IdentifyBudget(other);
+					if (!shared || !separate || shared->Id != first->Id || separate->Id != distinct->Id)
+						matching.store(false, std::memory_order_relaxed);
+				}
+			});
+		}
+		for (auto& reader : readers)
+			reader.join();
+		TEST_REQUIRE(matching.load(std::memory_order_relaxed));
+		topology.Freeze();
+		const auto final = topology.Snapshot();
+		TEST_REQUIRE(final.Complete && final.State == TopologySnapshotState::Final);
+		TEST_REQUIRE(final.Budgets.size() == 2);
+		TEST_REQUIRE(IdentifyBudget(closed)->Id == first->Id);
+		auto moved = std::move(other);
+		TEST_REQUIRE(!IdentifyBudget(other));
+		a.Probe()->Budget(9, other);
+		TEST_REQUIRE(a.Probe()->Incomplete());
 		return 0;
 	}
 
@@ -189,16 +231,15 @@ namespace {
 		Register(topology, b);
 		const auto live = topology.Snapshot();
 		TEST_REQUIRE(live.Budgets.size() == 1);
-		TEST_REQUIRE(live.Budgets.front().Identified);
 		TEST_REQUIRE(live.Budgets.front().Queues.size() == 2);
 		const auto id = live.Budgets.front().Id;
 		topology.Freeze();
 		const auto frozen = topology.Snapshot();
 		TEST_REQUIRE(frozen.State == TopologySnapshotState::Final);
 		TEST_REQUIRE(frozen.Budgets.size() == 1 && frozen.Budgets.front().Id == id);
-		// The frozen run still anchors the budget for the next run.
+		// The frozen run retains the budget identity for the next run.
 		const auto next = IdentifyBudget(budget);
-		TEST_REQUIRE(next->Identified() && next->Id == id);
+		TEST_REQUIRE(next && next->Id == id);
 		return 0;
 	}
 
@@ -286,7 +327,7 @@ namespace {
 		const int result = CheckReported([&budget](QueueProbe& probe) { probe.Budget(5, budget); },
 			[](const QueueProbe& probe) {
 				const auto reading = FindReading(probe, 5);
-				return reading && reading->Budget && reading->Budget->Identified();
+				return reading && reading->Budget;
 			});
 		TEST_REQUIRE(budget.Snapshot().Reserved == ByteSize{0});
 		return result;
@@ -303,7 +344,7 @@ namespace {
 	int test_topology_begin_allocation_failure_is_reported() {
 		unsigned failures = 0;
 		for (std::size_t position = 0; position < 64; ++position) {
-			// A fresh budget each round: no earlier anchor can satisfy the lookup.
+			// A fresh budget each round avoids an earlier identity satisfying the lookup.
 			StormByte::Buffer::ByteBudget budget{ByteSize{64}};
 			Topology topology;
 			const auto before = denied;
@@ -319,9 +360,9 @@ namespace {
 				continue;
 			}
 			TEST_REQUIRE(snapshot.Complete);
-			// Successful Begin pins an anchor that outlives the budget's closure.
+			// Successful Begin pins an identity that outlives the budget's closure.
 			budget.Close();
-			TEST_REQUIRE(IdentifyBudget(budget)->Identified());
+			TEST_REQUIRE(IdentifyBudget(budget));
 			break;
 		}
 		TEST_REQUIRE(failures > 0);
@@ -476,8 +517,8 @@ extern "C" void* aligned_alloc(std::size_t alignment, std::size_t size) noexcept
 
 int main(int argc, char** argv) {
 	static constexpr std::array tests{
-		TestEntry{"test_budget_identity_survives_close_after_anchor", test_budget_identity_survives_close_after_anchor},
-		TestEntry{"test_closed_budget_is_never_falsely_merged", test_closed_budget_is_never_falsely_merged},
+		TestEntry{"test_budget_identity_survives_close", test_budget_identity_survives_close},
+		TestEntry{"test_closed_budget_identity_is_deduplicated", test_closed_budget_identity_is_deduplicated},
 		TestEntry{"test_pinned_budget_stays_identified_after_close", test_pinned_budget_stays_identified_after_close},
 		TestEntry{"test_topology_marks_lost_registrations_incomplete", test_topology_marks_lost_registrations_incomplete},
 		TestEntry{"test_probe_producer_allocation_failure_is_reported", test_probe_producer_allocation_failure_is_reported},

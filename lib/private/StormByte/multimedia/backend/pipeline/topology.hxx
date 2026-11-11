@@ -92,11 +92,11 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 			void Reset() noexcept;
 
 			/**
-			 * @brief Start a new run anchoring the job budget first.
+			 * @brief Start a new run retaining the job budget identity first.
 			 *
 			 * The budget is identified before Reset releases the previous
-			 * run's anchors, so a budget closed later stays identifiable.
-			 * A lost anchor marks the run incomplete.
+			 * run's identities, so a shared budget keeps the same id.
+			 * A lost identity marks the run incomplete.
 			 * @param budget Job budget.
 			 */
 			void Begin(const StormByte::Buffer::ByteBudget& budget) noexcept;

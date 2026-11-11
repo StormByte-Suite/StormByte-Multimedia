@@ -75,6 +75,8 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 	}
 
 	StormByte::Safe::Shared<BudgetIdentity> IdentifyBudget(const StormByte::Buffer::ByteBudget& budget) {
+		if (!budget.SharesIdentity(budget))
+			return {};
 		auto& registry = Registry();
 		StormByte::Safe::UniqueLock lock(registry.Mutex);
 		bool expired = false;
@@ -84,25 +86,15 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 				expired = true;
 				continue;
 			}
-			if (identity->Anchor.BelongsTo(budget))
+			if (identity->Handle.SharesIdentity(budget))
 				return identity;
 		}
 		if (expired)
 			std::erase_if(registry.Entries, [](const auto& entry) { return !entry.lock(); });
-		auto identity = StormByte::Safe::Shared<BudgetIdentity>::MakePointer<BudgetIdentity>();
+		auto identity = StormByte::Safe::Shared<BudgetIdentity>::MakePointer<BudgetIdentity>(budget);
 		identity->Id = NextTopologyId();
-		// A zero-byte charge never changes Reserved, Peak, Pressure or Waits.
-		switch (budget.TryReserve(StormByte::ByteSize{0}, identity->Anchor)) {
-			case StormByte::Buffer::QueueStatus::Ok:
-				registry.Entries.push_back(StormByte::Safe::Weak<BudgetIdentity>{identity});
-				return identity;
-			case StormByte::Buffer::QueueStatus::Closed:
-				// Buffer exposes no other proof of identity: report it unidentified, never merged.
-				return identity;
-			default:
-				// Only the lease allocation can fail a zero-byte charge on an open budget.
-				throw std::bad_alloc();
-		}
+		registry.Entries.push_back(StormByte::Safe::Weak<BudgetIdentity>{identity});
+		return identity;
 	}
 
 	QueueProbe::QueueProbe(const ItemSink& sink)
@@ -153,6 +145,10 @@ namespace StormByte::Multimedia::Backend::Pipeline {
 
 	void QueueProbe::Budget(int key, const StormByte::Buffer::ByteBudget& budget) noexcept try {
 		auto identity = IdentifyBudget(budget);
+		if (!identity) {
+			m_incomplete.store(true, std::memory_order_release);
+			return;
+		}
 		StormByte::Safe::UniqueLock lock(m_mutex);
 		auto& state = Key(key);
 		state.Budget = std::move(identity);

@@ -559,7 +559,7 @@ int test_topology_closed_budget_identity() {
 	TEST_REQUIRE(first);
 	const auto open = first->Topology();
 	TEST_REQUIRE(CheckFinal(open) == 0 && open.Complete);
-	TEST_REQUIRE(open.Budgets.size() == 1 && open.Budgets.front().Identified);
+	TEST_REQUIRE(open.Budgets.size() == 1);
 	const auto id = open.Budgets.front().Id;
 
 	// Closed after an earlier sighting: still the same, proven budget.
@@ -570,9 +570,9 @@ int test_topology_closed_budget_identity() {
 	TEST_REQUIRE(Consistent(closed) && closed.Complete);
 	TEST_REQUIRE(closed.Available && !closed.Budgets.empty());
 	for (const auto& entry : closed.Budgets)
-		TEST_REQUIRE(entry.Identified && entry.Id == id && entry.Snapshot.Closed);
+		TEST_REQUIRE(entry.Id == id && entry.Snapshot.Closed);
 
-	// Closed before any sighting: reported unidentified, never merged under a false id.
+	// Closed before any sighting: still deduplicated and distinct from other budgets.
 	StormByte::Buffer::ByteBudget unseen{SharedBudgetBytes};
 	unseen.Close();
 	BufferingPolicy unseenPolicy;
@@ -581,9 +581,9 @@ int test_topology_closed_budget_identity() {
 	TEST_REQUIRE(third);
 	const auto anonymous = third->Topology();
 	TEST_REQUIRE(Consistent(anonymous) && anonymous.Complete);
-	TEST_REQUIRE(anonymous.Available && !anonymous.Budgets.empty());
+	TEST_REQUIRE(anonymous.Available && anonymous.Budgets.size() == 1);
 	for (const auto& entry : anonymous.Budgets)
-		TEST_REQUIRE(!entry.Identified && entry.Queues.size() == 1 && entry.Id != id);
+		TEST_REQUIRE(!entry.Queues.empty() && entry.Id != id && entry.Snapshot.Closed);
 	return 0;
 }
 

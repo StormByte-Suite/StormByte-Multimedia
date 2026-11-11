@@ -306,7 +306,7 @@ namespace {
 		TEST_REQUIRE(rd->Handle && !rd->Handle->Snapshot().Limited);
 		TEST_REQUIRE(re->Handle && re->Handle->Snapshot().Limited);
 		TEST_REQUIRE(re->Handle->Snapshot().Limit == ByteSize{0});
-		// The identity anchor is a zero-byte lease: it never changes accounting.
+		// Comparing budget identities never changes accounting.
 		TEST_REQUIRE(shared.Snapshot().Reserved == ByteSize{0});
 		TEST_REQUIRE(shared.Snapshot().Peak == ByteSize{0});
 		TEST_REQUIRE(shared.Snapshot().Pressure == 0);
