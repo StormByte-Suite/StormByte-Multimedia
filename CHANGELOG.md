@@ -19,17 +19,7 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Original-source license: [LICENSE](LICENSE) and [COPYING.LGPLv3](COPYING.LGPLv3)
 - Third-party notices and fixture provenance: [NOTICE](NOTICE) and [test/files/README.md](test/files/README.md)
 
-## [Unreleased]
-
-### Added
-
-- Add `EncoderInfo::PrivateOptions()` and `GenericOptions()` to enumerate FFmpeg
-  encoder option metadata separately, filtered for encoding and the media type.
-  Packed library parameter dictionaries remain single FFmpeg options.
-- Add `EncoderInfo::OptionChoice()` to resolve numeric option values to FFmpeg's
-  named choices without changing the existing numeric default metadata.
-
-### TODO
+## [Planned]
 
 - Investigate FFmpeg's handling of packed DivX/MPEG-4 AVI with missing VOL
   control parameters and B-frame reordering. With FFmpeg 9.0.2, one affected
@@ -47,7 +37,27 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Coordinate native HDR presentation with consumers such as Alchemist: negotiate a genuinely HDR-capable output/swapchain and active OS/compositor/display support, propagate signal metadata and handle screen changes. Evaluate Vulkan/native color-management support on Linux, DXGI HDR10/scRGB on Windows and Metal/EDR on macOS. Do not equate an OpenGL surface or a 16-bit texture with HDR output; retain SDR tone mapping when HDR cannot be confirmed.
 - Complete cross-platform validation for SDR/HDR output, actual hardware decoder selection, GPU processing, fallback behavior, A/V sync and CPU contention using the new diagnostics. Do not treat Auto decode policy alone as proof that hardware acceleration is active.
 
-[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.3.0...HEAD
+## [Unreleased]
+
+[Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.3.1...HEAD
+
+## [3.3.1] - 2026-11-12
+
+### Added
+
+- Add `EncoderInfo::PrivateOptions()` and `GenericOptions()` to enumerate FFmpeg
+  encoder option metadata separately, filtered for encoding and the media type.
+  Packed library parameter dictionaries remain single FFmpeg options.
+- Add `EncoderInfo::OptionChoice()` to resolve numeric option values to FFmpeg's
+  named choices without changing the existing numeric default metadata.
+
+### Fixed
+
+- Preserve sparse subtitle remux ordering and publish terminal progress at EOF,
+  with regression coverage for queue depths and interleave behavior.
+- Correct sparse interleave timing and retry-aware activity test expectations.
+
+[3.3.1]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.3.0...3.3.1
 
 ## [3.3.0] - 2026-11-10
 
