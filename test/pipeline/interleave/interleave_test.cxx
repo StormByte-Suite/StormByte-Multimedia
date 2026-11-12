@@ -1040,7 +1040,7 @@ namespace {
 			}
 	};
 
-	int MakeSparseInput(const std::filesystem::path& output, bool empty) {
+	int MakeSparseInput(const std::filesystem::path& output, bool empty, bool skewed = false) {
 		AVFormatContext* raw = nullptr;
 		TEST_REQUIRE(avformat_open_input(&raw, FixturePath(Fixture).string().c_str(), nullptr, nullptr) == 0);
 		std::unique_ptr<AVFormatContext, InputCloser> input{raw};
@@ -1071,21 +1071,24 @@ namespace {
 		TEST_REQUIRE(packet);
 		bool cue = empty;
 		int result = 0;
+		// Bypass source interleaving to exercise a cue arriving 800 ms behind A/V.
 		while ((result = av_read_frame(input.get(), packet.get())) == 0) {
 			const int index = packet->stream_index;
 			if (index < 2) {
 				av_packet_rescale_ts(packet.get(), input->streams[index]->time_base, mux->streams[index]->time_base);
-				if (!cue && Seconds(packet->dts, mux->streams[index]->time_base) >= 10) {
+				if (!cue && Seconds(packet->dts, mux->streams[index]->time_base) >= (skewed ? 10.8 : 10)) {
 					std::unique_ptr<AVPacket, PacketFree> subtitle{av_packet_alloc()};
 					TEST_REQUIRE(subtitle && av_new_packet(subtitle.get(), 4) >= 0);
 					std::memcpy(subtitle->data, "late", 4);
 					subtitle->stream_index = 2;
 					subtitle->pts = subtitle->dts = av_rescale_q(10, AVRational{1, 1}, mux->streams[2]->time_base);
 					subtitle->duration = av_rescale_q(1, AVRational{1, 1}, mux->streams[2]->time_base);
-					TEST_REQUIRE(av_interleaved_write_frame(mux, subtitle.get()) >= 0);
+					TEST_REQUIRE((skewed ? av_write_frame(mux, subtitle.get())
+						: av_interleaved_write_frame(mux, subtitle.get())) >= 0);
 					cue = true;
 				}
-				TEST_REQUIRE(av_interleaved_write_frame(mux, packet.get()) >= 0);
+				TEST_REQUIRE((skewed ? av_write_frame(mux, packet.get())
+					: av_interleaved_write_frame(mux, packet.get())) >= 0);
 			}
 			av_packet_unref(packet.get());
 		}
@@ -1140,6 +1143,9 @@ namespace {
 				TEST_REQUIRE(packet->size == 4 && std::memcmp(packet->data, "late", 4) == 0);
 				TEST_REQUIRE(std::abs(Seconds(packet->pts, raw->streams[index]->time_base) - 10) < 0.1);
 				TEST_REQUIRE(std::abs(Seconds(packet->duration, raw->streams[index]->time_base) - 1) < 0.01);
+				if (latestMedia - Seconds(stamp, raw->streams[index]->time_base) > MaxSpreadSeconds)
+					std::cerr << "[DETAIL] sparse subtitle timestamp=" << Seconds(stamp, raw->streams[index]->time_base)
+						<< " latest A/V timestamp=" << latestMedia << " limit=" << MaxSpreadSeconds << '\n';
 				TEST_REQUIRE(latestMedia - Seconds(stamp, raw->streams[index]->time_base) <= MaxSpreadSeconds);
 			}
 			else if (index == 1)
@@ -1344,6 +1350,30 @@ int test_interleave_sparse_subtitles_with_delayed_video() {
 	return RunSparseRetention(false, false);
 }
 
+int test_interleave_sparse_remux_source_skew() {
+	const auto input = OutputPath("pipeline/interleave/remux-skew-input.mkv");
+	const auto output = OutputPath("pipeline/interleave/remux-skew-output.mkv");
+	TEST_REQUIRE(MakeSparseInput(input, false, true) == 0);
+	for (const unsigned packets : {1u, 4096u}) {
+		{
+			Transcoder job{TestLocation(input), TestLocation(output), MakeLogger(), 12012000000LL};
+			BufferingPolicy buffering;
+			buffering.Packets(QueueLimit::Bounded(packets));
+			buffering.DemuxPending(QueueLimit::Bounded(1));
+			job.Buffering(buffering);
+			job.Video(0).Remux();
+			job.Audio(1).Remux();
+			job.Subtitle(2).Remux();
+			job.Subtitle(3).Remux();
+			TEST_REQUIRE(CheckTranscoderConfigured(job) == 0);
+			job.Run();
+			TEST_REQUIRE(WaitForTranscoder(job) == 0);
+		}
+		TEST_REQUIRE(CheckSparseOutput(input, output, false, true) == 0);
+	}
+	return 0;
+}
+
 // -------------------
 // Queue
 // -------------------
@@ -1485,6 +1515,7 @@ int RunPipelineInterleaveTests(int argc, char** argv) {
 		TestEntry{"test_interleave_deep_queues_do_not_extend_retention", test_interleave_deep_queues_do_not_extend_retention},
 		TestEntry{"test_interleave_empty_subtitles_with_delayed_video", test_interleave_empty_subtitles_with_delayed_video},
 		TestEntry{"test_interleave_sparse_subtitles_with_delayed_video", test_interleave_sparse_subtitles_with_delayed_video},
+		TestEntry{"test_interleave_sparse_remux_source_skew", test_interleave_sparse_remux_source_skew},
 		// -------------------
 		// Queue
 		// -------------------

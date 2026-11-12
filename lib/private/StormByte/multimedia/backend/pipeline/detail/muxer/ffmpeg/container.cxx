@@ -781,7 +781,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Muxer::FFmpeg {
 			const auto type = stream->codecpar ? stream->codecpar->codec_type : AVMEDIA_TYPE_UNKNOWN;
 			track.paced = (type == AVMEDIA_TYPE_VIDEO || type == AVMEDIA_TYPE_AUDIO)
 				&& (stream->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0;
-			track.subtitle = type == AVMEDIA_TYPE_SUBTITLE && track.encoder;
+			track.subtitle = type == AVMEDIA_TYPE_SUBTITLE;
 		}
 
 		m_header = true;

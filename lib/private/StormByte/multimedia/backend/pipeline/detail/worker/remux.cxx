@@ -53,7 +53,9 @@
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/name_thread.hxx>
 #include <StormByte/multimedia/pipeline/packet.hxx>
+#include <StormByte/multimedia/pipeline/plan.hxx>
 #include <StormByte/multimedia/pipeline/remuxer.hxx>
+#include <StormByte/multimedia/pipeline/track.hxx>
 #include <StormByte/multimedia/property/duration.hxx>
 #include <StormByte/safe/string.hxx>
 
@@ -99,8 +101,6 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 	}
 
 	void Remux::Process(Item::PointerType item) noexcept try {
-		if (dynamic_cast<const SubtitleProgress*>(item.get()))
-			return;
 		if (!item) {
 			Flush();
 			return;
@@ -116,6 +116,10 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 
 		if (packet->Track() != m_owner.m_index)
 			return;
+		if (dynamic_cast<const SubtitleProgress*>(packet.get())) {
+			m_owner.Emit(std::move(packet));
+			return;
+		}
 		if (!packet->Serial()) {
 			Fail("packet has no serial");
 			return;
@@ -136,5 +140,19 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		Fail();
 	}
 
-	void Remux::Flush() noexcept {}
+	void Remux::Flush() noexcept try {
+		if (m_owner.Failed() || !m_owner.Plan())
+			return;
+		for (const auto& track : m_owner.Plan()->Tracks()) {
+			if (track && track->In() == m_owner.m_index && track->Type() == Type::Subtitle) {
+				m_owner.Emit(Packet::PointerType::MakePointer<SubtitlePacketProgress>(m_owner.m_index,
+					StormByte::Multimedia::Pipeline::Producer::Remuxer, SubtitleProgress::End));
+				return;
+			}
+		}
+	} catch (const StormByte::Safe::AllocationError&) {
+		Fail();
+	} catch (const std::bad_alloc&) {
+		Fail();
+	}
 }

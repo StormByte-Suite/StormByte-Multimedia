@@ -54,7 +54,6 @@
 #include <StormByte/multimedia/backend/pipeline/ceiling.hxx>
 #include <StormByte/multimedia/backend/pipeline/pipe.hxx>
 #include <StormByte/multimedia/backend/pipeline/subtitle_progress.hxx>
-#include <StormByte/multimedia/pipeline/config/subtitle.hxx>
 #include <StormByte/safe/memory_order.hxx>
 #include <StormByte/multimedia/backend/pipeline/detail/packet_diagnostic.hxx>
 #include <StormByte/multimedia/backend/pipeline/demuxer.hxx>
@@ -234,8 +233,7 @@ namespace StormByte::Multimedia::Backend::Pipeline::Detail::Worker {
 		m_owner.m_positionNs.store(-1, StormByte::Safe::MemoryOrder::Release);
 		m_owner.m_nextSerial.clear();
 		for (const auto& track : m_owner.Plan()->Tracks()) {
-			const auto* config = track ? dynamic_cast<const StormByte::Multimedia::Pipeline::Config::Subtitle*>(track->Config()) : nullptr;
-			if (config && config->Codec()
+			if (track && track->Type() == StormByte::Multimedia::Type::Subtitle
 				&& std::find(m_subtitles.begin(), m_subtitles.end(), track->In()) == m_subtitles.end())
 				m_subtitles.push_back(track->In());
 		}

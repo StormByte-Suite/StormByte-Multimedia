@@ -161,7 +161,9 @@ capacity are not observable here and are intentionally not invented.
 ## Validation
 
 - Pipe tests hold input, a full output and an external shared-budget lease;
-  live samples show the correct open wait and unchanged processing.
+  live samples show the correct open wait. Admission samples cross the
+  100 ms retry boundary: actual waits and the processing between retries
+  partition the sampled interval exactly.
 - Nested processing/input/output/budget/pause scopes conserve time exactly
   (tolerance **0 ns**) and terminal samples remain identical after delays.
 - A gated real audio `Process` exposes the open interval; actual
@@ -174,6 +176,11 @@ capacity are not observable here and are intentionally not invented.
 - VMAF's analytics worker and inspection decoder expose their processing;
   mixed x265/audio-remux/sparse and empty subtitle tests preserve output
   correctness, progressive mux delivery and normal input waits.
+- Both encoded and remuxed subtitle lanes carry ordered demux watermarks
+  and a terminal watermark through their bounded queues. The muxer cannot
+  let audio/video overtake a delayed remuxed cue just because that lane is
+  temporarily empty. A skewed-source regression checks cue placement,
+  payload preservation and interleave with shallow and deep packet queues.
 
 Sleep-based tests require at least their deliberately held interval, not a
 tight scheduler-dependent upper bound. Timing conservation uses exact tick

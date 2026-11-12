@@ -203,7 +203,7 @@ namespace {
 		const auto state = budget_wait ? ActivityState::WaitingBudget : ActivityState::WaitingOutput;
 		const bool waiting = Await(stage.MainActivity(), state);
 		const auto first = stage.MainActivity().Snapshot();
-		std::this_thread::sleep_for(20ms);
+		std::this_thread::sleep_for(150ms);
 		const auto second = stage.MainActivity().Snapshot();
 		if (budget_wait)
 			lease.Reset();
@@ -213,14 +213,18 @@ namespace {
 		}
 		thread.join();
 		TEST_REQUIRE(waiting && Conserved(first) && Conserved(second));
-		TEST_REQUIRE(second.Processing == first.Processing);
+		// Admission retries every 100 ms; time checking admission is processing, not a wait.
+		const auto processing = second.Processing - first.Processing;
+		TEST_REQUIRE(processing >= 0ns);
 		if (budget_wait) {
 			TEST_REQUIRE(second.WaitingBudget - first.WaitingBudget >= 20ms);
 			TEST_REQUIRE(second.WaitingOutput == 0ns);
+			TEST_REQUIRE(second.WaitingBudget - first.WaitingBudget + processing == second.SampledAt - first.SampledAt);
 		}
 		else {
 			TEST_REQUIRE(second.WaitingOutput - first.WaitingOutput >= 20ms);
 			TEST_REQUIRE(second.WaitingBudget == 0ns);
+			TEST_REQUIRE(second.WaitingOutput - first.WaitingOutput + processing == second.SampledAt - first.SampledAt);
 		}
 		TEST_REQUIRE(Conserved(stage.MainActivity().Snapshot()));
 		return 0;

@@ -35,6 +35,10 @@ foreach(test_name IN ITEMS
 	set_tests_properties("pipeline.${test_name}" PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;interleave")
 endforeach()
 
+add_pipeline_test(MultimediaPipelineInterleaveTests test_interleave_sparse_remux_source_skew)
+set_tests_properties("pipeline.test_interleave_sparse_remux_source_skew"
+	PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;interleave")
+
 add_pipeline_test(MultimediaPipelineInterleaveTests test_three_track_remux_with_small_shared_queues)
 set_tests_properties("pipeline.test_three_track_remux_with_small_shared_queues"
 	PROPERTIES TIMEOUT ${PIPELINE_TEST_TIMEOUT_LONG} LABELS "multimedia;pipeline;interleave")
