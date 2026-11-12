@@ -1127,6 +1127,7 @@ namespace {
 		double latestMedia = -1;
 		while ((result = av_read_frame(raw, packet.get())) == 0) {
 			const int index = packet->stream_index;
+			const auto stamp = packet->dts != AV_NOPTS_VALUE ? packet->dts : packet->pts;
 			TEST_REQUIRE(index >= 0 && index < 4);
 			++count[index];
 			const auto dts = packet->dts;
@@ -1139,12 +1140,12 @@ namespace {
 				TEST_REQUIRE(packet->size == 4 && std::memcmp(packet->data, "late", 4) == 0);
 				TEST_REQUIRE(std::abs(Seconds(packet->pts, raw->streams[index]->time_base) - 10) < 0.1);
 				TEST_REQUIRE(std::abs(Seconds(packet->duration, raw->streams[index]->time_base) - 1) < 0.01);
-				TEST_REQUIRE(latestMedia - Seconds(packet->pts, raw->streams[index]->time_base) <= MaxSpreadSeconds);
+				TEST_REQUIRE(latestMedia - Seconds(stamp, raw->streams[index]->time_base) <= MaxSpreadSeconds);
 			}
 			else if (index == 1)
 				actualAudio.emplace_back(packet->data, packet->data + packet->size);
-			if (Paced(*raw->streams[index]) && packet->pts != AV_NOPTS_VALUE)
-				latestMedia = std::max(latestMedia, Seconds(packet->pts, raw->streams[index]->time_base));
+			if (Paced(*raw->streams[index]) && stamp != AV_NOPTS_VALUE)
+				latestMedia = std::max(latestMedia, Seconds(stamp, raw->streams[index]->time_base));
 			av_packet_unref(packet.get());
 		}
 		TEST_REQUIRE(result == AVERROR_EOF);
