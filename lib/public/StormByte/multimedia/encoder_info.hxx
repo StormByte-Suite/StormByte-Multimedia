@@ -255,6 +255,22 @@ namespace StormByte::Multimedia {
 			 */
 			StormByte::Safe::Optional<EncoderOption> Option(std::string_view name) const;
 
+			/**
+			 * @brief Enumerates encoder-specific FFmpeg options applicable to encoding.
+			 * @return Owned descriptions; empty for an empty or unavailable encoder.
+			 * @note Packed dictionary options are returned as single FFmpeg options;
+			 * their library-specific keys are not enumerated.
+			 */
+			StormByte::Safe::Vector<EncoderOption> PrivateOptions() const;
+
+			/**
+			 * @brief Enumerates generic FFmpeg codec options applicable to this encoder.
+			 * @return Owned descriptions, excluding names shadowed by private options.
+			 * @note This reports FFmpeg metadata, not whether a particular pipeline
+			 * configuration permits or uses every option.
+			 */
+			StormByte::Safe::Vector<EncoderOption> GenericOptions() const;
+
 		private:
 			/**
 			 * @brief Codec builds descriptions from the encoder tables.

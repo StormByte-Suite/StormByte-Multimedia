@@ -1,6 +1,12 @@
 add_executable(MultimediaRegistryTests registry_test.cxx)
 target_link_libraries(MultimediaRegistryTests PRIVATE multimedia_test_support)
 
+add_executable(MultimediaEncoderOptionsTests encoder_options_test.cxx)
+target_link_libraries(MultimediaEncoderOptionsTests PRIVATE multimedia_test_support)
+stormbyte_link_ffmpeg(MultimediaEncoderOptionsTests)
+add_test(NAME registry.encoder_options COMMAND MultimediaEncoderOptionsTests)
+set_tests_properties(registry.encoder_options PROPERTIES TIMEOUT 50 LABELS "multimedia;registry")
+
 add_executable(MultimediaRegistryAllocationTests allocation_failure_test.cxx)
 target_link_libraries(MultimediaRegistryAllocationTests PRIVATE multimedia_test_support)
 add_test(NAME registry.allocation_failure COMMAND MultimediaRegistryAllocationTests)

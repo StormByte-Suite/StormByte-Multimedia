@@ -94,6 +94,53 @@ namespace {
 				return {};
 		}
 	}
+
+	EncoderOption Describe(const ::AVClass* owner, const ::AVOption& option) {
+		EncoderOption out;
+		out.Name = StormByte::Safe::String{option.name};
+		out.Help = StormByte::Safe::String{option.help ? option.help : ""};
+		out.Type = TypeOf(option);
+		out.Minimum = option.min;
+		out.Maximum = option.max;
+		out.Default = StormByte::Safe::String{DefaultOf(option)};
+		if (option.unit) {
+			const ::AVOption* entry = nullptr;
+			while ((entry = av_opt_next(&owner, entry))) {
+				if (entry->type == AV_OPT_TYPE_CONST && entry->unit && std::string_view{entry->unit} == option.unit)
+					out.Choices.push_back(StormByte::Safe::String{entry->name});
+			}
+		}
+		return out;
+	}
+
+	StormByte::Safe::Vector<EncoderOption> Enumerate(const ::AVCodec& codec, bool privateOptions) {
+		StormByte::Safe::Vector<EncoderOption> result;
+		const ::AVClass* owner = privateOptions ? codec.priv_class : avcodec_get_class();
+		if (!owner)
+			return result;
+		int mediaFlag = 0;
+		switch (codec.type) {
+			case AVMEDIA_TYPE_VIDEO: mediaFlag = AV_OPT_FLAG_VIDEO_PARAM; break;
+			case AVMEDIA_TYPE_AUDIO: mediaFlag = AV_OPT_FLAG_AUDIO_PARAM; break;
+			case AVMEDIA_TYPE_SUBTITLE: mediaFlag = AV_OPT_FLAG_SUBTITLE_PARAM; break;
+			default: return result;
+		}
+		const int mediaFlags = AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_SUBTITLE_PARAM;
+		const ::AVOption* option = nullptr;
+		while ((option = av_opt_next(&owner, option))) {
+			if (option->type == AV_OPT_TYPE_CONST || !(option->flags & AV_OPT_FLAG_ENCODING_PARAM)
+				|| (option->flags & AV_OPT_FLAG_READONLY)
+				|| ((option->flags & mediaFlags) && !(option->flags & mediaFlag)))
+				continue;
+			if (!privateOptions && codec.priv_class) {
+				const ::AVClass* privateClass = codec.priv_class;
+				if (av_opt_find(&privateClass, option->name, nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ))
+					continue;
+			}
+			result.push_back(Describe(owner, *option));
+		}
+		return result;
+	}
 }
 
 EncoderOption::EncoderOption(): Type(EncoderOptionType::Other), Minimum(0), Maximum(0) {}
@@ -125,19 +172,15 @@ StormByte::Safe::Optional<EncoderOption> EncoderInfo::Option(std::string_view na
 	if (!option || option->type == AV_OPT_TYPE_CONST)
 		return std::nullopt;
 
-	EncoderOption out;
-	out.Name = StormByte::Safe::String{option->name};
-	out.Help = StormByte::Safe::String{option->help ? option->help : ""};
-	out.Type = TypeOf(*option);
-	out.Minimum = option->min;
-	out.Maximum = option->max;
-	out.Default = StormByte::Safe::String{DefaultOf(*option)};
-	if (option->unit) {
-		const ::AVOption* entry = nullptr;
-		while ((entry = av_opt_next(&owner, entry))) {
-			if (entry->type == AV_OPT_TYPE_CONST && entry->unit && std::string_view{entry->unit} == option->unit)
-				out.Choices.push_back(StormByte::Safe::String{entry->name});
-		}
-	}
-	return out;
+	return Describe(owner, *option);
+}
+
+StormByte::Safe::Vector<EncoderOption> EncoderInfo::PrivateOptions() const {
+	const auto* codec = m_name.empty() ? nullptr : avcodec_find_encoder_by_name(std::string(m_name).c_str());
+	return codec ? Enumerate(*codec, true) : StormByte::Safe::Vector<EncoderOption>{};
+}
+
+StormByte::Safe::Vector<EncoderOption> EncoderInfo::GenericOptions() const {
+	const auto* codec = m_name.empty() ? nullptr : avcodec_find_encoder_by_name(std::string(m_name).c_str());
+	return codec ? Enumerate(*codec, false) : StormByte::Safe::Vector<EncoderOption>{};
 }

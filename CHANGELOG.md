@@ -21,6 +21,12 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Added
+
+- Add `EncoderInfo::PrivateOptions()` and `GenericOptions()` to enumerate FFmpeg
+  encoder option metadata separately, filtered for encoding and the media type.
+  Packed library parameter dictionaries remain single FFmpeg options.
+
 ### TODO
 
 - Investigate FFmpeg's handling of packed DivX/MPEG-4 AVI with missing VOL
