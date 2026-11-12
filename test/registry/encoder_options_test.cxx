@@ -52,6 +52,8 @@
 
 #include <StormByte/multimedia/registry.hxx>
 
+#include <cstdint>
+#include <map>
 #include <set>
 #include <string>
 #include <string_view>
@@ -67,6 +69,7 @@ int main() {
 	const EncoderInfo empty;
 	TEST_REQUIRE(empty.PrivateOptions().empty());
 	TEST_REQUIRE(empty.GenericOptions().empty());
+	TEST_REQUIRE(!empty.OptionChoice("deadline", "1000000"));
 	int tested = 0;
 	for (const auto type : {StormByte::Multimedia::Type::Video, StormByte::Multimedia::Type::Audio, StormByte::Multimedia::Type::Subtitle}) {
 		const int media = type == StormByte::Multimedia::Type::Video ? AV_OPT_FLAG_VIDEO_PARAM
@@ -107,6 +110,21 @@ int main() {
 						TEST_REQUIRE(queried->Choices.size() == item.Choices.size());
 						for (std::size_t i = 0; i < item.Choices.size(); ++i)
 							TEST_REQUIRE(queried->Choices[i] == item.Choices[i]);
+						const auto* native = av_opt_find(&owner, name.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ);
+						if (native && native->unit && (native->type == AV_OPT_TYPE_INT || native->type == AV_OPT_TYPE_INT64
+							|| native->type == AV_OPT_TYPE_UINT || native->type == AV_OPT_TYPE_UINT64 || native->type == AV_OPT_TYPE_BOOL)) {
+							std::map<std::int64_t, std::string> firstNames;
+							const AVOption* entry = nullptr;
+							while ((entry = av_opt_next(&owner, entry))) {
+								if (entry->type == AV_OPT_TYPE_CONST && entry->unit && std::string_view{entry->unit} == native->unit)
+									firstNames.try_emplace(entry->default_val.i64, entry->name);
+							}
+							for (const auto& [value, expectedName] : firstNames) {
+								const auto choice = encoder.OptionChoice(name, std::to_string(value));
+								TEST_REQUIRE(choice);
+								TEST_REQUIRE(static_cast<std::string_view>(*choice) == expectedName);
+							}
+						}
 					}
 					TEST_REQUIRE(actual == expected);
 					return 0;
@@ -130,6 +148,20 @@ int main() {
 					TEST_REQUIRE(hasPrivate("iblock"));
 				if (name == "libx265")
 					TEST_REQUIRE(hasPrivate("x265-params"));
+				if (name == "libvpx-vp9") {
+					const auto deadline = encoder.Option("deadline");
+					TEST_REQUIRE(deadline);
+					TEST_REQUIRE(deadline->Default == StormByte::Safe::String("1000000"));
+					const auto choice = encoder.OptionChoice("deadline", "1000000");
+					TEST_REQUIRE(choice);
+					TEST_REQUIRE(*choice == StormByte::Safe::String("good"));
+					TEST_REQUIRE(encoder.OptionChoice("deadline", "0") == StormByte::Safe::String("best"));
+					TEST_REQUIRE(encoder.OptionChoice("deadline", "1") == StormByte::Safe::String("realtime"));
+					TEST_REQUIRE(!encoder.OptionChoice("deadline", "12345"));
+					TEST_REQUIRE(!encoder.OptionChoice("deadline", "good"));
+					TEST_REQUIRE(!encoder.OptionChoice("error-resilient", "1"));
+					TEST_REQUIRE(!encoder.OptionChoice("unknown", "1"));
+				}
 				++tested;
 			}
 		}

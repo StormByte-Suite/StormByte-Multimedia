@@ -51,6 +51,7 @@
 #include <StormByte/multimedia/encoder_info.hxx>
 
 #include <charconv>
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -141,6 +142,17 @@ namespace {
 		}
 		return result;
 	}
+
+	const ::AVOption* FindOption(const ::AVCodec& codec, std::string_view name, const ::AVClass*& owner) {
+		const std::string key(name);
+		owner = codec.priv_class;
+		const auto* option = owner ? av_opt_find(&owner, key.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ) : nullptr;
+		if (!option) {
+			owner = avcodec_get_class();
+			option = av_opt_find(&owner, key.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ);
+		}
+		return option;
+	}
 }
 
 EncoderOption::EncoderOption(): Type(EncoderOptionType::Other), Minimum(0), Maximum(0) {}
@@ -161,18 +173,40 @@ StormByte::Safe::Optional<EncoderOption> EncoderInfo::Option(std::string_view na
 	const ::AVCodec* codec = avcodec_find_encoder_by_name(std::string(m_name).c_str());
 	if (!codec)
 		return std::nullopt;
-	const std::string key(name);
-	const ::AVClass* owner = codec->priv_class;
-	const ::AVOption* option = owner
-		? av_opt_find(&owner, key.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ) : nullptr;
-	if (!option) {
-		owner = avcodec_get_class();
-		option = av_opt_find(&owner, key.c_str(), nullptr, 0, AV_OPT_SEARCH_FAKE_OBJ);
-	}
+	const ::AVClass* owner = nullptr;
+	const ::AVOption* option = FindOption(*codec, name, owner);
 	if (!option || option->type == AV_OPT_TYPE_CONST)
 		return std::nullopt;
 
 	return Describe(owner, *option);
+}
+
+StormByte::Safe::Optional<StormByte::Safe::String> EncoderInfo::OptionChoice(std::string_view name, std::string_view value) const {
+	if (m_name.empty() || name.empty() || value.empty())
+		return std::nullopt;
+	const auto* codec = avcodec_find_encoder_by_name(std::string(m_name).c_str());
+	if (!codec)
+		return std::nullopt;
+	const ::AVClass* owner = nullptr;
+	const auto* option = FindOption(*codec, name, owner);
+	if (!option || !option->unit)
+		return std::nullopt;
+	const bool integer = option->type == AV_OPT_TYPE_INT || option->type == AV_OPT_TYPE_INT64
+		|| option->type == AV_OPT_TYPE_UINT || option->type == AV_OPT_TYPE_UINT64 || option->type == AV_OPT_TYPE_BOOL;
+	if (!integer)
+		return std::nullopt;
+	std::int64_t intValue = 0;
+	const auto parsed = std::from_chars(value.data(), value.data() + value.size(), intValue);
+	if (parsed.ec != std::errc{} || parsed.ptr != value.data() + value.size())
+		return std::nullopt;
+	const ::AVOption* entry = nullptr;
+	while ((entry = av_opt_next(&owner, entry))) {
+		if (entry->type != AV_OPT_TYPE_CONST || !entry->unit || std::string_view{entry->unit} != option->unit)
+			continue;
+		if (entry->default_val.i64 == intValue)
+			return StormByte::Safe::String{entry->name};
+	}
+	return std::nullopt;
 }
 
 StormByte::Safe::Vector<EncoderOption> EncoderInfo::PrivateOptions() const {

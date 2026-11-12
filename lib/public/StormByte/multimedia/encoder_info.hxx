@@ -256,6 +256,15 @@ namespace StormByte::Multimedia {
 			StormByte::Safe::Optional<EncoderOption> Option(std::string_view name) const;
 
 			/**
+			 * @brief Resolves a numeric option value to an FFmpeg named choice.
+			 * @param name Private or generic codec option name.
+			 * @param value Integer value as text.
+			 * @return First matching choice, or empty when no choice is known.
+			 * @note Flags, non-integer options and packed library parameters are not resolved.
+			 */
+			StormByte::Safe::Optional<StormByte::Safe::String> OptionChoice(std::string_view name, std::string_view value) const;
+
+			/**
 			 * @brief Enumerates encoder-specific FFmpeg options applicable to encoding.
 			 * @return Owned descriptions; empty for an empty or unavailable encoder.
 			 * @note Packed dictionary options are returned as single FFmpeg options;

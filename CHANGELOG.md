@@ -26,6 +26,8 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 - Add `EncoderInfo::PrivateOptions()` and `GenericOptions()` to enumerate FFmpeg
   encoder option metadata separately, filtered for encoding and the media type.
   Packed library parameter dictionaries remain single FFmpeg options.
+- Add `EncoderInfo::OptionChoice()` to resolve numeric option values to FFmpeg's
+  named choices without changing the existing numeric default metadata.
 
 ### TODO
 
