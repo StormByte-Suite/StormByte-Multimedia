@@ -39,6 +39,13 @@ Original Multimedia sources are dual-licensed LGPL-3.0-or-later or commercial. T
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep MPEG-4 Part 2 decoding in software for preview and conversion, including
+  Auto mode, to avoid corrupted hardware-decoded GMC frames without an extra
+  input scan. Hardware encoding and automatic acceleration for other codecs
+  are unchanged. Works with bundled and system FFmpeg without FFmpeg patches.
+
 [Unreleased]: https://github.com/StormByte-Suite/StormByte-Multimedia/compare/3.3.1...HEAD
 
 ## [3.3.1] - 2026-11-12

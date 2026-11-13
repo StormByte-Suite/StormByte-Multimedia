@@ -258,6 +258,13 @@ Encoder preparation preserves supported representations or performs exact storag
 
 Video decoders use `DecodeAcceleration::Auto` by default on preview and encode lanes. Auto checks FFmpeg's hardware configurations for the selected codec, tries the platform backend, then opens a software decoder if device creation or hardware decoder initialization fails. Use `SimplePlayer::Acceleration(...)` or `Track::Acceleration(...)` to force CPU decoding for preview or an individual transcode lane. Decoder pins and `EnforceFeatures` remain independent of this setting; remux tracks do not open a decoder or device. Hardware-decoded frames are transferred to software storage with FFmpeg frame properties preserved before entering preview conversion or the filter pipeline, so this path is not zero-copy.
 
+MPEG-4 Part 2 (DivX/Xvid, not H.264 in an MP4 container) always uses software
+decoding, even in Auto mode. Hardware decoding can corrupt GMC (global motion
+compensation) frames, including when they first appear later in the stream.
+This policy avoids an additional compatibility scan and applies to preview
+and conversion with both bundled and system FFmpeg. Hardware encoding,
+including NVENC, remains available; other video codecs retain Auto acceleration.
+
 The bundled FFmpeg configuration enables VideoToolbox on macOS, probes VA-API on Linux, enables NVDEC where the NVIDIA codec-header plugin is available, and probes D3D11VA/DXVA2 on Windows. Device drivers and codec/profile support are runtime-dependent; Auto falls back only during device/decoder initialization, not after a stream has started failing.
 
 Audio encode adaptation can automatically reduce 7.1 to 5.1 for AC-3/E-AC3. MP3 requires an explicit downmix for inputs above two channels. These are **encoding policies**, not `SimplePlayer` output behavior: preview preserves decoded channels.

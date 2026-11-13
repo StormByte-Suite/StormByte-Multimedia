@@ -63,6 +63,10 @@ namespace StormByte::Multimedia::FFmpeg::HardwareDecode {
 		if (!codec || context.hw_device_ctx)
 			return false;
 
+		// MPEG-4 Part 2 stays in software: GMC can appear after initialization.
+		if (codec->id == AV_CODEC_ID_MPEG4)
+			return false;
+
 		for (int priority = 0; priority <= 3; ++priority) {
 			for (int index = 0; const AVCodecHWConfig* config = avcodec_get_hw_config(codec, index); ++index) {
 				const auto type = config->device_type;

@@ -1826,6 +1826,7 @@ int test_opus_without_video() {
 int test_packed_avi_seek() {
 	auto display = Safe::MakeShared<FakeDisplay>();
 	SimplePlayer player(display);
+	player.Acceleration(DecodeAcceleration::Auto);
 	TEST_REQUIRE(player.Open(Fixture("video/packed_ac3_seek.avi")));
 	TEST_REQUIRE(std::abs(player.Duration() - 8) < 0.1);
 	TEST_REQUIRE(player.Play());
@@ -1838,6 +1839,8 @@ int test_packed_avi_seek() {
 		previous = display->m_image;
 		TEST_REQUIRE(previous);
 	}
+	TEST_REQUIRE(player.Diagnostics().m_backend == StormByte::Multimedia::PreviewDecodeBackend::Software);
+	TEST_REQUIRE(player.Diagnostics().m_device.empty());
 	for (const double target : {4.0, 7.2, 0.8}) {
 		TEST_REQUIRE(player.Seek(target));
 		TEST_REQUIRE(Wait([&] {
@@ -1858,6 +1861,7 @@ int test_packed_avi_seek() {
 		TEST_REQUIRE(Wait([&] { return player.Position() > target + 0.20 || player.State() == PlaybackState::Error; }));
 		TEST_REQUIRE(player.State() != PlaybackState::Error);
 		TEST_REQUIRE(player.Pause());
+		TEST_REQUIRE(player.Diagnostics().m_backend == StormByte::Multimedia::PreviewDecodeBackend::Software);
 		{
 			std::lock_guard lock(display->m_mutex);
 			TEST_REQUIRE(display->m_first_audio);

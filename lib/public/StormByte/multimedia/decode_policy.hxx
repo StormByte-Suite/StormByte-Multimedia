@@ -38,6 +38,7 @@ namespace StormByte::Multimedia {
 	/**
 	 * @enum DecodeAcceleration
 	 * @brief Selects whether video decoders may use an available FFmpeg hardware backend.
+	 * @note MPEG-4 Part 2 always uses software decoding, including in Auto mode.
 	 */
 	enum class DecodeAcceleration {
 		Auto,		///< Try a compatible hardware device, then fall back to software.
